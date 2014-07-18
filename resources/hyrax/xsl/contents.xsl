@@ -61,6 +61,18 @@
 
 
     <xsl:template match="bes:showCatalog">
+        
+        <xsl:variable name="catalogName">
+            <xsl:choose>
+                <xsl:when test="bes:dataset/@name='/'" >
+                    <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
+                </xsl:when>
+                <xsl:otherwise >
+                    <xsl:value-of select="$besPrefix"/><xsl:value-of select="bes:dataset/@name"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        
             <head>
                 <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
@@ -75,14 +87,7 @@
 
                 <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
                 <h1>Contents of
-                    <xsl:choose>
-                        <xsl:when test="bes:dataset/@name='/'" >
-                            <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
-                        </xsl:when>
-                        <xsl:otherwise >
-                            <xsl:value-of select="$besPrefix"/><xsl:value-of select="bes:dataset/@name"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="$catalogName"/>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
@@ -91,7 +96,14 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <pre>
-                    <table border="0" width="100%">
+                    <table border="0" width="100%" itemscope="" itemtype="http://schema.org/DataCatalog">
+                        <caption style="display:none">
+                            <a itemprop="url" href="#">
+                                <span itemprop="name">
+                                    <xsl:value-of select="$catalogName"/>
+                                </span>
+                            </a>
+                        </caption>
                         <tr>
                             <th align="left">Name</th>
                             <th align="center">Last Modified</th>
@@ -122,7 +134,7 @@
 
                             <!-- Process a data set -->
                             <xsl:if test="@node='false'">
-                                <tr>
+                                <tr itemprop="dataset" itemscope="" itemtype="http://schema.org/Dataset">
                                 <xsl:choose>
                                     <xsl:when test="bes:serviceRef">
                                         <xsl:apply-templates />
@@ -206,7 +218,7 @@
                 <xsl:call-template name="DapServiceLinks" />
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="UnkownServiceLinks" />
+                <xsl:call-template name="UnknownServiceLinks" />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -216,13 +228,17 @@
     <xsl:template name="DapServiceLinks" >
         <td align="left">
             <b><a href="{../@name}.html">
-                <xsl:value-of select="../@name"/>
+                <span itemprop="name">
+                    <xsl:value-of select="../@name"/>
+                </span>
             </a>
             </b>
         </td>
 
         <td align="center" nowrap="nowrap">
-            <xsl:value-of select="../@lastModified" />
+            <time itemprop="dateModified" datetime="{../@lastModified}">
+                <xsl:value-of select="../@lastModified" />
+            </time>
         </td>
 
         <td align="right">
@@ -233,14 +249,35 @@
         <td align="center">
             <table>
                 <tr>
-                    <td> <a href="{../@name}.ddx">ddx</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dds">dds</a>&NBSP;</td>
-                    <td> <a href="{../@name}.das">das</a>&NBSP;</td>
-                    <td> <a href="{../@name}.info">info</a>&NBSP;</td>
-                    <td> <a href="{../@name}.html">html</a>&NBSP;</td>
-                    <td> <a href="{../@name}.rdf">rdf</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.ddx" />
+                        <meta itemprop="encodingFormat" content="text/xml" />
+                        <a itemprop="contentUrl" href="{../@name}.ddx">ddx</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.dds" />
+                        <meta itemprop="encodingFormat" content="text/plain" />
+                        <a itemprop="contentUrl" href="{../@name}.dds">dds</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.das" />
+                        <meta itemprop="encodingFormat" content="text/plain" />
+                        <a itemprop="contentUrl" href="{../@name}.das">das</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.info" />
+                        <meta itemprop="encodingFormat" content="text/html" />
+                        <a itemprop="contentUrl" href="{../@name}.info">info</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.html" />
+                        <meta itemprop="encodingFormat" content="text/html" />
+                        <a itemprop="contentUrl" href="{../@name}.html">html</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.rdf" />
+                        <meta itemprop="encodingFormat" content="application/rdf+xml" />
+                        <a itemprop="contentUrl" href="{../@name}.rdf">rdf</a>&NBSP;</td>
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
-                        <td> <a href="{../@name}">file</a>&NBSP;</td>
+                        <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                            <meta itemprop="name" content="{../@name}" />
+                            <meta itemprop="contentSize" content="{../@size}" />
+                            <a itemprop="contentUrl" href="{../@name}">file</a>&NBSP;</td>
                     </xsl:if>
                 </tr>
             </table>
@@ -275,7 +312,7 @@
 
 
 
-    <xsl:template name="UnkownServiceLinks" >
+    <xsl:template name="UnknownServiceLinks" >
         <td align="left">
             <a href="{../@name}">
                 <xsl:value-of select="../@name"/>
@@ -290,7 +327,7 @@
             <xsl:value-of select="../@size"/>
         </td>
         <td align="center">
-            Unkown Service Type: <xsl:value-of select="." />
+            Unknown Service Type: <xsl:value-of select="." />
         </td>
     </xsl:template>
 
