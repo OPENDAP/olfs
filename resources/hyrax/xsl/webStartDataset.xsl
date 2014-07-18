@@ -34,6 +34,7 @@
     <xsl:param name="docsService" />
     <xsl:param name="webStartService" />
     <xsl:param name="webStartApplications" />
+    <xsl:param name="webServices" />
     <xsl:output method='xhtml' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*" />
@@ -41,8 +42,6 @@
 
     <xsl:variable name="webStartAppsLinks">
 
-        <p>
-        <h4> Data Viewers</h4>
             <xsl:choose>
                 <xsl:when test="$webStartApplications">
                     <ul>
@@ -53,12 +52,28 @@
                     <p><i>This server cannot locate a Java WebStart data viewer or a data analysis application for this dataset.</i></p>
                 </xsl:otherwise>
             </xsl:choose>
-        </p>
-
     </xsl:variable>
-   
-    <xsl:template match="wsApp" mode="WebStartLinks">
+
+    <xsl:template match="webStartApp" mode="WebStartLinks">
         <li><a href="{$webStartService}/{@id}?dapService={$dapService}&#38;datasetID={$datasetID}"><xsl:value-of select="@applicationName"/></a></li>
+    </xsl:template>
+
+    <xsl:variable name="webServiceLinks">
+
+            <xsl:choose>
+                <xsl:when test="$webServices">
+                    <ul>
+                        <xsl:apply-templates mode="WebServiceLinks" select="$webServices"/>
+                    </ul>
+                </xsl:when>
+                <xsl:otherwise>
+                    <p><i>This server cannot locate a Java WebStart data viewer or a data analysis application for this dataset.</i></p>
+                </xsl:otherwise>
+            </xsl:choose>
+    </xsl:variable>
+
+    <xsl:template match="webService" mode="WebServiceLinks">
+        <li><a href="{@serviceUrl}"><xsl:value-of select="@applicationName"/></a></li>
     </xsl:template>
 
 
@@ -66,9 +81,6 @@
     <xsl:template match="/dap:Dataset">
 
         <html>
-
-
-
 
 
         <!-- ****************************************************** -->
@@ -92,13 +104,21 @@
             <table width="100%">
                 <tr>
                     <td width="30%" align="left"><img alt="Logo" src='{$docsService}/images/logo.gif' /></td>
+                    <td>Dataset Viewers</td>
                 </tr>
             </table>
 
-            <h1><font size="0">Dataset: <xsl:value-of select="@name"/> </font><br/>
+            <h1>Dataset: <xsl:value-of select="@name"/><br/>
             <font class="small_italic">(<xsl:value-of select="@xml:base"/>)</font>  </h1>
 
+            <p>
+            <div class="large.bold">Java Web Start Applications</div>
+
             <xsl:copy-of select="$webStartAppsLinks"/>
+            </p>
+
+            <div class="large.bold">Web Services</div>
+            <xsl:copy-of select="$webServiceLinks"/>
 
             <!-- xsl:call-template name="DatasetDetail"/ -->
 

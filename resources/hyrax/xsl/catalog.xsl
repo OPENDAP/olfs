@@ -37,6 +37,7 @@
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
     <xsl:param name="useDAP2ResourceUrlResponse"/>
+    <xsl:param name="wmsService"/>
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -63,6 +64,10 @@
         <thredds:catalog>
             <thredds:service name="dap" serviceType="OPeNDAP" base="{$dapService}"/>
             <thredds:service name="file" serviceType="HTTPServer" base="{$dapService}"/>
+            <xsl:if test="$wmsService">
+                <thredds:service name="wms" serviceType="WMS" base="{$wmsService}" />
+            </xsl:if>
+
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -190,6 +195,14 @@
                         <xsl:attribute name="urlPath">
                             <xsl:value-of select="$urlPath" />
                             <xsl:if test="$useDAP2ResourceUrlResponse!='true'">.file</xsl:if>
+                        </xsl:attribute>
+                    </thredds:access>
+                </xsl:if>
+                <xsl:if test="$wmsService">
+                    <thredds:access>
+                        <xsl:attribute name="serviceName">wms</xsl:attribute>
+                        <xsl:attribute name="urlPath">
+                            <xsl:value-of select="$urlPath" />
                         </xsl:attribute>
                     </thredds:access>
                 </xsl:if>

@@ -167,13 +167,13 @@
 
 
     <servlet>
-        <servlet-name>webstart</servlet-name>
+        <servlet-name>viewers</servlet-name>
 
-        <servlet-class>opendap.webstart.WebStartServlet</servlet-class>
+        <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
 
         <init-param>
-            <param-name>WebStartConfigFileName</param-name>
-            <param-value>webstart.xml</param-value>
+            <param-name>ViewersConfigFileName</param-name>
+            <param-value>viewers.xml</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup>
@@ -252,8 +252,8 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>webstart</servlet-name>
-        <url-pattern>/webstart/*</url-pattern>
+        <servlet-name>viewers</servlet-name>
+        <url-pattern>/viewers/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

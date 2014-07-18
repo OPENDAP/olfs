@@ -90,6 +90,7 @@ public class NormativeDR extends Dap4Responder {
         addAltRepResponder(new Netcdf4DR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new GeoTiffDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new GmlJpeg2000DR(sysPath, pathPrefix, besApi));
+        addAltRepResponder(new JsonDR(sysPath, pathPrefix, besApi));
 
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
