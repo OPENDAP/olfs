@@ -84,13 +84,14 @@ public class NormativeDR extends Dap4Responder {
 
         setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
 
-        addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new XmlDR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new Netcdf3DR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new Netcdf4DR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new GeoTiffDR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new GmlJpeg2000DR(sysPath, pathPrefix, besApi));
-        addAltRepResponder(new JsonDR(sysPath, pathPrefix, besApi));
+        addAltRepResponder(new CsvDR          (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new XmlDR          (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new Netcdf3DR      (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new Netcdf4DR      (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new GeoTiffDR      (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new GmlJpeg2000DR  (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new JsonDR         (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new IjsonDR        (sysPath, pathPrefix, besApi));
 
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
