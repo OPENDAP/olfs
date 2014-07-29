@@ -35,11 +35,11 @@ public class GodivaWebService implements  WebServiceHandler {
         _serviceId         = "godiva";
         _applicationName   = "Godiva Data Visualization";
 
-        _godivaBase        = "/wms/godiva2.html";
-        _godivaServiceUrl  = "http://localhost:8080/wms/godiva2.html";
+        _godivaBase        = "/ncWMS/godiva2.html";
+        _godivaServiceUrl  = "http://localhost:8080/ncWMS/godiva2.html";
 
-        _wmsServiceBase    = "/wms/wms/hyrax";
-        _wmsServiceUrl     = "http://localhost:8080/wms/wms/hyrax";
+        _wmsServiceBase    = "/ncWMS";
+        _wmsServiceUrl     = "http://localhost:8080/ncWMS";
 
     }
 
@@ -64,7 +64,7 @@ public class GodivaWebService implements  WebServiceHandler {
         }
 
 
-        e = _config.getChild("WmsService");
+        e = _config.getChild("NcWmsService");
         if(e!=null){
             s = e.getAttributeValue("href");
             if(s!=null && s.length()!=0)
@@ -114,7 +114,8 @@ public class GodivaWebService implements  WebServiceHandler {
     @Override
     public String getServiceLink(String datasetUrl) {
 
-        return _godivaBase + "?server="+ _wmsServiceUrl + datasetUrl;
+        // note that we escape the '?' and '=' characters.
+        return _godivaBase + "?server="+ _wmsServiceUrl + "%3FDATASET%3d" + _wmsServiceBase + datasetUrl;
     }
 
     @Override

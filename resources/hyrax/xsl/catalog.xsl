@@ -37,7 +37,9 @@
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
     <xsl:param name="useDAP2ResourceUrlResponse"/>
-    <xsl:param name="wmsService"/>
+    <xsl:param name="ncWmsServiceBase"/>
+    <xsl:param name="ncWmsDynamicServiceId"/>
+
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -64,8 +66,8 @@
         <thredds:catalog>
             <thredds:service name="dap" serviceType="OPeNDAP" base="{$dapService}"/>
             <thredds:service name="file" serviceType="HTTPServer" base="{$dapService}"/>
-            <xsl:if test="$wmsService">
-                <thredds:service name="wms" serviceType="WMS" base="{$wmsService}" />
+            <xsl:if test="$ncWmsServiceBase">
+                <thredds:service name="wms" serviceType="WMS" base="{$ncWmsServiceBase}" />
             </xsl:if>
 
             <xsl:apply-templates />
@@ -198,12 +200,10 @@
                         </xsl:attribute>
                     </thredds:access>
                 </xsl:if>
-                <xsl:if test="$wmsService">
+                <xsl:if test="$ncWmsServiceBase">
                     <thredds:access>
                         <xsl:attribute name="serviceName">wms</xsl:attribute>
-                        <xsl:attribute name="urlPath">
-                            <xsl:value-of select="$urlPath" />
-                        </xsl:attribute>
+                        <xsl:attribute name="urlPath">?DATASET=<xsl:value-of select="$ncWmsDynamicServiceId" /><xsl:value-of select="$urlPath" />&amp;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities</xsl:attribute>
                     </thredds:access>
                 </xsl:if>
             </xsl:when>

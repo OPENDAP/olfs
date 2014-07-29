@@ -35,6 +35,7 @@ import opendap.namespaces.THREDDS;
 import opendap.services.Service;
 import opendap.services.ServicesRegistry;
 import opendap.threddsHandler.InheritedMetadataManager;
+import opendap.viewers.NcWmsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -193,13 +194,17 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
             String base = null;
+            String dsId = null;
 
-            Service s = ServicesRegistry.getServiceById("wms");
-            if(s!=null){
-                base  = s.getBase();
-                showCatalogToThreddsCatalog.setParameter("wmsService",base);
+            Service s = ServicesRegistry.getServiceById("ncWms");
+            if(s!=null && s instanceof NcWmsService){
+                NcWmsService nws = (NcWmsService) s;
+                base  = nws.getBase();
+                dsId = nws.getDynamicServiceId();
+                showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
+                showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
             }
-            _log.debug("WMS service base:"+base);
+            _log.debug("ncWMS service base:"+base);
 
 
 
