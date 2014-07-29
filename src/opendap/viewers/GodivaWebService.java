@@ -27,19 +27,21 @@ public class GodivaWebService implements  WebServiceHandler {
     private String _godivaServiceUrl;
 
 
-    private String _wmsServiceBase;
-    private String _wmsServiceUrl;
+    private String _ncWmsServiceBase;
+    private String _ncWmsServiceUrl;
+    private String _ncWmsDynamicServiceId;
 
     public GodivaWebService(){
 
-        _serviceId         = "godiva";
-        _applicationName   = "Godiva Data Visualization";
+        _serviceId             = "godiva";
+        _applicationName       = "Godiva Data Visualization";
 
-        _godivaBase        = "/ncWMS/godiva2.html";
-        _godivaServiceUrl  = "http://localhost:8080/ncWMS/godiva2.html";
+        _godivaBase            = "/ncWMS/godiva2.html";
+        _godivaServiceUrl      = "http://localhost:8080/ncWMS/godiva2.html";
 
-        _wmsServiceBase    = "/ncWMS";
-        _wmsServiceUrl     = "http://localhost:8080/ncWMS";
+        _ncWmsServiceBase      = "/ncWMS/wms";
+        _ncWmsServiceUrl       = "http://localhost:8080/ncWMS/wms";
+        _ncWmsDynamicServiceId = "lds";
 
     }
 
@@ -68,12 +70,17 @@ public class GodivaWebService implements  WebServiceHandler {
         if(e!=null){
             s = e.getAttributeValue("href");
             if(s!=null && s.length()!=0)
-                _wmsServiceUrl = s;
+                _ncWmsServiceUrl = s;
 
 
             s = e.getAttributeValue("base");
             if(s!=null && s.length()!=0)
-                _wmsServiceBase = s;
+                _ncWmsServiceBase = s;
+
+
+            s = e.getAttributeValue("ncWmsDynamicServiceId");
+            if (s != null && s.length() != 0)
+                _ncWmsDynamicServiceId = s;
 
 
         }
@@ -115,7 +122,7 @@ public class GodivaWebService implements  WebServiceHandler {
     public String getServiceLink(String datasetUrl) {
 
         // note that we escape the '?' and '=' characters.
-        return _godivaBase + "?server="+ _wmsServiceUrl + "%3FDATASET%3d" + _wmsServiceBase + datasetUrl;
+        return _godivaBase + "?server="+ _ncWmsServiceUrl + "%3FDATASET%3d" + _ncWmsDynamicServiceId + datasetUrl;
     }
 
     @Override
@@ -131,7 +138,7 @@ public class GodivaWebService implements  WebServiceHandler {
         sb.append("    serviceId: ").append(_serviceId).append("\n");
         sb.append("    base: ").append(_godivaBase).append("\n");
         sb.append("    applicationName: ").append(_applicationName).append("\n");
-        sb.append("    WmsService: ").append(_wmsServiceUrl).append("\n");
+        sb.append("    WmsService: ").append(_ncWmsServiceUrl).append("\n");
         sb.append("    Service Link: ").append(getServiceLink("<datasetUrl>")).append("\n");
 
         return sb.toString();
