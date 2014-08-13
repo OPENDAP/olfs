@@ -1,8 +1,14 @@
 
+Version 1.12.0 (14 August 2014)
+
+Refactored OLFS configuration.
+Added JSON and IJSN responses.
+Added WMS support via ncWMS integration.
+
 Version 1.11.3 (02 July 2014)
 
-Repaired bug that was breaking Hyrax's ability to 
-serve plain files (not otherwise recognized as 
+Repaired bug that was breaking Hyrax's ability to
+serve plain files (not otherwise recognized as
 'data' by the BES)".
 
 

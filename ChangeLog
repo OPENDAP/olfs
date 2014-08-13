@@ -1,3 +1,51 @@
+2014-08-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactored OLFS configuration. Added JSON and IJSN data responses to DAP2 resource URL scheme.
+
+2014-07-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+2014-07-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+2014-07-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+2014-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Adding second JSON representation, IJSON (for what that's worth) suffix=.ijsn
+
+2014-07-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in schema.org changes to our contents.xsl submitted by Stefan Zednick."
+
+2014-07-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in dispatch support for JSON encodings of data and dmr.
+
+2014-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: check in for 1.11.3 release (Hyrax 1.9.7)
+
+2014-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: rewinding a failed check in
+
+2014-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated version information for 1.11.3
+
+2014-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
+	.
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
 2014-07-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
