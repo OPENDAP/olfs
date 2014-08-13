@@ -164,8 +164,6 @@
         <servlet-class>opendap.hai.DispatchServlet</servlet-class>
     </servlet>
 
-
-
     <servlet>
         <servlet-name>viewers</servlet-name>
 
@@ -180,19 +178,6 @@
 
     </servlet>
 
-    <servlet>
-        <servlet-name>gateway</servlet-name>
-
-        <servlet-class>opendap.gateway.DispatchServlet</servlet-class>
-
-        <init-param>
-            <param-name>GatewayConfigFileName</param-name>
-            <param-value>gateway.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
 
     <servlet>
         <servlet-name>docs_servlet</servlet-name>
@@ -256,10 +241,6 @@
         <url-pattern>/viewers/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>gateway</servlet-name>
-        <url-pattern>/servlet_gateway/*</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>docs_servlet</servlet-name>

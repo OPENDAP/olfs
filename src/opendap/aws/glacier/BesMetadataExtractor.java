@@ -79,7 +79,7 @@ public class BesMetadataExtractor {
         Element besConfig = DapServlet.getDefaultBesManagerConfig();
         try {
             BESManager besManager = new BESManager();
-            besManager.init(null,besConfig);
+            besManager.init(besConfig);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +110,7 @@ public class BesMetadataExtractor {
 
 
             BESManager besManager = new BESManager();
-            besManager.init(null,besConfig);
+            besManager.init(besConfig);
 
         } catch (Exception e) {
             e.printStackTrace();

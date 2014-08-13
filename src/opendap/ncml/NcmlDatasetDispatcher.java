@@ -37,7 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * IsoDispatchHandler for ISO responses from Hyrax
+ * Ncml Dataset handler responses for Hyrax. Massages NcML content retrieved from the BES
+ * path names are consistent with the paths from the users perspective.
+ *
  */
 public class NcmlDatasetDispatcher extends DapDispatcher {
 

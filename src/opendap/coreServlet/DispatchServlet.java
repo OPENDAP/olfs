@@ -27,6 +27,7 @@
 package opendap.coreServlet;
 
 
+import opendap.bes.BESManager;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import org.jdom.Document;
@@ -143,6 +144,8 @@ public class DispatchServlet extends HttpServlet {
 
         loadConfig();
 
+        initBesManager();
+
 
         buildHandlers("HttpGetHandlers", httpGetDispatchHandlers, httpGetHandlerConfigs);
         //identifyRequiredGetHandlers(httpGetDispatchHandlers);
@@ -215,6 +218,28 @@ public class DispatchServlet extends HttpServlet {
         }
 
         log.debug("Configuration loaded and parsed.");
+
+    }
+
+
+    private void initBesManager() throws ServletException {
+
+        Element besManagerElement = configDoc.getRootElement().getChild("BESManager");
+
+        if(besManagerElement ==  null){
+            String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
+            log.error(msg);
+            throw new ServletException(msg);
+
+        }
+
+        BESManager besManager  = new BESManager();
+        try {
+            besManager.init(besManagerElement);
+        }
+        catch(Exception e){
+            throw new ServletException(e);
+        }
 
     }
 

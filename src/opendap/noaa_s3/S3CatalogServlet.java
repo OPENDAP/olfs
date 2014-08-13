@@ -126,7 +126,7 @@ public class S3CatalogServlet extends HttpServlet {
         try {
             Element besConfiguration = getDefaultBesManagerConfig();
             BESManager besManager = new BESManager();
-            besManager.init(this,besConfiguration);
+            besManager.init(besConfiguration);
             _s3DapDispatcher.init(this, getDefaultDapDispatchConfig() );
 
         } catch (Exception e) {

@@ -203,10 +203,6 @@ public class DapDispatcher implements DispatchHandler {
         systemPath = ServletUtil.getSystemPath(dispatchServlet, "");
 
 
-        Dap4Responder hr;
-
-
-
 
         // DAP4 Responses
         responders.add(new NormativeDR(systemPath, besApi));
@@ -233,26 +229,36 @@ public class DapDispatcher implements DispatchHandler {
         //responders.add(new Netcdf4DR(systemPath, besApi)); // Uncomment this line to enable netcdf4 responses via the DAP2 resource URL scheme.
         responders.add(new XmlData(systemPath, besApi));
 
+
+        // DAP2 GeoTIFF Response
         Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
         geoTiff.clearAltResponders();
         geoTiff.setCombinedRequestSuffixRegex(geoTiff.buildRequestMatchingRegex());
         responders.add(geoTiff);
 
 
+        // DAP2 JPEG2000 Response
         Dap4Responder jp2 = new GmlJpeg2000DR(systemPath, null, ".jp2", besApi);
         jp2.clearAltResponders();
         jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
         responders.add(jp2);
 
-        //Dap4Responder json = new JsonDR(systemPath, null, ".json", besApi);
-        //json.clearAltResponders();
-        //json.setCombinedRequestSuffixRegex(json.buildRequestMatchingRegex());
-        //responders.add(json);
+        // DAP2 w10n JSON Response
+        Dap4Responder json = new JsonDR(systemPath, null, ".json", besApi);
+        json.clearAltResponders();
+        json.setCombinedRequestSuffixRegex(json.buildRequestMatchingRegex());
+        responders.add(json);
+
+        // DAP2 Instance Object JSON Response
+        Dap4Responder ijsn = new IjsonDR(systemPath, null, ".ijsn", besApi);
+        ijsn.clearAltResponders();
+        ijsn.setCombinedRequestSuffixRegex(ijsn.buildRequestMatchingRegex());
+        responders.add(ijsn);
 
 
         // DAP2 Metadata responses
-        hr = new DDX(systemPath, besApi);
-        responders.add(hr);
+        Dap4Responder d4r = new DDX(systemPath, besApi);
+        responders.add(d4r);
         responders.add(new DDS(systemPath, besApi));
         responders.add(new DAS(systemPath, besApi));
         responders.add(new RDF(systemPath, besApi));

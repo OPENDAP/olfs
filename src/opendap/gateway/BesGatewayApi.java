@@ -346,7 +346,7 @@ public class BesGatewayApi extends BesApi {
             int statusCode = httpClient.executeMethod(headReq);
 
             if (statusCode != HttpStatus.SC_OK) {
-                log.error("Unable to HEAD s3 object: " + dataSourceUrl);
+                log.error("Unable to HEAD remote resource: " + dataSourceUrl);
                 Dap4Error error = new Dap4Error();
                 error.setMessage("OLFS: Unable to access requested resource.");
                 error.setContext(dataSourceUrl);
@@ -385,8 +385,13 @@ public class BesGatewayApi extends BesApi {
             return true;
 
         } catch (Exception e) {
-            log.error("Unable to HEAD the s3 resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
+            log.warn("Unable to HEAD the remote resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
         }
+
+        Element catalogElement = getShowCatalogResponseDocForDatasetUrl("",0,new Date());
+
+        response.detachRootElement();
+        response.setRootElement(catalogElement);
 
 
         return false;
@@ -408,26 +413,29 @@ public class BesGatewayApi extends BesApi {
         Element showCatalog = new Element("showCatalog",BES.BES_NS);
         root.addContent(showCatalog);
 
+        if(dataSourceURL!=null && dataSourceURL.length()>0){
 
-        Element dataset = new Element("dataset",BES.BES_NS);
-        showCatalog.addContent(dataset);
+            Element dataset = new Element("dataset",BES.BES_NS);
+            showCatalog.addContent(dataset);
 
-        dataset.setAttribute("name",dataSourceURL);
-        dataset.setAttribute("size",""+size);
+            dataset.setAttribute("name",dataSourceURL);
+            dataset.setAttribute("size",""+size);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
+            SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
 
-        dataset.setAttribute("lastModified",sdf.format(lastModified));
-
-
-        dataset.setAttribute("node","false");
+            dataset.setAttribute("lastModified",sdf.format(lastModified));
 
 
+            dataset.setAttribute("node","false");
 
-        Element serviceRef = new Element("serviceRef",BES.BES_NS);
-        serviceRef.setText("dap");
 
-        dataset.addContent(serviceRef);
+
+            Element serviceRef = new Element("serviceRef",BES.BES_NS);
+            serviceRef.setText("dap");
+
+            dataset.addContent(serviceRef);
+
+        }
 
 
         return root;

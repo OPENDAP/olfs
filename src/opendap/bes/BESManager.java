@@ -43,7 +43,7 @@ import java.util.Vector;
  * Date: Mar 19, 2007
  * Time: 11:39:07 AM
  */
-public class BESManager implements DispatchHandler {
+public class BESManager {
 
 
     private static Vector<BesGroup> _besCollection;
@@ -64,8 +64,7 @@ public class BESManager implements DispatchHandler {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
     }
 
-    public void init(HttpServlet servlet, Element config) throws Exception{
-
+    public void init(Element config) throws Exception{
 
         if(initialized) return;
 
@@ -80,26 +79,6 @@ public class BESManager implements DispatchHandler {
 
 
 
-
-    public boolean requestCanBeHandled(HttpServletRequest request)
-            throws Exception{
-
-        return false;
-
-    }
-
-    public void handleRequest(HttpServletRequest request,
-                              HttpServletResponse response)
-            throws Exception{
-
-        throw new Exception("handleRequest(): ERROR! THis method should never " +
-                "be called because requestCanBeHandled() always returns false.");
-
-    }
-
-    public long getLastModified(HttpServletRequest request){
-        return -1;
-    }
 
     public void destroy(){
         shutdown();

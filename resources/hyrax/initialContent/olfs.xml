@@ -27,47 +27,47 @@
 
 <OLFSConfig>
 
+    <BESManager>
+        <BES>
+            <!-- The prefix is a URL token between server address/port
+            and catalog root used to designate a particular BES instance
+            in the case that multiple Back-End-Servers are available to
+            a single OLFS.  The default is no additional tag,
+            designated by "/". So, for a single BES the prefix MUST be
+            set to "/".  -->
+            <prefix>/</prefix>
+
+            <!-- The hostname (or IP address) for this BES -->
+            <host>localhost</host>
+
+            <!-- The port number for this BES -->
+            <port>10022</port>
+
+            <!-- Timeout (in seconds) for this BES, defaults to 300 seconds-->
+            <!-- <timeOut>300</timeOut> -->
+
+            <!-- The Administration port number for this BES -->
+            <!-- <adminPort>11002</adminPort> -->
+
+            <!--
+                The maximum response size, in kilobytes, for non authenticated users
+                A value of zero means there is no limit.
+            -->
+            <maxResponseSize>0</maxResponseSize>
+
+
+            <!-- The ClientPool maximum number of concurrent
+              -  BES client connections allowed.
+              -->
+            <ClientPool maximum="10" maxCmds="2000" />
+
+        </BES>
+    </BESManager>
+
+
     <DispatchHandlers>
 
         <HttpGetHandlers>
-            
-            <Handler className="opendap.bes.BESManager">
-                <BES>
-                    <!-- The prefix is a URL token between server address/port
-                    and catalog root used to designate a particular BES instance
-                    in the case that multiple Back-End-Servers are available to
-                    a single OLFS.  The default is no additional tag,
-                    designated by "/". So, for a single BES the prefix MUST be
-                    set to "/".  -->
-                    <prefix>/</prefix>
-
-                    <!-- The hostname (or IP address) for this BES -->
-                    <host>localhost</host>
-
-                    <!-- The port number for this BES -->
-                    <port>10022</port>
-
-                    <!-- Timeout (in seconds) for this BES, defaults to 300 seconds-->
-                    <!-- <timeOut>300</timeOut> -->
-
-                    <!-- The Administration port number for this BES -->
-                    <!-- <adminPort>11002</adminPort> -->
-
-                    <!--
-                        The maximum response size, in kilobytes, for non authenticated users
-                        A value of zero means there is no limit.
-                    -->
-                    <maxResponseSize>0</maxResponseSize>
-
-
-                    <!-- The ClientPool maximum number of concurrent
-                      -  BES client connections allowed.
-                      -->
-                    <ClientPool maximum="10" maxCmds="2000" />
-
-                </BES>
-
-            </Handler>
 
             <Handler className="opendap.bes.VersionDispatchHandler" />
 
@@ -143,7 +143,7 @@
            can configure the server to accept the ce as the body of a POST request referencing the same resource.
            If the the Content-Encoding of the request is set to "application/x-www-form-urlencoded" then the server
            will ingest all of parameter names "ce" and "dap4:ce"  to build the DAP constraint expression. Otherwise
-           the server will treat the entire POST bidy as a DAP ce.
+           the server will treat the entire POST body as a DAP ce.
 
            By default the maximum length of the POST body is limited to 2000000 characters, and may never be
            larger than 10000000 characters (if you need more then get in touch with support@opendap.org). You can adjust

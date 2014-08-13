@@ -229,7 +229,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
         response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
+        response.setHeader("Content-Description", "dap_directory");
 
         // response.setStatus(HttpServletResponse.SC_OK);
 

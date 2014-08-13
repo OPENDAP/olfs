@@ -132,7 +132,7 @@ public class DapServlet extends HttpServlet {
 
         try {
             BESManager besManager = new BESManager();
-            besManager.init(this,besConfiguration);
+            besManager.init(besConfiguration);
             _glacierDapDispatcher.init(this, getDefaultDapDispatchConfig());
 
         } catch (Exception e) {
