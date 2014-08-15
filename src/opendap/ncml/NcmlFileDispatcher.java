@@ -29,7 +29,7 @@ import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.bes.dap2Responders.DapDispatcher;
+import opendap.bes.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.ppt.PPTException;

@@ -103,7 +103,7 @@
 
 
 
-            <Handler className="opendap.bes.dap2Responders.DapDispatcher" >
+            <Handler className="opendap.bes.DapDispatcher" >
 
                 <!-- AllowDirectDataSourceAccess
                   - If this element is present then the server will allow users to request

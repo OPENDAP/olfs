@@ -29,7 +29,7 @@ package opendap.aws.glacier;
 import opendap.async.DocFactory;
 import opendap.async.HttpHeaders;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap2Responders.DapDispatcher;
+import opendap.bes.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.Element;

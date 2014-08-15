@@ -30,7 +30,7 @@ import opendap.bes.BES;
 import opendap.bes.BESConfig;
 import opendap.bes.BESManager;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.bes.dap2Responders.DapDispatcher;
+import opendap.bes.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.Element;

@@ -28,7 +28,7 @@ package opendap.noaa_s3;
 
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.FileAccess;
-import opendap.bes.dap2Responders.DapDispatcher;
+import opendap.bes.DapDispatcher;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;

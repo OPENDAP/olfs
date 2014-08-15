@@ -24,8 +24,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap2Responders;
+package opendap.bes;
 
+import opendap.bes.dap2Responders.*;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.*;
 import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
