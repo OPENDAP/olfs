@@ -30,7 +30,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesGroup;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.namespaces.NCML;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;

@@ -26,7 +26,7 @@
 
 package opendap.bes;
 
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;

@@ -27,8 +27,8 @@
 package opendap.bes;
 
 
-import opendap.bes.dapResponders.BesApi;
-import opendap.bes.dapResponders.DapDispatcher;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap2Responders.DapDispatcher;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;

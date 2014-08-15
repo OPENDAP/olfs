@@ -26,7 +26,7 @@
 
 package opendap.bes.dap4Responders;
 
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;

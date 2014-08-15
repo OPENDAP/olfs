@@ -28,7 +28,7 @@ package opendap.aws.glacier;
 
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.RequestCache;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;

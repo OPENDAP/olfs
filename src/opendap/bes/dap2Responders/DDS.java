@@ -23,7 +23,7 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-package opendap.bes.dapResponders;
+package opendap.bes.dap2Responders;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
@@ -43,40 +43,48 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DAS extends Dap4Responder {
+public class DDS extends Dap4Responder {
 
 
     private Logger log;
 
 
 
-    private static String _defaultRequestSuffix = ".das";
+    private static String _defaultRequestSuffix = ".dds";
 
 
-    public DAS(String sysPath, BesApi besApi) {
+    public boolean needsBesToMatch(){
+        return true;
+    }
+
+    public boolean needsBesToRespond(){
+        return true;
+    }
+
+    public DDS(String sysPath, BesApi besApi) {
         this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
-    public DAS(String sysPath, String pathPrefix, BesApi besApi) {
+    public DDS(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
-    public DAS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public DDS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/das");
-        setServiceTitle("DAP2 DAS");
-        setServiceDescription("DAP2 Dataset Attribute Structure (DAS).");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DAS_Service");
+        setServiceRoleId("http://services.opendap.org/dap2/dds");
+        setServiceTitle("DAP2 DDS");
+        setServiceDescription("DAP2 Data Description Structure (DDS).");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDS_Service");
 
         setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
-
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
+
 
     public boolean isDataResponder(){ return false; }
     public boolean isMetadataResponder(){ return true; }
@@ -85,17 +93,21 @@ public class DAS extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String resourceID = getResourceId(relativeUrl,false);
+        String resourceID = getResourceId(relativeUrl, false);
+
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
 
-        log.debug("sendDAS() for dataset: " + resourceID);
+
+        log.debug("Sending DDS for dataset: " + resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_das");
+        response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
@@ -103,12 +115,10 @@ public class DAS extends Dap4Responder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-
-
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os, erros)){
+        if(!besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -116,9 +126,8 @@ public class DAS extends Dap4Responder {
         }
 
         /*
-
         Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.DAS,
+                                                        BesApi.DDS,
                                                         resourceID,
                                                         constraintExpression,
                                                         xdap_accept,
@@ -129,16 +138,17 @@ public class DAS extends Dap4Responder {
                                                         BesApi.DAP2_ERRORS);
 
         if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
+
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
-
         }
-
-        */
+         */
 
         os.flush();
-        log.debug("Sent DAP DAS.");
+        log.debug("Sent DAP DDS.");
+
+
 
 
     }

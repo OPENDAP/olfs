@@ -28,7 +28,7 @@ package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;

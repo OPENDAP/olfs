@@ -28,7 +28,7 @@ package opendap.gateway;
 
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap4.Dap4Error;
@@ -107,7 +107,7 @@ public class BesGatewayApi extends BesApi {
      *
      *
      *
-     * @see opendap.bes.dapResponders.BesApi
+     * @see opendap.bes.dap2Responders.BesApi
      */
     @Override
     public Document getDap2RequestDocument(String type,

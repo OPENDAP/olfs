@@ -30,7 +30,7 @@ import opendap.bes.BESManager;
 import opendap.bes.BesGroup;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
 import org.jdom.Document;

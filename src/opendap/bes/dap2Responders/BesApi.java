@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dapResponders;
+package opendap.bes.dap2Responders;
 
 import opendap.bes.*;
 import opendap.coreServlet.RequestCache;

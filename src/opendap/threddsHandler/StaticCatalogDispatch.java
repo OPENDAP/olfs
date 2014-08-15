@@ -27,7 +27,7 @@ package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;

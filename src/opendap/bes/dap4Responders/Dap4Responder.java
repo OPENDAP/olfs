@@ -27,7 +27,7 @@
 package opendap.bes.dap4Responders;
 
 import opendap.bes.BesDapResponder;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;

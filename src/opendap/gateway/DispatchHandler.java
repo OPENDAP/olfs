@@ -26,7 +26,7 @@
 
 package opendap.gateway;
 
-import opendap.bes.dapResponders.DapDispatcher;
+import opendap.bes.dap2Responders.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;

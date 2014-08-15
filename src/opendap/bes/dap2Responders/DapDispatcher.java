@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dapResponders;
+package opendap.bes.dap2Responders;
 
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.*;

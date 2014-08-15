@@ -138,8 +138,8 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.bes.dapResponders.BesApi"  level="all"/>
-    <logger name="opendap.bes.dapResponders.Ascii"   level="all"/>
+    <logger name="opendap.bes.dap2Responders.BesApi"  level="all"/>
+    <logger name="opendap.bes.dap2Responders.Ascii"   level="all"/>
 
     <logger name="opendap.bes.BESManager"               level="all"/>
     <logger name="opendap.bes.BesXmlAPI"                level="all"/>

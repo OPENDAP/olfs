@@ -29,7 +29,7 @@ package opendap.aws.glacier;
 import opendap.aws.AwsUtil;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.dap.Dap2Error;
 import opendap.dap4.Dap4Error;
 import opendap.ppt.PPTException;

@@ -27,7 +27,7 @@
 package opendap.ncml;
 
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
@@ -74,7 +74,7 @@ public class NcmlDatasetBesApi extends BesApi {
      * @param errorContext See opendap.bes.BesXmlAPI
      * @return The request Document
      * @throws opendap.bes.BadConfigurationException When the bad things happen.
-     * @see opendap.bes.dapResponders.BesApi
+     * @see opendap.bes.dap2Responders.BesApi
      */
     @Override
     public  Document getDap2RequestDocument(String type,
