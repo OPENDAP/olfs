@@ -266,7 +266,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
 
-            if(DapDispatcher.useDAP2ResourceUrlResponse())
+            if(BesDapDispatcher.useDAP2ResourceUrlResponse())
                 xsltDoc = systemPath + "/xsl/contents.xsl";
 
             Transformer transformer = new Transformer(xsltDoc);
@@ -274,7 +274,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             transformer.setParameter("dapService",oreq.getDapServiceLocalID());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("viewersService", ViewersServlet.getServiceId());
-            if(DapDispatcher.allowDirectDataSourceAccess())
+            if(BesDapDispatcher.allowDirectDataSourceAccess())
                 transformer.setParameter("allowDirectDataSourceAccess","true");
 
             // Transform the BES  showCatalog response into a HTML page for the browser

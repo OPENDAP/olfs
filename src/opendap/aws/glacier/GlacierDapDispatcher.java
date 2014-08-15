@@ -29,7 +29,7 @@ package opendap.aws.glacier;
 import opendap.async.DocFactory;
 import opendap.async.HttpHeaders;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.DapDispatcher;
+import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -54,7 +54,7 @@ import java.util.Vector;
  * Time: 1:07 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GlacierDapDispatcher extends DapDispatcher{
+public class GlacierDapDispatcher extends BesDapDispatcher {
 
     private Logger log;
 

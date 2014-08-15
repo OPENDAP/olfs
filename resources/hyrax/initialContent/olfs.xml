@@ -103,7 +103,7 @@
 
 
 
-            <Handler className="opendap.bes.DapDispatcher" >
+            <Handler className="opendap.bes.BesDapDispatcher" >
 
                 <!-- AllowDirectDataSourceAccess
                   - If this element is present then the server will allow users to request
@@ -147,14 +147,14 @@
 
            By default the maximum length of the POST body is limited to 2000000 characters, and may never be
            larger than 10000000 characters (if you need more then get in touch with support@opendap.org). You can adjust
-           the limit in the configuration for the DapDispatcher.
+           the limit in the configuration for the BesDapDispatcher.
 
            Configuration:
-           Uncomment the HttpPostHandlers element below. Make sure that the body of the DapDispatcher Handler element is
+           Uncomment the HttpPostHandlers element below. Make sure that the body of the BesDapDispatcher Handler element is
            IDENTICAL to it's sister in the HttpGetHandlers element above.
 
            If you need to change the default value of the maximum POST body length do it by adding a
-           "PostBodyMaxLength" element to the DapDispatcher Handler below:
+           "PostBodyMaxLength" element to the BesDapDispatcher Handler below:
 
            <PostBodyMaxLength>500</PostBodyMaxLength>
 
@@ -162,7 +162,7 @@
         -->
         <!--
         <HttpPostHandlers>
-            <Handler className="opendap.bes.dapResponders.DapDispatcher" >
+            <Handler className="opendap.bes.dapResponders.BesDapDispatcher" >
                 MAKE SURE THAT THE CONTENT OF THIS ELEMENT IS IDENTICAL TO IT'S SISTER IN THE  HttpGetHandlers ELEMENT!
                 (Disregarding the presence of a PostBodyMaxLength element)
             </Handler>

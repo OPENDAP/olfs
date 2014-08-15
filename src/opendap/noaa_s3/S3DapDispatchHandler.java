@@ -26,9 +26,9 @@
 
 package opendap.noaa_s3;
 
+import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.FileAccess;
-import opendap.bes.DapDispatcher;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
  * Time: 1:01 PM
  * To change this template use File | Settings | File Templates.
  */
-public class S3DapDispatchHandler extends DapDispatcher {
+public class S3DapDispatchHandler extends BesDapDispatcher {
 
     private Logger log;
 

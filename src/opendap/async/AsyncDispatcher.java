@@ -30,7 +30,7 @@ import opendap.bes.BES;
 import opendap.bes.BESConfig;
 import opendap.bes.BESManager;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.bes.DapDispatcher;
+import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
  */
-public class AsyncDispatcher extends DapDispatcher {
+public class AsyncDispatcher extends BesDapDispatcher {
 
 
 

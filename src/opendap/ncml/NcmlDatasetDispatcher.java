@@ -25,7 +25,7 @@
  */
 package opendap.ncml;
 
-import opendap.bes.DapDispatcher;
+import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;
@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
  * path names are consistent with the paths from the users perspective.
  *
  */
-public class NcmlDatasetDispatcher extends DapDispatcher {
+public class NcmlDatasetDispatcher extends BesDapDispatcher {
 
 
 

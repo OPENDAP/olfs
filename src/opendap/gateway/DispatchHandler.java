@@ -26,7 +26,7 @@
 
 package opendap.gateway;
 
-import opendap.bes.DapDispatcher;
+import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -49,7 +49,7 @@ import java.util.Vector;
  * Time: 10:35 AM
  * To change this template use File | Settings | File Templates.
  */
-public class DispatchHandler extends DapDispatcher {
+public class DispatchHandler extends BesDapDispatcher {
 
 
     private Logger log;

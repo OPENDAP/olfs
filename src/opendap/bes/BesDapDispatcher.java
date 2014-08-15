@@ -58,7 +58,7 @@ import java.util.Vector;
  * Time: 4:33 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DapDispatcher implements DispatchHandler {
+public class BesDapDispatcher implements DispatchHandler {
 
     private Logger log;
     private boolean initialized;
@@ -75,7 +75,7 @@ public class DapDispatcher implements DispatchHandler {
 
 
 
-    public DapDispatcher() {
+    public BesDapDispatcher() {
         log = LoggerFactory.getLogger(getClass());
         responders = new Vector<Dap4Responder>();
 
@@ -181,7 +181,7 @@ public class DapDispatcher implements DispatchHandler {
     }
 
     /**
-     *  This method is where the behavior of the DapDispatcher is defined. In here the various Responder classes
+     *  This method is where the behavior of the BesDapDispatcher is defined. In here the various Responder classes
      *  are instantiated and loaded in to an ordered list. The types of the responders and their order defines the
      *  behaviour of the DAP dispatch activity.
      * @param servlet    The Servlet instance that this dispatcher is running in.

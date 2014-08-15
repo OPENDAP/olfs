@@ -208,10 +208,10 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
 
-            if(DapDispatcher.allowDirectDataSourceAccess())
+            if(BesDapDispatcher.allowDirectDataSourceAccess())
                 showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
-            if(DapDispatcher.useDAP2ResourceUrlResponse())
+            if(BesDapDispatcher.useDAP2ResourceUrlResponse())
                 showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
