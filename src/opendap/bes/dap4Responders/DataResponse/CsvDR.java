@@ -33,6 +33,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +72,7 @@ public class CsvDR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/data/csv");
         setServiceTitle("CSV Data Response");
         setServiceDescription("A comma separated values (CSV) representation of the DAP4 Data Response object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
         setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
 
@@ -93,7 +94,7 @@ public class CsvDR extends Dap4Responder {
 
         String context = request.getContextPath();
         String localUrl = ReqInfo.getLocalUrl(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        QueryParameters qp = new QueryParameters(request);
 
         String resourceID = getResourceId(localUrl, false);
 
@@ -105,46 +106,16 @@ public class CsvDR extends Dap4Responder {
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
 
-
-
-        String xdap_accept = "3.2";
 
         User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
-
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.ASCII,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        maxRS,
-                        null,
-                        null,
-                        null,
-                        BesApi.XML_ERRORS);
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-        }
-
-        */
-
-
-        if(!besApi.writeDap2AsciiData(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
+        if(!besApi.writeDap4DataAsCsv(resourceID, qp, user.getMaxResponseSize(), os, erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

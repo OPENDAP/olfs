@@ -33,6 +33,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.Request;
+import opendap.dap4.QueryParameters;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -72,7 +73,7 @@ public class IsoRubricDMR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("ISO-19115 Conformance Score.");
         setServiceDescription("ISO-19115 Conformance Score for the Dataset Metadata Response document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
         setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
 
@@ -93,7 +94,7 @@ public class IsoRubricDMR extends Dap4Responder {
 
         String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        QueryParameters qp = new QueryParameters(request);
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
@@ -115,27 +116,22 @@ public class IsoRubricDMR extends Dap4Responder {
         OutputStream os = response.getOutputStream();
 
 
-        String xdap_accept = "3.2";
+        Document dmr = new Document();
 
 
-
-        Document ddx = new Document();
-
-
-        if(!besApi.getDDXDocument(
+        if(!besApi.getDMRDocument(
                 resourceID,
-                constraintExpression,
-                xdap_accept,
+                qp,
                 xmlBase,
-                ddx)){
+                dmr)){
             response.setHeader("Content-Description", "application/vnd.opendap.dap4.error+xml");
 
-            BESError error = new BESError(ddx);
+            BESError error = new BESError(dmr);
             error.sendErrorResponse(_systemPath,context, response);
         }
         else {
 
-            ddx.getRootElement().setAttribute("dataset_id",resourceID);
+            dmr.getRootElement().setAttribute("dataset_id",resourceID);
 
             String currentDir = System.getProperty("user.dir");
             log.debug("Cached working directory: "+currentDir);
@@ -160,7 +156,7 @@ public class IsoRubricDMR extends Dap4Responder {
             transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
 
             // Transform the BES  showCatalog response into a HTML page for the browser
-            transformer.transform( new JDOMSource(ddx),os);
+            transformer.transform( new JDOMSource(dmr),os);
 
 
 

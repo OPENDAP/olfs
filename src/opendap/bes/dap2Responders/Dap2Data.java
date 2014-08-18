@@ -74,7 +74,7 @@ public class Dap2Data extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap2/data");
         setServiceTitle("DAP2 Data");
         setServiceDescription("DAP2 Data Object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
 
         setNormativeMediaType(new MediaType("application","octet-stream", getRequestSuffix()));

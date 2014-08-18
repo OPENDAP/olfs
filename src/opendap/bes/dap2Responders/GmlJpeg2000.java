@@ -24,16 +24,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap4Responders.DatasetMetadata;
+package opendap.bes.dap2Responders;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,42 +40,34 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 1/16/13
- * Time: 4:44 PM
- * To change this template use File | Settings | File Templates.
+ * Responder that transmits GML-JPEG2000 encoded DAP2 data to the client.
  */
-public class IjsonDMR extends Dap4Responder {
-
+public class GmlJpeg2000 extends Dap4Responder {
 
     private Logger log;
-    private static String defaultRequestSuffix = ".ijsn";
+    private static String defaultRequestSuffix = ".jp2";
 
-
-
-    public IjsonDMR(String sysPath, BesApi besApi) {
+    public GmlJpeg2000(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public IjsonDMR(String sysPath, String pathPrefix, BesApi besApi) {
+    public GmlJpeg2000(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-    public IjsonDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public GmlJpeg2000(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/data/json");
-        setServiceTitle("JSON Metadadata Response");
-        setServiceDescription("JSON representation of the DAP4 Dataset Metadata object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
+        setServiceRoleId("http://services.opendap.org/dap4/data/gmljp2");
+        setServiceTitle("GML-JPEG2000 Data Response");
+        setServiceDescription("GML-JPEG2000 representation of the DAP4 Data Response object.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
-        setNormativeMediaType(new MediaType("application","json", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("image","jp2;application=gmljp2", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
-
     }
 
 
@@ -85,13 +75,17 @@ public class IjsonDMR extends Dap4Responder {
     public boolean isMetadataResponder(){ return false; }
 
 
+    @Override
+    public boolean matches(String relativeUrl, boolean checkWithBes){
+        return super.matches(relativeUrl,checkWithBes);
+    }
 
 
-
+    @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        QueryParameters qp = new QueryParameters(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
 
@@ -116,16 +110,17 @@ public class IjsonDMR extends Dap4Responder {
 
 
 
+        String xdap_accept = "3.2";
         User user = new User(request);
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
-        boolean result = besApi.writeDap4MetadataAsIjsn(
+        boolean result = besApi.writeDap2DataAsGmlJpeg2000(
                 resourceID,
-                qp,
+                constraintExpression,
+                xdap_accept,
                 user.getMaxResponseSize(),
                 os,
                 erros);
@@ -135,8 +130,6 @@ public class IjsonDMR extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
-
-
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());

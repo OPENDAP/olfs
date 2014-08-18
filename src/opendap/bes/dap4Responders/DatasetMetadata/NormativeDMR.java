@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +63,7 @@ public class NormativeDMR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("Dataset Metadata Response");
         setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
         setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.dataset-metadata+xml", getRequestSuffix()));
 
@@ -88,7 +89,8 @@ public class NormativeDMR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        QueryParameters qp = new QueryParameters(request);
+
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
@@ -109,10 +111,9 @@ public class NormativeDMR extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        String xdap_accept = "3.2";
 
 
-        if(!besApi.writeDMR(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
+        if(!besApi.writeDMR(resourceID,qp,xmlBase,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

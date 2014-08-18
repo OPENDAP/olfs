@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +71,7 @@ public class JsonDMR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/data/json");
         setServiceTitle("JSON Metadadata Response");
         setServiceDescription("JSON representation of the DAP4 Dataset Metadata object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
         setNormativeMediaType(new MediaType("application","json", getRequestSuffix()));
 
@@ -90,8 +91,7 @@ public class JsonDMR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String xmlBase = getXmlBase(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        QueryParameters qp = new QueryParameters(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
 
@@ -116,7 +116,6 @@ public class JsonDMR extends Dap4Responder {
 
 
 
-        String xdap_accept = "3.2";
         User user = new User(request);
 
 
@@ -124,13 +123,12 @@ public class JsonDMR extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeJsonMetadataResponse(
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        user.getMaxResponseSize(),
-                        os,
-                        erros);
+        boolean result = besApi.writeDap4MetadataAsJson(
+                resourceID,
+                qp,
+                user.getMaxResponseSize(),
+                os,
+                erros);
         if(!result){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);

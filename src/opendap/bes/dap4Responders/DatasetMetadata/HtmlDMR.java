@@ -63,7 +63,7 @@ public class HtmlDMR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("HTML representation of the DMR.");
         setServiceDescription("HTML representation of the Dataset Metadata Response document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
         setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
 

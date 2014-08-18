@@ -24,180 +24,116 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap4Responders.Iso19115;
+package opendap.bes.dap2Responders;
 
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
-import opendap.dap4.QueryParameters;
+import opendap.coreServlet.Scrub;
+import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.xml.Transformer;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 9/5/12
- * Time: 8:05 PM
- * To change this template use File | Settings | File Templates.
+ * Responder that transmits JSON encoded DAP2 data to the client.
  */
-public class IsoDMR extends Dap4Responder {
+public class Iso19115Rubric extends Dap4Responder {
 
     private Logger log;
-    private static String defaultRequestSuffix = ".dmr.iso";
+    private static String defaultRequestSuffix = ".rubric";
 
-
-    public IsoDMR(String sysPath, BesApi besApi) {
+    public Iso19115Rubric(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public IsoDMR(String sysPath, String pathPrefix, BesApi besApi) {
+    public Iso19115Rubric(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-    public IsoDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public Iso19115Rubric(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("ISO-19115 Metadata");
         setServiceDescription("ISO-19115 metadata extracted form the normative DMR.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDX_Service");
 
         setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
-        IsoRubricDMR rubric =  new IsoRubricDMR(sysPath, pathPrefix, besApi);
-
-        addAltRepResponder(rubric);
-
-        //rubric.setRequestSuffix(buildRequestMatchingRegex());
-
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
-
     }
 
 
-    public boolean isDataResponder(){ return false; }
-    public boolean isMetadataResponder(){ return true; }
+    public boolean isDataResponder(){ return true; }
+    public boolean isMetadataResponder(){ return false; }
 
 
     @Override
-    public Element getServiceElement(String datasetUrl){
-        Element service = getServiceElement();
-
-        Element link = getNormativeLink(datasetUrl);
-
-        service.addContent(link);
-
-        for(Dap4Responder altRepResponder: getAltRepResponders()){
-            MediaType altMediaType = altRepResponder.getNormativeMediaType();
-            String href = datasetUrl + altMediaType.getMediaSuffix();
-            link = getLinkElement(altMediaType.getMimeType(),href,altRepResponder.getServiceDescription());
-            service.addContent(link);
-        }
-
-        return service;
-
+    public boolean matches(String relativeUrl, boolean checkWithBes){
+        return super.matches(relativeUrl,checkWithBes);
     }
 
 
     @Override
-    public String buildRequestMatchingRegex() {
-
-        StringBuilder s = new StringBuilder();
-        s.append(buildRequestMatchingRegexWorker(this));
-        s.append("$");
-        log.debug("Request Match Regex: {}", s.toString());
-        return s.toString();
-
-    }
-
-    private String buildRequestMatchingRegexWorker(Dap4Responder responder) {
-
-        StringBuilder s = new StringBuilder();
-
-        Dap4Responder[] altResponders = responder.getAltRepResponders();
-        boolean hasAltRepResponders = altResponders.length > 0;
-
-        if (hasAltRepResponders)
-            s.append("((");
-
-        if (responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
-            s.append("\\");
-        s.append(responder.getNormativeMediaType().getMediaSuffix());
-
-        if (hasAltRepResponders)
-            s.append(")");
-
-        for (Dap4Responder altResponder : altResponders) {
-
-            s.append("|");
-
-            s.append("(");
-
-            s.append(buildRequestMatchingRegexWorker(altResponder));
-
-            s.append(")");
-
-        }
-
-        if (hasAltRepResponders)
-            s.append(")");
-
-        return s.toString();
-
-    }
-
-
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-
-        QueryParameters qp = new QueryParameters(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
 
+        Request oreq = new Request(null,request);
+
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        log.debug("Sending {} for dataset: {}", getServiceTitle(), resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
 
 
         OutputStream os = response.getOutputStream();
 
 
-        Document dmr = new Document();
+        String xdap_accept = "3.2";
 
 
-        if(!besApi.getDMRDocument(
+
+        Document ddx = new Document();
+
+
+        if(!besApi.getDDXDocument(
                 resourceID,
-                qp,
+                constraintExpression,
+                xdap_accept,
                 xmlBase,
-                dmr)){
-            response.setHeader("Content-Description", "application/vnd.opendap.dap4.error+xml");
+                ddx)){
+            response.setHeader("Content-Description", "application/vnd.opendap.dap2.error");
 
-            BESError error = new BESError(dmr);
-            error.sendErrorResponse(_systemPath, context, response);
+            BESError error = new BESError(ddx);
+            error.sendErrorResponse(_systemPath,context, response);
         }
         else {
 
-            dmr.getRootElement().setAttribute("dataset_id",resourceID);
+            ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
             String currentDir = System.getProperty("user.dir");
             log.debug("Cached working directory: "+currentDir);
@@ -209,7 +145,7 @@ public class IsoDMR extends Dap4Responder {
             log.debug("Changing working directory to "+ xslDir);
             System.setProperty("user.dir",xslDir);
 
-            String xsltDocName = "ddx2iso.xsl";
+            String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
 
 
             // This Transformer class is an attempt at making the use of the saxon-9 API
@@ -217,8 +153,12 @@ public class IsoDMR extends Dap4Responder {
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
 
+
+            transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+            transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
+
             // Transform the BES  showCatalog response into a HTML page for the browser
-            transformer.transform( new JDOMSource(dmr),os);
+            transformer.transform( new JDOMSource(ddx),os);
 
 
 
@@ -232,5 +172,7 @@ public class IsoDMR extends Dap4Responder {
 
 
     }
+
+
 
 }

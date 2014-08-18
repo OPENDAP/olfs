@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap4.QueryParameters;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -74,7 +75,7 @@ public class RdfDMR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("RDF representation of the DMR");
         setServiceDescription("RDF representation of the Dataset Metadata Response document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
         setNormativeMediaType(new MediaType("application","rdf+xml", getRequestSuffix()));
 
@@ -99,7 +100,7 @@ public class RdfDMR extends Dap4Responder {
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        QueryParameters qp = new QueryParameters(request);
 
 
         BesApi besApi = getBesApi();
@@ -115,26 +116,24 @@ public class RdfDMR extends Dap4Responder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        String xdap_accept = "3.2";
-
-        Document ddx = new Document();
+        Document dmr = new Document();
 
 
-        if(!besApi.getDMRDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx)){
-            BESError besError = new BESError(xmlo.outputString(ddx));
+        if(!besApi.getDMRDocument(resourceID,qp,xmlBase,dmr)){
+            BESError besError = new BESError(xmlo.outputString(dmr));
             besError.sendErrorResponse(_systemPath, context, response);
-            log.error("sendNormativeRepresentation() - Encountered a BESError:\n" + xmlo.outputString(ddx));
+            log.error("sendNormativeRepresentation() - Encountered a BESError:\n" + xmlo.outputString(dmr));
             return;
 
         }
 
-        ddx.getRootElement().setAttribute("dataset_id",resourceID);
+        dmr.getRootElement().setAttribute("dataset_id",resourceID);
 
-        log.debug(xmlo.outputString(ddx));
+        log.debug(xmlo.outputString(dmr));
 
 
         ServletOutputStream os = response.getOutputStream();
-        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
+        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(dmr).getBytes()));
 
         /*
          Because we are going to daisy chain the XSLT's we have to be careful here!

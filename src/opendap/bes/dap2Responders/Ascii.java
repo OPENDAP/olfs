@@ -40,13 +40,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
-
+/**
+ * Responder that transmits ASCII (CSV) encoded DAP2 data to the client.
+ */
 public class Ascii extends Dap4Responder {
 
     private Logger log;
-
     private static String _defaultRequestSuffix = ".ascii";
-
 
     public Ascii(String sysPath, BesApi besApi) {
         this(sysPath,null, _defaultRequestSuffix,besApi);
@@ -61,10 +61,11 @@ public class Ascii extends Dap4Responder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/ascii");
-        setNormativeMediaType(new MediaType("text", "plain", getRequestSuffix()));
-        setServiceTitle("DAP2 ASCII Data");
+        setServiceTitle("ASCII (CSV) encoded DAP2 data");
         setServiceDescription("The DAP2 Data response in ASCII form.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ASCII_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_ASCII_Data_Service");
+
+        setNormativeMediaType(new MediaType("text", "plain", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -117,29 +118,7 @@ public class Ascii extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.ASCII,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        maxRS,
-                        null,
-                        null,
-                        null,
-                        BesApi.XML_ERRORS);
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-        }
-        */
-
-
-        if(!besApi.writeDap2AsciiData(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
+        if(!besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

@@ -68,7 +68,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap2/info");
         setServiceTitle("DAP2 INFO");
         setServiceDescription("DAP2 Dataset Information HTML Page.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Info_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Info_Service");
 
         setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());

@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.dap.Dap2Error;
 import opendap.dap4.Dap4Error;
+import opendap.dap4.QueryParameters;
 import opendap.ppt.PPTException;
 import org.jdom.JDOMException;
 
@@ -207,7 +208,7 @@ public class GlacierBesApi extends BesApi {
     }
 
     @Override
-     public boolean writeDMR(String dataSource, String constraintExpression, String xdap_accept,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+     public boolean writeDMR(String dataSource, QueryParameters qp,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
          dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);

@@ -69,7 +69,7 @@ public class XmlData extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap2/xml-data");
         setServiceTitle("DAP2 XML Data Response");
         setServiceDescription("An XML document containing both the DAP2 dataset's structural metadata along with data values.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_XML_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
         setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
@@ -118,7 +118,7 @@ public class XmlData extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeDap2XmlDataResponse(
+        boolean result = besApi.writeDap2DataAsXml(
                 resourceID,
                 constraintExpression,
                 xdap_accept,

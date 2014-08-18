@@ -62,7 +62,7 @@ public class DDX extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap2/ddx");
         setServiceTitle("DAP2 DDX");
         setServiceDescription("OPeNDAP Data Description and Attribute XML Document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDX_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDX_Service");
 
         setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());

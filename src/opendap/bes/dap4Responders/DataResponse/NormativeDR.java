@@ -79,7 +79,7 @@ public class NormativeDR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/data");
         setServiceTitle("DAP4 Data Response");
         setServiceDescription("DAP4 Data Response object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
 
         setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
@@ -126,7 +126,6 @@ public class NormativeDR extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
 
         MimeBoundary mb = new MimeBoundary();
@@ -156,7 +155,6 @@ public class NormativeDR extends Dap4Responder {
         boolean worked = besApi.writeDap4Data(
                 resourceID,
                 qp,
-                xdap_accept,
                 user.getMaxResponseSize(),
                 xmlBase,
                 startID,

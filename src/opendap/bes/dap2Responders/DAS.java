@@ -69,7 +69,7 @@ public class DAS extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap2/das");
         setServiceTitle("DAP2 DAS");
         setServiceDescription("DAP2 Dataset Attribute Structure (DAS).");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DAS_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DAS_Service");
 
         setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
 

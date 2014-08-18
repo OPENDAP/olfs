@@ -226,34 +226,26 @@ public class BesDapDispatcher implements DispatchHandler {
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
         //responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
-        responders.add(new Netcdf3DR(systemPath, besApi));
-        //responders.add(new Netcdf4DR(systemPath, besApi)); // Uncomment this line to enable netcdf4 responses via the DAP2 resource URL scheme.
+        responders.add(new Netcdf3(systemPath, besApi));
+        responders.add(new Netcdf4DR(systemPath, besApi)); // Uncomment this line to enable netcdf4 responses via the DAP2 resource URL scheme.
         responders.add(new XmlData(systemPath, besApi));
 
 
         // DAP2 GeoTIFF Response
-        Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
-        geoTiff.clearAltResponders();
-        geoTiff.setCombinedRequestSuffixRegex(geoTiff.buildRequestMatchingRegex());
+        Dap4Responder geoTiff = new GeoTiff(systemPath, besApi);
         responders.add(geoTiff);
 
 
         // DAP2 JPEG2000 Response
-        Dap4Responder jp2 = new GmlJpeg2000DR(systemPath, null, ".jp2", besApi);
-        jp2.clearAltResponders();
-        jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
+        Dap4Responder jp2 = new GmlJpeg2000(systemPath, besApi);
         responders.add(jp2);
 
         // DAP2 w10n JSON Response
-        Dap4Responder json = new JsonDR(systemPath, null, ".json", besApi);
-        json.clearAltResponders();
-        json.setCombinedRequestSuffixRegex(json.buildRequestMatchingRegex());
+        Dap4Responder json = new Json(systemPath, besApi);
         responders.add(json);
 
         // DAP2 Instance Object JSON Response
-        Dap4Responder ijsn = new IjsonDR(systemPath, null, ".ijsn", besApi);
-        ijsn.clearAltResponders();
-        ijsn.setCombinedRequestSuffixRegex(ijsn.buildRequestMatchingRegex());
+        Dap4Responder ijsn = new Ijson(systemPath, besApi);
         responders.add(ijsn);
 
 
@@ -265,9 +257,7 @@ public class BesDapDispatcher implements DispatchHandler {
         responders.add(new RDF(systemPath, besApi));
         responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
-        Dap4Responder iso = new IsoDMR(systemPath, null, ".iso", besApi);
-        iso.clearAltResponders();
-        iso.setCombinedRequestSuffixRegex(iso.buildRequestMatchingRegex());
+        Dap4Responder iso = new Iso19115(systemPath, besApi);
         responders.add(iso);
 
         Dap4Responder rubric = new IsoRubricDMR(systemPath, null, ".rubric", besApi);

@@ -24,18 +24,18 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap4Responders.DataResponse;
+package opendap.bes.dap2Responders;
 
+import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import opendap.dap4.QueryParameters;
+import opendap.xml.Transformer;
 import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,43 +44,34 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 9/5/12
- * Time: 7:47 PM
- * To change this template use File | Settings | File Templates.
+ * Responder that transmits JSON encoded DAP2 data to the client.
  */
-public class XmlDR extends Dap4Responder{
-
-
+public class Iso19115 extends Dap4Responder {
 
     private Logger log;
-    private static String defaultRequestSuffix = ".xml";
+    private static String defaultRequestSuffix = ".iso";
 
-
-
-    public XmlDR(String sysPath, BesApi besApi) {
+    public Iso19115(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public XmlDR(String sysPath, String pathPrefix, BesApi besApi) {
+    public Iso19115(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-    public XmlDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public Iso19115(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/data/xml");
-        setServiceTitle("XML Data Response");
-        setServiceDescription("XML representation of the DAP4 Data Response object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
+        setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
+        setServiceTitle("ISO-19115 Metadata");
+        setServiceDescription("ISO-19115 metadata extracted form the normative DMR.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDX_Service");
 
         setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
-
     }
 
 
@@ -88,14 +79,19 @@ public class XmlDR extends Dap4Responder{
     public boolean isMetadataResponder(){ return false; }
 
 
+    @Override
+    public boolean matches(String relativeUrl, boolean checkWithBes){
+        return super.matches(relativeUrl,checkWithBes);
+    }
 
 
+    @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
-
-        QueryParameters qp = new  QueryParameters(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
 
@@ -107,33 +103,64 @@ public class XmlDR extends Dap4Responder{
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-
-
-        User user = new User(request);
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        String xdap_accept = "3.2";
+
+        Document ddx = new Document();
 
 
-        if(!besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+        if(!besApi.getDDXDocument(
+                resourceID,
+                constraintExpression,
+                xdap_accept,
+                xmlBase,
+                ddx)){
+            response.setHeader("Content-Description", "application/vnd.opendap.dap4.error+xml");
 
+            BESError error = new BESError(ddx);
+            error.sendErrorResponse(_systemPath, context, response);
+        }
+        else {
+
+            ddx.getRootElement().setAttribute("dataset_id",resourceID);
+
+            String currentDir = System.getProperty("user.dir");
+            log.debug("Cached working directory: "+currentDir);
+
+
+            String xslDir = _systemPath + "/nciso/xsl";
+
+
+            log.debug("Changing working directory to "+ xslDir);
+            System.setProperty("user.dir",xslDir);
+
+            String xsltDocName = "ddx2iso.xsl";
+
+
+            // This Transformer class is an attempt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
+
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform( new JDOMSource(ddx),os);
+
+
+
+
+            os.flush();
+            log.info("Sent {}",getServiceTitle());
+            log.debug("Restoring working directory to "+ currentDir);
+            System.setProperty("user.dir",currentDir);
         }
 
 
 
-        os.flush();
-        log.debug("Sent {}",getServiceTitle());
-
-
-
     }
+
 
 
 }

@@ -84,7 +84,7 @@ public class NormativeDSR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/dataset-services");
         setServiceTitle("Dataset Services Response");
         setServiceDescription("An XML document itemizing the Services available for this dataset.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4_Dataset_Services_Response");
         //setPreferredServiceSuffix("");
 
         setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.dataset-services+xml", getRequestSuffix()));

@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class Netcdf4DR extends Dap4Responder{
         setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-4");
         setServiceTitle("NetCDF-4 Data Response");
         setServiceDescription("NetCDF-4 representation of the DAP4 Data Response object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
         setNormativeMediaType(new MediaType("application","x-netcdf;ver=4", getRequestSuffix()));
 
@@ -89,8 +90,8 @@ public class Netcdf4DR extends Dap4Responder{
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
 
 
@@ -101,48 +102,14 @@ public class Netcdf4DR extends Dap4Responder{
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-
-
-        String xdap_accept = "3.2";
 
         User user = new User(request);
-
-
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DAP2_DATA,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        user.getMaxResponseSize(),
-                        null,
-                        null,
-                        "netcdf-4",
-                        BesApi.DAP2_ERRORS);
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes());
-
-        }
-        */
-
-        if(!besApi.writeNetcdf4FileOut(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+        if(!besApi.writeDap4DataAsNetcdf4(resourceID, qp, user.getMaxResponseSize(), os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());

@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +71,7 @@ public class GeoTiffDR extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/data/geotiff");
         setServiceTitle("GeoTIFF Data Response");
         setServiceDescription("GeoTIFF representation of the DAP4 Data Response object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
         setNormativeMediaType(new MediaType("image","tiff;application=geotiff", getRequestSuffix()));
 
@@ -84,15 +85,10 @@ public class GeoTiffDR extends Dap4Responder {
     public boolean isMetadataResponder(){ return false; }
 
 
-
-
-
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String xmlBase = getXmlBase(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
+        QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
 
 
@@ -115,8 +111,6 @@ public class GeoTiffDR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 
-
-        String xdap_accept = "3.2";
         User user = new User(request);
 
 
@@ -124,13 +118,12 @@ public class GeoTiffDR extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeGeoTiffDataResponse(
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        user.getMaxResponseSize(),
-                        os,
-                        erros);
+        boolean result = besApi.writeDap4DataAsGeoTiff(
+                resourceID,
+                qp,
+                user.getMaxResponseSize(),
+                os,
+                erros);
         if(!result){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);

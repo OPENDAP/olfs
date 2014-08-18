@@ -64,7 +64,7 @@ public class RDF extends Dap4Responder {
         setServiceRoleId("http://services.opendap.org/dap4/rdf");
         setServiceTitle("DAP2 RDF");
         setServiceDescription("An RDF representation of the DAP2 Dataset response (DDX) document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_RDF_Service");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDX_Service");
 
         setNormativeMediaType(new MediaType("application","rdf+xml", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
