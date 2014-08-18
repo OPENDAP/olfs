@@ -123,9 +123,7 @@ public class XmlDR extends Dap4Responder{
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
-
         }
-
 
 
         os.flush();

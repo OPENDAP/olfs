@@ -265,7 +265,7 @@ public class GlacierBesApi extends BesApi {
 
 
     @Override
-    public boolean writeDap2HTMLForm(String dataSource, String xdap_accept, String url, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public boolean writeDap2DataRequestForm(String dataSource, String xdap_accept, String url, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
 

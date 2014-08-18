@@ -98,24 +98,6 @@ public class RDF extends Dap4Responder {
 
         String xdap_accept = "3.2";
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DDX,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        0,
-                        xmlBase,
-                        null,
-                        null,
-                        BesApi.DAP2_ERRORS);
-
-
-
-        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-*/
         Document ddx = new Document();
 
         besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);

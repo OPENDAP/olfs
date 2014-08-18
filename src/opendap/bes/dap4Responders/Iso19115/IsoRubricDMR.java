@@ -113,7 +113,6 @@ public class IsoRubricDMR extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
 
-        OutputStream os = response.getOutputStream();
 
 
         Document dmr = new Document();
@@ -130,6 +129,8 @@ public class IsoRubricDMR extends Dap4Responder {
             error.sendErrorResponse(_systemPath,context, response);
         }
         else {
+
+            OutputStream os = response.getOutputStream();
 
             dmr.getRootElement().setAttribute("dataset_id",resourceID);
 

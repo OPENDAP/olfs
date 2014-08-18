@@ -28,7 +28,7 @@ package opendap.bes;
 
 import opendap.bes.dap2Responders.*;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.DataResponse.*;
+import opendap.bes.dap4Responders.DataResponse.NormativeDR;
 import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
@@ -226,8 +226,9 @@ public class BesDapDispatcher implements DispatchHandler {
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
         //responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
+        responders.add(new CsvData(systemPath, besApi));
         responders.add(new Netcdf3(systemPath, besApi));
-        responders.add(new Netcdf4DR(systemPath, besApi)); // Uncomment this line to enable netcdf4 responses via the DAP2 resource URL scheme.
+        responders.add(new Netcdf4(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
 
 
@@ -272,9 +273,7 @@ public class BesDapDispatcher implements DispatchHandler {
             // Add the HTML form conditionally because the ".html" suffix is used
             // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
             // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder htmlForm = new HtmlDMR(systemPath, null, ".html", besApi);
-            htmlForm.clearAltResponders();
-            htmlForm.setCombinedRequestSuffixRegex(htmlForm.buildRequestMatchingRegex());
+            Dap4Responder htmlForm = new DatasetHtmlForm(systemPath, besApi);
             responders.add(htmlForm);
 
             FileAccess d4fa = new FileAccess(systemPath, null, "", besApi);

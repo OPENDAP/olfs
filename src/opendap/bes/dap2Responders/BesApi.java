@@ -1090,11 +1090,11 @@ public class BesApi {
      * @throws IOException              .
      * @throws BESError              .
      */
-    public boolean writeDap2HTMLForm(String dataSource,
-                                     String xdap_accept,
-                                     String url,
-                                     OutputStream os,
-                                     OutputStream err)
+    public boolean writeDap2DataRequestForm(String dataSource,
+                                            String xdap_accept,
+                                            String url,
+                                            OutputStream os,
+                                            OutputStream err)
             throws BadConfigurationException,
             BESError,
             IOException,

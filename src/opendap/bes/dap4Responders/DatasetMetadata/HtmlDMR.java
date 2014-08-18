@@ -26,15 +26,26 @@
 
 package opendap.bes.dap4Responders.DatasetMetadata;
 
+import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.Request;
+import opendap.dap4.QueryParameters;
+import opendap.xml.Transformer;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
@@ -84,41 +95,91 @@ public class HtmlDMR extends Dap4Responder {
 
 
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String context = request.getContextPath();
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
 
-        String resourceID = getResourceId(relativeUrl, false);
+        String resourceID = getResourceId(requestedResourceId, false);
+        QueryParameters qp = new QueryParameters(request);
+        Request oreq = new Request(null,request);
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         BesApi besApi = getBesApi();
 
+        log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
 
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-        String xdap_accept = "3.2";
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
 
-        if(!besApi.writeDap2HTMLForm(resourceID, xdap_accept, xmlBase, os, erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+        Document dmr = new Document();
 
+
+        if(!besApi.getDMRDocument(
+                resourceID,
+                qp,
+                xmlBase,
+                dmr)){
+            response.setHeader("Content-Description", "application/vnd.opendap.dap4.error+xml");
+
+            BESError error = new BESError(dmr);
+            error.sendErrorResponse(_systemPath,context, response);
+        }
+        else {
+
+            OutputStream os = response.getOutputStream();
+
+            dmr.getRootElement().setAttribute("dataset_id",resourceID);
+
+            String currentDir = System.getProperty("user.dir");
+            log.debug("Cached working directory: "+currentDir);
+
+
+            String xslDir = _systemPath + "/xsl";
+
+
+            log.debug("Changing working directory to "+ xslDir);
+            System.setProperty("user.dir",xslDir);
+
+            String xsltDocName = "DmrToDataRequestForm.xsl";
+
+
+            // This Transformer class is an attempt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
+
+
+            transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+            transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
+
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform( new JDOMSource(dmr),os);
+
+
+
+
+            os.flush();
+            log.info("Sent {}",getServiceTitle());
+            log.debug("Restoring working directory to "+ currentDir);
+            System.setProperty("user.dir",currentDir);
         }
 
 
 
-        os.flush();
-        log.info("Sent {}",getServiceTitle());
+
+
+
+
+
+        log.info("Sent {}.",getServiceTitle());
 
 
     }

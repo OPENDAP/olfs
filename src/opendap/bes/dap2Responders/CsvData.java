@@ -44,29 +44,29 @@ import java.io.OutputStream;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Netcdf4 extends Dap4Responder {
+public class CsvData extends Dap4Responder {
 
 
     private Logger log;
-    private static String defaultRequestSuffix = ".nc4";
+    private static String defaultRequestSuffix = ".csv";
 
 
 
-    public Netcdf4(String sysPath, BesApi besApi) {
+    public CsvData(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public Netcdf4(String sysPath, String pathPrefix, BesApi besApi) {
+    public CsvData(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-    public Netcdf4(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public CsvData(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-3");
-        setServiceTitle("NetCDF-3 Data Response");
-        setServiceDescription("NetCDF-3 representation of the DAP4 Data Response object.");
+        setServiceRoleId("http://services.opendap.org/dap2/data/csv");
+        setServiceTitle("Comma Separated Values Data Response");
+        setServiceDescription("Comma Separated Values representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
         setNormativeMediaType(new MediaType("application","x-netcdf", getRequestSuffix()));
@@ -113,7 +113,7 @@ public class Netcdf4 extends Dap4Responder {
 
 
 
-        if(!besApi.writeDap2DataAsNetcdf4(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
+        if(!besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());

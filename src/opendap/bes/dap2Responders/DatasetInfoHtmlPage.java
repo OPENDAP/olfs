@@ -84,7 +84,6 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String context = request.getContextPath();
 
@@ -95,8 +94,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
+
 
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
@@ -104,32 +102,6 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-
-        /*
-        Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.INFO_PAGE,
-                                                        resourceID,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        0,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesApi.XML_ERRORS);
-
-
-
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath, context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-
-        }
-        */
 
 
 
