@@ -36,6 +36,7 @@ import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.xml.Transformer;
 import org.jdom.Document;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
@@ -136,7 +137,10 @@ public class HtmlDMR extends Dap4Responder {
 
             OutputStream os = response.getOutputStream();
 
+
+
             dmr.getRootElement().setAttribute("dataset_id",resourceID);
+            dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);
 
             String currentDir = System.getProperty("user.dir");
             log.debug("Cached working directory: "+currentDir);
@@ -148,7 +152,7 @@ public class HtmlDMR extends Dap4Responder {
             log.debug("Changing working directory to "+ xslDir);
             System.setProperty("user.dir",xslDir);
 
-            String xsltDocName = "DmrToDataRequestForm.xsl";
+            String xsltDocName = "dap4_ifh.xsl";
 
 
             // This Transformer class is an attempt at making the use of the saxon-9 API
