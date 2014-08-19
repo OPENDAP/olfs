@@ -295,7 +295,7 @@
                 </xsl:if>
             </span-->
             <xsl:call-template name="DimHeader"/>
-            <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Fart is <xsl:value-of select ="name(.)"/>)</span>
+            <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is <xsl:value-of select ="name(.)"/>)</span>
         </div>  
     
         <xsl:call-template name="DimSlicing">
