@@ -61,9 +61,18 @@
                 <!--                      PAGE BANNER                       -->
                 <!--                                                        -->
                 <!--                                                        -->
-                
-                <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.gif"/>
-                <h1>DAP4 Dataset Access Form: <xsl:value-of select="@name"/></h1>
+                <table width="100%" border="0">
+                    <tr>
+                        <td><img alt="OPeNDAP Logo" src="{$docsService}/images/logo.gif"/></td>
+                        <td><div class="large">DAP4 Data Access Form</div></td>
+                    </tr>
+                </table>
+
+                <h1>
+                    <span style="font-size: 12px;  vertical-align: 35%; font-weight: normal;">dataset:</span>
+                    <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;"> <xsl:value-of select="@name"/></span>
+
+                </h1>
                 <hr size="1" noshade="noshade"/>
                 
                 <!-- ****************************************************** -->
@@ -85,8 +94,11 @@
                         <xsl:call-template name="globalAttributesRow"/>
                         
                         <xsl:call-template name="hrRow"/>
-                        <xsl:call-template name="VariablesRow"/>
+                        <xsl:call-template name="DimensionsRow"/>
                         
+                        <xsl:call-template name="hrRow"/>
+                        <xsl:call-template name="VariablesRow"/>
+
                     </table>
                     
                 </form>
@@ -587,8 +599,8 @@
                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
-                    <input type="button" value="Binary (DAP4) Object" onclick="binary_button('dap')"/>
-                    <input type="button" value="Binary (DAP2) Object" onclick="binary_button('dods')"/>
+                    <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
+                    <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>
@@ -649,13 +661,37 @@
            
             <td >
                 <div style="margin-left:25px;">
-                    <xsl:apply-templates select="./*[not(self::dap:Attribute)]"/>    
+                    <xsl:apply-templates select="./*[not(self::dap:Attribute or self::dap:Dimension)]"/>
                 </div>                
             </td>
         </tr>               
     </xsl:template>
     
-    
+    <!-- ######################################## -->
+    <!--            Dimensions Row                 -->
+    <xsl:template name="DimensionsRow">
+        <tr>
+            <td align="right" style="vertical-align:text-top">
+                <div class="medium_bold"><a href="opendap_form_help.html#shared_dimesions" target="help">Shared Dimensions</a> </div>
+            </td>
+
+            <td >
+                <div style="margin-left:25px;">
+                    <xsl:for-each select="dap:Dimension"><xsl:call-template name="SharedDimension"/></xsl:for-each>
+                </div>
+            </td>
+        </tr>
+    </xsl:template>
+
+
+    <!-- ######################################## -->
+    <!--            Dimensions Row                 -->
+    <xsl:template match="dap:Dimension" name="SharedDimension">
+        <span class="large">[<xsl:if test="@name"><span class="medium_italic" style="vertical-align: 10%;font-size: 12px;"><xsl:value-of select="@name"/> = </span></xsl:if><span class="medium_italic" style="vertical-align: 10%;">0..<xsl:value-of select="@size - 1"/></span>]</span>
+    </xsl:template>
+
+
+
     
 
 

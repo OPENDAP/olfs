@@ -94,6 +94,10 @@ HR {
     font-size: 14px;
     font-weight: normal
 }
+.medium_italic {
+    font-size: 14px;
+    font-style: italic;
+}
 .medium {
     font-size: 14px;
 }

@@ -140,7 +140,7 @@ public class HtmlDMR extends Dap4Responder {
 
 
             dmr.getRootElement().setAttribute("dataset_id",resourceID);
-            dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);
+            // dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
             String currentDir = System.getProperty("user.dir");
             log.debug("Cached working directory: "+currentDir);
