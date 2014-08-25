@@ -1658,7 +1658,8 @@ public class BesApi {
                                               int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(ASCII, dataSource, ce, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS);
+        // return getDap2RequestDocument(ASCII, dataSource, ce, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, ASCII, XML_ERRORS);
 
     }
 
