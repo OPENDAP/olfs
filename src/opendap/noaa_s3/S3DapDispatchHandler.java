@@ -168,7 +168,7 @@ public class S3DapDispatchHandler extends BesDapDispatcher {
 
 
 
-        if(relativeURL.startsWith("/"))
+        while(relativeURL.startsWith("/") && relativeURL.length()>1)
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
 

@@ -28,7 +28,6 @@
 <S3Config>
     <DapService context="/dap" />
     <CatalogService context="/catalog" />
-    <CatalogCache>/Users/ndp/scratch/s3Test/catalogCache</CatalogCache>
-    <Bucket name="ocean-archive.data.nodc.noaa.gov" context="/ocean-archive" loadCatalogOnStart="false" />
-    <Bucket name="foo-s3cmd.nodc.noaa.gov" context="/foo-s3cmd" loadCatalogOnStart="true" />
+    <CatalogCache>/tmp/s3CatalogCache</CatalogCache>
+    <Bucket name="opendap.test" context="/test" loadCatalogOnStart="true" />
 </S3Config>

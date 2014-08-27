@@ -31,6 +31,7 @@ package opendap.aws;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
@@ -111,6 +112,8 @@ public class demo {
         //AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider();
 
 
+        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("accessKey","secretKey");
+
         AWSCredentialsProvider credentialsProvider = new CredentialsProvider();
 
         ec2 = new AmazonEC2Client(credentialsProvider);
@@ -127,7 +130,25 @@ public class demo {
 
         init();
 
-        /*
+
+        //ec2_demo();
+
+        //simpleDB_demo();
+
+        s3_demo();
+
+
+
+
+    }
+
+    public static void ec2_demo(){
+
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
+        System.out.println("EC2 DEMO");
+
+
+            /*
          * Amazon EC2
          *
          * The AWS EC2 client allows you to create, delete, and administer
@@ -157,6 +178,14 @@ public class demo {
                 System.out.println("Request ID: " + ase.getRequestId());
         }
 
+    }
+
+    public static void simpleDB_demo(){
+
+
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
+        System.out.println("SimpleDB DEMO");
+
         /*
          * Amazon SimpleDB
          *
@@ -182,10 +211,45 @@ public class demo {
                     "containing a total of " + totalItems + " items.");
         } catch (AmazonServiceException ase) {
                 System.out.println("Caught Exception: " + ase.getMessage());
-                System.out.println("Reponse Status Code: " + ase.getStatusCode());
+                System.out.println("Response Status Code: " + ase.getStatusCode());
                 System.out.println("Error Code: " + ase.getErrorCode());
                 System.out.println("Request ID: " + ase.getRequestId());
         }
+
+    }
+
+    public static void s3_demo(){
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
+        System.out.println("S3 DEMO");
+
+
+
+        long totalSize  = 0;
+        int  totalItems = 0;
+
+
+
+        String bucketName =  "opendap.test";
+
+        ObjectListing objects = s3.listObjects("opendap.test");
+        do {
+            for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
+                System.out.println("   key: "+objectSummary.getKey());
+                totalSize += objectSummary.getSize();
+                totalItems++;
+            }
+            objects = s3.listNextBatchOfObjects(objects);
+        } while (objects.isTruncated());
+
+        System.out.println("The  Amazon S3 bucket '" + bucketName +"'"+
+                "contains " + totalItems + " objects with a total size of " + totalSize + " bytes.");
+
+
+
+
+
+
+
 
         /*
          * Amazon S3
@@ -199,11 +263,20 @@ public class demo {
          * without ever actually downloading a single object -- the requests
          * work with object metadata only.
          */
+
+
+
+
+
+         totalSize  = 0;
+          totalItems = 0;
+
+
+
         try {
+
             List<Bucket> buckets = s3.listBuckets();
 
-            long totalSize  = 0;
-            int  totalItems = 0;
             for (Bucket bucket : buckets) {
                 /*
                  * In order to save bandwidth, an S3 object listing does not
@@ -212,7 +285,7 @@ public class demo {
                  * obtained with the AmazonS3Client.listNextBatchOfObjects()
                  * method.
                  */
-                ObjectListing objects = s3.listObjects(bucket.getName());
+                objects = s3.listObjects(bucket.getName());
                 do {
                     for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
                         totalSize += objectSummary.getSize();
@@ -247,5 +320,6 @@ public class demo {
              */
             System.out.println("Error Message: " + ace.getMessage());
         }
+
     }
 }
