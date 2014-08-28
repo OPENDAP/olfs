@@ -160,7 +160,8 @@
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
-    <property name="glacier.resources" location="resources/experiments/AWS/Glacier"/>
+    <property name="aws.resources" location="resources/experiments/AWS"/>
+    <property name="glacier.resources" location="${aws.resources}/Glacier"/>
     <property name="nciso.resources"   location="resources/nciso"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
@@ -251,7 +252,7 @@
 
 
         </fileset>
-        <fileset dir="${glacier.resources}/lib">
+        <fileset dir="${aws.resources}/lib">
             <include name="**"/>
         </fileset>
 
@@ -484,7 +485,7 @@
 
 
             </lib>
-            <lib dir="${glacier.resources}/lib">
+            <lib dir="/resources/experiments/AWS/lib">
                 <include name="jackson-all-1.9.11.jar"/>
                 <include name="**"/>
                 <include name="**"/>

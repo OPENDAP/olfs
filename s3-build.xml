@@ -128,6 +128,7 @@
         <echo level="info" message="    src.dir:       ${src.dir}"/>
         <echo level="info" message="    doc.dir:       ${doc.dir}"/>
         <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    aws.resources:     ${aws.resources}"/>
         <echo level="info" message="    glacier.resources: ${glacier.resources}"/>
         <echo level="info" message="    s3dap.resources:   ${s3.resources}"/>
         <echo level="info" message=""/>
@@ -161,8 +162,9 @@
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
-    <property name="glacier.resources" location="resources/experiments/AWS/Glacier"/>
-    <property name="s3.resources"      location="resources/experiments/AWS/s3"/>
+    <property name="aws.resources"     location="resources/experiments/AWS" />
+    <property name="glacier.resources" location="${aws.resources}/Glacier"/>
+    <property name="s3.resources"      location="${aws.resources}/s3"/>
     <property name="nciso.resources"   location="resources/nciso"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
@@ -213,8 +215,12 @@
 
 
 
-    <property name="aws.sdk" location="resources/experiments/AWS/Glacier/lib/aws-java-sdk-1.8.9.1.jar" />
-    <property name="aws.sdk.tools" location="resources/experiments/AWS/Glacier/lib/aws-java-sdk-flow-build-tools-1.8.9.1.jar" />
+    <property name="aws.sdk" value="aws-java-sdk-1.8.9.1.jar" />
+    <property name="aws.sdk.tools" value="aws-java-sdk-flow-build-tools-1.8.9.1.jar" />
+
+    <property name="jackson.databind" value="jackson-databind-2.4.1.jar" />
+    <property name="jackson.core" value="jackson-core-2.4.1.jar" />
+    <property name="jackson.annotations" value="jackson-annotations-2.4.1.jar" />
 
 
 
@@ -261,8 +267,11 @@
             <include name="${logback-classic.lib}"/>
 
         </fileset>
-        <pathelement location="${aws.sdk}"/>
-        <pathelement location="${aws.sdk.tools}"/>
+
+        <fileset dir="${aws.resources}/lib">
+            <include name="**"/>
+        </fileset>
+
 
 
     </path>
@@ -562,47 +571,36 @@
 
     <!-- *******************************************************
 
-            NOAA S3 Resource Ingester -
+            S3 Uploader -
 
-            Given an S3 Bucket that contains an index/catalog as defined by Relph and Ogata along with the associated
-            data files the application will retrieve the S3 contents, create a local catalog, upload all of the data into a
-            glacier vault (with the same name as the s3 bucket) and inter the dataset metadata locally in the process.
+            Loads files into an S3 bucket under the supplied upload key.
 
     -->
 
-    <property name="S3_ROOT"              value="/Users/ndp/scratch/s3Test"/>
-    <property name="S3_BUCKET"            value="foo-s3cmd.nodc.noaa.gov"/>
+    <property name="S3_BUCKET"            value="opendap.test"/>
 
-    <property name="GLACIER_ARCHIVE_ROOT" value="/Users/ndp/scratch/glacier"/>
-    <property name="GLACIER_ENDPOINT_URL" value="https://glacier.us-east-1.amazonaws.com"/>
+    <property name="UPLOAD_FILE"          value="resources/experiments/AWS/s3/index.xml"/>
+    <property name="UPLOAD_KEY"           value="/index.xml"/>
 
     <property name="AWS_KEY_ID"           value="anonymous" />
     <property name="AWS_SECRET_KEY"       value="YouShouldKnowBetterThanThat" />
 
-    <property name="BES_PREFIX"           value="/Users/ndp/hyrax/trunk" />
-
-    <property name="VAULT_CMD"            value="isInventoryReady" />
-
-    <property name="VAULT_NAME"           value="foo-s3cmd.nodc.noaa.gov" />
-    <property name="WORKING_DIR"          value="${GLACIER_ARCHIVE_ROOT}/cache" />
 
 
-    <target  name="IngestS3Bucket" depends="compile">
+    <target  name="s3up" depends="compile">
 
-        <java classname="opendap.aws.glacier.NoaaResourceIngester"
+        <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
                 >
-            <classpath refid="compile.classpath"/>
+            <classpath refid="compile.classpath" />
 
-            <arg line="--s3-root=${S3_ROOT}" />
+            <arg line="--verbose" />
             <arg line="--s3-bucket-name=${S3_BUCKET}" />
 
-            <arg line="--glacier-archive-root=${GLACIER_ARCHIVE_ROOT}" />
-            <arg line="--glacier-endpoint-url=${GLACIER_ENDPOINT_URL}" />
-
-            <arg line="--bes-install-prefix=${BES_PREFIX}" />
+            <arg line="--uploadFile=${UPLOAD_FILE}" />
+            <arg line="--uploadKey=${UPLOAD_KEY}" />
 
             <arg line="--awsId=${AWS_KEY_ID}" />
             <arg line="--awsKey=${AWS_SECRET_KEY}" />
@@ -610,31 +608,6 @@
 
     </target>
 
-
-    <target  name="VaultOperation" depends="compile">
-
-        <java classname="opendap.aws.glacier.Vault"
-              fork="true"
-              maxmemory="1024m"
-              dir="${build.run}"
-                >
-            <classpath refid="compile.classpath"/>
-
-            <arg line="--vault-name=${GLACIER_ARCHIVE_ROOT}" />
-            <arg line="--endpoint-url=${GLACIER_ENDPOINT_URL}" />
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
-
-            <arg line="--vault-name=${VAULT_NAME}" />
-            <arg line="--working-directory=${WORKING_DIR}" />
-
-            <arg line="${VAULT_CMD}" />
-
-
-        </java>
-
-    </target>
 
 
     <!-- *******************************************************  -->
