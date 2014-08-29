@@ -77,11 +77,12 @@
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='font-size:large;'><a href="">Special Testiness</a></div>
+            <div style='font-size:large;font-style: italic'><a href="">Experimental DAP Service</a></div>
         </td>
     </tr>
 </table>
-<h1>NOAA S3 Index Test</h1>
+<h1>S3 DAP Service</h1>
+<div class="medium_italic">Bucket List</div>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->

@@ -281,12 +281,8 @@
 
 
 
-    <target name="all" depends="clean"
+    <target name="all" depends="clean, server"
             description="Builds lots of stuff.">
-
-        <!-- build the OLFS -->
-        <ant antfile="build.xml" target="server" />
-        <ant antfile="s3-build.xml" target="server" />
     </target>
 
 
@@ -295,14 +291,14 @@
     </target>
 
 
-    <target name="clean_retain_dist" description="Clean up build products except the dist directory.">
+    <!-- target name="clean_retain_dist" description="Clean up build products except the dist directory.">
         <delete verbose="true"  includeEmptyDirs="true">
             <fileset dir="${build.dir}">
                 <include name="**/*"/>
                 <exclude name="dist/**/*"/>
             </fileset>
         </delete>
-    </target>
+    </target -->
 
 
     <target name="init" description="Prepare all build directories.">
@@ -328,7 +324,7 @@
 
 
     <target  name="PreProcessSourceCode"
-             depends="clean_retain_dist,init"
+             depends="clean,init"
              description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
 
@@ -470,7 +466,7 @@
 
     <target
             name="server"
-            depends="clean_retain_dist,compile"
+            depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
 
