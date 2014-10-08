@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response xmlns="http://xml.opendap.org/ns/bes/1.0#" reqID="[http-8080-2:17:bes_request]"><getDDX><BESError><Type>1</Type><Message>libdap exception building response: error_code = 1001: libdap error transmitting DDX: Function calls can only be used with data requests. To see the structure of the underlying data source, reissue the URL without the function.</Message><Administrator>admin.email.address@your.domain.name</Administrator></BESError></getDDX></response>

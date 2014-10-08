@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: opendap.gateway.HexAsciiEncoder
+Created-By: 1.4.2_07 (Apple Computer, Inc.)
+Class-Path: apache-commons-cli-1.2.jar

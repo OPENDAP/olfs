@@ -1,0 +1,4 @@
+Error {
+    code = 1005;
+    message = "libdap error transmitting DataDDS: Constraint expression parse error: Not a registered function: date_time";
+};

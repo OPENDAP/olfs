@@ -1,0 +1,6 @@
+The loop.tar file contains a set of three THREDDS catalogs in a simple
+hierarchy that contain loops (simple, child-parent and
+child-grandparent) and ws used to test the Java THREDDS crawler build
+for the REAP cataloging project.
+
+jhrg 3.3.10

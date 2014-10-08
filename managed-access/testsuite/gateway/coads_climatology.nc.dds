@@ -1,0 +1,11 @@
+Dataset {
+    Grid {
+      Array:
+        Float32 AGssta[time = 1][altitude = 1][lat = 1501][lon = 3601];
+      Maps:
+        Float64 time[time = 1];
+        Float32 altitude[altitude = 1];
+        Float32 lat[lat = 1501];
+        Float32 lon[lon = 3601];
+    } AGssta;
+} dodsTrIdq6;

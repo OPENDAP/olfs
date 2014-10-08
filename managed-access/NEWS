@@ -1,0 +1,45 @@
+
+Version 1.12.0 (14 August 2014)
+
+Refactored OLFS configuration.
+Added JSON and IJSN responses.
+Added WMS support via ncWMS integration.
+
+Version 1.11.3 (02 July 2014)
+
+Repaired bug that was breaking Hyrax's ability to
+serve plain files (not otherwise recognized as
+'data' by the BES)".
+
+
+Version 1.11.2 (06 June 2014)
+
+Repaired broken nciso production rule.
+
+
+Version 1.11.1 (22 May 2014)
+
+Fixed a bug in the WebStart system.
+
+
+Version 1.11.0 (1 April 2014)
+
+Internal (but as yet not fully released support) for DAP4 responses,
+along with stored_result/asynchronous behavior
+Bug fixes.
+Major changes to internal API.
+
+
+Version 1.10.0 (11 September 2013)
+
+
+Support for geotiff and jpeg2000 responses.
+Bug fixes.
+Cruft code removal from code tree.
+Support for constraint expressions as POST bodies.
+
+
+Version < 1.10 (06 January 2013)
+
+I created the NEWS file with version 1.10.0 so no
+prior versions are represented here.

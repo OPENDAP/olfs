@@ -1,0 +1,71 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "Hyrax Data Server" project.
+ * //
+ * //
+ * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
+
+div.content {
+	border: #527CC1 solid 1px;
+	clear: left;
+    padding: 10px;
+}
+
+ol {
+	height: 2em;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+ol a {
+	background: #527CC1 100% 0;
+	color: #78a3e7;
+	float: left;
+	line-height: 2em;
+	outline: none;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-decoration: none;
+    border: #527CC1 solid 1px;
+}
+
+ol li.current {
+	background-color: #ffffff ;
+}
+
+ol li.current a {
+	background-color: #78a3e7 ;
+	color: #000;
+	font-weight: bold;
+    border: #527CC1 solid 1px;
+
+}
+
+ol li {
+	background: #527CC1;
+	float: left;
+	margin: 0 1px 0 0;
+	padding-left: 10px;
+}
+
+

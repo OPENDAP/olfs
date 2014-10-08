@@ -1,0 +1,4 @@
+Dataset {
+    Float32 DATA_GRANULE_PlanetaryGrid_percipitate[scan = 1][longitude = 360][latitude = 80];
+    Float32 DATA_GRANULE_PlanetaryGrid_relError[scan = 1][longitude = 360][latitude = 80];
+} 3B42.980909.5.HDF;

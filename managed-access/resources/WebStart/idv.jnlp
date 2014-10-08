@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+
+<!-- JNLP File for Integrated Data Viewer -->
+<jnlp spec="1.0+" codebase="http://www.unidata.ucar.edu/software/idv/current/webstart/">
+  <information>
+    <title>Integrated Data Viewer</title>
+    <vendor>Unidata</vendor>
+    <homepage href="http://www.unidata.ucar.edu/software/idv/index.html"/>
+    <description>Integrated Data Viewer (IDV)</description>
+    <description kind="short">A tool for geoscientific analysis and visualization.
+    </description>
+    <icon href="IDV/idv.gif"/>
+    <offline-allowed/>
+  </information>
+
+  <resources>
+    <j2se version="1.6+" max-heap-size="1024m"/>
+    <jar href="IDV/idv.jar"/>
+    <extension name="IDV Base" href="IDV/idvbase.jnlp"/>
+  </resources>
+  <resources os="Linux">
+    <property name="j3d.sharedctx" value="false"/>
+  </resources>
+
+  <application-desc main-class="ucar.unidata.idv.DefaultIdv">
+      <argument>-data</argument>
+      <argument>type:opendap.grid:{datasetUrl}</argument>
+      <argument>-oneinstanceport</argument>
+      <argument>14445</argument>
+  </application-desc>
+
+  <application-desc main-class="ucar.unidata.idv.DefaultIdv"/>
+  <security>
+    <all-permissions/>
+  </security>
+
+</jnlp>

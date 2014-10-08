@@ -1,0 +1,200 @@
+<%--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  --%>
+
+<%@ page import="opendap.bes.BES" %>
+<%@ page import="opendap.bes.BESManager" %>
+<%@ page import="opendap.bes.BesAdminFail" %>
+<%@ page import="opendap.bes.BesGroup" %>
+<%@ page import="opendap.hai.Util" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.TreeMap" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<%
+
+    Logger log = LoggerFactory.getLogger("opendap.hai.jsp.besLogConfig");
+
+
+
+    String contextPath = request.getContextPath();
+
+    HashMap<String, String> kvp = Util.processQuery(request);
+
+
+    String currentPrefix = kvp.get("prefix");
+    if (currentPrefix == null)
+        currentPrefix = "/";
+
+
+    log.debug("BES prefix: "+currentPrefix);
+
+    String currentBesTask = kvp.get("task");
+    if (currentBesTask == null)
+        currentBesTask = "";
+
+    String currentBesName  = kvp.get("besName");
+
+
+    BesGroup currentPrefixBesGroup = BESManager.getBesGroup(currentPrefix);
+
+    if(currentBesName==null){
+        currentBesName = currentPrefixBesGroup.get(0).getNickName();
+    }
+
+    BES bes = currentPrefixBesGroup.get(currentBesName);
+
+
+    String besCtlApi = contextPath + "/hai/besctl";
+
+
+    StringBuffer status = new StringBuffer();
+    status.append(" OK ");
+
+
+%>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>BES Controller</title>
+    <link rel='stylesheet' href='<%= contextPath%>/docs/css/contents.css' type='text/css'/>
+    <link rel='stylesheet' href='<%= contextPath%>/docs/css/tabs.css' type='text/css'/>
+    <link rel='stylesheet' href='<%= contextPath%>/docs/css/besctl.css' type='text/css'/>
+    <script type="text/javascript" src="../js/XmlHttpRequest.js"></script>
+    <script type="text/javascript" src="../js/besctl.js"></script>
+
+</head>
+
+<body>
+<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
+<div style="clear: both;"> </div>
+<h1 style="text-align: center;">BES Logging Configuration</h1>
+<div style="text-align: center;"> <%= currentBesName%> </div>
+
+<div id="besLoggingConfig" class="content">
+
+
+
+<%
+    if(bes==null){
+        /** #############################################################################
+         *  #############################################################################
+         *
+         *  Show No Such BES Error
+         *
+         */
+        status.replace(0,status.length(),"");
+        status.append(" FAIL ");
+
+%>
+
+<div class="medium_bold"><%=status%></div>
+<br/>
+<div class="medium">
+    There is no BES named '<%= currentBesName%>' associated with prefix '<%= currentPrefix%>'.
+    <br/>
+    <br/>
+    Please:
+    <ul>
+        <li><a href="<%= contextPath%>/admin/index.html">Follow this link to the Hyrax Admin Interface</a></li>
+        <li>Drill back down to this page.</li>
+        <li>
+            Don't edit it the command line parameters by hand. <br />
+            It's annoying and it makes me sad when you do that.
+        </li>
+        <li>Stop it.</li>
+    </ul>
+</div>
+
+<%
+    }
+    else {
+
+%>
+    <div class="small">
+
+        <div style=" margin-left: 40px; margin-right: 5px;">
+            <form name="loggerSelect" action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&cmd=setLoggers"
+                  method="get">
+
+            <%
+                TreeMap<String, BES.BesLogger> besLoggers = null;
+                try {
+                    besLoggers = bes.getBesLoggers();
+                    for (BES.BesLogger logger : besLoggers.values()) {
+                        out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
+
+                        if (logger.getIsEnabled()) {
+                            out.append(" checked='checked' ");
+                        }
+                        out.append(" />").append(logger.getName()).append("<br/>\n");
+
+                    }
+                } catch (BesAdminFail besAdminFail) {
+
+                    out.append("<strong>").append(besAdminFail.getMessage()).append("</strong>");
+                    status = new StringBuffer();
+                    status.append(besAdminFail.getMessage());
+                    //besAdminFail.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+
+            %>
+
+            </form>
+        </div>
+    </div>
+
+<button onclick="commitBesLoggingChanges('<%=besCtlApi%>','<%=currentPrefix%>','<%=currentBesName%>',document.loggerSelect.lSelection);">Commit</button>
+
+<button onclick="self.close()">Cancel</button>
+
+ <%
+
+
+    }
+
+%>
+
+
+
+
+</div>
+
+
+<br/>
+<div class="tiny_black_fw"><strong>Status</strong>
+
+    <div id='status' class='statusDisplay'>
+        <pre><%=status%></pre>
+    </div>
+
+</div>
+
+
+</body>
+</html>

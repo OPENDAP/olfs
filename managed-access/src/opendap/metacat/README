@@ -1,0 +1,86 @@
+
+This package contains software that crawls OPeNDAP servers and builds 
+different kinds of metadata records. There are main() methods for almost all 
+of the classes, although most are intended for simple testing only. To run the
+crawler, etc., use the shell scripts that the ant build file 
+(reap_crawler_build.xml) uses with the 'build' targets. These scripts are the
+executables and use executable jar files that include a control file for the
+logging system.
+
+Current shell commands provided:
+
+ddx_crawler.sh: 
+
+Based on DDXCrawler, this will crawl a server, fetching each
+THREDDS catalog and caching it in POSTGRES. The URLs that reference all the
+catalogs are stored in a ConcurrentHashMap (just 'map' from now on) which is
+made persistent using its 'Serializable' interface. The ddx_crawler command
+also extracts all of the DDX URLs from the catalogs and stores those in a
+second map. Optionally, ddx_crawler will fetch all of those referenced DDX
+objects and store those in POSTGRES, too. This command can also replay a crawl
+using cached data and, if the feature is fixed, it can recover from problems
+and resume a crawl. This works now if the crawl is interrupted by an Exception,
+but support for CNTL-c and the like is missing.
+
+print_cached_urls.sh:
+
+Print the URLs in the DDX and THREDDS caches. This takes a cache-name (e.g.,
+test.opendap.org) and uses the read-only cache feature to open and list all
+of the URLs. It does not print the documents.
+
+ddx_retriever.sh:
+
+Get all of the DDX URLs that have been cached and/or read a DDX document 
+either from the cache or off the wire.
+
+url_classifier.sh:
+
+Given that a crawl has run its course and both the thredds and ddx caches are
+loaded with data, classify the URLs. This forms groups, which may each have
+only one member if no URLs could actually be grouped together, and saves the
+result as a serialized URLGroups object. This object can be read and used
+by subsequent code to build different kinds of metadata documents.
+
+eml_writer.sh:
+
+Given the name of a URLGroups file built using URLClassifier, write an EML
+document for each group.
+
+ncml_writer.sh:
+
+Same as above, but writes NCML for a group if it can. There are limitations
+on the kinds of NCML and on the things that the code will recognize.
+
+-------------------------------------------------------------------------------
+
+URLs into servers that we should index for the ocean use case:
+
+http://data.nodc.noaa.gov/opendap/ghrsst/
+http://satdat1.gso.uri.edu/thredds/dodsC/NWPacificDec_1km
+http://satdat1.gso.uri.edu/thredds/dodsC/NEPacificDec_1km
+http://satdat1.gso.uri.edu/thredds/dodsC/NWAtlanticDec_1km
+    
+Other URLs:
+
+This is a set of hand written catalogs that contain gnarly loops
+http://test.opendap.org:8090/opendap/loop/catalog.xml
+
+This URL tests how the crawler deals with catalog references that
+fail (the server returns a 404 response when they are dereferenced)
+http://test.opendap.org:8090/opendap/codar/radials_measpatts/bisl/2006/mar/catalog.xml
+
+A smaller collection of datasets on test.opendap.org
+http://test.opendap.org:8090/opendap/data/catalog.html
+    
+Everything on test.opendap.org
+http://test.opendap.org:8090/opendap/catalog.xml
+
+----------------------------------------------------------------------------
+
+DDX URLs into the NODC GHRSST Server:
+
+http://data.nodc.noaa.gov/opendap/ghrsst/L4/AUS/ABOM/RAMSSA_09km/2008/092/20080401-ABOM-L4HRfnd-AUS-v01-fv02_0-RAMSSA_09km.nc.bz2.ddx
+http://data.nodc.noaa.gov/opendap/ghrsst/L4/GAL/EUR/ODYSSEA/2008/023/20080123-EUR-L4UHRfnd-GAL-v01-fv01-ODYSSEA.nc.bz2.ddx
+
+Other datasets that are part of the Ocean Use case:
+The HYCOM site, our AVHRR site and the JPL MODIS site - all in the Matlab toolbox thing.

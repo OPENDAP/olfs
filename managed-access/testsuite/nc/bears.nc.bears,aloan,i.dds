@@ -1,0 +1,17 @@
+Dataset {
+    Grid {
+      Array:
+        String bears[i = 2][j = 3];
+      Maps:
+        Int32 i[i = 2];
+        Float32 j[j = 3];
+    } bears;
+    Grid {
+      Array:
+        Float32 aloan[i = 2][j = 3];
+      Maps:
+        Int32 i[i = 2];
+        Float32 j[j = 3];
+    } aloan;
+    Int32 i[i = 2];
+} bears.nc;

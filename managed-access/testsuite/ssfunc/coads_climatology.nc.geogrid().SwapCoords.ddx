@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:37:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDDX>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: libdap error transmitting DDX: The upper and lower latitude indices appear to be reversed. Please provide the latitude bounding box numbers giving the northern-most latitude first.</Message>
+            <Administrator>admin.email.address@your.domain.name</Administrator>
+        </BESError>
+    </getDDX>
+</response>

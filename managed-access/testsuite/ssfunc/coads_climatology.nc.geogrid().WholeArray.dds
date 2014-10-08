@@ -1,0 +1,10 @@
+Dataset {
+    Grid {
+      Array:
+        Float32 SST[TIME = 12][COADSY = 46][COADSX = 90];
+      Maps:
+        Float64 TIME[TIME = 12];
+        Float64 COADSY[COADSY = 46];
+        Float64 COADSX[COADSX = 90];
+    } SST;
+} function_result_coads_climatology.nc;

@@ -1,0 +1,46 @@
+
+########################## Hyrax/OLFS ##########################
+
+Hyrax Version 1.9.9  (14 August 2014)
+OLFS  Version 1.12.0 (14 August 2014)
+
+The file install.html or docs/index.html may have additional information...
+
+First:
+
+    Build and install bes and at minimum the netcdf_handler projects.
+    Launch the bes (you can use besctl to do that). 
+    Make sure there s a beslistener process runnning.
+
+Check it out:
+
+    svn co http://scm.opendap.org/svn/trunk/olfs
+
+Build it:
+
+    ant server
+
+(To make a distribution for release:  ant server -DHYRAX_VERSION=<num> -DOLFS_VERSION=<num> )
+
+Install it:
+
+    rm -rf $CATALINA_HOME/webapps/opendap*
+    cp build/dist/opendap.war $TOMCAT_HOME/webapps
+
+Launch it:
+
+    $CATALINA_HOME/bin/startup.sh
+
+Configure it:
+
+    vi $CATALINA_HOME/content/opendap/olfs.xml
+    (If your beslistener is not running on localhost:10022 then besure to adjust the <host> and <port>
+    values to reflect your situation)
+
+Relaunch it:
+
+    $CATALINA_HOME/bin/shutdown.sh; $CATALINA_HOME/bin/startup.sh
+
+
+See http://docs.opendap.org/index.php/Hyrax for information about this software, Installation
+instructions and News.

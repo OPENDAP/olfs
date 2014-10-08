@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Check to make sure the computer is running 10.3 or later.
+
+# use "i386" or "ppc.*" - nake sure to use a regex for PPC!
+
+architecture="i386.*"
+
+
+PATH="/usr/local/opendap/servers/hyrax-1.6.2/bin:$PATH"
+
+
+
+
+if arch | grep -v "$architecture"
+then
+    if arch | grep "i386"
+    then
+	# You have an intel mac error message
+	exit 115
+    else
+	# PowerPC message
+	exit 116
+    fi
+fi
+
+# Check to make sure the computer is running 10.3 or later.
+
+version=`uname -a | sed 's/.*Darwin Kernel Version \([0-9.]*\):.*/\1/'`
+major=`echo $version | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1/'`
+minor=`echo $version | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\2/'`
+
+echo "OS X version: "$version" major: "$major" minor: "$minor 
+if test $major -lt 7 -o $major -eq 7 -a $minor -lt 9
+then
+    # Warn and display message 16
+    exit 112
+fi
+
+
+version=$(java -version 2>&1 | awk '{if(NR==1)print $3}' - | sed -e "s/\"//g")
+major=`echo $version | awk '{split($0,a,".");print a[1]}' -`
+minor=`echo $version | awk '{split($0,a,".");print a[2]}' -`
+
+echo "Java version: "$version" major: "$major" minor: "$minor 
+
+if test $major -lt 1 -o $major -eq 1 -a $minor -lt 6
+then
+    exit 113
+fi
+
+exit 0

@@ -1,0 +1,4 @@
+Error {
+    code = 1005;
+    message = "libdap error transmitting DataDDS: Wrong number of arguments to geogrid() (expected at least 5 args). See geogrid() for more information.";
+};

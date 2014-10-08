@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="bears.nc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://xml.opendap.org/ns/DAP/3.2#  http://xml.opendap.org/dap/dap/3.2.xsd"
+xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
+xmlns="http://xml.opendap.org/ns/DAP/3.2#"
+xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#"
+dap_version="3.2"
+xmlns:xml="http://www.w3.org/XML/1998/namespace"
+xml:base="http://localhost:8080/opendap/bears.nc.ddx"
+>
+    <Attribute name="bears" type="Container">
+        <Attribute name="act" type="String">
+            <value>text string\\012\\011123</value>
+        </Attribute>
+        <Attribute name="acs" type="Int16">
+            <value>-40</value>
+        </Attribute>
+        <Attribute name="acl" type="Int32">
+            <value>17000</value>
+        </Attribute>
+        <Attribute name="acf" type="Float32">
+            <value>-2.000000000</value>
+            <value>1.000000000</value>
+            <value>0.000000000</value>
+        </Attribute>
+        <Attribute name="acd" type="Float64">
+            <value>-1.0000000000000000</value>
+            <value>0.75000000000000000</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <value>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <value>k</value>
+        </Attribute>
+    </Attribute>
+
+    <Grid name="order">
+        <Array name="order">
+            <Int16/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Grid name="shot">
+        <Array name="shot">
+            <Int32/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Grid name="aloan">
+        <Array name="aloan">
+            <Float32/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Grid name="cross">
+        <Array name="cross">
+            <Float64/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Array name="i">
+        <Int32/>
+        <dimension name="i" size="2"/>
+    </Array>
+    <Array name="j">
+        <Float32/>
+        <dimension name="j" size="3"/>
+    </Array>
+    <Array name="l">
+        <Int16/>
+        <dimension name="l" size="3"/>
+    </Array>
+
+</Dataset>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="200803061600_HFRadar_USEGC_6km_rtv_SIO.nc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://xml.opendap.org/ns/DAP/3.2#  http://xml.opendap.org/dap/dap/3.2.xsd"
+xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
+xmlns="http://xml.opendap.org/ns/DAP/3.2#"
+xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#"
+dap_version="3.2"
+xmlns:xml="http://www.w3.org/XML/1998/namespace"
+xml:base="http://localhost:8080/opendap/coverage/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx"
+>
+    <Attribute name="site_code" type="Container">
+        <Attribute name="long_name" type="String">
+            <value>Contributing radar site code</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="site_netCode" type="Container">
+        <Attribute name="long_name" type="String">
+            <value>Contributing radar site network affiliation code</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="netcdf_library_version" type="String">
+            <value>netcdf library version 3.6.1 of Feb  3 2008 23:15:25 $</value>
+        </Attribute>
+        <Attribute name="format_version" type="String">
+            <value>HFRNet_1.0.0b2</value>
+        </Attribute>
+        <Attribute name="product_version" type="String">
+            <value>HFRNet_1.1.01</value>
+        </Attribute>
+        <Attribute name="Conventions" type="String">
+            <value>CF-1.1</value>
+        </Attribute>
+        <Attribute name="title" type="String">
+            <value>Near-Real Time Surface Ocean Velocity</value>
+        </Attribute>
+        <Attribute name="institution" type="String">
+            <value>Scripps Institution of Oceanography</value>
+        </Attribute>
+        <Attribute name="source" type="String">
+            <value>Surface Ocean HF-Radar</value>
+        </Attribute>
+        <Attribute name="history" type="String">
+            <value>12-Mar-2008 22:26:19:  NetCDF file created</value>
+        </Attribute>
+        <Attribute name="references" type="String">
+            <value>Terrill, E. et al., 2006. Data Management and Real-time\\012Distribution in the HF-Radar National Network. Proceedings\\012of the MTS/IEEE Oceans 2006 Conference, Boston MA,\\012September 2006.</value>
+        </Attribute>
+        <Attribute name="creator_name" type="String">
+            <value>Mark Otero</value>
+        </Attribute>
+        <Attribute name="creator_email" type="String">
+            <value>motero@mpl.ucsd.edu</value>
+        </Attribute>
+        <Attribute name="creator_url" type="String">
+            <value>http://cordc.ucsd.edu/projects/mapping/</value>
+        </Attribute>
+        <Attribute name="summary" type="String">
+            <value>Surface ocean velocities estimated from HF-Radar are\\012representitive of the upper 0.3 - 2.5 meters of the\\012ocean.  The main objective of near-real time\\012processing is to produce the best product from\\012available data at the time of processing.  Radial\\012velocity measurements are obtained from individual\\012radar sites through the HF-Radar Network and\\012processed to create near-real time velocities\\012(RTVs)</value>
+        </Attribute>
+        <Attribute name="geospatial_lat_min" type="Float32">
+            <value>21.73596001</value>
+        </Attribute>
+        <Attribute name="geospatial_lat_max" type="Float32">
+            <value>46.49441910</value>
+        </Attribute>
+        <Attribute name="geospatial_lon_min" type="Float32">
+            <value>-97.88385010</value>
+        </Attribute>
+        <Attribute name="geospatial_lon_max" type="Float32">
+            <value>-57.23120880</value>
+        </Attribute>
+        <Attribute name="grid_resolution" type="String">
+            <value>6km</value>
+        </Attribute>
+        <Attribute name="grid_projection" type="String">
+            <value>equidistant cylindrical</value>
+        </Attribute>
+        <Attribute name="regional_description" type="String">
+            <value>Unites States, East and Gulf Coast</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <value>time</value>
+        </Attribute>
+    </Attribute>
+
+    <Array name="time">
+        <Attribute name="standard_name" type="String">
+            <value>time</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>seconds since 1970-01-01</value>
+        </Attribute>
+        <Attribute name="calendar" type="String">
+            <value>gregorian</value>
+        </Attribute>
+        <Int32/>
+        <dimension name="time" size="1"/>
+    </Array>
+    <Array name="lat">
+        <Attribute name="standard_name" type="String">
+            <value>latitude</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>degrees_north</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="lat" size="460"/>
+    </Array>
+    <Array name="lon">
+        <Attribute name="standard_name" type="String">
+            <value>longitude</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>degrees_east</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="lon" size="701"/>
+    </Array>
+    <Grid name="u">
+        <Attribute name="standard_name" type="String">
+            <value>surface_eastward_sea_water_velocity</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>m s-1</value>
+        </Attribute>
+        <Attribute name="_FillValue" type="Int16">
+            <value>-32768</value>
+        </Attribute>
+        <Attribute name="scale_factor" type="Float32">
+            <value>0.009999999776</value>
+        </Attribute>
+        <Attribute name="ancillary_variables" type="String">
+            <value>DOPx</value>
+        </Attribute>
+        <Array name="u">
+            <Int16/>
+            <dimension name="time" size="1"/>
+            <dimension name="lat" size="460"/>
+            <dimension name="lon" size="701"/>
+        </Array>
+        <Map name="time">
+            <Int32/>
+            <dimension name="time" size="1"/>
+        </Map>
+        <Map name="lat">
+            <Float32/>
+            <dimension name="lat" size="460"/>
+        </Map>
+        <Map name="lon">
+            <Float32/>
+            <dimension name="lon" size="701"/>
+        </Map>
+    </Grid>
+    <Grid name="v">
+        <Attribute name="standard_name" type="String">
+            <value>surface_northward_sea_water_velocity</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>m s-1</value>
+        </Attribute>
+        <Attribute name="_FillValue" type="Int16">
+            <value>-32768</value>
+        </Attribute>
+        <Attribute name="scale_factor" type="Float32">
+            <value>0.009999999776</value>
+        </Attribute>
+        <Attribute name="ancillary_variables" type="String">
+            <value>DOPy</value>
+        </Attribute>
+        <Array name="v">
+            <Int16/>
+            <dimension name="time" size="1"/>
+            <dimension name="lat" size="460"/>
+            <dimension name="lon" size="701"/>
+        </Array>
+        <Map name="time">
+            <Int32/>
+            <dimension name="time" size="1"/>
+        </Map>
+        <Map name="lat">
+            <Float32/>
+            <dimension name="lat" size="460"/>
+        </Map>
+        <Map name="lon">
+            <Float32/>
+            <dimension name="lon" size="701"/>
+        </Map>
+    </Grid>
+    <Grid name="DOPx">
+        <Attribute name="long_name" type="String">
+            <value>longitudinal dilution of precision</value>
+        </Attribute>
+        <Attribute name="comment" type="String">
+            <value>The longitudinal dilution of precision (DOPx) represents the\\012contribution of the radars&apos; configuration geometry to\\012uncertainty in the eastward velocity estimate (u). DOPx is a\\012direct multiplier of the standard error in obtaining the\\012standard deviation for the eastward velocity estimate from the\\012least squares best fit. DOPx and DOPy are commonly used to\\012obtain the geometric dilution of precision\\012(GDOP = sqrt(DOPx^2 + DOPy^2)), a useful metric for filtering\\012errant velocities due to poor geometry.</value>
+        </Attribute>
+        <Attribute name="_FillValue" type="Int16">
+            <value>-32768</value>
+        </Attribute>
+        <Attribute name="scale_factor" type="Float32">
+            <value>0.009999999776</value>
+        </Attribute>
+        <Array name="DOPx">
+            <Int16/>
+            <dimension name="time" size="1"/>
+            <dimension name="lat" size="460"/>
+            <dimension name="lon" size="701"/>
+        </Array>
+        <Map name="time">
+            <Int32/>
+            <dimension name="time" size="1"/>
+        </Map>
+        <Map name="lat">
+            <Float32/>
+            <dimension name="lat" size="460"/>
+        </Map>
+        <Map name="lon">
+            <Float32/>
+            <dimension name="lon" size="701"/>
+        </Map>
+    </Grid>
+    <Grid name="DOPy">
+        <Attribute name="long_name" type="String">
+            <value>latitudinal dilution of precision</value>
+        </Attribute>
+        <Attribute name="comment" type="String">
+            <value>The latitudinal dilution of precision (DOPy) represents the\\012contribution of the radars&apos; configuration geometry to\\012uncertainty in the northward velocity estimate (v). DOPy is a\\012direct multiplier of the standard error in obtaining the\\012standard deviation for the northward velocity estimate from the\\012least squares best fit. DOPx and DOPy are commonly used to\\012obtain the geometric dilution of precision\\012(GDOP = sqrt(DOPx^2 + DOPy^2)), a useful metric for filtering\\012errant velocities due to poor geometry.</value>
+        </Attribute>
+        <Attribute name="_FillValue" type="Int16">
+            <value>-32768</value>
+        </Attribute>
+        <Attribute name="scale_factor" type="Float32">
+            <value>0.009999999776</value>
+        </Attribute>
+        <Array name="DOPy">
+            <Int16/>
+            <dimension name="time" size="1"/>
+            <dimension name="lat" size="460"/>
+            <dimension name="lon" size="701"/>
+        </Array>
+        <Map name="time">
+            <Int32/>
+            <dimension name="time" size="1"/>
+        </Map>
+        <Map name="lat">
+            <Float32/>
+            <dimension name="lat" size="460"/>
+        </Map>
+        <Map name="lon">
+            <Float32/>
+            <dimension name="lon" size="701"/>
+        </Map>
+    </Grid>
+    <Array name="site_lat">
+        <Attribute name="long_name" type="String">
+            <value>Contributing radar site latitudes</value>
+        </Attribute>
+        <Attribute name="standard_name" type="String">
+            <value>latitude</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>degrees_north</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="nSites" size="27"/>
+    </Array>
+    <Array name="site_lon">
+        <Attribute name="long_name" type="String">
+            <value>Contributing radar site longitudes</value>
+        </Attribute>
+        <Attribute name="standard_name" type="String">
+            <value>longitude</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>degrees_east</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="nSites" size="27"/>
+    </Array>
+    <Array name="procParams">
+        <Attribute name="long_name" type="String">
+            <value>RTV processing parameters</value>
+        </Attribute>
+        <Attribute name="comment" type="String">
+            <value>\\01201) Maximum GDOP threshold\\01202) Maximum speed threshold (cm s-1)\\01203) Minimum number of sites required\\01204) Minimum number of radials required\\01205) Maximum angular gap to interpolate radial\\012    data over (degrees, 0 = no interpolation)\\01206) Maximum gap in range to interpolate radial\\012    data over (range-resolution, 0 = no interpolation)\\01207) Spatial search radius for radial solutions (km)</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="nProcParam" size="7"/>
+    </Array>
+
+</Dataset>

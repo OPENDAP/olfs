@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmi:MI_Metadata xmlns:gsr="http://www.isotc211.org/2005/gsr"
+                 xmlns:gss="http://www.isotc211.org/2005/gss"
+                 xmlns:gts="http://www.isotc211.org/2005/gts"
+                 xmlns:gml="http://www.opengis.net/gml/3.2"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                 xmlns:srv="http://www.isotc211.org/2005/srv"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                 xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#"
+                 xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                 xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd">
+   <gmd:fileIdentifier gco:nilReason="missing"/>
+   <gmd:language>
+      <gmd:LanguageCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#gmd:LanguageCode"
+                        codeListValue="eng">eng</gmd:LanguageCode>
+   </gmd:language>
+   <gmd:characterSet>
+      <gmd:MD_CharacterSetCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#gmd:MD_CharacterSetCode"
+                               codeListValue="UTF8">UTF8</gmd:MD_CharacterSetCode>
+   </gmd:characterSet>
+   <gmd:hierarchyLevel>
+      <gmd:MD_ScopeCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#gmd:MD_ScopeCode"
+                        codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+   </gmd:hierarchyLevel>
+   <gmd:hierarchyLevel>
+      <gmd:MD_ScopeCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#gmd:MD_ScopeCode"
+                        codeListValue="service">service</gmd:MD_ScopeCode>
+   </gmd:hierarchyLevel>
+   <gmd:contact gco:nilReason="unknown"/>
+   <gmd:dateStamp gco:nilReason="unknown"/>
+   <gmd:metadataStandardName>
+      <gco:CharacterString>ISO 19115-2 Geographic Information - Metadata Part 2 Extensions for imagery and gridded data</gco:CharacterString>
+   </gmd:metadataStandardName>
+   <gmd:metadataStandardVersion>
+      <gco:CharacterString>ISO 19115-2:2009(E)</gco:CharacterString>
+   </gmd:metadataStandardVersion>
+   <gmd:spatialRepresentationInfo gco:nilReason="missing"/>
+   <gmd:identificationInfo>
+      <gmd:MD_DataIdentification>
+         <gmd:citation>
+            <gmd:CI_Citation>
+               <gmd:title>
+                  <gco:CharacterString> FNOC UV wind components from 1988- 10 to 1988- 13.</gco:CharacterString>
+               </gmd:title>
+               <gmd:date gco:nilReason="missing"/>
+               <gmd:identifier gco:nilReason="missing"/>
+               <gmd:citedResponsibleParty gco:nilReason="missing"/>
+            </gmd:CI_Citation>
+         </gmd:citation>
+         <gmd:abstract gco:nilReason="missing"/>
+         <gmd:credit gco:nilReason="missing"/>
+         <gmd:language>
+            <gco:CharacterString>eng</gco:CharacterString>
+         </gmd:language>
+         <gmd:topicCategory>
+            <gmd:MD_TopicCategoryCode>climatologyMeteorologyAtmosphere</gmd:MD_TopicCategoryCode>
+         </gmd:topicCategory>
+         <gmd:extent gco:nilReason="missing"/>
+      </gmd:MD_DataIdentification>
+   </gmd:identificationInfo>
+   <gmd:identificationInfo>
+      <srv:SV_ServiceIdentification id="OPeNDAP">
+         <gmd:citation>
+            <gmd:CI_Citation>
+               <gmd:title>
+                  <gco:CharacterString> FNOC UV wind components from 1988- 10 to 1988- 13.</gco:CharacterString>
+               </gmd:title>
+               <gmd:date gco:nilReason="missing"/>
+            </gmd:CI_Citation>
+         </gmd:citation>
+         <gmd:abstract gco:nilReason="missing"/>
+         <srv:serviceType>
+            <gco:LocalName>THREDDS OPeNDAP</gco:LocalName>
+         </srv:serviceType>
+         <srv:extent gco:nilReason="missing"/>
+         <srv:couplingType>
+            <srv:SV_CouplingType codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#SV_CouplingType"
+                                 codeListValue="tight">tight</srv:SV_CouplingType>
+         </srv:couplingType>
+         <srv:containsOperations>
+            <srv:SV_OperationMetadata>
+               <srv:operationName>
+                  <gco:CharacterString>OPeNDAPDatasetQueryAndAccess</gco:CharacterString>
+               </srv:operationName>
+               <srv:DCP gco:nilReason="unknown"/>
+               <srv:connectPoint>
+                  <gmd:CI_OnlineResource>
+                     <gmd:linkage>
+                        <gmd:URL>http://localhost:8080/opendap/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65</gmd:URL>
+                     </gmd:linkage>
+                  </gmd:CI_OnlineResource>
+               </srv:connectPoint>
+            </srv:SV_OperationMetadata>
+         </srv:containsOperations>
+         <srv:operatesOn xlink:href="#DataIdentification"/>
+      </srv:SV_ServiceIdentification>
+   </gmd:identificationInfo>
+   <gmd:metadataMaintenance>
+      <gmd:MD_MaintenanceInformation>
+         <gmd:maintenanceAndUpdateFrequency gco:nilReason="unknown"/>
+         <gmd:maintenanceNote>
+            <gco:CharacterString>This record was translated from NcML using OPeNDAP2MI.xsl Version 1.1.0</gco:CharacterString>
+         </gmd:maintenanceNote>
+      </gmd:MD_MaintenanceInformation>
+   </gmd:metadataMaintenance>
+</gmi:MI_Metadata>

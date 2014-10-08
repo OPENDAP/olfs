@@ -1,0 +1,4 @@
+Error {
+    code = 1001;
+    message = "libdap error transmitting DDS: Function calls can only be used with data requests. To see the structure of the underlying data source, reissue the URL without the function.";
+};

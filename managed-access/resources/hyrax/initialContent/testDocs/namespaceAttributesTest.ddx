@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="namespaceAttributesTest.nc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://xml.opendap.org/ns/DAP/3.2#  http://xml.opendap.org/dap/dap/3.2.xsd"
+xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
+xmlns="http://xml.opendap.org/ns/DAP/3.2#"
+xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#"
+dap_version="3.2"
+xmlns:xml="http://www.w3.org/XML/1998/namespace"
+xml:base="http://localhost:8080/opendap/namespaceAttributesTest.nc.ddx"
+>
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="Conventions" type="String">
+            <value>CF-1.0</value>
+        </Attribute>
+        <Attribute name="xmlns:wcs" type="String">
+            <value>http://www.opengis.net/wcs/1.1/</value>
+        </Attribute>
+    </Attribute>
+
+    <Array name="lat">
+        <Float64/>
+        <dimension name="lat" size="18"/>
+    </Array>
+    <Array name="lon">
+        <Float64/>
+        <dimension name="lon" size="36"/>
+    </Array>
+    <Grid name="temp">
+        <Attribute name="long_name" type="String">
+            <value>temperature</value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <value>K</value>
+        </Attribute>
+        <Attribute name="grid_mapping" type="String">
+            <value>crs</value>
+        </Attribute>
+        <Attribute name="wcs:gridCRS" type="String">
+            <value>crs</value>
+        </Attribute>
+        <Array name="temp">
+            <Float32/>
+            <dimension name="lat" size="18"/>
+            <dimension name="lon" size="36"/>
+        </Array>
+        <Map name="lat">
+            <Float64/>
+            <dimension name="lat" size="18"/>
+        </Map>
+        <Map name="lon">
+            <Float64/>
+            <dimension name="lon" size="36"/>
+        </Map>
+    </Grid>
+
+</Dataset>
