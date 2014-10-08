@@ -321,7 +321,7 @@ public class WebStartServlet extends HttpServlet {
         LogUtil.logServerAccessStart(req, "WebStartServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
 
 
-        log.debug(opendap.coreServlet.Util.showRequest(req, reqNumber.get()));
+        log.debug(ServletUtil.showRequest(req, reqNumber.get()));
         //log.debug(opendap.coreServlet.AwsUtil.probeRequest(this, req));
 
 

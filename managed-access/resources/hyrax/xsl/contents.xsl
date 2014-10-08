@@ -37,6 +37,9 @@
     <xsl:param name="docsService" />
     <xsl:param name="viewersService" />
     <xsl:param name="allowDirectDataSourceAccess" />
+    <xsl:param name="userId" />
+    <xsl:param name="loginLink" />
+    <xsl:param name="logoutLink" />
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
@@ -79,6 +82,25 @@
                 <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
             </head>
             <body>
+
+                <xsl:choose>
+                    <xsl:when test="$userId">
+
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                            <a style="color: green;" href="{$logoutLink}">logout</a>
+                        </div>
+
+
+                    </xsl:when>
+                    <xsl:otherwise>
+
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <a style="color: green;" href="{$loginLink}">login</a>
+                        </div>
+
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->

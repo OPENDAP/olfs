@@ -26,6 +26,7 @@
 
 package opendap.bes;
 
+import opendap.auth.UserProfile;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
@@ -41,6 +42,8 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.Date;
 
 
@@ -229,6 +232,10 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dap_directory");
+        response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+
+
+        //Cache-Control: max-age=0, no-cache, no-store
 
         // response.setStatus(HttpServletResponse.SC_OK);
 
@@ -276,6 +283,19 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             transformer.setParameter("viewersService", ViewersServlet.getServiceId());
             if(BesDapDispatcher.allowDirectDataSourceAccess())
                 transformer.setParameter("allowDirectDataSourceAccess","true");
+
+
+
+            Principal userPrinciple = request.getUserPrincipal();
+            if(userPrinciple != null) {
+                String userId = userPrinciple.getName();
+                transformer.setParameter("userId", userId);
+            }
+
+            transformer.setParameter("loginLink", request.getContextPath()+"/login");
+            transformer.setParameter("logoutLink", request.getContextPath()+"/logout");
+
+
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(besCatalog, response.getOutputStream());

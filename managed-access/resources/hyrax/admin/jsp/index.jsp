@@ -1,3 +1,4 @@
+<%@ page import="java.security.Principal" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -25,7 +26,17 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% String contextPath = request.getContextPath(); %>
+<%
+    String contextPath = request.getContextPath();
+    String userId = null;
+    Principal userPrinciple = request.getUserPrincipal();
+    if(userPrinciple != null) {
+        userId = userPrinciple.getName();
+    }
+
+
+
+%>
 
 <html>
 <head>
@@ -41,9 +52,17 @@
 <!--                      PAGE BANNER                       -->
 <!--                                                        -->
 <!--                                                        -->
-
-<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
-<div style="clear: both;"> </div>
+<div style='float: right;vertical-align:middle;font-size:small;'>
+    <%
+    if (userId != null) {
+    %>
+        <span style="font-weight: bold;"><%= userId%></span> <br/>
+    <%
+    }
+    %>
+    <a style="color: green;" href="logout.jsp">logout</a>
+</div>
+<div style="clear: both;"></div>
 
 <table width='95%'>
     <tr>

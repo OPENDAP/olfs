@@ -158,7 +158,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         
 
-        _log.debug(Util.probeRequest(_servlet,request));
+        _log.debug(ServletUtil.probeRequest(_servlet, request));
 
 
         String besCatalogName = Scrub.urlContent(oreq.getRelativeUrl());

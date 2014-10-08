@@ -139,6 +139,38 @@
   <!--   Please see the "Using Jikes" section of the Jasper-HowTo           -->
   <!--   page in the Tomcat documentation.                                  -->
 
+    <filter>
+   		<filter-name>IdFilter</filter-name>
+   		<filter-class>opendap.auth.IdFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>/Users/ndp/hyrax/trunk/apache-tomcat-6.0.26/content/opendap/idFilter.xml</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>login_banner</param-name>
+            <param-value>Managed Access Test-Mule</param-value>
+        </init-param>
+
+   	</filter>
+   	<filter-mapping>
+   		<filter-name>IdFilter</filter-name>
+   		<url-pattern>/*</url-pattern>
+   	</filter-mapping>
+
+    <filter>
+   		<filter-name>PermissionsFilter</filter-name>
+   		<filter-class>opendap.auth.PermissionsFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>/Users/ndp/hyrax/trunk/apache-tomcat-6.0.26/content/opendap/permFilter.xml</param-value>
+        </init-param>
+   	</filter>
+   	<filter-mapping>
+   		<filter-name>PermissionsFilter</filter-name>
+   		<url-pattern>/*</url-pattern>
+   	</filter-mapping>
+
 
     <servlet>
         <servlet-name>hyrax</servlet-name>
@@ -270,6 +302,10 @@
         <location>/error/error400.jsp</location>
     </error-page>
     <error-page>
+        <error-code>401</error-code>
+        <location>/error/error401.jsp</location>
+    </error-page>
+    <error-page>
         <error-code>403</error-code>
         <location>/error/error403.jsp</location>
     </error-page>
@@ -311,7 +347,7 @@
 
 
 
-    <!-- Define a Security Constraint on this Application -->
+    <!-- Define a Security Constraint on the Admin command and user interfaces -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Hyrax Admin Interface</web-resource-name>
@@ -321,6 +357,7 @@
 
         <auth-constraint>
             <role-name>manager</role-name>
+            <role-name>scientists</role-name>
         </auth-constraint>
 
         <user-data-constraint>
@@ -329,6 +366,27 @@
             <!-- transport-guarantee>NONE</transport-guarantee  -->
         </user-data-constraint>
     </security-constraint>
+
+    <!-- Define a Security Constraint on the Realm Login Endpoint used by the IdFilter Login scheme in which the
+     Login landing page provides a link to /login/realm . Because we set this security constraint traffic directed
+     to this location will be forced to authenticate via the current Tomcat Realm.-->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Realm Login</web-resource-name>
+            <url-pattern>/login/realm</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+
+        <user-data-constraint>
+            <!-- this ensures that all efforts to access the realm login must use HTTPS -->
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+            <!-- transport-guarantee>NONE</transport-guarantee  -->
+        </user-data-constraint>
+    </security-constraint>
+
 
     <!-- Define the Login Configuration for this Application -->
 

@@ -281,7 +281,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 

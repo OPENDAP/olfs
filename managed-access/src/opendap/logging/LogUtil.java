@@ -261,27 +261,6 @@ public class LogUtil {
     }
 
 
-    /**
-     * Initialize logging for the web application context in which the given
-     * servlet is running. Two types of logging are supported:
-     * <p/>
-     * 1) Regular logging using the SLF4J API.
-     * 2) Performance logging which can write Apache common logging format logs,
-     * use the LogUtil.logServerStartup(String) method.
-     * <p/>
-     * The log directory is determined by the servlet containers content
-     * directory. The configuration of logging is controlled by the log4j.xml
-     * file.
-     *
-     */
-    public static void initLogging() {
-
-        String path = System.getProperty("user.dir")+"/";
-
-        initLogging(path);
-    }
-
-
 
     /**
      * Gather current thread information for inclusion in regular logging

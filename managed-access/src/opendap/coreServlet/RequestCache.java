@@ -102,17 +102,22 @@ public class RequestCache {
 
 
 
-        co = hm.put(key,co);
-
-
-        if(co != null){
-            log.debug("Response cache NOT updated, key already present: \"" + key + "\"");
+        if(hm == null) {
+            log.warn("put() - Thread cache not initialized. {} object not cached under key '{}'", o.getClass().getName(),key);
+            return;
         }
-        else {
+
+        co = hm.put(key, co);
+
+
+        if (co != null) {
+            log.debug("Response cache NOT updated, key already present: \"" + key + "\"");
+        } else {
             log.debug("Response cache updated by adding new object to cache using key \"" +
                     key + "\"");
 
         }
+
 
     }
 
@@ -123,6 +128,11 @@ public class RequestCache {
 
         HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
 
+        if(hm == null) {
+            log.warn("putIfAbsent() - Thread cache not initialized. {} object not cached under key '{}'", o.getClass().getName(),key);
+            return;
+        }
+
         if (!hm.containsKey(key))
            co = hm.put(key, co);
         else
@@ -130,10 +140,10 @@ public class RequestCache {
 
 
         if(co != null){
-            log.info("Response cache NOT updated, key already present: \"" + key + "\"");
+            log.info("putIfAbsent() - Cache NOT updated, key already present: \"" + key + "\"");
         }
         else {
-            log.info("Response cache updated by adding new object to cache using key \"" +
+            log.info("putIfAbsent() - Cache updated by adding new object to cache using key \"" +
                     key + "\"");
 
         }
