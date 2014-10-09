@@ -340,7 +340,7 @@ public class IdFilter implements Filter {
 
         StringBuilder noProfile = new StringBuilder();
 
-        noProfile.append("<p>You are not currently logged on.</p>");
+        noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
 
         noProfile.append("<i>You may login using one of these identity providers:</i>");
 
@@ -353,12 +353,16 @@ public class IdFilter implements Filter {
 
             noProfile.append("<li><a href=\"").append(loginContext).append("\">");
             noProfile.append(idProvider.getDescription());
-            noProfile.append("</a></li>");
+            noProfile.append("</a><br/><br/></li>");
 
 
         }
-        noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
 
+        noProfile.append("</ul>");
+
+        noProfile.append("<i>Or you may:</i><br />");
+        noProfile.append("<ul>");
+        noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
         noProfile.append("</ul>");
 
 
@@ -406,6 +410,11 @@ public class IdFilter implements Filter {
 
                 }
 
+
+            }
+            else if(request.getUserPrincipal() !=null){
+                out.println("<p>Welcome " + request.getUserPrincipal().getName() + "</p>");
+                out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
 
             }
             else {
