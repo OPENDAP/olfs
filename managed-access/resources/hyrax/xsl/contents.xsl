@@ -95,9 +95,11 @@
                     </xsl:when>
                     <xsl:otherwise>
 
-                        <div style='float: right;vertical-align:middle;font-size:small;'>
-                            <a style="color: green;" href="{$loginLink}">login</a>
-                        </div>
+                        <xsl:if test="$loginLink">
+                            <div style='float: right;vertical-align:middle;font-size:small;'>
+                                <a style="color: green;" href="{$loginLink}">login</a>
+                            </div>
+                        </xsl:if>
 
                     </xsl:otherwise>
                 </xsl:choose>

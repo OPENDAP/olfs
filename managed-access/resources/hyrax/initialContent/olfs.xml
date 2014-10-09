@@ -128,9 +128,12 @@
 
             </Handler>
 
-            <Handler className="opendap.bes.DirectoryDispatchHandler" />
+            <Handler className="opendap.bes.DirectoryDispatchHandler">
+                <ShowLoginControl />
+            </Handler>
 
-            <Handler className="opendap.bes.BESThreddsDispatchHandler" />
+
+            <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
 
             <Handler className="opendap.bes.FileDispatchHandler" />
 

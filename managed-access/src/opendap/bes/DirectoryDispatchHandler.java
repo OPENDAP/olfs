@@ -26,7 +26,6 @@
 
 package opendap.bes;
 
-import opendap.auth.UserProfile;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.Date;
 
@@ -63,6 +61,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     private BesApi _besApi;
 
+    private boolean _showLoginControl;
+
 
     public DirectoryDispatchHandler() {
 
@@ -70,6 +70,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
+        _showLoginControl = false;
 
     }
 
@@ -85,6 +86,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         _besApi = new BesApi();
 
 
+        if(config.getChild("ShowLoginControl") != null){
+            _showLoginControl = true;
+        }
 
         initialized = true;
     }
@@ -286,15 +290,19 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-            Principal userPrinciple = request.getUserPrincipal();
-            if(userPrinciple != null) {
-                String userId = userPrinciple.getName();
-                transformer.setParameter("userId", userId);
+
+
+            if(_showLoginControl) {
+
+                Principal userPrinciple = request.getUserPrincipal();
+                if(userPrinciple != null) {
+                    String userId = userPrinciple.getName();
+                    transformer.setParameter("userId", userId);
+                }
+
+                transformer.setParameter("loginLink", request.getContextPath() + "/login");
+                transformer.setParameter("logoutLink", request.getContextPath() + "/logout");
             }
-
-            transformer.setParameter("loginLink", request.getContextPath()+"/login");
-            transformer.setParameter("logoutLink", request.getContextPath()+"/logout");
-
 
 
             // Transform the BES  showCatalog response into a HTML page for the browser
