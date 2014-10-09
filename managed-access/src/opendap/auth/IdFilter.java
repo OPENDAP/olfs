@@ -341,21 +341,25 @@ public class IdFilter implements Filter {
         StringBuilder noProfile = new StringBuilder();
 
         noProfile.append("<p>You are not currently logged on.</p>");
-        noProfile.append("<p><a href=\"").append(request.getContextPath()).append("/guest\">Please click here</a> if you would like to login as 'guest'.</p>");
+
+        noProfile.append("<i>You may login using one of these identity providers:</i>");
+
+        noProfile.append("<ul>");
 
         for(IdProvider idProvider: _idProviders.values()) {
             String contextPath = request.getContextPath();
 
             String loginContext = contextPath + "/login" + idProvider.getLoginContext();
 
-            noProfile.append("<p><a href=\"").append(loginContext).append("\">");
-            noProfile.append(idProvider.getId());
-            noProfile.append("</a> Login using ").append(idProvider.getDescription());
-            noProfile.append("</p>");
+            noProfile.append("<li><a href=\"").append(loginContext).append("\">");
+            noProfile.append(idProvider.getDescription());
+            noProfile.append("</a></li>");
 
 
         }
+        noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
 
+        noProfile.append("</ul>");
 
 
         response.setContentType("text/html");
