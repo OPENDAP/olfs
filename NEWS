@@ -1,16 +1,11 @@
 
-Version 1.12.1 (20 October 2014)
+Version 1.11.4 (20 October 2014)
 
  Repaired bug that was introducing whitespace
  characters into the MIME Type strings extracted
  from the clients Accept header, and thus causing '
  the server to incorrectly return a HTTP status of 406
 
-Version 1.12.0 (14 August 2014)
-
-Refactored OLFS configuration.
-Added JSON and IJSN responses.
-Added WMS support via ncWMS integration.
 
 Version 1.11.3 (02 July 2014)
 
