@@ -52,7 +52,6 @@ public class IdFilter implements Filter {
 
 
 
-    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
         _log = LoggerFactory.getLogger(this.getClass());
@@ -149,7 +148,6 @@ public class IdFilter implements Filter {
 
 
 
-    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
 
@@ -247,7 +245,6 @@ public class IdFilter implements Filter {
 
     }
 
-    @Override
     public void destroy() {
         _log = null;
     }
@@ -337,7 +334,6 @@ public class IdFilter implements Filter {
     {
         HttpSession session = request.getSession();
 
-
         StringBuilder noProfile = new StringBuilder();
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
@@ -377,6 +373,12 @@ public class IdFilter implements Filter {
 		out.println("<html><head><title></title></head>");
 		out.println("<body><h1>"+_loginBanner+"</h1>");
 		out.println("<br/>");
+
+        if(request.getUserPrincipal() !=null){
+            out.println("<p>Welcome " + request.getUserPrincipal().getName() + "</p>");
+            out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
+
+        }
 
 
         /**
