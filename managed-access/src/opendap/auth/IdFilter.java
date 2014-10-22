@@ -374,9 +374,12 @@ public class IdFilter implements Filter {
 		out.println("<body><h1>"+_loginBanner+"</h1>");
 		out.println("<br/>");
 
+
+
+        out.println("<p>request.getRemoteUser(): " + request.getRemoteUser() + "</p>");
+        out.println("<p>request.getUserPrincipal(): " + request.getUserPrincipal() + "</p>");
         if(request.getUserPrincipal() !=null){
-            out.println("<p>Welcome " + request.getUserPrincipal().getName() + "</p>");
-            out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
+            out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
 
         }
 
