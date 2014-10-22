@@ -231,6 +231,8 @@
     <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
     <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
 
+    <property name="json.lib"      value="json-simple-1.1.1.jar"/>
+
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
                property="fortify.present"/>
@@ -244,6 +246,7 @@
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
             <include name="${servlet-api.lib}"/>
+            <include name="${json.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
             <include name="${commons-cli.lib}"/>
@@ -254,6 +257,7 @@
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
+
             <include name="${catalina.lib}"/>
 
             <include name="${slf4j.lib}"/>
