@@ -51,7 +51,7 @@ public class ShibbolethLogin extends IdProvider {
         _log = LoggerFactory.getLogger(this.getClass());
 
         setId(DEFAULT_ID);
-        setDescription("Tomcat Realm Authentication");
+        setDescription("Shibboleth Authentication");
     }
 
 
