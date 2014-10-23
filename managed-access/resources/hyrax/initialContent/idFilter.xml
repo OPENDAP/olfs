@@ -30,7 +30,7 @@
 
     <!-- IdProvider class="opendap.auth.UrsLogin">
         <UrsClientId>04xHKVaNdYNzCBG6KB7-Ig</UrsClientId>
-        <UrsClientAuthCode>MDR4SEtWYU5kWU56Q0JHNktCNy1sZzpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
+        <UrsClientAuthCode>MDR4SEtWYU5kWU56Q0JHNktCNy1JZzpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
 
         <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
     </IdProvider -->

@@ -716,6 +716,7 @@
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
                 <include name="${urlRewrite.lib}"/>
+                <include name="${json.lib}"/>
 
                 <include name="${commons-lang.lib}"/>
                 <include name="${commons-cli.lib}"/>
