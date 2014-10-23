@@ -264,10 +264,17 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            session.invalidate();
+            IdProvider idProvider = (IdProvider) session.getAttribute("IdP");
+            if(idProvider!=null){
+                idProvider.doLogout(request,response);
+            }
+            else {
+                // This is essentially a "punt" since things aren't as expected.
+                session.invalidate();
+                response.sendRedirect(request.getContextPath());
+            }
         }
 
-        response.sendRedirect(request.getContextPath());
     }
 
 

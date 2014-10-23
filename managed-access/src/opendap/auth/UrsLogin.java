@@ -269,6 +269,7 @@ public class UrsLogin extends IdProvider{
         String redirectUrl = (String) session.getAttribute("original_request_url");
 
 
+        session.setAttribute("IdP",this);
 
         response.sendRedirect(redirectUrl);
 

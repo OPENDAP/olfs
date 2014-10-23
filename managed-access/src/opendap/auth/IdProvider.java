@@ -30,6 +30,8 @@ import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Created by ndp on 9/24/14.
@@ -38,6 +40,7 @@ public abstract class  IdProvider {
 
 
     protected String _id;
+    protected String _logoutLocation;
     protected String _description;
 
 
@@ -52,6 +55,8 @@ public abstract class  IdProvider {
     }
 
 
+    public void setLogoutLocation(String logoutLocation){  _logoutLocation =  logoutLocation; }
+    public String getLogoutLocation(){ return _logoutLocation; }
 
 
     public  String getId(){ return _id; }
@@ -71,5 +76,23 @@ public abstract class  IdProvider {
      * @throws Exception
      */
     public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+
+    /**
+     * Logs a user out.
+     * This method simply terminates the local session and redirects the user back
+     * to the home page.
+     */
+    public void doLogout(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException
+    {
+        HttpSession session = request.getSession(false);
+        if( session != null )
+        {
+            session.invalidate();
+        }
+
+        response.sendRedirect(request.getContextPath());
+    }
 
 }

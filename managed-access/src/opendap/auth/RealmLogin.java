@@ -92,6 +92,7 @@ public class RealmLogin extends IdProvider {
         }
 
 
+        session.setAttribute("IdP",this);
 
 
         response.sendRedirect(redirectUrl);

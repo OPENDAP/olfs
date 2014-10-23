@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Created by ndp on 10/7/14.
@@ -41,6 +42,7 @@ public class ShibbolethLogin extends IdProvider {
 
 
     public static final String DEFAULT_ID="shib";
+    public static final String DEFAULT_LOGOUT_LOCATION = "/Shibboleth.sso/Logout";
 
 
     private Logger _log;
@@ -51,6 +53,7 @@ public class ShibbolethLogin extends IdProvider {
         _log = LoggerFactory.getLogger(this.getClass());
 
         setId(DEFAULT_ID);
+        setLogoutLocation(DEFAULT_LOGOUT_LOCATION);
         setDescription("Shibboleth Authentication");
     }
 
@@ -71,6 +74,7 @@ public class ShibbolethLogin extends IdProvider {
      */
     @Override
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
         /**
          * Redirect the user back to the their original requested resource.
          */
@@ -92,6 +96,7 @@ public class ShibbolethLogin extends IdProvider {
         }
 
 
+        session.setAttribute("IdP",this);
 
 
         response.sendRedirect(redirectUrl);
@@ -100,4 +105,23 @@ public class ShibbolethLogin extends IdProvider {
 
         return true;
     }
+
+
+    /**
+     * Logs a user out.
+     * This method simply terminates the local session and redirects the user back
+     * to the home page.
+     */
+    public void doLogout(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException
+    {
+        HttpSession session = request.getSession(false);
+        if( session != null )
+        {
+            session.invalidate();
+        }
+
+        response.sendRedirect(getLogoutLocation());
+    }
+
 }
