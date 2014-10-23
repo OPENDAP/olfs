@@ -212,6 +212,7 @@ public class UrsLogin extends IdProvider{
             return false;
         }
 
+        _log.info("URS Code: {}",code);
 
         /**
          * If we get here, the the user was redirected by URS back to our application,
@@ -228,11 +229,13 @@ public class UrsLogin extends IdProvider{
         String authHeader = "Basic " + getUrsClientAppAuthCode();
         headers.put("Authorization", authHeader );
 
-        _log.info("URS Token URL: {}",url);
-        _log.info("URS Toke POST data: {}",post_data);
-        _log.info("URS  Authorization Header: {}",authHeader);
+        _log.info("URS Token Request URL: {}",url);
+        _log.info("URS Token Request POST data: {}",post_data);
+        _log.info("URS Token Request Authorization Header: {}",authHeader);
 
         String contents = Util.submitHttpRequest(url, headers, post_data);
+
+        _log.info("URS Token: {}",contents);
 
 
         /**
@@ -250,9 +253,15 @@ public class UrsLogin extends IdProvider{
          * is returned as a JSON document.
          */
         url = _ursUrl + oat.getEndPoint();
-        headers.put("Authorization", oat.getTokenType()+ " " + oat.getAccessToken());
+        authHeader = oat.getTokenType()+ " " + oat.getAccessToken();
+        headers.put("Authorization", authHeader);
+
+        _log.info("URS User Profile Request URL: {}",url);
+        _log.info("URS User Profile Request Authorization Header: {}",authHeader);
+
         contents = Util.submitHttpRequest(url, headers, null);
 
+        _log.info("URS User Profile: {}",contents);
 
         /**
          * Parse the json to extract the user id, first and last names,
