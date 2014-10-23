@@ -205,6 +205,9 @@ public class UrsLogin extends IdProvider{
             String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 "&response_type=code&redirect_uri=" + request.getRequestURL();
 
+            _log.info("URS Code Request URL: {}",url);
+
+
             response.sendRedirect(url);
             return false;
         }
