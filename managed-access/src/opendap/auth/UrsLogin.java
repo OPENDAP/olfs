@@ -35,13 +35,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -224,7 +221,13 @@ public class UrsLogin extends IdProvider{
             "&redirect_uri=" + request.getRequestURL();
 
         Map<String, String> headers = new HashMap<String,String>();
-        headers.put("Authorization", "Basic " + getUrsClientAppAuthCode());
+
+        String authHeader = "Basic " + getUrsClientAppAuthCode();
+        headers.put("Authorization", authHeader );
+
+        _log.info("URS Token URL: {}",url);
+        _log.info("URS Toke POST data: {}",post_data);
+        _log.info("URS  Authorization Header: {}",authHeader);
 
         String contents = Util.submitHttpRequest(url, headers, post_data);
 

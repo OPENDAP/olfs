@@ -28,12 +28,19 @@
 
 <IdFilter>
 
-    <IdProvider class="opendap.auth.UrsLogin">
+    <!-- IdProvider class="opendap.auth.UrsLogin">
         <UrsClientId>04xHKVaNdYNzCBG6KB7-Ig</UrsClientId>
-        <UrsClientAuthCode>MDR4SEtWYU5kWU56Q0JHNktCNy1JZzpqa2h2SktINzY1OGt2</UrsClientAuthCode>
+        <UrsClientAuthCode>MDR4SEtWYU5kWU56Q0JHNktCNy1sZzpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
+
+        <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
+    </IdProvider -->
+    
+    <IdProvider class="opendap.auth.UrsLogin">
+        <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
+        <UrsClientAuthCode>aVBsRWpaak12cmR3TFVsbmJhS3hXUTpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
         <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
     </IdProvider>
-    
+
     <IdProvider class="opendap.auth.RealmLogin" />
 
 </IdFilter>

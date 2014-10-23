@@ -183,6 +183,10 @@
              <appender-ref ref="stdout"/>
     </logger>
 
+    <logger name="opendap.auth" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+
 
 
 <!--
