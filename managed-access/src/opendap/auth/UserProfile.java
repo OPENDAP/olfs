@@ -36,11 +36,13 @@ import java.util.HashSet;
  * Created by ndp on 9/25/14.
  */
 public class UserProfile {
+
     protected Date   _objectCreationTime;
     protected JSONObject _jsonInit;
     protected HashSet<String> _groups;
     protected HashSet<String> _roles;
 
+    protected IdProvider _idp;
 
 
 
@@ -50,6 +52,7 @@ public class UserProfile {
         _jsonInit = new JSONObject();
         _groups = new HashSet<String>();
         _roles = new HashSet<String>();
+        _idp  = null;
     }
 
     public UserProfile(JSONObject json){
@@ -70,6 +73,12 @@ public class UserProfile {
         return (String) _jsonInit.get("uid");
     }
 
+    public IdProvider getIdP(){
+        return _idp;
+    }
+    public void setIdP(IdProvider idProvider){
+        _idp = idProvider;
+    }
 
 
     public void addGroups(HashSet<String> groupMemberships){

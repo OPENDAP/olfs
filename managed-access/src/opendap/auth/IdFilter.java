@@ -399,6 +399,11 @@ public class IdFilter implements Filter {
          */
 
         if(session != null){
+
+
+
+
+
             UserProfile userProfile = (UserProfile) session.getAttribute("user_profile");
             if( userProfile != null ){
                 String first_name = userProfile.getAttribute("first_name");

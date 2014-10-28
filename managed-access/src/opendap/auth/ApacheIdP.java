@@ -125,8 +125,9 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         String redirectUrl = request.getContextPath();
 
+        String uid = request.getRemoteUser();
 
-        if (request.getRemoteUser()==null) {
+        if (uid==null) {
 
             // Hmmm... The user has not logged in.
 
@@ -140,12 +141,11 @@ public class ApacheIdP extends IdProvider {
 
         }
         else {
-            // We have a user - for now we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
+            // We have a user - so let's mak sure they have a profile,
+            // and then we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
 
-            _log.info("doLogin() - User has uid: {}",request.getRemoteUser());
+            _log.info("doLogin() - User has uid: {}",uid);
 
-            // TODO How do I reliably know if the user has been shib authenticated?   Do we care?
-            // TODO How can we stash our self w our custom logout method without breaking another IdP?
 
             // Do they have a session?
 
@@ -156,32 +156,13 @@ public class ApacheIdP extends IdProvider {
                 session = request.getSession(true);
 
             }
-            else {
-                _log.info("doLogin() - User has Session. id: {}",session.getId());
 
-                // Let's inspect the attributes.
-                String s = (String) session.getAttribute("eppn");
-                _log.info("doLogin() - HttpSession Attribute eppn: {}",s);
+            UserProfile up = new UserProfile();
+            up.setIdP(this);
+            up.setAttribute("uid",uid);
 
-                s = (String) request.getAttribute("eppn");
-                _log.info("doLogin() - HttpRequest Attribute eppn: {}",s);
+            session.setAttribute("user_profile", up);
 
-                s = (String) request.getAttribute("affiliation");
-                _log.info("doLogin() - HttpRequest Attribute affiliation: {}",s);
-
-                s = (String) request.getAttribute("unscoped-affiliation");
-                _log.info("doLogin() - HttpRequest Attribute unscoped-affiliation: {}",s);
-
-                s = (String) request.getAttribute("targeted-id");
-                _log.info("doLogin() - HttpRequest Attribute targeted-id: {}",s);
-
-
-
-                _log.info(opendap.coreServlet.ServletUtil.probeRequest(null,request));
-
-
-
-            }
             // We need to capture the original redirect url if there is one,
             // and then invalidate the session and then start a new one before we send them
             // off to authenticate.

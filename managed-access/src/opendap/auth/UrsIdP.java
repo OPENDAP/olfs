@@ -266,6 +266,7 @@ public class UrsIdP extends IdProvider{
         UserProfile userProfile = new UserProfile(json);
 
         userProfile.setAttribute("IdProvider", getId());
+        userProfile.setIdP(this);
 
         session.setAttribute("user_profile", userProfile);
 
