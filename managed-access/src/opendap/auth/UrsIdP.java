@@ -265,10 +265,9 @@ public class UrsIdP extends IdProvider{
 
         UserProfile userProfile = new UserProfile(json);
 
-        userProfile.setAttribute("IdProvider", getId());
         userProfile.setIdP(this);
 
-        session.setAttribute("user_profile", userProfile);
+        session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
         /**
          * Finally, redirect the user back to the their original requested resource.
@@ -277,8 +276,6 @@ public class UrsIdP extends IdProvider{
         String redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
 
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
-
-        session.setAttribute("IdP",this);
 
         response.sendRedirect(redirectUrl);
 

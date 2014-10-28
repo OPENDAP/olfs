@@ -87,7 +87,7 @@ public class TomcatRealmIdP extends IdProvider {
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
 
-        session.setAttribute("IdP",this);
+        session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
 
 
         response.sendRedirect(redirectUrl);

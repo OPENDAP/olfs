@@ -186,7 +186,7 @@ public class ShibbolethIdP extends IdProvider {
             }
 
             // Now we stash ourselves for Logout purposes..
-            session.setAttribute("IdP",this);
+            session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
 
 
             // TODO Is this the correct thing or should we simply punt and throw a ConfigurationException?

@@ -46,6 +46,8 @@ public class IdFilter implements Filter {
 
 
     public static final String ORIGINAL_REQUEST_URL = "original_request_url";
+    public static final String USER_PROFILE = "user_profile";
+    public static final String IDENTITY_PROVIDER = "identity_provider";
 
     private ConcurrentHashMap<String,IdProvider> _idProviders;
 
@@ -235,7 +237,7 @@ public class IdFilter implements Filter {
          * the presence of the user_profile attribute in the session) we need to spoof the API to show our
          * authenticated user.
          */
-        UserProfile up = (UserProfile) session.getAttribute("user_profile");
+        UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
 
         if(up != null) {
             AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
@@ -266,16 +268,23 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            IdProvider idProvider = (IdProvider) session.getAttribute("IdP");
-            if(idProvider!=null){
-                idProvider.doLogout(request,response);
-            }
-            else {
-                // This is essentially a "punt" since things aren't as expected.
-                session.invalidate();
-                response.sendRedirect(request.getContextPath());
+            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            if(up!=null){
+                _log.info("doLogout() - Logging out user '{}'",up.getUID());
+                IdProvider idProvider = up.getIdP();
+                if(idProvider!=null){
+                    _log.info("doLogout() - Calling '{}' logout handler.",idProvider.getId());
+                    idProvider.doLogout(request,response);
+                    return ;
+                }
+
             }
         }
+
+        // This is essentially a "punt" since things aren't as expected.
+        session.invalidate();
+        response.sendRedirect(request.getContextPath());
+
 
     }
 
@@ -318,7 +327,7 @@ public class IdFilter implements Filter {
 
 
         session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
-        session.setAttribute("user_profile", new GuestProfile());
+        session.setAttribute(USER_PROFILE, new GuestProfile());
 
         /**
          * Finally, redirect the user back to the their original requested resource.
@@ -343,6 +352,8 @@ public class IdFilter implements Filter {
     {
         HttpSession session = request.getSession();
 
+
+        _log.debug("doLandingPage() - Building noProfile String.");
         StringBuilder noProfile = new StringBuilder();
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
@@ -363,6 +374,7 @@ public class IdFilter implements Filter {
 
         }
 
+
         noProfile.append("</ul>");
 
         noProfile.append("<i>Or you may:</i><br />");
@@ -370,10 +382,14 @@ public class IdFilter implements Filter {
         noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
         noProfile.append("</ul>");
 
+        _log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "Login Page");
         response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+
+
+        _log.debug("doLandingPage() - Writing page contents.");
 
         /**
          * Generate the html page header
@@ -401,10 +417,7 @@ public class IdFilter implements Filter {
         if(session != null){
 
 
-
-
-
-            UserProfile userProfile = (UserProfile) session.getAttribute("user_profile");
+            UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 String first_name = userProfile.getAttribute("first_name");
                 String last_name =  userProfile.getAttribute("last_name");

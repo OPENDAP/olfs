@@ -161,7 +161,7 @@ public class ApacheIdP extends IdProvider {
             up.setIdP(this);
             up.setAttribute("uid",uid);
 
-            session.setAttribute("user_profile", up);
+            session.setAttribute(IdFilter.USER_PROFILE, up);
 
             // We need to capture the original redirect url if there is one,
             // and then invalidate the session and then start a new one before we send them
