@@ -160,12 +160,19 @@ public class ApacheIdP extends IdProvider {
                 _log.info("doLogin() - User has Session. id: {}",session.getId());
 
                 // Let's inspect the attributes.
-                String eppn = (String) session.getAttribute("eppn");
-                _log.info("doLogin() - HttpSession Attribute eppn: {}",eppn);
+                String s = (String) session.getAttribute("eppn");
+                _log.info("doLogin() - HttpSession Attribute eppn: {}",s);
 
-                eppn = (String) request.getAttribute("eppn");
+                s = (String) request.getAttribute("affiliation");
+                _log.info("doLogin() - HttpRequest Attribute affiliation: {}",s);
 
-                _log.info("doLogin() - HttpRequest Attribute eppn: {}",eppn);
+                s = (String) request.getAttribute("unscoped-affiliation");
+                _log.info("doLogin() - HttpRequest Attribute unscoped-affiliation: {}",s);
+
+                s = (String) request.getAttribute("targeted-id");
+                _log.info("doLogin() - HttpRequest Attribute targeted-id: {}",s);
+
+
 
                 _log.info(opendap.coreServlet.ServletUtil.probeRequest(null,request));
 
