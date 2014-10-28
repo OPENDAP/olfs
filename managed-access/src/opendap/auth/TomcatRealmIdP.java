@@ -37,7 +37,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Created by ndp on 10/7/14.
  */
-public class RealmLogin extends IdProvider {
+public class TomcatRealmIdP extends IdProvider {
 
 
     public static final String DEFAULT_ID="realm";
@@ -46,7 +46,7 @@ public class RealmLogin extends IdProvider {
     private Logger _log;
 
 
-    public RealmLogin(){
+    public TomcatRealmIdP(){
         super();
         _log = LoggerFactory.getLogger(this.getClass());
 
@@ -56,12 +56,6 @@ public class RealmLogin extends IdProvider {
 
 
 
-    @Override
-    public void init(Element config) throws ConfigurationException {
-
-        _log.info("init(): Initializing {}. login context: {}",getDescription(),getLoginContext());
-
-    }
 
     /**
      * @param request
@@ -77,7 +71,7 @@ public class RealmLogin extends IdProvider {
         HttpSession session = request.getSession();
         String redirectUrl = request.getContextPath();
         if(session!=null){
-            String url = (String) session.getAttribute("original_request_url");
+            String url = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
             if(url != null) {
                 redirectUrl = url;
             }
@@ -90,6 +84,7 @@ public class RealmLogin extends IdProvider {
             redirectUrl = redirectUrl.replace("http://","https://");
             redirectUrl = redirectUrl.replace(":8080/",":8443/");
         }
+        _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
 
         session.setAttribute("IdP",this);

@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * Created by ndp on 9/25/14.
  */
-public class UrsLogin extends IdProvider{
+public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_ID="urs";
 
@@ -55,7 +55,7 @@ public class UrsLogin extends IdProvider{
     private String _clientAppAuthCode;
 
 
-    public UrsLogin(){
+    public UrsIdP(){
         super();
         _log = LoggerFactory.getLogger(this.getClass());
         setId(DEFAULT_ID);
@@ -65,20 +65,12 @@ public class UrsLogin extends IdProvider{
 
 
 
+    @Override
     public void init(Element config) throws ConfigurationException {
-
-        if(config == null){
-            throw new ConfigurationException("init(): Configuration element may not be null.");
-        }
+        super.init(config);
 
         Element e;
         String eName;
-
-
-        e = config.getChild("id");
-        if(e != null){
-            setId(e.getTextTrim());
-        }
 
 
         eName = "UrsUrl";
@@ -120,8 +112,8 @@ public class UrsLogin extends IdProvider{
 
     public void setUrsUrl(String ursUrl) throws ServletException{
         if(ursUrl == null){
-            String msg = "BAD CONFIGURATION - URS Login Module must be configured with a URS Service URL. (urs_url)";
-            _log.error("UrsLogin() - {}",msg);
+            String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a URS Service URL. (urs_url)";
+            _log.error("UrsIdP() - {}",msg);
             throw new ServletException(msg);
         }
 
@@ -138,8 +130,8 @@ public class UrsLogin extends IdProvider{
     public void setUrsClientAppId(String ursClientApplicationId) throws ServletException{
 
         if(ursClientApplicationId == null){
-            String msg = "BAD CONFIGURATION - URS Login Module must be configured with a Client Application ID. (client_id)";
-            _log.error("UrsLogin() - {}",msg);
+            String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Application ID. (client_id)";
+            _log.error("UrsIdP() - {}",msg);
             throw new ServletException(msg);
         }
         _clientAppId = ursClientApplicationId;
@@ -153,8 +145,8 @@ public class UrsLogin extends IdProvider{
 
     public void setUrsClientAppAuthCode(String ursClientAppAuthCode) throws ServletException {
         if(ursClientAppAuthCode == null){
-            String msg = "BAD CONFIGURATION - URS Login Module must be configured with a Client Authorization Code. (client_auth_code)";
-            _log.error("UrsLogin() - {}",msg);
+            String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Authorization Code. (client_auth_code)";
+            _log.error("UrsIdP() - {}",msg);
             throw new ServletException(msg);
         }
 
@@ -281,8 +273,9 @@ public class UrsLogin extends IdProvider{
          * Finally, redirect the user back to the their original requested resource.
          */
 
-        String redirectUrl = (String) session.getAttribute("original_request_url");
+        String redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
 
+        _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
         session.setAttribute("IdP",this);
 

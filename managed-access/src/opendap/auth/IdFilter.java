@@ -45,6 +45,8 @@ public class IdFilter implements Filter {
     private Logger _log;
 
 
+    public static final String ORIGINAL_REQUEST_URL = "original_request_url";
+
     private ConcurrentHashMap<String,IdProvider> _idProviders;
 
     private String _loginBanner;
@@ -162,10 +164,10 @@ public class IdFilter implements Filter {
 
 
         // Cache the original  request URI in the session if it's not there already
-        String originalResourceRequestUrl = (String) session.getAttribute("original_request_url");
+        String originalResourceRequestUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
         if(originalResourceRequestUrl==null){
             originalResourceRequestUrl = hsReq.getRequestURL().toString();
-            session.setAttribute("original_request_url",originalResourceRequestUrl);
+            session.setAttribute(ORIGINAL_REQUEST_URL,originalResourceRequestUrl);
         }
 
 
@@ -196,7 +198,7 @@ public class IdFilter implements Filter {
 
                 if( requestURI.equals(loginContext)) {
                     if(originalResourceRequestUrl.equals(loginContext))
-                        session.setAttribute("original_request_url",contextPath);
+                        session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
 
                     try {
 
@@ -303,7 +305,7 @@ public class IdFilter implements Filter {
         String redirectUrl = null;
 
         if(session != null) {
-            redirectUrl = (String) session.getAttribute("original_request_url");
+            redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
             session.invalidate();
         }
 
@@ -315,7 +317,7 @@ public class IdFilter implements Filter {
         session = request.getSession(true);
 
 
-        session.setAttribute("original_request_url", redirectUrl);
+        session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
         session.setAttribute("user_profile", new GuestProfile());
 
         /**

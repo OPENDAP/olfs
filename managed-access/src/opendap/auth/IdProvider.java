@@ -40,7 +40,6 @@ public abstract class  IdProvider {
 
 
     protected String _id;
-    protected String _logoutLocation;
     protected String _description;
 
 
@@ -55,8 +54,6 @@ public abstract class  IdProvider {
     }
 
 
-    public void setLogoutLocation(String logoutLocation){  _logoutLocation =  logoutLocation; }
-    public String getLogoutLocation(){ return _logoutLocation; }
 
 
     public  String getId(){ return _id; }
@@ -66,7 +63,22 @@ public abstract class  IdProvider {
     public  void setDescription(String d){ _description = d; }
 
 
-    public abstract void init(Element config) throws ConfigurationException;
+    public void init(Element config) throws ConfigurationException{
+        if(config == null){
+            throw new ConfigurationException("init(): Configuration element may not be null.");
+        }
+
+        Element e = config.getChild("id");
+        if(e!=null){
+            setId(config.getTextTrim());
+        }
+
+        e = config.getChild("description");
+        if(e!=null){
+            setDescription(config.getTextTrim());
+        }
+
+    }
 
     /**
      *
