@@ -265,9 +265,15 @@ public class IdFilter implements Filter {
     private void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+
+        _log.info("doLogout() - BEGIN");
+
+        _log.info("doLogout() - Retrieving session...");
         HttpSession session = request.getSession(false);
         if( session != null )
         {
+            _log.info("doLogout() - Got session...");
+
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if(up!=null){
                 _log.info("doLogout() - Logging out user '{}'",up.getUID());
@@ -275,16 +281,22 @@ public class IdFilter implements Filter {
                 if(idProvider!=null){
                     _log.info("doLogout() - Calling '{}' logout handler.",idProvider.getId());
                     idProvider.doLogout(request,response);
+                    _log.info("doLogout() - END");
                     return ;
                 }
 
+            } else {
+                _log.info("doLogout() - Missing UserProfile object....");
+
             }
         }
+        _log.info("doLogout() - Punting with session.invalidate()");
 
         // This is essentially a "punt" since things aren't as expected.
         session.invalidate();
         response.sendRedirect(request.getContextPath());
 
+        _log.info("doLogout() - END");
 
     }
 
