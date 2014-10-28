@@ -42,7 +42,7 @@ import java.net.URL;
 public class ApacheIdP extends IdProvider {
 
 
-    public static final String DEFAULT_ID="shib";
+    public static final String DEFAULT_ID="apache";
     /**
      * Default service point for the mod_shib Logout
      */
@@ -162,6 +162,9 @@ public class ApacheIdP extends IdProvider {
                 // Let's inspect the attributes.
                 String s = (String) session.getAttribute("eppn");
                 _log.info("doLogin() - HttpSession Attribute eppn: {}",s);
+
+                s = (String) request.getAttribute("eppn");
+                _log.info("doLogin() - HttpRequest Attribute eppn: {}",s);
 
                 s = (String) request.getAttribute("affiliation");
                 _log.info("doLogin() - HttpRequest Attribute affiliation: {}",s);
