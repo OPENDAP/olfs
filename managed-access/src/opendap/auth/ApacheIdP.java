@@ -89,13 +89,13 @@ public class ApacheIdP extends IdProvider {
 
         Element e = config.getChild("login");
         if(e!=null){
-            setLoginLocation(config.getTextTrim());
+            setLoginLocation(e.getTextTrim());
         }
 
 
         e = config.getChild("logout");
         if(e!=null){
-            setLogoutLocation(config.getTextTrim());
+            setLogoutLocation(e.getTextTrim());
         }
 
 

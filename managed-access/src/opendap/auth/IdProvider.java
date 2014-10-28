@@ -70,12 +70,12 @@ public abstract class  IdProvider {
 
         Element e = config.getChild("id");
         if(e!=null){
-            setId(config.getTextTrim());
+            setId(e.getTextTrim());
         }
 
         e = config.getChild("description");
         if(e!=null){
-            setDescription(config.getTextTrim());
+            setDescription(e.getTextTrim());
         }
 
     }

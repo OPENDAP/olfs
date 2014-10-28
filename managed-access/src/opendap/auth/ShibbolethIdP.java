@@ -89,13 +89,13 @@ public class ShibbolethIdP extends IdProvider {
 
         Element e = config.getChild("ShibLogin");
         if(e!=null){
-            setLoginLocation(config.getTextTrim());
+            setLoginLocation(e.getTextTrim());
         }
 
 
         e = config.getChild("ShibLogout");
         if(e!=null){
-            setLogoutLocation(config.getTextTrim());
+            setLogoutLocation(e.getTextTrim());
         }
 
 
