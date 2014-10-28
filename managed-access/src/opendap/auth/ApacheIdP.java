@@ -167,6 +167,8 @@ public class ApacheIdP extends IdProvider {
 
                 _log.info("doLogin() - HttpRequest Attribute eppn: {}",eppn);
 
+                _log.info(opendap.coreServlet.ServletUtil.probeRequest(null,request));
+
 
 
             }
