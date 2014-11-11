@@ -87,8 +87,15 @@
                     <xsl:when test="$userId">
 
                         <div style='float: right;vertical-align:middle;font-size:small;'>
-                            <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
-                            <a style="color: green;" href="{$logoutLink}">logout</a>
+                            <xsl:choose>
+                                <xsl:when test="$loginLink">
+                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <b><xsl:value-of select="$userId"/></b><br/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
                         </div>
 
 

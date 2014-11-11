@@ -61,7 +61,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     private BesApi _besApi;
 
-    private boolean _showLoginControl;
+    private String _loginPath;
+    private String _logoutPath;
 
 
     public DirectoryDispatchHandler() {
@@ -70,7 +71,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
-        _showLoginControl = false;
+        _loginPath = null;
+        _logoutPath = null;
 
     }
 
@@ -86,8 +88,19 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         _besApi = new BesApi();
 
 
-        if(config.getChild("ShowLoginControl") != null){
-            _showLoginControl = true;
+        Element loginControls = config.getChild("AuthenticationControls");
+
+        if( loginControls!= null){
+
+            Element e = loginControls.getChild("login");
+            if(e!=null){
+                _loginPath = e.getTextTrim();
+            }
+            e = loginControls.getChild("logout");
+            if(e!=null){
+                _logoutPath = e.getTextTrim();
+            }
+
         }
 
         initialized = true;
@@ -290,19 +303,24 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-
-
-            if(_showLoginControl) {
-
-                Principal userPrinciple = request.getUserPrincipal();
-                if(userPrinciple != null) {
-                    String userId = userPrinciple.getName();
-                    transformer.setParameter("userId", userId);
-                }
-
-                transformer.setParameter("loginLink", request.getContextPath() + "/login");
-                transformer.setParameter("logoutLink", request.getContextPath() + "/logout");
+            Principal userPrinciple = request.getUserPrincipal();
+            if(userPrinciple != null) {
+                String userId = userPrinciple.getName();
+                transformer.setParameter("userId", userId);
             }
+            else if(request.getRemoteUser()!=null){
+                String userId = request.getRemoteUser();
+                transformer.setParameter("userId", userId);
+
+            }
+
+            if(_loginPath != null) {
+                transformer.setParameter("loginLink", _loginPath);
+            }
+            if(_logoutPath != null) {
+                transformer.setParameter("logoutLink", _logoutPath);
+            }
+
 
 
             // Transform the BES  showCatalog response into a HTML page for the browser

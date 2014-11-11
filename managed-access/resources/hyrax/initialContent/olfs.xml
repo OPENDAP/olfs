@@ -129,7 +129,9 @@
             </Handler>
 
             <Handler className="opendap.bes.DirectoryDispatchHandler">
-                <ShowLoginControl />
+                <AuthenticationControls>
+                    <logout>/?urslogout=HyraxDataServer</logout>
+                </AuthenticationControls>
             </Handler>
 
 
