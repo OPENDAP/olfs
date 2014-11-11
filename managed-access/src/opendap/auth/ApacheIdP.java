@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by ndp on 10/7/14.
@@ -141,31 +140,26 @@ public class ApacheIdP extends IdProvider {
 
         }
         else {
-            // We have a user - so let's mak sure they have a profile,
+            // We have a user - so let's make sure they have a profile,
             // and then we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
 
-            _log.info("doLogin() - User has uid: {}",uid);
+            _log.info("doLogin() - User has uid: {}", uid);
 
 
-            // Do they have a session?
+            /*
 
-            if(session==null) {
-                _log.error("doLogin() - No current session, creating new session.");
-
-                //Oddly not, ok make them one..
-                session = request.getSession(true);
-
+            // Do they have a profile?
+            UserProfile up = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            if (up == null){
+                // Nope. Make one.
+                up = new UserProfile();
+                up.setIdP(this);
+                up.setAttribute("uid", uid);
             }
-
-            UserProfile up = new UserProfile();
-            up.setIdP(this);
-            up.setAttribute("uid",uid);
-
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
-            // We need to capture the original redirect url if there is one,
-            // and then invalidate the session and then start a new one before we send them
-            // off to authenticate.
+            */
+
             redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
 
             if(redirectUrl==null){

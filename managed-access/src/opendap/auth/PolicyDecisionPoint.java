@@ -28,6 +28,8 @@ package opendap.auth;
 
 import org.jdom.Element;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by ndp on 9/26/14.
@@ -44,6 +46,48 @@ public abstract class PolicyDecisionPoint {
     public abstract boolean removePolicy(Policy policy);
 
     public abstract boolean evaluate(String userId, String resourceId, String queryString, String actionId);
+
+    public static PolicyDecisionPoint pdpFactory(Element config) throws ConfigurationException {
+
+        Logger log = LoggerFactory.getLogger(PolicyDecisionPoint.class);
+        String msg;
+
+
+        if(config==null) {
+            msg = "Configuration MAY NOT be null!.";
+            log.error("pdpFactory():  {}",msg);
+            throw new ConfigurationException(msg);
+        }
+
+
+        String pdpClassName = config.getAttributeValue("class");
+
+        if(pdpClassName==null) {
+            msg = "PolicyDecisionPoint definition must contain a \"class\" attribute whose value is the class name of the PolicyDecisionPoint implementation to be created.";
+            log.error("pdpFactory(): {}",msg);
+            throw new ConfigurationException(msg);
+        }
+
+        try {
+
+            log.debug("pdpFactory(): Building PolicyDecisionPoint: " + pdpClassName);
+            Class classDefinition = Class.forName(pdpClassName);
+            PolicyDecisionPoint pdp = (PolicyDecisionPoint) classDefinition.newInstance();
+
+            pdp.init(config);
+
+            return pdp;
+
+
+        } catch (Exception e) {
+            msg = "Unable to manufacture an instance of "+pdpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+            log.error("pdpFactory(): {}"+msg);
+            throw new ConfigurationException(msg, e);
+
+        }
+
+
+    }
 
 
 }

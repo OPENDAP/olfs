@@ -27,10 +27,12 @@
 package opendap.dap4;
 
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -122,8 +124,6 @@ public class QueryParameters {
     /**
      * Using the passed HttpServletRequest this method extracts DAP4 query string parameters from the query string,
      * sets their internal values appropriately, and returns the DAP2 constraint expression String sans DAP4 components.
-     * This method integrates the infamous GDS {}{}{} syntax content from the path section of the URL into the
-     * the returned DAP2 query string.
      * @param req
      * @return Returns a string containing the "remainder" of query string: The original query string with all of
      * the (recognized) dap4 parameters removed.
@@ -141,7 +141,7 @@ public class QueryParameters {
 
                 if(key.equals(STORE_RESULT)){
                     setIsStoreResultRequest(true);
-                    setStoreResultRequestServiceUrl(ReqInfo.getServiceUrl(req));
+                    setStoreResultRequestServiceUrl(new Request(null, req).getDapServiceUrl());
                     dropList.add(key);
                 }
                 if(key.equals(CONSTRAINT_EXPRESSION)){

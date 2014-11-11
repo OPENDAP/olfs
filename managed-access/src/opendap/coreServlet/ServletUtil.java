@@ -100,6 +100,71 @@ public class ServletUtil {
 
 
 
+
+    /**
+     * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
+     * keep service related content such as:
+     *   <ui>
+     *     <li>Configuration information</li>
+     *     <li>THREDDS catalog files.</li>
+     *     <li>Log files</li>
+     *   </ui>
+     *
+     * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
+     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
+     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
+     *
+     * @param sc  The ServletContext for this servlet that is running.
+     * @return  A String containing the content path (aka the peristent content path) for the web application.
+     */
+    public static String getConfigPath(ServletContext sc, String configDirPropertyName) {
+
+
+
+        String confDir = System.getProperty(configDirPropertyName);
+
+        if(confDir!=null) {
+            if(pathIsGood(confDir)){
+                return confDir;
+            }
+        }
+
+        confDir  = "/etc/olfs"+ sc.getContextPath();
+        if(pathIsGood(confDir)){
+            return confDir;
+        }
+
+        confDir ="FAILED_To_Determine_Config_Path!";
+        String webappConfig = "WEB-INF/conf/";
+
+        String filename =  Scrub.fileName(getRootPath(sc) + webappConfig);
+
+        File cf = new File( filename );
+        try{
+            confDir = cf.getCanonicalPath() +"/";
+            confDir = confDir.replace('\\','/');
+
+        } catch (IOException e) {
+            log.error("Failed to produce a confDir! Error: "+e.getMessage());
+         }
+        log.debug("confDir: '"+confDir+"'");
+      return confDir;
+    }
+
+    private static boolean pathIsGood(String path){
+
+        File confDirPath = new File(path);
+
+        return  confDirPath.exists() || confDirPath.canRead();
+
+
+    }
+
+
+
+
+
+
     /**
      * Returns the path to the web applications "context" directory as defined by the value of the
      * web appications &lt;initParameter&gt; ContextPath. This directory is where the web application is unpacked. It
@@ -371,7 +436,6 @@ public class ServletUtil {
         sb.append(showSession(req.getSession(true)));
 
         sb.append("  Request Info:\n");
-        sb.append("    baseURI:                   '").append(ReqInfo.getServiceUrl(req)).append("'\n");
         sb.append("    localUrl:                  '").append(ReqInfo.getLocalUrl(req)).append("'\n");
         sb.append("    dataSetName:               '").append(ReqInfo.getDataSetName(req)).append("'\n");
         sb.append("    requestSuffixRegex:             '").append(ReqInfo.getRequestSuffix(req)).append("'\n");

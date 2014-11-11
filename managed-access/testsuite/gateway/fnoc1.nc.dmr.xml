@@ -25,7 +25,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 
-<Dataset name="dodsH7ssR1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<Dataset name="dodsH7ssR1"
          xmlns:grddl="http://www.w3.org/2003/g/data-view#"
          grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
          xmlns="http://xml.opendap.org/ns/DAP/3.2#"

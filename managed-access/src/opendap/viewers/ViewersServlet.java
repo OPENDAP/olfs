@@ -53,7 +53,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -431,7 +433,7 @@ public class ViewersServlet extends HttpServlet {
             }
 
 
-            URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
+            URL serviceURL = new URL(new Request(null,req).getDapServiceUrl());
             String protocol = serviceURL.getProtocol();
             String host = serviceURL.getHost();
             int port = serviceURL.getPort();

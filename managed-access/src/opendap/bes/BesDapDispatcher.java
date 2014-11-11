@@ -29,13 +29,11 @@ package opendap.bes;
 import opendap.bes.dap2Responders.*;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.NormativeDR;
-import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dap4Responders.Iso19115.IsoDMR;
 import opendap.bes.dap4Responders.Iso19115.IsoRubricDMR;
-//import opendap.bes.dap4Responders.DataResponse.JsonDR;
 import opendap.bes.dap4Responders.Version;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.HttpResponder;
@@ -50,6 +48,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Vector;
+
+//import opendap.bes.dap4Responders.DataResponse.JsonDR;
 
 /**
  * Created by IntelliJ IDEA.

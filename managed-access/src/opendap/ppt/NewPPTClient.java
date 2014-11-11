@@ -25,14 +25,12 @@
  */
 package opendap.ppt;
 
-import opendap.bes.BES;
 import opendap.bes.BESChunkedOutputStream;
 import opendap.io.ChunkedInputStream;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

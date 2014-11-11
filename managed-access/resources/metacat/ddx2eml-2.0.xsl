@@ -31,7 +31,6 @@ saxon 9. -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xs" version="1.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
                 xmlns:dap="http://xml.opendap.org/ns/DAP2"
 

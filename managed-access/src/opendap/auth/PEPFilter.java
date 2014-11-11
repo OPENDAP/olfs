@@ -31,30 +31,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Iterator;
 
 
 /**
  * Creates a policy enforcement point (PEP) for this server.
  */
-public class PermissionsFilter implements Filter {
+public class PEPFilter implements Filter {
 
     private Logger _log;
 
 
     private PolicyDecisionPoint _pdp;
 
-    private boolean _everyOneMustHaveProfile;
-
-
-
-
+    private boolean _everyOneMustHaveUid;
 
 
 
@@ -63,7 +56,7 @@ public class PermissionsFilter implements Filter {
 
         _log = LoggerFactory.getLogger(filterConfig.getFilterName());
 
-        _everyOneMustHaveProfile = false;
+        _everyOneMustHaveUid = false;
 
         String msg;
 
@@ -74,9 +67,17 @@ public class PermissionsFilter implements Filter {
         try {
             config = opendap.xml.Util.getDocumentRoot(configFile);
 
+
+
             Element e = config.getChild("PolicyDecisionPoint");
 
             _pdp = pdpFactory(e);
+
+
+            e = config.getChild("EveryOneMustHaveId");
+            if(e !=null){
+                _everyOneMustHaveUid = true;
+            }
 
 
         } catch (Exception e) {
@@ -144,20 +145,30 @@ public class PermissionsFilter implements Filter {
         HttpServletResponse hsRes = (HttpServletResponse) response;
 
 
+        // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
         String userId = null;
-        // String remoteUser = hsReq.getRemoteUser();
-        Principal userPrinciple = hsReq.getUserPrincipal();
-        if(userPrinciple != null) {
-            userId = userPrinciple.getName();
+        String remoteUser = hsReq.getRemoteUser();
+        if(remoteUser == null) {
+            Principal userPrinciple = hsReq.getUserPrincipal();
+            if (userPrinciple != null) {
+                userId = userPrinciple.getName();
+            }
+
+        }
+        else {
+            userId = remoteUser;
         }
 
 
-        if(userId == null  && _everyOneMustHaveProfile) {
+
+        // So - Do they have to be authenticated?
+        if(userId == null  && _everyOneMustHaveUid) {
             hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
 
+        // Are they allowed access?
         if(requestIsGranted(userId, hsReq)){
             filterChain.doFilter(hsReq, hsRes);
         }

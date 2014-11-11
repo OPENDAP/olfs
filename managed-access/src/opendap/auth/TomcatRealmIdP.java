@@ -26,7 +26,6 @@
 
 package opendap.auth;
 
-import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +84,8 @@ public class TomcatRealmIdP extends IdProvider {
             redirectUrl = redirectUrl.replace(":8080/",":8443/");
         }
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
+
+
 
 
         session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);

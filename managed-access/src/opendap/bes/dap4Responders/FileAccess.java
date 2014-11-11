@@ -34,6 +34,7 @@ import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
+import opendap.dap.Request;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.jdom.Element;
@@ -209,7 +210,7 @@ public class FileAccess extends Dap4Responder {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String serviceUrl = ReqInfo.getServiceUrl(request);
+        String serviceUrl = new Request(null,request).getDapServiceUrl();
 
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");

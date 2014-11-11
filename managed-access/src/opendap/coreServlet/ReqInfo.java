@@ -28,7 +28,6 @@
 package opendap.coreServlet;
 
 
-import opendap.dap.Request;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,20 +128,6 @@ public class ReqInfo {
     }
 
 
-
-    /**
-     * Get service portion of the URL - everything in the URL before the localID (aka relativeUrl) of the dataset.
-     * @param request The client request.
-     * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
-     * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
-     */
-
-    public static String getServiceUrl(HttpServletRequest request){
-        Request req = new Request(null,request);
-        
-        return req.getDapServiceUrl();
-
-    }
 
     /**
      * Get service context portion of the URL - everything in the URL after the name of the server and before the
@@ -699,7 +684,6 @@ public class ReqInfo {
         
         s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
         s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
-        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
         s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
 
         s += "getConstraintExpression(): ";

@@ -46,8 +46,8 @@ public class IdFilter implements Filter {
 
 
     public static final String ORIGINAL_REQUEST_URL = "original_request_url";
-    public static final String USER_PROFILE = "user_profile";
-    public static final String IDENTITY_PROVIDER = "identity_provider";
+    public static final String USER_PROFILE         = "user_profile";
+    public static final String IDENTITY_PROVIDER    = "identity_provider";
 
     private ConcurrentHashMap<String,IdProvider> _idProviders;
 

@@ -1,12 +1,12 @@
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESResource;
 import opendap.bes.BESError;
+import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapResponder;
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -314,7 +314,7 @@ public class DatasetFileAccess extends BesDapResponder {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String serviceUrl = ReqInfo.getServiceUrl(request);
+        String serviceUrl = new Request(null,request).getDapServiceUrl()Z;
 
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");

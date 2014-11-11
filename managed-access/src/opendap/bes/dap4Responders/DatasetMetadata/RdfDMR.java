@@ -28,9 +28,9 @@ package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.bes.BESError;
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap4.QueryParameters;
 import opendap.xml.Transformer;

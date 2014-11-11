@@ -27,15 +27,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%@ page import="opendap.bes.*" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%@ page import="opendap.hai.Util" %>
 <%@ page import="opendap.ppt.OPeNDAPClient" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Vector" %>
-<%@ page import="opendap.coreServlet.RequestCache" %>
-<%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="org.slf4j.Logger" %>
 <html>
 <%
 

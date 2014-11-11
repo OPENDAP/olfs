@@ -26,8 +26,6 @@
 
 package opendap.auth;
 
-import java.util.HashSet;
-
 /**
  * Created by ndp on 9/24/14.
  */

@@ -1,0 +1,275 @@
+package opendap.auth;
+
+import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
+import opendap.logging.LogUtil;
+import org.jdom.Element;
+import org.slf4j.Logger;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Created by ndp on 11/6/14.
+ */
+public class PDPService extends HttpServlet {
+
+    private Logger _log;
+    private String _accessLogName = "PDP_SERVICE_ACCESS";
+
+
+    private Element _config;
+
+
+    private AtomicInteger _reqNumber;
+
+    private String _systemPath;
+
+    private boolean _isInitialized;
+
+    private boolean _requireSecureTransport;
+
+    private boolean _everyOneMustHaveUid;
+
+
+    private PolicyDecisionPoint _myPDP;
+
+    public PDPService(){
+        _isInitialized = false;
+        _reqNumber = new AtomicInteger(0);
+        _requireSecureTransport = true;
+        _everyOneMustHaveUid = false;
+
+    }
+
+    public void init() throws ServletException {
+        super.init();
+        initLogging();
+
+        _log.info("init() - BEGIN");
+
+        String msg;
+
+        if (_isInitialized) {
+            _log.info("init() - END (Already initialized. Nothing changed.)");
+            return;
+        }
+        _systemPath = ServletUtil.getSystemPath(this, "");
+        _isInitialized = true;
+        _requireSecureTransport = false;
+
+        String configFile = getInitParameter("config");
+
+        try {
+            _config = opendap.xml.Util.getDocumentRoot(configFile);
+
+            Element e = _config.getChild("PolicyDecisionPoint");
+
+            _myPDP = PolicyDecisionPoint.pdpFactory(e);
+
+            e = _config.getChild("EveryOneMustHaveId");
+            if(e !=null){
+                _everyOneMustHaveUid = true;
+            }
+
+            e = _config.getChild("requireSecureTransport");
+            if(e !=null){
+                _requireSecureTransport = true;
+            }
+
+
+        } catch (Exception e) {
+            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+            _log.error(msg);
+            throw new ServletException(msg, e);
+
+        }
+
+        _log.info("init() - END");
+    }
+
+
+
+    /**
+     * Starts the logging process.
+     */
+    private void initLogging() {
+        LogUtil.initLogging(this);
+        _log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Gets the last modified date of the requested resource. Because the data handler is really
+     * the only entity capable of determining the last modified date the job is passed  through to it.
+     *
+     * @param req The current request
+     * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
+     *         since midnight January 1, 1970 GMT
+     */
+    protected long getLastModified(HttpServletRequest req) {
+
+
+
+        try {
+            RequestCache.openThreadCache();
+
+            long reqno = _reqNumber.incrementAndGet();
+            LogUtil.logServerAccessStart(req, _accessLogName, "LastModified", Long.toString(reqno));
+            return -1;
+
+        } finally {
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, _accessLogName);
+        }
+
+
+    }
+
+
+    private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
+
+        if (req.getPathInfo() == null) {
+            res.sendRedirect(Scrub.urlContent(req.getRequestURI() + "/"));
+            _log.debug("Sent redirect to make the web page work!");
+            return true;
+        }
+        return false;
+    }
+
+
+
+    public void doGet(HttpServletRequest request,
+                      HttpServletResponse response) {
+
+        doEvaluate(request, response);
+
+    }
+
+    public void doPost(HttpServletRequest request,
+                      HttpServletResponse response) {
+
+        doEvaluate(request, response);
+
+    }
+
+    public void doEvaluate(HttpServletRequest request,
+                      HttpServletResponse response)  {
+
+        String msg = "";
+        int status = HttpServletResponse.SC_FORBIDDEN;
+
+        LogUtil.logServerAccessStart(request,_accessLogName, request.getMethod(), Integer.toString(_reqNumber.incrementAndGet()));
+        try {
+            if (!redirect(request, response)) {
+
+                String uid         = request.getParameter("uid");
+                if(uid == null) uid = "";
+
+                String resourceId  = request.getParameter("resourceId");
+                if(resourceId == null) resourceId = "";
+
+                String query       = request.getParameter("query");
+                if(query == null) query = "";
+
+                String action      = request.getParameter("action");
+                if(action == null) action = "GET";
+
+
+                StringBuilder quadTuple = new StringBuilder();
+
+                quadTuple.append("{ ");
+                quadTuple.append("uid:\"").append(uid).append("\", ");
+                quadTuple.append("resourceId:\"").append(resourceId).append("\", ");
+                quadTuple.append("query:\"").append(query).append("\", ");
+                quadTuple.append("action:\"").append(action).append("\"");
+                quadTuple.append(" }");
+                _log.debug("doGet() - {}", quadTuple);
+
+                if(_myPDP.evaluate(uid,resourceId,query,action)){
+                    status = HttpServletResponse.SC_OK;
+                    response.setStatus(status);
+                    ServletOutputStream sos = response.getOutputStream();
+                    msg = "Yes. Affirmative. Absolutely. I do.";
+                    sos.println(msg);
+                    _log.debug("doEvaluate() - ACCESS PERMITTED {}", quadTuple);
+
+                }
+                else {
+                    status = HttpServletResponse.SC_FORBIDDEN;
+                    response.setStatus(status);
+                    ServletOutputStream sos = response.getOutputStream();
+                    msg = "No. Nope. Not even.";
+                    sos.println(msg);
+                    _log.debug("doEvaluate() - ACCESS DENIED {}", quadTuple);
+                }
+            }
+
+        }
+        catch (Throwable t) {
+            try {
+                _log.error("doEvaluate() - The Bad Things have happened. Message: {}", t.getMessage());
+                if(!response.isCommitted()){
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
+            }
+            catch(Throwable t2){
+                // It's boned now.. Leave it be.
+            }
+        }
+        finally {
+            RequestCache.closeThreadCache();
+            LogUtil.logServerAccessEnd(status, msg.length(), _accessLogName);
+        }
+
+    }
+
+
+    /**
+     *
+     * This override checks to see if we are in secure mode and if not send a forbidden error.
+     *
+     * @param req   Same as for javax.servlet.http.HttpServlet.service()
+     * @param resp   Same as for javax.servlet.http.HttpServlet.service()
+     * @throws javax.servlet.ServletException    Same as for javax.servlet.http.HttpServlet.service()
+     * @throws java.io.IOException   Same as for javax.servlet.http.HttpServlet.service()
+     */
+    @Override
+    protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
+            throws javax.servlet.ServletException, java.io.IOException {
+
+        if (_requireSecureTransport){
+            if(!req.isSecure()) {
+                        _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
+                        resp.sendError(403);
+                    }
+                    else {
+                        _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
+                    }
+        } else {
+            _log.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
+
+        }
+
+        super.service(req,resp);
+
+
+
+    }
+
+
+
+
+}

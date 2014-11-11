@@ -25,8 +25,8 @@
  */
 package opendap.gateway;
 
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ResourceInfo;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;

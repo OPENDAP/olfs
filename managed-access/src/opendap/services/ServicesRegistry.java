@@ -27,11 +27,9 @@ package opendap.services;
 
 import opendap.viewers.WebServiceHandler;
 import opendap.webstart.JwsHandler;
-import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
