@@ -183,6 +183,10 @@
              <appender-ref ref="stdout"/>
     </logger>
 
+    <logger name="opendap.auth" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+
 
 
 <!--
@@ -232,6 +236,14 @@
         <appender-ref ref="stdout"/>
     </logger>
 -->
+
+
+
+    <logger name="HyraxAccess" level="all">
+        <appender-ref ref="HyraxAccessLog" />
+    </logger>
+
+
 
     <root level="error">
         <appender-ref ref="ErrorLog"/>
