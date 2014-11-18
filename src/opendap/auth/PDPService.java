@@ -35,7 +35,6 @@ public class PDPService extends HttpServlet {
 
     private boolean _requireSecureTransport;
 
-    private boolean _everyOneMustHaveUid;
 
 
     private PolicyDecisionPoint _myPDP;
@@ -44,7 +43,6 @@ public class PDPService extends HttpServlet {
         _isInitialized = false;
         _reqNumber = new AtomicInteger(0);
         _requireSecureTransport = true;
-        _everyOneMustHaveUid = false;
 
     }
 
@@ -60,36 +58,13 @@ public class PDPService extends HttpServlet {
             _log.info("init() - END (Already initialized. Nothing changed.)");
             return;
         }
+
         _systemPath = ServletUtil.getSystemPath(this, "");
         _isInitialized = true;
         _requireSecureTransport = false;
 
-        String configFile = getInitParameter("config");
+        load_config();
 
-        try {
-            _config = opendap.xml.Util.getDocumentRoot(configFile);
-
-            Element e = _config.getChild("PolicyDecisionPoint");
-
-            _myPDP = PolicyDecisionPoint.pdpFactory(e);
-
-            e = _config.getChild("EveryOneMustHaveId");
-            if(e !=null){
-                _everyOneMustHaveUid = true;
-            }
-
-            e = _config.getChild("requireSecureTransport");
-            if(e !=null){
-                _requireSecureTransport = true;
-            }
-
-
-        } catch (Exception e) {
-            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error(msg);
-            throw new ServletException(msg, e);
-
-        }
 
         _log.info("init() - END");
     }
@@ -102,6 +77,38 @@ public class PDPService extends HttpServlet {
     private void initLogging() {
         LogUtil.initLogging(this);
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+    }
+
+    private void load_config() throws ServletException {
+        String msg;
+        String configFile = getInitParameter("config");
+
+        if(configFile==null){
+            configFile = _systemPath + "/WEB-INF/conf/SimplePDP.xml";
+        }
+
+        try {
+            _config = opendap.xml.Util.getDocumentRoot(configFile);
+
+            Element e = _config.getChild("PolicyDecisionPoint");
+
+            _myPDP = PolicyDecisionPoint.pdpFactory(e);
+
+
+            e = _config.getChild("RequireSecureTransport");
+            if(e !=null){
+                _requireSecureTransport = true;
+            }
+
+
+        } catch (Exception e) {
+            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+            _log.error(msg);
+            throw new ServletException(msg, e);
+
+        }
+
 
     }
 
