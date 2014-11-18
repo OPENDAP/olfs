@@ -29,7 +29,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        name="Builds the Simple Policy Decision Point web service."
         default="all" basedir=".">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
