@@ -421,7 +421,7 @@
 
 
 
-        <war destfile="${build.dist}/pdp.war"
+        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
              webxml="${build.resources}/WEB-INF/web.xml"
                 >
 
