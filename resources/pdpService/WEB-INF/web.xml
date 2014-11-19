@@ -12,10 +12,10 @@
         <servlet-name>pdpService</servlet-name>
         <servlet-class>opendap.auth.PDPService </servlet-class>
         <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
-        <init-param>
+        <!-- init-param>
             <param-name>config</param-name>
             <param-value>/Users/ndp/hyrax/ANU/apache-tomcat-7.0.53/content/opendap/SimplePDP.xml</param-value>
-        </init-param>
+        </init-param -->
         <load-on-startup>1</load-on-startup>
     </servlet>
 
