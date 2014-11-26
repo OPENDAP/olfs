@@ -107,9 +107,6 @@ public class HtmlDMR extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
-	//set the no frame header.  Avoids cross frame attack.
-	response.setHeader("X-Frame-Options", "DENY");
-
         log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
