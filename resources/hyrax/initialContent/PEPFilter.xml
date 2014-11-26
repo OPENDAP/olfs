@@ -24,7 +24,16 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 
-<PermissionsFilter>
+<PolicyEnforcementPointFilter>
+
+
+    <!-- You can use a RemotePDP -->
+    <!-- PolicyDecisionPoint class="opendap.auth.RemotePDP">
+        <PDPServiceEndpoint>http://localhost:8080/pdp</PDPServiceEndpoint>
+    </PolicyDecisionPoint -->
+
+
+    <!-- You can use an in memory local PDP -->
     <PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*</role>
@@ -77,5 +86,10 @@
         </Memberships>
 
     </PolicyDecisionPoint>
-</PermissionsFilter>
+
+
+
+
+
+</PolicyEnforcementPointFilter>
 
