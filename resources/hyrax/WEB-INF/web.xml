@@ -140,6 +140,17 @@
   <!--   page in the Tomcat documentation.                                  -->
 
 
+
+    <filter>
+        <filter-name>ClickJackFilter</filter-name>
+        <filter-class>opendap.coreServlet.ClickjackFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ClickJackFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
     <servlet>
         <servlet-name>hyrax</servlet-name>
 
