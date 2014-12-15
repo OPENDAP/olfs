@@ -1,8 +1,8 @@
 
 ########################## Hyrax/OLFS ##########################
 
-Hyrax Version 1.9.9  (14 August 2014)
-OLFS  Version 1.11.4 (14 August 2014)
+Hyrax Version 1.10.0  (04 December 2014)
+OLFS  Version 1.12.0  (04 December 2014)
 
 The file install.html or docs/index.html may have additional information...
 
@@ -14,7 +14,8 @@ First:
 
 Check it out:
 
-    svn co http://scm.opendap.org/svn/trunk/olfs
+    git clone https://github.com/OPENDAP/olfs.git
+
 
 Build it:
 

@@ -1,3 +1,151 @@
+commit f0876e951be51fc5b909af2b0b6574c557394f19
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Nov 26 12:17:57 2014 -0800
+
+    olfs: Added ClickjackFilter.
+
+commit a56ac76281bb355db6f33b63cb66ec81d4dd5661
+Merge: 5dcb67c e4cae8d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Nov 26 12:15:42 2014 -0800
+
+    Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+commit 5dcb67cbf667bc72704ffc3fbb0fd7b9e2a90fe8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Nov 26 12:13:51 2014 -0800
+
+    olfs: Added ClickjackFilter.
+
+commit e4cae8d310aa8420cfc5e6dae91a881c8acea86a
+Merge: b476ba7 fbc2d97
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Nov 25 10:34:06 2014 -0700
+
+    Merge branch 'master' of https://github.com/opendap/olfs
+
+commit b476ba732d0c872dcb7113ee391b9c82e2edea48
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Nov 25 10:32:31 2014 -0700
+
+    Applied patch from LARC for X-Frame-Options: DENY.
+
+commit fbc2d978925b51c36077e9636821da9a0bd49be0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Nov 18 14:16:05 2014 -0800
+
+    olfs-managed-access: Adding access logging to logback-tes.xml
+
+commit 2c9b4743c40212251d84d2c70548b557d6586bcc
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Tue Oct 21 00:00:49 2014 +0000
+
+    olfs: Oops. Wrong version #..
+
+commit 799395a51dcccb4947d386eb2043d11745d95056
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Mon Oct 20 23:43:51 2014 +0000
+
+    olfs: Updated minor version number prior to minor release of OLFS.
+
+commit e4b554b78ab95289828c723a0dcb7e5a67122ae0
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Fri Aug 29 22:23:09 2014 +0000
+
+    olfs: Repaired bug that was introducing whitespace characters into the MIME Type strings extracted from the clients Accept header, and thus causing the server to incorrectly return a HTTP status of 406..
+
+commit b22e503b8e995f0cfc622433ea4c05290edbf2c2
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Fri Aug 29 21:18:37 2014 +0000
+
+    olfs: Tweeks to S3 service and production  rules for same.
+
+commit 4c55585f540f01d1531d44c26d7358fcdc996f43
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Thu Aug 28 00:29:44 2014 +0000
+
+    olfs: Fixed up build files to accomodate library move. Also added run target for SimpleS3Uploader to the s3-build.xml file
+
+commit f80455e3e5242c437ab4482ff2df8b12fb4b32f8
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Thu Aug 28 00:13:55 2014 +0000
+
+    olfs: Moved libs for AWS into AWS resources.
+
+commit 30fbf3757b94077a53fe655e6509d7122e208568
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Thu Aug 28 00:12:02 2014 +0000
+
+    olfs: Moved libs for AWS into AWS resources.
+
+commit 7eca73b7737d1439c3915a60669cac3615255bbb
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Wed Aug 27 23:35:54 2014 +0000
+
+    olfs: Updated NOAA S3 code to work again. Built bucket for testing.
+
+commit 3309be19fc15d96356364604fca60c96dbbc83c4
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Mon Aug 25 22:50:29 2014 +0000
+
+    olfs: Soliciting the DAP2 ASCII response is now a "returnAs" attribute of the get DAP2 Data request.
+
+commit 1c0d32c0dc024738340e5b0d77cddb2a3fe15e41
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Thu Aug 21 00:18:10 2014 +0000
+
+    olfs: Improvements ton DAP4 Data Request form.
+
+commit c21622e206f3d1863bac247ce623532cec6bd6b0
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Tue Aug 19 22:02:47 2014 +0000
+
+    olfs: Added XSLT to make the Data Request form from a DMR.
+
+commit c95cc82a9467c1f97072ae9747f34cc22d9749e4
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Tue Aug 19 21:59:29 2014 +0000
+
+    olfs: Added XSLT to make the Data Request form from a DMR.
+
+commit 561540415c603ff8cbc07f1302248872bf1f82c3
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Tue Aug 19 21:59:07 2014 +0000
+
+    olfs: Added XSLT to make the Data Request form from a DMR.
+
+commit 49f05d9abacac38520a493d1d800d430cf324ffb
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Mon Aug 18 23:03:21 2014 +0000
+
+    olfs: Repaired DAP2 fileout NetCDF4. Started sorting out HTML Data request forms.
+
+commit d3c9a1b988c33316a9467cfc9af0f41932ca5340
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Mon Aug 18 17:37:17 2014 +0000
+
+    olfs: Replumbed so that all DAP4 requests now solicit DAP4 material from the BES.
+
+commit ef6209cfdcacce835753df98ec7672cd0063e049
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Fri Aug 15 18:03:34 2014 +0000
+
+    olfs: Renamed DapDispatcher to BesDapDispatcher
+
+commit 2408f76697fcf038a00bfe353b64c0e5ee37fefa
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Fri Aug 15 17:28:08 2014 +0000
+
+    olfs: moved DapDispatcher to opendap.bes package
+
+commit 5473de78180e4470c9789414a143a70bcf11ac2d
+Author: ndp <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+Date:   Fri Aug 15 17:26:45 2014 +0000
+
+    olfs: Renamed dapREsponders package to a more trthful dap2Responders
+
+
+
 2014-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactored OLFS configuration. Added JSON and IJSN data responses to DAP2 resource URL scheme.
@@ -41,15 +189,10 @@
 2014-07-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
-	.
 
-;; Local Variables:
-;; coding: utf-8
-;; End:
 2014-07-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
-	.
 
 2014-06-06  Nathan Potter <ndp@opendap.org>
 
@@ -63,9 +206,6 @@
 
 	olfs: Fixed bug in WebStartServlet.
 
-;; Local Variables:
-;; coding: utf-8
-;; End:
 2014-05-22  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed bug in WebStartServlet.
@@ -86,9 +226,6 @@
 
 	olfs: Fixed test classpath
 
-;; Local Variables:
-;; coding: utf-8
-;; End:
 2014-04-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated README, ChangeLog, News
@@ -105,9 +242,6 @@
 
 	olfs: Added processing to handle the HTTP response headers for the async behavior of the store_result requests.
 
-;; Local Variables:
-;; coding: utf-8
-;; End:
 2014-03-31  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed test classpath

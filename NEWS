@@ -1,3 +1,15 @@
+Version 1.12.0 (03 December 2014)
+
+ Refactored OLFS configuration file. Installing into
+ an existing Hyrax instance will require installing
+ the new opendap.war file; restarting tomcat;
+ manually copying the file:
+   $CATALINA_HOME/opendap/initialContent/olfs.xml
+ to:
+   $CATALINA_HOME/content/opendap/olfs.xml
+ and restarting Tomcat again.
+ Added security patches.
+
 
 Version 1.11.4 (20 October 2014)
 
