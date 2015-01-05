@@ -1,3 +1,8 @@
+commit b8cfb550a9f0bed4cc29fcad4055ae73a6e2378a
+Author: Nathan Potter <ndp@opendap.org>
+
+    olfs: Dropped broken test for dataset WMSness. Will have to revisit in the future, as users will likely dislike false positives (showing WMS and Godiva links for incompatible datasets) almost as much as false negatives (not showing WMS and Godiva links for valid WMS datasets)
+
 commit f0876e951be51fc5b909af2b0b6574c557394f19
 Author: Nathan Potter <ndp@opendap.org>
 Date:   Wed Nov 26 12:17:57 2014 -0800

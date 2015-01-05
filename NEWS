@@ -1,3 +1,8 @@
+Version 1.12.1 (05 January 2015)
+
+  Disabled bug in our viewers page that was preventing some valid WMS datasets from receiving WMS and Godiva links.
+
+
 Version 1.12.0 (03 December 2014)
 
  Refactored OLFS configuration file. Installing into
