@@ -93,11 +93,11 @@ public class NcWmsService implements WebServiceHandler {
 
     @Override
     public boolean datasetCanBeViewed(Document ddx) {
-        Element dataset = ddx.getRootElement();
+        //Element dataset = ddx.getRootElement();
 
-        Iterator i = dataset.getDescendants(new ElementFilter("Grid", DAP.DAPv32_NS));
+        //Iterator i = dataset.getDescendants(new ElementFilter("Grid", DAP.DAPv32_NS));
 
-        return i.hasNext();
+        return true; // i.hasNext();
     }
 
     @Override
