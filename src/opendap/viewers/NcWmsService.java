@@ -103,7 +103,8 @@ public class NcWmsService implements WebServiceHandler {
     @Override
     public String getServiceLink(String datasetUrl) {
 
-        return _ncWmsServiceUrl + "?DATASET=" + _ncWmsDynamicServiceId + datasetUrl + "&SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+        return _ncWmsServiceUrl + "/" + _ncWmsDynamicServiceId + datasetUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+
     }
 
     public String getBase() {
