@@ -124,7 +124,11 @@ public class GodivaWebService implements  WebServiceHandler {
     public String getServiceLink(String datasetUrl) {
 
         // note that we escape the '?' and '=' characters.
-        return _godivaBase + "?server="+ _ncWmsServiceUrl + "%3FDATASET%3d" + _ncWmsDynamicServiceId + datasetUrl;
+        //return _godivaBase + "?server="+ _ncWmsServiceUrl + "%3FDATASET%3d" + _ncWmsDynamicServiceId + datasetUrl;
+
+
+        return _godivaBase + "?server="+ _ncWmsServiceUrl + "/" +_ncWmsDynamicServiceId + datasetUrl;
+
     }
 
     @Override
