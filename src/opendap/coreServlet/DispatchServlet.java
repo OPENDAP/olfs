@@ -448,7 +448,7 @@ public class DispatchServlet extends HttpServlet {
 
                 log.debug(Util.getMemoryReport());
 
-                log.debug(Util.showRequest(request, reqno));
+                log.debug(ServletUtil.showRequest(request, reqno));
                 //log.debug(AwsUtil.probeRequest(this, request));
 
 
@@ -463,7 +463,7 @@ public class DispatchServlet extends HttpServlet {
 
 
                 if (Debug.isSet("probeRequest"))
-                    log.debug(Util.probeRequest(this, request));
+                    log.debug(ServletUtil.probeRequest(this, request));
 
 
                 DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
@@ -571,7 +571,7 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-        Util.probeRequest(this, req);
+        ServletUtil.probeRequest(this, req);
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
@@ -604,7 +604,7 @@ public class DispatchServlet extends HttpServlet {
 
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
 
-                log.debug(Util.showRequest(request, reqno));
+                log.debug(ServletUtil.showRequest(request, reqno));
 
 
                 log.debug("Requested relative URL: '" + relativeUrl +
@@ -612,7 +612,7 @@ public class DispatchServlet extends HttpServlet {
                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
                 if (Debug.isSet("probeRequest"))
-                    log.debug(Util.probeRequest(this, request));
+                    log.debug(ServletUtil.probeRequest(this, request));
 
 
                 DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);

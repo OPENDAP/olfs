@@ -397,7 +397,7 @@ public class ViewersServlet extends HttpServlet {
         LogUtil.logServerAccessStart(req, "WebStartServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
 
 
-        _log.debug(opendap.coreServlet.Util.showRequest(req, reqNumber.get()));
+        _log.debug(ServletUtil.showRequest(req, reqNumber.get()));
         //log.debug(opendap.coreServlet.AwsUtil.probeRequest(this, req));
 
 
