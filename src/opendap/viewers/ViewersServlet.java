@@ -561,7 +561,7 @@ public class ViewersServlet extends HttpServlet {
         }
 
         handlers = getWebServicesParam(datasetID, ddx);
-        _log.error("WebServices: \n" + handlers);
+        _log.debug("WebServices: \n" + handlers);
         if(handlers!=null){
             ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes());
             XdmNode valueNode = transformer.build(new StreamSource(reader));
