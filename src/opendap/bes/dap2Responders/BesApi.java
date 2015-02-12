@@ -1,9 +1,9 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) $year OPeNDAP, Inc.
+ * // Copyright (c) 2015 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
@@ -80,6 +80,8 @@ public class BesApi {
     public static final String GMLJP2     = "jpeg2000";
     public static final String JSON       = "json";
     public static final String IJSON      = "ijson";
+    public static final String W10N       = "w10n";
+    public static final String W10N_META       = "w10nMeta";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -692,38 +694,6 @@ public class BesApi {
     }
 
 
-    /**
-     * Writes the NetCDF file out response for the dataSource to the passed
-     * stream.
-     *
-     * @param dataSource The requested DataSource
-     * @param constraintExpression The constraintElement expression to be applied to
-     *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
-     * @param os         The Stream to which to write the response.
-     * @param err        The Stream to which to write errors returned
-     *                   by the BES.
-     * @return False if the BES returns an error, true otherwise.
-     * @throws BadConfigurationException .
-     * @throws BESError                  .
-     * @throws IOException               .
-     * @throws PPTException              .
-     */
-    public boolean writeDap2DataAsJson(String dataSource,
-                                       String constraintExpression,
-                                       String xdap_accept,
-                                       int maxResponseSize,
-                                       OutputStream os,
-                                       OutputStream err)
-            throws BadConfigurationException, BESError, IOException, PPTException {
-
-        return besTransaction(
-                dataSource,
-                getDap2JsonDataRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
-                os,
-                err);
-    }
-
 
     /**
      * Writes the NetCDF file out response for the dataSource to the passed
@@ -753,6 +723,60 @@ public class BesApi {
                 os,
                 err);
     }
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writePathInfoResponse(String dataSource,
+                                         OutputStream os,
+                                         OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getShowPathInfoRequestDocument(dataSource),
+                os,
+                err);
+    }
+
+    public boolean getPathInfoDocument(String dataSource,Document response)
+            throws PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException, BESError {
+
+
+        ByteArrayOutputStream pathInfoDocString = new ByteArrayOutputStream();
+
+
+        boolean ret = writePathInfoResponse(dataSource,pathInfoDocString,pathInfoDocString);
+
+
+        SAXBuilder sb = new SAXBuilder();
+
+        Document pathInfoResponseDoc = sb.build(new ByteArrayInputStream(pathInfoDocString.toByteArray()));
+
+        response.detachRootElement();
+
+        response.setRootElement(pathInfoResponseDoc.detachRootElement());
+
+
+        return ret;
+
+
+    }
+
 
     /**
      * Writes the NetCDF file out response for the dataSource to the passed
@@ -972,6 +996,139 @@ public class BesApi {
                 err);
     }
 
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeDap2DataAsJson(String dataSource,
+                                       String constraintExpression,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       OutputStream os,
+                                       OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getDap2DataAsJsonRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                os,
+                err);
+    }
+
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeDap2MetadataAsJson(String dataSource,
+                                           String constraintExpression,
+                                           String xdap_accept,
+                                           int maxResponseSize,
+                                           OutputStream os,
+                                           OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getDap2MetadataAsJsonRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                os,
+                err);
+    }
+
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeDap2DataAsW10nJson(String dataSource,
+                                       String constraintExpression,
+                                       String w10nMeta,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       OutputStream os,
+                                       OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getDap2DataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, xdap_accept, maxResponseSize),
+                os,
+                err);
+    }
+
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeDap2MetadataAsW10nJson(String dataSource,
+                                           String constraintExpression,
+                                           String w10nMeta,
+                                           String xdap_accept,
+                                           int maxResponseSize,
+                                           OutputStream os,
+                                           OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, xdap_accept, maxResponseSize),
+                os,
+                err);
+    }
+
 
     /**
      * Writes the NetCDF file out response for the dataSource to the passed
@@ -1135,6 +1292,9 @@ public class BesApi {
                 os,
                 err);
     }
+
+
+
 
 
 
@@ -1860,15 +2020,93 @@ public class BesApi {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public Document getDap2JsonDataRequest(String dataSource,
-                                           String ce,
-                                           String xdap_accept,
-                                           int maxResponseSize)
+    public Document getDap2DataAsJsonRequest(String dataSource,
+                                             String ce,
+                                             String xdap_accept,
+                                             int maxResponseSize)
             throws BadConfigurationException {
 
         return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, JSON, JSON_ERRORS);
 
     }
+    /**
+     *  Returns the JSON encoded DAP2 Metadata response (DDX) for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The DAP2 query string parameters associated wih the request.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap2MetadataAsJsonRequest(String dataSource,
+                                                 String ce,
+                                                 String xdap_accept,
+                                             int maxResponseSize
+    )
+            throws BadConfigurationException {
+
+        return getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, JSON, JSON_ERRORS);
+
+
+    }
+
+
+
+    /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap2DataAsW10nJsonRequest(String dataSource,
+                                           String ce,
+                                           String w10nMeta,
+                                           String xdap_accept,
+                                           int maxResponseSize)
+            throws BadConfigurationException {
+
+        Document requestDoc =  getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, JSON_ERRORS);
+
+
+        requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+
+        return requestDoc;
+
+    }
+    /**
+     *  Returns the JSON encoded DAP2 Metadata response (DDX) for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The DAP2 query string parameters associated wih the request.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap2MetadataAsW10nJsonRequest(String dataSource,
+                                                 String ce,
+                                                 String w10nMeta,
+                                                 String xdap_accept,
+                                             int maxResponseSize
+    )
+            throws BadConfigurationException {
+
+        Document requestDoc = getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, JSON_ERRORS);
+
+
+        requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+
+        return requestDoc;
+
+
+    }
+
 
 
     /**
@@ -1893,6 +2131,7 @@ public class BesApi {
     }
 
 
+
     /**
      *  Returns the XML data response for the passed dataSource
      *  using the passed constraint expression.
@@ -1913,6 +2152,7 @@ public class BesApi {
 
 
     }
+
 
 
 
@@ -2027,7 +2267,6 @@ public class BesApi {
                                             String errorContext)
                 throws BadConfigurationException {
 
-        QueryParameters qp = new QueryParameters();
 
 
         return getDap2RequestDocument(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
@@ -2101,63 +2340,101 @@ public class BesApi {
 
 
 
-   public  Document getDap4RequestDocument(String type,
-                                           String dataSource,
-                                           QueryParameters qp,
-                                           int maxResponseSize,
-                                           String xmlBase,
-                                           String formURL,
-                                           String returnAs,
-                                           String errorContext)
-               throws BadConfigurationException {
+    public  Document getDap4RequestDocument(String type,
+                                            String dataSource,
+                                            QueryParameters qp,
+                                            int maxResponseSize,
+                                            String xmlBase,
+                                            String formURL,
+                                            String returnAs,
+                                            String errorContext)
+                throws BadConfigurationException {
 
 
-       String besDataSource = getBES(dataSource).trimPrefix(dataSource);
+        String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
 
-       Element e, request = new Element("request", BES_NS);
+        Element e, request = new Element("request", BES_NS);
 
-       String reqID = "["+Thread.currentThread().getName()+":"+
-               Thread.currentThread().getId()+":bes_request]";
+        String reqID = "["+Thread.currentThread().getName()+":"+
+                Thread.currentThread().getId()+":bes_request]";
 
-       request.setAttribute("reqID",reqID);
-
-
-       request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-
-       request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-       if(xmlBase!=null)
-           request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
-
-       if(maxResponseSize>=0)
-           request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+        request.setAttribute("reqID",reqID);
 
 
-       request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
-       Element def = defineElement("d1","default");
-       e = (containerElement("catalogContainer"));
+        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-       if(qp.getCe()!=null && !qp.getCe().equals(""))
-           e.addContent(dap4ConstraintElement(qp.getCe()));
+        if(xmlBase!=null)
+            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
-       if(qp.getFunc()!=null && !qp.getFunc().equals(""))
-           e.addContent(dap4FunctionElement(qp.getFunc()));
-
-       def.addContent(e);
-
-       request.addContent(def);
-
-       e = getElement(type,"d1",formURL,returnAs,qp.getAsync(),qp.getStoreResultRequestServiceUrl());
-
-       request.addContent(e);
-
-       return new Document(request);
-
-   }
+        if(maxResponseSize>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
 
+        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));
+
+        Element def = defineElement("d1","default");
+        e = (containerElement("catalogContainer"));
+
+        if(qp.getCe()!=null && !qp.getCe().equals(""))
+            e.addContent(dap4ConstraintElement(qp.getCe()));
+
+        if(qp.getFunc()!=null && !qp.getFunc().equals(""))
+            e.addContent(dap4FunctionElement(qp.getFunc()));
+
+        def.addContent(e);
+
+        request.addContent(def);
+
+        e = getElement(type,"d1",formURL,returnAs,qp.getAsync(),qp.getStoreResultRequestServiceUrl());
+
+        request.addContent(e);
+
+        return new Document(request);
+
+    }
+
+
+    public  Document getShowPathInfoRequestDocument(String dataSource)
+                throws BadConfigurationException {
+
+
+        String besDataSource = getBES(dataSource).trimPrefix(dataSource);
+
+
+        Element request = new Element("request", BES_NS);
+
+        String reqID = "["+Thread.currentThread().getName()+":"+
+                Thread.currentThread().getId()+":bes_request]";
+
+        request.setAttribute("reqID",reqID);
+
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
+        //request.addContent(w10nRequestElement(besDataSource,queryString,mediaType,maxResponseSize));
+
+
+
+        request.addContent(showPathInfoRequestElement(besDataSource));
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        log.debug("getShowPathInfoRequestDocument() - Document\n {}",xmlo.outputString(request));
+
+        return new Document(request);
+
+    }
+
+
+    public Element showPathInfoRequestElement(String resource) {
+        Element e;
+        Element spi = new Element("showPathInfo",BES_NS);
+
+        spi.setAttribute("node", resource);
+
+        return spi;
+    }
 
 
 

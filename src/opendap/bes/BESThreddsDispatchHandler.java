@@ -189,7 +189,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
 
-            showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
+            showCatalogToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
 
 
             String base = null;
@@ -216,7 +216,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String threddsCatalogID = oreq.getDapServiceLocalID() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
+            String threddsCatalogID = oreq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
 
 
             response.setContentType("text/xml");
