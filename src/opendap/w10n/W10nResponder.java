@@ -878,7 +878,7 @@ public class W10nResponder  {
 
 
         if(mt.getName().equalsIgnoreCase(Json.NAME)) {
-            sendW10nDataResponseForDap2Data(resourceId, dapCe, w10nPathIdentifier, mt, maxResponseSize, response);
+            sendDap2DataAsW10nJson(resourceId, dapCe, w10nPathIdentifier, mt, maxResponseSize, response);
             return;
         }
 
@@ -992,12 +992,12 @@ public class W10nResponder  {
 
 
 
-    private void sendW10nDataResponseForDap2Data(String resourceId,
-                                                 W10nDap2Constraint dapCe,
-                                                 String w10nPathIdentifier,
-                                                 MediaType mt,
-                                                 int maxResponseSize,
-                                                 HttpServletResponse response)
+    private void sendDap2DataAsW10nJson(String resourceId,
+                                        W10nDap2Constraint dapCe,
+                                        String w10nPathIdentifier,
+                                        MediaType mt,
+                                        int maxResponseSize,
+                                        HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
 

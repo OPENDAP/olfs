@@ -81,7 +81,7 @@ public class BesApi {
     public static final String JSON       = "json";
     public static final String IJSON      = "ijson";
     public static final String W10N       = "w10n";
-    public static final String W10N_META       = "w10nMeta";
+    public static final String W10N_META  = "w10nMeta";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -2074,7 +2074,8 @@ public class BesApi {
         Document requestDoc =  getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, JSON_ERRORS);
 
 
-        requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+        if(w10nMeta!=null)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
 
         return requestDoc;
 
@@ -2100,7 +2101,8 @@ public class BesApi {
         Document requestDoc = getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, JSON_ERRORS);
 
 
-        requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+        if(w10nMeta!=null)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
 
         return requestDoc;
 
