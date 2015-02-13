@@ -65,7 +65,6 @@
                 <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
                 <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
-                <script type="text/javascript" src="{$serviceContext}/js/ifh_buttons.js"><xsl:value-of select="' '"/></script>
 
                 <title>w10n Service: meta for <xsl:value-of select="$w10nType"/> <xsl:value-of select="$w10nName"/></title>
             </head>

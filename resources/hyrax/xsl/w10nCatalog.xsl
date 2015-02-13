@@ -98,7 +98,21 @@
                         <xsl:otherwise>node:</xsl:otherwise>
                     </xsl:choose>
                     </span> <xsl:value-of select="$catalogName"/></h1>
-                <span class="medium"><a href=".?output=json">json</a></span>
+                <table width="100%">
+                    <tr>
+                        <td class="small">
+                            <xsl:if test="bes:dataset/@name!='/'" >
+                                <a href="..">Parent Node/</a>
+                            </xsl:if>
+                        </td>
+                        <td align="right">
+                            <span class="small">
+                                JSON <a href=".?output=json"> meta </a>
+                            </span>
+
+                        </td>
+                    </tr>
+                </table>
 
                 <hr size="1" noshade="noshade"/>
 
@@ -131,18 +145,6 @@
                                 <th align="left">Name</th>
                                 <th align="center">Last Modified</th>
                                 <th align="center">Size</th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <xsl:if test="bes:dataset/@name!='/'" >
-                                        <a href="..">Parent Directory/</a>
-                                    </xsl:if>
-                                    <xsl:if test="$besPrefix!='/'" >
-                                        <xsl:if test="bes:dataset/@name='/'" >
-                                            <a href="..">Parent Directory/</a>
-                                        </xsl:if>
-                                    </xsl:if>
-                                </td>
                             </tr>
 
                             <xsl:call-template name="ProcessCatalogNode" />
