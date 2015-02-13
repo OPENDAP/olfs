@@ -7,8 +7,13 @@ import opendap.bes.dap4Responders.MediaType;
  */
 public class Netcdf4 extends MediaType {
 
+    public static final String NAME = "nc4";
+
     public Netcdf4(){
-        this("nc4");
+
+        this("."+ NAME);
+        setName(NAME);
+
     }
 
     public Netcdf4(String typeMatchString){

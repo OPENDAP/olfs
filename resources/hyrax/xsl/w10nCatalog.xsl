@@ -102,12 +102,20 @@
                     <tr>
                         <td class="small">
                             <xsl:if test="bes:dataset/@name!='/'" >
-                                <a href="..">Parent Node/</a>
+                                <span class="small" style="font-weight: bold;"><a href="..">Parent Node</a></span>
                             </xsl:if>
                         </td>
                         <td align="right">
                             <span class="small">
-                                JSON <a href=".?output=json"> meta </a>
+                                <span style="font-weight: bold;">
+                                    META:
+                                </span>
+                                <span style="padding-left:2px;">
+                                    <a href=".?output=json">json</a>
+                                </span>
+                                <span style="padding-left:2px;">
+                                    <a href=".?output=html">html</a>
+                                </span>
                             </span>
 
                         </td>
@@ -141,13 +149,13 @@
                                         </span>
                                     </a>
                                 </caption>
-                            <tr>
-                                <th align="left">Name</th>
-                                <th align="center">Last Modified</th>
-                                <th align="center">Size</th>
-                            </tr>
+                                <tr>
+                                    <th align="left">Name</th>
+                                    <th align="center">Last Modified</th>
+                                    <th align="center">Size</th>
+                                </tr>
 
-                            <xsl:call-template name="ProcessCatalogNode" />
+                                <xsl:call-template name="ProcessCatalogNode" />
 
                             </table>
 

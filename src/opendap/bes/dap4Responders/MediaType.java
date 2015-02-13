@@ -38,6 +38,9 @@ import java.util.HashMap;
 
 public class MediaType implements Comparable {
 
+
+    protected String _name;
+
     protected String _mimeType;
     protected String _mediaSuffix;
     protected String _primaryType;
@@ -73,6 +76,13 @@ public class MediaType implements Comparable {
             return -1;
 
         return 0;
+    }
+
+    public void setName(String name){
+        _name = name;
+    }
+    public String getName(){
+        return _name;
     }
 
 

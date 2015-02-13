@@ -89,14 +89,46 @@
                 </h1>
                 <table width="100%">
                     <tr>
-                        <td><span class="small"><a href="..">Parent Node</a></span></td>
+                        <td><span class="small" style="font-weight: bold;"><a href="..">Parent Node</a></span></td>
                         <td align="right">
                             <span class="small">
-                                JSON <a href=".?output=json"> meta </a>
+
+                                <span style="font-weight: bold;">
+                                    META:
+                                </span>
+                                <span style="padding-left:2px;">
+                                    <a href=".?output=json">json</a>
+                                </span>
+                                <span style="padding-left:2px;">
+                                    <a href=".?output=html">html</a>
+                                </span>
+
                                 <xsl:if test="$w10nType='leaf'">
-                                    <span style="padding-left: 5px;">
-                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=json"> data </a>
+                                    <span style="font-weight: bold;padding-left: 5px;">
+                                        DATA:
                                     </span>
+                                    <span style="padding-left:2px;">
+                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=json">json</a>
+                                    </span>
+                                    <span style="padding-left:2px;">
+                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=dods">dap2</a>
+                                    </span>
+                                    <span style="padding-left:2px;">
+                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=nc">nc3</a>
+                                    </span>
+                                    <span style="padding-left:2px;">
+                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=nc4">nc4</a>
+                                    </span>
+                                    <span style="padding-left: 2px;color: grey;">
+                                        dap4
+                                    </span>
+                                    <span style="padding-left: 2px;color: grey;">
+                                        wee-e
+                                    </span>
+                                    <span style="padding-left: 2px;color: grey;">
+                                        big-e
+                                    </span>
+
                                 </xsl:if>
                             </span>
 

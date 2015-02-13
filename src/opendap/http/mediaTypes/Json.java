@@ -7,8 +7,13 @@ import opendap.bes.dap4Responders.MediaType;
  */
 public class Json extends MediaType {
 
+    public static final String NAME = "json";
+
+
     public Json(){
-        this("json");
+        this("."+ NAME);
+        setName(NAME);
+
     }
 
     public Json(String typeMatchString){
