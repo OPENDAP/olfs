@@ -81,7 +81,9 @@ public class BesApi {
     public static final String JSON       = "json";
     public static final String IJSON      = "ijson";
     public static final String W10N       = "w10n";
-    public static final String W10N_META  = "w10nMeta";
+    public static final String W10N_META      = "w10nMeta";
+    public static final String W10N_CALLBACK  = "w10nCallback";
+    public static final String W10N_FLATTEN   = "w10nFlatten";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -1082,6 +1084,8 @@ public class BesApi {
     public boolean writeDap2DataAsW10nJson(String dataSource,
                                        String constraintExpression,
                                        String w10nMeta,
+                                       String w10nCallback,
+                                       boolean w10nFlatten,
                                        String xdap_accept,
                                        int maxResponseSize,
                                        OutputStream os,
@@ -1090,7 +1094,7 @@ public class BesApi {
 
         return besTransaction(
                 dataSource,
-                getDap2DataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, xdap_accept, maxResponseSize),
+                getDap2DataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, xdap_accept, maxResponseSize),
                 os,
                 err);
     }
@@ -1116,6 +1120,8 @@ public class BesApi {
     public boolean writeDap2MetadataAsW10nJson(String dataSource,
                                            String constraintExpression,
                                            String w10nMeta,
+                                           String w10nCallback,
+                                           boolean w10nFlatten,
                                            String xdap_accept,
                                            int maxResponseSize,
                                            OutputStream os,
@@ -1124,7 +1130,7 @@ public class BesApi {
 
         return besTransaction(
                 dataSource,
-                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, xdap_accept, maxResponseSize),
+                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, xdap_accept, maxResponseSize),
                 os,
                 err);
     }
@@ -2067,6 +2073,8 @@ public class BesApi {
     public Document getDap2DataAsW10nJsonRequest(String dataSource,
                                            String ce,
                                            String w10nMeta,
+                                           String w10nCallback,
+                                           boolean w10nFlatten,
                                            String xdap_accept,
                                            int maxResponseSize)
             throws BadConfigurationException {
@@ -2076,6 +2084,12 @@ public class BesApi {
 
         if(w10nMeta!=null)
             requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+
+        if(w10nCallback!=null)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_CALLBACK,w10nCallback));
+
+        if(w10nFlatten)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_FLATTEN,"true"));
 
         return requestDoc;
 
@@ -2093,6 +2107,8 @@ public class BesApi {
     public Document getDap2MetadataAsW10nJsonRequest(String dataSource,
                                                  String ce,
                                                  String w10nMeta,
+                                                 String w10nCallback,
+                                                 boolean w10nFlatten,
                                                  String xdap_accept,
                                              int maxResponseSize
     )
@@ -2103,6 +2119,12 @@ public class BesApi {
 
         if(w10nMeta!=null)
             requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
+
+        if(w10nCallback!=null)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_CALLBACK,w10nCallback));
+
+        if(w10nFlatten)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_FLATTEN,"true"));
 
         return requestDoc;
 

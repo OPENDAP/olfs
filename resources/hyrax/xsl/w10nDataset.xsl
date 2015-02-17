@@ -33,6 +33,7 @@
     <xsl:param name="serviceContext"/>
     <xsl:param name="w10nName"/>
     <xsl:param name="w10nType"/>
+    <xsl:param name="arrayConstraint"/>
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
@@ -46,15 +47,13 @@
     <xsl:variable name="requestedVariable" select="/dap:Dataset/w10n:requestedVariable"/>
 
 
-
-
-    
     <xsl:template match="dap:Dataset">
 
 
 
 
         <xsl:call-template name="copyright"/>
+
 
 
 
@@ -108,16 +107,16 @@
                                         DATA:
                                     </span>
                                     <span style="padding-left:2px;">
-                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=json">json</a>
+                                        <a href="{$w10nName}{$arrayConstraint}?output=json">json</a>
                                     </span>
                                     <span style="padding-left:2px;">
-                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=dods">dap2</a>
+                                        <a href="{$w10nName}{$arrayConstraint}?output=dods">dap2</a>
                                     </span>
                                     <span style="padding-left:2px;">
-                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=nc">nc3</a>
+                                        <a href="{$w10nName}{$arrayConstraint}?output=nc">nc3</a>
                                     </span>
                                     <span style="padding-left:2px;">
-                                        <a href="{substring($w10nName,0,string-length($w10nName))}?output=nc4">nc4</a>
+                                        <a href="{$w10nName}{$arrayConstraint}?output=nc4">nc4</a>
                                     </span>
                                     <span style="padding-left: 2px;color: grey;">
                                         dap4
@@ -354,6 +353,7 @@
 
         <xsl:variable name="myType">
             <xsl:choose>
+                <xsl:when test="self::dap:Grid | self::dap:Structure | self::dap:Sequence">node</xsl:when>
                 <xsl:when test="self::dap:Array"><xsl:value-of select="name(*[not(self::dap:Attribute) and not(self::dap:dimension)])"/></xsl:when>
                 <xsl:otherwise><xsl:value-of select="name(.)"/></xsl:otherwise>
             </xsl:choose>
@@ -378,6 +378,8 @@
         </xsl:choose>
 
         <xsl:call-template name="DimHeader"/>
+
+
         <span class="small" style="vertical-align: 15%;"> (Type is <xsl:value-of select ="$myType"/>)</span>
 
 
