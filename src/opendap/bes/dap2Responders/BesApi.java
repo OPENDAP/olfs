@@ -84,6 +84,7 @@ public class BesApi {
     public static final String W10N_META      = "w10nMeta";
     public static final String W10N_CALLBACK  = "w10nCallback";
     public static final String W10N_FLATTEN   = "w10nFlatten";
+    public static final String W10N_TRAVERSE   = "w10nTraverse";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -1122,6 +1123,7 @@ public class BesApi {
                                            String w10nMeta,
                                            String w10nCallback,
                                            boolean w10nFlatten,
+                                           boolean w10nTraverse,
                                            String xdap_accept,
                                            int maxResponseSize,
                                            OutputStream os,
@@ -1130,7 +1132,7 @@ public class BesApi {
 
         return besTransaction(
                 dataSource,
-                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, xdap_accept, maxResponseSize),
+                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, w10nTraverse, xdap_accept, maxResponseSize),
                 os,
                 err);
     }
@@ -2109,6 +2111,7 @@ public class BesApi {
                                                  String w10nMeta,
                                                  String w10nCallback,
                                                  boolean w10nFlatten,
+                                                 boolean w10nTraverse,
                                                  String xdap_accept,
                                              int maxResponseSize
     )
@@ -2125,6 +2128,9 @@ public class BesApi {
 
         if(w10nFlatten)
             requestDoc.getRootElement().addContent(1,setContextElement(W10N_FLATTEN,"true"));
+
+        if(w10nTraverse)
+            requestDoc.getRootElement().addContent(1,setContextElement(W10N_TRAVERSE,"true"));
 
         return requestDoc;
 

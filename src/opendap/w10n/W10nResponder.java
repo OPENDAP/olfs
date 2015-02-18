@@ -1112,6 +1112,7 @@ public class W10nResponder  {
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
+                w10nRequest.traverse(),
                 "3.2",
                 maxResponseSize,
                 os,
