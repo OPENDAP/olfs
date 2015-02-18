@@ -25,6 +25,7 @@
  */
 package opendap.w10n;
 
+import com.google.gson.Gson;
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
@@ -40,7 +41,6 @@ import opendap.dap.User;
 import opendap.http.mediaTypes.*;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
-import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -48,8 +48,6 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -508,7 +506,8 @@ public class W10nResponder  {
             sos.print(w10nRequest.callback()+"(");
         }
 
-        sos.print(JSONValue.toJSONString(jsonBesCatalogResponse));
+        Gson gson = new Gson();
+        sos.print(gson.toJson(jsonBesCatalogResponse));
 
         if(w10nRequest.callback()!=null){
             sos.print(")");
@@ -643,13 +642,13 @@ public class W10nResponder  {
      * @param value  Attribute value
      * @return Attribute as a JSONObject
      */
-    private JSONObject getW10nAttribute(String name, Object value){
+    private HashMap<String,Object> getW10nAttribute(String name, Object value){
 
         HashMap<String,Object> w10nAttribute = new HashMap<>();
         w10nAttribute.put("name", name);
         w10nAttribute.put("value", value);
 
-        return new JSONObject(w10nAttribute);
+        return w10nAttribute;
 
     }
 
@@ -922,8 +921,9 @@ public class W10nResponder  {
 
         _log.debug("Sending w10n JSON data response for dataset: {}",w10nRequest.getValidResourcePath());
 
+        Gson gson = new Gson();
 
-        String w10nMetaObject = "\"w10n\":"+ JSONValue.toJSONString(
+        String w10nMetaObject = "\"w10n\":"+ gson.toJson(
                 getW10nMetaObject(
                         "dap",
                         w10nRequest.getW10nResourcePath(),
@@ -1108,7 +1108,8 @@ public class W10nResponder  {
     private void sendDap2MetadataAsW10nJson(W10nRequest w10nRequest, int maxResponseSize, HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-        String w10nMetaObject = "\"w10n\":"+ JSONValue.toJSONString(
+        Gson gs = new Gson();
+        String w10nMetaObject = "\"w10n\":"+ gs.toJson(
                 getW10nMetaObject(
                         "dap",
                         w10nRequest.getW10nResourcePath(),
