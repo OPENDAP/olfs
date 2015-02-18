@@ -20,31 +20,31 @@ import java.util.Vector;
 class W10nRequest {
     private Logger _log;
 
-    HttpServletRequest _request;
+    private HttpServletRequest _request;
 
     private Vector<String> _requestedVariable;
     private String _dap2ArrayConstraint;
     private String _w10nArrayConstraint;
 
 
-    String  _output;
-    String  _callback;
+    private String  _output;
+    private String  _callback;
     boolean _reCache;
     boolean _flatten;
     boolean _traverse;
 
-    String _requestedResourceId;
+    private String _requestedResourceId;
 
 
-    String _validResourcePath;
-    String _w10nId;
+    private String _validResourcePath;
+    private String _w10nId;
 
 
     boolean _isData;
     boolean _isDir;
     boolean _isFile;
 
-    MediaType _bestResponseMediaType;
+    private MediaType _bestResponseMediaType;
 
 
     /**

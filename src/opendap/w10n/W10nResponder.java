@@ -26,6 +26,7 @@
 package opendap.w10n;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
@@ -449,6 +450,7 @@ public class W10nResponder  {
 
 
 
+
         Element showCatalogElement = showCatalogDoc.getRootElement().getChild("showCatalog",BES.BES_NS);
 
         Element topDataset = showCatalogElement.getChild("dataset",BES.BES_NS);
@@ -466,6 +468,7 @@ public class W10nResponder  {
 
             @SuppressWarnings("unchecked")
             List<Element> childDatasets = (List<Element>) topDataset.getChildren("dataset", BES.BES_NS);
+
 
             for(Element childDataset: childDatasets){
                 HashMap<String,Object> jsonDataset = getJsonForDatasetElement(childDataset);
@@ -506,7 +509,8 @@ public class W10nResponder  {
             sos.print(w10nRequest.callback()+"(");
         }
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
         sos.print(gson.toJson(jsonBesCatalogResponse));
 
         if(w10nRequest.callback()!=null){
@@ -652,25 +656,6 @@ public class W10nResponder  {
 
     }
 
-    /**
-     *
-     * @param name The attribute name
-     * @param value The attribute value
-     * @param description The attribute mime-type
-     * @return
-     */
-    /*
-    private JSONObject getW10nOutputAttribute(String name, Object value, String description){
-
-        HashMap<String,Object> w10nAttribute = new HashMap<>();
-        w10nAttribute.put("name", name);
-        w10nAttribute.put("value", value);
-        w10nAttribute.put("mime-type", description);
-
-        return new JSONObject(w10nAttribute);
-
-    }
-   */
 
     /**
      * Determines the w10n "type" of a BES catalog dataset element.
