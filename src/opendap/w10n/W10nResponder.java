@@ -127,9 +127,16 @@ public class W10nResponder  {
     }
 
 
-
-
-
+    /**
+     * Sets the response headers based on the passed media type and incoming request. The request is need to
+     * discover which BES is servicing the request so that it's version information can be included in the
+     * headers.
+     * @param request Clients request.
+     * @param requestedResourceId   The thing they asked for.
+     * @param mt The MediaType of the outgoing response.
+     * @param response The response in which the headers will be set.
+     * @throws Exception
+     */
     private void setResponseHeaders(HttpServletRequest request, String requestedResourceId, MediaType mt, HttpServletResponse response) throws Exception {
 
         response.setContentType(mt.getMimeType());
@@ -173,6 +180,12 @@ public class W10nResponder  {
     }
 
 
+    /**
+     * Handles all w10n service activity.
+     * @param request Incoming client request
+     * @param response Outbound response.
+     * @throws Exception
+     */
     public void send_w10n_response(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
@@ -181,19 +194,23 @@ public class W10nResponder  {
 
 
         W10nRequest w10nRequest = new W10nRequest(request);
-
-
-
         User user = new User(request);
 
 
+        /**
+         * This section asks the BES to evaluate the requested resource and return a report that indicates what
+         * part (if any) can be mapped to an actual thing in the BES catalog and what part (if any) cannot.
+         * The BES also supplies information regarding the matching part (aka validResourcePath) such is
+         * if it's a file, a directory, and if the BES thinks it's a dataset.
+         *
+         */
         Document pathInfoDoc =  new Document();
         boolean result = _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), pathInfoDoc);
         if(!result){
             BESError besError = new BESError(pathInfoDoc);
             _log.error("send_w10n_response() encountered a BESError: {}"+besError.getErrorMessage());
 
-            sendErrorResponse(response,besError, _defaultMetaMediaType);
+            besError.sendErrorResponse(_systemPath,request.getContextPath(),response);
             return; // Because it broke already....
         }
 
@@ -219,8 +236,10 @@ public class W10nResponder  {
 
         w10nRequest.setValidResourcePath(validResourcePath);
 
-        // We know that the resourceId is a proper dataset in the BES, so now we know we need to formulate
-        // a DAP constraint expression from the remainder (if there is one)
+        /**
+         * We know that the resourceId is a proper dataset in the BES, so now we know we need to formulate
+         *  a DAP constraint expression from the remainder (if there is one)
+         */
         w10nRequest.ingestPathRemainder(remainder);
 
 
@@ -249,7 +268,7 @@ public class W10nResponder  {
 
                     // And then we to send the response, using the MediaType to determine what to
                     // send back.
-                    sendW10nMetaResponseForDap2Metadata(request,w10nRequest, user.getMaxResponseSize(), response);
+                    sendW10nMetaResponseForDap2Metadata(w10nRequest, user.getMaxResponseSize(), response);
 
                 }
                 else {
@@ -272,7 +291,7 @@ public class W10nResponder  {
 
                     // It doesn't matter if it's a directory or a file, we'll get the show catalog response
                     // as an XML document and we'll return a version appropriate to the negotiated media type.
-                    sendW10nMetaResponseForFileOrDir(request, w10nRequest, response);
+                    sendW10nMetaResponseForFileOrDir(w10nRequest, response);
                 }
 
             }
@@ -334,9 +353,14 @@ public class W10nResponder  {
     }
 
 
-
-
+    /**
+     * Transmits a bad media type error to the client.
+     * @param mt  The MediaType that we can't give them.
+     * @param response The outgoing response.
+     * @throws IOException
+     */
     private void sendBadMediaTypeError(MediaType mt, HttpServletResponse response) throws IOException {
+
         if(!response.isCommitted())
             response.reset();
         response.setContentType(new Html().getMimeType());
@@ -356,38 +380,23 @@ public class W10nResponder  {
     }
 
 
-    public void sendErrorResponse(HttpServletResponse response, BESError besError, MediaType mt) throws IOException {
-
-
-        if(!response.isCommitted())
-            response.reset();
-        response.setContentType(new Html().getMimeType());
-        response.setHeader("Content-Description","BES ERROR");
-
-        response.sendError(besError.getHttpStatus());
-
-
-
-
-    }
 
 
     /**
      *
-     * @param request
-     * @param response
+     * Transmits the w10n meta response for a catalog directory/collection or file/granule using the correct media type.
+     *
+     * @param w10nRequest The w10n request to be serviced
+     * @param response The outbound response
      * @throws JDOMException
      * @throws BadConfigurationException
      * @throws PPTException
      * @throws IOException
      * @throws SaxonApiException
      */
-    private void sendW10nMetaResponseForFileOrDir(HttpServletRequest request,
-                                                  W10nRequest w10nRequest,
+    private void sendW10nMetaResponseForFileOrDir(W10nRequest w10nRequest,
                                                   HttpServletResponse response)
             throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
-
-        String context = request.getContextPath();
 
 
         MediaType mt = w10nRequest.getBestMediaType();
@@ -410,7 +419,7 @@ public class W10nResponder  {
             }
             else if(mt.getName().equalsIgnoreCase(Html.NAME)){
                 _log.debug("sendMetaResponseForFileOrDir() - Sending as HTML");
-                sendBesCatalogAsHtml(request, showCatalogDoc, response);
+                sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
             }
             else {
                 sendBadMediaTypeError(mt,response);
@@ -419,7 +428,7 @@ public class W10nResponder  {
         }
         else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(_systemPath, context, response);
+            besError.sendErrorResponse(_systemPath, w10nRequest.getServiceContextPath(), response);
             _log.error(besError.getMessage());
 
         }
@@ -427,6 +436,14 @@ public class W10nResponder  {
     }
 
 
+    /**
+     * Transmits a BES showCatalog response in a w10n JSON encoding.
+     *
+     * @param showCatalogDoc The showCatalog response document.
+     * @param w10nRequest  The w10n request to be service.
+     * @throws JDOMException
+     * @throws IOException
+     */
     private void sendBesCatalogAsJson(Document showCatalogDoc, W10nRequest w10nRequest, HttpServletResponse response) throws JDOMException, IOException {
 
         // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -468,7 +485,7 @@ public class W10nResponder  {
             jsonBesCatalogResponse.put("w10n",
                     getW10nMetaObject(
                             type,
-                            w10nRequest.getW10nPathIdenitifier(),
+                            w10nRequest.getW10nResourcePath(),
                             w10nRequest.getW10nId(),
                             _defaultMetaMediaType,
                             _supportedMetaMediaTypes)
@@ -478,7 +495,7 @@ public class W10nResponder  {
             jsonBesCatalogResponse.put("w10n",
                     getW10nMetaObject(
                             type,
-                            w10nRequest.getW10nPathIdenitifier(),
+                            w10nRequest.getW10nResourcePath(),
                             w10nRequest.getW10nId(),
                             _defaultMetaMediaType,
                             _supportedMetaMediaTypes));
@@ -502,13 +519,19 @@ public class W10nResponder  {
     }
 
 
+    /**
+     * Determines is a bes:dataset object is a w10n node.
+     * @param dataset The bes:dataset object
+     *
+     * @return  True if the dataset is a w10n node, false otherwise.
+     */
     private boolean isDatasetW10nNode(Element dataset){
 
         boolean isNode;
 
         isNode = dataset.getAttributeValue("node").equalsIgnoreCase("true");
 
-        Element serviceRef = dataset.getChild("serviceRef",BES.BES_NS);
+        Element serviceRef = dataset.getChild("serviceRef", BES.BES_NS);
         if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase("dap")){
             isNode = true;
         }
@@ -518,6 +541,11 @@ public class W10nResponder  {
     }
 
 
+    /**
+     * Returns a w10n JSON object representation of a bes:dataset element.
+     * @param dataset The bes:dataset element
+     * @return  The JSON representation (as a HashMap<String,Object>)
+     */
     private HashMap<String,Object> getJsonForDatasetElement(Element dataset){
 
         String nodeName = dataset.getAttributeValue("name");
@@ -556,9 +584,15 @@ public class W10nResponder  {
     }
 
 
-
-
-
+    /**
+     * Returns the w10n meta object used in all w10n JSON encoded responses
+     * @param type The tyt]pe string
+     * @param path
+     * @param id
+     * @param defaultMT
+     * @param altMediaTypes
+     * @return
+     */
     private  ArrayList<Object> getW10nMetaObject(
             String type,
             String path,
@@ -581,15 +615,20 @@ public class W10nResponder  {
     }
 
 
-
+    /**
+     * Constructs list of available output MediaTypes.
+     * @param defaultMT default MediaTypes
+     * @param altMediaTypes  AlternateMediaType
+     * @return List of available output MediaTypes
+     */
     private ArrayList<Object> getW10nOutputTypes(MediaType defaultMT, Map<String,MediaType> altMediaTypes ) {
 
         ArrayList<Object> outputTypes = new ArrayList<>();
 
-        outputTypes.add(getW10nAttribute("type",defaultMT.getName(),defaultMT.getMimeType()));
+        outputTypes.add(getW10nAttribute(defaultMT.getName(), defaultMT.getMimeType()));
 
         for(MediaType mt : altMediaTypes.values()){
-            outputTypes.add(getW10nAttribute("type",mt.getName(),mt.getMimeType()));
+            outputTypes.add(getW10nAttribute(mt.getName(), mt.getMimeType()));
         }
 
         return outputTypes;
@@ -598,11 +637,12 @@ public class W10nResponder  {
     }
 
 
-
-
-
-
-
+    /**
+     * Forms a simple attribute for use in JSON
+     * @param name Attribute name
+     * @param value  Attribute value
+     * @return Attribute as a JSONObject
+     */
     private JSONObject getW10nAttribute(String name, Object value){
 
         HashMap<String,Object> w10nAttribute = new HashMap<>();
@@ -613,7 +653,15 @@ public class W10nResponder  {
 
     }
 
-    private JSONObject getW10nAttribute(String name, Object value, String description){
+    /**
+     *
+     * @param name The attribute name
+     * @param value The attribute value
+     * @param description The attribute mime-type
+     * @return
+     */
+    /*
+    private JSONObject getW10nOutputAttribute(String name, Object value, String description){
 
         HashMap<String,Object> w10nAttribute = new HashMap<>();
         w10nAttribute.put("name", name);
@@ -623,8 +671,13 @@ public class W10nResponder  {
         return new JSONObject(w10nAttribute);
 
     }
+   */
 
-
+    /**
+     * Determines the w10n "type" of a BES catalog dataset element.
+     * @param dataset A bes:dataset element from a BES showCatalog response.
+     * @return The w10n "type" of a BES catalog dataset element
+     */
     private String getW10nTypeStringForBesCatalogDataset(Element dataset){
 
         String type;
@@ -654,11 +707,19 @@ public class W10nResponder  {
     }
 
 
+    /**
+     * Transmits a BES catalog document as a w10n meta response encoded as HTML (srsly.)
+     *
+     * @param w10nRequest The w10n request to be serviced.
+     * @param showCatalogDoc The BES showCatalog response document.
+     * @param response The outgoing response.
+     * @throws SaxonApiException
+     * @throws IOException
+     */
+    private void sendBesCatalogAsHtml(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws SaxonApiException, IOException {
 
-    private void sendBesCatalogAsHtml(HttpServletRequest request, Document showCatalogDoc, HttpServletResponse response) throws SaxonApiException, IOException {
 
-
-        Request oreq = new Request(null,request);
+        Request oreq = new Request(null,w10nRequest.getServletRequest());
 
         JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
@@ -669,7 +730,6 @@ public class W10nResponder  {
 
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-        transformer.setParameter("viewersService", ViewersServlet.getServiceId());
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
 
@@ -681,18 +741,15 @@ public class W10nResponder  {
 
     }
 
-    private void sendBesCatalogAsThredds(Document showCatalogDoc, HttpServletResponse response){
-
-    }
-
 
     /**
      *
      *
+     * Sends the w10n data response using the client/server negotiated media type.
      *
-     * @param w10nRequest
-     * @param maxResponseSize
-     * @param response
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
@@ -734,8 +791,21 @@ public class W10nResponder  {
 
     }
 
+    /**
+     *
+     * Utilizes the BesApi and the BES fileout_netcdf handler to transmit the requested variable
+     * as NetCDF-3 encoded data.
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
     public void sendNetCDF_3(W10nRequest w10nRequest,
-                             int maxRS,
+                             int maxResponseSize,
                              HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -753,7 +823,15 @@ public class W10nResponder  {
 
 
 
-        if(!_besApi.writeDap2DataAsNetcdf3(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), xdap_accept, maxRS, os, erros)){
+        if(!_besApi.writeDap2DataAsNetcdf3(
+                w10nRequest.getValidResourcePath(),
+                w10nRequest.getDap2CE(),
+                xdap_accept,
+                maxResponseSize,
+                os,
+                erros)){
+
+
             String msg = new String(erros.toByteArray());
             _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());
@@ -769,8 +847,21 @@ public class W10nResponder  {
     }
 
 
+    /**
+     *
+     * Utilizes the BesApi and the BES fileout_netcdf handler to transmit the requested variable
+     * as NetCDF-4 encoded data.
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
     public void sendNetCDF_4(W10nRequest w10nRequest,
-                                 int maxRS,
+                                 int maxResponseSize,
                                  HttpServletResponse response)
                 throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -790,8 +881,14 @@ public class W10nResponder  {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        if (!_besApi.writeDap2DataAsNetcdf4(
+                w10nRequest.getValidResourcePath(),
+                w10nRequest.getDap2CE(),
+                xdap_accept,
+                maxResponseSize,
+                os,
+                erros)){
 
-        if(!_besApi.writeDap2DataAsNetcdf4(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), xdap_accept, maxRS, os, erros)){
             String msg = new String(erros.toByteArray());
             _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());
@@ -807,8 +904,17 @@ public class W10nResponder  {
     }
 
 
-
-
+    /**
+     * Utilizes the BesApi and the BES w10n_handler to transmit the DAP2 data encoded as w10n JSON.
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
     private void sendDap2DataAsW10nJson(W10nRequest w10nRequest,
                                         int maxResponseSize,
                                         HttpServletResponse response)
@@ -820,7 +926,7 @@ public class W10nResponder  {
         String w10nMetaObject = "\"w10n\":"+ JSONValue.toJSONString(
                 getW10nMetaObject(
                         "dap",
-                        w10nRequest.getW10nPathIdenitifier(),
+                        w10nRequest.getW10nResourcePath(),
                         w10nRequest.getW10nId(),
                         _defaultDataMediaType,
                         _supportedDataMediaTypes));
@@ -850,6 +956,18 @@ public class W10nResponder  {
 
     }
 
+    /**
+     *
+     * Sends a DAP2 data response for the requested variable.
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
     private void sendDap2Data(W10nRequest w10nRequest,
                               int maxResponseSize,
                               HttpServletResponse response)
@@ -873,8 +991,13 @@ public class W10nResponder  {
     }
 
 
-
-
+    /**
+     * Transmits a non-data file from the BES to the requesting client.
+     *
+     * @param req Client request
+     * @param response Outbound response.
+     * @throws Exception
+     */
     public void sendFile(HttpServletRequest req,
                          HttpServletResponse response)
             throws Exception {
@@ -928,35 +1051,22 @@ public class W10nResponder  {
     }
 
 
-
-    public String getXmlBase(HttpServletRequest req){
-
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = req.getRequestURL().toString();
-
-
-        if(forwardRequestUri != null){
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
-        }
-
-
-
-        String xmlBase = requestUrl;
-
-
-
-        _log.debug("@xml:base='{}'", xmlBase);
-        return xmlBase;
-    }
-
-
-
-
-    private void sendW10nMetaResponseForDap2Metadata(HttpServletRequest request,
-                                                     W10nRequest w10nRequest,
+    /**
+     *
+     * Sends the w10n meta response using the client/server negotiated media type.
+     *
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
+     * @throws BESError
+     * @throws BadConfigurationException
+     * @throws PPTException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws SaxonApiException
+     */
+    private void sendW10nMetaResponseForDap2Metadata(W10nRequest w10nRequest,
                                                     int maxResponseSize,
                                                     HttpServletResponse response)
             throws BESError, BadConfigurationException, PPTException, IOException, JDOMException, SaxonApiException {
@@ -965,7 +1075,7 @@ public class W10nResponder  {
         MediaType mt = w10nRequest.getBestMediaType();
 
         if(mt.getName().equalsIgnoreCase(Html.NAME)){
-            sendDap2MetadataAsW10nHtml(request,  w10nRequest, response);
+            sendDap2MetadataAsW10nHtml(w10nRequest, response);
             return;
         }
 
@@ -985,11 +1095,11 @@ public class W10nResponder  {
 
     /**
      *
+     * Utilizes the BesApi and the BES w10n_handler to transmit the DAP2 metadata encoded as w10n JSON.
      *
-     *
-     * @param w10nRequest
-     * @param maxResponseSize
-     * @param response
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param maxResponseSize  Max response size.
+     * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
@@ -1001,7 +1111,7 @@ public class W10nResponder  {
         String w10nMetaObject = "\"w10n\":"+ JSONValue.toJSONString(
                 getW10nMetaObject(
                         "dap",
-                        w10nRequest.getW10nPathIdenitifier(),
+                        w10nRequest.getW10nResourcePath(),
                         w10nRequest.getW10nId(),
                         _defaultMetaMediaType,
                         _supportedMetaMediaTypes));
@@ -1031,18 +1141,25 @@ public class W10nResponder  {
     }
 
 
-    private void sendDap2MetadataAsW10nHtml(HttpServletRequest request,
-                                            W10nRequest w10nRequest,
-                                            HttpServletResponse response)
+    /**
+     * Retrieves a DDX from the server and produces a html view consistent with a w10n meta response using some hacking
+     * of the DDX document and an XSLT.
+     *
+     * @param w10nRequest The w10nRequest object for the request to be serviced.
+     * @param response The outgoing response.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     * @throws JDOMException
+     * @throws SaxonApiException
+     */
+    private void sendDap2MetadataAsW10nHtml(W10nRequest w10nRequest,  HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError, JDOMException, SaxonApiException {
-
-        String context = request.getContextPath();
-
-        String xmlBase = getXmlBase(request);
 
         Document besResponse = new Document();
 
-        if (!_besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", xmlBase, besResponse)) {
+        if (!_besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(), besResponse)) {
             BESError besError = new BESError(besResponse,w10nRequest.getBestMediaType());
             besError.sendErrorResponse(_systemPath, "opendap", response);
             return;
@@ -1051,6 +1168,11 @@ public class W10nResponder  {
 
         boolean isNode = true;
 
+        /**
+         * If the requested a variable then we are going to hack the DDX document so that
+         * only the stuff we want gets sent into the XSLT. Why? Because w10n doesn't care about parent containers
+         * and such, only about the target variable - which may be a node or a leaf in w10n parlance.
+         */
         if(w10nRequest.variableWasRequested()) {
             Element dataset = besResponse.getRootElement();
 
@@ -1102,8 +1224,8 @@ public class W10nResponder  {
 
         Transformer transformer = new Transformer(xsltDoc);
 
-        transformer.setParameter("serviceContext", context);
-        transformer.setParameter("w10nName", w10nRequest.getW10nPathIdenitifier() + w10nRequest.getW10nId());
+        transformer.setParameter("serviceContext", w10nRequest.getServiceContextPath());
+        transformer.setParameter("w10nName", w10nRequest.getW10nResourcePath() + w10nRequest.getW10nId());
         transformer.setParameter("w10nType", isNode?"node":"leaf");
         transformer.setParameter("arrayConstraint", w10nRequest.getW10nArrayConstraint());
 
@@ -1117,7 +1239,15 @@ public class W10nResponder  {
     }
 
 
-    Element childSearchWorker(Element e, Iterator<String> reqVarIter){
+    /**
+     * Worker method to recursively locate the requested variable whose name is held in the iterator as a series
+     * of name component strings.
+     *
+     * @param e The DDX Element to search
+     * @param reqVarIter  The name component iterator.
+     * @return
+     */
+    private Element childSearchWorker(Element e, Iterator<String> reqVarIter){
 
 
         Element requestedVariableElement = e;
