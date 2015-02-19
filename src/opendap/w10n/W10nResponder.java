@@ -71,6 +71,9 @@ public class W10nResponder  {
 
     private Logger _log;
 
+    private final String DAP2_TYPE = "dap.2";
+    private final String BES_DAP_SERVICE = "dap";
+
     TreeMap<String,MediaType> _supportedMetaMediaTypes;
     TreeMap<String,MediaType> _supportedDataMediaTypes;
 
@@ -535,7 +538,7 @@ public class W10nResponder  {
         isNode = dataset.getAttributeValue("node").equalsIgnoreCase("true");
 
         Element serviceRef = dataset.getChild("serviceRef", BES.BES_NS);
-        if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase("dap")){
+        if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase(BES_DAP_SERVICE)){
             isNode = true;
         }
 
@@ -910,7 +913,7 @@ public class W10nResponder  {
 
         String w10nMetaObject = "\"w10n\":"+ gson.toJson(
                 getW10nMetaObject(
-                        "dap",
+                        DAP2_TYPE,
                         w10nRequest.getW10nResourcePath(),
                         w10nRequest.getW10nId(),
                         _defaultDataMediaType,
@@ -1096,7 +1099,7 @@ public class W10nResponder  {
         Gson gs = new Gson();
         String w10nMetaObject = "\"w10n\":"+ gs.toJson(
                 getW10nMetaObject(
-                        "dap",
+                        DAP2_TYPE,
                         w10nRequest.getW10nResourcePath(),
                         w10nRequest.getW10nId(),
                         _defaultMetaMediaType,

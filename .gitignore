@@ -1,0 +1,14 @@
+## directories
+
+## OS-X Finder spoo
+*.DS_Store
+
+## IDEA files and dirs
+.idea
+olfs.iml
+out
+
+## Build dir
+build
+
+]
