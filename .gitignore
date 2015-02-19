@@ -12,3 +12,10 @@ out
 build
 
 ]
+
+##
+.classpath
+.project
+
+## Emacs backup files
+*~
