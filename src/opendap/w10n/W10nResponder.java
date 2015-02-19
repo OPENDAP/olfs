@@ -72,7 +72,6 @@ public class W10nResponder  {
     private Logger _log;
 
     private final String DAP2_TYPE = "dap.2";
-    private final String BES_DAP_SERVICE = "dap";
 
     TreeMap<String,MediaType> _supportedMetaMediaTypes;
     TreeMap<String,MediaType> _supportedDataMediaTypes;
@@ -538,7 +537,7 @@ public class W10nResponder  {
         isNode = dataset.getAttributeValue("node").equalsIgnoreCase("true");
 
         Element serviceRef = dataset.getChild("serviceRef", BES.BES_NS);
-        if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase(BES_DAP_SERVICE)){
+        if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase(BES.DAP_SERVICE_ID)){
             isNode = true;
         }
 
