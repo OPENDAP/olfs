@@ -81,8 +81,8 @@ public class JsonDMR extends Dap4Responder {
     }
 
 
-    public boolean isDataResponder(){ return true; }
-    public boolean isMetadataResponder(){ return false; }
+    public boolean isDataResponder(){ return false; }
+    public boolean isMetadataResponder(){ return true; }
 
 
 

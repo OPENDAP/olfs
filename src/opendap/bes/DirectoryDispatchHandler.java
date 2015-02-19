@@ -271,7 +271,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             Transformer transformer = new Transformer(xsltDoc);
 
-            transformer.setParameter("dapService",oreq.getDapServiceLocalID());
+            transformer.setParameter("dapService",oreq.getServiceLocalId());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("viewersService", ViewersServlet.getServiceId());
             if(BesDapDispatcher.allowDirectDataSourceAccess())

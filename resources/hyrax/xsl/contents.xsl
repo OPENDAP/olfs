@@ -116,11 +116,6 @@
                                 <xsl:if test="bes:dataset/@name!='/'" >
                                     <a href="..">Parent Directory/</a>
                                 </xsl:if>
-                                <xsl:if test="$besPrefix!='/'" >
-                                    <xsl:if test="bes:dataset/@name='/'" >
-                                        <a href="..">Parent Directory/</a>
-                                    </xsl:if>
-                                </xsl:if>
                             </td>
                         </tr>
                         <xsl:for-each select="bes:dataset/bes:dataset">

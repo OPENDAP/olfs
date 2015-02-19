@@ -140,7 +140,7 @@ public class ReqInfo {
     public static String getServiceUrl(HttpServletRequest request){
         Request req = new Request(null,request);
         
-        return req.getDapServiceUrl();
+        return req.getServiceUrl();
 
     }
 
