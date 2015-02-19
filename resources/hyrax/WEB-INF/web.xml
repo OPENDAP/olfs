@@ -169,6 +169,10 @@
         <load-on-startup>1</load-on-startup>
 
     </servlet>
+    <servlet>
+        <servlet-name>w10n</servlet-name>
+        <servlet-class>opendap.w10n.W10nServlet</servlet-class>
+    </servlet>
 
     <servlet>
         <servlet-name>adminInterface</servlet-name>
@@ -256,6 +260,14 @@
         <servlet-name>docs_servlet</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
+
+
+
+    <servlet-mapping>
+        <servlet-name>w10n</servlet-name>
+        <url-pattern>/w10n/*</url-pattern>
+    </servlet-mapping>
+
 
 
 

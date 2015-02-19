@@ -26,9 +26,6 @@
 
 package opendap.dap;
 
-import opendap.services.Service;
-import opendap.services.ServicesRegistry;
-import opendap.viewers.ViewersServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,14 +67,14 @@ public class Request {
      *
      * @return
      */
-    public String getDapServiceLocalID(){
+    public String getServiceLocalId(){
 
         String contextName = _request.getContextPath();
         String servletName = _request.getServletPath();
 
         String dapService = contextName + servletName;
 
-        log.debug("getDapServiceLocalID(): "+dapService);
+        log.debug("getServiceLocalId(): "+dapService);
 
         return dapService;
 
@@ -112,19 +109,19 @@ public class Request {
 
 
 
-    public String getDapServiceUrl()  {
+    public String getServiceUrl()  {
 
         String transport  = _request.getScheme();
         String serverName = _request.getServerName();
         int    serverPort = _request.getServerPort();
 
 
-        String dapService = getDapServiceLocalID();
+        String dapService = getServiceLocalId();
 
         String serviceUrl = transport + "://"+ serverName + ":"+ serverPort + dapService;
 
 
-        log.debug("getDapServiceURL(): "+serviceUrl);
+        log.debug("getServiceUrl(): "+serviceUrl);
 
         return serviceUrl;
 

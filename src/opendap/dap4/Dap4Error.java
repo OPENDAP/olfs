@@ -366,7 +366,7 @@ public class Dap4Error {
             else {
                 if(!response.isCommitted())
                     response.reset();
-                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/error/error.html.proto", context, response);
+                HttpResponder.sendHttpErrorResponse(errorVal, getMessage(), systemPath + "/error/error.html.proto", context, response);
             }
 
         }
@@ -374,7 +374,7 @@ public class Dap4Error {
             if(!response.isCommitted())
                 response.reset();
             try {
-                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/error/error.html.proto",context,response);
+                HttpResponder.sendHttpErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e.getMessage(),systemPath + "/error/error.html.proto",context,response);
             }
             catch(Exception e1){
                 response.sendError(errorVal,e1.getMessage());

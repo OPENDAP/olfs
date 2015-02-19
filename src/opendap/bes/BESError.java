@@ -26,8 +26,10 @@
 
 package opendap.bes;
 
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.http.mediaTypes.Html;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -45,7 +47,7 @@ import java.util.Iterator;
 
 
 /**
- * Thrown when something BAD happens in the BES - primairly used to wrap BES
+ * Thrown when something BAD happens in the BES - primarily used to wrap BES
  * errors in a way that the servlet can manage.
  *
  *
@@ -57,6 +59,8 @@ import java.util.Iterator;
 public class BESError extends OPeNDAPException {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
+
+    private MediaType _mt;
 
 
     public static final String BES_ERROR = "BESError";
@@ -83,7 +87,7 @@ public class BESError extends OPeNDAPException {
      * Some part of the (possibly user supplied) syntax of the BES request was
      * incorrrect and could not be handled.
      */
-    public static final int SYNTAX_USER_ERROR     = 3;
+    public static final int USER_SYNTAX_ERROR     = 3;
 
 
     /**
@@ -102,11 +106,16 @@ public class BESError extends OPeNDAPException {
     Document besError = null;
 
 
-
-
-
-
     public BESError(Document error) {
+        this(error,new Html());
+    }
+
+
+
+
+    public BESError(Document error, MediaType mt) {
+
+        _mt = mt;
 
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
 
@@ -123,14 +132,29 @@ public class BESError extends OPeNDAPException {
     }
 
     public BESError(Element error) {
+        this(error,new Html());
+
+    }
+    public BESError(Element error, MediaType mt) {
+
+        _mt = mt;
 
         besError = new Document(error);
         processError(error);
 
-
     }
 
     public BESError( InputStream is) {
+
+        this(is,new Html());
+
+
+    }
+    public BESError( InputStream is, MediaType mt) {
+
+
+        _mt = mt;
+
         SAXBuilder sb = new SAXBuilder();
 
         try {
@@ -157,26 +181,49 @@ public class BESError extends OPeNDAPException {
 
 
 
-
-
-
     public BESError(String msg) {
-        super(msg);
+        this(msg, new Html());
     }
 
+    public BESError(String msg, MediaType mt) {
+        super(msg);
+        _mt = mt;
+    }
     public BESError(String msg, Exception e) {
+        this(msg, e, new Html());
+    }
+
+    public BESError(String msg, Exception e, MediaType mt) {
         super(msg, e);
+        _mt = mt;
     }
 
     public BESError(String msg, Throwable cause) {
+        this(msg,cause, new Html());
+    }
+
+    public BESError(String msg, Throwable cause, MediaType mt) {
         super(msg, cause);
+        _mt = mt;
     }
 
     public BESError(Throwable cause) {
+        this(cause, new Html());
+    }
+    public BESError(Throwable cause, MediaType mt) {
         super(cause);
+        _mt = mt;
+
     }
 
 
+    public void setReturnMediaType(MediaType mt){
+        _mt = mt;
+    }
+
+    public MediaType getReturnMediaType(){
+        return _mt;
+    }
 
     public boolean notFound(){
         return getErrorCode()==NOT_FOUND_ERROR;
@@ -186,7 +233,50 @@ public class BESError extends OPeNDAPException {
         return getErrorCode()==FORBIDDEN_ERROR;
     }
 
+    public boolean syntax(){
+        return getErrorCode()==USER_SYNTAX_ERROR;
+    }
 
+    public boolean internal(){
+        return getErrorCode()==INTERNAL_FATAL_ERROR || getErrorCode()==INTERNAL_ERROR;
+    }
+
+
+
+    public int getHttpStatus(){
+        int httpStatus;
+        switch(getErrorCode()){
+
+            case BESError.INTERNAL_ERROR:
+                httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                break;
+
+            case BESError.INTERNAL_FATAL_ERROR:
+                httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                break;
+
+            case BESError.NOT_FOUND_ERROR:
+                httpStatus = HttpServletResponse.SC_NOT_FOUND;
+                break;
+
+            case BESError.FORBIDDEN_ERROR:
+                httpStatus = HttpServletResponse.SC_FORBIDDEN;
+                break;
+
+            case BESError.USER_SYNTAX_ERROR:
+                httpStatus = HttpServletResponse.SC_BAD_REQUEST;
+
+                break;
+
+            default:
+                httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                break;
+
+        }
+
+        return httpStatus;
+
+    }
 
 
 
@@ -280,42 +370,34 @@ public class BESError extends OPeNDAPException {
     public int sendErrorResponse(String systemPath, String context, HttpServletResponse response)
             throws IOException{
 
+        if(_mt.getSubType().equalsIgnoreCase("html"))
+            return  sendHtmlErrorResponse(systemPath,context,response);
 
-        int errorVal;
+
+        if(_mt.getSubType().equalsIgnoreCase("json"))
+            return  sendJsonErrorResponse(systemPath, context, response);
+
+        return  sendHtmlErrorResponse(systemPath,context,response);
+
+    }
+
+    private int sendJsonErrorResponse(String systemPath, String context, HttpServletResponse response) throws IOException  {
+        int errorVal =  getHttpStatus();
+
+
+        return errorVal;
+
+    }
+
+
+    private int sendHtmlErrorResponse(String systemPath, String context, HttpServletResponse response) throws IOException {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        switch(getErrorCode()){
-
-            case BESError.INTERNAL_ERROR:
-                errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                break;
-
-            case BESError.INTERNAL_FATAL_ERROR:
-                errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                break;
-
-            case BESError.NOT_FOUND_ERROR:
-                errorVal = HttpServletResponse.SC_NOT_FOUND;
-                break;
-
-            case BESError.FORBIDDEN_ERROR:
-                errorVal = HttpServletResponse.SC_FORBIDDEN;
-                break;
-
-            case BESError.SYNTAX_USER_ERROR:
-                errorVal = HttpServletResponse.SC_BAD_REQUEST;
-
-                break;
-
-            default:
-                errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                break;
-
-        }
+        int errorVal =  getHttpStatus();
 
 
         try {
-            String xsltDoc = systemPath + "/docs/xsl/error"+errorVal+".xsl";
+            String xsltDoc = systemPath + "/xsl/error"+errorVal+".xsl";
 
 
             File xsltFile = new File(xsltDoc);
@@ -336,7 +418,12 @@ public class BESError extends OPeNDAPException {
             else {
                 if(!response.isCommitted())
                     response.reset();
-                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/error/error.html.proto",context,response);
+                HttpResponder.sendHttpErrorResponse(
+                        errorVal,
+                        getMessage(),
+                        systemPath + "/error/error.html.proto",
+                        context,
+                        response);
             }
 
         }
@@ -344,7 +431,11 @@ public class BESError extends OPeNDAPException {
             if(!response.isCommitted())
                 response.reset();
             try {
-                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/error/error.html.proto",context,response);
+                HttpResponder.sendHttpErrorResponse(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        e.getMessage(),
+                        systemPath + "/error/error.html.proto",
+                        context,response);
             }
             catch(Exception e1){
                 response.sendError(errorVal,e1.getMessage());
@@ -355,7 +446,6 @@ public class BESError extends OPeNDAPException {
         return errorVal;
 
     }
-
 
 
 }

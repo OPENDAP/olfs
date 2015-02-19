@@ -69,6 +69,7 @@ public class QueryParameters {
         ingestDap4Query(req);
     }
 
+
     public String getQueryRemainder(){
         return queryRemainder;
     }

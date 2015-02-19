@@ -202,6 +202,9 @@
 
 
     <!-- Libraries -->
+    <property name="json.lib"       value="gson-2.3.1.jar"/>
+
+
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
     <property name="urlRewrite.lib"  value="urlrewrite-3.2.0.jar"/>
@@ -244,6 +247,7 @@
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
             <include name="${servlet-api.lib}"/>
+            <include name="${json.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
             <include name="${commons-cli.lib}"/>
@@ -709,6 +713,7 @@
                 >
 
             <lib dir="${lib.dir}">
+                <include name="${json.lib}"/>
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
                 <include name="${urlRewrite.lib}"/>

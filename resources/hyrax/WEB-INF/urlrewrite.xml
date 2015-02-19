@@ -35,7 +35,7 @@
     </rule>
 
     <rule>
-        <from>^/(admin|hai|error|docs|jsp|viewers|xsl|hyrax|servlet_gateway|js)(/.*)?$</from>
+        <from>^/(admin|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
