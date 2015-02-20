@@ -164,7 +164,7 @@
     <property name="metacat.lib" value="metacat-client.jar"/>
     <property name="nceas-utilities.lib" value="nceas-utilities.jar"/>
     <property name="httpclient.lib" value="httpclient.jar"/>
-    <property name="servlet-api.lib" value="servlet-api-2.5.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
     <property name="catalina.lib" value="catalina-6.0.14.jar"/>
     <property name="xalan.lib" value="xalan.jar"/>
 
