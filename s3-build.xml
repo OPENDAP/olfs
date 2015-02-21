@@ -211,7 +211,7 @@
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
     <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
+    <property name="servlet-api.lib"      value="servlet-api-3.0.jar"/>
 
 
 

@@ -172,6 +172,7 @@
     <servlet>
         <servlet-name>w10n</servlet-name>
         <servlet-class>opendap.w10n.W10nServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>

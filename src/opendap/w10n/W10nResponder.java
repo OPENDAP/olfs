@@ -460,9 +460,9 @@ public class W10nResponder  {
         String type = getW10nTypeStringForBesCatalogDataset(topDataset);
 
 
-        boolean isNode = isDatasetW10nNode(topDataset);
+        boolean isNode = isW10nNode(topDataset);
 
-        HashMap<String,Object> jsonBesCatalogResponse = getJsonForDatasetElement(topDataset);
+        HashMap<String,Object> jsonBesCatalogResponse = getJsonForCatalogDatasetElement(topDataset);
 
         if(isNode) {
             ArrayList<Object> nodes = new ArrayList<>();
@@ -473,9 +473,9 @@ public class W10nResponder  {
 
 
             for(Element childDataset: childDatasets){
-                HashMap<String,Object> jsonDataset = getJsonForDatasetElement(childDataset);
+                HashMap<String,Object> jsonDataset = getJsonForCatalogDatasetElement(childDataset);
 
-                if(isDatasetW10nNode(childDataset)){
+                if(isW10nNode(childDataset)){
                     nodes.add(jsonDataset);
                 }
                 else {
@@ -525,12 +525,13 @@ public class W10nResponder  {
 
 
     /**
-     * Determines is a bes:dataset object is a w10n node.
+     * Determines is a bes:dataset object is a w10n node.  It must either have child datasets, or
+     * the BES must have provided a child serviceRef element whose value is "dap".
      * @param dataset The bes:dataset object
      *
      * @return  True if the dataset is a w10n node, false otherwise.
      */
-    private boolean isDatasetW10nNode(Element dataset){
+    private boolean isW10nNode(Element dataset){
 
         boolean isNode;
 
@@ -551,7 +552,7 @@ public class W10nResponder  {
      * @param dataset The bes:dataset element
      * @return  The JSON representation (as a HashMap<String,Object>)
      */
-    private HashMap<String,Object> getJsonForDatasetElement(Element dataset){
+    private HashMap<String,Object> getJsonForCatalogDatasetElement(Element dataset){
 
         String nodeName = dataset.getAttributeValue("name");
 

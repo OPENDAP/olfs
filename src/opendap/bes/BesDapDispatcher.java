@@ -29,7 +29,6 @@ package opendap.bes;
 import opendap.bes.dap2Responders.*;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.NormativeDR;
-import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
@@ -60,13 +59,13 @@ import java.util.Vector;
  */
 public class BesDapDispatcher implements DispatchHandler {
 
-    private Logger log;
-    private boolean initialized;
-    private HttpServlet dispatchServlet;
+    private Logger _log;
+    private boolean _initialized;
+    private HttpServlet _dispatchServlet;
 
-    private String systemPath;
+    private String _systemPath;
     private Element _config;
-    private Vector<Dap4Responder> responders;
+    private Vector<Dap4Responder> _responders;
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
 
@@ -76,14 +75,14 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
     public BesDapDispatcher() {
-        log = LoggerFactory.getLogger(getClass());
-        responders = new Vector<Dap4Responder>();
+        _log = LoggerFactory.getLogger(getClass());
+        _responders = new Vector<Dap4Responder>();
 
     }
 
 
     public String getSystemPath(){
-        return systemPath;
+        return _systemPath;
 
     }
 
@@ -97,11 +96,11 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
     protected Vector<Dap4Responder> getResponders() {
-        return responders;
+        return _responders;
     }
 
     protected void addResponder(Dap4Responder r) {
-        responders.add(r);
+        _responders.add(r);
     }
 
 
@@ -131,13 +130,13 @@ public class BesDapDispatcher implements DispatchHandler {
             Element besApiImpl = _config.getChild("BesApiImpl");
             if (besApiImpl != null) {
                 String className = besApiImpl.getTextTrim();
-                log.debug("Building BesApi: " + className);
+                _log.debug("Building BesApi: " + className);
                 Class classDefinition = Class.forName(className);
 
                 Object classInstance = classDefinition.newInstance();
 
                 if (classInstance instanceof BesApi) {
-                    log.debug("Loading BesApi from configuration.");
+                    _log.debug("Loading BesApi from configuration.");
                     BesApi besApi = (BesApi) classDefinition.newInstance();
                     setBesApi(besApi);
                 }
@@ -166,11 +165,11 @@ public class BesDapDispatcher implements DispatchHandler {
                     ReqInfo.setMaxPostBodyLength(maxLength);
                 }
                 catch(NumberFormatException e){
-                    log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ",dv.getTextTrim());
+                    _log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ", dv.getTextTrim());
 
                 }
             }
-            log.info("PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
+            _log.info("PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
 
         }
 
@@ -191,81 +190,80 @@ public class BesDapDispatcher implements DispatchHandler {
      */
     protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
 
-        if (initialized) return;
+        if (_initialized) return;
 
         setBesApi(besApi);
 
         ingestConfig(config);
 
-        log.debug("Using BesApi implementation: {}", getBesApi().getClass().getName());
+        _log.debug("Using BesApi implementation: {}", getBesApi().getClass().getName());
 
-        dispatchServlet = servlet;
+        _dispatchServlet = servlet;
 
-        systemPath = ServletUtil.getSystemPath(dispatchServlet, "");
+        _systemPath = ServletUtil.getSystemPath(_dispatchServlet, "");
 
 
 
         // DAP4 Responses
-        responders.add(new NormativeDR(systemPath, besApi));
-        responders.add(new NormativeDMR(systemPath, besApi));
-        responders.add(new IsoDMR(systemPath, besApi));
+        _responders.add(new NormativeDR(_systemPath, besApi));
+        _responders.add(new NormativeDMR(_systemPath, besApi));
+        _responders.add(new IsoDMR(_systemPath, besApi));
 
-        responders.add(new Version(systemPath, besApi));
+        _responders.add(new Version(_systemPath, besApi));
         if (!_useDAP2ResourceUrlResponse) {
 
-            FileAccess dfa = new FileAccess(systemPath, besApi);
+            FileAccess dfa = new FileAccess(_systemPath, besApi);
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            responders.add(dfa);
+            _responders.add(dfa);
 
-            responders.add(new NormativeDSR(systemPath, besApi, responders));
+            _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
         }
 
 
 
         // DAP2 Data Responses
-        responders.add(new Dap2Data(systemPath, besApi));
-        responders.add(new Ascii(systemPath, besApi));
+        _responders.add(new Dap2Data(_systemPath, besApi));
+        _responders.add(   new Ascii(_systemPath, besApi));
         //responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
-        responders.add(new CsvData(systemPath, besApi));
-        responders.add(new Netcdf3(systemPath, besApi));
-        responders.add(new Netcdf4(systemPath, besApi));
-        responders.add(new XmlData(systemPath, besApi));
+        _responders.add( new CsvData(_systemPath, besApi));
+        _responders.add( new Netcdf3(_systemPath, besApi));
+        _responders.add( new Netcdf4(_systemPath, besApi));
+        _responders.add( new XmlData(_systemPath, besApi));
 
 
         // DAP2 GeoTIFF Response
-        Dap4Responder geoTiff = new GeoTiff(systemPath, besApi);
-        responders.add(geoTiff);
+        Dap4Responder geoTiff = new GeoTiff(_systemPath, besApi);
+        _responders.add(geoTiff);
 
 
         // DAP2 JPEG2000 Response
-        Dap4Responder jp2 = new GmlJpeg2000(systemPath, besApi);
-        responders.add(jp2);
+        Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi);
+        _responders.add(jp2);
 
         // DAP2 w10n JSON Response
-        Dap4Responder json = new Json(systemPath, besApi);
-        responders.add(json);
+        Dap4Responder json = new Json(_systemPath, besApi);
+        _responders.add(json);
 
         // DAP2 Instance Object JSON Response
-        Dap4Responder ijsn = new Ijson(systemPath, besApi);
-        responders.add(ijsn);
+        Dap4Responder ijsn = new Ijson(_systemPath, besApi);
+        _responders.add(ijsn);
 
 
         // DAP2 Metadata responses
-        Dap4Responder d4r = new DDX(systemPath, besApi);
-        responders.add(d4r);
-        responders.add(new DDS(systemPath, besApi));
-        responders.add(new DAS(systemPath, besApi));
-        responders.add(new RDF(systemPath, besApi));
-        responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
+        Dap4Responder d4r = new DDX(_systemPath, besApi);
+        _responders.add(d4r);
+        _responders.add(new DDS(_systemPath, besApi));
+        _responders.add(new DAS(_systemPath, besApi));
+        _responders.add(new RDF(_systemPath, besApi));
+        _responders.add(new DatasetInfoHtmlPage(_systemPath, besApi));
 
-        Dap4Responder iso = new Iso19115(systemPath, besApi);
-        responders.add(iso);
+        Dap4Responder iso = new Iso19115(_systemPath, besApi);
+        _responders.add(iso);
 
-        Dap4Responder rubric = new IsoRubricDMR(systemPath, null, ".rubric", besApi);
+        Dap4Responder rubric = new IsoRubricDMR(_systemPath, null, ".rubric", besApi);
         rubric.clearAltResponders();
         rubric.setCombinedRequestSuffixRegex(rubric.buildRequestMatchingRegex());
-        responders.add(rubric);
-
+        _responders.add(rubric);
 
 
         if (_useDAP2ResourceUrlResponse) {
@@ -273,22 +271,22 @@ public class BesDapDispatcher implements DispatchHandler {
             // Add the HTML form conditionally because the ".html" suffix is used
             // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
             // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder htmlForm = new DatasetHtmlForm(systemPath, besApi);
-            responders.add(htmlForm);
+            Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
+            _responders.add(htmlForm);
 
-            FileAccess d4fa = new FileAccess(systemPath, null, "", besApi);
+            FileAccess d4fa = new FileAccess(_systemPath, null, "", besApi);
             d4fa.clearAltResponders();
             d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
             d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            responders.add(d4fa);
+            _responders.add(d4fa);
         }
 
 
 
-        log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") + "  " +
+        _log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") + "  " +
                 "Resource URL returns: " + (_useDAP2ResourceUrlResponse ? "DAP2 File Response" : "DAP4 Service Description"));
 
-        initialized = true;
+        _initialized = true;
 
 
     }
@@ -297,13 +295,13 @@ public class BesDapDispatcher implements DispatchHandler {
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception {
 
-        log.debug("************************************************************");
+        _log.debug("************************************************************");
         if (requestDispatch(request, null, false)) {
-            log.debug("Request can be handled.");
+            _log.debug("Request can be handled.");
             return true;
         }
-        log.debug("Request can not be handled.");
-        log.debug("************************************************************");
+        _log.debug("Request can not be handled.");
+        _log.debug("************************************************************");
         return false;
     }
 
@@ -313,7 +311,7 @@ public class BesDapDispatcher implements DispatchHandler {
             throws Exception {
 
         if (!requestDispatch(request, response, true)) {
-            log.error("Unable to service request.");
+            _log.error("Unable to service request.");
         }
 
 
@@ -328,13 +326,13 @@ public class BesDapDispatcher implements DispatchHandler {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         // String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
 
-        log.debug("The client requested this resource: {}",relativeUrl);
+        _log.debug("The client requested this resource: {}", relativeUrl);
 
-        for (HttpResponder r : responders) {
-            log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
+        for (HttpResponder r : _responders) {
+            _log.debug("Checking responder: " + r.getClass().getSimpleName() + " (pathPrefix: " + r.getPathPrefix() + ")");
             if (r.matches(relativeUrl)) {
 
-                log.info("The relative URL: " + relativeUrl + " matches " +
+                _log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 if (sendResponse){
@@ -360,23 +358,23 @@ public class BesDapDispatcher implements DispatchHandler {
         String relativeUrl = ReqInfo.getLocalUrl(req);
 
 
-        if(!initialized)
+        if(!_initialized)
             return -1;
 
 
-        for (HttpResponder r : responders) {
+        for (HttpResponder r : _responders) {
             if (r.matches(relativeUrl)) {
-                log.info("The relative URL: " + relativeUrl + " matches " +
+                _log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
 
                     long lmt =  r.getLastModified(req);
-                    log.debug("getLastModified(): Returning: {}", new Date(lmt));
+                    _log.debug("getLastModified(): Returning: {}", new Date(lmt));
                     return lmt;
 
                 } catch (Exception e) {
-                    log.debug("getLastModified(): Returning: -1");
+                    _log.debug("getLastModified(): Returning: -1");
                     return -1;
                 }
 
@@ -392,7 +390,7 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
     public void destroy() {
-        log.info("Destroy complete.");
+        _log.info("Destroy complete.");
 
     }
 
