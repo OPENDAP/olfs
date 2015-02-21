@@ -26,8 +26,14 @@
 
 package opendap.aggregation;
 
+import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.ppt.PPTException;
 
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,39 +94,38 @@ public class AggregationServlet extends HttpServlet {
         sb.append("init() - max memory: " + format.format(maxMemory / 1024) + "\n");
         sb.append("init() - total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "\n");
 
-
         _log.info(sb.toString());
-
     }
-
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        _log.info("doGet() - BEGIN");
+        _log.debug("doGet() - BEGIN");
 
         response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
 
-
-
         StringBuilder echoText = new StringBuilder();
-        int contentLength = getPlainText(request,echoText);
-        _log.info(echoText.toString());
+        getPlainText(request,echoText);
+
         out.print(echoText.toString());
         out.flush();
 
-        if(contentLength!=-1){
-            _log.info("doGet() - Processing Request body. contentLength: {}",contentLength);
-            out.print("Request Body: \n");
-            out.print(convertStreamToString(request.getInputStream(),contentLength).toString());
-            out.print("\n");
-            out.print("\n");
-
-        }
-        _log.info("doGet() - END");
-
+        // get the bes version info and dump it out
+        // getBesVersion(String dataSource, Document response)
+        Document version = null;
+        try {
+			_besApi.getBesVersion("/", version);
+		} catch (BadConfigurationException | PPTException | JDOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(version, out);
+        
+        _log.debug("doGet() - END");
     }
 
     @Override
@@ -214,40 +219,32 @@ public class AggregationServlet extends HttpServlet {
 
 
 
-    public int  getPlainText(HttpServletRequest request, StringBuilder out)
+    private int  getPlainText(HttpServletRequest request, StringBuilder out)
             throws IOException, ServletException {
 
-
-        out.append("\n\n---------------------------------------------------------------------\n");
+        out.append("\n---------------------------------------------------------------------\n");
         out.append("HTTP Method: ").append(request.getMethod()).append("\n");
         out.append("\n");
         out.append("HTTP Request Headers");
-
-
-
         out.append("\n");
         Enumeration<String> headers = request.getHeaderNames();
         while(headers.hasMoreElements()){
             String headerName = headers.nextElement();
             String headerValue = request.getHeader(headerName);
-            out.append("    ").append(headerName).append("            ").append(headerValue).append("\n");
+            out.append("    ").append(headerName).append(": ").append(headerValue).append("\n");
         }
-        out.append("\n");
+
         out.append("\n");
 
         String queryString = request.getQueryString();
-        out.append("\n");
         out.append("Query String and KVP Evaluation\n");
         out.append("\n");
-        out.append("  HttpServletRequest.getQueryString():     ").append(queryString).append("\n");
+        out.append("  HttpServletRequest.getQueryString(): ").append(queryString).append("\n");
         out.append("\n");
-        out.append("  Decoded:                                 ").append(java.net.URLDecoder.decode(queryString == null ? "null" : queryString, "UTF-8")).append("\n");
+        out.append("  Decoded: ").append(java.net.URLDecoder.decode(queryString == null ? "null" : queryString, "UTF-8")).append("\n");
         out.append("\n");
-
 
         int contentLength = request.getContentLength();
-        _log.info("getPlainText() - request.getContentLength() returned "+contentLength);
-
         out.append("request.getContentLength(): ").append(contentLength).append("\n");
         out.append("\n");
 
@@ -259,14 +256,11 @@ public class AggregationServlet extends HttpServlet {
             }
         }
 
-        _log.info("getPlainText() - Using contentLength: "+contentLength);
-
-
         String ctype = request.getHeader("Content-Type");
 
         if(ctype!=null && ctype.equalsIgnoreCase("application/x-www-form-urlencoded")){
 
-            out.append("Content-Type indicates that the request body is form url encoded. Utilizing Servlet API to evaluate parameters.\n\n");
+            out.append("Content-Type indicates that the request body is form url encoded. Utilizing Servlet API to evaluate parameters.\n");
 
             out.append("  HttpServletRequest.getParameter()\n");
             out.append("        keyName            value \n");
@@ -275,23 +269,18 @@ public class AggregationServlet extends HttpServlet {
             while(paramNames.hasMoreElements()){
                 String paramName = paramNames.nextElement();
                 String paramValue = request.getParameter(paramName);
-                out.append("        ").append(paramName).append("            ").append(paramValue).append("\n");
+                out.append("        ").append(paramName).append(": ").append(paramValue).append("\n");
             }
-            out.append("\n");
-
-
+   
             out.append("  HttpServletRequest.getParameterMap()\n");
             out.append("\n");
 
-
-
             Map paramMap = request.getParameterMap();
 
-            out.append("    ParameterMap is an instance of: ").append(paramMap.getClass().getName()).append("\n");
-            out.append("    ParameterMap contains ").append(paramMap.size()).append(" element(s).\n");
+            out.append("  ParameterMap is an instance of: ").append(paramMap.getClass().getName()).append("\n");
+            out.append("  ParameterMap contains ").append(paramMap.size()).append(" element(s).\n");
             out.append("\n");
             out.append("        keyName            value(s) \n");
-
 
             for(Object o:paramMap.keySet()){
                 String key = (String) o;
@@ -314,51 +303,15 @@ public class AggregationServlet extends HttpServlet {
 
         }
         else {
-            out.append("Content-Type indicates that the request body is NOT form url encoded.\n\n");
-
-            return contentLength;
+            out.append("Content-Type indicates that the request body is NOT form url encoded.\n");
         }
-
-
-
-
-
-
 
         return contentLength;
 
     }
 
-
-
-
-    public String scannerConvertStreamToString(java.io.InputStream is) throws IOException {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        String result = "";
-
-        if(s.hasNext()){
-            _log.info("convertStreamToString() - Scanner found at least one token in the stream.");
-            result = s.next();
-            _log.info("convertStreamToString() - Token size: "+result.length());
-        }
-
-
-        return result;
-    }
-
-
-
-    public StringBuilder convertStreamToString(ServletInputStream is, int size) throws IOException {
-
-
-        _log.info("convertStreamToString() - BEGIN");
-
-        _log.info("convertStreamToString() - size: "+size);
-
-
+    private StringBuilder convertStreamToString(ServletInputStream is, int size) throws IOException {
         StringBuilder result = new StringBuilder(size);
-
-
 
         int ret;
         boolean done = false;
@@ -371,16 +324,7 @@ public class AggregationServlet extends HttpServlet {
 
         }
 
-
-
-
-        _log.info("convertStreamToString() - END");
-
         return result;
     }
-
-
-
-
 
 }
