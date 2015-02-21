@@ -110,19 +110,16 @@
                   - the data source (file) directly. For example a user could just get the
                   - underlying NetCDF files located on the server without using the OPeNDAP
                   - request interface.
-                  -
-                  - THINK TWICE before allowing this, as data sources can be quite large
-                  - and allowing their transmission with out subsetting can put heavy loads
-                  - on the network and the server.
                   -->
 
                 <!-- AllowDirectDataSourceAccess / -->
 
                 <!--
-                  By default, at least for now, the server will provide the (undefined) DAP2 style response
-                  to requests for a dataset resource URL. Commenting out the "UseDAP2ResourceUrlResponse" element will
-                  cause the server to return the (well defined) DAP4 DSR response when a dataset resource URL is
-                  requested.
+                  By default, the server will provide a DAP2-style response
+                  to requests for a dataset resource URL. Commenting out the
+                  "UseDAP2ResourceUrlResponse" element will cause the server
+                  to return the DAP4 DSR response when a dataset resource URL
+                  is requested.
                 -->
                 <UseDAP2ResourceUrlResponse />
 

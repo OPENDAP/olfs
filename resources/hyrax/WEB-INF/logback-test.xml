@@ -27,14 +27,8 @@
 
 <configuration>
 
-
-
-
-
     <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
-
-
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -110,12 +104,6 @@
         </layout>
     </appender>
 
-
-
-
-
-
-
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
     </logger>
@@ -123,8 +111,6 @@
     <logger name="org.jdom" level="all">
         <appender-ref ref="stdout"/>
     </logger>
-    
-    
     
     <logger name="opendap.coreServlet" level="error">
         <appender-ref ref="stdout"/>
@@ -136,8 +122,6 @@
     
     <logger name="opendap.dap.Request"         level="all"/>
     
-
-    
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
     <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
     <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
@@ -145,13 +129,9 @@
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
     <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
     
-    
-    
-    
     <logger name="opendap.bes" level="error">
         <appender-ref ref="stdout"/>
     </logger>
-
 
     <logger name="opendap.bes.BESManager"               level="all"/>
     <logger name="opendap.bes.BesXmlAPI"                level="all"/>
@@ -170,7 +150,6 @@
                  <appender-ref ref="stdout"/>
     </logger>
     
-
     <logger name="opendap.threddsHandler" level="all">
              <appender-ref ref="stdout"/>
     </logger>
@@ -184,6 +163,10 @@
     </logger>
 
     <logger name="opendap.auth" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+    
+    <logger name="opendap.aggregation" level="all">
              <appender-ref ref="stdout"/>
     </logger>
 

@@ -202,7 +202,7 @@ public class BesApi {
      * Writes an OPeNDAP DAP4 DMR for the dataSource to the passed stream.
      *
      * @param dataSource           The requested DataSource
-     * @param qp The DAP4 query string parameters associated wih the request.
+     * @param qp The DAP4 query string parameters associated with the request.
      * @param xmlBase The request URL.
      * @param os                   The Stream to which to write the response.
      * @param err                  The Stream to which to errors returned by
