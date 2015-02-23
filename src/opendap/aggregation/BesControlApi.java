@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class BesControlApi extends HttpResponder {
-    private java.util.logging.Logger log;
+    private Logger log;
 
     private static String defaultRegex = ".*\\/besctl";
 

@@ -26,6 +26,20 @@
 
 package opendap.aggregation;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.NumberFormat;
+import java.util.Enumeration;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.ppt.PPTException;
@@ -36,18 +50,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.Enumeration;
-import java.util.Map;
 
 // Some commentary from Nathan via chat:
 /*
@@ -66,6 +68,10 @@ String msg = new String(erros.toByteArray());
 }
 */
 
+/**
+ * @brief An 'aggregation servlet developed specifically for the EDSC web client 
+ * @author James Gallagher <jgallagher@opendap.org>
+ */
 public class AggregationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Logger _log;
@@ -110,20 +116,52 @@ public class AggregationServlet extends HttpServlet {
         getPlainText(request,echoText);
 
         out.print(echoText.toString());
-        out.flush();
 
         // get the bes version info and dump it out
         // getBesVersion(String dataSource, Document response)
-        Document version = null;
         try {
-			_besApi.getBesVersion("/", version);
+        	_log.debug("Calling bes isInit'd");
+        	boolean status = _besApi.isInitialized();
+        	out.println("Initialization status of the BES: " + Boolean.valueOf(status).toString());
+        	_log.debug("Back from bes isInit'd");
+       	
+        	_log.debug("calling bes.isConfigured");
+			if (!_besApi.isConfigured()) {
+				out.println("BES is not configured!");
+			}
+			_log.debug("back from bes.isConfigured");
+			
+        	Document version = null;
+        	_log.debug("calling bes.version");
+			if (!_besApi.getBesVersion("/", version)) {
+				out.println("Error getting version information from the BES!");
+			}
+			_log.debug("back from bes.version");
+			
+	        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+	        String besVer = xmlo.outputString(version);
+	        _log.debug("The BES Version information:\n");
+	        _log.debug(besVer);
+	        out.print(besVer);
 		} catch (BadConfigurationException | PPTException | JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			out.println("Caught exception while calling getBesVersion: " + e.getMessage());
+			StringWriter writer = new StringWriter();
+			e.printStackTrace(new PrintWriter(writer));
+			String stackTrace = writer.toString();
+			out.print(stackTrace); out.println();
+			_log.debug("Caught exception while calling getBesVersion: {}", e.getMessage());
+			// _log.debug(e.);
 		}
+        catch (Exception e) {
+			out.println("Caught exception while calling getBesVersion: " + e.getMessage());
+			StringWriter writer = new StringWriter();
+			e.printStackTrace(new PrintWriter(writer));
+			String stackTrace = writer.toString();
+			out.print(stackTrace); out.println();
+			_log.debug("Caught exception while calling getBesVersion: {}", e.getMessage());        	
+        }
         
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(version, out);
+        out.flush();
         
         _log.debug("doGet() - END");
     }
