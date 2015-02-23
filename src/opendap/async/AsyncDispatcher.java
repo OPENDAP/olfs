@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2015 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -40,8 +40,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
-import javax.servlet.http.*;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -629,6 +640,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
         }
 
 
+
         
         public String getAuthType() { return r.getAuthType(); }
 
@@ -731,6 +743,31 @@ public class AsyncDispatcher extends BesDapDispatcher {
         @Deprecated
         public boolean isRequestedSessionIdFromUrl() { return r.isRequestedSessionIdFromUrl(); }
 
+        @Override
+        public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException {
+            return false;
+        }
+
+        @Override
+        public void login(String s, String s1) throws ServletException {
+
+        }
+
+        @Override
+        public void logout() throws ServletException {
+
+        }
+
+        @Override
+        public Collection<Part> getParts() throws IOException, ServletException {
+            return null;
+        }
+
+        @Override
+        public Part getPart(String s) throws IOException, ServletException {
+            return null;
+        }
+
         public Object getAttribute(String s) { return r.getAttribute(s); }
 
         public Enumeration getAttributeNames() { return r.getAttributeNames(); }
@@ -789,6 +826,41 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public String getLocalAddr() { return r.getLocalAddr(); }
 
         public int getLocalPort() { return r.getLocalPort(); }
+
+        @Override
+        public ServletContext getServletContext() {
+            return null;
+        }
+
+        @Override
+        public AsyncContext startAsync() throws IllegalStateException {
+            return null;
+        }
+
+        @Override
+        public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
+            return null;
+        }
+
+        @Override
+        public boolean isAsyncStarted() {
+            return false;
+        }
+
+        @Override
+        public boolean isAsyncSupported() {
+            return false;
+        }
+
+        @Override
+        public AsyncContext getAsyncContext() {
+            return null;
+        }
+
+        @Override
+        public DispatcherType getDispatcherType() {
+            return null;
+        }
     }
 
 
