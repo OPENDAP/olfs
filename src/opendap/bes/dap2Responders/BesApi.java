@@ -112,11 +112,10 @@ public class BesApi {
 
     private Logger log;
 
-    public BesApi(){
+    public BesApi() {
         super();
         init();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
     }
 
 

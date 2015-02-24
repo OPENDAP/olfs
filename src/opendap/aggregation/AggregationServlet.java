@@ -26,12 +26,12 @@
 
 package opendap.aggregation;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -40,8 +40,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap4Responders.MediaType;
+//import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
+import opendap.http.mediaTypes.Netcdf3;
 import opendap.ppt.PPTException;
 
 import org.jdom.Document;
@@ -83,7 +91,7 @@ public class AggregationServlet extends HttpServlet {
 
         _log = LoggerFactory.getLogger(this.getClass());
         _besApi = new BesApi();
-
+        
         _log.info("Initialized Aggregation #2.");
 
         Runtime runtime = Runtime.getRuntime();
@@ -103,54 +111,237 @@ public class AggregationServlet extends HttpServlet {
         _log.info(sb.toString());
     }
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    /**
+     * Given a pathname, split it into two parts, the basename and the
+     * directories leading up to that basename.
+     * @param path The path to split up
+     * @return A two element String array.
+     */
+    private static String []basename(String path) {
+        String[] tokens = path.split("/(?=[^/]+$)");
+        return tokens;
+    }
 
-        _log.debug("doGet() - BEGIN");
+    /**
+     * @brief Write the Aggregation Service endpoint's version
+     *
+     * @param request The HTTP Servlet Request object
+     * @param response The HTTP Servlet Response object
+     * @param out The Stream
+     * @throws IOException
+     * @throws ServletException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws JDOMException
+     */
+    private void writeAggregationVersion(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
+            throws IOException, ServletException, PPTException, BadConfigurationException, JDOMException {
 
         response.setContentType("text/plain");
-        ServletOutputStream out = response.getOutputStream();
+
+        boolean initialized = _besApi.isInitialized();
+        out.println("Initialization status of the BES: " + Boolean.valueOf(initialized).toString());
+        _log.debug("Initialization status of the BES: {}", Boolean.valueOf(initialized).toString());
+
+        boolean configured = _besApi.isConfigured();
+        out.println("Configuration status of the BES: " + Boolean.valueOf(configured).toString());
+        _log.debug("Configuration status of the BES: {}", Boolean.valueOf(configured).toString());
+
+        if (!configured || !initialized) {
+            _log.error("BES is not configured or not initialized!");
+        }
 
         StringBuilder echoText = new StringBuilder();
         getPlainText(request,echoText);
 
         out.print(echoText.toString());
 
+        out.println("Aggregation Interface Version: 0.1");
+
         // get the bes version info and dump it out
-        // getBesVersion(String dataSource, Document response)
+        // getBesVersion(String dataSource, Document response).
+        // This is here primarily to shoe that we are talking to the
+        // BES.
+        Document version = new Document();
+        if (!_besApi.getBesVersion("/", version)) {
+            _log.error("Error getting version information from the BES!");
+        }
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        String besVer = xmlo.outputString(version);
+        _log.debug("The BES Version information:\n");
+        _log.debug(besVer);
+        out.print(besVer);
+    }
+
+    /**
+     * @brief Helper for writeTextGranules
+     *
+     * @param granule
+     * @param os
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
+    private void writeSingleTextGranule(String granule, OutputStream os)
+            throws IOException, PPTException, BadConfigurationException, BESError {
+
+        _log.debug("Sending {}", granule);
+
+        ByteArrayOutputStream errors = new ByteArrayOutputStream();
+
+        if (!_besApi.writeFile(granule, os, errors)) {
+            String msg = new String(errors.toByteArray());
+            _log.error("respondToHttpGetRequest() encountered a BESError: {}", msg);
+            os.write(msg.getBytes());
+        }
+
+        _log.debug("Sent {}", granule);
+    }
+
+    /**
+     * @brief Test getting the BES to write several files to its stream
+     *
+     * @param request
+     * @param response
+     * @param out
+     * @throws Exception
+     */
+    private void writeTextGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws Exception {
+        Map<String, String[]> queryParameters = request.getParameterMap();
+
+        response.setContentType("application/x-zip-compressed");
+        response.setHeader("Content-Disposition", "attachment; filename=text.zip"); // TODO Better name?
+
+        ZipOutputStream zos = new ZipOutputStream(out);
+
+        int N = queryParameters.get("file").length;
+        for (int i = 0; i < N; ++i) {
+            String granule = queryParameters.get("file")[i];
+
+            zos.putNextEntry(new ZipEntry(basename(granule)[1]));
+            writeSingleTextGranule(granule, zos);
+            zos.closeEntry();
+        }
+
+        zos.finish();
+    }
+
+    /**
+     * @brief Helper - write a single netCDF3 file to the stream
+     * @param granule
+     * @param ce
+     * @param os
+     * @param maxResponseSize
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
+    private void writeSingleGranuleAsNetcdf(String granule, String ce, OutputStream os, int maxResponseSize)
+            throws IOException, PPTException, BadConfigurationException, BESError {
+
+        _log.debug("Sending {}", granule);
+
+        String xdap_accept = "3.2";
+        ByteArrayOutputStream errors = new ByteArrayOutputStream();
+
+        if (!_besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, os, errors)) {
+            String msg = new String(errors.toByteArray());
+            _log.error("respondToHttpGetRequest() encountered a BESError: {}", msg);
+            os.write(msg.getBytes());
+        }
+
+        _log.debug("Sent {}", granule);
+    }
+
+    /**
+     * @brief Write a set of netCDF3 files to the client, wrapped up ina zip file.
+     * @param request
+     * @param response
+     * @param out
+     * @throws Exception
+     */
+    private void writeGranulesAsNetcdf(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws Exception {
+        //MediaType mt = new Netcdf3();
+        Map<String, String[]> queryParameters = request.getParameterMap();
+
+        // Before we start trying to send back netCDF files, we check to make
+        // sure that the parameters passed in are valid. There must be N values
+        // for 'file' and either 1 or N values for 'ce'
+        int N = queryParameters.get("ce").length;
+        if (!(queryParameters.get("ce").length == 1 || queryParameters.get("ce").length == N))
+            throw new Exception("Incorrect number of 'ce' parameters (found " + N + " instances of 'file').");
+
+        // We have valid 'file' and 'ce' params...
+
+        response.setContentType("application/x-zip-compressed");
+        response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");  // TODO Better name?
+
+        User user = new User(request);
+        int maxResponse = user.getMaxResponseSize();
+
+        ZipOutputStream zos = new ZipOutputStream(out);
+
+        String masterCe = new String("");
+        if (queryParameters.get("ce").length == 1)
+            masterCe = queryParameters.get("ce")[0];
+        for (int i = 0; i < N; ++i) {
+            String granule = queryParameters.get("file")[i];
+            String ce;
+            if (masterCe.equals(""))
+                ce = queryParameters.get("ce")[i];
+            else
+                ce = masterCe;
+
+            zos.putNextEntry(new ZipEntry(basename(granule)[1]));
+            writeSingleGranuleAsNetcdf(granule, ce, zos, maxResponse);
+            zos.closeEntry();
+        }
+
+        zos.finish();
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+        _log.debug("doGet() - BEGIN");
+
+        ServletOutputStream out = response.getOutputStream();
+
+        // There is a much more convoluted set of try/catch/finally blocks
+        // that a production server needs to pass fortify's tests, but 
+        // that is probably not needed when the version response is still
+        // not working... FIXME jhrg 2/23/15
         try {
-        	_log.debug("Calling bes isInit'd");
-        	boolean status = _besApi.isInitialized();
-        	out.println("Initialization status of the BES: " + Boolean.valueOf(status).toString());
-        	_log.debug("Back from bes isInit'd");
-       	
-        	_log.debug("calling bes.isConfigured");
-			if (!_besApi.isConfigured()) {
-				out.println("BES is not configured!");
-			}
-			_log.debug("back from bes.isConfigured");
-			
-        	Document version = null;
-        	_log.debug("calling bes.version");
-			if (!_besApi.getBesVersion("/", version)) {
-				out.println("Error getting version information from the BES!");
-			}
-			_log.debug("back from bes.version");
-			
-	        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-	        String besVer = xmlo.outputString(version);
-	        _log.debug("The BES Version information:\n");
-	        _log.debug(besVer);
-	        out.print(besVer);
-		} catch (BadConfigurationException | PPTException | JDOMException e) {
+            RequestCache.openThreadCache();
+
+            String requestedResourceId = ReqInfo.getLocalUrl(request);
+            _log.debug("The resource ID is: {}", requestedResourceId);
+
+            if (requestedResourceId.equals("/version")) {
+                writeAggregationVersion(request, response, out);
+            }
+            else if (requestedResourceId.equals("/text")) {
+                writeTextGranules(request, response, out);
+            }
+            else if (requestedResourceId.equals("/netcdf3")) {
+                writeGranulesAsNetcdf(request, response, out);
+            }
+            else {
+                throw new Exception("I expected either a list of files and CEs or 'version', got: " + requestedResourceId);
+            }
+		} 
+        catch (BadConfigurationException | PPTException | JDOMException e) {
 			out.println("Caught exception while calling getBesVersion: " + e.getMessage());
 			StringWriter writer = new StringWriter();
 			e.printStackTrace(new PrintWriter(writer));
 			String stackTrace = writer.toString();
 			out.print(stackTrace); out.println();
+
 			_log.debug("Caught exception while calling getBesVersion: {}", e.getMessage());
-			// _log.debug(e.);
 		}
         catch (Exception e) {
 			out.println("Caught exception while calling getBesVersion: " + e.getMessage());
@@ -158,9 +349,13 @@ public class AggregationServlet extends HttpServlet {
 			e.printStackTrace(new PrintWriter(writer));
 			String stackTrace = writer.toString();
 			out.print(stackTrace); out.println();
+
 			_log.debug("Caught exception while calling getBesVersion: {}", e.getMessage());        	
+        } 
+        finally {
+        	RequestCache.closeThreadCache();
         }
-        
+
         out.flush();
         
         _log.debug("doGet() - END");
@@ -175,8 +370,6 @@ public class AggregationServlet extends HttpServlet {
         response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
 
-
-
         StringBuilder echoText = new StringBuilder();
         int contentLength = getPlainText(request,echoText);
         _log.info(echoText.toString());
@@ -189,10 +382,9 @@ public class AggregationServlet extends HttpServlet {
             out.print(convertStreamToString(request.getInputStream(),contentLength).toString());
             out.print("\n");
             out.print("\n");
-
         }
+        
         _log.info("doHead() - END");
-
     }
 
     @Override
@@ -203,8 +395,6 @@ public class AggregationServlet extends HttpServlet {
 
         response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
-
-
 
         StringBuilder echoText = new StringBuilder();
         int contentLength = getPlainText(request,echoText);
@@ -220,10 +410,9 @@ public class AggregationServlet extends HttpServlet {
             out.print("\n");
 
         }
+        
         _log.info("doPut() - END");
-
     }
-
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -232,8 +421,6 @@ public class AggregationServlet extends HttpServlet {
         _log.info("doPost() - BEGIN");
         response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
-
-
 
         StringBuilder echoText = new StringBuilder();
         int contentLength = getPlainText(request,echoText);
@@ -251,11 +438,7 @@ public class AggregationServlet extends HttpServlet {
         }
 
         _log.info("doPost() - END");
-
     }
-
-
-
 
     private int  getPlainText(HttpServletRequest request, StringBuilder out)
             throws IOException, ServletException {
@@ -345,7 +528,6 @@ public class AggregationServlet extends HttpServlet {
         }
 
         return contentLength;
-
     }
 
     private StringBuilder convertStreamToString(ServletInputStream is, int size) throws IOException {
@@ -359,7 +541,6 @@ public class AggregationServlet extends HttpServlet {
                 done = true;
             else
                 result.append((char)ret);
-
         }
 
         return result;
