@@ -86,6 +86,7 @@ import org.slf4j.LoggerFactory;
  * Example use:
  *
  * Suppose 'hdf4_files.txt' contains:
+ *
  * &ce=Sensor_Azimuth,Sensor_Zenith
  * &file=/data/hdf4/MOD04_L2.A2015021.0020.051.NRT.hdf
  * &file=/data/hdf4/MOD04_L2.A2015021.0025.051.NRT.hdf
@@ -96,6 +97,12 @@ import org.slf4j.LoggerFactory;
  * Will call the servlet, using the data in 'hdf4_files.txt' as the contents of the
  * HTTP request document body (i.e., using POST) and save the response to 'data.zip'.
  * Running unizp -t on the response reveals a zip archive with three files:
+ *
+ * Archive:  data2.zip
+ * testing: MOD04_L2.A2015021.0020.051.NRT.hdf.nc   OK
+ * testing: MOD04_L2.A2015021.0025.051.NRT.hdf.nc   OK
+ * testing: MOD04_L2.A2015021.0030.051.NRT.hdf.nc   OK
+ * No errors detected in compressed data of data2.zip.
  *
  * @todo Write a /help response?
  * @todo Add an option to return netCDF4 (using /netcdf4)?
