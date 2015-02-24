@@ -56,7 +56,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @brief An 'aggregation servlet developed specifically for the EDSC web client 
+ * @brief An 'aggregation servlet developed specifically for the EDSC web client
+ *
+ * This returns a Zip file containing a number of resources read/produced by the Hyrax
+ * BES. It can handle a list of resources (typically files) and simply return them,
+ * unaltered or translated into netCDF files. In the later case, a constraint expression
+ * can be applied to each resource before the transformation takes place, limiting the
+ * variables and/or parts of variables in the resulting netCDF file. Note that for the
+ * netCDF format response to work, the BES must be able to read the format of the
+ * original resource (e.g., HDF4).
+ *
+ * To methods of interaction are supported: GET and POST. HEAD requests are also supported,
+ * although not particularly meaningful.
+ *
+ * How to call this service:
+ * /version: Get the version of this servlet. Includes BES version info too.
+ *
+ * /file: Given a list of files, return them in a zip archive. Each file is named
+ * using &file=<path on the BES>. Both GET and POST are supported. In the case of
+ * POST, the &file=<path on the BES> entries may be separated by a newline. The
+ * 'file' param must be supplied.
+ *
+ * /netcdf3: Like 'file' above, but all data are returned in netCDF3 files. In addition,
+ * each file has an associated constraint expression, specified using &ce=<ce>. This is
+ * required. If only one 'ce' param is given, that constraint is applied to every file.
+ * If more than one 'ce' param is supplied, the number must match the number of files and
+ * they are associated 1-to-1.
+ *
+ * Example use:
+ *
+ * Suppose 'hdf4_files.txt' contains:
+ * &ce=Sensor_Azimuth,Sensor_Zenith
+ * &file=/data/hdf4/MOD04_L2.A2015021.0020.051.NRT.hdf
+ * &file=/data/hdf4/MOD04_L2.A2015021.0025.051.NRT.hdf
+ * &file=/data/hdf4/MOD04_L2.A2015021.0030.051.NRT.hdf
+ *
+ * curl -X POST -d @hdf4_files.txt http://localhost:8080/opendap/aggregation/netcdf3 -o data.zip
+ *
+ * Will call the servlet, using the data in 'hdf4_files.txt' as the contents of the
+ * HTTP request document body (i.e., using POST) and save the response to 'data.zip'.
+ * Running unizp -t on the response reveals a zip archive with three files:
+ *
+ * @todo Write a /help response?
+ * @todo Add an option to return netCDF4 (using /netcdf4)?
+ * @todo (Hard) Make this parallelize requests to the BES.
+ *
  * @author James Gallagher <jgallagher@opendap.org>
  */
 public class AggregationServlet extends HttpServlet {
@@ -66,7 +110,7 @@ public class AggregationServlet extends HttpServlet {
     private Set<String> _granuleNames;
 
     private static final String invocationError = "I expected '/version', '/file', or '/netcdf3', got: ";
-    private static final String versionInfo = "Aggregation Interface Version: 0.9";
+    private static final String versionInfo = "Aggregation Interface Version: 1.0";
 
     @Override
     public void init() throws ServletException {
@@ -101,7 +145,7 @@ public class AggregationServlet extends HttpServlet {
      * @param path The path to split up
      * @return A two element String array.
      */
-    private static String []basename(String path) {
+    private static String[] basename(String path) {
         String[] tokens = path.split("/(?=[^/]+$)");
         return tokens;
     }
@@ -300,6 +344,14 @@ public class AggregationServlet extends HttpServlet {
 
     /**
      * Write a set of netCDF3 files to the client, wrapped up in a zip file.
+     *
+     * Each input file in included in the zip archive with the original
+     * directory hierarchy information removed (but is protected from
+     * name collisions). In addition, since this code will be transforming
+     * the original file into a netCDF3, the extension '.nc' is appended,
+     * even if the original file was a netCDF file. This provides a primitive
+     * indication that the file differs from the original source file.
+     *
      * @param request
      * @param response
      * @param out
@@ -340,7 +392,7 @@ public class AggregationServlet extends HttpServlet {
             else
                 ce = masterCE;
 
-            String granuleName = getNameForZip(basename(granule)[1]);
+            String granuleName = getNameForZip(basename(granule)[1]) + ".nc";
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
                 writeSingleGranuleAsNetcdf(granule, ce, zos, maxResponse);
@@ -361,6 +413,9 @@ public class AggregationServlet extends HttpServlet {
             throws IOException, ServletException {
 
         _log.debug("doGet() - BEGIN");
+
+        // forget the names used in/by previous requests
+        _granuleNames.clear();
 
         ServletOutputStream out = response.getOutputStream();
 
@@ -406,7 +461,7 @@ public class AggregationServlet extends HttpServlet {
     public void doHead(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        _log.info("doHead() - BEGIN");
+        _log.debug("doHead() - BEGIN");
 
         ServletOutputStream out = response.getOutputStream();
 
@@ -441,20 +496,31 @@ public class AggregationServlet extends HttpServlet {
 
         out.flush();
 
-        _log.info("doHead() - END");
+        _log.debug("doHead() - END");
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        _log.info("doPost() - BEGIN");
+        _log.debug("doPost() - BEGIN");
 
-        // doGet(request, response);
+        doGet(request, response);
 
-        _log.info("doPost() - END");
+        _log.debug("doPost() - END");
     }
 
+    /**
+     * Copied from the EchoServlet written by Nathan, this was used to debug
+     * processing GET and POST requests and is called only when the /version
+     * response is requested and logback is in DEBUG mode.
+     *
+     * @param request
+     * @param out
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     private int  getPlainText(HttpServletRequest request, StringBuilder out)
             throws IOException, ServletException {
 
