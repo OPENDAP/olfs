@@ -223,7 +223,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String serviceUrl = new Request(null, request).getDapServiceUrl();
+        String serviceUrl = new Request(null, request).getServiceUrl();
 
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");

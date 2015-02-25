@@ -92,7 +92,7 @@ public class Util {
     }
 
     public static String getServiceUrl(HttpServletRequest request){
-        return new Request(null,request).getDapServiceUrl();
+        return new Request(null,request).getServiceUrl();
     }
 
 

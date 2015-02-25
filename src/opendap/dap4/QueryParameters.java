@@ -147,7 +147,7 @@ public class QueryParameters {
 
                 if(key.equals(STORE_RESULT)){
                     setIsStoreResultRequest(true);
-                    setStoreResultRequestServiceUrl(new Request(null, req).getDapServiceUrl());
+                    setStoreResultRequestServiceUrl(new Request(null, req).getServiceUrl());
                     dropList.add(key);
                 }
                 if(key.equals(CONSTRAINT_EXPRESSION)){
