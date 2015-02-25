@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+
+    <display-name>Simple_PDP_Service</display-name>
+    <description>A Simple Policy Decision Point Service</description>
+
+
+    <servlet>
+        <servlet-name>pdpService</servlet-name>
+        <servlet-class>opendap.auth.PDPService </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <!-- init-param>
+            <param-name>config</param-name>
+            <param-value>/Users/ndp/hyrax/ANU/apache-tomcat-7.0.53/content/opendap/SimplePDP.xml</param-value>
+        </init-param -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>pdpService</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+
+
+  <!-- ==================== Default Session Configuration ================= -->
+  <!-- You can set the default session timeout (in minutes) for all newly   -->
+  <!-- created sessions by modifying the value below.                       -->
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+
+</web-app>
+
+
+

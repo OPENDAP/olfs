@@ -639,8 +639,6 @@ public class AsyncDispatcher extends BesDapDispatcher {
             r = request;
         }
 
-
-
         
         public String getAuthType() { return r.getAuthType(); }
 

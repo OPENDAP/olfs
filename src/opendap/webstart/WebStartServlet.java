@@ -355,7 +355,7 @@ public class WebStartServlet extends HttpServlet {
             }
 
 
-            URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
+            URL serviceURL = new URL(new Request(null,req).getDapServiceUrl());
             String protocol = serviceURL.getProtocol();
             String host = serviceURL.getHost();
             int port = serviceURL.getPort();

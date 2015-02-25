@@ -194,10 +194,22 @@ Date:   Fri Aug 15 17:26:45 2014 +0000
 2014-07-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
+<<<<<<< HEAD
 
 2014-07-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
+=======
+	.
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
+2014-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)"
+	.
+>>>>>>> origin/managed-access
 
 2014-06-06  Nathan Potter <ndp@opendap.org>
 
@@ -211,6 +223,12 @@ Date:   Fri Aug 15 17:26:45 2014 +0000
 
 	olfs: Fixed bug in WebStartServlet.
 
+<<<<<<< HEAD
+=======
+;; Local Variables:
+;; coding: utf-8
+;; End:
+>>>>>>> origin/managed-access
 2014-05-22  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed bug in WebStartServlet.
@@ -231,6 +249,12 @@ Date:   Fri Aug 15 17:26:45 2014 +0000
 
 	olfs: Fixed test classpath
 
+<<<<<<< HEAD
+=======
+;; Local Variables:
+;; coding: utf-8
+;; End:
+>>>>>>> origin/managed-access
 2014-04-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated README, ChangeLog, News
@@ -247,6 +271,12 @@ Date:   Fri Aug 15 17:26:45 2014 +0000
 
 	olfs: Added processing to handle the HTTP response headers for the async behavior of the store_result requests.
 
+<<<<<<< HEAD
+=======
+;; Local Variables:
+;; coding: utf-8
+;; End:
+>>>>>>> origin/managed-access
 2014-03-31  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed test classpath

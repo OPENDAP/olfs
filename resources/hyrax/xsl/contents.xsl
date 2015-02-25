@@ -37,6 +37,9 @@
     <xsl:param name="docsService" />
     <xsl:param name="viewersService" />
     <xsl:param name="allowDirectDataSourceAccess" />
+    <xsl:param name="userId" />
+    <xsl:param name="loginLink" />
+    <xsl:param name="logoutLink" />
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
@@ -80,6 +83,34 @@
             </head>
             <body>
 
+                <xsl:choose>
+                    <xsl:when test="$userId">
+
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <xsl:choose>
+                                <xsl:when test="$loginLink">
+                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <b><xsl:value-of select="$userId"/></b><br/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                        </div>
+
+
+                    </xsl:when>
+                    <xsl:otherwise>
+
+                        <xsl:if test="$loginLink">
+                            <div style='float: right;vertical-align:middle;font-size:small;'>
+                                <a style="color: green;" href="{$loginLink}">login</a>
+                            </div>
+                        </xsl:if>
+
+                    </xsl:otherwise>
+                </xsl:choose>
+
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->
                 <!--                                                        -->
@@ -113,8 +144,13 @@
                         </tr>
                         <tr>
                             <td>
-                                <xsl:if test="bes:dataset/@name!='/'" >
+                                <!-- xsl:if test="bes:dataset/@name!='/'" >
                                     <a href="..">Parent Directory/</a>
+                                </xsl:if -->
+                                <xsl:if test="$besPrefix!='/'" >
+                                    <xsl:if test="bes:dataset/@name='/'" >
+                                        <a href="..">Parent Directory/</a>
+                                    </xsl:if>
                                 </xsl:if>
                             </td>
                         </tr>

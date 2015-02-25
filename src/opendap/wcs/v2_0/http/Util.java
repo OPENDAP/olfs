@@ -27,6 +27,7 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.Request;
 import opendap.wcs.v2_0.WcsException;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -91,7 +92,7 @@ public class Util {
     }
 
     public static String getServiceUrl(HttpServletRequest request){
-        return ReqInfo.getServiceUrl(request);
+        return new Request(null,request).getDapServiceUrl();
     }
 
 

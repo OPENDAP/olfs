@@ -26,11 +26,11 @@
 <%@ page import="ch.qos.logback.classic.LoggerContext" %>
 <%@ page import="opendap.bes.BES" %>
 <%@ page import="opendap.bes.BESManager" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%@ page import="opendap.hai.Util" %>
+<%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="opendap.coreServlet.RequestCache" %>
-<%@ page import="org.slf4j.Logger" %>
 <html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
