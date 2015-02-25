@@ -26,9 +26,12 @@
 
 package opendap.auth;
 
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+//import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -38,7 +41,7 @@ import java.util.HashSet;
 public class UserProfile {
 
     protected Date   _objectCreationTime;
-    protected JSONObject _jsonInit;
+    protected JsonObject _jsonInit;
     protected HashSet<String> _groups;
     protected HashSet<String> _roles;
 
@@ -49,15 +52,19 @@ public class UserProfile {
 
     public UserProfile() {
         _objectCreationTime = new Date();
-        _jsonInit = new JSONObject();
+        _jsonInit = new JsonObject();
         _groups = new HashSet<String>();
         _roles = new HashSet<String>();
         _idp  = null;
     }
 
-    public UserProfile(JSONObject json){
+    public UserProfile(JsonObject json){
         this();
-        _jsonInit      = (JSONObject) json.clone();
+
+        Gson gson = new Gson();
+        String  jsonString = gson.toJson(json);
+
+        _jsonInit      = gson.fromJson(jsonString, JsonObject.class);
     }
 
 
@@ -66,11 +73,11 @@ public class UserProfile {
     }
 
     public void setAttribute(String attrName, String value){
-         _jsonInit.put(attrName, value);
+         _jsonInit.add(attrName, new JsonPrimitive(value));
     }
 
     public String getUID() {
-        return (String) _jsonInit.get("uid");
+        return (String) _jsonInit.get("uid").getAsString();
     }
 
     public IdProvider getIdP(){
@@ -177,12 +184,17 @@ public class UserProfile {
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
-        JSONObject externalRepresentation = new JSONObject(_jsonInit);
 
-        externalRepresentation.put("groups",new ArrayList<String>(_groups));
-        externalRepresentation.put("roles",new ArrayList<String>(_roles));
+        Gson gson = new Gson();
+        String  jsonString = gson.toJson(_jsonInit);
+        JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
 
-        sb.append("UserProfile:").append(externalRepresentation.toJSONString());
+
+
+        externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonObject.class));
+        externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonObject.class));
+
+        sb.append("UserProfile:").append(externalRepresentation.getAsString());
 
 
         return sb.toString();

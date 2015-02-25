@@ -10,7 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.json.simple.JSONObject;
+//import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +33,6 @@ public class RemotePDP extends PolicyDecisionPoint {
     RemotePDP() {
         _log = LoggerFactory.getLogger(this.getClass());
         _pdpServiceEndpoint = null;
-    }
-
-    @Override
-    public void init(JSONObject config) {
-
     }
 
 

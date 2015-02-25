@@ -27,14 +27,12 @@
 package opendap.auth;
 
 import org.jdom.Element;
-import org.json.simple.JSONObject;
 
 /**
  * Created by ndp on 9/29/14.
  */
 public interface Policy {
 
-    public void init(JSONObject config) throws ConfigurationException;
     public void init(Element config) throws ConfigurationException;
 
 

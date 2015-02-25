@@ -28,7 +28,6 @@ package opendap.auth;
 
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,12 +102,6 @@ public class SimplePDP extends PolicyDecisionPoint {
     }
 
 
-    @Override
-    public void init(JSONObject config) {
-
-
-
-    }
 
 
 

@@ -27,7 +27,6 @@
 package opendap.auth;
 
 import org.jdom.Element;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
 public abstract class PolicyDecisionPoint {
 
 
-    public abstract void init(JSONObject config);
     public abstract void init(Element config) throws ConfigurationException;
 
 

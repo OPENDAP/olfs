@@ -27,7 +27,7 @@
 package opendap.auth;
 
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 import java.util.Date;
 
@@ -46,15 +46,15 @@ public class OAuthAccessToken {
 
 
 
-    public OAuthAccessToken(JSONObject json)  {
+    public OAuthAccessToken(JsonObject json)  {
 
         _creationTime = new Date();
 
-        _accessToken  = (String) json.get("access_token");
-        _endPoint     = (String) json.get("endpoint");
-        _expiresIn    = (Long)   json.get("expires_in");
-        _tokenType    = (String) json.get("token_type");
-        _refreshToken = (String) json.get("refresh_token");
+        _accessToken  = json.get("access_token").getAsString();
+        _endPoint     = json.get("endpoint").getAsString();
+        _expiresIn    = json.get("expires_in").getAsLong();
+        _tokenType    = json.get("token_type").getAsString();
+        _refreshToken = json.get("refresh_token").getAsString();
 
     }
 

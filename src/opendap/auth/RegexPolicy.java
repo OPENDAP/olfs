@@ -27,7 +27,6 @@
 package opendap.auth;
 
 import org.jdom.Element;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +61,6 @@ public class RegexPolicy implements Policy {
 
 
 
-    @Override
-    public void init(JSONObject config) throws ConfigurationException {
-
-    }
 
     @Override
     public void init(Element config) throws ConfigurationException {

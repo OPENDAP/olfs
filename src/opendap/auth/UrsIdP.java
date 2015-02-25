@@ -26,10 +26,8 @@
 
 package opendap.auth;
 
+import com.google.gson.*;
 import org.jdom.Element;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,9 +177,8 @@ public class UrsIdP extends IdProvider{
      * @param response
      * @return True if login is complete and user profile has been added to session object. False otherwise.
      * @throws IOException
-     * @throws ParseException
      */
-	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException
+	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
 
@@ -233,8 +230,8 @@ public class UrsIdP extends IdProvider{
         /**
          * Parse the json to extract the token.
          */
-        JSONParser parser = new JSONParser();
-        JSONObject json = (JSONObject) parser.parse(contents);
+        JsonParser jparse = new JsonParser();
+        JsonObject json = jparse.parse(contents).getAsJsonObject();
 
 
         OAuthAccessToken oat = new OAuthAccessToken(json);
@@ -261,7 +258,7 @@ public class UrsIdP extends IdProvider{
          * parameters are mandatory, and will always exist in the user
          * profile.
          */
-        json = (JSONObject) parser.parse(contents);
+        json = jparse.parse(contents).getAsJsonObject();
 
         UserProfile userProfile = new UserProfile(json);
 
