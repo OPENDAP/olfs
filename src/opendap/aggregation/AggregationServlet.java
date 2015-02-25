@@ -34,7 +34,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +44,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.ppt.PPTException;
 
@@ -106,7 +106,7 @@ import org.slf4j.LoggerFactory;
  *
  * @todo Write a /help response?
  * @todo Add an option to return netCDF4 (using /netcdf4)?
- * @todo (Hard) Make this parallelize requests to the BES.
+ * @todo (Hard) Make  parallel requests to the BES.
  *
  * @author James Gallagher <jgallagher@opendap.org>
  */
@@ -125,7 +125,7 @@ public class AggregationServlet extends HttpServlet {
 
         _log = LoggerFactory.getLogger(this.getClass());
         _besApi = new BesApi();
-        _granuleNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        _granuleNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
         _log.info(versionInfo);
 
@@ -138,10 +138,10 @@ public class AggregationServlet extends HttpServlet {
         long allocatedMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
 
-        sb.append("init() - free memory: " + format.format(freeMemory / 1024) + "\n");
-        sb.append("init() - allocated memory: " + format.format(allocatedMemory / 1024) + "\n");
-        sb.append("init() - max memory: " + format.format(maxMemory / 1024) + "\n");
-        sb.append("init() - total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "\n");
+        sb.append("init() - free memory: ").append(format.format(freeMemory / 1024)).append("\n")
+            .append("init() - allocated memory: ").append(format.format(allocatedMemory / 1024)).append("\n")
+            .append("init() - max memory: ").append(format.format(maxMemory / 1024)).append("\n")
+            .append("init() - total free memory: ").append(format.format((freeMemory + maxMemory - allocatedMemory) / 1024)).append("\n");
 
         _log.info(sb.toString());
     }
@@ -153,8 +153,7 @@ public class AggregationServlet extends HttpServlet {
      * @return A two element String array.
      */
     private static String[] basename(String path) {
-        String[] tokens = path.split("/(?=[^/]+$)");
-        return tokens;
+        return path.split("/(?=[^/]+$)");
     }
 
     /**
@@ -163,12 +162,12 @@ public class AggregationServlet extends HttpServlet {
      * @param msg A message to indicate where this happened. Ex: "in doHead():"
      */
     private void logError(Throwable t, String msg) {
-        _log.error("Error {}{}", msg, t.getMessage());
+        _log.error("Aggregation: Error {}{}", msg, t.getMessage());
 
         StringWriter writer = new StringWriter();
         t.printStackTrace(new PrintWriter(writer));
 
-        _log.error("Stack trace: ");
+        _log.error("Aggregation: Stack trace: ");
         _log.error(writer.toString());
     }
 
@@ -210,20 +209,19 @@ public class AggregationServlet extends HttpServlet {
      * @param request The HTTP Servlet Request object
      * @param response The HTTP Servlet Response object
      * @param out The Stream
-     * @throws IOException
-     * @throws ServletException
+     * @throws java.io.IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws JDOMException
      */
     private void writeAggregationVersion(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
-            throws IOException, ServletException, PPTException, BadConfigurationException, JDOMException {
+            throws IOException, PPTException, BadConfigurationException, JDOMException {
 
         response.setContentType("text/plain");
 
         // These should always be true
         if (!_besApi.isConfigured() || !_besApi.isInitialized()) {
-            String err = "BES is not configured or not initialized";
+            String err = "Aggregation: BES is not configured or not initialized";
             out.println(err);
 
             _log.error(err);
@@ -243,7 +241,7 @@ public class AggregationServlet extends HttpServlet {
         // This is here primarily to show that we are talking to the BES.
         Document version = new Document();
         if (!_besApi.getBesVersion("/", version)) {
-            String err = "Error getting version information from the BES";
+            String err = "Aggregation: Error getting version information from the BES";
             out.println(err);
 
             _log.error(err);
@@ -253,7 +251,7 @@ public class AggregationServlet extends HttpServlet {
         String besVer = xmlo.outputString(version);
         out.print(besVer);
 
-        _log.debug("The BES Version information:\n");
+        _log.debug("Aggregation: The BES Version information:\n");
         _log.debug(besVer);
     }
 
@@ -276,7 +274,7 @@ public class AggregationServlet extends HttpServlet {
             String msg = new String(errors.toByteArray());
             os.write(msg.getBytes());
 
-            _log.error("Error in writeSinglePlainGranule(): {}", msg);
+            _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
         }
     }
 
@@ -307,7 +305,7 @@ public class AggregationServlet extends HttpServlet {
                 zos.closeEntry();
             }
             catch (ZipException ze) {
-                out.println("Error: " + ze.getMessage());
+                out.println("Aggregation Error: " + ze.getMessage());
 
                 logError(ze, "in writePlainGranules():");
             }
@@ -345,7 +343,7 @@ public class AggregationServlet extends HttpServlet {
             String msg = new String(errors.toByteArray());
             os.write(msg.getBytes());
 
-            _log.error("Error in writeSingleGranuleAsNetcdf(): {}", msg);
+            _log.error("Aggregation Error in writeSingleGranuleAsNetcdf(): {}", msg);
         }
     }
 
@@ -387,7 +385,7 @@ public class AggregationServlet extends HttpServlet {
 
         ZipOutputStream zos = new ZipOutputStream(out);
 
-        String masterCE = new String("");
+        String masterCE = "";
         if (queryParameters.get("ce").length == 1)
             masterCE = queryParameters.get("ce")[0];
 
@@ -406,7 +404,7 @@ public class AggregationServlet extends HttpServlet {
                 zos.closeEntry();
             }
             catch (ZipException ze) {
-                out.println("Error: " + ze.getMessage());
+                out.println("Aggregation Error: " + ze.getMessage());
 
                 logError(ze, "in writeGranulesAsNetcdf():");
             }
@@ -421,6 +419,12 @@ public class AggregationServlet extends HttpServlet {
 
         _log.debug("doGet() - BEGIN");
 
+        if (request.getPathInfo() == null) {
+            response.sendRedirect(Scrub.urlContent(request.getRequestURI() + "/"));
+            _log.debug("Aggregation: Sent redirect to make the web page work!");
+            return;
+        }
+
         // forget the names used in/by previous requests
         _granuleNames.clear();
 
@@ -430,28 +434,29 @@ public class AggregationServlet extends HttpServlet {
             RequestCache.openThreadCache();
 
             String requestedResourceId = ReqInfo.getLocalUrl(request);
-            _log.debug("The resource ID is: {}", requestedResourceId);
+            _log.debug("Aggregation: The resource ID is: {}", requestedResourceId);
 
-            if (requestedResourceId.equals("/version")) {
-                writeAggregationVersion(request, response, out);
+            switch (requestedResourceId) {
+                case "/version":
+                    writeAggregationVersion(request, response, out);
+                    break;
+                case "/file":
+                    writePlainGranules(request, response, out);
+                    break;
+                case "/netcdf3":
+                    writeGranulesAsNetcdf(request, response, out);
+                    break;
+                default:
+                    throw new Exception(invocationError + requestedResourceId);
             }
-            else if (requestedResourceId.equals("/file")) {
-                writePlainGranules(request, response, out);
-            }
-            else if (requestedResourceId.equals("/netcdf3")) {
-                writeGranulesAsNetcdf(request, response, out);
-            }
-            else {
-                throw new Exception(invocationError + requestedResourceId);
-            }
-		} 
+		}
         catch (BadConfigurationException | PPTException | JDOMException e) {
-			out.println("Error: " + e.getMessage());
+			out.println("Aggregation Error: " + e.getMessage());
 
             logError(e, "in doGet(), caught an BadConfiguration, PPT or JDOM Exception:");
 		}
         catch (Throwable t) {
-            out.println("Error: " + t.getMessage());
+            out.println("Aggregation Error: " + t.getMessage());
 
             logError(t, "in doGet():");
         }
@@ -477,23 +482,24 @@ public class AggregationServlet extends HttpServlet {
 
             String requestedResourceId = ReqInfo.getLocalUrl(request);
 
-            if (requestedResourceId.equals("/version")) {
-                response.setContentType("text/plain");
-            }
-            else if (requestedResourceId.equals("/text")) {
-                response.setContentType("application/x-zip-compressed");
-                response.setHeader("Content-Disposition", "attachment; filename=text.zip");
-            }
-            else if (requestedResourceId.equals("/netcdf3")) {
-                response.setContentType("application/x-zip-compressed");
-                response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
-            }
-            else {
-                throw new Exception(invocationError + requestedResourceId);
+            switch (requestedResourceId) {
+                case "/version":
+                    response.setContentType("text/plain");
+                    break;
+                case "/text":
+                    response.setContentType("application/x-zip-compressed");
+                    response.setHeader("Content-Disposition", "attachment; filename=text.zip");
+                    break;
+                case "/netcdf3":
+                    response.setContentType("application/x-zip-compressed");
+                    response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
+                    break;
+                default:
+                    throw new Exception(invocationError + requestedResourceId);
             }
         }
         catch (Throwable t) {
-            out.println("Error: " + t.getMessage());
+            out.println("Aggregation Error: " + t.getMessage());
 
             logError(t, "in doHead():");
         }
@@ -526,10 +532,8 @@ public class AggregationServlet extends HttpServlet {
      * @param out
      * @return
      * @throws IOException
-     * @throws ServletException
      */
-    private int  getPlainText(HttpServletRequest request, StringBuilder out)
-            throws IOException, ServletException {
+    private void getPlainText(HttpServletRequest request, StringBuilder out) throws IOException {
 
         out.append("\n---------------------------------------------------------------------\n");
         out.append("HTTP Method: ").append(request.getMethod()).append("\n");
@@ -556,14 +560,6 @@ public class AggregationServlet extends HttpServlet {
         int contentLength = request.getContentLength();
         out.append("request.getContentLength(): ").append(contentLength).append("\n");
         out.append("\n");
-
-        if(contentLength==-1){
-            _log.info("getPlainText() - Retrieving Content-Length header.");
-            String s = request.getHeader("Content-Length");
-            if(s!=null){
-                contentLength = Integer.parseInt(s);
-            }
-        }
 
         String ctype = request.getHeader("Content-Type");
 
@@ -614,24 +610,6 @@ public class AggregationServlet extends HttpServlet {
         else {
             out.append("Content-Type indicates that the request body is NOT form url encoded.\n");
         }
-
-        return contentLength;
-    }
-
-    private StringBuilder convertStreamToString(ServletInputStream is, int size) throws IOException {
-        StringBuilder result = new StringBuilder(size);
-
-        int ret;
-        boolean done = false;
-        while(!done){
-            ret = is.read();
-            if(ret==-1)
-                done = true;
-            else
-                result.append((char)ret);
-        }
-
-        return result;
     }
 
 }
