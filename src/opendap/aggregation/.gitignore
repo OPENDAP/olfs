@@ -1,1 +1,5 @@
-/DispatchServlet.java.example
+*.zip
+MOD04*.hdf*
+
+*.DS_Strore
+

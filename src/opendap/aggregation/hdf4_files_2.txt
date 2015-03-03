@@ -1,0 +1,3 @@
+&file=/data/hdf4/MOD04_L2.A2015021.0020.051.NRT.hdf&var=Latitude,Longitude
+&file=/data/hdf4/MOD04_L2.A2015021.0025.051.NRT.hdf&var=Latitude,Longitude,Optical_Depth_Land_And_Ocean
+&file=/data/hdf4/MOD04_L2.A2015021.0030.051.NRT.hdf&var=Latitude,Longitude

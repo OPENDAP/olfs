@@ -78,10 +78,15 @@ import org.slf4j.LoggerFactory;
  * 'file' param must be supplied.
  *
  * /netcdf3: Like 'file' above, but all data are returned in netCDF3 files. In addition,
- * each file has an associated constraint expression, specified using &ce=<ce>. This is
- * required. If only one 'ce' param is given, that constraint is applied to every file.
- * If more than one 'ce' param is supplied, the number must match the number of files and
- * they are associated 1-to-1.
+ * each file has an associated constraint expression, specified using &var=<var1>,
+ * <var2>, ..., <varn>. This is required. If only one 'var' param is given, that constraint
+ * is applied to every file.  If more than one 'var' param is supplied, the number must
+ * match the number of files and they are associated 1-to-1. The /netcdf3 option also
+ * accepts an optional &bbox parameter. The format for these is
+ * &bbox=<top lat>,<left lon>,<bottom lat>,<right lon>. These values are
+ * used as a bounding box for the variables listed in the &var parameter. NB: &var
+ * must not be empty if &bbox is used, otherwise, if &var it is empty,
+ * the entire file contents will be returned.
  *
  * Example use:
  *
@@ -315,6 +320,31 @@ public class AggregationServlet extends HttpServlet {
     }
 
     /**
+     * Are the QueryString parameters sent by the client valid for a
+     * 'netcdf3' request? Throw if the params/values are not valid.
+     * @param queryParameters The Query Parameters as returned by the
+     *                        Http Servlet Request object.
+     * @return The number of values for the 'file' parameter.
+     */
+    private int validateNetcdf3Params(Map<String, String[]> queryParameters) throws Exception
+    {
+        // Before we start trying to send back netCDF files, we check to make
+        // sure that the parameters passed in are valid. There must be N values
+        // for 'file' and either 1 or N values for 'var'. If 'bbox' is used, the
+        // number must match 'var'.
+        int N = queryParameters.get("file").length;
+        if (!(queryParameters.get("var").length == 1 || queryParameters.get("var").length == N))
+            throw new Exception("Incorrect number of 'var' parameters (found " + N + " instances of 'file' and "
+                    + queryParameters.get("var").length + " of 'var').");
+
+        if (queryParameters.get("bbox") != null && queryParameters.get("bbox").length != queryParameters.get("var").length)
+            throw new Exception("Incorrect number of 'bbox' parameters (found " + queryParameters.get("bbox").length
+                    + " instances of 'bbox' and " + queryParameters.get("var").length + " of 'var' - they should match).");
+
+        return N;
+    }
+
+    /**
      * Helper - write a single netCDF3 file to the stream. If an error is
      * returned by the BES, use the value of the error message as the file
      * contents.
@@ -367,15 +397,10 @@ public class AggregationServlet extends HttpServlet {
 
         Map<String, String[]> queryParameters = request.getParameterMap();
 
-        // Before we start trying to send back netCDF files, we check to make
-        // sure that the parameters passed in are valid. There must be N values
-        // for 'file' and either 1 or N values for 'ce'
-        int N = queryParameters.get("file").length;
-        if (!(queryParameters.get("ce").length == 1 || queryParameters.get("ce").length == N))
-            throw new Exception("Incorrect number of 'ce' parameters (found " + N + " instances of 'file' and "
-                    + queryParameters.get("ce").length + " of 'ce').");
+        AggregationParams params = new AggregationParams(queryParameters);
+        int N = params.getFileNumber();
 
-        // We have valid 'file' and 'ce' params...
+        // We have valid 'file' and 'var' params...
 
         response.setContentType("application/x-zip-compressed");
         response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");  // TODO Better name?
@@ -385,18 +410,20 @@ public class AggregationServlet extends HttpServlet {
 
         ZipOutputStream zos = new ZipOutputStream(out);
 
+        /*
         String masterCE = "";
-        if (queryParameters.get("ce").length == 1)
-            masterCE = queryParameters.get("ce")[0];
-
+        if (queryParameters.get("var").length == 1)
+            masterCE = queryParameters.get("var")[0];
+*/
         for (int i = 0; i < N; ++i) {
-            String granule = queryParameters.get("file")[i];
-            String ce;
+            String granule = params.getFilename(i); //= queryParameters.get("file")[i];
+            String ce = params.getCE(i);
+            /*
             if (masterCE.equals(""))
-                ce = queryParameters.get("ce")[i];
+                ce = queryParameters.get("var")[i];
             else
                 ce = masterCE;
-
+            */
             String granuleName = getNameForZip(basename(granule)[1]) + ".nc";
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
@@ -455,6 +482,11 @@ public class AggregationServlet extends HttpServlet {
 
             logError(e, "in doGet(), caught an BadConfiguration, PPT or JDOM Exception:");
 		}
+        catch (Exception e) {
+            out.println("Aggregation Error: " + e.getMessage());
+
+            logError(e, "in doGet(), caught an Exception:");
+        }
         catch (Throwable t) {
             out.println("Aggregation Error: " + t.getMessage());
 
