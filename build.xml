@@ -723,7 +723,7 @@
 
 
 
-        <war destfile="${build.dist}/opendap.war"
+        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
              webxml="${build.resources}/WEB-INF/web.xml"
                 >
 
