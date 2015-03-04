@@ -31,6 +31,9 @@ public class AggregationParams {
     private boolean _has_bbox = false;
     private boolean _one_bbox = false;
 
+    // When there is only one 'var' (and optional 'bbox') build the ce once and reuse
+    private String _ce = "";
+
     /**
      * If the parameters do not contain any instances of 'file', that is an
      * error given that this code will only be used with the /netcdf3 version
@@ -261,42 +264,38 @@ public class AggregationParams {
      * in the granule, it can actually be a DAP CE. A feature that might be
      * useful...
      *
-     * TDB bbox code
+     * If the parameter 'bbox' is used, then parse that build a call to the
+     * BES Swath subsetting function. If there is only one instance of bbox,
+     * there must only be one instance of var and the ce can be built once
+     * and simply reused.
+     *
      * @param i Build the CE for the ith file/granule
      * @return The correct BES/DAP CE
      */
     public String getCE(int i) throws Exception {
         // Simple case first...
-        if (!_has_bbox) {
-            if (_one_var)
-                return _queryParameters.get("var")[0];
-            else
-                return _queryParameters.get("var")[i];
+        if (_one_var) {
+            // If the field '_ce' is empty, compute. reuse on subsequent calls
+            if (_ce.isEmpty()) {
+                if (_has_bbox) {
+                    String bboxes = _queryParameters.get("bbox")[0].replace("\"", "");// remove surrounding "s
+                    _ce = "roi(" + _queryParameters.get("var")[0] + "," + parseBBox(bboxes) + ")";
+                }
+                else {
+                    _ce = _queryParameters.get("var")[0];
+                }
+            }
+
+            return _ce;
         }
         else {
-            String bboxes;
-            if (_one_bbox)
-                bboxes = _queryParameters.get("bbox")[0];
-            else
-                bboxes = _queryParameters.get("bbox")[i];
-
-            bboxes = bboxes.replace("\"", "");// remove surrounding "s
-            bboxes = parseBBox(bboxes);
-
-            String vars;
-            if (_one_var)
-                vars = _queryParameters.get("var")[0];
-            else
-                vars = _queryParameters.get("var")[i];
-
-            // Here's what we're shooting for:
-            // roi( <vars>, <bboxes expr> )
-            // where <vars> is the list of variables passed in using 'var'
-            // and <bboxes expr> is a list of bbox() calls built by parsing the
-            // stuff passed in using 'bbox'. Example:
-            // roi ( Lat, Lon, SST, bbox_union( bbox(Lat, 30, 50), bbox(Lon,70, 100), "intersection") )
-
-            return "roi(" + vars + "," + bboxes + ")";
+            if (_has_bbox) {
+                String bboxes = _queryParameters.get("bbox")[i].replace("\"", "");// remove surrounding "s
+                return "roi(" + _queryParameters.get("var")[i] + "," + parseBBox(bboxes) + ")";
+            }
+            else {
+                return _queryParameters.get("var")[i];
+            }
         }
     }
 }
