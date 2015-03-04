@@ -57,7 +57,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 /**
- * @brief An 'aggregation servlet developed specifically for the EDSC web client
+ * An 'aggregation servlet developed specifically for the EDSC web client
  *
  * This returns a Zip file containing a number of resources read/produced by the Hyrax
  * BES. It can handle a list of resources (typically files) and simply return them,
@@ -110,9 +110,9 @@ import java.util.zip.ZipOutputStream;
  * testing: MOD04_L2.A2015021.0030.051.NRT.hdf.nc   OK
  * No errors detected in compressed data of data2.zip.
  *
- * @todo Write a /help response?
- * @todo Add an option to return netCDF4 (using /netcdf4)?
- * @todo (Hard) Make  parallel requests to the BES.
+ * TODO Write a /help response?
+ * TODO Add an option to return netCDF4 (using /netcdf4)?
+ * TODO (Hard) Make  parallel requests to the BES.
  *
  * @author James Gallagher <jgallagher@opendap.org>
  */
@@ -264,8 +264,8 @@ public class AggregationServlet extends HttpServlet {
     /**
      * Helper for writePlainGranules
      *
-     * @param granule
-     * @param os
+     * @param granule The granule pathname
+     * @param os Write the information to this stream
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
@@ -285,14 +285,16 @@ public class AggregationServlet extends HttpServlet {
     }
 
     /**
-     * Test getting the BES to write several files to its output stream
+     * Use the BES to write several files to its output stream
      *
-     * @param request
-     * @param response
-     * @param out
+     * @param request The HttpServletRequest
+     * @param response The HttpServletResponse
+     * @param out The ServletOutputStream
      * @throws Exception
      */
-    private void writePlainGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws Exception {
+    private void writePlainGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
+            throws Exception {
+
         Map<String, String[]> queryParameters = request.getParameterMap();
 
         response.setContentType("application/x-zip-compressed");
@@ -388,43 +390,30 @@ public class AggregationServlet extends HttpServlet {
      * even if the original file was a netCDF file. This provides a primitive
      * indication that the file differs from the original source file.
      *
-     * @param request
-     * @param response
-     * @param out
+     * @param request The HttpServletRequest
+     * @param response The HttpServletResponse
+     * @param out The ServletOutputStream
      * @throws Exception
      */
     private void writeGranulesAsNetcdf(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
         throws Exception {
 
-        Map<String, String[]> queryParameters = request.getParameterMap();
-
-        AggregationParams params = new AggregationParams(queryParameters);
+        // This ctor vets the params and throws an Exception if there are problems
+        AggregationParams params = new AggregationParams(request.getParameterMap());
         int N = params.getFileNumber();
 
-        // We have valid 'file' and 'var' params...
-
         response.setContentType("application/x-zip-compressed");
-        response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");  // TODO Better name?
+        response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
 
         User user = new User(request);
         int maxResponse = user.getMaxResponseSize();
 
         ZipOutputStream zos = new ZipOutputStream(out);
 
-        /*
-        String masterCE = "";
-        if (queryParameters.get("var").length == 1)
-            masterCE = queryParameters.get("var")[0];
-*/
         for (int i = 0; i < N; ++i) {
-            String granule = params.getFilename(i); //= queryParameters.get("file")[i];
+            String granule = params.getFilename(i);
             String ce = params.getCE(i);
-            /*
-            if (masterCE.equals(""))
-                ce = queryParameters.get("var")[i];
-            else
-                ce = masterCE;
-            */
+
             String granuleName = getNameForZip(basename(granule)[1]) + ".nc";
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
@@ -561,9 +550,8 @@ public class AggregationServlet extends HttpServlet {
      * processing GET and POST requests and is called only when the /version
      * response is requested and logback is in DEBUG mode.
      *
-     * @param request
-     * @param out
-     * @return
+     * @param request The HttpServletRequest
+     * @param out Write to this value-result parameter.
      * @throws IOException
      */
     private void getPlainText(HttpServletRequest request, StringBuilder out) throws IOException {

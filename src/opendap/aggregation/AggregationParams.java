@@ -1,3 +1,29 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "Hyrax Data Server" project.
+ * //
+ * //
+ * // Copyright (c) 2015 OPeNDAP, Inc.
+ * // Author: James Gallagher <jgallagher@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
+
 package opendap.aggregation;
 
 import java.util.Map;
@@ -29,7 +55,6 @@ public class AggregationParams {
     // These are all set (internally) by the validator
     private boolean _one_var = false;
     private boolean _has_bbox = false;
-    private boolean _one_bbox = false;
 
     // When there is only one 'var' (and optional 'bbox') build the ce once and reuse
     private String _ce = "";
@@ -82,7 +107,7 @@ public class AggregationParams {
                     + _queryParameters.get("var").length + " of 'var').");
 
         _has_bbox = _queryParameters.get("bbox") != null;
-        _one_bbox = _has_bbox && _queryParameters.get("bbox").length == 1;
+        // one_bbox = _has_bbox && _queryParameters.get("bbox").length == 1;
 
         if (_has_bbox && _queryParameters.get("bbox").length != _queryParameters.get("var").length)
             throw new Exception("Incorrect number of 'bbox' parameters (found " + _queryParameters.get("bbox").length

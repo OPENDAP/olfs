@@ -316,6 +316,7 @@
           <classpath refid="olfs.compile.classpath"/>
 
           <test name="opendap.coreServlet.Scrub" />
+          <test name="opendap.aggregation.AggregationParamsTest" />
 
         </junit>
     </target>
