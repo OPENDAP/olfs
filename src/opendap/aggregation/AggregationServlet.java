@@ -111,7 +111,6 @@ import java.util.zip.ZipOutputStream;
  * No errors detected in compressed data of data2.zip.
  *
  * TODO Write a /help response?
- * TODO Add an option to return netCDF4 (using /netcdf4)?
  * TODO (Hard) Make  parallel requests to the BES.
  *
  * @author James Gallagher <jgallagher@opendap.org>
@@ -122,7 +121,7 @@ public class AggregationServlet extends HttpServlet {
     private BesApi _besApi;
     private Set<String> _granuleNames;
 
-    private static final String invocationError = "I expected '/version', '/file', or '/netcdf3', got: ";
+    private static final String invocationError = "I expected '/version', '/file', '/netcdf3', '/netcdf4', '/ascii', got: ";
     private static final String versionInfo = "Aggregation Interface Version: 1.0";
 
     @Override
@@ -189,12 +188,30 @@ public class AggregationServlet extends HttpServlet {
      *                to be added to the Zip file
      * @return Use this name for the granule in the Zip file
      */
-    private String getNameForZip(String granule) {
+    private String getNameForZip(String granule, ResponseFormat format) {
 
         if (!_granuleNames.contains(granule)) {
             // In the simple case, don't fiddle with the name, just record that
             // it's been used.
             _granuleNames.add(granule);
+
+            switch (format) {
+                case netcdf3:
+                    granule = granule + ".nc";
+                    break;
+                case netcdf4:
+                    granule =  granule + ".nc4";
+                    break;
+                case ascii:
+                    granule =  granule + ".txt";
+                    break;
+                case plain:
+                    // No change to the name in this case - this ResponseFormat is
+                    // used by the /file service that simply reads files and dumps
+                    // them into the zip output stream.
+                    break;
+            }
+
             return granule;
         }
         else {
@@ -202,7 +219,7 @@ public class AggregationServlet extends HttpServlet {
             int i = 1;
             while (_granuleNames.contains(granule + "_" + i))
                 ++i;
-            return getNameForZip(granule + "_" + i);
+            return getNameForZip(granule + "_" + i, format);
         }
     }
 
@@ -306,7 +323,7 @@ public class AggregationServlet extends HttpServlet {
         for (int i = 0; i < N; ++i) {
             String granule = queryParameters.get("file")[i];
 
-            String granuleName = getNameForZip(basename(granule)[1]);
+            String granuleName = getNameForZip(basename(granule)[1], ResponseFormat.plain);
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
                 writeSinglePlainGranule(granule, zos);
@@ -322,29 +339,11 @@ public class AggregationServlet extends HttpServlet {
         zos.finish();
     }
 
-    /**
-     * Are the QueryString parameters sent by the client valid for a
-     * 'netcdf3' request? Throw if the params/values are not valid.
-     * @param queryParameters The Query Parameters as returned by the
-     *                        Http Servlet Request object.
-     * @return The number of values for the 'file' parameter.
-     */
-    private int validateNetcdf3Params(Map<String, String[]> queryParameters) throws Exception
-    {
-        // Before we start trying to send back netCDF files, we check to make
-        // sure that the parameters passed in are valid. There must be N values
-        // for 'file' and either 1 or N values for 'var'. If 'bbox' is used, the
-        // number must match 'var'.
-        int N = queryParameters.get("file").length;
-        if (!(queryParameters.get("var").length == 1 || queryParameters.get("var").length == N))
-            throw new Exception("Incorrect number of 'var' parameters (found " + N + " instances of 'file' and "
-                    + queryParameters.get("var").length + " of 'var').");
-
-        if (queryParameters.get("bbox") != null && queryParameters.get("bbox").length != queryParameters.get("var").length)
-            throw new Exception("Incorrect number of 'bbox' parameters (found " + queryParameters.get("bbox").length
-                    + " instances of 'bbox' and " + queryParameters.get("var").length + " of 'var' - they should match).");
-
-        return N;
+    private enum ResponseFormat {
+        netcdf3,
+        netcdf4,
+        ascii,
+        plain
     }
 
     /**
@@ -362,13 +361,26 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSingleGranuleAsNetcdf(String granule, String ce, OutputStream os, int maxResponseSize)
+    private void writeSingleGranuleAsNetcdf(String granule, String ce, OutputStream os, int maxResponseSize, ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
         String xdap_accept = "3.2";
         ByteArrayOutputStream errors = new ByteArrayOutputStream();
+        boolean status = false;
 
-        if (!_besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, os, errors)) {
+        switch (format) {
+            case netcdf3:
+                status = _besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                break;
+            case netcdf4:
+                status = _besApi.writeDap2DataAsNetcdf4(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                break;
+            case ascii:
+                status = _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                break;
+        }
+
+        if (!status) {
             // Processing errors this way means that if the BES fails to perform
             // some function, e.g., the CE is bad, that error message will be used
             // as the value of the file in the Zip archive. This provides a way for
@@ -395,7 +407,7 @@ public class AggregationServlet extends HttpServlet {
      * @param out The ServletOutputStream
      * @throws Exception
      */
-    private void writeGranulesAsNetcdf(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
+    private void writeGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, ResponseFormat format)
         throws Exception {
 
         // This ctor vets the params and throws an Exception if there are problems
@@ -414,16 +426,14 @@ public class AggregationServlet extends HttpServlet {
             String granule = params.getFilename(i);
             String ce = params.getCE(i);
 
-            String granuleName = getNameForZip(basename(granule)[1]) + ".nc";
             try {
-                zos.putNextEntry(new ZipEntry(granuleName));
-                writeSingleGranuleAsNetcdf(granule, ce, zos, maxResponse);
+                zos.putNextEntry(new ZipEntry(getNameForZip(basename(granule)[1], format)));
+                writeSingleGranuleAsNetcdf(granule, ce, zos, maxResponse, format);
                 zos.closeEntry();
-            }
-            catch (ZipException ze) {
+            } catch (ZipException ze) {
                 out.println("Aggregation Error: " + ze.getMessage());
 
-                logError(ze, "in writeGranulesAsNetcdf():");
+                logError(ze, "in writeGranules():");
             }
         }
 
@@ -461,7 +471,13 @@ public class AggregationServlet extends HttpServlet {
                     writePlainGranules(request, response, out);
                     break;
                 case "/netcdf3":
-                    writeGranulesAsNetcdf(request, response, out);
+                    writeGranules(request, response, out, ResponseFormat.netcdf3);
+                    break;
+                case "/netcdf4":
+                    writeGranules(request, response, out, ResponseFormat.netcdf4);
+                    break;
+                case "/ascii":
+                    writeGranules(request, response, out, ResponseFormat.ascii);
                     break;
                 default:
                     throw new Exception(invocationError + requestedResourceId);
@@ -508,14 +524,23 @@ public class AggregationServlet extends HttpServlet {
                 case "/version":
                     response.setContentType("text/plain");
                     break;
-                case "/text":
+                case "/file":
                     response.setContentType("application/x-zip-compressed");
-                    response.setHeader("Content-Disposition", "attachment; filename=text.zip");
+                    response.setHeader("Content-Disposition", "attachment; filename=file.zip");
                     break;
                 case "/netcdf3":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
                     break;
+                case "/netcdf4":
+                    response.setContentType("application/x-zip-compressed");
+                    response.setHeader("Content-Disposition", "attachment; filename=netcdf4.zip");
+                    break;
+                case "/ascii":
+                    response.setContentType("application/x-zip-compressed");
+                    response.setHeader("Content-Disposition", "attachment; filename=ascii.zip");
+                    break;
+
                 default:
                     throw new Exception(invocationError + requestedResourceId);
             }
