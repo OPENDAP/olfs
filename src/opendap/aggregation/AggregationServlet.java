@@ -361,7 +361,7 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSingleGranuleAsNetcdf(String granule, String ce, OutputStream os, int maxResponseSize, ResponseFormat format)
+    private void writeSingleFormattedGranule(String granule, String ce, OutputStream os, int maxResponseSize, ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
         String xdap_accept = "3.2";
@@ -388,7 +388,7 @@ public class AggregationServlet extends HttpServlet {
             String msg = new String(errors.toByteArray());
             os.write(msg.getBytes());
 
-            _log.error("Aggregation Error in writeSingleGranuleAsNetcdf(): {}", msg);
+            _log.error("Aggregation Error in writeSingleFormattedGranule(): {}", msg);
         }
     }
 
@@ -407,7 +407,7 @@ public class AggregationServlet extends HttpServlet {
      * @param out The ServletOutputStream
      * @throws Exception
      */
-    private void writeGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, ResponseFormat format)
+    private void writeFormattedGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, ResponseFormat format)
         throws Exception {
 
         // This ctor vets the params and throws an Exception if there are problems
@@ -428,12 +428,12 @@ public class AggregationServlet extends HttpServlet {
 
             try {
                 zos.putNextEntry(new ZipEntry(getNameForZip(basename(granule)[1], format)));
-                writeSingleGranuleAsNetcdf(granule, ce, zos, maxResponse, format);
+                writeSingleFormattedGranule(granule, ce, zos, maxResponse, format);
                 zos.closeEntry();
             } catch (ZipException ze) {
                 out.println("Aggregation Error: " + ze.getMessage());
 
-                logError(ze, "in writeGranules():");
+                logError(ze, "in writeFormattedGranules():");
             }
         }
 
@@ -471,13 +471,13 @@ public class AggregationServlet extends HttpServlet {
                     writePlainGranules(request, response, out);
                     break;
                 case "/netcdf3":
-                    writeGranules(request, response, out, ResponseFormat.netcdf3);
+                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf3);
                     break;
                 case "/netcdf4":
-                    writeGranules(request, response, out, ResponseFormat.netcdf4);
+                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf4);
                     break;
                 case "/ascii":
-                    writeGranules(request, response, out, ResponseFormat.ascii);
+                    writeFormattedGranules(request, response, out, ResponseFormat.ascii);
                     break;
                 default:
                     throw new Exception(invocationError + requestedResourceId);
