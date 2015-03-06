@@ -27,6 +27,8 @@
 package opendap.aggregation;
 
 import org.apache.commons.io.FileUtils;
+
+// This uses JUnit 4; the first set of tests I made used JUnit 3. Not sure it matters
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,7 +82,7 @@ public class FilterAsciiHeaderStreamTest {
 
     @Test
     public void testWrite() throws Exception {
-        _in = new FileInputStream("src/opendap/aggregation/source_1.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_1.txt");
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
         _out.set(true);
@@ -88,52 +90,52 @@ public class FilterAsciiHeaderStreamTest {
 
         // validate dest.txt here
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_2.txt")));
+                new File("resources/aggregation/unit-tests/baseline_2.txt")));
     }
 
     @Test
     public void testWrite_1() throws Exception {
-        _in = new FileInputStream("src/opendap/aggregation/source_1.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_1.txt");
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
         _out.set(false);
         grind(false);
 
         _out.set(true);
-        _in = new FileInputStream("src/opendap/aggregation/source_2.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_2.txt");
         grind(true);
 
         // validate dest_2.txt here
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_3.txt")));
+                new File("resources/aggregation/unit-tests/baseline_3.txt")));
     }
 
     @Test
     public void testWrite_2() throws Exception {
-        _in = new FileInputStream("src/opendap/aggregation/source_1.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_1.txt");
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
         _out.set(false);
         grind(false);
 
         _out.set(true);
-        _in = new FileInputStream("src/opendap/aggregation/source_2.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_2.txt");
         grind(false);
 
         _out.set(true);
-        _in = new FileInputStream("src/opendap/aggregation/source_3.txt");
+        _in = new FileInputStream("resources/aggregation/unit-tests/source_3.txt");
         grind(true);
 
         // validate dest_2.txt here
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_4.txt")));
+                new File("resources/aggregation/unit-tests/baseline_4.txt")));
     }
 
     @Test
     public void testWriteArray() throws Exception {
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
-        Path path = Paths.get("src/opendap/aggregation/source_1.txt");
+        Path path = Paths.get("resources/aggregation/unit-tests/source_1.txt");
         byte[] data = Files.readAllBytes(path);
 
         _out.set(false);
@@ -142,51 +144,51 @@ public class FilterAsciiHeaderStreamTest {
         _out.close();
 
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_1.txt")));
+                new File("resources/aggregation/unit-tests/baseline_1.txt")));
     }
 
     @Test
     public void testWriteArray_1() throws Exception {
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
-        Path path = Paths.get("src/opendap/aggregation/source_1.txt");
+        Path path = Paths.get("resources/aggregation/unit-tests/source_1.txt");
         byte[] data = Files.readAllBytes(path);
 
         _out.set(false);
         _out.write(data);
 
-        data = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_2.txt"));
+        data = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_2.txt"));
         _out.set(true);
         _out.write(data);
 
         _out.close();
 
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_3.txt")));
+                new File("resources/aggregation/unit-tests/baseline_3.txt")));
     }
 
     @Test
     public void testWriteArray_2() throws Exception {
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
-        Path path = Paths.get("src/opendap/aggregation/source_1.txt");
+        Path path = Paths.get("resources/aggregation/unit-tests/source_1.txt");
         byte[] data = Files.readAllBytes(path);
 
         _out.set(false);
         _out.write(data);
 
-        data = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_2.txt"));
+        data = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_2.txt"));
         _out.set(true);
         _out.write(data);
 
-        data = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_3.txt"));
+        data = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_3.txt"));
         _out.set(true);
         _out.write(data);
 
         _out.close();
 
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_4.txt")));
+                new File("resources/aggregation/unit-tests/baseline_4.txt")));
     }
 
     // This test uses the third form of write() where the offset and length
@@ -196,9 +198,9 @@ public class FilterAsciiHeaderStreamTest {
     public void testWrite_3() throws Exception {
         _out = new FilterAsciiHeaderStream(new FileOutputStream("src/opendap/aggregation/dest.txt"));
 
-        byte[] data1 = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_1.txt"));
-        byte[] data2 = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_2.txt"));
-        byte[] data3 = Files.readAllBytes(Paths.get("src/opendap/aggregation/source_3.txt"));
+        byte[] data1 = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_1.txt"));
+        byte[] data2 = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_2.txt"));
+        byte[] data3 = Files.readAllBytes(Paths.get("resources/aggregation/unit-tests/source_3.txt"));
 
         byte[] data = new byte[data1.length + data2.length + data3.length];
         System.arraycopy(data1, 0, data, 0, data1.length);
@@ -217,6 +219,6 @@ public class FilterAsciiHeaderStreamTest {
         _out.close();
 
         Assert.assertTrue(FileUtils.contentEquals(new File("src/opendap/aggregation/dest.txt"),
-                new File("src/opendap/aggregation/baseline_4.txt")));
+                new File("resources/aggregation/unit-tests/baseline_4.txt")));
     }
 }
