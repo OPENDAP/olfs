@@ -121,7 +121,7 @@ public class AggregationServlet extends HttpServlet {
     private BesApi _besApi;
     private Set<String> _granuleNames;
 
-    private static final String invocationError = "I expected '/version', '/file', '/netcdf3', '/netcdf4', '/ascii', got: ";
+    private static final String invocationError = "I expected '/version', '/file', '/netcdf3', '/netcdf4', '/ascii' or '/csv' but got: ";
     private static final String versionInfo = "Aggregation Interface Version: 1.0";
 
     @Override
@@ -237,7 +237,8 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws JDOMException
      */
-    private void writeAggregationVersion(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
+    private void writeAggregationVersion(HttpServletRequest request, HttpServletResponse response,
+                                         ServletOutputStream out)
             throws IOException, PPTException, BadConfigurationException, JDOMException {
 
         response.setContentType("text/plain");
@@ -361,7 +362,8 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSingleFormattedGranule(String granule, String ce, OutputStream os, int maxResponseSize, ResponseFormat format)
+    private void writeSingleFormattedGranule(String granule, String ce, OutputStream os, int maxResponseSize,
+                                             ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
         String xdap_accept = "3.2";
@@ -407,12 +409,13 @@ public class AggregationServlet extends HttpServlet {
      * @param out The ServletOutputStream
      * @throws Exception
      */
-    private void writeFormattedGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, ResponseFormat format)
+    private void writeFormattedGranules(HttpServletRequest request, HttpServletResponse response,
+                                        ServletOutputStream out, ResponseFormat format)
         throws Exception {
 
         // This ctor vets the params and throws an Exception if there are problems
         AggregationParams params = new AggregationParams(request.getParameterMap());
-        int N = params.getFileNumber();
+        int N = params.getNumberOfFiles();
 
         response.setContentType("application/x-zip-compressed");
         response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
@@ -424,7 +427,7 @@ public class AggregationServlet extends HttpServlet {
 
         for (int i = 0; i < N; ++i) {
             String granule = params.getFilename(i);
-            String ce = params.getCE(i);
+            String ce = params.getArrayCE(i);
 
             try {
                 zos.putNextEntry(new ZipEntry(getNameForZip(basename(granule)[1], format)));
@@ -438,6 +441,48 @@ public class AggregationServlet extends HttpServlet {
         }
 
         zos.finish();
+    }
+
+    /**
+     * Get the values from a number of data files in a single CSV-format table.
+     *
+     * @note This version of the method does not do any sanity checking; caveat emptor.
+     *
+     * @param request The HttpServletRequest object
+     * @param response The HttpServletResponse object
+     * @param out where to write the response
+     * @throws Exception
+     */
+    private void writeGranulesSingleTable(HttpServletRequest request, HttpServletResponse response,
+                                          ServletOutputStream out)
+            throws Exception {
+
+        // This ctor vets the params and throws an Exception if there are problems
+        AggregationParams params = new AggregationParams(request.getParameterMap());
+        int N = params.getNumberOfFiles();
+
+        response.setContentType("text/plain");
+        //response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
+
+        User user = new User(request);
+        int maxResponse = user.getMaxResponseSize();
+
+        FilterAsciiHeaderStream filter = new FilterAsciiHeaderStream(out);
+        filter.set(false);// let the first set of header lines through
+
+        for (int i = 0; i < N; ++i) {
+            String granule = params.getFilename(i);
+            String ce = params.getTableCE(i);
+
+            try {
+                writeSingleFormattedGranule(granule, ce, filter, maxResponse, ResponseFormat.ascii);
+                filter.set(true);// filter out all the remaining header lines
+            } catch (IOException ioe) {
+                out.println("Aggregation error building table of values: " + ioe.getMessage());
+
+                logError(ioe, "in writeGranulesSingleTable():");
+            }
+        }
     }
 
     @Override
@@ -478,6 +523,9 @@ public class AggregationServlet extends HttpServlet {
                     break;
                 case "/ascii":
                     writeFormattedGranules(request, response, out, ResponseFormat.ascii);
+                    break;
+                case "/csv":
+                    writeGranulesSingleTable(request, response, out);
                     break;
                 default:
                     throw new Exception(invocationError + requestedResourceId);
@@ -539,6 +587,9 @@ public class AggregationServlet extends HttpServlet {
                 case "/ascii":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=ascii.zip");
+                    break;
+                case "/csv":
+                    response.setContentType("text/plain");
                     break;
 
                 default:
