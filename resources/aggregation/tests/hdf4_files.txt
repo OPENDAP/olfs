@@ -1,3 +1,4 @@
+&operation=netcdf3
 &var=Latitude,Longitude
 &file=/data/hdf4/MOD04_L2.A2015021.0020.051.NRT.hdf
 &file=/data/hdf4/MOD04_L2.A2015021.0025.051.NRT.hdf
