@@ -41,12 +41,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
-
 public class FilterAsciiHeaderStreamTest {
 
-    FileInputStream _in;
-    FilterAsciiHeaderStream _out;
+    private FileInputStream _in;
+    private FilterAsciiHeaderStream _out;
 
     /**
      * Use the single character version of write() to output one char at
@@ -70,11 +68,13 @@ public class FilterAsciiHeaderStreamTest {
         }
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Before
     public void setUp() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @After
     public void tearDown() throws Exception {
 

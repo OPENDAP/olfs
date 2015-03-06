@@ -29,7 +29,6 @@ package opendap.aggregation;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
@@ -71,14 +70,14 @@ import java.util.zip.ZipOutputStream;
  * although not particularly meaningful.
  *
  * How to call this service:
- * /version: Get the version of this servlet. Includes BES version info too.
+ * &operation=version: Get the version of this servlet. Includes BES version info too.
  *
- * /file: Given a list of files, return them in a zip archive. Each file is named
+ * &operation=file: Given a list of files, return them in a zip archive. Each file is named
  * using &file=<path on the BES>. Both GET and POST are supported. In the case of
  * POST, the &file=<path on the BES> entries may be separated by a newline. The
  * 'file' param must be supplied.
  *
- * /netcdf3: Like 'file' above, but all data are returned in netCDF3 files. In addition,
+ * &operation=netcdf3: Like 'file' above, but all data are returned in netCDF3 files. In addition,
  * each file has an associated constraint expression, specified using &var=<var1>,
  * <var2>, ..., <varn>. This is required. If only one 'var' param is given, that constraint
  * is applied to every file.  If more than one 'var' param is supplied, the number must
@@ -89,16 +88,25 @@ import java.util.zip.ZipOutputStream;
  * must not be empty if &bbox is used, otherwise, if &var it is empty,
  * the entire file contents will be returned.
  *
+ * &operation=netcdf4: Like 'netcdf3', but the individual response files use netCDF4
+ * &operation=ascii: Like 'netcdf4', but using the DAP ASCII format - this is not the
+ * tabular data option.
+ *
+ * &operation=csv: Convert the arrays listed in 'var' into a table, and optionally restrict
+ * the values to those defined by the bounding box(es) given using the bbox parameter.
+ * All of the values are returned in a single table.
+ *
  * Example use:
  *
  * Suppose 'hdf4_files.txt' contains:
  *
+ * &operation=netcdf3
  * &ce=Sensor_Azimuth,Sensor_Zenith
  * &file=/data/hdf4/MOD04_L2.A2015021.0020.051.NRT.hdf
  * &file=/data/hdf4/MOD04_L2.A2015021.0025.051.NRT.hdf
  * &file=/data/hdf4/MOD04_L2.A2015021.0030.051.NRT.hdf
  *
- * curl -X POST -d @hdf4_files.txt http://localhost:8080/opendap/aggregation/netcdf3 -o data.zip
+ * curl -X POST -d @hdf4_files.txt http://localhost:8080/opendap/aggregation -o data.zip
  *
  * Will call the servlet, using the data in 'hdf4_files.txt' as the contents of the
  * HTTP request document body (i.e., using POST) and save the response to 'data.zip'.
@@ -121,8 +129,9 @@ public class AggregationServlet extends HttpServlet {
     private BesApi _besApi;
     private Set<String> _granuleNames;
 
-    private static final String invocationError = "I expected '/version', '/file', '/netcdf3', '/netcdf4', '/ascii' or '/csv' but got: ";
-    private static final String versionInfo = "Aggregation Interface Version: 1.0";
+    private static final String invocationError =
+            "I expected the operation to be one of: version, file, netcdf3, netcdf4, ascii or csv but got: ";
+    private static final String versionInfo = "Aggregation Interface Version: 1.1";
 
     @Override
     public void init() throws ServletException {
@@ -446,8 +455,6 @@ public class AggregationServlet extends HttpServlet {
     /**
      * Get the values from a number of data files in a single CSV-format table.
      *
-     * @note This version of the method does not do any sanity checking; caveat emptor.
-     *
      * @param request The HttpServletRequest object
      * @param response The HttpServletResponse object
      * @param out where to write the response
@@ -485,6 +492,79 @@ public class AggregationServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Do the work of processing the request and returning a response. This code
+     * is broken out so that the doGet() method can handle redirecting URLs that
+     * don't end in a slash, which will break web pages that might be associated
+     * with this service. The doPut(), on the other hand does not care and should
+     * not be issuing redirects (doing so will break curl, e.g., when it is used
+     * with -X POST.
+     *
+     * @param request The HttpServletRequest object
+     * @param response The HttpServletResponse object
+     * @throws IOException
+     */
+    private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // forget the names used in/by previous requests
+        _granuleNames.clear();
+
+        ServletOutputStream out = response.getOutputStream();
+
+        try {
+            RequestCache.openThreadCache();
+
+            // String requestKind = ReqInfo.getLocalUrl(request);
+            String requestKind = request.getParameter("operation");
+            if (requestKind == null)
+                requestKind = "nothing - the operation parameter was not supplied.";
+
+            _log.debug("Aggregation: The requested operation is: {}", requestKind);
+
+            switch (requestKind) {
+                case "version":
+                    writeAggregationVersion(request, response, out);
+                    break;
+                case "file":
+                    writePlainGranules(request, response, out);
+                    break;
+                case "netcdf3":
+                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf3);
+                    break;
+                case "netcdf4":
+                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf4);
+                    break;
+                case "ascii":
+                    writeFormattedGranules(request, response, out, ResponseFormat.ascii);
+                    break;
+                case "csv":
+                    writeGranulesSingleTable(request, response, out);
+                    break;
+                default:
+                    throw new Exception(invocationError + requestKind);
+            }
+        }
+        catch (BadConfigurationException | PPTException | JDOMException e) {
+            out.println("Aggregation Error: " + e.getMessage());
+
+            logError(e, "in doGet(), caught an BadConfiguration, PPT or JDOM Exception:");
+        }
+        catch (Exception e) {
+            out.println("Aggregation Error: " + e.getMessage());
+
+            logError(e, "in doGet(), caught an Exception:");
+        }
+        catch (Throwable t) {
+            out.println("Aggregation Error: " + t.getMessage());
+
+            logError(t, "in doGet():");
+        }
+        finally {
+            RequestCache.closeThreadCache();
+        }
+
+        out.flush();
+    }
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -497,61 +577,9 @@ public class AggregationServlet extends HttpServlet {
             return;
         }
 
-        // forget the names used in/by previous requests
-        _granuleNames.clear();
+        processRequest(request, response);
 
-        ServletOutputStream out = response.getOutputStream();
 
-        try {
-            RequestCache.openThreadCache();
-
-            String requestedResourceId = ReqInfo.getLocalUrl(request);
-            _log.debug("Aggregation: The resource ID is: {}", requestedResourceId);
-
-            switch (requestedResourceId) {
-                case "/version":
-                    writeAggregationVersion(request, response, out);
-                    break;
-                case "/file":
-                    writePlainGranules(request, response, out);
-                    break;
-                case "/netcdf3":
-                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf3);
-                    break;
-                case "/netcdf4":
-                    writeFormattedGranules(request, response, out, ResponseFormat.netcdf4);
-                    break;
-                case "/ascii":
-                    writeFormattedGranules(request, response, out, ResponseFormat.ascii);
-                    break;
-                case "/csv":
-                    writeGranulesSingleTable(request, response, out);
-                    break;
-                default:
-                    throw new Exception(invocationError + requestedResourceId);
-            }
-		}
-        catch (BadConfigurationException | PPTException | JDOMException e) {
-			out.println("Aggregation Error: " + e.getMessage());
-
-            logError(e, "in doGet(), caught an BadConfiguration, PPT or JDOM Exception:");
-		}
-        catch (Exception e) {
-            out.println("Aggregation Error: " + e.getMessage());
-
-            logError(e, "in doGet(), caught an Exception:");
-        }
-        catch (Throwable t) {
-            out.println("Aggregation Error: " + t.getMessage());
-
-            logError(t, "in doGet():");
-        }
-        finally {
-        	RequestCache.closeThreadCache();
-        }
-
-        out.flush();
-        
         _log.debug("doGet() - END");
     }
 
@@ -564,36 +592,37 @@ public class AggregationServlet extends HttpServlet {
         ServletOutputStream out = response.getOutputStream();
 
         try {
-            RequestCache.openThreadCache();
+            // RequestCache.openThreadCache(); // I don't think we need this - ask Nathan
 
-            String requestedResourceId = ReqInfo.getLocalUrl(request);
+            String requestKind = request.getParameter("operation");
+            _log.debug("Aggregation: The requested operation is: {}", requestKind);
 
-            switch (requestedResourceId) {
-                case "/version":
+            switch (requestKind) {
+                case "version":
                     response.setContentType("text/plain");
                     break;
-                case "/file":
+                case "file":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=file.zip");
                     break;
-                case "/netcdf3":
+                case "netcdf3":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
                     break;
-                case "/netcdf4":
+                case "netcdf4":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=netcdf4.zip");
                     break;
-                case "/ascii":
+                case "ascii":
                     response.setContentType("application/x-zip-compressed");
                     response.setHeader("Content-Disposition", "attachment; filename=ascii.zip");
                     break;
-                case "/csv":
+                case "csv":
                     response.setContentType("text/plain");
                     break;
 
                 default:
-                    throw new Exception(invocationError + requestedResourceId);
+                    throw new Exception(invocationError + requestKind);
             }
         }
         catch (Throwable t) {
@@ -616,14 +645,14 @@ public class AggregationServlet extends HttpServlet {
 
         _log.debug("doPost() - BEGIN");
 
-        doGet(request, response);
+        processRequest(request, response);
 
         _log.debug("doPost() - END");
     }
 
     /**
      * Copied from the EchoServlet written by Nathan, this was used to debug
-     * processing GET and POST requests and is called only when the /version
+     * processing GET and POST requests and is called only when the 'version'
      * response is requested and logback is in DEBUG mode.
      *
      * @param request The HttpServletRequest

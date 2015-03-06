@@ -26,6 +26,8 @@
 
 package opendap.aggregation;
 
+import com.sun.istack.internal.NotNull;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,14 +57,14 @@ import java.io.OutputStream;
  *
  * Created by jimg on 3/5/15.
  */
-public class FilterAsciiHeaderStream extends FilterOutputStream {
+class FilterAsciiHeaderStream extends FilterOutputStream {
 
     // Track if the header has been found.
-    boolean _found_header;
+    private boolean _found_header;
     private boolean _found_first_newline;
 
     // Write stuff to this stream.
-    OutputStream _out;
+    private final OutputStream _out;
 
     public FilterAsciiHeaderStream(OutputStream out) {
         super(out);
@@ -95,6 +97,7 @@ public class FilterAsciiHeaderStream extends FilterOutputStream {
      *          two line header has not yet been seen.
      * @throws IOException
      */
+    @Override
     public void write(int b) throws IOException {
         if (_found_header) {
             _out.write(b);
@@ -120,7 +123,8 @@ public class FilterAsciiHeaderStream extends FilterOutputStream {
      * @param b The byte array to send
      * @throws IOException
      */
-    public void write(byte[] b) throws IOException {
+    @Override
+    public void write(@NotNull byte[] b) throws IOException {
         if (_found_header) {
             _out.write(b, 0, b.length);
         }
@@ -141,7 +145,8 @@ public class FilterAsciiHeaderStream extends FilterOutputStream {
      * @param len send this many bytes
      * @throws IOException
      */
-    public void write(byte[] b, int off, int len) throws IOException {
+    @Override
+    public void write(@NotNull byte[] b, int off, int len) throws IOException {
         if (_found_header) {
             _out.write(b, off, len);
         }

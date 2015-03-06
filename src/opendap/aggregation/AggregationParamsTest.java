@@ -37,11 +37,11 @@ import java.util.Map;
 
 public class AggregationParamsTest {
 
-    AggregationParams params_1, params_2;
-    AggregationParams bbox_1, bbox_2, bbox_error;
+    private AggregationParams params_1, params_2;
+    private AggregationParams bbox_1, bbox_2;
 
     private Map<String, String[]> buildMap(String file_values[], String var_values[]) {
-        Map<String, String[]> theMap = new HashMap<String, String[]>();
+        Map<String, String[]> theMap = new HashMap<>();
 
         theMap.put("file", file_values);
         theMap.put("var", var_values);
@@ -73,6 +73,7 @@ public class AggregationParamsTest {
         bbox_2 = new AggregationParams(buildMap(file_values, var, bbox));
     }
 
+    @SuppressWarnings("EmptyMethod")
     @After
     public void tearDown() throws Exception {
 

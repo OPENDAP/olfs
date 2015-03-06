@@ -61,8 +61,8 @@ public class AggregationParams {
 
     // Very OO, but I'm not sure it's an improvement over the older way...
     // This does cut down on extra code.
-    private BBoxConstraintBuilder _roiConstraintBuilder = new RoiConstraintBuilder();
-    private BBoxConstraintBuilder _tabularConstraintBuilder = new TabularConstraintBuilder();
+    private final BBoxConstraintBuilder _roiConstraintBuilder = new RoiConstraintBuilder();
+    private final BBoxConstraintBuilder _tabularConstraintBuilder = new TabularConstraintBuilder();
 
     /**
      * If the parameters do not contain any instances of 'file', that is an
@@ -136,11 +136,23 @@ public class AggregationParams {
         error
     }
 
+    /**
+     * Interface to help modularize the parser so that one state machine
+     * can parse the 'bbox expression' and make two different kinds of
+     * output, depending on other parameters. This could be done using
+     * lambdas or a boolean/enum, but I went with this...
+     * (lambdas == Java 8 and I don't want that dependency.)
+     */
     private interface BBoxConstraintBuilder {
         void outputClause(int bboxNumber,  String var, String min, String max, StringBuilder ce);
         void completeExpression(int bboxNumber, StringBuilder ce);
     }
 
+    /**
+     * Build a little subexpression that the caller can mash into a call to
+     * the roi() function. The result is box(var,min,max) or
+     * bbox_union(box(var,min,max),bbox(next_var,min,max), ...,"intersection")
+     */
     private class RoiConstraintBuilder implements BBoxConstraintBuilder {
         public void outputClause(int bboxNumber, String var, String min, String max, StringBuilder ce) {
             // Write out the comma as a separator - don't write this with only one bbox()
@@ -159,6 +171,11 @@ public class AggregationParams {
         }
     }
 
+    /**
+     * Build a little subexpression that can be used to get a Sequence/CSV
+     * response from the BES. The result is '&var>=min&var<=max' for one
+     * var or ''&var1>=min&var1<=max'&var2>=min&var2<=max&...' for N vars
+     */
     private class TabularConstraintBuilder implements BBoxConstraintBuilder {
         public void outputClause(int bboxNumber, String var, String min, String max, StringBuilder ce) {
             ce.append("&").append(var).append(">=").append(min);
@@ -275,13 +292,7 @@ public class AggregationParams {
                     ++bboxNumber;// track the number of bbox() calls
 
                     builder.outputClause(bboxNumber, var, min, max, ce);
-/*
-                    // Write out the comma as a separator - don't write this with only one bbox()
-                    if (bboxNumber > 1)
-                        ce.append(",");
 
-                    ce.append("bbox(").append(var).append(",").append(min).append(",").append(max).append(")");
-*/
                     state = States.start;
                     min = "";
                     max = "";
@@ -291,123 +302,11 @@ public class AggregationParams {
         }
 
         builder.completeExpression(bboxNumber, ce);
-/*
-        // This code takes two or more bbox() calls and wraps them in bbox_union(... , "intersection")
-        if (bboxNumber > 1)
-            ce.insert(0, "bbox_union(");
-        if (bboxNumber > 1)
-            ce.append(",\"intersection\")");
-*/
+
         return ce.toString();
     }
 
     /**
-     * Parse the value of the bbox parameter so that it can be used along with
-     * the tabular() server function.
-     *
-     * @see parseBBoxForRoi
-     * @param bbox
-     * @return
-     * @throws Exception
-     */
-/*
-    private String parseBBoxForTabular(String bbox) throws Exception {
-        if (bbox.isEmpty())
-            return "";
-
-        StringTokenizer tokens = new StringTokenizer(bbox, "[],", true);
-
-        StringBuilder ce = new StringBuilder("");
-
-        States state = States.start;
-        String min = "";
-        String var = "";
-        String max = "";
-
-        int bboxNumber = 0;
-
-        // the states rbracket and error don't read from the token stream, so
-        // run their code even when the stream is empty to ensure the last clause
-        // parses.
-        while (tokens.hasMoreElements() || state == States.rbracket || state == States.error) {
-            String token;
-
-            switch(state) {
-                case start:
-                    token = tokens.nextToken();
-                    if (token.equals("["))
-                        state = States.lbracket;
-                    else
-                        state = States.error;
-                    break;
-
-                case lbracket:
-                    token = tokens.nextToken();
-                    if (token.contains("[],"))
-                        state = States.error;
-                    else {
-                        min = token;
-                        state = States.min_val;
-                    }
-                    break;
-
-                case min_val:
-                    token = tokens.nextToken();
-                    if (token.equals(","))
-                        state = States.comma;
-                    else
-                        state = States.error;
-                    break;
-
-                case comma:
-                    token = tokens.nextToken();
-                    if (token.contains("[],"))
-                        state = States.error;
-                    else if (var.equals("")) {
-                        var = token;
-                        state = States.variable;
-                    }
-                    else {
-                        max = token;
-                        state = States.max_val;
-                    }
-                    break;
-
-                case variable:
-                    token = tokens.nextToken();
-                    if (token.equals(","))
-                        state = States.comma;
-                    else
-                        state = States.error;
-                    break;
-
-                case max_val:
-                    token = tokens.nextToken();
-                    if (token.equals("]"))
-                        state = States.rbracket;
-                    else
-                        state = States.error;
-                    break;
-
-                case error:
-                    throw new Exception("The value of the parameter 'bbox' does not parse: '" + bbox + "'");
-
-                case rbracket:
-                    ce.append("&").append(var).append(">=").append(min);
-                    ce.append("&").append(var).append("<=").append(max);
-
-                    state = States.start;
-                    min = "";
-                    max = "";
-                    var= "";
-                    break;
-            }
-        }
-
-        return ce.toString();
-    }
-**/
-
     /**
      * Return the number of files/granules in the current set of query
      * parameters.
@@ -490,7 +389,7 @@ public class AggregationParams {
      * the BES when the caller has requested that the values be returned
      * in a single table of CSV values
      *
-     * @see getArrayCE
+     * @see AggregationParams#getArrayCE
      * @param i Build the CE for the ith file/granule
      * @return The correct BES/DAP CE
      */
