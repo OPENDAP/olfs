@@ -1,0 +1,8 @@
+file.txt
+col1, col2, col3
+data1, data2, data3
+test1, test2, test3
+value1, value2, value3
+data4, data5, data6
+test4, test5, test6
+value4, value5, value6
