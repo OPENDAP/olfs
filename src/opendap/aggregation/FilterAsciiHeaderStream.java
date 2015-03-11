@@ -26,7 +26,9 @@
 
 package opendap.aggregation;
 
-import com.sun.istack.internal.NotNull;
+// IJ Idea added this for @NotNull but the import is not found by the ant build.
+// jhrg 3/11/15
+// import com.sun.istack.internal.NotNull;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -120,11 +122,16 @@ class FilterAsciiHeaderStream extends FilterOutputStream {
     /**
      * Write out the byte array, first stripping a two line header
      * if it has not already been found and removed.
+     *
+     * NB: IJ Idea suggested adding @NotNull to qualify the byte[] b but
+     * doing so break the ant build (it works fine in the IDE). See the
+     * above comment. jhrg 3/11/15
+     *
      * @param b The byte array to send
      * @throws IOException
      */
     @Override
-    public void write(@NotNull byte[] b) throws IOException {
+    public void write(/* @NotNull */ byte[] b) throws IOException {
         if (_found_header) {
             _out.write(b, 0, b.length);
         }
@@ -146,7 +153,7 @@ class FilterAsciiHeaderStream extends FilterOutputStream {
      * @throws IOException
      */
     @Override
-    public void write(@NotNull byte[] b, int off, int len) throws IOException {
+    public void write(/* @NotNull */  byte[] b, int off, int len) throws IOException {
         if (_found_header) {
             _out.write(b, off, len);
         }
