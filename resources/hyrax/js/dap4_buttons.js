@@ -611,7 +611,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      * 
-     * dap_var.getCE()
+     * dap_var.getArrayCE()
      * 
      * Returns the constraint expression clause associated with this 
      * and (if it's a container) its children.
