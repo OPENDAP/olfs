@@ -97,7 +97,6 @@ public class Version  {
 
     }
 
-
     /**
      *  Produce the ServerUUID value used by the top level of Hyrax.
      * @return The UUID.

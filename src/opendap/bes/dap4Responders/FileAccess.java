@@ -34,8 +34,9 @@ import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
+import opendap.dap.Request;
 import opendap.ppt.PPTException;
-import org.apache.commons.httpclient.HttpStatus;
+// import org.apache.commons.httpclient.HttpStatus;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
@@ -122,27 +123,27 @@ public class FileAccess extends Dap4Responder {
                     else {
                         String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(resourceID);
                         log.info("respondToHttpGetRequest() - {}", errMsg);
-                        sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+                        sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
                     }
                 }
                 else {
                     String errMsg = "BES data source {} is not accessible." + Scrub.completeURL(resourceID);
                     log.info("respondToHttpGetRequest() - {}", errMsg);
-                    sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+                    sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
                 }
 
             }
             else {
                 String errMsg = "You may not downloadJobOutput nodes/directories, only files." + Scrub.completeURL(resourceID);
                 log.info("respondToHttpGetRequest() - {}", errMsg);
-                sendHttpErrorResponse(HttpStatus.SC_FORBIDDEN, errMsg, "docs", response);
+                sendHttpErrorResponse(HttpServletResponse.SC_FORBIDDEN, errMsg, "docs", response);
             }
 
         }
         else {
             String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(resourceID);
             log.info("matches() - {}", errMsg);
-            sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+            sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
         }
 
 
@@ -209,7 +210,7 @@ public class FileAccess extends Dap4Responder {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String serviceUrl = ReqInfo.getServiceUrl(request);
+        String serviceUrl = new Request(null,request).getServiceUrl();
 
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");

@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -40,7 +41,7 @@ import java.util.Enumeration;
 
 public class ServletUtil {
 
-    static private org.slf4j.Logger log = LoggerFactory.getLogger(ServletUtil.class);;
+    static private org.slf4j.Logger log = LoggerFactory.getLogger(ServletUtil.class);
 
     //public static final String DEFAULT_CONTEXT_PATH = "opendap";
 
@@ -99,6 +100,71 @@ public class ServletUtil {
 
 
 
+
+    /**
+     * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
+     * keep service related content such as:
+     *   <ui>
+     *     <li>Configuration information</li>
+     *     <li>THREDDS catalog files.</li>
+     *     <li>Log files</li>
+     *   </ui>
+     *
+     * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
+     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
+     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
+     *
+     * @param sc  The ServletContext for this servlet that is running.
+     * @return  A String containing the content path (aka the peristent content path) for the web application.
+     */
+    public static String getConfigPath(ServletContext sc, String configDirPropertyName) {
+
+
+
+        String confDir = System.getProperty(configDirPropertyName);
+
+        if(confDir!=null) {
+            if(pathIsGood(confDir)){
+                return confDir;
+            }
+        }
+
+        confDir  = "/etc/olfs"+ sc.getContextPath();
+        if(pathIsGood(confDir)){
+            return confDir;
+        }
+
+        confDir ="FAILED_To_Determine_Config_Path!";
+        String webappConfig = "WEB-INF/conf/";
+
+        String filename =  Scrub.fileName(getRootPath(sc) + webappConfig);
+
+        File cf = new File( filename );
+        try{
+            confDir = cf.getCanonicalPath() +"/";
+            confDir = confDir.replace('\\','/');
+
+        } catch (IOException e) {
+            log.error("Failed to produce a confDir! Error: "+e.getMessage());
+         }
+        log.debug("confDir: '"+confDir+"'");
+      return confDir;
+    }
+
+    private static boolean pathIsGood(String path){
+
+        File confDirPath = new File(path);
+
+        return  confDirPath.exists() || confDirPath.canRead();
+
+
+    }
+
+
+
+
+
+
     /**
      * Returns the path to the web applications "context" directory as defined by the value of the
      * web appications &lt;initParameter&gt; ContextPath. This directory is where the web application is unpacked. It
@@ -113,7 +179,7 @@ public class ServletUtil {
      * Code in many DispatchHandlers uses this path string to locate required files for use during
      * runtime.
      *
-     * @param servlet
+     * @param servlet Servlet instance to evaluate
      * @return Returns the path to the web applications "context" directory
      */
     public static String getContextPath( HttpServlet servlet ) {
@@ -135,7 +201,7 @@ public class ServletUtil {
      * Code in many DispatchHandlers uses this path string to locate required files for use during
      * runtime.
      *
-     * @param sc
+     * @param sc ServletContext to evaluate
      * @return Returns the path to the web applications "context" directory
      */
     public static String getContextPath( ServletContext sc ) {
@@ -318,6 +384,114 @@ public class ServletUtil {
 
 
     /**
+     * Writes information about the incomming request to a String.
+     * @param req The current request
+     * @param reqno The request number.
+     * @return A string containing infformation about the passed HttpServletRequest req
+     */
+    public static String showRequest(HttpServletRequest req, long reqno) {
+
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("\n-------------------------------------------\n");
+        sb.append("showRequest()\n");
+        sb.append("  Request #").append(reqno).append("\n");
+        sb.append("  HttpServletRequest Object:\n");
+        sb.append("    getServerName():          ").append(req.getServerName()).append("\n");
+        sb.append("    getServerPort():          ").append(req.getServerPort()).append("\n");
+        sb.append("    getProtocol():            ").append(req.getProtocol()).append("\n");
+        sb.append("    getScheme():              ").append(req.getScheme()).append("\n");
+
+
+        sb.append("    getRemoteHost():          ").append(req.getRemoteHost()).append("\n");
+        sb.append("    getRemoteUser():          ").append(req.getRemoteUser()).append("\n");
+        sb.append("    getRequestURL():          ").append(req.getRequestURL()).append("\n");
+        sb.append("    getRequestURI():          ").append(req.getRequestURI()).append("\n");
+        sb.append("    getContextPath():         ").append(req.getContextPath()).append("\n");
+        sb.append("    getQueryString():         ").append(req.getQueryString()).append("\n");
+        sb.append("    getAuthType():            ").append(req.getAuthType()).append("\n");
+        sb.append("    getMethod():              ").append(req.getMethod()).append("\n");
+        sb.append("    getPathInfo():            ").append(req.getPathInfo()).append("\n");
+        sb.append("    getPathTranslated():      ").append(req.getPathTranslated()).append("\n");
+        sb.append("    getRequestedSessionId():  ").append(req.getRequestedSessionId()).append("\n");
+
+        sb.append("    getServletPath():         ").append(req.getServletPath()).append("\n");
+
+        sb.append("    getCharacterEncoding():   ").append(req.getCharacterEncoding()).append("\n");
+        sb.append("    getContentType():         ").append(req.getContentType()).append("\n");
+        sb.append("    getLocalAddr():           ").append(req.getLocalAddr()).append("\n");
+        sb.append("    getLocalName():           ").append(req.getLocalName()).append("\n");
+
+        sb.append("  HttpServletRequest Attributes: \n");
+        
+        Enumeration attrNames =  req.getAttributeNames();
+        while(attrNames.hasMoreElements()){
+            String attrName = (String) attrNames.nextElement();
+            Object value = req.getAttribute(attrName);
+            sb.append("    ").append(value.getClass().getName()).append(" ").append(attrName).append("='");
+            sb.append(value.toString()).append("'\n");
+
+        }
+
+        sb.append(showSession(req.getSession(true)));
+
+        sb.append("  Request Info:\n");
+        sb.append("    localUrl:                  '").append(ReqInfo.getLocalUrl(req)).append("'\n");
+        sb.append("    dataSetName:               '").append(ReqInfo.getDataSetName(req)).append("'\n");
+        sb.append("    requestSuffixRegex:             '").append(ReqInfo.getRequestSuffix(req)).append("'\n");
+        sb.append("    CE:                        '");
+        try {
+            sb.append(ReqInfo.getConstraintExpression(req)).append("'\n");
+        } catch (IOException e) {
+            sb.append("Encountered IOException when attempting get the constraint expression! Msg: ").append(e.getMessage()).append("\n");
+        }
+        sb.append("\n");
+        sb.append("ReqInfo:\n");
+        sb.append(ReqInfo.toString(req));
+        sb.append("-------------------------------------------");
+
+        return sb.toString();
+
+    }
+
+
+    public static String showSession(HttpSession session) {
+
+        StringBuilder sb = new StringBuilder();
+
+
+
+        sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
+        sb.append("  Session: \n");
+        sb.append("    getId():                   ").append(session.getId()).append("\n");
+        sb.append("    getCreationTime():         ").append(session.getCreationTime()).append("\n");
+        sb.append("    getLastAccessedTime():     ").append(session.getLastAccessedTime()).append("\n");
+        sb.append("    getMaxInactiveInterval():  ").append(session.getMaxInactiveInterval()).append("\n");
+
+
+        sb.append("    Attributes: \n");
+        Enumeration attrNames =  session.getAttributeNames();
+        while(attrNames.hasMoreElements()){
+            String attrName = (String) attrNames.nextElement();
+            Object value = session.getAttribute(attrName);
+            sb.append("      ").append(value.getClass().getName()).append(" ").append(attrName).append("=\"");
+            sb.append(value.toString()).append("\"\n");
+
+        }
+
+
+        sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
+
+
+        return sb.toString();
+
+    }
+
+
+
+
+
+    /**
      * ************************************************************************
      * This is a bit of instrumentation that I kept around to let me look at the
      * state of the incoming <code>HttpServletRequest</code> from the client.
@@ -490,39 +664,6 @@ public class ServletUtil {
         probeMsg.append("\n");
 
         return probeMsg.toString();
-
-    }
-
-    /**
-     * Writes information about the incomming request to a String.
-     * @param req The current request
-     * @param reqno The request number.
-     * @return A string containing infformation about the passed HttpServletRequest req
-     */
-    public static String showRequest(HttpServletRequest req, long reqno) {
-
-        String msg = "\n-------------------------------------------\n";
-        msg += "showRequest():\n";
-        msg += "  Request #" + reqno + "\n";
-        msg += "  Client:  " + req.getRemoteHost() + "\n";
-        msg += "  Request Info:\n";
-        msg += "    baseURI:                   '" + ReqInfo.getServiceUrl(req) + "'\n";
-        msg += "    localUrl:                  '" + ReqInfo.getLocalUrl(req) + "'\n";
-        msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
-        msg += "    requestSuffixRegex:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
-        msg += "    CE:                        '";
-        try {
-            msg +=  ReqInfo.getConstraintExpression(req) + "'\n";
-        } catch (IOException e) {
-            msg += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
-        }
-        msg += "\n";
-        msg += "    getPathInfo():             '" + req.getPathInfo()+"'\n";
-        msg +="ReqInfo:\n";
-        msg += ReqInfo.toString(req);
-        msg += "-------------------------------------------";
-
-        return msg;
 
     }
 }

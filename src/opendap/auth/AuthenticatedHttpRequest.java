@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2014 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -24,51 +24,58 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.wcs.v1_1_2.http;
-
-import opendap.coreServlet.ReqInfo;
-import opendap.dap.Request;
+package opendap.auth;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.security.Principal;
+import java.util.HashSet;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Oct 21, 2010
- * Time: 3:43:11 PM
- * To change this template use File | Settings | File Templates.
+ * Created by ndp on 10/7/14.
  */
-public class Util {
-    /***************************************************************************/
 
+public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
 
+    private String _uid;
+    private HashSet<String> _groups;
 
+    public AuthenticatedHttpRequest(HttpServletRequest request) {
+        super(request);
+        _groups = new HashSet<String>();
+    }
 
-    public static String getServiceUrlString(HttpServletRequest request, String prefix){
-        String serviceURL = getServiceUrl(request);
+    public void setUid(String uid){
+        _uid = uid;
 
-        if (!prefix.equals("")) {
-            if (!serviceURL.endsWith("/")) {
-                if (prefix.startsWith("/"))
-                    serviceURL += prefix;
-                else
-                    serviceURL += "/" + prefix;
+    }
 
-            } else {
-                if (prefix.startsWith("/"))
-                    serviceURL += serviceURL.substring(0, serviceURL.length() - 1) + prefix;
-                else
-                    serviceURL += prefix;
+    public boolean addRole(String role){
+        return _groups.add(role);
 
+    }
+
+    @Override
+    public String getRemoteUser(){
+        return _uid;
+    }
+
+    @Override
+    public Principal getUserPrincipal(){
+        return new Principal() {
+            @Override
+            public String getName() {
+                return _uid;
             }
-        }
-        return serviceURL;
-
+        };
     }
 
-    public static String getServiceUrl(HttpServletRequest request){
-        return new Request(null,request).getServiceUrl();
+    @Override
+    public boolean isUserInRole(String roleName){
+        return false;
     }
+
 
 
 }
+

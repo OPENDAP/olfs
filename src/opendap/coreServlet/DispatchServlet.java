@@ -296,7 +296,7 @@ public class DispatchServlet extends HttpServlet {
                     log.error(msg);
                     throw new ServletException(msg, e);
                 } catch (ClassCastException e) {
-                    msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
+                    msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
                     log.error(msg);
                     throw new ServletException(msg, e);
                 } catch (Exception e) {
@@ -433,6 +433,9 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             String tKey = Timer.start();
+
+            RequestCache.openThreadCache();
+
             try {
 
                 if(LicenseManager.isExpired(request)){
@@ -441,7 +444,6 @@ public class DispatchServlet extends HttpServlet {
                 }
 
 
-                RequestCache.openThreadCache();
 
                 int reqno = reqNumber.incrementAndGet();
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));

@@ -28,6 +28,7 @@ package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
+import opendap.dap.Request;
 import org.jdom.Element;
 
 import javax.servlet.ServletOutputStream;
@@ -222,7 +223,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String serviceUrl = ReqInfo.getServiceUrl(request);
+        String serviceUrl = new Request(null, request).getServiceUrl();
 
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");

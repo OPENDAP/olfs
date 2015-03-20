@@ -30,7 +30,12 @@ import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import opendap.dap.Request;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -142,7 +147,7 @@ public class QueryParameters {
 
                 if(key.equals(STORE_RESULT)){
                     setIsStoreResultRequest(true);
-                    setStoreResultRequestServiceUrl(ReqInfo.getServiceUrl(req));
+                    setStoreResultRequestServiceUrl(new Request(null, req).getServiceUrl());
                     dropList.add(key);
                 }
                 if(key.equals(CONSTRAINT_EXPRESSION)){

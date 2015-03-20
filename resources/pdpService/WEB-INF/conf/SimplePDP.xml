@@ -1,0 +1,61 @@
+
+<PDPService >
+
+
+    <!--  <RequireSecureTransport /> -->
+
+
+    <PolicyDecisionPoint class="opendap.auth.SimplePDP">
+        <Policy class="opendap.auth.RegexPolicy">
+            <role>.*</role>
+            <resource>.*(/|\.(css|png|jpg|ico|gif|xsl|jsp)|/contents.html|/catalog.html|/catalog.xml)$</resource>
+            <queryString>.*$</queryString>
+            <allowedAction>GET</allowedAction>
+        </Policy>
+        <Policy class="opendap.auth.RegexPolicy">
+            <role>guest</role>
+            <resource>.*\.(dds|html|das|ddx)$</resource>
+            <queryString>.*$</queryString>
+            <allowedAction>GET</allowedAction>
+        </Policy>
+        <Policy class="opendap.auth.RegexPolicy">
+            <role>manager</role>
+            <resource>.*$</resource>
+            <queryString>.*$</queryString>
+            <allowedAction>GET</allowedAction>
+            <allowedAction>POST</allowedAction>
+        </Policy>
+        <Memberships>
+           <group id="guest" >
+               <user id="GUEST" />
+           </group>
+
+           <group id="users" >
+               <user id="ndp_opendap" />
+               <user id="jhrg" />
+           </group>
+
+           <group id="cmip" >
+               <user id="ndp_opendap" />
+           </group>
+
+           <group id="managers" >
+               <user id="root" />
+               <user id="ndp_opendap" />
+               <user id="jhrg" />
+           </group>
+
+           <role id="manager">
+               <group id="managers" />
+               <group id="cmip" />
+           </role>
+
+           <role id="guest">
+               <group id="guest" />
+           </role>
+
+        </Memberships>
+
+    </PolicyDecisionPoint>
+
+</PDPService>
