@@ -27,14 +27,32 @@
 <PolicyEnforcementPointFilter>
 
 
+    <!-- This PDP definition allows everyone access to everything -->
+    <PolicyDecisionPoint class="opendap.auth.SimplePDP">
+        <Policy class="opendap.auth.RegexPolicy">
+            <role>.*$</role>
+            <resource>.*$</resource>
+            <queryString>.*$</queryString>
+            <allowedAction>GET</allowedAction>
+            <allowedAction>POST</allowedAction>
+        </Policy>
+        <Memberships>
+        </Memberships>
+    </PolicyDecisionPoint>
+
+
+
+
     <!-- You can use a RemotePDP -->
     <!-- PolicyDecisionPoint class="opendap.auth.RemotePDP">
         <PDPServiceEndpoint>http://localhost:8080/pdp</PDPServiceEndpoint>
     </PolicyDecisionPoint -->
 
 
+
+
     <!-- You can use an in memory local PDP -->
-    <PolicyDecisionPoint class="opendap.auth.SimplePDP">
+    <!-- PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*</role>
             <resource>.*(/|\.(css|png|jpg|ico|gif|xsl|jsp)|/contents.html|/catalog.html|/catalog.xml)$</resource>
@@ -85,7 +103,7 @@
     
         </Memberships>
 
-    </PolicyDecisionPoint>
+    </PolicyDecisionPoint -->
 
 
 
