@@ -11,4 +11,15 @@ out
 ## Build dir
 build
 
+# Is there a file called ']' somewhere in this project? jhrg 3/11/15
 ]
+
+##
+.classpath
+.project
+
+## Emacs backup files
+*~
+
+## aggregation servlet
+src/opendap/aggregation/AggregationServletTest.java.broken

@@ -1,0 +1,4 @@
+
+The Aggregation servlet.
+
+Builds aggregations by calling the BES iteratively.

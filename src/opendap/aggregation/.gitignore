@@ -1,0 +1,7 @@
+dest.txt
+
+*.zip
+MOD04*.hdf*
+hdf4_*.txt
+
+*.DS_Strore
