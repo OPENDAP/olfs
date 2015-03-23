@@ -302,22 +302,28 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 transformer.setParameter("allowDirectDataSourceAccess","true");
 
 
-
+            String userId = null;
             Principal userPrinciple = request.getUserPrincipal();
             if(userPrinciple != null) {
-                String userId = userPrinciple.getName();
-                transformer.setParameter("userId", userId);
+                userId = userPrinciple.getName();
             }
             else if(request.getRemoteUser()!=null){
-                String userId = request.getRemoteUser();
-                transformer.setParameter("userId", userId);
+                userId = request.getRemoteUser();
 
             }
 
+            if(userId != null){
+                log.debug("xsltDir() - UserId: {}",userId);
+                transformer.setParameter("userId", userId);
+            }
+
+
             if(_loginPath != null) {
+                log.debug("xsltDir() - _loginPath: {}",_loginPath);
                 transformer.setParameter("loginLink", _loginPath);
             }
             if(_logoutPath != null) {
+                log.debug("xsltDir() - _logoutPath: {}",_logoutPath);
                 transformer.setParameter("logoutLink", _logoutPath);
             }
 
