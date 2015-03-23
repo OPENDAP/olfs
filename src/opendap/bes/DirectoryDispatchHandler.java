@@ -304,12 +304,12 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             String userId = null;
             Principal userPrinciple = request.getUserPrincipal();
-            if(userPrinciple != null) {
-                userId = userPrinciple.getName();
-            }
-            else if(request.getRemoteUser()!=null){
+            if(request.getRemoteUser()!=null){
                 userId = request.getRemoteUser();
 
+            }
+            else if(userPrinciple != null) {
+                userId = userPrinciple.getName();
             }
 
             log.debug("xsltDir() - UserId: {}",userId);
