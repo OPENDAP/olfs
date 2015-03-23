@@ -312,18 +312,19 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             }
 
+            log.debug("xsltDir() - UserId: {}",userId);
             if(userId != null){
-                log.debug("xsltDir() - UserId: {}",userId);
                 transformer.setParameter("userId", userId);
             }
 
 
+            log.debug("xsltDir() - _loginPath: {}",_loginPath);
             if(_loginPath != null) {
-                log.debug("xsltDir() - _loginPath: {}",_loginPath);
                 transformer.setParameter("loginLink", _loginPath);
             }
+
+            log.debug("xsltDir() - _logoutPath: {}",_logoutPath);
             if(_logoutPath != null) {
-                log.debug("xsltDir() - _logoutPath: {}",_logoutPath);
                 transformer.setParameter("logoutLink", _logoutPath);
             }
 
