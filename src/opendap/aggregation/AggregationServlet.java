@@ -121,6 +121,8 @@ import java.util.zip.ZipOutputStream;
  *
  * TODO Write a /help response?
  * TODO (Hard) Make  parallel requests to the BES.
+ * TODO Add an option to return tar.gz: 
+ * http://www.selikoff.net/2010/07/28/creating-a-tar-gz-file-in-java/
  *
  * @author James Gallagher <jgallagher@opendap.org>
  */
