@@ -359,6 +359,9 @@
                 <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
 
+                <!-- Exclude the auth code  -->
+                <exclude name="opendap/auth/**"/>
+
                 <!-- Exclude the Metacat code  -->
                 <exclude name="opendap/metacat/**"/>
 

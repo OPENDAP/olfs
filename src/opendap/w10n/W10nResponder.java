@@ -508,7 +508,7 @@ public class W10nResponder  {
         ServletOutputStream sos =  response.getOutputStream();
 
         if(w10nRequest.callback()!=null){
-            sos.print(w10nRequest.callback()+"(");
+            sos.print(Scrub.simpleString(w10nRequest.callback())+"(");
         }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -998,7 +998,7 @@ public class W10nResponder  {
 
         String downloadFileName = Scrub.fileName(name.substring(name.lastIndexOf("/")+1));
 
-        _log.debug("sendFile() downloadFileName: " + downloadFileName );
+        _log.debug("sendFile() downloadFileName: " + downloadFileName);
 
         // I commented these two lines  out because it was incorrectly causing browsers to downloadJobOutput
         // (as opposed to display) EVERY file retrieved.
@@ -1076,7 +1076,7 @@ public class W10nResponder  {
 
 
 
-        sendBadMediaTypeError(mt,response);
+        sendBadMediaTypeError(mt, response);
 
     }
 
@@ -1277,8 +1277,33 @@ public class W10nResponder  {
     }
 
 
+    public static  String  escapeForJson(String s) {
+
+        char[] input = s.toCharArray();
+
+        StringBuilder ss = new StringBuilder();
+
+        // Send all output to the Appendable object ss
+        Formatter formatter = new Formatter(ss, Locale.US);
 
 
+        for (int i = 0; i < input.length;  ++i) {
+            int c = input[i];
+            if (c < 0x20 || c == '\\' || c == '"') {
+
+                formatter.format("\\u%04x", (int)c);
+
+                // C++ version of the appender.
+                // ss << "\\u" << std::setfill('0') << std::setw(4) << std::hex << unsigned(input[i]);
+
+
+            } else {
+                formatter.format("%c", c);
+            }
+        }
+
+        return formatter.toString();
+    }
 
 
 
