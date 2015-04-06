@@ -34,6 +34,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
@@ -117,7 +119,7 @@ public class InheritedMetadataManager {
                     "        <xsl:variable name=\"serviceElement\" select=\"key('service-by-name', $serviceName)\"/>\n" +
                     "\n" +
                     "        <xsl:variable name=\"dapServices\"\n" +
-                    "                      select=\"$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] \"/>\n" +
+                    "                      select=\"$serviceElement[upper-case(@serviceType)='OPENDAP'] | $serviceElement/thredds:service[upper-case(@serviceType)='OPENDAP'] \"/>\n" +
                     "\n" +
                     "        <datasetScanIngest name=\"{$datasetScanName}\">\n" +
                     "\n" +
@@ -133,27 +135,31 @@ public class InheritedMetadataManager {
                     "                        <xsl:when test=\"$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')\">\n" +
                     "                            <xsl:variable name=\"location\"\n" +
                     "                                          select=\"substring($datasetScanLocation,2,string-length($datasetScanLocation))\"/>\n" +
+                    "                            <xsl:comment>location:  <xsl:value-of select=\"$location\" /></xsl:comment>\n" +
                     "                            <xsl:variable name=\"targetURL\" select=\"concat($base,$location)\"/>\n" +
+                    "                            <xsl:comment>targetURL: <xsl:value-of select=\"$targetURL\" /></xsl:comment>\n" +
                     "                            <xsl:value-of select=\"$targetURL\"/>\n" +
                     "                        </xsl:when>\n" +
                     "\n" +
                     "                        <xsl:when test=\"$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))\">\n" +
                     "                            <xsl:variable name=\"targetURL\" select=\"concat($base,'/',$datasetScanLocation)\"/>\n" +
+                    "                            <xsl:comment>targetURL: <xsl:value-of select=\"$targetURL\" /></xsl:comment>\n" +
                     "                            <xsl:value-of select=\"$targetURL\"/>\n" +
                     "                        </xsl:when>\n" +
                     "\n" +
                     "                        <xsl:otherwise>\n" +
                     "                            <xsl:variable name=\"targetURL\" select=\"concat($base,$datasetScanLocation)\"/>\n" +
+                    "                            <xsl:comment>targetURL: <xsl:value-of select=\"$targetURL\" /></xsl:comment>\n" +
                     "                            <xsl:value-of select=\"$targetURL\"/>\n" +
                     "                        </xsl:otherwise>\n" +
                     "\n" +
                     "                    </xsl:choose>\n" +
+
+
                     "\n" +
                     "                </xsl:variable>\n" +
                     "\n" +
-                    "                <metadataRootPath>\n" +
-                    "                    <xsl:value-of select=\"$metadataRootPath\"/>\n" +
-                    "                </metadataRootPath>\n" +
+                    "                <metadataRootPath> <xsl:value-of select=\"$metadataRootPath\"/> </metadataRootPath>\n" +
                     "\n" +
                     "            </xsl:for-each>\n" +
                     "\n" +
@@ -238,11 +244,15 @@ public class InheritedMetadataManager {
             HashMap<String, Vector<Element>> metadataForThisRootPath;
             HashMap<String, Vector<Element>> inheritedServicesForThisRootPath;
 
+
+            log.debug("ingestInheritedMetadata() - datasetIngestTransform: \n{}",transform);
+
             _dsIngestTransformer.transform(cat, baos);
 
 
             dsIngest = sb.build(new ByteArrayInputStream(baos.toByteArray()));
 
+            log.debug("ingestInheritedMetadata() - datasetScanIngest document: \n{}",new XMLOutputter(Format.getPrettyFormat()).outputString(dsIngest));
 
             // Round up all of the services
             Iterator i = dsIngest.getDescendants(new ElementFilter("service",THREDDS.NS));
@@ -263,12 +273,12 @@ public class InheritedMetadataManager {
 
 
             for (Element dsi : ingests) {
-                log.debug("Processing datasetScan '" + dsi.getAttributeValue("name") + "'");
+                log.debug("ingestInheritedMetadata() - Processing datasetScan '" + dsi.getAttributeValue("name") + "'");
 
                 metadataElement = dsi.getChild("metadata", THREDDS.NS);
                 if (metadataElement != null) {
                     metadataElement.detach();
-                    log.debug("Found inherited metadata.");
+                    log.debug("ingestInheritedMetadata() - Found inherited metadata.");
 
 
 
@@ -300,7 +310,11 @@ public class InheritedMetadataManager {
                     Element serviceName = metadataElement.getChild("serviceName", THREDDS.NS);
                     if(serviceName != null){
                         service = serviceByName.get(serviceName.getTextTrim());
-                        inheritedService = getServiceDefintion(service);
+                        if(service != null)
+                            inheritedService = getServiceDefintion(service);
+                        else {
+                            log.error("ingestInheritedMetadata() - Failed to locate service {}", serviceName.getTextTrim());
+                        }
                     }
 
                     // This may be a poorly named variable, the value of metadataRootPath is the place
@@ -310,26 +324,26 @@ public class InheritedMetadataManager {
                         metadataRootPathElement = (Element) metadataRootPathIterator.next();
                         metadataRootPath = metadataRootPathElement.getTextTrim();
                         if (!_inheritedMetadata.contains(metadataRootPath)) {
-                            log.debug("Found new metadataRootPath: '"+metadataRootPath+"' Creating storage HashMap");
+                            log.debug("ingestInheritedMetadata() - Found new metadataRootPath: '"+metadataRootPath+"' Creating storage HashMap");
                             _inheritedMetadata.put(metadataRootPath, new HashMap<String, Vector<Element>>());
                         }
                         metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
                         if (!metadataForThisRootPath.containsKey(catalogKey)) {
-                            log.debug("The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Creating storage Vector");
+                            log.debug("ingestInheritedMetadata() - The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Creating storage Vector");
                             metadataForThisRootPath.put(catalogKey, new Vector<Element>());
                         }
 
                         metadataElements = metadataForThisRootPath.get(catalogKey);
 
-                        log.debug("Adding metadata element to inventory.");
+                        log.debug("ingestInheritedMetadata() - Adding metadata element to inventory.");
                         metadataElements.add(metadataElement);
 
 
                         if(inheritedService!=null){
-                            log.debug("Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
+                            log.debug("ingestInheritedMetadata() - Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
 
                             if (!_inheritedServices.contains(metadataRootPath)) {
-                                log.debug("Creating inherited services storage HashMap for " +
+                                log.debug("ingestInheritedMetadata() - Creating inherited services storage HashMap for " +
                                         "metadataRootPath: '"+metadataRootPath+"'");
                                 _inheritedServices.put(metadataRootPath, new HashMap<String, Vector<Element>>());
                             }
@@ -337,27 +351,27 @@ public class InheritedMetadataManager {
                             inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
 
                             if(!inheritedServicesForThisRootPath.containsKey(catalogKey)){
-                                log.debug("Creating inherited services storage Vector for " +
+                                log.debug("ingestInheritedMetadata() - Creating inherited services storage Vector for " +
                                         "metadataRootPath: '"+metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
                                 inheritedServicesForThisRootPath.put(catalogKey, new Vector<Element>());
                             }
 
 
 
-                            log.debug("Adding service '"+inheritedService.getAttributeValue("name")+
+                            log.debug("ingestInheritedMetadata() - Adding service '"+inheritedService.getAttributeValue("name")+
                                     "' to inherited services inventory for metadataRootPath: "+metadataRootPath+"' " +
                                     "originating from catalogKey: '",catalogKey+"'");
                             Vector<Element> fromThisCatalogKey =  inheritedServicesForThisRootPath.get(catalogKey);
                             fromThisCatalogKey.add(inheritedService);
                         }
-                        log.debug("Adding metadataRootPath '"+metadataRootPath+"'to list of metadataRootPaths " +
+                        log.debug("ingestInheritedMetadata() - Adding metadataRootPath '"+metadataRootPath+"'to list of metadataRootPaths " +
                                 "spawned by catalog '"+catalogKey+"'");
                         metadataRootPaths.add(metadataRootPath);
                     }
                 }
 
             }
-            log.debug("Adding mapping of catalog '"+catalogKey+"' to a collection of metadataRootPaths to inventory.");
+            log.debug("ingestInheritedMetadata() - Adding mapping of catalog '"+catalogKey+"' to a collection of metadataRootPaths to inventory.");
             _catalog2MetadataMap.put(catalogKey, metadataRootPaths.toArray(new String[metadataRootPaths.size()]));
 
         }

@@ -609,7 +609,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             ingestTransformFile = e.getTextTrim();
         }
 
-        log.debug("Configuration file processing complete.");
+        log.debug("init() - Configuration file processing complete.");
 
         /* USe the generic one for now and if later we want to reuse this code we can pass in another on through the
         config */
@@ -621,9 +621,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
             ingestTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/threddsCatalogIngest.xsl");
         }
 
-        log.debug("Using ingest transform file: " + ingestTransformFile);
+        log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
-        log.debug("Processing THREDDS catalog.xml file...");
+        log.debug("init() - Processing THREDDS catalog.xml file...");
 
         String contentPath = ServletUtil.getContentPath(servlet);
         CatalogManager.init(contentPath, ingestTransformFile);
@@ -639,9 +639,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
         fileName = "catalog.xml";
         pathPrefix = s.substring(0, s.lastIndexOf(fileName));
 
-        log.debug("Top Level Catalog - pathPrefix: " + pathPrefix);
-        log.debug("Top Level Catalog - urlPrefix: " + thisUrlPrefix);
-        log.debug("Top Level Catalog - fileName: " + fileName);
+        log.debug("init() - Top Level Catalog - pathPrefix: " + pathPrefix);
+        log.debug("init() - Top Level Catalog - urlPrefix: " + thisUrlPrefix);
+        log.debug("init() - Top Level Catalog - fileName: " + fileName);
 
         /*
         CatalogManager.addRootCatalog(
@@ -651,7 +651,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 useMemoryCache);
         */
 
-        log.debug("Memory report prior to static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
+        log.debug("init() - Memory report prior to static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
 
         CatalogManager.addCatalog(
                 pathPrefix,
@@ -659,12 +659,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 fileName,
                 useMemoryCache);
 
-        log.debug("Memory report post static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
+        log.debug("init() - Memory report post static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
 
-        log.debug("THREDDS catalog.xml (and children thereof) have been ingested.");
+        log.debug("init() - THREDDS catalog.xml (and children thereof) have been ingested.");
 
 
-        log.debug("Loading XSLT for thredds presentation views.");
+        log.debug("init() - Loading XSLT for thredds presentation views.");
 
         // Create a lock for use with the thread-unsafe transformer.
         catalogToHtmlTransformLock = new ReentrantLock(true);
@@ -680,7 +680,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             catalogToHtmlTransform = new Transformer(catalogToHtmlXslt);
 
 
-            log.debug("XSLT file \"" + catalogToHtmlXslt + "\"loaded & parsed. " +
+            log.debug("init() - XSLT file \"" + catalogToHtmlXslt + "\"loaded & parsed. " +
                     "Transfrom object created and cached. " +
                     "Transform lock created.");
         }
@@ -702,7 +702,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build an cache an XSLT transformer for the XSLT document.
             datasetToHtmlTransform = new Transformer(datasetToHtmlXslt);
 
-            log.debug("XSLT file \"" + datasetToHtmlXslt + "\"loaded & parsed. " +
+            log.debug("init() - XSLT file \"" + datasetToHtmlXslt + "\"loaded & parsed. " +
                     "Transfrom object created and cached. " +
                     "Transform lock created.");
         }
@@ -711,7 +711,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
 
 
-        log.info("Initialized.");
+        log.info("init() - Initialized.");
         initialized = true;
     }
 

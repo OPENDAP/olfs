@@ -31,6 +31,8 @@ import opendap.ncml.NcmlManager;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.util.Iterator;
@@ -135,8 +137,7 @@ public class CatalogManager {
 
 
         Document catDoc = catalog.getCatalogDocument();
-        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        //xmlo.output(catDoc, System.out);
+        _log.debug("addCatalog() - Loaded Catalog document: \n{}",new XMLOutputter(Format.getPrettyFormat()).outputString(catDoc));
 
         Element catRef;
         String href, catFname, thisUrlPrefix, thisPathPrefix;
