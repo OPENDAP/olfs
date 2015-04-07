@@ -1,7 +1,649 @@
+commit 8a902d37758256467066e2b37c3fd83c7fe010a4
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 7 10:09:12 2015 -0700
+
+    olfs: Repaired small bug in services presentation.
+
+commit 94834b49f10289077fb8ac5c664dc427372775ff
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 7 09:27:17 2015 -0700
+
+    olfs: Disabling ncWMS by deault for the moment.
+
+commit 862edf145c5e4063007d7b6a472683eb8b7f352a
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 7 09:21:59 2015 -0700
+
+    olfs: Updated test targets to reflect changes in HTML form buttons and comments.
+
+commit 83eb16c29a0e9244187450d81f23ddf2fbebf04f
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 7 08:21:27 2015 -0700
+
+    olfs: Removing unused security restrictions from web.xml
+
+commit 7bad5231d73cfa3dc64a0603327e03732296cc94
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Apr 6 19:08:59 2015 -0700
+
+    olfs: Repaired some issues with unreleased streams.
+
+commit 9807ecdbf33c469ff6dc7953be01d971996ed4d0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Apr 6 16:14:36 2015 -0700
+
+    olfs: Removed prototype auth/authz code from build and distro. Scrubbed some w10n output.".
+
+commit ef9e9c2b8af6e52eddd9ce457e764494fa58d3f5
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Mar 26 16:47:15 2015 -0700
+
+    olfs: Repaired a bug in THREDDS catalog ingest where the value of the serviceType attribute  of thredds:service elements was being assessed in a case sensitive manner.  Made it a case-insensitive test.
+
+commit 4cdfe2ce4cf060890eaa1f1356ba4579c93d0286
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Mar 23 10:10:51 2015 -0700
+
+    Instrumentation for auth related output
+
+commit b172ccfe57f0805c5542ff707640992fa977ca85
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Mar 23 10:06:41 2015 -0700
+
+    Instrumentation for auth related output
+
+commit 30ad2ca4e1a12d11dd8b029b94c69ddfa286960a
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Mar 23 10:00:10 2015 -0700
+
+    Instrumentation for auth related output
+
+commit 514c829f66a4acaa886f3e1c35cb67a5816c1abf
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Mar 20 14:46:59 2015 -0700
+
+    Commented out PEPFilter from web.xml file.
+
+commit 6cba0b42bc27ff90e17d5a0ec0d4dc83d3d7468b
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 20 14:50:53 2015 -0600
+
+    Fixed web.xml
+
+    After the merge this file listed the aggregation servlet twice.
+
+commit b71d4d4ff2a213734cc9b1172c40267f898def35
+Merge: c64c406 b902fed
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 20 13:22:28 2015 -0600
+
+    Merge branch 'jg_agg'
+
+    This merges all my additions of/for the aggregation servlet. Both
+    the CSV and netCDF/zip aggregation responses are supported.
+
+    Conflicts:
+    	build.xml
+    	resources/hyrax/WEB-INF/urlrewrite.xml
+    	resources/hyrax/WEB-INF/web.xml
+    	src/opendap/aggregation/AggregationServlet.java
+
+commit c64c4063d558abbdb3fac3b708252d6a666077aa
+Merge: 89fc19b 7f9acfb
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 20 13:06:56 2015 -0600
+
+    Merge branch 'master' of https://github.com/opendap/olfs
+
+    Conflicts:
+    	resources/hyrax/WEB-INF/urlrewrite.xml
+    	resources/hyrax/WEB-INF/web.xml
+
+commit 7f9acfb8b885f7acdc0e397cfe75fe20186f4281
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Mar 20 06:30:19 2015 -0700
+
+    Made default PEPFilter configuration allow all access
+
+commit b902fedf5a40d64992138fab64a78a8ce75ab33a
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 13 16:15:37 2015 -0600
+
+    Added a test for dependent vars with greater rank then the independent vars.
+
+    It's a mouthful... Anyway, the code actually limits the
+    difference in rank to just one additional dimension.
+
+commit 4874f921e94a54638eaa2e7b3cea6f66638f816c
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Mar 11 15:40:04 2015 -0600
+
+    Modified gitignore
+
+commit 3a9b652dc5bc7ff50c6e95424413e2d09798ad16
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Mar 11 15:33:33 2015 -0600
+
+    Build changes for the aggregation servlet
+
+    Fir my aggregation servlet JUnit tests, I used apache commons io and
+    so I added that jar to the lib dir and then to the build.xml file. The
+    commons io jar is only installed for the opendap.war file; there are
+    other targets in the build.xml file where it does not seem to be a
+    factor.
+
+commit 0a960f3be64ea54b71bba7ded70834c3a59c063c
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Mar 11 15:31:18 2015 -0600
+
+    Update/fix for FilterAsciiHeaderStream.java
+
+    IJ Idea suggested I add @NotNull to the byte[] parameter
+    of the write() methods my FilterStream specialization
+    overrode, but that broke the ant build. It worked in the
+    IDE. I removed the change for now.
+
+commit e225f3a08febe6f53d49ca5f116923a6e9cdd392
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Mar 11 15:29:42 2015 -0600
+
+    Added a number of test input and baseline files
+
+    These are for the aggregation servlet.
+
+commit 3c220bb12553bb2e5b002647967458e044434571
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 6 16:04:37 2015 -0700
+
+    Modified text files to use the new &operation= parameter
+
+    ...and added a text file that requests the servlet version
+    information.
+
+commit ec7d1e3a47c7f73c7f9930bec08e378d5a6a29e6
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 6 16:03:17 2015 -0700
+
+    Modified how operation is provided
+
+    The operation to perform was derived from the URL, using the
+    last part of the path. I dropped that in favor of using a query
+    string parameter so that this servlet will work with our json
+    code (at least in theory; I'm not sure how it'll work in practice).
+    I also fixed an issue where POST would redirect when the URL
+    did not end in a slash - this is good behavior for GET, but it
+    breaks POST because clients like curl don't expect POST to
+    get a redirect.
+
+commit a79cbb28e6d34ac23d196f63c78f44c788e6f235
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 6 14:23:07 2015 -0700
+
+    Added the CSV feature to the servlet
+
+    This includes some changes to the way the input parameters
+    are parsed, depending on how the servlet is called. The CSV
+    response along with the netcdf3/4 and ascii responses use
+    the same input parameters.
+
+commit 77aeb3e0aa39b41721f61fdbb3a1dce855a6aaec
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Mar 6 14:21:03 2015 -0700
+
+    I moved the unit-test sources and baselines to resources
+
+    I'm not sure this is the best place, but I want to have my test
+    code part of typical distributions.
+
+commit 1af0365de721f1c5bd6111d91da467c2911624c1
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Mar 5 17:58:57 2015 -0700
+
+    Added FilterAsciiHeaderStream
+
+    ...and tests
+
+commit c6e57003fde66cdfedd1803a59314fadf4e58151
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Mar 5 14:16:19 2015 -0700
+
+    Minor refactor of method names
+
+commit 9d8a9e9cec2eff5ddcfd1169d832cb77434ff247
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Mar 5 14:12:07 2015 -0700
+
+    Added two new response types: nc4 and ASCII
+
+commit b2008ec149e35696a23ced5d7a4fc44396e3bdc9
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Mar 4 10:36:13 2015 -0700
+
+    Aggregation servlet 1.0 beta
+
+    Fixed some warning issues, documentation, unused code, ...
+    Also, added the sole unit test file to build.xml and hacked
+    in the README file a bit.
+
+commit 25207505827f46166714c754d3f49bac596d9214
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Mar 4 09:24:28 2015 -0800
+
+    olfs: Fixed use of DEPLOYMENT_CONTEXT in production rules.
+
+commit 9443ca9a9e97ae1fa00d976bfde4df01f0b598ed
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Mar 3 17:46:03 2015 -0700
+
+    Added unit tests for AggregationParams
+
+    These are mostly a token effort, but I wanted to go through the
+    process since I suspect that when I'm working on the CSV stuff
+    the tests will matter.
+
+commit f18e82d325ec5ba6137c6840535ccacda3f77204
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Mar 3 15:51:20 2015 -0700
+
+    The aggregation server now uses the swath subsetting function.
+
+    The bbox query string parameter is now parsed and its value
+    is used to build the subsetting expression along with the list
+    of variable names. However, bbox is not required and it's
+    possible to use the var parameter to pass in a complete CE
+    (for now at least).
+
+commit 855fe80f0eeb0eeeb6beb07b3f6f3e45aabc0286
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 25 12:17:49 2015 -0800
+
+    olfs: Removed json-simple library and replaced with gson
+
+commit 4f23b37f85689fbf35ae42c5f0d035b2daf8c4d6
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 25 12:16:45 2015 -0800
+
+    olfs: Changes to supported modified opendap.dap.Request API
+
+commit 1e39d80c9905aa7f597aa02bd6ac251d5b88de3d
+Merge: b040109 756a19e
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Feb 24 17:40:05 2015 -0800
+
+    Merge remote-tracking branch 'origin/managed-access'
+
+    Conflicts:
+    	ChangeLog
+    	NEWS
+    	README
+    	besclient-build.xml
+    	build.xml
+    	glacier-build.xml
+    	k_means.xml
+    	reap_crawler_build.xml
+    	resources/WebStart/ToolsUI.jnlp
+    	resources/hyrax/WEB-INF/logback-test.xml
+    	resources/hyrax/WEB-INF/logback.xml
+    	resources/hyrax/WEB-INF/urlrewrite.xml
+    	resources/hyrax/WEB-INF/web.xml
+    	resources/hyrax/admin/jsp/besctl.jsp
+    	resources/hyrax/admin/jsp/index.jsp
+    	resources/hyrax/admin/jsp/olfsLogView.jsp
+    	resources/hyrax/initialContent/olfs.xml
+    	resources/hyrax/xsl/contents.xsl
+    	resources/metacat/ddx2eml-2.0.xsl
+    	retired_source/opendap/bes/dapResponders/DatasetFileAccess.java
+    	s3-build.xml
+    	src/opendap/async/AsyncDispatcher.java
+    	src/opendap/bes/BESError.java
+    	src/opendap/bes/BESManager.java
+    	src/opendap/bes/BESThreddsDispatchHandler.java
+    	src/opendap/bes/BesDapDispatcher.java
+    	src/opendap/bes/DirectoryDispatchHandler.java
+    	src/opendap/bes/FileDispatchHandler.java
+    	src/opendap/bes/Version.java
+    	src/opendap/bes/dap2Responders/BesApi.java
+    	src/opendap/bes/dap2Responders/Iso19115.java
+    	src/opendap/bes/dap2Responders/Iso19115Rubric.java
+    	src/opendap/bes/dap4Responders/DataResponse/CsvDR.java
+    	src/opendap/bes/dap4Responders/DataResponse/GeoTiffDR.java
+    	src/opendap/bes/dap4Responders/DataResponse/GmlJpeg2000DR.java
+    	src/opendap/bes/dap4Responders/DataResponse/IjsonDR.java
+    	src/opendap/bes/dap4Responders/DataResponse/JsonDR.java
+    	src/opendap/bes/dap4Responders/DataResponse/Netcdf3DR.java
+    	src/opendap/bes/dap4Responders/DataResponse/Netcdf4DR.java
+    	src/opendap/bes/dap4Responders/DataResponse/NormativeDR.java
+    	src/opendap/bes/dap4Responders/DataResponse/XmlDR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/HtmlDMR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/IjsonDMR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/JsonDMR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/NormativeDMR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/RdfDMR.java
+    	src/opendap/bes/dap4Responders/DatasetMetadata/XmlDMR.java
+    	src/opendap/bes/dap4Responders/DatasetServices/HtmlDSR.java
+    	src/opendap/bes/dap4Responders/DatasetServices/NormativeDSR.java
+    	src/opendap/bes/dap4Responders/DatasetServices/XmlDSR.java
+    	src/opendap/bes/dap4Responders/FileAccess.java
+    	src/opendap/bes/dap4Responders/Iso19115/IsoDMR.java
+    	src/opendap/bes/dap4Responders/Iso19115/IsoRubricDMR.java
+    	src/opendap/bes/dap4Responders/MediaType.java
+    	src/opendap/coreServlet/DispatchServlet.java
+    	src/opendap/coreServlet/ReqInfo.java
+    	src/opendap/coreServlet/RequestCache.java
+    	src/opendap/coreServlet/ServletUtil.java
+    	src/opendap/coreServlet/Util.java
+    	src/opendap/dap/Request.java
+    	src/opendap/dap4/Dap4Error.java
+    	src/opendap/dap4/QueryParameters.java
+    	src/opendap/gateway/GatewayForm.java
+    	src/opendap/hai/DispatchServlet.java
+    	src/opendap/logging/LogUtil.java
+    	src/opendap/namespaces/BES.java
+    	src/opendap/ncml/NcmlFileDispatcher.java
+    	src/opendap/ppt/NewPPTClient.java
+    	src/opendap/services/ServicesRegistry.java
+    	src/opendap/threddsHandler/StaticCatalogDispatch.java
+    	src/opendap/viewers/GodivaWebService.java
+    	src/opendap/viewers/NcWmsService.java
+    	src/opendap/viewers/ViewersServlet.java
+    	src/opendap/wcs/v1_1_2/http/Util.java
+    	src/opendap/wcs/v2_0/http/Util.java
+    	src/opendap/webstart/WebStartServlet.java
+    	testsuite/gateway/fnoc1.nc.dmr.xml
+    	wcs-build.xml
+    	wcs2-build.xml
+
+commit 1fd374b914137bca8911dd93c85e06146c34ba41
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Feb 24 18:10:41 2015 -0700
+
+    Updated copyright date in the Aggregation servlet.
+
+commit 3e963abc25b102e96a5b72fccd07a11c3ddbe24a
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Feb 24 18:07:04 2015 -0700
+
+    Fixed the redirect issue
+
+    URLs to the base servlet need trailing slashes. I copied
+    Nathan's redirect code so this will work. I also used the
+    Idea code analysis to fix up some minor issues.
+
+commit e088ba580665acd3554385f6fa1a504e41707b1a
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Feb 24 14:43:52 2015 -0700
+
+    Added just tiny bit to the Servlets doc comment.
+
+commit f81fe5715d57999722276742e75ca07491bc595b
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Feb 24 14:36:37 2015 -0700
+
+    Added POST support; fixed minor issues
+
+    POST and GET now both work. I added an extensive comment
+    that includes an example call using curl. I fixed an issue
+    where the Set<String> used to find name collisions in
+    the files to be added to the zip archive was not reset
+    between calls. Also, the servlet now adds ".nc" when
+    netCDF3 files are requested, no matter what the type of
+    the source files.
+
+commit 19d0260f89b2a4bc15354681d04781585aadae10
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Feb 24 12:32:37 2015 -0700
+
+    First working version; no support for POST yet
+
+    This version of the Aggregation servlet will return a zip file
+    of arbitrary files or netcdf3 files built from any type of file
+    the BES recognizes. In the latter case, a CE is applied to the
+    source file before the result is returned as a netCDF3 file.
+
+commit 0cb42d49514d5d85c4530238618a94876637cafd
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Mon Feb 23 18:08:06 2015 -0700
+
+    Added more features
+
+    The servlet can get small text files and return them
+    in a single zip file. It seems to gag on netcdf files,
+    but that's for tomorrow...
+
+commit b0401097c7ce54cf99aa7675c9089382482283e4
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Feb 23 15:10:15 2015 -0800
+
+    olfs: Updated inner class for compatibility with the servlet 3.0 specification
+
+commit 4d087e62d0267ecd0f7d6f7264fb579fc18ff758
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Feb 23 15:09:35 2015 -0800
+
+    olfs: Corrected pattern for request cache initiation.
+
+commit 7ad2724929ed5c48a16c69c5392d6c5b433bee4f
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Sun Feb 22 23:45:06 2015 -0700
+
+    Hacking toward some sort of BES interaction...
+
+commit 6f5ac667b8dd64077c4f6d60b5070cccaed853f9
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Feb 20 18:05:41 2015 -0700
+
+    Hacks to AggregationServlet.java
+
+    The AggregationServlet has been hacked so that it talks to the
+    BES and gets a version response. I think. Not working yet, but
+    my 'just do a pull' hijinks on Friday afternoon left me nervous
+    about loosing code, so in it goes.
+
+commit 89fc19b33cf02b54393ae64991fed10d2722d9ef
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Feb 20 17:58:03 2015 -0700
+
+    More merge maddness
+
+    I did a pull for some changes Nathan added and used stash
+    to hold onto the work I was doing on my agg branch, but
+    somehow botched the stash apply or something. I think I
+    inadvertantly have merged my branch to the master...
+
+commit 5d1c052e61a3169eb86813252679057dcf187ea2
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Feb 20 17:53:00 2015 -0700
+
+    pull/merge/deleted files... Friday afternoon...
+
+commit 608f0b3bee4f8a9cc1c589d2705fe868b298464c
+Merge: efffe3f db61857
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Feb 20 17:47:28 2015 -0700
+
+    Merge branch 'master' of https://github.com/opendap/olfs
+
+commit db61857415cf17cc4c4ecbf7021f3f7b756bd863
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Feb 20 15:51:46 2015 -0800
+
+    olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+commit 10c85f140913cac215a3d64b6e6ce73cbcc7a737
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Feb 20 15:49:27 2015 -0800
+
+    olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+commit 8b7c32f424820dd6baf826fb7646f33fea255068
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Feb 20 15:47:48 2015 -0800
+
+    olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+commit 37349b5081f5e076e76449ebcfb2fe1204f87caf
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Fri Feb 20 15:53:35 2015 -0700
+
+    Switched from a child of opendap.DispatchServlet to HttpServlet
+
+    This should simplify things and is more likely what I need.
+    There is likely considerable simplification I can do to the
+    code in this directory (opendap/aggregation), but I want to
+    get some basic I/O working before I hack away at stuff.
+
+commit 11baee4d7a9a86f216eb3ee91d5ae840fbc66601
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Feb 19 15:36:26 2015 -0700
+
+    Added to gitignore
+
+commit 778553810455e37922030277325c22b046fff834
+Merge: 3eed2d8 efffe3f
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Feb 19 15:34:37 2015 -0700
+
+    Merge branch 'master' into jg_agg
+
+    Conflicts:
+    	.gitignore
+
+commit efffe3f05efed2ec8645ebb9ef34698d10253010
+Merge: 9333a59 a934258
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Feb 19 14:53:51 2015 -0700
+
+    Merge branch 'master' of https://github.com/opendap/olfs
+
+    Conflicts:
+    	.gitignore
+
+commit 9333a59da1d2934f8f2fb4519f86ad06155f4a3c
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Feb 19 14:46:46 2015 -0700
+
+    Added .gitignore
+
+commit a9342580a93283516690af1eff97822a831d3e00
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 18 18:39:44 2015 -0800
+
+    Tweaks..
+
+commit d761a6b3d8b253c86164a263a001557d5edfe6c6
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 18 18:35:08 2015 -0800
+
+    Changed w10n.type for datasets to 'dap.2'. Added .gitignore file
+
+commit 3eed2d8d586ff4f016c14a0a811e528d099271ce
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed Feb 18 18:49:48 2015 -0700
+
+    Initial commit - started at home; not working
+
+commit 503d0f84274ae65b50d223de4f3baafd5991df0f
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 18 15:40:11 2015 -0800
+
+    olfs:  Implemented w10n "traverse" query string parameter, but limited the scope of it's applicability to datasets and their variables. The "traverse" parameter is ignored at the filesystem level. Because, well, think about it...
+
+commit 675f28b322b469ebf1da8e32f1470cc7ef2f4e8c
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 18 14:55:42 2015 -0800
+
+    olfs:  Made JSON output indented
+
+commit 0df0b6eb3279d720a0ec7f90e62d7138efa4b17e
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Feb 18 14:38:32 2015 -0800
+
+    Replaced json-simple library with Gson because the json-simple library was blowing it when encoding complex string attribute values
+
+commit eea14872c4e49cdb74af1ca7547fe6f6ca124708
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Feb 17 16:55:08 2015 -0800
+
+    olfs: Minor API cleanup. Comments!
+
+commit 8545edb4d222e0471b0a3b684b19a65c5cf7fdaf
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Feb 17 06:28:25 2015 -0800
+
+    olfs: Refactored use of w10nRequest object to simplify the internal API and to coalesce methods into the w10nRequest class so that the code can be more easily understood. Re worker the use of "path" and "identifier" to correctly represent section 3 of the w10n specification.
+
+commit 2f299476774caa5951a34d8e50f830642d495bb1
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Feb 13 11:54:35 2015 -0800
+
+    olfs: Added w10n meta object to w10n json data responses.
+
+commit 1104d9a3f31369925afee18f654ca6bce1c50f82
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Feb 13 11:11:47 2015 -0800
+
+    olfs: Implement netcdf-3, netcdf-4, and dap2 data responses. Groomed MediaType stack
+
+commit 2600d4a56e89e640f2cfabce5ccebbc437b45959
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Feb 12 21:35:05 2015 -0800
+
+    olfs: Production rules repair and small fixes to both w10n and DAP catalog navigation.
+
+commit 06719b81c36d73960239cd8b82d9531d90d97af8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Feb 12 14:34:55 2015 -0800
+
+    olfs: Functional w10n service prototype.
+
+commit 810801cae97d42eb91957af0fe5a18c8a7447ae2
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Jan 22 11:38:44 2015 -0800
+
+    olfs: Creating w10n servlet.
+
+commit 82451c34bc5e25d2dc6ecd4dac4ac49120f6ef3d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Jan 22 11:37:42 2015 -0800
+
+    olfs: Updated ToolsUI JNLP, fixed minor bug in Error management
+
+commit f7e44e6e5bd4ffc6aa88bfba65692fb9dd377cf5
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Jan 20 05:11:13 2015 -0800
+
+    olfs: Fixed log message that was erroneously sent to error (now debug)
+
+commit 9955b8b4795aa7b3badd3ad24ad5ba1339542139
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Jan 15 15:59:55 2015 -0800
+
+    olfs: Failed to patch the NcWMS service, fixed now.
+
+commit 74b3c30aec80cc273dbb17ff023320330b99ec33
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Jan 15 10:38:43 2015 -0800
+
+    olfs: Patched the generation of Godiva links to accommodate the new (old?) TDS like arrangement where the Dynamic Service dataset name appears in the URL path and not in the query string as the value of the "dataset" parameter. (Because the former is WMS compliant and the latter is not)
+
+commit 66561c4195f4bcab5329e79468b461c1a640454d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Jan 15 10:09:39 2015 -0800
+
+    olfs: Moved around some utility methods so that similar tools are kept together.
+
+commit 038a7a7b462578651fc284fba3c69d95e8b6eeee
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Jan 5 10:17:21 2015 -0800
+
+    olfs: Updating version numbers, NEWS, ChangeLog, and README for HYrax 1.10.1 / OLFS 1.12.1
+
 commit b8cfb550a9f0bed4cc29fcad4055ae73a6e2378a
 Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Jan 5 08:24:08 2015 -0800
 
     olfs: Dropped broken test for dataset WMSness. Will have to revisit in the future, as users will likely dislike false positives (showing WMS and Godiva links for incompatible datasets) almost as much as false negatives (not showing WMS and Godiva links for valid WMS datasets)
+
 
 commit f0876e951be51fc5b909af2b0b6574c557394f19
 Author: Nathan Potter <ndp@opendap.org>
