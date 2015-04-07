@@ -55,10 +55,10 @@ public class W10nServlet extends HttpServlet   {
          */
         @Override
         public void init() throws ServletException {
+            super.init();
 
             _log = LoggerFactory.getLogger(this.getClass());
 
-            super.init();
 
             _reqNumber = new AtomicInteger(0);
 
