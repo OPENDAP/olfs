@@ -108,8 +108,21 @@ public class RemoteHttpCatalog implements Catalog {
 
 
         Document catalog  = getCatalogDocument();
+        if(catalog==null){
+            msg = "THREDDS ERROR: Catalog document is null.";
+            log.error(msg);
+            throw new Exception(msg);
+
+        }
 
         Element ce = catalog.getRootElement();
+        if(ce==null){
+            msg = "THREDDS ERROR: Catalog document has no root element.";
+            log.error(msg);
+            throw new Exception(msg);
+
+        }
+
 
         _name = ce.getAttributeValue("name");
 
