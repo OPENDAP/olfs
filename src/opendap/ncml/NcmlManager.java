@@ -118,9 +118,14 @@ public class NcmlManager {
     private static BesApi _besApi = new BesApi();
 
 
-
-
-
+    /**
+     *
+     * @param catalog
+     * @throws SaxonApiException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws InterruptedException
+     */
     public static  void ingestNcml(Catalog catalog) throws SaxonApiException, IOException, JDOMException, InterruptedException {
 
 

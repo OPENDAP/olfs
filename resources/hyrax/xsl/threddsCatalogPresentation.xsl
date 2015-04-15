@@ -67,8 +67,13 @@
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
                         <xsl:if test="thredds:service">
-                            <br/>services:
                             <table>
+                                <tr>
+                                    <th class="small"><u>Service Name</u></th>
+                                    <th class="small"><u>Service Type</u></th>
+                                    <th class="small"><u>Service Base</u></th>
+                                </tr>
+
                                 <xsl:apply-templates select="thredds:service" mode="banner">
                                     <xsl:with-param name="indent"> </xsl:with-param>
                                 </xsl:apply-templates>
@@ -375,17 +380,17 @@
 
         <tr>
             <td class="small" align="left">
-                <xsl:value-of select="$indent"/><xsl:value-of select="@name"/>&#160;&#160;&#160;&#160;&#160;&#160;
+                <xsl:value-of select="$indent"/><xsl:value-of select="@name"/>
             </td>
             <td class="small" align="left">
-                <xsl:value-of select="$indent"/><i>serviceType:</i> <xsl:value-of select="@serviceType"/>&#160;&#160;
+                <xsl:value-of select="$indent"/><xsl:value-of select="@serviceType"/>
             </td>
             <td class="small" align="left">
-                <xsl:value-of select="$indent"/><i>base:</i> <xsl:value-of select="@base"/>&#160;&#160;
+                <xsl:value-of select="$indent"/><xsl:value-of select="@base"/>
                 <br/>
             </td>
             <xsl:apply-templates  mode="banner" >
-                <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
             </xsl:apply-templates>
 
         </tr>

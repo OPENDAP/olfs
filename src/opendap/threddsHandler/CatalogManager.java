@@ -54,8 +54,9 @@ public class CatalogManager {
     private static String _catalogIngestTransformFilename;
 
 
-    private static ConcurrentHashMap<String, Catalog>   _catalogs = new ConcurrentHashMap<String, Catalog>();
-    private static ConcurrentHashMap<String, String[]>  _children = new ConcurrentHashMap<String, String[]>();
+    private static ConcurrentHashMap<String, DatasetScan>   _datasetScans = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Catalog>       _catalogs     = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, String[]>      _children     = new ConcurrentHashMap<>();
 
     private static ReentrantLock _catalogLock  = new ReentrantLock();
 
@@ -213,6 +214,31 @@ public class CatalogManager {
             String[] s = new String[catalogChildren.size()];
             _children.put(catalogKey, catalogChildren.toArray(s));
         }
+
+
+        /**
+         * ###############################################################################
+         *
+         * Ingest datasetScan Elements....
+         *
+         *
+         *
+         */
+
+
+         // Get all of the datasetScan elements in the  catalog document.
+         i = catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.DATASETSCAN, THREDDS.NS));
+
+        while (i.hasNext()) {
+
+
+
+
+        }
+
+
+
+
 
         _log.debug("Ingesting inherited metadata (if any) for catalog '"+catalog.getName()+"'");
         InheritedMetadataManager.ingestInheritedMetadata(catalog);

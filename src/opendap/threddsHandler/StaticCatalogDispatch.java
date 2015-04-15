@@ -618,7 +618,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
         if (ingestTransformFile == null) {
-            ingestTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/threddsCatalogIngest.xsl");
+            ingestTransformFile = ServletUtil.getSystemPath(serv1 let, "/xsl/threddsCatalogIngest.xsl");
         }
 
         log.debug("init() - Using ingest transform file: " + ingestTransformFile);
