@@ -126,9 +126,16 @@
             </Handler>
 
             <Handler className="opendap.bes.DirectoryDispatchHandler">
-                <AuthenticationControls>
-                    <logout>/?urslogout=HyraxDataServer</logout>
-                </AuthenticationControls>
+                <!--
+                  If your particular authentication scheme (usually brokered by Apache httpd) utilizes
+                  a particular logout or login location you have Hyrax display links to those locations
+                  as part of the generated web pages by uncommenting the "AuthenticationControls" element and
+                  editing the logout and/or login locations to match your service instance.
+                  -->
+                <!-- AuthenticationControls>
+                    <logout>loginPath?login_param=foo</logout>
+                    <logout>logoutPath?logout_param=foo</logout>
+                </AuthenticationControls -->
             </Handler>
 
 
