@@ -18,6 +18,9 @@ import java.util.Iterator;
  */
 public class GodivaWebService implements  WebServiceHandler {
 
+    public static final String ID = "godiva";
+
+
     private String _serviceId;
     private String _applicationName;
 
@@ -33,7 +36,7 @@ public class GodivaWebService implements  WebServiceHandler {
 
     public GodivaWebService(){
 
-        _serviceId             = "godiva";
+        _serviceId             = ID;
         _applicationName       = "Godiva Data Visualization";
 
         _godivaBase            = "/ncWMS/godiva2.html";

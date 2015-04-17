@@ -55,6 +55,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -595,18 +596,18 @@ public class ViewersServlet extends HttpServlet {
 
     }
 
-    private Vector<WebServiceHandler> getWebServicesForDataset(String datasetId, Document ddx){
+    private TreeMap<String, WebServiceHandler> getWebServicesForDataset(String datasetId, Document ddx){
 
         Iterator<WebServiceHandler> e = ServicesRegistry.getWebServiceHandlers().values().iterator();
         WebServiceHandler wsHandler;
 
-        Vector<WebServiceHandler> canHandleDataset = new Vector<WebServiceHandler>();
+        TreeMap<String, WebServiceHandler> canHandleDataset = new TreeMap<>();
 
 
         while(e.hasNext()){
             wsHandler = e.next();
             if(wsHandler.datasetCanBeViewed(ddx)){
-                canHandleDataset.add(wsHandler);
+                canHandleDataset.put(wsHandler.getName(), wsHandler);
             }
 
         }
@@ -643,7 +644,7 @@ public class ViewersServlet extends HttpServlet {
 
     private String getWebServicesParam(String datasetId, Document ddx) {
 
-        Vector<WebServiceHandler> webServicesForDataset =  getWebServicesForDataset(datasetId, ddx);
+        TreeMap<String, WebServiceHandler> webServicesForDataset =  getWebServicesForDataset(datasetId, ddx);
 
         if(webServicesForDataset.isEmpty())
             return null;
@@ -651,8 +652,8 @@ public class ViewersServlet extends HttpServlet {
         Element webServicesElement = new Element("WebServices");
         Element wsElement;
 
-        for(WebServiceHandler wsh : webServicesForDataset){
-
+        for(String key : webServicesForDataset.keySet()){
+            WebServiceHandler wsh = webServicesForDataset.get(key);
             wsElement = new Element("webService");
             wsElement.setAttribute("id",wsh.getServiceId());
             wsElement.setAttribute("applicationName",wsh.getName());

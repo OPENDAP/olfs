@@ -5,6 +5,7 @@ import opendap.namespaces.THREDDS;
 import org.jdom.Element;
 
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by ndp on 4/14/15.
@@ -32,17 +33,25 @@ public class Dataset {
     }
 
 
-    public Element[] getAccess(){
-        List<Element> access = _sourceDataset.getChildren("access", THREDDS.NS);
-        Element accessElements[] = new Element[access.size()];
-        return access.toArray(accessElements);
+    public Vector<Element> getAccess(){
+        List access = _sourceDataset.getChildren(THREDDS.ACCESS, THREDDS.NS);
+        Vector<Element> accessElements = new Vector<>();
+        for(Object a : access)
+            accessElements.add((Element) ((Element)a).clone());
+        return accessElements;
     }
 
-    public Element[] getMetadata(){
-        List<Element> meta = _sourceDataset.getChildren("metadata", THREDDS.NS);
-        Element metaElements[] = new Element[meta.size()];
-        return meta.toArray(metaElements);
+    public Vector<Element> getMetadata(){
+        List meta = _sourceDataset.getChildren(THREDDS.METADATA, THREDDS.NS);
+        Vector<Element> metaElements = new Vector<>();
+        for(Object metadata : meta)
+            metaElements.add((Element) ((Element)metadata).clone());
+
+        return metaElements;
     }
+
+
+
 
 
 
@@ -92,6 +101,8 @@ public class Dataset {
     public String getUrlPath(){
         return  _sourceDataset.getAttributeValue("urlPath");
     }
+
+
 
 
 }

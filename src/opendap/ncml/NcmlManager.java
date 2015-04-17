@@ -146,20 +146,23 @@ public class NcmlManager {
                 for(String dapAccessID: localDapAccessIds){
 
 
-                    log.debug("DAP ACCESS ID: {}",dapAccessID);
+                    log.debug("ingestNcml() - DAP ACCESS ID: {}",dapAccessID);
 
                     _ncmlDatasets.put(dapAccessID, (Element)netcdf.clone());
                     _ncmlDatasetsLastModifiedTimes.put(dapAccessID, catalog.getLastModified());
                     ncmlDatasetIds.add(dapAccessID);
 
-                    if(preloadBes())
+                    if(preloadBes()) {
+                        log.debug("ingestNcml() - Sending NcML content to BES.");
                         sendNcmlToBes(dapAccessID, netcdf);
+                    }
+
 
                 }
 
             }
             else {
-                log.error("Encountered unanticipated NCML content in dataset[{}]. This will not be ingested.",dataset.getAttributeValue("ID"));
+                log.error("ingestNcml() - Encountered unanticipated NCML content in dataset[{}]. This will not be ingested.",dataset.getAttributeValue("ID"));
             }
         }
 
@@ -230,7 +233,11 @@ public class NcmlManager {
     }
 
 
-
+    /**
+     *
+     * @param dapAccessID
+     * @param netcdf
+     */
     public static void sendNcmlToBes(String dapAccessID, Element netcdf){
 
 
@@ -263,16 +270,9 @@ public class NcmlManager {
                 if(!bes.besTransaction(besCmd,response)){
                     log.error("BES '"+bes.getNickName()+"' failed to ingest NcML dataset '"+dapAccessID+"' BES Error Object: \n"+xmlo.outputString(response));
                 }
-            } catch (BadConfigurationException e) {
-                log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
-            } catch (PPTException e) {
-                log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
-            } catch (JDOMException e) {
-                log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
             }
-
         }
 
 

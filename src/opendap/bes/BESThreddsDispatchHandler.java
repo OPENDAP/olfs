@@ -195,7 +195,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             String base = null;
             String dsId = null;
 
-            Service s = ServicesRegistry.getServiceById("ncWms");
+            Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
             if(s!=null && s instanceof NcWmsService){
                 NcWmsService nws = (NcWmsService) s;
                 base  = nws.getBase();

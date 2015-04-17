@@ -43,10 +43,28 @@ public class THREDDS {
     public static final String SERVICE = "service";
     public static final String CATALOG_REF = "catalogRef";
     public static final String CATALOG = "catalog";
-    public static final String DATASET = "dataset";
-    public static final String DATASETSCAN = "datasetScan";
     public static final String NAME = "name";
     public static final String DATASIZE = "dataSize";
     public static final String DATE = "date";
     public static final String ACCESS = "access";
+    public static final String METADATA = "metadata";
+
+    public static final String DATASET = "dataset";
+    public static final String DATASET_SCAN = "datasetScan";
+
+    public static final String FILTER = "filter";
+    public static final String INCLUDE = "include";
+    public static final String EXCLUDE = "exclude";
+    public static final String REGEXP = "regExp";
+    public static final String WILDCARD = "wildcard";
+    public static final String ATOMIC = "atomic";
+    public static final String COLLECTION = "collection";
+
+    public static final String NAMER = "namer";
+
+    public static final String SORT = "sort";
+    public static final String ADD_PROXIES = "addProxies";
+    public static final String ADD_TIME_COVERAGE = "addTimeCoverage";
+
+
 }

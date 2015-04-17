@@ -4,11 +4,28 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.BesDapDispatcher;
+import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.dap.Dap2Service;
 import opendap.namespaces.THREDDS;
+import opendap.ppt.PPTException;
+import opendap.services.Service;
+import opendap.services.ServicesRegistry;
+import opendap.viewers.NcWmsService;
+import opendap.viewers.WebServiceHandler;
+import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -17,7 +34,16 @@ import java.util.Vector;
 /**
  * Created by ndp on 4/13/15.
  */
-public class DatasetScan  extends Dataset implements Catalog{
+public class DatasetScan  extends Dataset {
+
+    private Logger _log;
+
+    private BesApi _besApi;
+
+    private String _catalogUrlPrefix;
+    private String _besCatalogToThreddsCatalogTransformFilename;
+
+    private Filter _filter;
 
 
 
@@ -28,8 +54,14 @@ public class DatasetScan  extends Dataset implements Catalog{
     private Element _addTimeCoverage;
 
 
-    public DatasetScan(Element datasetScan)throws BadConfigurationException {
+    public DatasetScan(String catalogUrlPrefix, Element datasetScan, String besCatalogToThreddsCatalogTransformFilename, BesApi besApi)throws BadConfigurationException {
         super(datasetScan);
+        _log = LoggerFactory.getLogger(this.getClass());
+        _besApi = besApi;
+        _besCatalogToThreddsCatalogTransformFilename = besCatalogToThreddsCatalogTransformFilename;
+        _catalogUrlPrefix = catalogUrlPrefix;
+
+        _filter = new Filter(getFilter());
 
     }
 
@@ -42,106 +74,115 @@ public class DatasetScan  extends Dataset implements Catalog{
     }
 
     public Element getNamer(){
-        return _sourceDataset.getChild("namer", THREDDS.NS);
+
+        return getCopy(THREDDS.NAMER, THREDDS.NS);
+
     }
 
 
     public Element getFilter(){
-        return _sourceDataset.getChild("filter", THREDDS.NS);
+        return getCopy(THREDDS.FILTER, THREDDS.NS);
     }
 
     public Element getSort(){
-        return _sourceDataset.getChild("sort", THREDDS.NS);
+        return getCopy(THREDDS.SORT, THREDDS.NS);
     }
 
     public Element getAddProxies(){
-        return _sourceDataset.getChild("addProxies", THREDDS.NS);
+
+        return getCopy(THREDDS.ADD_PROXIES, THREDDS.NS);
     }
 
     public Element getAddTimeCoverage(){
-        return _sourceDataset.getChild("addTimeCoverage", THREDDS.NS);
+        return getCopy(THREDDS.ADD_TIME_COVERAGE, THREDDS.NS);
+    }
+
+    private Element getCopy(String name, Namespace ns){
+        Element e = _sourceDataset.getChild(name , ns);
+
+        if(e==null)
+            return e;
+
+
+        return (Element) e.clone();
+
     }
 
 
 
 
-    @Override
-    public void destroy() {
+    private String getUrlPrefix() {
+
+
+        return _catalogUrlPrefix + getPath();
 
     }
 
-    @Override
-    public boolean usesMemoryCache() {
+    public boolean matches(String catalogKey){
+
+        String urlPrefix = getUrlPrefix();
+
+        if(catalogKey.startsWith(urlPrefix)){
+            Element filter = getFilter();
+
+            if(filter != null){
+                _log.error("matches() - Sorry! The filter element is not yet supported.");
+            }
+
+            return true;
+        }
+
         return false;
-    }
 
-    @Override
-    public boolean needsRefresh() {
-        return false;
-    }
-
-    @Override
-    public void writeCatalogXML(OutputStream os) throws Exception {
 
     }
 
-    @Override
-    public void writeRawCatalogXML(OutputStream os) throws Exception {
+
+    public Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+
+
+        if(!matches(catalogKey))
+            return null;
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        String besCatalogResourceId = catalogKey;
+
+
+
+        if(besCatalogResourceId.startsWith(getUrlPrefix())){
+            besCatalogResourceId = besCatalogResourceId.substring(getUrlPrefix().length());
+        }
+
+        if(besCatalogResourceId.endsWith(CatalogManager.DEFAULT_CATALOG_NAME)){
+            besCatalogResourceId = besCatalogResourceId.substring(0,besCatalogResourceId.lastIndexOf(CatalogManager.DEFAULT_CATALOG_NAME));
+        }
+
+        while(besCatalogResourceId.startsWith("/") && besCatalogResourceId.length()>1)
+            besCatalogResourceId = besCatalogResourceId.substring(1);
+
+
+        String location = getLocation();
+        while(location.endsWith("/") && location.length()>1)
+            location  = location.substring(0,location.length()-1);
+
+
+        besCatalogResourceId = location + "/" + besCatalogResourceId;
+
+        Vector<Element> metadata = getMetadata();
+
+        if(catalogKey.endsWith(CatalogManager.DEFAULT_CATALOG_NAME))
+            catalogKey = catalogKey.substring(0,catalogKey.length() - CatalogManager.DEFAULT_CATALOG_NAME.length());
+
+
+
+        BesCatalog besCatalog = new BesCatalog(_besApi, catalogKey,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter);
+
+
+        return besCatalog;
 
     }
 
-    @Override
-    public Document getCatalogDocument() throws IOException, JDOMException, SaxonApiException {
-        return null;
-    }
 
-    @Override
-    public Document getRawCatalogDocument() throws IOException, JDOMException, SaxonApiException {
-        return null;
-    }
-
-    @Override
-    public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
-        return null;
-    }
-
-    @Override
-    public XdmNode getRawCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public String getCatalogKey() {
-        return null;
-    }
-
-    @Override
-    public String getPathPrefix() {
-        return null;
-    }
-
-    @Override
-    public String getUrlPrefix() {
-        return null;
-    }
-
-    @Override
-    public String getFileName() {
-        return null;
-    }
-
-    @Override
-    public String getIngestTransformFilename() {
-        return null;
-    }
-
-    @Override
-    public long getLastModified() {
-        return 0;
-    }
 }

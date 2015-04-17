@@ -10,6 +10,8 @@ import org.jdom.Document;
  * To change this template use File | Settings | File Templates.
  */
 public interface Service {
+
+
     public String getName();
 
     public String getServiceId();

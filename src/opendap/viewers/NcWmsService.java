@@ -18,6 +18,9 @@ import java.util.Iterator;
 public class NcWmsService implements WebServiceHandler {
 
 
+    public static final String ID = "ncWms";
+
+
     private String _serviceId;
     private String _base;
     private String _applicationName;
@@ -29,10 +32,10 @@ public class NcWmsService implements WebServiceHandler {
 
     public NcWmsService() {
 
-        _serviceId = "ncWms";
-        _applicationName = "ncWMS Service";
-        _ncWmsServiceUrl = "http://localhost:8080/ncWMS/wms";
-        _base = "/ncWMS/wms";
+        _serviceId = ID;
+        _applicationName = ID + " Service";
+        _ncWmsServiceUrl = "http://localhost:8080/"+ID+"/wms";
+        _base = "/" + ID + "/wms";
         _ncWmsDynamicServiceId = "lds";
 
 
