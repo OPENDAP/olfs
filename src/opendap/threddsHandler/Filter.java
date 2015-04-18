@@ -22,7 +22,7 @@ public class Filter {
 
                 Element cludeElement = (Element) o;
 
-                Clude clude = new Clude(cludeElement,cludeElement.getName().equals(THREDDS.EXCLUDE));
+                Clude clude = new Clude(cludeElement);
 
                 _cludes.add(clude);
 
@@ -45,13 +45,16 @@ public class Filter {
         Pattern wildCardPattern;
         Pattern regexPattern;
 
-        public Clude(Element clude, boolean isExclude){
+        public Clude(Element clude){
 
             appliesToAtomic = true;
             appliesToCollection = false;
 
             if(clude==null)
                 return;
+
+            excludeMatching = clude.getName().equals(THREDDS.EXCLUDE);
+
 
             wildcard = clude.getAttributeValue(THREDDS.WILDCARD);
             if(wildcard!=null){
@@ -81,7 +84,6 @@ public class Filter {
             if(collectionAttrVal!=null)
                 appliesToCollection = Boolean.parseBoolean(collectionAttrVal);
 
-            excludeMatching = isExclude;
         }
 
 

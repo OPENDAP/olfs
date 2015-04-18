@@ -44,6 +44,8 @@ public class DatasetScan  extends Dataset {
     private String _besCatalogToThreddsCatalogTransformFilename;
 
     private Filter _filter;
+    private Namer  _namer;
+
 
 
 
@@ -62,6 +64,7 @@ public class DatasetScan  extends Dataset {
         _catalogUrlPrefix = catalogUrlPrefix;
 
         _filter = new Filter(getFilter());
+        _namer = new Namer(getNamer());
 
     }
 
@@ -74,14 +77,26 @@ public class DatasetScan  extends Dataset {
     }
 
     public Element getNamer(){
-
         return getCopy(THREDDS.NAMER, THREDDS.NS);
-
     }
-
 
     public Element getFilter(){
         return getCopy(THREDDS.FILTER, THREDDS.NS);
+    }
+
+    public boolean increasingSort(){
+        boolean ascending = true;
+        Element sortElement  = _sourceDataset.getChild(THREDDS.SORT,THREDDS.NS);
+        if(sortElement!=null){
+            Element lexigraphicByNameElement  = sortElement.getChild(THREDDS.LEXIGRAPHIC_BY_NAME,THREDDS.NS);
+            if(lexigraphicByNameElement!=null){
+                String increasing  = lexigraphicByNameElement.getAttributeValue(THREDDS.INCREASING);
+                if(increasing!=null)
+                    ascending = Boolean.parseBoolean(increasing);
+            }
+        }
+        return ascending;
+
     }
 
     public Element getSort(){
@@ -177,7 +192,7 @@ public class DatasetScan  extends Dataset {
 
 
 
-        BesCatalog besCatalog = new BesCatalog(_besApi, catalogKey,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter);
+        BesCatalog besCatalog = new BesCatalog(_besApi, catalogKey,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter, increasingSort(), _namer);
 
 
         return besCatalog;

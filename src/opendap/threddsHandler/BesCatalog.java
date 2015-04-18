@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -48,6 +49,8 @@ public class BesCatalog implements Catalog {
     private String _ingestTransformer;
     private Vector<Element> _metadata;
     private Filter _catalogFilter;
+    private boolean _ascendingOrder;
+    private Namer _catalogNamer;
 
 
 
@@ -63,7 +66,9 @@ public class BesCatalog implements Catalog {
                String besCatalogResourceId,
                String besCatalogToThreddsCatalogTransformFilename,
                Vector<Element> metadata,
-               Filter catalogFilter
+               Filter catalogFilter,
+               boolean ascendingOrder,
+               Namer namer
     ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
 
         _log = LoggerFactory.getLogger(this.getClass());
@@ -81,6 +86,10 @@ public class BesCatalog implements Catalog {
         _metadata = metadata;
 
         _catalogFilter = catalogFilter;
+
+        _ascendingOrder = ascendingOrder;
+
+        _catalogNamer = namer;
 
         loadCatalog();
 
@@ -157,43 +166,86 @@ public class BesCatalog implements Catalog {
 
 
 
-            /**
-             * Apply Filter!!
+            /** ############################################################################################
+             * Here we groom the client response catalog by applying all of the datasetScan directives
+             * (directives is my word, not a THREDDS word)
              */
 
-            List elementList = topDataset.getChildren(THREDDS.DATASET,THREDDS.NS);
+            Vector<Element> graphElements = new Vector<>();
+
+            // Grab all the dataset elements
+            graphElements.addAll((List<Element>) topDataset.getChildren(THREDDS.DATASET,THREDDS.NS));
+
+
+            // Grab all the catalogRef elements
+            graphElements.addAll((List<Element>) topDataset.getChildren(THREDDS.CATALOG_REF,THREDDS.NS));
+
+
+            // Deatach everything!
+            graphElements.forEach(org.jdom.Element::detach);
 
             Vector<Element> dropList = new Vector<>();
 
-            for(Object o : elementList){
-                Element dataset = (Element) o;
-                String name = dataset.getAttributeValue(THREDDS.NAME);
 
-                if(!_catalogFilter.include(name,false)){
-                    dropList.add(dataset);
+            // Apply the filter by determing what to drop...
+            boolean isNode;
+            for(Element e : graphElements){
+
+                String name = e.getAttributeValue(THREDDS.NAME);
+                isNode = false;
+                if(e.getName().equals(THREDDS.CATALOG_REF)) {
+                    isNode = true;
+                }
+
+                if(!_catalogFilter.include(name,isNode)){
+                    dropList.add(e);
                 }
             }
 
-            elementList = topDataset.getChildren(THREDDS.CATALOG_REF,THREDDS.NS);
-
-            for(Object o : elementList){
-                Element catRef = (Element) o;
-                String name = catRef.getAttributeValue(THREDDS.NAME);
-
-                if(!_catalogFilter.include(name,false)){
-                    dropList.add(catRef);
-                }
-            }
-
-
+            // Drop that stuff that didn't pass the filter.
             for(Element e : dropList)
-                e.detach();
+                graphElements.remove(e);
 
 
 
 
+            // Apply the Namer to get news names, if any...
+
+            String name, newName;
+            for(Element e : graphElements){
+
+                name = e.getAttributeValue(THREDDS.NAME);
+
+                newName = _catalogNamer.getName(name);
+                if(newName!=null){
+                    e.setAttribute(THREDDS.NAME,newName);
+                }
+
+            }
 
 
+            // Pack (possibly) newly named elements into a sorted thing.
+            TreeMap<String, Element> elementsByName = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+            for(Element e : graphElements){
+                name = e.getAttributeValue(THREDDS.NAME);
+                elementsByName.put(name,e);
+            }
+
+
+
+            // Rebuild document in the correct order.
+            if(_ascendingOrder) {
+                for (String nme : elementsByName.keySet()) {
+                    topDataset.addContent(elementsByName.get(nme));
+                }
+            }
+            else {
+                for (String nme : elementsByName.descendingKeySet()) {
+                    topDataset.addContent(elementsByName.get(nme));
+                }
+
+            }
 
 
 

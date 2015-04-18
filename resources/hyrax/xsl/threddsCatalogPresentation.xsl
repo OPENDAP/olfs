@@ -218,12 +218,12 @@
                         <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
                         <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
                             <!--Then replace that with '.html'   -->
-                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@name"/> /</a>
                         </xsl:when>
 
                         <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
                         <xsl:otherwise>
-                            <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                            <a href="{./@xlink:href}" ><xsl:value-of select="./@name"/> /</a>
                         </xsl:otherwise>
                     </xsl:choose>
 

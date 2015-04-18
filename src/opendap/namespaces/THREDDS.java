@@ -61,8 +61,13 @@ public class THREDDS {
     public static final String COLLECTION = "collection";
 
     public static final String NAMER = "namer";
+    public static final String REG_EXP_ON_NAME = "regExpOnName";
+    public static final String REG_EXP_ON_PATH = "regExpOnPath";
+    public static final String REPLACE_STRING = "replaceString";
 
     public static final String SORT = "sort";
+    public static final String LEXIGRAPHIC_BY_NAME = "lexigraphicByName";
+    public static final String INCREASING = "increasing";
     public static final String ADD_PROXIES = "addProxies";
     public static final String ADD_TIME_COVERAGE = "addTimeCoverage";
 
