@@ -53,6 +53,8 @@ public class BesCatalog implements Catalog {
     private boolean _ascendingOrder;
     private Namer _catalogNamer;
     private AddTimeCoverage _addTimeCoverage;
+    private Vector<Proxy> _catalogProxies;
+
 
 
 
@@ -71,7 +73,8 @@ public class BesCatalog implements Catalog {
                Filter catalogFilter,
                boolean ascendingOrder,
                Namer namer,
-               AddTimeCoverage addTimeCoverage
+               AddTimeCoverage addTimeCoverage,
+               Vector<Proxy> proxies
     ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
 
         _log = LoggerFactory.getLogger(this.getClass());
@@ -95,6 +98,8 @@ public class BesCatalog implements Catalog {
         _catalogNamer = namer;
 
         _addTimeCoverage = addTimeCoverage;
+
+        _catalogProxies = proxies;
 
         loadCatalog();
 
@@ -205,6 +210,7 @@ public class BesCatalog implements Catalog {
                 if(!_catalogFilter.include(name,isNode)){
                     dropList.add(e);
                 }
+
             }
 
             // Drop that stuff that didn't pass the filter.
@@ -212,10 +218,15 @@ public class BesCatalog implements Catalog {
                 graphElements.remove(e);
 
 
+            TreeMap<String, Element> notRenamed = new TreeMap<>();
+            for(Element e: graphElements)
+                notRenamed.put(e.getAttributeValue(THREDDS.NAME),(Element)e.clone());
 
 
-            // Add time coverage is needed.
-            // Apply the Namer to get news names, if any.
+
+
+
+
 
             String name, newName, elementType;
             for(Element e : graphElements){
@@ -224,6 +235,7 @@ public class BesCatalog implements Catalog {
                 name = e.getAttributeValue(THREDDS.NAME);
 
 
+                // Add time coverage if needed.
                 // Is this an atomic dataset and not a collection?
                 if(elementType==THREDDS.DATASET  && !e.getDescendants(new ElementFilter(THREDDS.DATASET,THREDDS.NS)).hasNext() ) {
                     Element timeCoverage = _addTimeCoverage.getTimeCoverage(name);
@@ -231,7 +243,7 @@ public class BesCatalog implements Catalog {
                         e.addContent(1,timeCoverage);
                 }
 
-
+                // Apply the Namer to get news names, if any.
                 newName = _catalogNamer.getName(name);
                 if(newName!=null){
                     e.setAttribute(THREDDS.NAME,newName);
@@ -260,6 +272,26 @@ public class BesCatalog implements Catalog {
                 for (String nme : elementsByName.descendingKeySet()) {
                     topDataset.addContent(elementsByName.get(nme));
                 }
+
+            }
+
+
+
+            for(Proxy proxy: _catalogProxies){
+
+                Element proxyDataset = proxy.getProxyDataset(notRenamed);
+                if(proxyDataset!=null){
+                    if(proxy.isTop()){
+                        int position = 1;
+                        if(_metadata.isEmpty())
+                            position = 0;
+                        topDataset.addContent(position,proxyDataset);
+                    }
+                    else {
+                        topDataset.addContent(proxyDataset);
+                    }
+                }
+
 
             }
 

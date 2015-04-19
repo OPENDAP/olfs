@@ -46,6 +46,8 @@ public class DatasetScan  extends Dataset {
     private Filter _filter;
     private Namer  _namer;
 
+    private Vector<Proxy> _proxies;
+
 
 
 
@@ -64,6 +66,10 @@ public class DatasetScan  extends Dataset {
         _catalogUrlPrefix = catalogUrlPrefix;
 
         _filter = new Filter(getFilter());
+
+        _proxies = getProxies();
+
+
 
     }
 
@@ -104,9 +110,33 @@ public class DatasetScan  extends Dataset {
     */
 
 
-    public Element getAddProxies(){
+    public Vector<Proxy> getProxies(){
 
-        return getCopy(THREDDS.ADD_PROXIES, THREDDS.NS);
+        Vector<Proxy> proxies = new Vector<>();
+
+        Element addProxiesElement =  getCopy(THREDDS.ADD_PROXIES, THREDDS.NS);
+
+        if(addProxiesElement==null)
+            return null;
+
+        List<Element> proxiesList = addProxiesElement.getChildren();
+
+        for(Element proxy : proxiesList){
+            if(proxy.getName().equals(THREDDS.SIMPLE_LATEST)){
+                proxies.add(new SimpleLatest(proxy));
+            }
+            else if(proxy.getName().equals(THREDDS.LATEST_COMPLETE)){
+                proxies.add(new LatestComplete(proxy));
+            }
+
+            // Note that we ignore anything we don't have code to handle...
+        }
+
+
+
+        return proxies;
+
+
     }
 
     public Element getAddTimeCoverage(){
@@ -226,7 +256,19 @@ public class DatasetScan  extends Dataset {
         AddTimeCoverage atc = new AddTimeCoverage(getAddTimeCoverage(), catalogPath);
 
 
-        BesCatalog besCatalog = new BesCatalog(_besApi, catalogPath,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter, increasingSort(), namer, atc);
+        BesCatalog besCatalog =
+                new BesCatalog(
+                        _besApi,
+                        catalogPath,
+                        besCatalogResourceId,
+                        _besCatalogToThreddsCatalogTransformFilename,
+                        metadata,
+                        _filter,
+                        increasingSort(),
+                        namer,
+                        atc,
+                        _proxies
+                );
 
 
         return besCatalog;

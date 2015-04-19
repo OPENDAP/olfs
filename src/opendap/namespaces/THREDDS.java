@@ -71,6 +71,11 @@ public class THREDDS {
 
 
     public static final String ADD_PROXIES = "addProxies";
+    public static final String TOP = "top";
+    public static final String SERVICE_NAME = "serviceName";
+    public static final String SIMPLE_LATEST = "simpleLatest";
+    public static final String LATEST_COMPLETE = "latestComplete";
+    public static final String LAST_MODIFIED_LIMIT = "lastModifiedLimit";
 
 
 
