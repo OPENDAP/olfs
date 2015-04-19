@@ -18,6 +18,7 @@ import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
@@ -51,6 +52,7 @@ public class BesCatalog implements Catalog {
     private Filter _catalogFilter;
     private boolean _ascendingOrder;
     private Namer _catalogNamer;
+    private AddTimeCoverage _addTimeCoverage;
 
 
 
@@ -68,7 +70,8 @@ public class BesCatalog implements Catalog {
                Vector<Element> metadata,
                Filter catalogFilter,
                boolean ascendingOrder,
-               Namer namer
+               Namer namer,
+               AddTimeCoverage addTimeCoverage
     ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
 
         _log = LoggerFactory.getLogger(this.getClass());
@@ -90,6 +93,8 @@ public class BesCatalog implements Catalog {
         _ascendingOrder = ascendingOrder;
 
         _catalogNamer = namer;
+
+        _addTimeCoverage = addTimeCoverage;
 
         loadCatalog();
 
@@ -187,7 +192,7 @@ public class BesCatalog implements Catalog {
             Vector<Element> dropList = new Vector<>();
 
 
-            // Apply the filter by determing what to drop...
+            // Apply the filter by determining what to drop...
             boolean isNode;
             for(Element e : graphElements){
 
@@ -209,12 +214,23 @@ public class BesCatalog implements Catalog {
 
 
 
-            // Apply the Namer to get news names, if any...
+            // Add time coverage is needed.
+            // Apply the Namer to get news names, if any.
 
-            String name, newName;
+            String name, newName, elementType;
             for(Element e : graphElements){
 
+                elementType = e.getName();
                 name = e.getAttributeValue(THREDDS.NAME);
+
+
+                // Is this an atomic dataset and not a collection?
+                if(elementType==THREDDS.DATASET  && !e.getDescendants(new ElementFilter(THREDDS.DATASET,THREDDS.NS)).hasNext() ) {
+                    Element timeCoverage = _addTimeCoverage.getTimeCoverage(name);
+                    if (timeCoverage != null)
+                        e.addContent(1,timeCoverage);
+                }
+
 
                 newName = _catalogNamer.getName(name);
                 if(newName!=null){

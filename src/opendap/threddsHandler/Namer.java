@@ -17,16 +17,16 @@ public class Namer {
     Vector<NamerWorker> _workers;
 
 
-    public Namer(Element namer) {
+    public Namer(Element namer, String parentCatalogPath) {
         _workers = new Vector<>();
         if (namer != null) {
             for (Object o : namer.getChildren()) {
 
                 Element workerElement = (Element) o;
 
-                NamerWorker clude = new NamerWorker(workerElement);
+                NamerWorker nw = new NamerWorker(workerElement);
 
-                _workers.add(clude);
+                _workers.add(nw);
 
             }
         }

@@ -64,7 +64,6 @@ public class DatasetScan  extends Dataset {
         _catalogUrlPrefix = catalogUrlPrefix;
 
         _filter = new Filter(getFilter());
-        _namer = new Namer(getNamer());
 
     }
 
@@ -98,10 +97,12 @@ public class DatasetScan  extends Dataset {
         return ascending;
 
     }
-
+      /*
     public Element getSort(){
         return getCopy(THREDDS.SORT, THREDDS.NS);
     }
+    */
+
 
     public Element getAddProxies(){
 
@@ -116,7 +117,7 @@ public class DatasetScan  extends Dataset {
         Element e = _sourceDataset.getChild(name , ns);
 
         if(e==null)
-            return e;
+            return null;
 
 
         return (Element) e.clone();
@@ -161,8 +162,20 @@ public class DatasetScan  extends Dataset {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
+        String catalogPath = catalogKey;
+        if(!catalogPath.endsWith("/")){
+            int lastSlash = catalogPath.lastIndexOf("/");
+            if(lastSlash>0) {
+                catalogPath = catalogPath.substring(0, catalogPath.lastIndexOf("/"));
+            }
+            else {
 
-        String besCatalogResourceId = catalogKey;
+            }
+        }
+
+
+
+        String besCatalogResourceId = catalogPath;
 
 
 
@@ -170,9 +183,21 @@ public class DatasetScan  extends Dataset {
             besCatalogResourceId = besCatalogResourceId.substring(getUrlPrefix().length());
         }
 
+
+
+
+        /*
+        Replaced by catalogPath computation above
+
         if(besCatalogResourceId.endsWith(CatalogManager.DEFAULT_CATALOG_NAME)){
             besCatalogResourceId = besCatalogResourceId.substring(0,besCatalogResourceId.lastIndexOf(CatalogManager.DEFAULT_CATALOG_NAME));
         }
+         */
+
+
+
+
+
 
         while(besCatalogResourceId.startsWith("/") && besCatalogResourceId.length()>1)
             besCatalogResourceId = besCatalogResourceId.substring(1);
@@ -187,12 +212,21 @@ public class DatasetScan  extends Dataset {
 
         Vector<Element> metadata = getMetadata();
 
+
+        /*
+        Replaced by catalogPath computation above
         if(catalogKey.endsWith(CatalogManager.DEFAULT_CATALOG_NAME))
             catalogKey = catalogKey.substring(0,catalogKey.length() - CatalogManager.DEFAULT_CATALOG_NAME.length());
 
+        */
 
 
-        BesCatalog besCatalog = new BesCatalog(_besApi, catalogKey,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter, increasingSort(), _namer);
+
+        Namer namer = new Namer(getNamer(), catalogPath);
+        AddTimeCoverage atc = new AddTimeCoverage(getAddTimeCoverage(), catalogPath);
+
+
+        BesCatalog besCatalog = new BesCatalog(_besApi, catalogPath,  besCatalogResourceId, _besCatalogToThreddsCatalogTransformFilename,metadata, _filter, increasingSort(), namer, atc);
 
 
         return besCatalog;

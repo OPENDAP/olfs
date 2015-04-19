@@ -68,8 +68,21 @@ public class THREDDS {
     public static final String SORT = "sort";
     public static final String LEXIGRAPHIC_BY_NAME = "lexigraphicByName";
     public static final String INCREASING = "increasing";
+
+
     public static final String ADD_PROXIES = "addProxies";
+
+
+
+
+
     public static final String ADD_TIME_COVERAGE = "addTimeCoverage";
+    public static final String DATASET_NAME_MATCH_PATTERN = "datasetNameMatchPattern";
+    public static final String DATASET_PATH_MATCH_PATTERN = "datasetPathMatchPattern";
+    public static final String START_TIME_SUBSTITUTION_PATTERN = "startTimeSubstitutionPattern";
+    public static final String TIME_COVERAGE = "timeCoverage";
+    public static final String START = "start";
+    public static final String DURATION = "duration";
 
 
 }
