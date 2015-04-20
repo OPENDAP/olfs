@@ -46,6 +46,8 @@ public class THREDDS {
     public static final String NAME = "name";
     public static final String DATASIZE = "dataSize";
     public static final String DATE = "date";
+    public static final String TYPE = "type";
+
     public static final String ACCESS = "access";
     public static final String METADATA = "metadata";
 
@@ -76,6 +78,8 @@ public class THREDDS {
     public static final String SIMPLE_LATEST = "simpleLatest";
     public static final String LATEST_COMPLETE = "latestComplete";
     public static final String LAST_MODIFIED_LIMIT = "lastModifiedLimit";
+
+    public static final String MODIFIED = "modified";
 
 
 
