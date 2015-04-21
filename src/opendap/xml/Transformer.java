@@ -569,6 +569,20 @@ public class Transformer {
     }
 
 
+    public static XdmNode getElementAsXdmNode(Processor proc, Element src) throws IOException, SaxonApiException {
+
+        XdmNode result;
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
+
+        xmlo.output(src,baos);
+
+        return proc.newDocumentBuilder().build(new StreamSource(new ByteArrayInputStream(baos.toByteArray())));
+
+    }
 
 
 

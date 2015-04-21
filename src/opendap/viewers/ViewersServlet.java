@@ -35,6 +35,7 @@ import opendap.dap.Request;
 import opendap.logging.LogUtil;
 import opendap.ppt.PPTException;
 import opendap.services.ServicesRegistry;
+import opendap.services.WebServiceHandler;
 import opendap.webstart.JwsHandler;
 import opendap.xml.Transformer;
 import org.jdom.Document;

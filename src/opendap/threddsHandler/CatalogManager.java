@@ -251,8 +251,7 @@ public class CatalogManager {
             // For each one of them...
             Element dssElem = (Element) i.next();
 
-
-            addDatasetScan(catalog.getUrlPrefix(),dssElem);
+            addDatasetScan(catalog,dssElem);
         }
 
         /** ###############################################################################  */
@@ -273,10 +272,10 @@ public class CatalogManager {
 
 
 
-    private static void addDatasetScan(String catalogUrlPrefix,Element dssElem) throws BadConfigurationException{
+    private static void addDatasetScan(Catalog catalog,Element dssElem) throws BadConfigurationException{
 
 
-        DatasetScan ds = new DatasetScan( catalogUrlPrefix, dssElem, _besCatalogToThreddsCatalogTransformFilename, _besApi);
+        DatasetScan ds = new DatasetScan(catalog,  dssElem,  _besCatalogToThreddsCatalogTransformFilename, _besApi);
 
         _datasetScans.put(ds.getPath(),ds);
 

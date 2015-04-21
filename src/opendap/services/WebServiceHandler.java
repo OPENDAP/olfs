@@ -1,4 +1,4 @@
-package opendap.viewers;
+package opendap.services;
 
 import opendap.services.Service;
 import org.jdom.Document;
@@ -22,6 +22,10 @@ public interface WebServiceHandler extends Service {
     public boolean datasetCanBeViewed(Document ddx);
 
     public String getServiceLink(String datasetUrl);
+
+    public String getThreddsServiceType();
+
+    public String getThreddsUrlPath(String datasetUrl);
 
 
 }

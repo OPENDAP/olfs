@@ -616,13 +616,13 @@ public class StaticCatalogDispatch implements DispatchHandler {
             ingestTransformFile = e.getTextTrim();
         }
 
-        String besCatalogToThreddsCatalogTransformFile = null;
-        e = _config.getChild("besCatalogToThreddsCatalogTransformFile");
+        String besCatalogToDatasetScanCatalogTransformFile = null;
+        e = _config.getChild("besCatalogToDatasetScanCatalogTransformFile");
         if (e != null) {
-            besCatalogToThreddsCatalogTransformFile = e.getTextTrim();
+            besCatalogToDatasetScanCatalogTransformFile = e.getTextTrim();
         }
 
-        _log.debug("init() - Configuration file processing complete.");
+        _log.debug("init() - Configuration file ingest complete.");
 
         /* USe the generic one for now and if later we want to reuse this code we can pass in another on through the
         config */
@@ -635,19 +635,17 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
-
-
-        if (besCatalogToThreddsCatalogTransformFile == null) {
-            besCatalogToThreddsCatalogTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/catalog.xsl");
+        if (besCatalogToDatasetScanCatalogTransformFile == null) {
+            besCatalogToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/besCatalogToDatasetScanCatalog.xsl");
         }
-        _log.debug("init() - Using bes transform file: " + besCatalogToThreddsCatalogTransformFile);
+        _log.debug("init() - Using BES ingest transform file: " + besCatalogToDatasetScanCatalogTransformFile);
 
 
 
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
         String contentPath = ServletUtil.getContentPath(servlet);
-        CatalogManager.init(contentPath, ingestTransformFile, besCatalogToThreddsCatalogTransformFile, _besApi);
+        CatalogManager.init(contentPath, ingestTransformFile, besCatalogToDatasetScanCatalogTransformFile, _besApi);
 
 
         String fileName, pathPrefix, thisUrlPrefix;

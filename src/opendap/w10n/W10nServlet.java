@@ -67,11 +67,7 @@ public class W10nServlet extends HttpServlet   {
 
             W10nService w10nService = new W10nService();
 
-
-            //_log.error(ServletUtil.probeServlet(this));
-
-            String base = this.getServletContext().getContextPath() + "/" +this.getServletName() + "/";
-            w10nService.setBase(base);
+            w10nService.init(this,null);
 
             ServicesRegistry.addService(w10nService);
 

@@ -41,6 +41,10 @@ public class THREDDS {
     public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_STRING);
 
     public static final String SERVICE = "service";
+    public static final String SERVICE_TYPE = "serviceType";
+    public static final String BASE = "base";
+    public static final String COMPOUND = "Compound"
+            ;
     public static final String CATALOG_REF = "catalogRef";
     public static final String CATALOG = "catalog";
     public static final String NAME = "name";
@@ -52,6 +56,7 @@ public class THREDDS {
     public static final String METADATA = "metadata";
 
     public static final String DATASET = "dataset";
+    public static final String ID = "ID";
     public static final String DATASET_SCAN = "datasetScan";
 
     public static final String FILTER = "filter";
@@ -78,7 +83,6 @@ public class THREDDS {
     public static final String SIMPLE_LATEST = "simpleLatest";
     public static final String LATEST_COMPLETE = "latestComplete";
     public static final String LAST_MODIFIED_LIMIT = "lastModifiedLimit";
-
     public static final String MODIFIED = "modified";
 
 

@@ -1,6 +1,7 @@
 package opendap.services;
 
 import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,5 +20,6 @@ public interface Service {
     public String getBase();
 
     public boolean datasetCanBeViewed(Document ddx);
+
 
 }

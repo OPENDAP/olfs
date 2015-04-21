@@ -7,13 +7,12 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.dap.Dap2Service;
+import opendap.namespaces.BES;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;
-import opendap.services.Service;
+import opendap.services.FileService;
 import opendap.services.ServicesRegistry;
-import opendap.viewers.NcWmsService;
-import opendap.viewers.WebServiceHandler;
+import opendap.services.WebServiceHandler;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -27,9 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -54,6 +51,9 @@ public class BesCatalog implements Catalog {
     private Namer _catalogNamer;
     private AddTimeCoverage _addTimeCoverage;
     private Vector<Proxy> _catalogProxies;
+    private Vector<Element> _catalogServices;
+
+    private boolean _useServiceRegistryServices;
 
 
 
@@ -74,10 +74,17 @@ public class BesCatalog implements Catalog {
                boolean ascendingOrder,
                Namer namer,
                AddTimeCoverage addTimeCoverage,
-               Vector<Proxy> proxies
+               Vector<Proxy> proxies,
+               Vector<Element> catalogServices,
+               boolean useServiceRegistryServices
     ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
 
         _log = LoggerFactory.getLogger(this.getClass());
+
+
+
+        _useServiceRegistryServices = useServiceRegistryServices;
+
 
         _catalogLock = new ReentrantReadWriteLock();
 
@@ -101,7 +108,52 @@ public class BesCatalog implements Catalog {
 
         _catalogProxies = proxies;
 
+        _catalogServices = catalogServices;
+
         loadCatalog();
+
+    }
+
+
+    private Vector<Element> getThreddsCatalogServiceElements(Map<String, WebServiceHandler> catalogServices){
+
+        Element serviceElement;
+        Vector<Element> services = new Vector<>();
+        for(WebServiceHandler service: catalogServices.values()){
+
+            if(service.getThreddsServiceType()!=null){
+                serviceElement = new Element(THREDDS.SERVICE,THREDDS.NS);
+                serviceElement.setAttribute(THREDDS.NAME,service.getServiceId());
+                serviceElement.setAttribute(THREDDS.SERVICE_TYPE,service.getThreddsServiceType());
+                serviceElement.setAttribute(THREDDS.BASE,service.getBase());
+                services.add(serviceElement);
+            }
+
+        }
+
+        return services;
+    }
+
+    private TreeMap<String, WebServiceHandler> getStaticCatalogServices(){
+
+        return getStaticCatalogServicesWorker(_catalogServices);
+
+    }
+    private TreeMap<String, WebServiceHandler> getStaticCatalogServicesWorker(List<Element> services){
+        TreeMap<String, WebServiceHandler> sCatServices = new TreeMap<>();
+
+        for(Element serviceElement : services){
+            if(serviceElement.getAttributeValue(THREDDS.SERVICE_TYPE).equalsIgnoreCase(THREDDS.COMPOUND)){
+
+                sCatServices.putAll(getStaticCatalogServicesWorker((List<Element>) serviceElement.getChildren(THREDDS.SERVICE,THREDDS.NS)));
+            }
+            else {
+                SimpleWebServiceHandler swh = new SimpleWebServiceHandler(serviceElement);
+                sCatServices.put(swh.getServiceId(), swh);
+            }
+        }
+
+        return sCatServices;
 
     }
 
@@ -113,53 +165,52 @@ public class BesCatalog implements Catalog {
         try {
             lock.lock();
 
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
             Document besShowCatalogDoc = loadBesCatalog();
 
             Transformer showCatalogToThreddsCatalog = new Transformer(_ingestTransformer);
 
 
-            WebServiceHandler dapService = ServicesRegistry.getWebServiceById(Dap2Service.ID);
-
-
-            showCatalogToThreddsCatalog.setParameter("dapService", dapService.getBase());
-
-
-            String base = null;
-            String dsId = null;
-
-            Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
-            if (s != null && s instanceof NcWmsService) {
-                NcWmsService nws = (NcWmsService) s;
-                base = nws.getBase();
-                dsId = nws.getDynamicServiceId();
-                showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase", base);
-                showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId", dsId);
-            }
-            _log.debug("cacheRawCatalogFileContent() - ncWMS service base:" + base);
-
-
-            if (BesDapDispatcher.allowDirectDataSourceAccess())
-                showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess", "true");
-
-            if (BesDapDispatcher.useDAP2ResourceUrlResponse())
-                showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse", "true");
-
             JDOMSource besCatalog = new JDOMSource(besShowCatalogDoc);
 
-            //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            //showCatalogToThreddsCatalog.transform(besCatalog, baos);
-
             Document catalog = showCatalogToThreddsCatalog.getTransformedDocument(besCatalog);
+
             Element catalogElement = catalog.getRootElement();
+
+
+            /**
+             * Add Services to catalog.
+             */
+            TreeMap<String, WebServiceHandler> catalogServices =  new TreeMap<>();
+
+
+            // Use ServiceRegistry??
+            if(_useServiceRegistryServices){
+                catalogServices.putAll(ServicesRegistry.getWebServiceHandlers());
+
+            }
+
+            // Put those in the catalog...
+            int position = 0;
+            for(Element service : getThreddsCatalogServiceElements(catalogServices)){
+                catalogElement.addContent(position++,service);
+            }
+
+
+            // Get any services defined on the catalog from the catalog file ingest.
+            for(Element service: _catalogServices){
+                Element copy = (Element) service.clone();
+                _log.debug(xmlo.outputString(copy));
+                catalogElement.addContent(position++, (Element) service.clone());
+            }
+
 
             Element topDataset =  catalogElement.getChild(THREDDS.DATASET, THREDDS.NS);
 
 
             topDataset.setAttribute(THREDDS.NAME,getCatalogKey());
 
-
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
             /**
@@ -223,9 +274,16 @@ public class BesCatalog implements Catalog {
                 notRenamed.put(e.getAttributeValue(THREDDS.NAME),(Element)e.clone());
 
 
+            /**
+             * Make thredds:access for each service on bes datasets, and file access otherwise.
+             *
+             *
+             *
+             */
 
+            catalogServices.putAll(getStaticCatalogServices());
 
-
+            addServiceAccessToDatasets(graphElements,catalogServices);
 
 
             String name, newName, elementType;
@@ -281,8 +339,12 @@ public class BesCatalog implements Catalog {
 
                 Element proxyDataset = proxy.getProxyDataset(notRenamed);
                 if(proxyDataset!=null){
+
+                    addServiceAccessToDataset(proxyDataset,catalogServices);
+
+
                     if(proxy.isTop()){
-                        int position = 1;
+                        position = 1;
                         if(_metadata.isEmpty())
                             position = 0;
                         topDataset.addContent(position,proxyDataset);
@@ -312,6 +374,82 @@ public class BesCatalog implements Catalog {
 
 
 
+    public void addServiceAccessToDataset(Element e ,TreeMap<String, WebServiceHandler> catalogServices) {
+        if (e.getName().equals(THREDDS.DATASET)) {
+
+            String datasetID = e.getAttributeValue(THREDDS.ID);
+            Element access;
+
+            if (isBesDataset(e)) {
+
+
+                for (WebServiceHandler wsh : catalogServices.values()) {
+                    access = new Element(THREDDS.ACCESS, THREDDS.NS);
+
+                    access.setAttribute("serviceName", wsh.getServiceId());
+
+                    access.setAttribute("urlPath", wsh.getThreddsUrlPath(datasetID));
+
+                    if (wsh.getServiceId().equalsIgnoreCase(FileService.ID)) {
+                        if (BesDapDispatcher.allowDirectDataSourceAccess()) {
+                            e.addContent(access);
+                        }
+
+                    } else {
+                        e.addContent(access);
+                    }
+
+                }
+            } else {
+                WebServiceHandler wsh = ServicesRegistry.getWebServiceById(FileService.ID);
+                access = new Element(THREDDS.ACCESS, THREDDS.NS);
+
+                access.setAttribute("serviceName", wsh.getServiceId());
+
+                access.setAttribute("urlPath", datasetID);
+                e.addContent(access);
+
+
+            }
+
+        }
+
+    }
+
+    public void addServiceAccessToDatasets(Vector<Element> graphElements,TreeMap<String, WebServiceHandler> catalogServices) {
+
+        for (Element e : graphElements) {
+
+            addServiceAccessToDataset(e,catalogServices);
+
+        }
+    }
+
+
+
+
+
+    private boolean isBesDataset(Element e){
+
+
+        List<Element> list = e.getChildren(BES.SERVICE_REF,BES.BES_NS);
+        Vector<Element> besServiceRefs = new Vector<>(list);
+
+        boolean isBesDataset = false;
+        for(Element besServiceRef: besServiceRefs) {
+
+            if(besServiceRef.getTextTrim().equals(BES.DAP_SERVICE_ID)){
+                isBesDataset = true;
+            }
+            else {
+                XMLOutputter xmlo =  new XMLOutputter(Format.getCompactFormat());
+                _log.warn("loadCatalog() - Unexpected content! BES returned: '{}'",xmlo.outputString(besServiceRef));
+            }
+            besServiceRef.detach();
+        }
+        return isBesDataset;
+
+    }
 
 
 

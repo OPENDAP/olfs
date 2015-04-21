@@ -42,6 +42,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.dap.Dap2Service;
 import opendap.dap4.Dap4Service;
+import opendap.services.FileService;
 import opendap.services.ServicesRegistry;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -301,13 +302,15 @@ public class BesDapDispatcher implements DispatchHandler {
 
         Dap2Service dap2Service = new Dap2Service();
         Dap4Service dap4Service = new Dap4Service();
+        FileService fileService = new FileService();
 
-        String base = servlet.getServletContext().getContextPath() + "/" +servlet.getServletName() + "/";
-        dap2Service.setBase(base);
-        dap4Service.setBase(base);
+        dap2Service.init(servlet,null);
+        dap4Service.init(servlet,null);
+        fileService.init(servlet,null);
 
         ServicesRegistry.addService(dap2Service);
         ServicesRegistry.addService(dap4Service);
+        ServicesRegistry.addService(fileService);
 
 
 

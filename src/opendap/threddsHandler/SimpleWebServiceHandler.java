@@ -1,18 +1,18 @@
-package opendap.w10n;
+package opendap.threddsHandler;
 
-import opendap.PathBuilder;
+import opendap.namespaces.THREDDS;
 import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServlet;
 
-/**
- * Created by ndp on 4/15/15.
- */
-public class W10nService implements WebServiceHandler {
 
-    public static final String ID = "w10n";
+/**
+ * Created by ndp on 4/21/15.
+ */
+public class SimpleWebServiceHandler implements WebServiceHandler {
+
 
     private String _serviceId;
     private String _base;
@@ -20,19 +20,30 @@ public class W10nService implements WebServiceHandler {
     private String _threddsServiceType;
 
 
+    public SimpleWebServiceHandler(Element serviceElement) {
 
-    public W10nService() {
 
-        _serviceId = ID;
-        _name = ID +" Service";
-        _base = "/opendap/"+ID;
-        _threddsServiceType = ID;
+        _name = serviceElement.getAttributeValue(THREDDS.NAME);
+        _serviceId = _name;
+        _threddsServiceType = serviceElement.getAttributeValue(THREDDS.SERVICE_TYPE);
+        _base = serviceElement.getAttributeValue(THREDDS.BASE);
+
+
     }
+
+
+    public SimpleWebServiceHandler(String serviceId, String name, String base, String threddsServiceType) {
+
+        _serviceId = serviceId;
+        _name = name;
+        _base = base;
+        _threddsServiceType = threddsServiceType;
+    }
+
 
     @Override
     public void init(HttpServlet servlet, Element config) {
-        String base = servlet.getServletContext().getContextPath() + "/" +servlet.getServletName() + "/";
-        setBase(base);
+
     }
 
     @Override
@@ -50,10 +61,6 @@ public class W10nService implements WebServiceHandler {
         return _base;
     }
 
-    public void setBase(String base) {
-        _base = base;
-    }
-
     @Override
     public boolean datasetCanBeViewed(Document ddx) {
         return true;
@@ -61,26 +68,17 @@ public class W10nService implements WebServiceHandler {
 
     @Override
     public String getServiceLink(String datasetUrl) {
-
-        PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_base).pathAppend(datasetUrl).append("/");
-        return pb.toString();
+        return _base + datasetUrl;
     }
-
-
 
     @Override
     public String getThreddsServiceType() {
         return _threddsServiceType;
     }
 
+
     public String getThreddsUrlPath(String datasetUrl)  {
-        PathBuilder pb = new PathBuilder();
-        pb.pathAppend(datasetUrl).append("/");
-        return pb.toString();
-    }
-
-
+            return datasetUrl;
+        }
 
 }
-

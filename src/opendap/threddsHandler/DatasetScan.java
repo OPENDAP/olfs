@@ -1,33 +1,21 @@
 package opendap.threddsHandler;
 
-import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.BesDapDispatcher;
-import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.dap.Dap2Service;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;
-import opendap.services.Service;
-import opendap.services.ServicesRegistry;
-import opendap.viewers.NcWmsService;
-import opendap.viewers.WebServiceHandler;
-import opendap.xml.Transformer;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -40,45 +28,48 @@ public class DatasetScan  extends Dataset {
 
     private BesApi _besApi;
 
-    private String _catalogUrlPrefix;
+    private Catalog _parentCatalog;
     private String _besCatalogToThreddsCatalogTransformFilename;
 
     private Filter _filter;
-    private Namer  _namer;
-
     private Vector<Proxy> _proxies;
 
+    private Element _sourceDatasetScanElement;
+
+    private boolean _useServiceRegistryServices;
 
 
 
-    private Element _addProxies;
-
-
-
-    private Element _addTimeCoverage;
-
-
-    public DatasetScan(String catalogUrlPrefix, Element datasetScan, String besCatalogToThreddsCatalogTransformFilename, BesApi besApi)throws BadConfigurationException {
+    public DatasetScan(
+            Catalog parentCatalog,
+            Element datasetScan,
+            String besCatalogToThreddsCatalogTransformFilename,
+            BesApi besApi
+    )throws BadConfigurationException {
         super(datasetScan);
         _log = LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+
+        _sourceDatasetScanElement = _sourceDatasetElement;
+
+        _parentCatalog = parentCatalog;
+
         _besCatalogToThreddsCatalogTransformFilename = besCatalogToThreddsCatalogTransformFilename;
-        _catalogUrlPrefix = catalogUrlPrefix;
+        _besApi = besApi;
+
 
         _filter = new Filter(getFilter());
-
         _proxies = getProxies();
 
-
+        _useServiceRegistryServices = true;
 
     }
 
     public String getPath(){
-        return _sourceDataset.getAttributeValue("path");
+        return _sourceDatasetScanElement.getAttributeValue("path");
     }
 
     public String getLocation(){
-        return _sourceDataset.getAttributeValue("location");
+        return _sourceDatasetScanElement.getAttributeValue("location");
     }
 
     public Element getNamer(){
@@ -91,7 +82,7 @@ public class DatasetScan  extends Dataset {
 
     public boolean increasingSort(){
         boolean ascending = true;
-        Element sortElement  = _sourceDataset.getChild(THREDDS.SORT,THREDDS.NS);
+        Element sortElement  = _sourceDatasetScanElement.getChild(THREDDS.SORT,THREDDS.NS);
         if(sortElement!=null){
             Element lexigraphicByNameElement  = sortElement.getChild(THREDDS.LEXIGRAPHIC_BY_NAME,THREDDS.NS);
             if(lexigraphicByNameElement!=null){
@@ -103,11 +94,53 @@ public class DatasetScan  extends Dataset {
         return ascending;
 
     }
-      /*
-    public Element getSort(){
-        return getCopy(THREDDS.SORT, THREDDS.NS);
+
+    private Element getServiceByName(String name) throws JDOMException, SaxonApiException, IOException {
+
+        Element catalogElement = _parentCatalog.getCatalogDocument().getRootElement();
+
+        Iterator<Element> i = catalogElement.getDescendants(new ElementFilter(THREDDS.SERVICE, THREDDS.NS));
+
+        while(i.hasNext()){
+
+            Element service = i.next();
+            String serviceName = service.getAttributeValue(THREDDS.NAME);
+
+            if(serviceName.equalsIgnoreCase(name)){
+                return getCopy(service);
+
+            }
+
+        }
+
+        return null;
     }
-    */
+
+
+    private Vector<Element> getDatasetScanServiceElements() throws JDOMException, SaxonApiException, IOException {
+
+        Vector<Element> services = new Vector<>();
+
+        Iterator<Element> i = _sourceDatasetScanElement.getDescendants(new ElementFilter(THREDDS.SERVICE_NAME, THREDDS.NS));
+
+
+        while(i.hasNext()){
+            Element serviceNameElement = i.next();
+            String serviceName = serviceNameElement.getTextTrim();
+
+            Element service = getServiceByName(serviceName);
+
+            if (service == null ) {
+                _log.error("getDatasetScanServiceElements() - Unable to locate service named '{}'. Skipping.",serviceName);
+            }
+            else {
+                services.add(service);
+            }
+        }
+
+        return services;
+    }
+
 
 
     public Vector<Proxy> getProxies(){
@@ -144,7 +177,7 @@ public class DatasetScan  extends Dataset {
     }
 
     private Element getCopy(String name, Namespace ns){
-        Element e = _sourceDataset.getChild(name , ns);
+        Element e = _sourceDatasetScanElement.getChild(name , ns);
 
         if(e==null)
             return null;
@@ -154,13 +187,19 @@ public class DatasetScan  extends Dataset {
 
     }
 
+    private Element getCopy(Element e){
+        if(e==null)
+            return null;
+        return (Element) e.clone();
+    }
+
 
 
 
     private String getUrlPrefix() {
 
 
-        return _catalogUrlPrefix + getPath();
+        return _parentCatalog.getUrlPrefix() + getPath();
 
     }
 
@@ -253,8 +292,9 @@ public class DatasetScan  extends Dataset {
 
 
         Namer namer = new Namer(getNamer(), catalogPath);
-        AddTimeCoverage atc = new AddTimeCoverage(getAddTimeCoverage(), catalogPath);
+        AddTimeCoverage addTimeCoverage = new AddTimeCoverage(getAddTimeCoverage(), catalogPath);
 
+        Vector<Element> services  = getDatasetScanServiceElements();
 
         BesCatalog besCatalog =
                 new BesCatalog(
@@ -266,8 +306,10 @@ public class DatasetScan  extends Dataset {
                         _filter,
                         increasingSort(),
                         namer,
-                        atc,
-                        _proxies
+                        addTimeCoverage,
+                        _proxies,
+                        services,
+                        _useServiceRegistryServices
                 );
 
 

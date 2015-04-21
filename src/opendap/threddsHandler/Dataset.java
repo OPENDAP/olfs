@@ -15,7 +15,7 @@ public class Dataset {
 
     private String  _name;
 
-    protected Element _sourceDataset;
+    protected Element _sourceDatasetElement;
 
 
     public Dataset(Element dataset) throws BadConfigurationException {
@@ -27,14 +27,14 @@ public class Dataset {
         if(_name  ==null)
             throw new BadConfigurationException("Dataset() - The 'dataset' element must have a 'name' attribute.");
 
-        _sourceDataset = dataset;
+        _sourceDatasetElement = dataset;
 
 
     }
 
 
     public Vector<Element> getAccess(){
-        List access = _sourceDataset.getChildren(THREDDS.ACCESS, THREDDS.NS);
+        List access = _sourceDatasetElement.getChildren(THREDDS.ACCESS, THREDDS.NS);
         Vector<Element> accessElements = new Vector<>();
         for(Object a : access)
             accessElements.add((Element) ((Element)a).clone());
@@ -42,7 +42,7 @@ public class Dataset {
     }
 
     public Vector<Element> getMetadata(){
-        List meta = _sourceDataset.getChildren(THREDDS.METADATA, THREDDS.NS);
+        List meta = _sourceDatasetElement.getChildren(THREDDS.METADATA, THREDDS.NS);
         Vector<Element> metaElements = new Vector<>();
         for(Object metadata : meta)
             metaElements.add((Element) ((Element)metadata).clone());
@@ -60,46 +60,46 @@ public class Dataset {
     }
 
     public String getAlias(){
-        return  _sourceDataset.getAttributeValue("alias");
+        return  _sourceDatasetElement.getAttributeValue("alias");
     }
 
 
     public String getAuthority(){
-        return  _sourceDataset.getAttributeValue("authority");
+        return  _sourceDatasetElement.getAttributeValue("authority");
     }
 
 
     public String getCollectionType(){
-        return  _sourceDataset.getAttributeValue("collectionType");
+        return  _sourceDatasetElement.getAttributeValue("collectionType");
     }
 
 
     public String getDataType(){
-        return  _sourceDataset.getAttributeValue("dataType");
+        return  _sourceDatasetElement.getAttributeValue("dataType");
     }
 
 
     public String getHarvest(){
-        return  _sourceDataset.getAttributeValue("harvest");
+        return  _sourceDatasetElement.getAttributeValue("harvest");
     }
 
 
     public String getID(){
-        return  _sourceDataset.getAttributeValue("ID");
+        return  _sourceDatasetElement.getAttributeValue("ID");
     }
 
 
     public String getRestrictAccess(){
-        return  _sourceDataset.getAttributeValue("restrictAccess");
+        return  _sourceDatasetElement.getAttributeValue("restrictAccess");
     }
 
 
     public String getServiceName(){
-        return  _sourceDataset.getAttributeValue("serviceName");
+        return  _sourceDatasetElement.getAttributeValue("serviceName");
     }
 
     public String getUrlPath(){
-        return  _sourceDataset.getAttributeValue("urlPath");
+        return  _sourceDatasetElement.getAttributeValue("urlPath");
     }
 
 

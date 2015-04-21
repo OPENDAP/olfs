@@ -477,6 +477,9 @@
 
     <xsl:template match="*" mode="ServiceLinks" >
         <xsl:param name="urlPath" />
+        <xsl:apply-templates mode="ServiceLinks" >
+            <xsl:with-param name="urlPath" select="$urlPath"/>
+        </xsl:apply-templates>
     </xsl:template>
 
 
@@ -487,15 +490,10 @@
             <xsl:when test="./@serviceType[.='Compound']">
                 <tr>
                     <td colspan="2">
-                        <div class="small" style="color: grey;"><xsl:value-of select="./@name" />:</div>
+                        <div class="small">Compound Service: <xsl:value-of select="./@name" />:</div>
                     </td>
                 </tr>
-                <xsl:apply-templates select="./thredds:service" mode="ServiceLinks" >
-                        <xsl:with-param name="urlPath" select="$urlPath" />
-                </xsl:apply-templates>
-                <tr>
-                    <td colspan="2">&#160;</td>
-                </tr>
+
 
             </xsl:when>
 
@@ -519,7 +517,8 @@
 
                                 <!-- Check to see if we can build an access URL. -->
                                 <xsl:when test="not($urlPath)">
-                                No Service Links Available (Missing thredds:dataset/@urlPath or thredds:access/@urlPath)
+                                No Service Links Available (Missing thredds:dataset/@urlPath or thredds:access/@urlPath) : urlPath: <xsl:value-of
+                                        select="$urlPath"/>
                                 </xsl:when>
 
 

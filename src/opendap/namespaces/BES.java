@@ -43,6 +43,7 @@ public class BES {
     public static final Namespace BES_ADMIN_NS =  Namespace.getNamespace("bai", BES_ADMIN_NAMESPACE_STRING);
 
     public static final String DAP_SERVICE_ID = "dap";
+    public static final String SERVICE_REF = "serviceRef";
 
 
 }
