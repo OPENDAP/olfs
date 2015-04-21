@@ -3,9 +3,8 @@
 <html><head><title>OPeNDAP Server Dataset Query Form</title>
 <base href="http://www.opendap.org/online_help_files/opendap_form_help.html">
 <script type="text/javascript">
-<!--
 
-// $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+// $Id$
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -311,7 +310,15 @@ function get_selection() {
 }    
 
 DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat");
-// -->
+</script>
+<style id="antiClickjack">body{display:none !important;}</style>
+<script type="text/javascript">
+   if (self === top) {
+       var antiClickjack = document.getElementById("antiClickjack");
+       antiClickjack.parentNode.removeChild(antiClickjack);
+   } else {
+       top.location = self.location;
+   }
 </script>
 </head>
 <body>
@@ -326,8 +333,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat"
 <td>
 <input type="button" value="Get ASCII" onclick="ascii_button()">
 <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')">
-<input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')">
-<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
+<input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')">
+<input type="button" value="Binary (DAP2) Object" onclick="binary_button('dods')">
 <input type="button" value="Show Help" onclick="help_button()">
 
 <tr>
@@ -358,10 +365,8 @@ DODS_Date.year_day_variable: GSO_AVHRR.day_num
 <td><b>Sequence GSO_AVHRR</b><br>
 <dl><dd>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_satellite = new dods_var("GSO_AVHRR.satellite", "org_opendap_GSO_AVHRR_satellite", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_satellite);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_satellite"
 onclick="org_opendap_GSO_AVHRR_satellite.handle_projection_change(get_org_opendap_GSO_AVHRR_satellite) "  onfocus="describe_projection()">
@@ -381,10 +386,8 @@ satellite <select name="org_opendap_GSO_AVHRR_satellite_operator" onfocus="descr
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_year = new dods_var("GSO_AVHRR.year", "org_opendap_GSO_AVHRR_year", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_year);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_year"
 onclick="org_opendap_GSO_AVHRR_year.handle_projection_change(get_org_opendap_GSO_AVHRR_year) "  onfocus="describe_projection()">
@@ -404,10 +407,8 @@ year <select name="org_opendap_GSO_AVHRR_year_operator" onfocus="describe_operat
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_day_num = new dods_var("GSO_AVHRR.day_num", "org_opendap_GSO_AVHRR_day_num", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_day_num);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_day_num"
 onclick="org_opendap_GSO_AVHRR_day_num.handle_projection_change(get_org_opendap_GSO_AVHRR_day_num) "  onfocus="describe_projection()">
@@ -427,10 +428,8 @@ day_num <select name="org_opendap_GSO_AVHRR_day_num_operator" onfocus="describe_
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_hh = new dods_var("GSO_AVHRR.hh", "org_opendap_GSO_AVHRR_hh", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_hh);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_hh"
 onclick="org_opendap_GSO_AVHRR_hh.handle_projection_change(get_org_opendap_GSO_AVHRR_hh) "  onfocus="describe_projection()">
@@ -450,10 +449,8 @@ hh <select name="org_opendap_GSO_AVHRR_hh_operator" onfocus="describe_operator()
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_mm = new dods_var("GSO_AVHRR.mm", "org_opendap_GSO_AVHRR_mm", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_mm);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_mm"
 onclick="org_opendap_GSO_AVHRR_mm.handle_projection_change(get_org_opendap_GSO_AVHRR_mm) "  onfocus="describe_projection()">
@@ -473,10 +470,8 @@ mm <select name="org_opendap_GSO_AVHRR_mm_operator" onfocus="describe_operator()
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_ss = new dods_var("GSO_AVHRR.ss", "org_opendap_GSO_AVHRR_ss", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_ss);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_ss"
 onclick="org_opendap_GSO_AVHRR_ss.handle_projection_change(get_org_opendap_GSO_AVHRR_ss) "  onfocus="describe_projection()">
@@ -496,10 +491,8 @@ ss <select name="org_opendap_GSO_AVHRR_ss_operator" onfocus="describe_operator()
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_GSO_AVHRR_DODS_URL = new dods_var("GSO_AVHRR.DODS_URL", "org_opendap_GSO_AVHRR_DODS_URL", 0);
 DODS_URL.add_dods_var(org_opendap_GSO_AVHRR_DODS_URL);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_GSO_AVHRR_DODS_URL"
 onclick="org_opendap_GSO_AVHRR_DODS_URL.handle_projection_change(get_org_opendap_GSO_AVHRR_DODS_URL) "  onfocus="describe_projection()">

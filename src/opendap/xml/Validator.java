@@ -36,6 +36,7 @@ import org.jdom.output.XMLOutputter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * User: ndp
@@ -101,7 +102,12 @@ public class Validator {
                   System.err.println("ERROR: Method failed " + request.getStatusLine());
                 }
 
-                doc = simpleParser.build(request.getResponseBodyAsStream());
+                InputStream is = request.getResponseBodyAsStream();
+                try {
+                    doc = simpleParser.build(is);
+                }finally {
+                    is.close();
+                }
                 xmlo.output(doc,System.out);
 
 
@@ -112,7 +118,13 @@ public class Validator {
                 if (statusCode != HttpStatus.SC_OK) {
                   System.err.println("ERROR: Method failed " + request.getStatusLine());
                 }
-                doc = validatingParser.build(request.getResponseBodyAsStream());
+
+                is = request.getResponseBodyAsStream();
+                try {
+                    doc = validatingParser.build(is);
+                }finally {
+                    is.close();
+                }
                 xmlo.output(doc,System.out);
 
 
@@ -136,11 +148,15 @@ public class Validator {
             }
 
             System.out.println("Parsing file: '"+s+"' without validation.\n");
-            doc = simpleParser.build(new FileInputStream(file));
+            try (FileInputStream fis = new FileInputStream(file)) {
+                doc = simpleParser.build(fis);
+            }
             xmlo.output(doc,System.out);
 
             System.out.println("Parsing file: '"+s+"' WITH validation.\n");
-            doc = validatingParser.build(new FileInputStream(file));
+            try (FileInputStream fis = new FileInputStream(file)) {
+                doc = validatingParser.build(fis);
+            }
             xmlo.output(doc,System.out);
 
 

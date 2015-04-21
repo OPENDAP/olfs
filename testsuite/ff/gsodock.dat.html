@@ -3,9 +3,8 @@
 <html><head><title>OPeNDAP Server Dataset Query Form</title>
 <base href="http://www.opendap.org/online_help_files/opendap_form_help.html">
 <script type="text/javascript">
-<!--
 
-// $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+// $Id$
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -311,7 +310,15 @@ function get_selection() {
 }    
 
 DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/gsodock.dat");
-// -->
+</script>
+<style id="antiClickjack">body{display:none !important;}</style>
+<script type="text/javascript">
+   if (self === top) {
+       var antiClickjack = document.getElementById("antiClickjack");
+       antiClickjack.parentNode.removeChild(antiClickjack);
+   } else {
+       top.location = self.location;
+   }
 </script>
 </head>
 <body>
@@ -326,8 +333,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/gsodock.dat");
 <td>
 <input type="button" value="Get ASCII" onclick="ascii_button()">
 <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')">
-<input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')">
-<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
+<input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')">
+<input type="button" value="Binary (DAP2) Object" onclick="binary_button('dods')">
 <input type="button" value="Show Help" onclick="help_button()">
 
 <tr>
@@ -352,10 +359,8 @@ FF_GLOBAL.text: Time    Dep     Temp    Sal     DO%     pH      Turb    AirT    
 <td><b>Sequence URI_GSO-Dock</b><br>
 <dl><dd>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Time = new dods_var("URI_GSO-Dock.Time", "org_opendap_URI_GSO_Dock_Time", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Time);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Time"
 onclick="org_opendap_URI_GSO_Dock_Time.handle_projection_change(get_org_opendap_URI_GSO_Dock_Time) "  onfocus="describe_projection()">
@@ -375,10 +380,8 @@ Time <select name="org_opendap_URI_GSO_Dock_Time_operator" onfocus="describe_ope
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Depth = new dods_var("URI_GSO-Dock.Depth", "org_opendap_URI_GSO_Dock_Depth", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Depth);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Depth"
 onclick="org_opendap_URI_GSO_Dock_Depth.handle_projection_change(get_org_opendap_URI_GSO_Dock_Depth) "  onfocus="describe_projection()">
@@ -398,10 +401,8 @@ Depth <select name="org_opendap_URI_GSO_Dock_Depth_operator" onfocus="describe_o
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Sea_Temp = new dods_var("URI_GSO-Dock.Sea_Temp", "org_opendap_URI_GSO_Dock_Sea_Temp", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Sea_Temp);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Sea_Temp"
 onclick="org_opendap_URI_GSO_Dock_Sea_Temp.handle_projection_change(get_org_opendap_URI_GSO_Dock_Sea_Temp) "  onfocus="describe_projection()">
@@ -421,10 +422,8 @@ Sea_Temp <select name="org_opendap_URI_GSO_Dock_Sea_Temp_operator" onfocus="desc
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Salinity = new dods_var("URI_GSO-Dock.Salinity", "org_opendap_URI_GSO_Dock_Salinity", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Salinity);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Salinity"
 onclick="org_opendap_URI_GSO_Dock_Salinity.handle_projection_change(get_org_opendap_URI_GSO_Dock_Salinity) "  onfocus="describe_projection()">
@@ -444,10 +443,8 @@ Salinity <select name="org_opendap_URI_GSO_Dock_Salinity_operator" onfocus="desc
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_DO_percent = new dods_var("URI_GSO-Dock.DO_percent", "org_opendap_URI_GSO_Dock_DO_percent", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_DO_percent);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_DO_percent"
 onclick="org_opendap_URI_GSO_Dock_DO_percent.handle_projection_change(get_org_opendap_URI_GSO_Dock_DO_percent) "  onfocus="describe_projection()">
@@ -467,10 +464,8 @@ DO_percent <select name="org_opendap_URI_GSO_Dock_DO_percent_operator" onfocus="
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_pH = new dods_var("URI_GSO-Dock.pH", "org_opendap_URI_GSO_Dock_pH", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_pH);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_pH"
 onclick="org_opendap_URI_GSO_Dock_pH.handle_projection_change(get_org_opendap_URI_GSO_Dock_pH) "  onfocus="describe_projection()">
@@ -490,10 +485,8 @@ pH <select name="org_opendap_URI_GSO_Dock_pH_operator" onfocus="describe_operato
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Turbidity = new dods_var("URI_GSO-Dock.Turbidity", "org_opendap_URI_GSO_Dock_Turbidity", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Turbidity);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Turbidity"
 onclick="org_opendap_URI_GSO_Dock_Turbidity.handle_projection_change(get_org_opendap_URI_GSO_Dock_Turbidity) "  onfocus="describe_projection()">
@@ -513,10 +506,8 @@ Turbidity <select name="org_opendap_URI_GSO_Dock_Turbidity_operator" onfocus="de
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Air_Temp = new dods_var("URI_GSO-Dock.Air_Temp", "org_opendap_URI_GSO_Dock_Air_Temp", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Air_Temp);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Air_Temp"
 onclick="org_opendap_URI_GSO_Dock_Air_Temp.handle_projection_change(get_org_opendap_URI_GSO_Dock_Air_Temp) "  onfocus="describe_projection()">
@@ -536,10 +527,8 @@ Air_Temp <select name="org_opendap_URI_GSO_Dock_Air_Temp_operator" onfocus="desc
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Wind_Speed = new dods_var("URI_GSO-Dock.Wind_Speed", "org_opendap_URI_GSO_Dock_Wind_Speed", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Wind_Speed);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Wind_Speed"
 onclick="org_opendap_URI_GSO_Dock_Wind_Speed.handle_projection_change(get_org_opendap_URI_GSO_Dock_Wind_Speed) "  onfocus="describe_projection()">
@@ -559,10 +548,8 @@ Wind_Speed <select name="org_opendap_URI_GSO_Dock_Wind_Speed_operator" onfocus="
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Wind_Direction = new dods_var("URI_GSO-Dock.Wind_Direction", "org_opendap_URI_GSO_Dock_Wind_Direction", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Wind_Direction);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Wind_Direction"
 onclick="org_opendap_URI_GSO_Dock_Wind_Direction.handle_projection_change(get_org_opendap_URI_GSO_Dock_Wind_Direction) "  onfocus="describe_projection()">
@@ -582,10 +569,8 @@ Wind_Direction <select name="org_opendap_URI_GSO_Dock_Wind_Direction_operator" o
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Barometric_Pres = new dods_var("URI_GSO-Dock.Barometric_Pres", "org_opendap_URI_GSO_Dock_Barometric_Pres", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Barometric_Pres);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Barometric_Pres"
 onclick="org_opendap_URI_GSO_Dock_Barometric_Pres.handle_projection_change(get_org_opendap_URI_GSO_Dock_Barometric_Pres) "  onfocus="describe_projection()">
@@ -605,10 +590,8 @@ Barometric_Pres <select name="org_opendap_URI_GSO_Dock_Barometric_Pres_operator"
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_GSO_Dock_Solar_Radiation = new dods_var("URI_GSO-Dock.Solar_Radiation", "org_opendap_URI_GSO_Dock_Solar_Radiation", 0);
 DODS_URL.add_dods_var(org_opendap_URI_GSO_Dock_Solar_Radiation);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_GSO_Dock_Solar_Radiation"
 onclick="org_opendap_URI_GSO_Dock_Solar_Radiation.handle_projection_change(get_org_opendap_URI_GSO_Dock_Solar_Radiation) "  onfocus="describe_projection()">

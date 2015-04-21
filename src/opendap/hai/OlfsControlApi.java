@@ -338,8 +338,8 @@ public class OlfsControlApi extends HttpResponder {
                     }
                     else {
                         sb.append("Unable to set log level. ");
-                        sb.append("LoggerName: ").append(loggerName).append(" ");
-                        sb.append(" LogLevel: ").append(logLevel).append(" ");
+                        sb.append("LoggerName: ").append(Scrub.urlContent(loggerName)).append(" ");
+                        sb.append(" LogLevel: ").append(Scrub.simpleString(logLevel)).append(" ");
                     }
 
                     break;

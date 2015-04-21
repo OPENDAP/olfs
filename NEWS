@@ -1,3 +1,11 @@
+Version 1.13.0 (07 April 2015)
+
+  New w10n navigation and data access service.
+  Updated ncWMS integration.
+  Bug fix in THREDDS catalog inherited metadata injection.
+  New Swath data aggregation service.
+
+
 Version 1.12.1 (05 January 2015)
 
   Disabled bug in our viewers page that was preventing some valid WMS datasets from receiving WMS and Godiva links.

@@ -37,7 +37,7 @@
 
     <JwsHandler className="opendap.webstart.AutoplotRequestHandler" />
 
-    <WebServiceHandler className="opendap.viewers.NcWmsService" serviceId="ncWms" >
+    <!-- WebServiceHandler className="opendap.viewers.NcWmsService" serviceId="ncWms" >
         <applicationName>Web Mapping Service</applicationName>
         <NcWmsService href="/ncWMS/wms" base="/ncWMS/wms" ncWmsDynamicServiceId="lds" />
     </WebServiceHandler>
@@ -46,7 +46,7 @@
         <applicationName>Godiva WMS GUI</applicationName>
         <NcWmsService href="http://localhost:8080/ncWMS/wms" base="/ncWMS/wms" ncWmsDynamicServiceId="lds"/>
         <Godiva href="/ncWMS/godiva2.html" base="/ncWMS/godiva2.html"/>
-    </WebServiceHandler>
+    </WebServiceHandler -->
 
 
 </ViewersConfig>

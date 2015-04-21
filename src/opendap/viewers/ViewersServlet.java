@@ -620,6 +620,9 @@ public class ViewersServlet extends HttpServlet {
 
         Vector<JwsHandler> jwsHandlers =  getWebStartApplicationsForDataset(ddx);
 
+        if(jwsHandlers.isEmpty())
+            return null;
+
         Element webStartAppsElement = new Element("WebStartApplications");
         Element wsElement;
 
@@ -641,6 +644,9 @@ public class ViewersServlet extends HttpServlet {
     private String getWebServicesParam(String datasetId, Document ddx) {
 
         Vector<WebServiceHandler> webServicesForDataset =  getWebServicesForDataset(datasetId, ddx);
+
+        if(webServicesForDataset.isEmpty())
+            return null;
 
         Element webServicesElement = new Element("WebServices");
         Element wsElement;

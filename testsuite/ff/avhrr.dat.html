@@ -3,9 +3,8 @@
 <html><head><title>OPeNDAP Server Dataset Query Form</title>
 <base href="http://www.opendap.org/online_help_files/opendap_form_help.html">
 <script type="text/javascript">
-<!--
 
-// $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+// $Id$
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -311,7 +310,15 @@ function get_selection() {
 }    
 
 DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/avhrr.dat");
-// -->
+</script>
+<style id="antiClickjack">body{display:none !important;}</style>
+<script type="text/javascript">
+   if (self === top) {
+       var antiClickjack = document.getElementById("antiClickjack");
+       antiClickjack.parentNode.removeChild(antiClickjack);
+   } else {
+       top.location = self.location;
+   }
 </script>
 </head>
 <body>
@@ -326,8 +333,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/avhrr.dat");
 <td>
 <input type="button" value="Get ASCII" onclick="ascii_button()">
 <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')">
-<input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')">
-<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
+<input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')">
+<input type="button" value="Binary (DAP2) Object" onclick="binary_button('dods')">
 <input type="button" value="Show Help" onclick="help_button()">
 
 <tr>
@@ -374,10 +381,8 @@ DODS_Date_Time.gmt_time: true
 <td><b>Sequence URI_Avhrr</b><br>
 <dl><dd>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_year = new dods_var("URI_Avhrr.year", "org_opendap_URI_Avhrr_year", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_year);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_year"
 onclick="org_opendap_URI_Avhrr_year.handle_projection_change(get_org_opendap_URI_Avhrr_year) "  onfocus="describe_projection()">
@@ -397,10 +402,8 @@ year <select name="org_opendap_URI_Avhrr_year_operator" onfocus="describe_operat
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_month = new dods_var("URI_Avhrr.month", "org_opendap_URI_Avhrr_month", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_month);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_month"
 onclick="org_opendap_URI_Avhrr_month.handle_projection_change(get_org_opendap_URI_Avhrr_month) "  onfocus="describe_projection()">
@@ -420,10 +423,8 @@ month <select name="org_opendap_URI_Avhrr_month_operator" onfocus="describe_oper
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_day = new dods_var("URI_Avhrr.day", "org_opendap_URI_Avhrr_day", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_day);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_day"
 onclick="org_opendap_URI_Avhrr_day.handle_projection_change(get_org_opendap_URI_Avhrr_day) "  onfocus="describe_projection()">
@@ -443,10 +444,8 @@ day <select name="org_opendap_URI_Avhrr_day_operator" onfocus="describe_operator
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_hours = new dods_var("URI_Avhrr.hours", "org_opendap_URI_Avhrr_hours", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_hours);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_hours"
 onclick="org_opendap_URI_Avhrr_hours.handle_projection_change(get_org_opendap_URI_Avhrr_hours) "  onfocus="describe_projection()">
@@ -466,10 +465,8 @@ hours <select name="org_opendap_URI_Avhrr_hours_operator" onfocus="describe_oper
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_minutes = new dods_var("URI_Avhrr.minutes", "org_opendap_URI_Avhrr_minutes", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_minutes);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_minutes"
 onclick="org_opendap_URI_Avhrr_minutes.handle_projection_change(get_org_opendap_URI_Avhrr_minutes) "  onfocus="describe_projection()">
@@ -489,10 +486,8 @@ minutes <select name="org_opendap_URI_Avhrr_minutes_operator" onfocus="describe_
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_seconds = new dods_var("URI_Avhrr.seconds", "org_opendap_URI_Avhrr_seconds", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_seconds);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_seconds"
 onclick="org_opendap_URI_Avhrr_seconds.handle_projection_change(get_org_opendap_URI_Avhrr_seconds) "  onfocus="describe_projection()">
@@ -512,10 +507,8 @@ seconds <select name="org_opendap_URI_Avhrr_seconds_operator" onfocus="describe_
 
 <p><p>
 <script type="text/javascript">
-<!--
 org_opendap_URI_Avhrr_DODS_URL = new dods_var("URI_Avhrr.DODS_URL", "org_opendap_URI_Avhrr_DODS_URL", 0);
 DODS_URL.add_dods_var(org_opendap_URI_Avhrr_DODS_URL);
-// -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_URI_Avhrr_DODS_URL"
 onclick="org_opendap_URI_Avhrr_DODS_URL.handle_projection_change(get_org_opendap_URI_Avhrr_DODS_URL) "  onfocus="describe_projection()">

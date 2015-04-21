@@ -59,7 +59,6 @@
     </xsl:template>
 
     <xsl:variable name="webServiceLinks">
-
             <xsl:choose>
                 <xsl:when test="$webServices">
                     <ul>
@@ -67,7 +66,7 @@
                     </ul>
                 </xsl:when>
                 <xsl:otherwise>
-                    <p><i>This server cannot locate a Java WebStart data viewer or a data analysis application for this dataset.</i></p>
+                    <p><i>There are no available Web Services for this dataset.</i></p>
                 </xsl:otherwise>
             </xsl:choose>
     </xsl:variable>
@@ -117,8 +116,10 @@
             <xsl:copy-of select="$webStartAppsLinks"/>
             </p>
 
-            <div class="large.bold">Web Services</div>
-            <xsl:copy-of select="$webServiceLinks"/>
+            <xsl:if test="$webServiceLinks">
+                <div class="large.bold">Web Services</div>
+                <xsl:copy-of select="$webServiceLinks"/>
+            </xsl:if>
 
             <!-- xsl:call-template name="DatasetDetail"/ -->
 
