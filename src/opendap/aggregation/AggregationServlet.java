@@ -60,12 +60,13 @@ import java.util.zip.ZipOutputStream;
  * An 'aggregation servlet developed specifically for the EDSC web client
  *
  * This returns a Zip file containing a number of resources read/produced by the Hyrax
- * BES. It can handle a list of resources (typically files) and simply return them,
- * unaltered or translated into netCDF files. In the later case, a constraint expression
- * can be applied to each resource before the transformation takes place, limiting the
- * variables and/or parts of variables in the resulting netCDF file. Note that for the
- * netCDF format response to work, the BES must be able to read the format of the
- * original resource (e.g., HDF4).
+ * BES. The ZIP64(tm) format extensions are used to overcome the size limitations of 
+ * the original ZIP format. It can handle a list of resources (typically files) and simply
+ * return them, unaltered or translated into netCDF files. In the later case, a 
+ * constraint expression can be applied to each resource before the transformation takes
+ * place, limiting the variables and/or parts of variables in the resulting netCDF file.
+ * Note that for the netCDF format response to work, the BES must be able to read the 
+ * format of the original resource (e.g., HDF4). 
  *
  * To methods of interaction are supported: GET and POST. HEAD requests are also supported,
  * although not particularly meaningful.
@@ -136,6 +137,13 @@ public class AggregationServlet extends HttpServlet {
             "I expected the operation to be one of: version, file, netcdf3, netcdf4, ascii or csv but got: ";
     private static final String versionInfo = "Aggregation Interface Version: 1.1";
 
+    private enum ResponseFormat {
+        netcdf3,
+        netcdf4,
+        ascii,
+        plain
+    }
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -189,9 +197,9 @@ public class AggregationServlet extends HttpServlet {
     }
 
     /**
-     * Given a granule name, and return a name that will not collide
+     * Given a granule name, return a name that will not collide
      * with a file name already used in the Zip file. This is used
-     * because Zip files don't tolerate duplicate entries, it's possible
+     * because Zip files don't tolerate duplicate entries. It's possible
      * to have the same files used with different CEs and users
      * on machines with case insensitive file systems will have duplicate
      * names even when Unix thinks they are unique...
@@ -352,13 +360,6 @@ public class AggregationServlet extends HttpServlet {
         zos.finish();
     }
 
-    private enum ResponseFormat {
-        netcdf3,
-        netcdf4,
-        ascii,
-        plain
-    }
-
     /**
      * Helper - write a single netCDF3 file to the stream. If an error is
      * returned by the BES, use the value of the error message as the file
@@ -392,6 +393,8 @@ public class AggregationServlet extends HttpServlet {
             case ascii:
                 status = _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, os, errors);
                 break;
+            default:
+            	break;
         }
 
         if (!status) {
@@ -472,7 +475,6 @@ public class AggregationServlet extends HttpServlet {
         int N = params.getNumberOfFiles();
 
         response.setContentType("text/plain");
-        //response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
 
         User user = new User(request);
         int maxResponse = user.getMaxResponseSize();
