@@ -1,6 +1,7 @@
 package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
+import opendap.PathBuilder;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.namespaces.THREDDS;
@@ -60,7 +61,11 @@ public class DatasetScan  extends Dataset {
         _filter = new Filter(getFilter());
         _proxies = getProxies();
 
+
         _useServiceRegistryServices = true;
+        String s = datasetScan.getAttributeValue("useHyraxServices");
+        if(s!=null && s.equalsIgnoreCase("false"))
+            _useServiceRegistryServices = false;
 
     }
 
@@ -199,7 +204,13 @@ public class DatasetScan  extends Dataset {
     private String getUrlPrefix() {
 
 
-        return _parentCatalog.getUrlPrefix() + getPath();
+        PathBuilder pb = new PathBuilder();
+        String parentPrefix = _parentCatalog.getUrlPrefix();
+        String path = getPath();
+
+        pb.append(parentPrefix).pathAppend(path);
+
+        return pb.toString();
 
     }
 
@@ -208,11 +219,6 @@ public class DatasetScan  extends Dataset {
         String urlPrefix = getUrlPrefix();
 
         if(catalogKey.startsWith(urlPrefix)){
-            Element filter = getFilter();
-
-            if(filter != null){
-                _log.error("matches() - Sorry! The filter element is not yet supported.");
-            }
 
             return true;
         }
@@ -237,14 +243,14 @@ public class DatasetScan  extends Dataset {
             if(lastSlash>0) {
                 catalogPath = catalogPath.substring(0, catalogPath.lastIndexOf("/"));
             }
-            else {
-
-            }
         }
 
 
 
+
         String besCatalogResourceId = catalogPath;
+        if(catalogPath.startsWith(getPath()))
+            besCatalogResourceId = catalogPath.substring(getPath().length());
 
 
 

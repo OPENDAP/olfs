@@ -26,6 +26,7 @@
 package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
+import opendap.PathBuilder;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.RequestCache;
@@ -277,7 +278,11 @@ public class CatalogManager {
 
         DatasetScan ds = new DatasetScan(catalog,  dssElem,  _besCatalogToThreddsCatalogTransformFilename, _besApi);
 
-        _datasetScans.put(ds.getPath(),ds);
+
+        PathBuilder pb = new PathBuilder();
+
+        pb.append(catalog.getPathPrefix()).append(ds.getPath());
+        _datasetScans.put(pb.toString(),ds);
 
 
     }

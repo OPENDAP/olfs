@@ -335,28 +335,30 @@ public class BesCatalog implements Catalog {
 
 
 
-            for(Proxy proxy: _catalogProxies){
+            if(_catalogProxies!=null){
+                for(Proxy proxy: _catalogProxies){
 
-                Element proxyDataset = proxy.getProxyDataset(notRenamed);
-                if(proxyDataset!=null){
+                    Element proxyDataset = proxy.getProxyDataset(notRenamed);
+                    if(proxyDataset!=null){
 
-                    addServiceAccessToDataset(proxyDataset,catalogServices);
+                        addServiceAccessToDataset(proxyDataset,catalogServices);
 
 
-                    if(proxy.isTop()){
-                        position = 1;
-                        if(_metadata.isEmpty())
-                            position = 0;
-                        topDataset.addContent(position,proxyDataset);
+                        if(proxy.isTop()){
+                            position = 1;
+                            if(_metadata.isEmpty())
+                                position = 0;
+                            topDataset.addContent(position,proxyDataset);
+                        }
+                        else {
+                            topDataset.addContent(proxyDataset);
+                        }
                     }
-                    else {
-                        topDataset.addContent(proxyDataset);
-                    }
+
+
                 }
 
-
             }
-
 
 
 

@@ -31,6 +31,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.AuthenticationControls;
 import opendap.logging.Timer;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -151,14 +152,14 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             if (query != null) {
                 if (query.startsWith("dataset=")) {
-                    sendDatasetHtmlPage(orq, response, catalogKey, query);
+                    sendDatasetHtmlPage(request, response, catalogKey, query);
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
                 }
 
 
             } else {
-                sendCatalogHTML(orq, response, catalogKey);
+                sendCatalogHTML(request, response, catalogKey);
             }
 
         } else { // Send the the raw catalog XML.
@@ -378,6 +379,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
             _catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
 
+
             // Set up the Http headers.
             response.setContentType("text/html");
             response.setHeader("Content-Description", "thredds_catalog");
@@ -420,7 +422,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void sendDatasetHtmlPage(Request oRequest,
+    private void sendDatasetHtmlPage(HttpServletRequest request,
                                      HttpServletResponse response,
                                      String catalogKey,
                                      String query) throws IOException, JDOMException, SaxonApiException {
@@ -432,6 +434,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             _datasetToHtmlTransformLock.lock();
             _datasetToHtmlTransform.reloadTransformIfRequired();
 
+            Request orq = new Request(null,request);
 
 
 
@@ -458,8 +461,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
             _log.debug("targetDataset: " + targetDataset);
 
             // Pass the docsService  parameter to the transform
-            _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+            _datasetToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
             _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
+
+
+            AuthenticationControls.setLoginParameters(_datasetToHtmlTransform, request);
 
 
             // Set up the http headers.
@@ -487,10 +493,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-    private void sendCatalogHTML(Request oRequest, HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException, JDOMException, BadConfigurationException, PPTException {
+    private void sendCatalogHTML(HttpServletRequest request, HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException, JDOMException, BadConfigurationException, PPTException {
 
 
         try {
+            Request orq = new Request(null,request);
+
 
             _catalogToHtmlTransformLock.lock();
             _catalogToHtmlTransform.reloadTransformIfRequired();
@@ -520,8 +528,10 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
-            _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
-            _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+            _catalogToHtmlTransform.setParameter("dapService", orq.getServiceLocalId());
+            _catalogToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
+
+            AuthenticationControls.setLoginParameters(_catalogToHtmlTransform, request);
 
             _catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
 
@@ -749,7 +759,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
+        String dataSource = relativeUrl; //_besApi.getBesDataSourceID(relativeUrl,false);
         //String requestSuffixRegex = ReqInfo.getRequestSuffix(request);
 
         boolean threddsRequest = false;

@@ -85,7 +85,7 @@
 
         <thredds:catalogRef name="{$datasetScanName}"
                             xlink:title="{$datasetScanName}"
-                            xlink:href="{$path}"
+                            xlink:href="{$path}/catalog.xml"
                             xlink:type="simple"/>
 
 
