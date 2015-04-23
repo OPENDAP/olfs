@@ -33,6 +33,7 @@
 
                 >
     <xsl:import href="version.xsl"/>
+    <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
     <xsl:param name="targetDataset" />
     <xsl:param name="remoteCatalog" />
@@ -117,13 +118,17 @@
                 <!--                                                        -->
 
                 <head>
-                    <link rel='stylesheet' href='{$docsService}/css/contents.css'
-                          type='text/css'/>
+
+                    <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
+                    <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
+                    <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+
                     <title>THREDDS Dataset: <xsl:value-of select="@name"/></title>
 
                 </head>
 
                 <body>
+                    <!-- div class="small">serviceContext: '<xsl:value-of select="$serviceContext"/>'</div -->
                     <!-- ****************************************************** -->
                     <!--                      LOGIN UI                          -->
                     <!--                                                        -->
@@ -321,18 +326,44 @@
 
                     <h2>Metadata Detail: </h2>
 
-                    <ul class="small">
-                        <xsl:apply-templates select="." mode="metadataDetail" >
-                            <xsl:with-param name="currentDataset" select="." />
-                        </xsl:apply-templates>
 
-                        <xsl:variable name="metadataTest" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
-                        <xsl:if test="$metadataTest" >
-                            <xsl:apply-templates select="$metadataTest" mode="metadataDetail" >
-                                <xsl:with-param name="currentDataset" select="." />
-                            </xsl:apply-templates>
-                        </xsl:if>
+
+                    <ul class="collapsibleList" style="font-size: 10px;">
+                        <li>
+                            <div class="tightView">
+                                <span class="small_bold">Dataset Metadata</span>
+                                <ul>
+                                    <xsl:apply-templates select="." mode="metadataDetail" >
+                                        <xsl:with-param name="currentDataset" select="." />
+                                    </xsl:apply-templates>
+
+                                </ul>
+                            </div>
+
+                        </li>
+
+
                     </ul>
+
+
+
+                    <xsl:variable name="metadataTest" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
+                    <xsl:if test="$metadataTest" >
+                        <ul class="collapsibleList" style="font-size: 10px;">
+                            <li>
+                                <div class="tightView">
+                                    <span class="small_bold">Inherited Metadata</span>
+                                    <ul>
+                                        <xsl:apply-templates select="$metadataTest" mode="metadataDetail" >
+                                            <xsl:with-param name="currentDataset" select="." />
+                                        </xsl:apply-templates>
+                                    </ul>
+                                </div>
+
+                            </li>
+                        </ul>
+
+                    </xsl:if>
 
 
 
@@ -370,6 +401,7 @@
                     </h1>
 
                 </body>
+        <script>CollapsibleLists.apply(true);</script>
 
     </xsl:template>
 
@@ -560,29 +592,60 @@
                                 </xsl:when>
 
 
+                                <!--
+
+                                DAP2 Service Links
+
+                                -->
                                 <xsl:when test="matches(./@serviceType, 'opendap', 'i')">
 
-                                    <a title="Browser accessible form for requesting data."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.html">Data Request Form</a>&#160;
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.html">Data Request Form</a>
 
                                     <xsl:if test="not($remoteHost)">
-                                        <a title="RDF representation of the DDX."
-                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.rdf">rdf</a>&#160;
+                                        <a style="padding-right: 3px"  title="RDF representation of the DDX."
+                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.rdf">rdf</a>
                                     </xsl:if>
 
-                                    <a title="The DAP DDX document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.ddx">ddx</a>&#160;
-                                    <a title="The DAP DDS document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dds">dds</a>&#160;
-                                    <a title="The DAP DAS document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.das">das</a>&#160;
-                                    <a title="Browser accessible informational page regarding this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.info">info</a>&#160;
+                                    <a style="padding-right: 3px" title="The DAP DDX document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.ddx">ddx</a>
+                                    <a style="padding-right: 3px" title="The DAP DDS document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dds">dds</a>
+                                    <a style="padding-right: 3px" title="The DAP DAS document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.das">das</a>
+                                    <a style="padding-right: 3px" title="Browser accessible informational page regarding this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.info">info</a>
+                                </xsl:when>
+
+                                <!--
+
+                                DAP4 Service Links
+
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'dap4', 'i')">
+
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.html">Data Request Form</a>
+
+                                    <a style="padding-right: 3px" title="The DAP DMR document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.xml">dmr</a>
+
+                                    <xsl:if test="not($remoteHost)">
+                                        <a style="padding-right: 3px" title="RDF representation of the DMR."
+                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.rdf">rdf</a>
+                                    </xsl:if>
+
                                 </xsl:when>
 
 
-                                <!-- Produces service URL's for the HTTPServer serviceType -->
-                                <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i')">
+
+
+                                <!--
+
+                                Produce service URL's for the HTTPServer and File serviceType
+
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i') or matches(./@serviceType, 'File', 'i')">
                                     <a
                                             title="This link provides file download access via HTTP."
                                             href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >File Download</a>
@@ -771,8 +834,9 @@
             <ul>
                 <li><em>urlPath: </em><xsl:value-of select="@urlPath" /></li>
                 <li><em>serviceName: </em><xsl:value-of select="@serviceName" /></li>
-                <li><em>dataFormat</em><xsl:value-of select="@dataFormat" /></li>
-                <xsl:apply-templates mode="dataSizeDetail" />
+                <xsl:if test="@dataFormat">
+                    <li><em>dataFormat</em><xsl:value-of select="@dataFormat" /></li>
+                </xsl:if>
             </ul>
         </li>
     </xsl:template>
@@ -797,6 +861,8 @@
     <xsl:template match="thredds:authority" mode="authorityDetail">
          <li><em>Naming Authority: </em><xsl:value-of select="."/></li>
     </xsl:template>
+
+
 
 
 
@@ -988,11 +1054,11 @@
      -->
     <xsl:template match="thredds:dataset" mode="datasetDetail">
         <li>
-            <b>Dataset Metadata: </b>
-            <ul>
-                <li><em>name: </em><xsl:value-of select="@name" /></li>
-                <xsl:apply-templates select="*" mode="metadataDetail"/>
-            </ul>
+            <div class="small_bold"><em>name: </em><xsl:value-of select="@name" /></div>
+                <ul>
+                    <xsl:apply-templates select="*" mode="metadataDetail"/>
+                </ul>
+
         </li>
     </xsl:template>
 
@@ -1031,7 +1097,6 @@
 
     <xsl:template match="thredds:metadata" mode="metadataDetail">
         <xsl:param name="currentDataset" />
-        <li><b><xsl:if test="./@inherited[.='true']">Inherited</xsl:if> Metadata Group:</b></li>
         <ul>
         <xsl:apply-templates mode="metadataDetail" />
         </ul>

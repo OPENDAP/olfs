@@ -275,6 +275,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build the catalog document as an XdmNode.
             XdmNode catDoc = _datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
+            _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
             _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
             _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
             _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
@@ -373,6 +374,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             XdmNode catDoc = _catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
             _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
+            _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
             _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
 
             _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
@@ -461,6 +463,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             _log.debug("targetDataset: " + targetDataset);
 
             // Pass the docsService  parameter to the transform
+            _datasetToHtmlTransform.setParameter("serviceContext",_dispatchServlet.getServletContext().getContextPath());
             _datasetToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
             _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
 

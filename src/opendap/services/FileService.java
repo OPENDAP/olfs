@@ -74,7 +74,7 @@ public class FileService implements WebServiceHandler {
 
     public String getThreddsUrlPath(String datasetUrl)  {
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(datasetUrl).append(".file");
+        pb.pathAppend(datasetUrl);//.append(".file");
         return pb.toString();
         }
 

@@ -61,7 +61,7 @@ public class Dap4Service  implements WebServiceHandler {
 
         PathBuilder pb = new PathBuilder();
 
-        pb.pathAppend(_base).pathAppend(datasetUrl).append(".dmr");
+        pb.pathAppend(_base).pathAppend(datasetUrl); //.append(".dmr");
         return pb.toString();
     }
 
@@ -71,7 +71,7 @@ public class Dap4Service  implements WebServiceHandler {
 
     public String getThreddsUrlPath(String datasetUrl)  {
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(datasetUrl).append(".dmr");
+        pb.pathAppend(datasetUrl);//.append(".dmr");
         return pb.toString();
         }
 

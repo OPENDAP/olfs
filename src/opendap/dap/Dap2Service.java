@@ -67,8 +67,8 @@ public class Dap2Service  implements WebServiceHandler {
     @Override
     public String getThreddsUrlPath(String datasetUrl) {
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_base).pathAppend(datasetUrl).append(".ddx");
-        return pb.toString();
+        pb.pathAppend(_base).pathAppend(datasetUrl);// .append(".ddx");
+        return datasetUrl;
     }
 
     public String getThreddsServiceType() {

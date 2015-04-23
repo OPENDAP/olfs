@@ -37,8 +37,8 @@ public class PathBuilder  {
             s = s.substring(1);
         }
 
-        _log.error("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);
-        _log.error("pathAppend: _sb.lastIndexOf(\"/\"): '{}' _sb.length(): '{}'",_sb.lastIndexOf("/"),_sb.length());
+        //_log.debug("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);
+        //_log.debug("pathAppend: _sb.lastIndexOf(\"/\"): '{}' _sb.length(): '{}'",_sb.lastIndexOf("/"),_sb.length());
 
 
         if (_sb.length()==0 || (_sb.lastIndexOf("/") == _sb.length()-1)) {

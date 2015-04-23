@@ -103,6 +103,7 @@
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
                         <xsl:if test="thredds:service">
+                            <span style="color: black;">Catalog Services</span>
                             <table>
                                 <tr>
                                     <th class="small"><u>Service Name</u></th>
@@ -485,6 +486,7 @@
                     <xsl:call-template name="NoSizeNoTime" />
                 </tr>
                 <xsl:apply-templates>
+                    <xsl:with-param name="ident" select="2"/>
                     <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
                     <!--
                       -   Note that the followiing parameter uses an XPath that
@@ -550,15 +552,15 @@
             <xsl:choose>
 
                 <xsl:when test="$currentDataset/thredds:dataSize">
-                    <xsl:value-of select="$currentDataset/thredds:dataSize" />&#160;<xsl:value-of select="$currentDataset/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$currentDataset/thredds:dataSize" /></span><xsl:value-of select="$currentDataset/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:when test="$metadata/thredds:dataSize">
-                    <xsl:value-of select="$metadata/thredds:dataSize" />&#160;<xsl:value-of select="$metadata/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$metadata/thredds:dataSize" /></span><xsl:value-of select="$metadata/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:when test="$inheritedMetadata/thredds:dataSize">
-                    <xsl:value-of select="$inheritedMetadata/thredds:dataSize" />&#160;<xsl:value-of select="$inheritedMetadata/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$inheritedMetadata/thredds:dataSize" /></span><xsl:value-of select="$inheritedMetadata/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:otherwise>--</xsl:otherwise>
