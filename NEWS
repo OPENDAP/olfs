@@ -1,3 +1,10 @@
+Version 1.13.q (24 April 2015)
+
+  New datasetScan implementation for THREDDS catalogs provides for all datasetScan activities as described here:
+      http://www.unidata.ucar.edu/software/thredds/v4.6/tds/reference/DatasetScan.html
+  As of the day of this writing.
+
+
 Version 1.13.0 (07 April 2015)
 
   New w10n navigation and data access service.

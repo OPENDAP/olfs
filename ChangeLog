@@ -1,3 +1,126 @@
+commit 3384d849a160689860700561981b21cdd5bd7273
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 11:18:46 2015 -0700
+
+    Created an example datasetScan in the default catalog.xml file
+
+commit c841e0030ef74a30ee26b9051e71371a6bed6575
+Merge: d56219b 9730c11
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 10:48:04 2015 -0700
+
+    Merge branch 'datasetScan'
+
+commit 9730c112d6d9f1d2057b25b0f8be60944edf1eaa
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 10:33:42 2015 -0700
+
+    olfs: Fixed problems with service path/link generation.
+
+commit b020e53fff2e2e7a48146412bb0f3e0f96dbf8d9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 08:36:04 2015 -0700
+
+    olfs: Added serviceContext to parameter lost for thredds xslt.
+
+commit ab352beb7e1c3a246ef87d484d3c1830802c1037
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 08:13:15 2015 -0700
+
+    olfs: Fixed presentation so that it uses css and not lists to manage formatting.
+
+commit 1d0bc147f01e119934c30abf66fca58d72d69619
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Apr 23 16:20:40 2015 -0700
+
+    olfs: Repaired fixed the emssion of &#160; characters in the THREDDS catalog code. These things still exist in the  (currently unused) AWS code and in the WCS code.
+
+commit 156a7068f40f6412e952e01bdb3910de5ca4d808
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Apr 23 13:53:46 2015 -0700
+
+    olfs: Added collapsing lists to DMR and THREDDS datasetDetail pages
+
+commit d409de8a9b5b7b73e14999ec03ee58cda0a92c16
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Apr 22 15:38:54 2015 -0700
+
+    olfs: Added authentication controls to THREDDS pages. Fixed link, path, and ID construction
+     issues.
+
+commit c4d69386ffd35bd27f739a9e11805647026e0780
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 21 16:04:26 2015 -0700
+
+    olfs: Fixed the way that services are managed in the new DatasetScan class. Now it uses the Hyrax ServiceRegistry and allows for the catalog datasetScan elements to inject other services.
+
+commit d56219bfcb3feda55c04bd75868fc184b444ae11
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Apr 21 14:35:19 2015 -0600
+
+    Added files in resources/aggregation to gitignore
+
+commit 8eb7101f35c0a7b5f63ed880d67056d31d16a3c3
+Merge: 4eaa731 8cc2ea8
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Apr 21 14:33:53 2015 -0600
+
+    Merge branch 'master' of https://github.com/opendap/olfs.git
+
+commit 4eaa731bd67ad81a4aae6f42bac9513e2988c48f
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Tue Apr 21 14:32:42 2015 -0600
+
+    Updates to doc comments
+
+commit fc5f0fe834af3c604fd4bef374bca143ee47f499
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Apr 20 09:12:38 2015 -0700
+
+    olfs: New DatasetScan fixed a timezone issue with LatestComplete
+
+commit fcea444e850ebf8319aab71fd3c4c738c5bc7801
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Sun Apr 19 12:17:21 2015 -0700
+
+    olfs: New DatasetScan 'addProxies' is now working.
+
+commit 8d5c84d829a600e7c09083657c147810486074b1
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Sun Apr 19 07:01:13 2015 -0700
+
+    olfs: New DatasetScan 'addTimeCoverage' is now working.
+
+commit 3512dd920e8b6c22bc8075c7059aa0221fee5961
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Sat Apr 18 09:34:36 2015 -0700
+
+    olfs: New DatasetScan 'namer' is now working.
+
+commit 05985b1da4cdd43f4332d3c9478aa13ddd58b513
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 17 16:53:35 2015 -0700
+
+    olfs: New DatasetScan implementation that works directly with the BES. First Draft. Inherited metadata and filters working.
+
+commit 29a40961c36971ee7e13f7bf3ce3de5258c24784
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Apr 15 08:29:35 2015 -0700
+
+    Starting datasetScan refactor (new version  will work directly with BES and not just provide pointers into the default catalog)
+
+commit 8cc2ea81aee4cfd62f1c61ab04aaf24bfa7fb161
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Apr 15 05:39:19 2015 -0700
+
+    olfs: Commented out AuthenticationControls for the default DirectroyDispathHandler config.
+
+commit 937e1d938f301d33d169791161f06acae8d69cf0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 7 13:16:21 2015 -0700
+
+    olfs: Updating version numbers to 1.13.0
+
 commit 8a902d37758256467066e2b37c3fd83c7fe010a4
 Author: Nathan Potter <ndp@opendap.org>
 Date:   Tue Apr 7 10:09:12 2015 -0700
