@@ -34,6 +34,7 @@
 
         >
     <xsl:import href="version.xsl"/>
+    <xsl:param name="serviceContext"/>
     <xsl:param name="dapService"/>
     <xsl:param name="docsService"/>
     <xsl:param name="remoteHost" />
@@ -48,8 +49,6 @@
     <xsl:variable name="indentIncrement" select="3"/>
 
 
-
-
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
     <xsl:template match="thredds:catalog">
@@ -58,7 +57,7 @@
                 <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
                 <!-- script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script -->
-                <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
 
                 <title>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>

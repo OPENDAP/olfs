@@ -373,6 +373,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build the catalog document as an XdmNode.
             XdmNode catDoc = _catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
+            _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
             _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
             _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
             _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
@@ -531,6 +532,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
+            _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
             _catalogToHtmlTransform.setParameter("dapService", orq.getServiceLocalId());
             _catalogToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
 
