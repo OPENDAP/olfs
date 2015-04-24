@@ -53,6 +53,58 @@ FIRST: Go Read The THREDDS Documentation:
     <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
 
 
+    <!-- ************************************************************************************* -->
+    <!--
+          This is an example datasetScan Element that does some rewriting of the entire catalog.
+          It is provided as an example of functionality and isn't intended for production
+          use.
+
+    -->
+    <!-- datasetScan name="DatasetScanExample" path="hyrax" location="/" useHyraxServices="true" >
+        <metadata inherited="true">
+          <documentation type="Rights">Freely Available</documentation>
+          <documentation xlink:href="http://docs.opendap.org"
+                         xlink:title="OPeNDAP Documentation Home"/>
+          <documentation xlink:href="http://docs.opendap.org/index.php/Hyrax" xlink:title="Hyrax Server Documentation" />
+          <documentation xlink:href="http://docs.opendap.org/index.php/Hyrax_-_THREDDS_Configuration" xlink:title="Hyrax THREDDS Catalog Configuration" />
+          <creator>
+            <name vocabulary="DIF">OPeNDAP</name>
+            <contact url="http://www.opendap.org/" email="support@opendap.org" />
+          </creator>
+          <authority>org.opendap</authority>
+          <publisher>
+            <name vocabulary="DIF">OPeNDAP</name>
+            <contact url="http://www.opendap.org/" email="support@opendap.org" />
+          </publisher>
+          <keyword>Hyrax</keyword>
+          <keyword>THREDDS</keyword>
+          <keyword>OPeNDAP</keyword>
+        </metadata>
+        <filter>
+            <exclude wildcard="*not_currently_supported" />
+            <exclude regExp="/data/h5/dir2" collection="true" />
+        </filter>
+        <sort>
+            <lexigraphicByName increasing="true" />
+        </sort>
+        <namer>
+            <regExpOnName regExp="/data/he/dir1" replaceString="A sweet lullabye." />
+            <regExpOnName regExp="(.*)\.h5" replaceString="$1.hdf5" />
+            <regExpOnName regExp="(.*)\.he5" replaceString="$1.hdf5_eos" />
+            <regExpOnName regExp="(.*)\.nc" replaceString="$1.netcdf" />
+        </namer>
+          <addTimeCoverage
+              datasetNameMatchPattern="(.*)\.he5"
+              startTimeSubstitutionPattern="ThisStringRepresentsASubstitutionGroupUsedToBuildAStartTimeValueFromTheFileName"
+              duration="60 hours"
+          />
+          <addProxies>
+              <simpleLatest name="simpleLatest" />
+              <latestComplete name="latestComplete" lastModifiedLimit="1.0" />
+          </addProxies>
+
+    </datasetScan -->
+
 
 
 
