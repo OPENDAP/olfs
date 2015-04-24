@@ -61,12 +61,12 @@ public class Dap4Service  implements WebServiceHandler {
 
         PathBuilder pb = new PathBuilder();
 
-        pb.pathAppend(_base).pathAppend(datasetUrl); //.append(".dmr");
+        pb.append(_base).pathAppend(datasetUrl).append(".dmr.html");
         return pb.toString();
     }
 
     public String getThreddsServiceType() {
-        return "DAP4";
+        return ID.toUpperCase();
     }
 
     public String getThreddsUrlPath(String datasetUrl)  {

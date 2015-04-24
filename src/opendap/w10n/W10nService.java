@@ -63,7 +63,7 @@ public class W10nService implements WebServiceHandler {
     public String getServiceLink(String datasetUrl) {
 
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_base).pathAppend(datasetUrl).append("/");
+        pb.append(_base).pathAppend(datasetUrl).append("/");
         return pb.toString();
     }
 

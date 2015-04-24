@@ -106,7 +106,7 @@ public class NcWmsService implements WebServiceHandler {
     public String getServiceLink(String datasetUrl) {
 
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
+        pb.append(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
         return pb.toString();
 
 

@@ -130,7 +130,7 @@ public class GodivaWebService implements WebServiceHandler {
 
 
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_godivaBase).append("?server=");
+        pb.append(_godivaBase).append("?server=");
         pb.append(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl);
 
         return pb.toString();

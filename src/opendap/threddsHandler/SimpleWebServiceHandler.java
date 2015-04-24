@@ -1,5 +1,6 @@
 package opendap.threddsHandler;
 
+import opendap.PathBuilder;
 import opendap.namespaces.THREDDS;
 import opendap.services.WebServiceHandler;
 import org.jdom.Document;
@@ -78,7 +79,10 @@ public class SimpleWebServiceHandler implements WebServiceHandler {
 
 
     public String getThreddsUrlPath(String datasetUrl)  {
-            return datasetUrl;
-        }
+        PathBuilder pb = new PathBuilder();
+        pb.pathAppend(datasetUrl);
+        return pb.toString();
+    }
+
 
 }

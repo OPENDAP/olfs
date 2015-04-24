@@ -60,15 +60,15 @@ public class Dap2Service  implements WebServiceHandler {
     @Override
     public String getServiceLink(String datasetUrl) {
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_base).pathAppend(datasetUrl).append(".ddx");
+        pb.append(_base).pathAppend(datasetUrl).append(".html");
         return pb.toString();
     }
 
     @Override
     public String getThreddsUrlPath(String datasetUrl) {
         PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_base).pathAppend(datasetUrl);// .append(".ddx");
-        return datasetUrl;
+        pb.pathAppend(datasetUrl);// .append(".ddx");
+        return pb.toString();
     }
 
     public String getThreddsServiceType() {

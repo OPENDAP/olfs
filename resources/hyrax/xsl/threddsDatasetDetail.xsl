@@ -194,6 +194,36 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </div>
+
+                        <xsl:if test="/thredds:catalog/thredds:service">
+                            <div class="small" align="left">
+
+                                <div class="tightView" style="padding-left: 15px;">
+                                    <ul class="collapsibleList">
+                                        <li>
+                                                <span class="small_bold" style="color: black;">Catalog Services</span>
+                                                <ul>
+
+                                                    <table>
+                                                        <tr>
+                                                            <th class="small"><u>Service Name</u></th>
+                                                            <th class="small"><u>Service Type</u></th>
+                                                            <th class="small"><u>Service Base</u></th>
+                                                        </tr>
+
+                                                        <xsl:apply-templates select="/thredds:catalog/thredds:service" mode="banner">
+                                                            <xsl:with-param name="indent" select="0"/>
+                                                        </xsl:apply-templates>
+                                                    </table>
+
+                                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </xsl:if>
+
+
                     </h1>
 
                     <div>
@@ -439,6 +469,27 @@
     </xsl:template>
 
 
+
+    <xsl:template match="thredds:service" name="serviceBanner" mode="banner">
+        <xsl:param name="indent" />
+
+        <tr>
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@name"/>
+            </td>
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@serviceType"/>
+            </td>
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@base"/>
+                <br/>
+            </td>
+            <xsl:apply-templates  mode="banner" >
+                <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
+            </xsl:apply-templates>
+
+        </tr>
+    </xsl:template>
 
 
 
