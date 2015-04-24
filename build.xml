@@ -492,6 +492,7 @@
                  Verbose="true"
                  Version="true"
                  failonerror="true"
+                 additionalparam="-Xdoclint:none"
                 >
             <classpath refid="olfs.compile.classpath"/>
 
