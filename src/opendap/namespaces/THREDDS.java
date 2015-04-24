@@ -41,11 +41,61 @@ public class THREDDS {
     public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_STRING);
 
     public static final String SERVICE = "service";
+    public static final String SERVICE_TYPE = "serviceType";
+    public static final String BASE = "base";
+    public static final String COMPOUND = "Compound"
+            ;
     public static final String CATALOG_REF = "catalogRef";
     public static final String CATALOG = "catalog";
-    public static final String DATASET = "dataset";
     public static final String NAME = "name";
     public static final String DATASIZE = "dataSize";
     public static final String DATE = "date";
+    public static final String TYPE = "type";
+
     public static final String ACCESS = "access";
+    public static final String METADATA = "metadata";
+
+    public static final String DATASET = "dataset";
+    public static final String ID = "ID";
+    public static final String DATASET_SCAN = "datasetScan";
+
+    public static final String FILTER = "filter";
+    public static final String INCLUDE = "include";
+    public static final String EXCLUDE = "exclude";
+    public static final String REGEXP = "regExp";
+    public static final String WILDCARD = "wildcard";
+    public static final String ATOMIC = "atomic";
+    public static final String COLLECTION = "collection";
+
+    public static final String NAMER = "namer";
+    public static final String REG_EXP_ON_NAME = "regExpOnName";
+    public static final String REG_EXP_ON_PATH = "regExpOnPath";
+    public static final String REPLACE_STRING = "replaceString";
+
+    public static final String SORT = "sort";
+    public static final String LEXIGRAPHIC_BY_NAME = "lexigraphicByName";
+    public static final String INCREASING = "increasing";
+
+
+    public static final String ADD_PROXIES = "addProxies";
+    public static final String TOP = "top";
+    public static final String SERVICE_NAME = "serviceName";
+    public static final String SIMPLE_LATEST = "simpleLatest";
+    public static final String LATEST_COMPLETE = "latestComplete";
+    public static final String LAST_MODIFIED_LIMIT = "lastModifiedLimit";
+    public static final String MODIFIED = "modified";
+
+
+
+
+
+    public static final String ADD_TIME_COVERAGE = "addTimeCoverage";
+    public static final String DATASET_NAME_MATCH_PATTERN = "datasetNameMatchPattern";
+    public static final String DATASET_PATH_MATCH_PATTERN = "datasetPathMatchPattern";
+    public static final String START_TIME_SUBSTITUTION_PATTERN = "startTimeSubstitutionPattern";
+    public static final String TIME_COVERAGE = "timeCoverage";
+    public static final String START = "start";
+    public static final String DURATION = "duration";
+
+
 }

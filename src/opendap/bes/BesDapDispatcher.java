@@ -40,6 +40,10 @@ import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
+import opendap.dap.Dap2Service;
+import opendap.dap4.Dap4Service;
+import opendap.services.FileService;
+import opendap.services.ServicesRegistry;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +80,7 @@ public class BesDapDispatcher implements DispatchHandler {
 
     public BesDapDispatcher() {
         _log = LoggerFactory.getLogger(getClass());
-        _responders = new Vector<Dap4Responder>();
+        _responders = new Vector<>();
 
     }
 
@@ -192,6 +196,13 @@ public class BesDapDispatcher implements DispatchHandler {
 
         if (_initialized) return;
 
+
+
+
+
+
+
+
         setBesApi(besApi);
 
         ingestConfig(config);
@@ -287,6 +298,20 @@ public class BesDapDispatcher implements DispatchHandler {
                 "Resource URL returns: " + (_useDAP2ResourceUrlResponse ? "DAP2 File Response" : "DAP4 Service Description"));
 
         _initialized = true;
+
+
+        Dap2Service dap2Service = new Dap2Service();
+        Dap4Service dap4Service = new Dap4Service();
+        FileService fileService = new FileService();
+
+        dap2Service.init(servlet,null);
+        dap4Service.init(servlet,null);
+        fileService.init(servlet,null);
+
+        ServicesRegistry.addService(dap2Service);
+        ServicesRegistry.addService(dap4Service);
+        ServicesRegistry.addService(fileService);
+
 
 
     }

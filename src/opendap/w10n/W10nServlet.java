@@ -28,6 +28,7 @@ package opendap.w10n;
 import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
+import opendap.services.ServicesRegistry;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
@@ -64,15 +65,17 @@ public class W10nServlet extends HttpServlet   {
 
             _responder = new W10nResponder(ServletUtil.getSystemPath(this,""));
 
+            W10nService w10nService = new W10nService();
 
+            w10nService.init(this,null);
+
+            ServicesRegistry.addService(w10nService);
 
         }
 
         @Override
         public void doGet(HttpServletRequest request,
                           HttpServletResponse response) {
-
-
 
 
             try {

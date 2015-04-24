@@ -280,6 +280,28 @@ public class Transformer {
 
     }
 
+    public Document getTransformedDocument(Source inputDocumentSource) throws SaxonApiException, IOException, JDOMException {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        log.debug("getTransformedDocument() - Transforming...");
+
+        transform(inputDocumentSource, baos);
+        log.debug("getTransformedDocument() - Transform completed.");
+
+        SAXBuilder sb =  new SAXBuilder();
+
+        Document result = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        log.debug("getTransformedDocument() - Docuemtn built.");
+
+        return result;
+
+    }
+
+
+
 
 
     private HashMap<QName,XdmValue> currentParameters = new HashMap<QName,XdmValue>();
@@ -547,6 +569,20 @@ public class Transformer {
     }
 
 
+    public static XdmNode getElementAsXdmNode(Processor proc, Element src) throws IOException, SaxonApiException {
+
+        XdmNode result;
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
+
+        xmlo.output(src,baos);
+
+        return proc.newDocumentBuilder().build(new StreamSource(new ByteArrayInputStream(baos.toByteArray())));
+
+    }
 
 
 

@@ -1,13 +1,12 @@
 package opendap.viewers;
 
+import opendap.PathBuilder;
 import opendap.coreServlet.ServletUtil;
-import opendap.namespaces.DAP;
+import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
 
 import javax.servlet.http.HttpServlet;
-import java.util.Iterator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +15,10 @@ import java.util.Iterator;
  * Time: 9:19 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GodivaWebService implements  WebServiceHandler {
+public class GodivaWebService implements WebServiceHandler {
+
+    public static final String ID = "godiva";
+
 
     private String _serviceId;
     private String _applicationName;
@@ -33,7 +35,7 @@ public class GodivaWebService implements  WebServiceHandler {
 
     public GodivaWebService(){
 
-        _serviceId             = "godiva";
+        _serviceId             = ID;
         _applicationName       = "Godiva Data Visualization";
 
         _godivaBase            = "/ncWMS/godiva2.html";
@@ -127,7 +129,11 @@ public class GodivaWebService implements  WebServiceHandler {
         //return _godivaBase + "?server="+ _ncWmsServiceUrl + "%3FDATASET%3d" + _ncWmsDynamicServiceId + datasetUrl;
 
 
-        return _godivaBase + "?server="+ _ncWmsServiceUrl + "/" +_ncWmsDynamicServiceId + datasetUrl;
+        PathBuilder pb = new PathBuilder();
+        pb.append(_godivaBase).append("?server=");
+        pb.append(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl);
+
+        return pb.toString();
 
     }
 
@@ -167,4 +173,17 @@ public class GodivaWebService implements  WebServiceHandler {
         return "";
 
     }
+
+    public String getThreddsServiceType() {
+        return null;
+    }
+
+    public String getThreddsUrlPath(String datasetUrl)  {
+        PathBuilder pb = new PathBuilder();
+        pb.pathAppend(_godivaBase).append("?server=");
+        pb.append(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl);
+        return pb.toString();
+    }
+
+
 }

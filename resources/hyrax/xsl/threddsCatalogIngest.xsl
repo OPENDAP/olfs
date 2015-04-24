@@ -78,100 +78,16 @@
 
 
         <xsl:variable name="datasetScanName" select="@name"/>
-        <!-- xsl:comment>  datasetScanName: <xsl:value-of select="$datasetScanName"/></xsl:comment -->
 
-        <xsl:variable name="datasetScanLocation" >
-            <xsl:choose>
-                <xsl:when test="substring(@location,string-length(@location))='/'">
-                    <xsl:value-of select="@location"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="concat(@location,'/')"/>
-                </xsl:otherwise>
-
-            </xsl:choose>
-        </xsl:variable>
-        <!-- datasetScanLocation = '<xsl:value-of select="$datasetScanLocation"/>'-->
-        <!-- xsl:comment>  datasetScanLocation: <xsl:value-of select="$datasetScanLocation"/></xsl:comment -->
+        <xsl:variable name="path" select="@path" />
 
 
 
+        <thredds:catalogRef name="{$datasetScanName}"
+                            xlink:title="{$datasetScanName}"
+                            xlink:href="{$path}/catalog.xml"
+                            xlink:type="simple"/>
 
-
-        <xsl:variable name="serviceName" select="thredds:metadata/thredds:serviceName"/>
-        <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
-        <!-- xsl:comment>  serviceName: <xsl:value-of select="$serviceName"/></xsl:comment -->
-
-
-
-        <!-- Get the service definition form the key (a hash map) -->
-        <xsl:variable name="serviceElement" select="key('service-by-name', $serviceName)" />
-        <!-- xsl:comment>  serviceElement:
-                name:<xsl:value-of select="$serviceElement/@name"/>
-                serviceType:<xsl:value-of select="$serviceElement/@serviceType"/>
-                base:<xsl:value-of select="$serviceElement/@base"/>
-        </xsl:comment -->
-
-
-
-        <!-- Get the service definition form the key (a hash map) -->
-        <xsl:variable name="dapServices" select="$serviceElement[upper-case(@serviceType)='OPENDAP'] | $serviceElement/thredds:service[upper-case(@serviceType)='OPENDAP'] "/>
-        <!-- xsl:comment>  dapServices:
-            <xsl:for-each select="$dapServices">
-                name:<xsl:value-of select="@name"/>
-                serviceType:<xsl:value-of select="@serviceType"/>
-                base:<xsl:value-of select="@base"/>
-            </xsl:for-each>
-        </xsl:comment -->
-
-
-
-
-
-        <xsl:for-each select="$dapServices">
-
-            <xsl:variable name="base" select="@base" />
-            <!-- base = '<xsl:value-of select="$base"/>' -->
-
-            <xsl:variable name="lastCharOfBase" select="substring($base,string-length($base))" />
-            <!-- lastCharOfBase = '<xsl:value-of select="$lastCharOfBase"/>' -->
-
-
-
-
-            <xsl:variable name="catalogURL">
-                <xsl:choose>
-
-                    <xsl:when test="$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')">
-                        <xsl:variable name="location" select="substring($datasetScanLocation,2,string-length($datasetScanLocation))" />
-                        <xsl:variable name="targetURL" select="concat($base,$location,'catalog.xml')" />
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:when>
-
-                    <xsl:when test="$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))">
-                        <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation,'catalog.xml')" />
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:when>
-
-                    <xsl:otherwise>
-                        <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation,'catalog.xml')" />
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:otherwise>
-
-                </xsl:choose>
-
-            </xsl:variable>
-
-
-            <thredds:catalogRef name="{$datasetScanName}"
-                                xlink:title="{$datasetScanName}"
-                                xlink:href="{$catalogURL}"
-                                xlink:type="simple"/>
-
-
-
-
-        </xsl:for-each>
 
         <xsl:comment>########## thredds:catalogRef generated from thredds:datasetScan END ##########</xsl:comment>
 

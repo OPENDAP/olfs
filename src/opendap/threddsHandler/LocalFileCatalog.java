@@ -426,7 +426,7 @@ public class LocalFileCatalog implements Catalog {
 
             if (_clientResponseCatalogBuffer != null) {
                 os.write(_clientResponseCatalogBuffer);
-                log.debug("writeCatalogXML(): Sending cached ingetTransform processed catalog.");
+                log.debug("writeCatalogXML(): Sending cached ingestTransform processed catalog.");
 
             } else if (_rawCatalogBuffer != null) {
                 os.write(_rawCatalogBuffer);

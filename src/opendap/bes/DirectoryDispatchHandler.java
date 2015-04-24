@@ -29,6 +29,7 @@ package opendap.bes;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.AuthenticationControls;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -302,33 +303,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 transformer.setParameter("allowDirectDataSourceAccess","true");
 
 
-            String userId = null;
-            Principal userPrinciple = request.getUserPrincipal();
-            if(request.getRemoteUser()!=null){
-                userId = request.getRemoteUser();
-
-            }
-            else if(userPrinciple != null) {
-                userId = userPrinciple.getName();
-            }
-
-            log.debug("xsltDir() - UserId: {}",userId);
-            if(userId != null){
-                transformer.setParameter("userId", userId);
-            }
-
-
-            log.debug("xsltDir() - _loginPath: {}",_loginPath);
-            if(_loginPath != null) {
-                transformer.setParameter("loginLink", _loginPath);
-            }
-
-            log.debug("xsltDir() - _logoutPath: {}",_logoutPath);
-            if(_logoutPath != null) {
-                transformer.setParameter("logoutLink", _logoutPath);
-            }
-
-
+            AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(besCatalog, response.getOutputStream());
@@ -345,7 +320,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
 
     }
-
 
 
 }

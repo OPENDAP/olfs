@@ -44,7 +44,7 @@
                 <title>OPeNDAP Hyrax: Dataset Service Description for <xsl:value-of select="@xml:base"/></title>
                 <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
                 <link rel='stylesheet' href='{$docsService}/css/treeView.css' type='text/css'/>
-                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js">&#160;</script>
+                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
             </head>
             <body>
 

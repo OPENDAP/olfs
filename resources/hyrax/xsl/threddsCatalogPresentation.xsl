@@ -34,13 +34,19 @@
 
         >
     <xsl:import href="version.xsl"/>
+    <xsl:param name="serviceContext"/>
     <xsl:param name="dapService"/>
     <xsl:param name="docsService"/>
     <xsl:param name="remoteHost" />
     <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteCatalog" />
+    <xsl:param name="userId" />
+    <xsl:param name="loginLink" />
+    <xsl:param name="logoutLink" />
+
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 
+    <xsl:variable name="indentIncrement" select="3"/>
 
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -48,14 +54,49 @@
     <xsl:template match="thredds:catalog">
         <html>
             <head>
-                <link rel='stylesheet' href='{$docsService}/css/contents.css'
-                      type='text/css'/>
+                <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
+                <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
+                <!-- script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script -->
+                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+
                 <title>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                 </title>
 
             </head>
             <body>
+
+                <!-- ****************************************************** -->
+                <!--                      LOGIN UI                          -->
+                <!--                                                        -->
+                <!--                                                        -->
+                <xsl:choose>
+                    <xsl:when test="$userId">
+
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <xsl:choose>
+                                <xsl:when test="$loginLink">
+                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <b><xsl:value-of select="$userId"/></b><br/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                        </div>
+
+
+                    </xsl:when>
+                    <xsl:otherwise>
+
+                        <xsl:if test="$loginLink">
+                            <div style='float: right;vertical-align:middle;font-size:small;'>
+                                <a style="color: green;" href="{$loginLink}">login</a>
+                            </div>
+                        </xsl:if>
+
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->
@@ -67,13 +108,29 @@
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
                         <xsl:if test="thredds:service">
-                            <br/>services:
-                            <table>
-                                <xsl:apply-templates select="thredds:service" mode="banner">
-                                    <xsl:with-param name="indent"> </xsl:with-param>
-                                </xsl:apply-templates>
-                            </table>
-                            <br/>
+
+                            <div class="tightView" style="padding-left: 15px;">
+                                <ul class="collapsibleList">
+                                    <li>
+                                            <span class="small_bold" style="color: black;">Catalog Services</span>
+                                            <ul>
+
+                                                <table>
+                                                    <tr>
+                                                        <th class="small"><u>Service Name</u></th>
+                                                        <th class="small"><u>Service Type</u></th>
+                                                        <th class="small"><u>Service Base</u></th>
+                                                    </tr>
+
+                                                    <xsl:apply-templates select="thredds:service" mode="banner">
+                                                        <xsl:with-param name="indent" select="0"/>
+                                                    </xsl:apply-templates>
+                                                </table>
+
+                                            </ul>
+                                    </li>
+                                </ul>
+                            </div>
                         </xsl:if>
 
                     </div>
@@ -102,7 +159,9 @@
                         </tr>
 
 
-                        <xsl:apply-templates />
+                        <xsl:apply-templates>
+                            <xsl:with-param name="indent" select="0"/>
+                        </xsl:apply-templates>
 
 
                     </table>
@@ -167,6 +226,8 @@
 
 
             </body>
+            <script>CollapsibleLists.apply(true);</script>
+
         </html>
 
 
@@ -188,12 +249,11 @@
 
         <xsl:if test="not($remoteHost)">
             <tr>
-                <td align="left" >
+                <td style="align: left; padding-left: {$indent}px;" >
 
                     <!-- If the href ends in .xml, change it to .html
                          so the link in the presentation points to
                          another HTML page. -->
-                    <xsl:value-of select="$indent"/>
 
                     <xsl:choose>
 
@@ -213,12 +273,12 @@
                         <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
                         <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
                             <!--Then replace that with '.html'   -->
-                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@name"/> /</a>
                         </xsl:when>
 
                         <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
                         <xsl:otherwise>
-                            <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                            <a href="{./@xlink:href}" ><xsl:value-of select="./@name"/> /</a>
                         </xsl:otherwise>
                     </xsl:choose>
 
@@ -281,7 +341,7 @@
     <xsl:template match="thredds:datasetScan" >
         <xsl:param name="indent" />
         <tr>
-            <td align="left">
+            <td style="align: left; padding-left: {$indent}px;" >
 
                 ERROR! thredds:datasetScan element should not be reaching this style sheet!!<br />
                 Offending Element (view Source):<br />
@@ -321,10 +381,10 @@
     <xsl:template match="ncml:netcdf" >
         <xsl:param name="indent" />
         <tr>
-            <td align="left">
-                <xsl:value-of select="$indent"/>NcML
+            <td style="align: left; padding-left: {$indent}px;" >
+                NcML
                 <xsl:apply-templates >
-                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                    <xsl:with-param name="indent" select="$indent" />
                 </xsl:apply-templates>
             </td>
 
@@ -336,26 +396,27 @@
 
     <xsl:template match="ncml:aggregation" >
         <xsl:param name="indent" />
-                - Aggregation<br/>
-                <xsl:value-of select="$indent"/>Dimension:  <xsl:value-of select="@dimName"/><br/>
-                <xsl:value-of select="$indent"/>Type:<xsl:value-of select="@type"/><br/>
-                <xsl:value-of select="$indent"/>Rescan Interval: <xsl:value-of select="@recheckEvery"/><br/>
+
+        - Aggregation<br/>
+        <span style="padding-left: {$indent}px;">Dimension:  <xsl:value-of select="@dimName"/></span><br/>
+        <span style="padding-left: {$indent}px;">Type:<xsl:value-of select="@type"/></span><br/>
+        <span style="padding-left: {$indent}px;">Rescan Interval: <xsl:value-of select="@recheckEvery"/></span><br/>
         <xsl:apply-templates >
-            <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
+            <xsl:with-param name="indent" select="$indent" />
         </xsl:apply-templates>
 
     </xsl:template>
 
     <xsl:template match="ncml:variableAgg" >
         <xsl:param name="indent" />
-                <xsl:value-of select="$indent"/>Aggregation Variable: <xsl:value-of select="@name"/><br/>
+        <span style="padding-left: {$indent}px;">Aggregation Variable: <xsl:value-of select="@name"/></span><br/>
     </xsl:template>
 
 
     <xsl:template match="ncml:scan" >
         <xsl:param name="indent" />
-                <xsl:value-of select="$indent"/>Scan Location: <xsl:value-of select="@location"/><br/>
-                <xsl:value-of select="$indent"/>Scan File Suffix: <xsl:value-of select="@suffix"/><br/>
+        <span style="padding-left: {$indent}px;">Scan Location: <xsl:value-of select="@location"/></span><br/>
+        <span style="padding-left: {$indent}px;">Scan File Suffix: <xsl:value-of select="@suffix"/></span><br/>
     </xsl:template>
 
 
@@ -374,18 +435,18 @@
         <xsl:param name="indent" />
 
         <tr>
-            <td class="small" align="left">
-                <xsl:value-of select="$indent"/><xsl:value-of select="@name"/>&#160;&#160;&#160;&#160;&#160;&#160;
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@name"/>
             </td>
-            <td class="small" align="left">
-                <xsl:value-of select="$indent"/><i>serviceType:</i> <xsl:value-of select="@serviceType"/>&#160;&#160;
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@serviceType"/>
             </td>
-            <td class="small" align="left">
-                <xsl:value-of select="$indent"/><i>base:</i> <xsl:value-of select="@base"/>&#160;&#160;
+            <td class="small" style="align: left; padding-left: {$indent}px;">
+                <xsl:value-of select="@base"/>
                 <br/>
             </td>
             <xsl:apply-templates  mode="banner" >
-                <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
             </xsl:apply-templates>
 
         </tr>
@@ -421,8 +482,7 @@
         <xsl:choose>
             <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
                 <tr>
-                    <td  class="dark" align="left">
-                        <xsl:value-of select="$indent"/>
+                    <td  class="dark" style="align: left; padding-left: {$indent}px;">
                         <a>
                             <xsl:if test="$remoteCatalog">
                                 <xsl:attribute name="href">?browseDataset=<xsl:value-of select="$datasetPositionInDocument"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
@@ -444,7 +504,7 @@
                     <xsl:call-template name="NoSizeNoTime" />
                 </tr>
                 <xsl:apply-templates>
-                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                    <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
                     <!--
                       -   Note that the followiing parameter uses an XPath that
                       -   accumulates inherited thredds:metadata elements as it descends the
@@ -457,9 +517,8 @@
             </xsl:when>
             <xsl:otherwise>
                 <tr>
-                    <td class="dark">
+                    <td class="dark" tyle="align: left; padding-left: {$indent}px;">
 
-                        <xsl:value-of select="$indent"/>
                         <a>
                             <xsl:if test="$remoteCatalog">
                                 <xsl:attribute name="href">?browseDataset=<xsl:value-of select="$datasetPositionInDocument"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
@@ -481,7 +540,7 @@
                     </xsl:call-template>
                 </tr>
                 <xsl:apply-templates>
-                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                    <xsl:with-param name="indent" select="$indent + $indentIncrement" />
                 </xsl:apply-templates>                
 
 
@@ -509,15 +568,15 @@
             <xsl:choose>
 
                 <xsl:when test="$currentDataset/thredds:dataSize">
-                    <xsl:value-of select="$currentDataset/thredds:dataSize" />&#160;<xsl:value-of select="$currentDataset/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$currentDataset/thredds:dataSize" /></span><xsl:value-of select="$currentDataset/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:when test="$metadata/thredds:dataSize">
-                    <xsl:value-of select="$metadata/thredds:dataSize" />&#160;<xsl:value-of select="$metadata/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$metadata/thredds:dataSize" /></span><xsl:value-of select="$metadata/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:when test="$inheritedMetadata/thredds:dataSize">
-                    <xsl:value-of select="$inheritedMetadata/thredds:dataSize" />&#160;<xsl:value-of select="$inheritedMetadata/thredds:dataSize/@units" />
+                    <span style="padding-right: 3px;"><xsl:value-of select="$inheritedMetadata/thredds:dataSize" /></span><xsl:value-of select="$inheritedMetadata/thredds:dataSize/@units" />
                 </xsl:when>
 
                 <xsl:otherwise>--</xsl:otherwise>

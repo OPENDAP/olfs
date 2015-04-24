@@ -1,6 +1,7 @@
 package opendap.services;
 
 import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,6 +11,8 @@ import org.jdom.Document;
  * To change this template use File | Settings | File Templates.
  */
 public interface Service {
+
+
     public String getName();
 
     public String getServiceId();
@@ -17,5 +20,6 @@ public interface Service {
     public String getBase();
 
     public boolean datasetCanBeViewed(Document ddx);
+
 
 }

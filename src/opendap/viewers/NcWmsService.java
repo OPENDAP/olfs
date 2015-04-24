@@ -1,12 +1,11 @@
 package opendap.viewers;
 
-import opendap.namespaces.DAP;
+import opendap.PathBuilder;
+import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
 
 import javax.servlet.http.HttpServlet;
-import java.util.Iterator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +15,9 @@ import java.util.Iterator;
  * To change this template use File | Settings | File Templates.
  */
 public class NcWmsService implements WebServiceHandler {
+
+
+    public static final String ID = "ncWms";
 
 
     private String _serviceId;
@@ -29,10 +31,10 @@ public class NcWmsService implements WebServiceHandler {
 
     public NcWmsService() {
 
-        _serviceId = "ncWms";
-        _applicationName = "ncWMS Service";
-        _ncWmsServiceUrl = "http://localhost:8080/ncWMS/wms";
-        _base = "/ncWMS/wms";
+        _serviceId = ID;
+        _applicationName = ID + " Service";
+        _ncWmsServiceUrl = "http://localhost:8080/"+ID+"/wms";
+        _base = "/" + ID + "/wms";
         _ncWmsDynamicServiceId = "lds";
 
 
@@ -103,9 +105,15 @@ public class NcWmsService implements WebServiceHandler {
     @Override
     public String getServiceLink(String datasetUrl) {
 
-        return _ncWmsServiceUrl + "/" + _ncWmsDynamicServiceId + datasetUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+        PathBuilder pb = new PathBuilder();
+        pb.append(_ncWmsServiceUrl).pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
+        return pb.toString();
+
+
+       // return _ncWmsServiceUrl + "/" + _ncWmsDynamicServiceId + datasetUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
     }
+
 
     public String getBase() {
 
@@ -129,6 +137,18 @@ public class NcWmsService implements WebServiceHandler {
         sb.append("    WmsService: ").append(_ncWmsServiceUrl).append("\n");
 
         return sb.toString();
+    }
+
+    public String getThreddsServiceType() {
+        return "WMS";
+    }
+
+
+
+    public String getThreddsUrlPath(String datasetUrl)  {
+        PathBuilder pb = new PathBuilder();
+        pb.pathAppend(_ncWmsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
+        return pb.toString();
     }
 
 

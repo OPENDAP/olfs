@@ -161,6 +161,7 @@ public class HtmlDMR extends Dap4Responder {
             Transformer transformer = new Transformer(xsltDocName);
 
 
+            transformer.setParameter("serviceContext",request.getServletContext().getContextPath());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
 

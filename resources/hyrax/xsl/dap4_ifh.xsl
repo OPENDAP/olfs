@@ -28,9 +28,10 @@
     xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
     
-    <xsl:param name="HyraxVersion"/>
+    <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
-    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
+    <xsl:param name="HyraxVersion"/>
+
 
     <!-- xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable> -->
     <!-- xsl:variable name="datasetUrl">http://ec2-54-242-224-73.compute-1.amazonaws.com:8080/opendap/hyrax/data/nc/fnoc1.nc</xsl:variable -->

@@ -25,16 +25,24 @@
  */
 package opendap.threddsHandler;
 
+import net.sf.saxon.s9api.SaxonApiException;
+import opendap.PathBuilder;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.namespaces.THREDDS;
 import opendap.ncml.NcmlManager;
+import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,20 +60,28 @@ public class CatalogManager {
     private static Logger _log;
     private static String _contentPath;
     private static String _catalogIngestTransformFilename;
+    private static String _besCatalogToThreddsCatalogTransformFilename;
+
+    private static BesApi _besApi;
 
 
-    private static ConcurrentHashMap<String, Catalog>   _catalogs = new ConcurrentHashMap<String, Catalog>();
-    private static ConcurrentHashMap<String, String[]>  _children = new ConcurrentHashMap<String, String[]>();
+    private static ConcurrentHashMap<String, DatasetScan>   _datasetScans = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Catalog>       _catalogs     = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, String[]>      _children     = new ConcurrentHashMap<>();
 
     private static ReentrantLock _catalogLock  = new ReentrantLock();
 
 
     private static boolean _isInitialized = false;
 
-    
+
+    public static final String DEFAULT_CATALOG_NAME = "catalog.xml";
 
 
-    public static void init(String contentPath, String catalogIngestTransformFilename) {
+    public static void init(String contentPath,
+                            String catalogIngestTransformFilename,
+                            String besCatalogToThreddsCatalogTransformFilename,
+                            BesApi besApi) {
 
         _log = org.slf4j.LoggerFactory.getLogger(CatalogManager.class);
 
@@ -78,6 +94,8 @@ public class CatalogManager {
 
         _contentPath = contentPath;
         _catalogIngestTransformFilename = catalogIngestTransformFilename;
+        _besCatalogToThreddsCatalogTransformFilename = besCatalogToThreddsCatalogTransformFilename;
+        _besApi = besApi;
         _isInitialized = true;
     }
 
@@ -174,7 +192,7 @@ public class CatalogManager {
                 // @todo Add support for catalog caching within the local server? Mabye not.
             } else {
 
-                // Since it's not a remote catalog, and an absolute path (starting with '/') then
+                // Since it's not a remote catalog, or an absolute path (starting with '/') then
                 // we will conclude that it is a static THREDDS catalog file. Let's slurp it up into
                 // a LocalFileCatalog object.
 
@@ -214,6 +232,34 @@ public class CatalogManager {
             _children.put(catalogKey, catalogChildren.toArray(s));
         }
 
+
+        /** ###############################################################################
+         *
+         * Ingest datasetScan Elements..
+         *
+         *
+         *
+         */
+
+         Document rawCatalog = catalog.getRawCatalogDocument();
+
+
+         // Get all of the datasetScan elements in the  catalog document.
+         i = rawCatalog.getRootElement().getDescendants(new ElementFilter(THREDDS.DATASET_SCAN, THREDDS.NS));
+
+
+        while (i.hasNext()) {
+            // For each one of them...
+            Element dssElem = (Element) i.next();
+
+            addDatasetScan(catalog,dssElem);
+        }
+
+        /** ###############################################################################  */
+
+
+
+
         _log.debug("Ingesting inherited metadata (if any) for catalog '"+catalog.getName()+"'");
         InheritedMetadataManager.ingestInheritedMetadata(catalog);
 
@@ -226,19 +272,77 @@ public class CatalogManager {
     }
 
 
-    public static Catalog getCatalog(String catalogKey) {
-        Catalog cat = getCatalogAndUpdateIfRequired(catalogKey);
-        return cat;
+
+    private static void addDatasetScan(Catalog catalog,Element dssElem) throws BadConfigurationException{
+
+
+        DatasetScan ds = new DatasetScan(catalog,  dssElem,  _besCatalogToThreddsCatalogTransformFilename, _besApi);
+
+
+        PathBuilder pb = new PathBuilder();
+
+        pb.append(catalog.getPathPrefix()).append(ds.getPath());
+        _datasetScans.put(pb.toString(),ds);
+
 
     }
 
-    public static long getLastModified(String catalogKey) {
+
+
+
+
+    public static Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+        Catalog cat = getCatalogAndUpdateIfRequired(catalogKey);
+
+        if(cat == null){
+
+            Catalog datasetScanCatalog = (Catalog) RequestCache.get(catalogKey);
+
+            if(datasetScanCatalog == null ){
+
+                DatasetScan datasetScan = null;
+                for(DatasetScan ds : _datasetScans.values()) {
+                    if(ds.matches(catalogKey)){
+
+                        _log.info("Found DatasetScan matching catalogKey '{}' datasetScan: \n'{}'",catalogKey,ds);
+                        if(datasetScan==null){
+                            datasetScan = ds;
+                        }
+
+                    }
+
+                }
+                if(datasetScan==null)
+                    return null;
+
+
+                datasetScanCatalog = datasetScan.getCatalog(catalogKey);
+                RequestCache.put(catalogKey,datasetScanCatalog);
+
+            }
+
+            return datasetScanCatalog;
+
+        }
+        return cat;
+
+
+
+    }
+
+    public static long getLastModified(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException {
 
         Catalog cat;
 
-        cat = getCatalog(catalogKey);
-        if (cat != null)
-            return cat.getLastModified();
+
+        try {
+            cat = getCatalog(catalogKey);
+            if (cat != null)
+                return cat.getLastModified();
+        }
+        catch(Exception e){
+            _log.info("No such catalog: {}",catalogKey);
+        }
 
         return -1;
     }

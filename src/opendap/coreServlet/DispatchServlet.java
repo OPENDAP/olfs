@@ -28,6 +28,7 @@ package opendap.coreServlet;
 
 
 import opendap.bes.BESManager;
+import opendap.http.AuthenticationControls;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import org.jdom.Document;
@@ -146,6 +147,8 @@ public class DispatchServlet extends HttpServlet {
 
         initBesManager();
 
+        initAuthenticationControls();
+
 
         buildHandlers("HttpGetHandlers", httpGetDispatchHandlers, httpGetHandlerConfigs);
         //identifyRequiredGetHandlers(httpGetDispatchHandlers);
@@ -165,6 +168,24 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
+
+
+    private void initAuthenticationControls() throws ServletException {
+
+        Element authControlElem = configDoc.getRootElement().getChild(AuthenticationControls.CONFIG_ELEMENT);
+
+
+        try {
+            if(authControlElem !=  null){
+                AuthenticationControls.init(authControlElem);
+            }
+        }
+        catch(Exception e){
+            throw new ServletException(e);
+        }
+
+
+    }
 
 
     /**
