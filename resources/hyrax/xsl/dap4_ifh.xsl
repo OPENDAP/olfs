@@ -54,7 +54,7 @@
                     DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
                 </script>
                 
-                <title>Interface From Hell <xsl:value-of select="@name"/></title>
+                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>
             </head>
             <body>
                 
