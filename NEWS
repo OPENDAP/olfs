@@ -1,4 +1,9 @@
-Version 1.13.q (24 April 2015)
+Version 1.13.2 (07 May 2015)
+
+  New patched bugs in datasetScan implementation.
+
+
+Version 1.13.1 (24 April 2015)
 
   New datasetScan implementation for THREDDS catalogs provides for all datasetScan activities as described here:
       http://www.unidata.ucar.edu/software/thredds/v4.6/tds/reference/DatasetScan.html

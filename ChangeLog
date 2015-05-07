@@ -1,3 +1,78 @@
+commit 8e5cbd037c2506c54f1bf098da25c6eb0f8c56b5
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 14:12:56 2015 -0700
+
+    olfs: Fixed syntax error - incorrect placement of double quote.
+
+commit 7dfa14beb1e60a75efd68dc3bd8ae06c71d6cca7
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 14:12:10 2015 -0700
+
+    olfs: Fixed bug in Filter.
+
+commit 792f27831810a501d1cbca478bd1fa523c94a969
+Merge: 95fdc1a 0a4b3f5
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 10:40:22 2015 -0700
+
+    Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+commit 95fdc1acb15e46d544ec9b2bb29c3acb8f7a30ab
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 10:39:09 2015 -0700
+
+    olfs: Instrumentation fixes.
+
+commit 569eda0246daaf0fda58e78c6d4d7ebdbea5e602
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 10:38:38 2015 -0700
+
+    olfs: Fixed bug in datasetScan filter. Instrumentation, fix bug where datasetScan catalogs where getting crawled into the static catalog list.
+
+commit 0a4b3f5124bbe18327b36e020780c0bd187f1050
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu May 7 10:58:30 2015 -0600
+
+    URI-encoded the href output by contents.xsl
+
+    This was part of the fix for the NASA/Raytheon issue where directories
+    that contain colons were not working. Part of the fix was to change how
+    URL/URIs are scrubbed. However, to get the HTML pages to work in a
+    browser, the href elements built by centents.xsl had to use
+    encode-for-uri(@name) and not just @name.
+
+commit 8ce5ad15f31e4b89138b2fac84fe02e6d0b5303a
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu May 7 10:07:28 2015 -0600
+
+    Added colon to the set of chars allowed in a url.
+
+    ... based on a bug report from NASA/Raytheon.
+
+commit d4b9637296619fcdd98701d00f00f8411351a1c4
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 08:29:38 2015 -0700
+
+    olfs: Reoaired vague debugging ouput.
+
+commit 3b2129571b63c2ecf5942da770aaba9dc349ebee
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Apr 28 15:42:41 2015 -0700
+
+    olfs: Changed the title of the  DAP4 request form to something more apropriate than IFH
+
+commit f1838a86cd068c2a2d81e100c651263d8a41172c
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 11:58:47 2015 -0700
+
+    Suppressed doclint in java doc because I don't have time to fix it all the javadoc issues  (>100 errors)
+
+commit 30353554faa1a5573a7d7b37272e9df6c818782e
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Apr 24 11:32:37 2015 -0700
+
+    Updated README, NEWS, ChangeLog
+
 commit 3384d849a160689860700561981b21cdd5bd7273
 Author: Nathan Potter <ndp@opendap.org>
 Date:   Fri Apr 24 11:18:46 2015 -0700
