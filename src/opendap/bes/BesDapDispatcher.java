@@ -290,6 +290,16 @@ public class BesDapDispatcher implements DispatchHandler {
             d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
             d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             _responders.add(d4fa);
+
+            NormativeDSR ndsr = new NormativeDSR(_systemPath, null, ".dsr", besApi,_responders);
+            //ndsr.setRequestSuffix(".dsr");
+            ndsr.buildRequestMatchingRegex();
+
+
+            //public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<Dap4Responder> services) {
+
+            _responders.add(ndsr);
+
         }
 
 

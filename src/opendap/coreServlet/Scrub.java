@@ -132,7 +132,7 @@ public class Scrub {
         if(url==null)
             return null;
         Matcher m = completeURLInclusionPattern.matcher(url);
-        log.debug("completeURL() - Scrubbing URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
+        log.debug("completeURL() - Scrubbing complete URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return url;
         }
@@ -154,7 +154,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = simpleStringInclusionPattern.matcher(s);
-        log.debug("simpleString() - Scrubbing String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("simpleString() - Scrubbing simple String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
@@ -175,7 +175,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = integerStringInclusionPattern.matcher(s);
-        log.debug("integerString() - Scrubbing String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("integerString() - Scrubbing integer String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
@@ -200,7 +200,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = simpleQueryStringInclusionPattern.matcher(s);
-        log.debug("simpleQueryString() - Scrubbing String: "+s+"   white list pattern: "+ simpleQueryStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("simpleQueryString() - Scrubbing simple query String: "+s+"   white list pattern: "+ simpleQueryStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
