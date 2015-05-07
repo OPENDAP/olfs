@@ -56,7 +56,7 @@ public class Scrub {
             return null;
         Matcher m = fileNameInclusionPattern.matcher(fileName);
 
-        log.debug("URL() - Scrubbing file Name: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
+        log.debug("fileName() - Scrubbing file Name: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return fileName;
         }
@@ -108,7 +108,7 @@ public class Scrub {
 
         Matcher m = htmlContentInclusionPattern.matcher(urlContent);
 
-        log.debug("URL() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ htmlContentInclusionRegex +"    matches: "+m.matches());
+        log.debug("urlContent() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ htmlContentInclusionRegex +"    matches: "+m.matches());
 
 
 
@@ -132,7 +132,7 @@ public class Scrub {
         if(url==null)
             return null;
         Matcher m = completeURLInclusionPattern.matcher(url);
-        log.debug("URL() - Scrubbing URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
+        log.debug("completeURL() - Scrubbing URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return url;
         }
@@ -154,7 +154,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = simpleStringInclusionPattern.matcher(s);
-        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("simpleString() - Scrubbing String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
@@ -175,7 +175,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = integerStringInclusionPattern.matcher(s);
-        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("integerString() - Scrubbing String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
@@ -200,7 +200,7 @@ public class Scrub {
         if(s==null)
             return null;
         Matcher m = simpleQueryStringInclusionPattern.matcher(s);
-        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ simpleQueryStringInclusionRegex +"    matches: "+m.matches());
+        log.debug("simpleQueryString() - Scrubbing String: "+s+"   white list pattern: "+ simpleQueryStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
