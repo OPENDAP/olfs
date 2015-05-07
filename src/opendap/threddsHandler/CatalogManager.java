@@ -154,7 +154,7 @@ public class CatalogManager {
         }
 
 
-        Document catDoc = catalog.getCatalogDocument();
+        Document catDoc = catalog.getRawCatalogDocument();
         _log.debug("addCatalog() - Loaded Catalog document: \n{}",new XMLOutputter(Format.getPrettyFormat()).outputString(catDoc));
 
         Element catRef;
@@ -209,19 +209,16 @@ public class CatalogManager {
                         catFname,
                         _catalogIngestTransformFilename,
                         cacheCatalogFileContent);
-                }
-                catch( Exception e){
-                    _log.error("Failed to build catalog from file: "+catFname+ " Msg: "+e.getMessage());
-                }
 
-                if (thisCatalog != null) {
                     addCatalog(thisCatalog, cacheCatalogFileContent);
                     String thisCatalogIndex = thisCatalog.getCatalogKey();
                     catalogChildren.add(thisCatalogIndex);
+
                 }
-                else {
-                    _log.error("Catalog dropped reference to: "+catFname);
+                catch( Exception e){
+                    _log.error("addCatalog() - Failed to build catalog. Dropping. File: "+thisPathPrefix + catFname+ " Msg: "+e.getMessage());
                 }
+
 
 
             }

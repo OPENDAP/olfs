@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 public class Filter {
 
 
+    String includeAllRegexString = ".*$";
+
     Vector<Clude> _cludes;
 
 
@@ -27,6 +29,9 @@ public class Filter {
                 _cludes.add(clude);
 
             }
+        }
+        else {
+            _cludes.add(new Clude());
         }
 
     }
@@ -45,7 +50,21 @@ public class Filter {
         Pattern wildCardPattern;
         Pattern regexPattern;
 
+
+        /**
+         * Default includes everything!
+         */
+        public Clude() {
+            appliesToAtomic = true;
+            appliesToCollection = false;
+            excludeMatching = false;
+            regexPattern = Pattern.compile(includeAllRegexString);
+            wildCardPattern = Pattern.compile(includeAllRegexString);
+
+        }
+
         public Clude(Element clude){
+            this();
 
             appliesToAtomic = true;
             appliesToCollection = false;
@@ -58,22 +77,15 @@ public class Filter {
 
             wildcard = clude.getAttributeValue(THREDDS.WILDCARD);
             if(wildcard!=null){
-                String regex = wildcard.replace("*",".*")+"$";
+                String regex = wildcard.replace(".","\\.");
+                regex = regex.replace("*",".*")+"$";
                 wildCardPattern = Pattern.compile(regex);
-            }
-            else {
-                wildCardPattern = Pattern.compile(".*$");
-
             }
 
 
             regex = clude.getAttributeValue(THREDDS.REGEXP);
             if(regex!=null){
                 regexPattern = Pattern.compile(regex);
-            }
-            else {
-                regexPattern = Pattern.compile(".*$");
-
             }
 
             atomicAttrVal  = clude.getAttributeValue(THREDDS.ATOMIC);
@@ -106,10 +118,11 @@ public class Filter {
     boolean include(String name, boolean isNode){
 
 
-        boolean include = true;
+        boolean include = false;
         for(Clude clude : _cludes){
 
-            include &= clude.include(name,isNode);
+            if(clude.include(name,isNode))
+                include = true;
         }
         return include;
 

@@ -188,7 +188,6 @@ public class BesCatalog implements Catalog {
             // Use ServiceRegistry??
             if(_useServiceRegistryServices){
                 catalogServices.putAll(ServicesRegistry.getWebServiceHandlers());
-
             }
 
             // Put those in the catalog...
@@ -201,7 +200,7 @@ public class BesCatalog implements Catalog {
             // Get any services defined on the catalog from the catalog file ingest.
             for(Element service: _catalogServices){
                 Element copy = (Element) service.clone();
-                _log.debug(xmlo.outputString(copy));
+                _log.debug("loadCatalog() - Adding catalog service: \n",xmlo.outputString(copy));
                 catalogElement.addContent(position++, (Element) service.clone());
             }
 
@@ -539,7 +538,7 @@ public class BesCatalog implements Catalog {
             lock.lock();
             if (_clientResponseCatalogBuffer != null) {
                 is = new ByteArrayInputStream(_clientResponseCatalogBuffer);
-                _log.debug("getCatalogAsXdmNode(): Reading ingestTransform processed catalog from memory cache.");
+                _log.debug("getCatalogAsXdmNode(): Reading ingestTransform processed catalog from memory cache. \n{}",new String(_clientResponseCatalogBuffer));
             } else {
                 throw new IOException("getCatalogAsXdmNode() - Catalog file was not previously ingested.");
             }
