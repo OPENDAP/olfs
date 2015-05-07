@@ -43,8 +43,6 @@ public class Scrub {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(Scrub.class);
 
-
-
     // The C++ coe uses this regex: Regex name("[-0-9A-z_./]+");
 
     private static String fileNameInclusionRegex = "[-a-zA-Z0-9/.%_ :]*";
@@ -66,66 +64,31 @@ public class Scrub {
 
     }
 
-
-
-
-    /*
-
-    // These two regex are missing the "[" and the "]" charcaters. I don't know
-    // to make them work with those included in the character class.
-    private static String  uriInclusionRegex   = "[-a-zA-Z0-9/:?#@!$&'()*+,;=]*";
-    private static String  uriExclusionRegex   = "[^-a-zA-Z0-9/:?#@!$&'()*+,;=]*";
-    private static Pattern uriInclusionPattern = Pattern.compile(uriInclusionRegex);
-    public static String URI(String uri){
-        if(uri==null)
-            return null;
-        Matcher m = uriInclusionPattern.matcher(uri);
-
-        log.debug("URL() - Scrubbing file Name: "+uri+"   white list pattern: "+ uriInclusionRegex +"    matches: "+m.matches());
-        if(m.matches()){
-            return uri;
-        }
-        else {
-            return uri.replaceAll(uriExclusionRegex,"#");
-        }
-
-    }
-
-            
-     */
-
-
-
-
-    private static String htmlContentInclusionRegex = "[-a-zA-Z0-9/.%_ ]*";
-    private static String htmlContentExclusionRegex = "[^-a-zA-Z0-9/.%_ ]";
-    private static Pattern htmlContentInclusionPattern = Pattern.compile(htmlContentInclusionRegex);
+    // Added the colon (:) to the list of allowed characters, based on 
+    // a bug report from NASA/Raytheon. jhrg 5/7/15
+    private static String urlContentInclusionRegex = "[-a-zA-Z0-9/.%_ :]*";
+    private static String urlContentExclusionRegex = "[^-a-zA-Z0-9/.%_ :]";
+    private static Pattern urlContentInclusionPattern = Pattern.compile(urlContentInclusionRegex);
 
     public static String urlContent(String urlContent){
 
         if(urlContent==null)
             return null;
 
-        Matcher m = htmlContentInclusionPattern.matcher(urlContent);
+        Matcher m = urlContentInclusionPattern.matcher(urlContent);
 
-        log.debug("urlContent() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ htmlContentInclusionRegex +"    matches: "+m.matches());
-
-
+        log.debug("urlContent() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ urlContentInclusionRegex +"    matches: "+m.matches());
 
         if(m.matches()){
             return urlContent;
         }
         else {
-            return urlContent.replaceAll(htmlContentExclusionRegex,"#");
+            return urlContent.replaceAll(urlContentExclusionRegex,"#");
         }
-
-
     }
 
-
-
-    private static String completeURLInclusionRegex = "http://"+ htmlContentInclusionRegex;
-    private static String completeURLExclusionRegex = "http://"+ htmlContentExclusionRegex;
+    private static String completeURLInclusionRegex = "http(s)?://"+ urlContentInclusionRegex;
+    private static String completeURLExclusionRegex = "http(s)?://"+ urlContentExclusionRegex;
     private static Pattern completeURLInclusionPattern = Pattern.compile(completeURLInclusionRegex);
 
     public static String completeURL(String url){
@@ -140,11 +103,6 @@ public class Scrub {
             return url.replaceAll(completeURLExclusionRegex,"#");
         }
     }
-
-
-
-
-
 
     private static String simpleStringInclusionRegex = "[a-zA-Z0-9_ ]*";
     private static String simpleStringExclusionRegex = "[^a-zA-Z0-9_ ]";
@@ -163,10 +121,6 @@ public class Scrub {
         }
     }
 
-
-
-
-
     private static String integerStringInclusionRegex = "[0-9]*";
     private static String integerStringExclusionRegex = "[^0-9]";
     private static Pattern integerStringInclusionPattern = Pattern.compile(integerStringInclusionRegex);
@@ -183,14 +137,6 @@ public class Scrub {
             return s.replaceAll(integerStringExclusionRegex,"#");
         }
     }
-
-
-
-
-
-
-
-
 
     private static String simpleQueryStringInclusionRegex = "[a-zA-Z0-9_ =\\.]*";
     private static String simpleQueryStringExclusionRegex = "[^a-zA-Z0-9_ =\\.]";
@@ -209,28 +155,15 @@ public class Scrub {
         }
     }
 
-
-
-
-
-
-
-
-
     public static void main(String[] args){
         org.junit.runner.JUnitCore.main("opendap.coreServlet.Scrub");
     }
 
-
     @org.junit.Test public void test() {
-
 
         checkURLContent("This <> should suck.", false);
 
-
         checkURLContent("this IsGood", true);
-
-
 
         checkCompleteURL("http://.../OAK_00168/microstar227926-20080205.nc",
                 true);
@@ -264,23 +197,17 @@ public class Scrub {
                 "ASSIMtF_COLAMOM3/Tot/" +
                 "current.dds",
                 true);
-
-
     }
 
     private static void checkCompleteURL(String s, boolean expected){
 
         simpleCheck(s,completeURL(s),expected);
 
-
     }
-
 
     private static void checkURLContent(String s, boolean expected){
 
-
         simpleCheck(s,urlContent(s),expected);
-
 
     }
 
@@ -301,19 +228,6 @@ public class Scrub {
             assertFalse(msg,value);
         }
 
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }
