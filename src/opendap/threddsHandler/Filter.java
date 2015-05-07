@@ -66,9 +66,6 @@ public class Filter {
         public Clude(Element clude){
             this();
 
-            appliesToAtomic = true;
-            appliesToCollection = false;
-
             if(clude==null)
                 return;
 
@@ -101,13 +98,20 @@ public class Filter {
 
         boolean include(String s, boolean isNode){
 
-            if(wildCardPattern.matcher(s).matches() && regexPattern.matcher(s).matches()){
 
-                if( (!isNode && appliesToAtomic) || (isNode && appliesToCollection)){
+            if( (!isNode && appliesToAtomic) || (isNode && appliesToCollection)){
+
+                if(wildCardPattern.matcher(s).matches() && regexPattern.matcher(s).matches()) {
                     return !excludeMatching;
                 }
+                else {
+                    return excludeMatching;
+                }
             }
-            return excludeMatching;
+
+            return true;
+
+
         }
 
     }

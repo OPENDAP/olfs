@@ -259,6 +259,7 @@ public class BesCatalog implements Catalog {
 
                 if(!_catalogFilter.include(name,isNode)){
                     dropList.add(e);
+                    _log.debug("loadCatalog(): Filter dropped {}",name);
                 }
 
             }
