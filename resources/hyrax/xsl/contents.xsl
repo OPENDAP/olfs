@@ -232,7 +232,12 @@
 
     <xsl:template name="NodeLinks" >
         <td align="left">
-            <a href="{@name}/contents.html">
+            <!-- a href="{@name}/contents.html" -->
+            <!-- Added 'encode-for-uri()' to fix an issue where URL components that contain
+            	 colon characters were confusing browsers. Colons were added to the set of
+            	 URL chars not scrubbed at the request of NASA/Raytheon. The equivalent edit
+            	 was made in several places below. jhrg 5/7/15 -->
+        	<a href="{encode-for-uri(@name)}/contents.html">
             <xsl:value-of select="@name"/>/</a>
         </td>
 
@@ -262,7 +267,7 @@
 
     <xsl:template name="DapServiceLinks" >
         <td align="left">
-            <b><a href="{../@name}.html">
+            <b><a href="{encode-for-uri(../@name)}.html">
                 <span itemprop="name">
                     <xsl:value-of select="../@name"/>
                 </span>
@@ -287,32 +292,32 @@
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.ddx" />
                         <meta itemprop="encodingFormat" content="text/xml" />
-                        <a itemprop="contentUrl" href="{../@name}.ddx">ddx</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".ddx">ddx</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.dds" />
                         <meta itemprop="encodingFormat" content="text/plain" />
-                        <a itemprop="contentUrl" href="{../@name}.dds">dds</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".dds">dds</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.das" />
                         <meta itemprop="encodingFormat" content="text/plain" />
-                        <a itemprop="contentUrl" href="{../@name}.das">das</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".das">das</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.info" />
                         <meta itemprop="encodingFormat" content="text/html" />
-                        <a itemprop="contentUrl" href="{../@name}.info">info</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".info">info</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.html" />
                         <meta itemprop="encodingFormat" content="text/html" />
-                        <a itemprop="contentUrl" href="{../@name}.html">html</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".html">html</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                         <meta itemprop="name" content="{../@name}.rdf" />
                         <meta itemprop="encodingFormat" content="application/rdf+xml" />
-                        <a itemprop="contentUrl" href="{../@name}.rdf">rdf</a>&NBSP;</td>
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}".rdf">rdf</a>&NBSP;</td>
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
                         <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                             <meta itemprop="name" content="{../@name}" />
                             <meta itemprop="contentSize" content="{../@size}" />
-                            <a itemprop="contentUrl" href="{../@name}">file</a>&NBSP;</td>
+                            <a itemprop="contentUrl" href="{encode-for-uri(../@name)}">file</a>&NBSP;</td>
                     </xsl:if>
                 </tr>
             </table>
@@ -349,7 +354,7 @@
 
     <xsl:template name="UnknownServiceLinks" >
         <td align="left">
-            <a href="{../@name}">
+            <a href="{encode-for-uri(../@name)}">
                 <xsl:value-of select="../@name"/>
             </a>
         </td>
@@ -370,7 +375,7 @@
 
     <xsl:template name="FileServiceLinks" >
         <td align="left">
-            <a href="{@name}">
+            <a href="{encode-for-uri(@name)}">
                 <xsl:value-of select="@name"/>
             </a>
         </td>
