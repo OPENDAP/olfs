@@ -4,6 +4,7 @@ import opendap.namespaces.THREDDS;
 import org.jdom.Element;
 
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -74,8 +75,7 @@ public class Filter {
 
             wildcard = clude.getAttributeValue(THREDDS.WILDCARD);
             if(wildcard!=null){
-                String regex = wildcard.replace(".","\\.");
-                regex = regex.replace("*",".*")+"$";
+                String regex = makeRegexFromWildCard(wildcard);
                 wildCardPattern = Pattern.compile(regex);
             }
 
@@ -116,6 +116,21 @@ public class Filter {
 
     }
 
+    String makeRegexFromWildCard(String subject) {
+
+        Pattern regex = Pattern.compile("[^*]+|(\\*)");
+        Matcher m = regex.matcher(subject);
+        StringBuffer b = new StringBuffer();
+        while (m.find()) {
+            if (m.group(1) != null) m.appendReplacement(b, ".*");
+            else m.appendReplacement(b, "\\\\Q" + m.group(0) + "\\\\E");
+        }
+        m.appendTail(b);
+
+        return b.toString();
+
+
+    }
 
 
 
