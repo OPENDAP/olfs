@@ -216,6 +216,10 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
         // DAP4 Responses
+
+        NormativeDSR ndsr = new NormativeDSR(_systemPath, null, ".dsr", besApi,_responders);
+        _responders.add(ndsr);
+
         _responders.add(new NormativeDR(_systemPath, besApi));
         _responders.add(new NormativeDMR(_systemPath, besApi));
         _responders.add(new IsoDMR(_systemPath, besApi));
@@ -291,14 +295,6 @@ public class BesDapDispatcher implements DispatchHandler {
             d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             _responders.add(d4fa);
 
-            NormativeDSR ndsr = new NormativeDSR(_systemPath, null, ".dsr", besApi,_responders);
-            //ndsr.setRequestSuffix(".dsr");
-            ndsr.buildRequestMatchingRegex();
-
-
-            //public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<Dap4Responder> services) {
-
-            _responders.add(ndsr);
 
         }
 

@@ -94,7 +94,9 @@ public class XmlDSR extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String requestedResource = request.getRequestURL().toString();
-        String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
+
+        //String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
+        String baseUrl = getResourceId(requestedResource,false);
 
         String context = request.getContextPath()+"/";
 

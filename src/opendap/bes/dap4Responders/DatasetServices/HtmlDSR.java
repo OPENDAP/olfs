@@ -100,7 +100,8 @@ public class HtmlDSR extends Dap4Responder {
 
         String requestedResource = request.getRequestURL().toString();
 
-        String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
+        //String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
+        String baseUrl = getResourceId(requestedResource, false);
 
         String context = request.getContextPath()+"/";
 

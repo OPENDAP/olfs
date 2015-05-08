@@ -106,7 +106,13 @@ public class NormativeDSR extends Dap4Responder {
 
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
         String datasetUrl = request.getRequestURL().toString();
+
+        String datasetResourceID = getResourceId(datasetUrl,false);
+
+        log.debug("datasetResourceID: {} datasetURL: {}",datasetResourceID,datasetUrl);
 
         String context = request.getContextPath()+"/";
 
@@ -123,7 +129,7 @@ public class NormativeDSR extends Dap4Responder {
 
         Element datasetServices;
 
-        datasetServices = getDatasetServicesElement(datasetUrl);
+        datasetServices = getDatasetServicesElement(datasetResourceID);
 
         serviceDescription.setRootElement(datasetServices);
 
