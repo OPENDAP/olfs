@@ -31,6 +31,7 @@ import opendap.bes.BESManager;
 import opendap.http.AuthenticationControls;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
+import opendap.logging.Procedure;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -144,6 +145,20 @@ public class DispatchServlet extends HttpServlet {
 
 
         loadConfig();
+
+
+        Element timer = configDoc.getRootElement().getChild("Timer");
+        if(timer!=null){
+            String enabled = timer.getAttributeValue("enabled");
+            if(enabled!=null && enabled.equalsIgnoreCase("true")){
+                Timer.enable();
+                Timer.enable();
+            }
+        }
+
+        log.info("init() - Timer is {}",Timer.isEnabled()?"ENABLED":"DISABLED");
+
+
 
         initBesManager();
 
@@ -453,7 +468,7 @@ public class DispatchServlet extends HttpServlet {
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         try {
-            String tKey = Timer.start();
+            Procedure timedProcedure = Timer.start();
 
             RequestCache.openThreadCache();
 
@@ -502,7 +517,7 @@ public class DispatchServlet extends HttpServlet {
             finally {
                 RequestCache.closeThreadCache();
                 log.info("doGet(): Response completed.\n");
-                Timer.stop(tKey);
+                Timer.stop(timedProcedure);
             }
 
 
@@ -525,7 +540,7 @@ public class DispatchServlet extends HttpServlet {
             }
         }
 
-        Timer.report(System.out);
+        log.info("doGet() - Timing Report: \n{}", Timer.report());
         Timer.reset();
     }
     //**************************************************************************
@@ -709,7 +724,6 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
-        String tKey = Timer.start();
 
         RequestCache.openThreadCache();
 
@@ -718,10 +732,15 @@ public class DispatchServlet extends HttpServlet {
 
 
         long lmt = -1;
-        if (ReqInfo.isServiceOnlyRequest(req))
-            return -1;
 
+        Procedure timedProcedure = Timer.start();
         try {
+
+            if (ReqInfo.isServiceOnlyRequest(req)) {
+                LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                return -1;
+            }
+
 
             if (!LicenseManager.isExpired(req) && !ReqInfo.isServiceOnlyRequest(req)) {
 
@@ -737,10 +756,10 @@ public class DispatchServlet extends HttpServlet {
             lmt = -1;
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+            Timer.stop(timedProcedure);
 
         }
 
-        Timer.stop(tKey);
 
         return lmt;
 
