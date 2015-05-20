@@ -1,0 +1,6 @@
+&operation=csv
+&var=mod04_Geolocation_Fields_Latitude,mod04_Geolocation_Fields_Longitude,mod04_Data_Fields_Corrected_Optical_Depth_Land
+&bbox="[49,mod04_Geolocation_Fields_Latitude,50][167,mod04_Geolocation_Fields_Longitude,170]"
+&file=/data/modis/MOD04_L2.A2015021.0020.051.NRT.hdf
+&file=/data/modis/MOD04_L2.A2015021.0025.051.NRT.hdf
+&file=/data/modis/MOD04_L2.A2015021.0030.051.NRT.hdf
