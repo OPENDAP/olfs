@@ -33,6 +33,7 @@ import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.http.AuthenticationControls;
 import opendap.logging.Timer;
+import opendap.logging.Procedure;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
 import org.apache.commons.httpclient.HttpClient;
@@ -129,41 +130,49 @@ public class StaticCatalogDispatch implements DispatchHandler {
     public void sendThreddsCatalogResponse(HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
 
-        String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(request));
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-        String query = request.getQueryString();
 
-        Request orq = new Request(null,request);
+        Procedure timedProc = Timer.start();
+        try {
 
-        if (redirectRequest(request, response))
-            return;
+            String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(request));
+            String requestSuffix = ReqInfo.getRequestSuffix(request);
+            String query = request.getQueryString();
 
-        // Are we browsing a remote catalog? a remote dataset?
-        if (query != null && query.startsWith("browseCatalog=")) {
-            // browseRemoteCatalog(response, query);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } else if (query != null && query.startsWith("browseDataset=")) {
-            // browseRemoteDataset(response, query);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
+            Request orq = new Request(null, request);
 
-        // Is the request for a presentation view (HTML version) of the catalog?
-        else if (requestSuffix != null && requestSuffix.equals("html")) {
+            if (redirectRequest(request, response))
+                return;
 
-            if (query != null) {
-                if (query.startsWith("dataset=")) {
-                    sendDatasetHtmlPage(request, response, catalogKey, query);
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
-                }
-
-
-            } else {
-                sendCatalogHTML(request, response, catalogKey);
+            // Are we browsing a remote catalog? a remote dataset?
+            if (query != null && query.startsWith("browseCatalog=")) {
+                // browseRemoteCatalog(response, query);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            } else if (query != null && query.startsWith("browseDataset=")) {
+                // browseRemoteDataset(response, query);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
 
-        } else { // Send the the raw catalog XML.
-            sendCatalogXML(orq, response, catalogKey);
+            // Is the request for a presentation view (HTML version) of the catalog?
+            else if (requestSuffix != null && requestSuffix.equals("html")) {
+
+                if (query != null) {
+                    if (query.startsWith("dataset=")) {
+                        sendDatasetHtmlPage(request, response, catalogKey, query);
+                    } else {
+                        response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
+                    }
+
+
+                } else {
+                    sendCatalogHTML(request, response, catalogKey);
+                }
+
+            } else { // Send the the raw catalog XML.
+                sendCatalogXML(orq, response, catalogKey);
+            }
+        }
+        finally {
+            Timer.stop(timedProc);
         }
 
     }
@@ -795,7 +804,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String tKey = Timer.start();
+        Procedure timedProc = Timer.start();
 
         RequestCache.openThreadCache();
 
@@ -811,7 +820,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
         catch (Exception e) {
             _log.error("Failed to get a last modified time for '" + Scrub.urlContent(catalogKey) + "'  msg: " + e.getMessage());
         }
-        Timer.stop(tKey);
+        finally {
+            Timer.stop(timedProc);
+        }
 
         return -1;
     }

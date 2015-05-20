@@ -186,6 +186,8 @@
 
     </DispatchHandlers>
 
+    <Timer enabled="false" />
+
 
 </OLFSConfig>
 

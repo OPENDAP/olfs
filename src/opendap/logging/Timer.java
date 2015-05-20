@@ -26,107 +26,171 @@
 
 package opendap.logging;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This Timer is NOT thread safe.
+ * This Timer is thread safe.
  */
 public class Timer {
 
-    private static HashMap<String, Long> startTimes = new HashMap<String, Long>();
-    private static HashMap<String, Long> endTimes = new HashMap<String, Long>();
+    private static Logger _log = LoggerFactory.getLogger(Timer.class);
+
+    private static ConcurrentHashMap<String, StringBuilder> threadLogs = new ConcurrentHashMap<>();
 
     private static boolean enabled = false;
 
+    /**
+     * Turn on the Timer.
+     */
     public static void enable(){
         enabled = true;
     }
 
+    /**
+     * Turn off the Timer.
+     */
     public static void disable() {
         enabled = false;
     }
 
-    public static String start(){
+    /**
+     * Is it on?
+     * @return True if Timer is enabled.
+     */
+    public static boolean isEnabled(){
+        return enabled;
+    }
+
+
+    /**
+     * @return A StringBuilder for logging the current thread's timers
+     */
+    private static StringBuilder getThreadLog(){
+        String threadName = Thread.currentThread().getName();
+        if(!threadLogs.containsKey(threadName)){
+            threadLogs.put(threadName, new StringBuilder());
+        }
+        return threadLogs.get(threadName);
+
+    }
+
+
+    /**
+     * Starts (and logs) a timer associated with the current thread. The time will back up the call stack and
+     * name the Timer for the calling class and method.
+     * @return A an object to hand the Timer.stop() method.
+     */
+    public static Procedure start(){
         if(!enabled)
             return null;
 
+
+        //List<Procedure> timedProcedures  = getTimedProcedures();
+
+        StringBuilder threadLog = getThreadLog();
+
+        String threadName = Thread.currentThread().getName();
+
+
         StackTraceElement st[] = Thread.currentThread().getStackTrace();
-        boolean done = false;
 
         int callingMethodStackIndex = 2;
-        int timesCalled = 0;
 
-        while(!done){
-            StringBuilder key = new StringBuilder();
-            key.append(st[callingMethodStackIndex].getClassName()).append(".")
-                    .append(st[callingMethodStackIndex].getMethodName()).append("_").append(timesCalled++);
 
-            if(!startTimes.containsKey(key.toString())){
-                startTimes.put(key.toString(), System.nanoTime());
-                return key.toString();
-            }
+        StringBuilder key = new StringBuilder();
+        key.append(st[callingMethodStackIndex].getClassName()).append(".")
+                .append(st[callingMethodStackIndex].getMethodName());
 
+
+        Procedure p = new Procedure();
+        p.name = key.toString();
+        p.start();
+
+        threadLog.append("[").append(threadName).append("] ").append(key.toString()).append("  STARTED: ").append(p.start).append("\n");
+
+        _log.info("start() - {} started:  {} ", key.toString(), p.start);
+
+
+        return p;
+
+    }
+
+    /**
+     * Stops and logs the timing of the associated procedure.
+     *
+     * @param procedure  The Procedure to stop timing.
+     */
+    public static void stop(Procedure procedure){
+        if(!enabled)
+            return;
+
+        StringBuilder sb = new StringBuilder();
+        procedure.end();
+
+        String threadName = Thread.currentThread().getName();
+
+
+        sb.append("stop() - ").append(procedure.name).append(" stopped:  ");
+        sb.append(procedure.end).append(" (").append(procedure.elapsedTime()).append(" ms)");
+
+        _log.info(sb.toString());
+
+        StringBuilder threadLog = getThreadLog();
+        threadLog.append("[").append(threadName).append("] ").append(procedure.name).append(" STOPPED: ").append(procedure.end);
+        threadLog.append(" ELAPSED: ").append(procedure.elapsedTime()).append("\n");
+
+
+
+    }
+
+    /**
+     * Writes the report() to the pass PrintStream.
+     * @param pw  A PrintStream to which to print the report String.
+     */
+    public static void report(PrintStream pw){
+        if(!enabled) {
+            pw.print("Timer is NOT enabled");
+            return;
         }
 
-        return null;
-
-    }
-
-    public static void stop(String key){
-        if(!enabled)
-            return;
-
-        endTimes.put(key, System.nanoTime());
-
-
-    }
-
-    public static void report(PrintStream pw){
-        if(!enabled)
-            return;
         pw.print(report());
     }
 
-    public static String report(){
-        if(!enabled)
-            return null;
 
-        StringBuilder rprt = new StringBuilder();
-
-        for(String key: startTimes.keySet()){
-
-            rprt.append(key);
-
-            long startTime = startTimes.get(key);
-            rprt.append(" START: ").append(startTime);
-
-            if(endTimes.containsKey(key)){
-                long endTime = endTimes.get(key);
-
-                rprt.append(" END: ").append(endTime);
-                rprt.append(" elapsed: ").append((endTime - startTime)/1000000.00).append(" ms");
-
-
-            }
-            else {
-                rprt.append(" END: ERROR_-_Timer.stop()_was_never_called.");
-
-            }
-            rprt.append("\n");
-
-
-        }
-
-
-        return rprt.toString();
-    }
-
+    /**
+     * Resets the Timer for the current thread.
+     */
     public static void reset() {
         if(!enabled)
             return;
-        startTimes.clear();
-        endTimes.clear();
+
+
+        String threadName = Thread.currentThread().getName();
+
+        threadLogs.remove(threadName);
     }
+
+
+    /**
+     *
+     * @return A summary of the current timing activities since the last call to Timer.reset()
+     */
+    public static String report() {
+        if (!enabled)
+            return "Timer is NOT enabled";
+
+        return getThreadLog().toString();
+
+    }
+
+
+
+
+
+
 
 }

@@ -28,6 +28,7 @@ package opendap.w10n;
 import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
+import opendap.logging.Procedure;
 import opendap.services.ServicesRegistry;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,7 @@ public class W10nServlet extends HttpServlet   {
 
 
             try {
-                String tKey = Timer.start();
+                Procedure timedProc = Timer.start();
                 try {
 
                     if(LicenseManager.isExpired(request)){
@@ -128,7 +129,7 @@ public class W10nServlet extends HttpServlet   {
                 finally {
                     RequestCache.closeThreadCache();
                     _log.info("doGet(): Response completed.\n");
-                    Timer.stop(tKey);
+                    Timer.stop(timedProc);
                 }
 
 
@@ -151,7 +152,7 @@ public class W10nServlet extends HttpServlet   {
                 }
             }
 
-            Timer.report(System.out);
+            _log.info(Timer.report());
             Timer.reset();
         }
         //**************************************************************************

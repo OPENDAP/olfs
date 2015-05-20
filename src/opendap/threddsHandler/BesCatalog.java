@@ -242,7 +242,10 @@ public class BesCatalog implements Catalog {
 
 
             // Deatach everything!
-            graphElements.forEach(org.jdom.Element::detach);
+            // graphElements.forEach(org.jdom.Element::detach);  // Java 8 too soon....
+            for(Element e :graphElements){
+                e.detach();
+            }
 
             Vector<Element> dropList = new Vector<>();
 
