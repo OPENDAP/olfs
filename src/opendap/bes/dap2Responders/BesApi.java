@@ -2328,8 +2328,7 @@ public class BesApi {
 
         Element e, request = new Element("request", BES_NS);
 
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
+        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
 
         request.setAttribute("reqID",reqID);
 
@@ -2391,8 +2390,9 @@ public class BesApi {
 
         Element e, request = new Element("request", BES_NS);
 
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
+
+        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
+
 
         request.setAttribute("reqID",reqID);
 
