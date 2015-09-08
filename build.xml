@@ -64,6 +64,10 @@
     <property name="compile.debuglevel" value="lines,vars,source"/>
     <property name="compile.deprecation" value="on"/>
 
+    <property name="compile.TARGET" value="1.7"/>
+    <property name="compile.SOURCE" value="1.7"/>
+
+
     <property name="modern.compiler" value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
@@ -421,9 +425,13 @@
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
+        <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
         <echo level="info" message=""/>
 
         <javac compiler="${build.compiler}"
+               target="${compile.TARGET}"
+               source="${compile.SOURCE}"
                destdir="${build.classes}"
                debug="${compile.debug}"
                debuglevel="${compile.debuglevel}"

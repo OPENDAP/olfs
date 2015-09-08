@@ -29,6 +29,7 @@ import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import org.slf4j.Logger;
 
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,8 +67,8 @@ public class Netcdf4 extends Dap4Responder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-3");
-        setServiceTitle("NetCDF-3 Data Response");
-        setServiceDescription("NetCDF-3 representation of the DAP4 Data Response object.");
+        setServiceTitle("NetCDF-4 Data Response");
+        setServiceDescription("NetCDF-4 representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
         setNormativeMediaType(new MediaType("application","x-netcdf", getRequestSuffix()));
@@ -100,6 +102,18 @@ public class Netcdf4 extends Dap4Responder {
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        downloadFileName = downloadFileName+".nc4";
+
+        log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+
+        response.setHeader("Content-Disposition", contentDisposition);
 
 
         String xdap_accept = "3.2";

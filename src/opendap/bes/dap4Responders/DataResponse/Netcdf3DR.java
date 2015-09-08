@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -107,6 +109,18 @@ public class Netcdf3DR extends Dap4Responder{
         //response.setHeader("Content-Encoding", "plain");
 
 
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        downloadFileName = downloadFileName+".nc";
+
+        log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+
+        response.setHeader("Content-Disposition", contentDisposition);
 
 
         User user = new User(request);
