@@ -1,0 +1,22 @@
+
+This directory contains files that can be used to demonstrate the
+'Aggregation handler' developed for the EDSC. While the code is named
+a handler, it is actually implemented as a servlet that makes calls to
+the BES, bypassing the OLFS. The software can be used by any client
+that can form the correct POST-type queries.
+
+How to run these files using curl:
+
+curl -X POST -d @d1_netcdf3_variable_subset.txt http://<host>/opendap/aggregation > d1.zip
+
+host: 52.1.74.222, localhost:8080, etc.
+
+These *.txt files are the text to send, using POST, to the aggregation
+servlet. The ones in this directory using long names while the ones in
+the 'short_names' directory use names that do not include the
+enclosing structure's names - the two name schemes correspond to two
+different HDF4 handler configurations (both use CF set to 'yes'). When
+the hdf4 handler is built with the hdfeos2 library, the variable names
+will not include the enclosing structures when CF is true. When the
+handler build does not include the hdfeos2 library the long name
+format is used.

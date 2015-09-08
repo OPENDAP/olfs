@@ -1,0 +1,40 @@
+
+# Initial Travic-CI control file. 6.11.15 jhrg
+
+language: java
+
+# I don't think travis-ci has openjdk8 yet (6.11.15 jhrg)
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+  - openjdk7
+  
+# whitelist
+branches:
+  only:
+    - master
+
+notifications:
+  email:
+    - ndp@opendap.org
+    - jgallagher@opendap.org
+    
+# Use this to prepare the system to install prerequisites or dependencies
+#
+# before_install:
+
+# Use this to install any prerequisites or dependencies necessary to run your build
+#
+# install:
+
+# Use this to prepare your build for testing
+# e.g. copy database configurations, environment variables, etc.
+#
+# before_script:
+
+# All commands must exit with code 0 on success. Anything else is considered failure.
+#
+script:
+  - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+  
+# after_script:
