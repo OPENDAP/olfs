@@ -344,29 +344,36 @@ public class Dap4Error {
 
 
         try {
+            if(!response.isCommitted())
+                response.reset();
+
             String xsltDoc = systemPath + "/docs/xsl/error"+errorVal+".xsl";
 
 
+            boolean done = false;
             File xsltFile = new File(xsltDoc);
-
             if(xsltFile.exists()){
+
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
                 Document errorPage = transformer.transform(errorDoc);
 
-                if(!response.isCommitted())
-                    response.reset();
-
-                response.setContentType("text/html");
-                response.setStatus(errorVal);
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                xmlo.output(errorPage, response.getOutputStream());
-                xmlo.output(errorPage, System.out);
-                xmlo.output(errorDoc, System.out);
+                if(errorPage!=null) {
+                    response.setContentType("text/html");
+                    response.setStatus(errorVal);
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    xmlo.output(errorPage, response.getOutputStream());
+                    xmlo.output(errorPage, System.out);
+                    xmlo.output(errorDoc, System.out);
+                    done = true;
+                }
             }
-            else {
-                if(!response.isCommitted())
-                    response.reset();
-                HttpResponder.sendHttpErrorResponse(errorVal, getMessage(), systemPath + "/error/error.html.proto", context, response);
+            if(!done) {
+                HttpResponder.sendHttpErrorResponse(
+                        errorVal,
+                        getMessage(),
+                        systemPath + "/error/error.html.proto",
+                        context,
+                        response);
             }
 
         }
