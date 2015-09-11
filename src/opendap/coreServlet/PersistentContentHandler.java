@@ -126,7 +126,7 @@ public class PersistentContentHandler {
 
       File[] files = fromDir.listFiles();
       if(files==null){
-          log.error("Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+          log.error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
           return;
       }
       for (int i=0; i<files.length; i++) {

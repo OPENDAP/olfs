@@ -131,6 +131,10 @@ public class NcmlManager {
 
         Document catDoc = catalog.getCatalogDocument();
 
+        if(catDoc==null){
+            log.error("ingestNcml() - FAILED to locate catalog document {}", catalog.getFileName());
+            return;
+        }
 
         Vector<String> ncmlDatasetIds =  new Vector<String>();
 
