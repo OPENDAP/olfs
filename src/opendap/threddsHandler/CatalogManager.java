@@ -314,6 +314,11 @@ public class CatalogManager {
 
 
                 datasetScanCatalog = datasetScan.getCatalog(catalogKey);
+                if(datasetScanCatalog==null){
+                    String msg = "FAILED to retrieve the catalog identified by the key '{}' from the DatasetScan instance "+datasetScan.getName();
+                    _log.error("getCatalog() - {}",msg);
+                    throw new BadConfigurationException(msg);
+                }
                 RequestCache.put(catalogKey,datasetScanCatalog);
 
             }
