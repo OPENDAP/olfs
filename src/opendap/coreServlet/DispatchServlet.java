@@ -310,39 +310,45 @@ public class DispatchServlet extends HttpServlet {
             for (Object o : httpHandlerElements.getChildren("Handler")) {
                 Element handlerElement = (Element) o;
                 handlerConfigs.add(handlerElement);
-                String className = handlerElement.getAttribute("className").getValue();
-                DispatchHandler dh;
-                try {
+                String className = handlerElement.getAttributeValue("className");
+                if(className!=null) {
 
-                    log.debug("Building Handler: " + className);
-                    Class classDefinition = Class.forName(className);
-                    dh = (DispatchHandler) classDefinition.newInstance();
+                    DispatchHandler dh;
+                    try {
+
+                        log.debug("Building Handler: " + className);
+                        Class classDefinition = Class.forName(className);
+                        dh = (DispatchHandler) classDefinition.newInstance();
 
 
-                } catch (ClassNotFoundException e) {
-                    msg = "Cannot find class: " + className;
-                    log.error(msg);
-                    throw new ServletException(msg, e);
-                } catch (InstantiationException e) {
-                    msg = "Cannot instantiate class: " + className;
-                    log.error(msg);
-                    throw new ServletException(msg, e);
-                } catch (IllegalAccessException e) {
-                    msg = "Cannot access class: " + className;
-                    log.error(msg);
-                    throw new ServletException(msg, e);
-                } catch (ClassCastException e) {
-                    msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
-                    log.error(msg);
-                    throw new ServletException(msg, e);
-                } catch (Exception e) {
-                    msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-                    log.error(msg);
-                    throw new ServletException(msg, e);
+                    } catch (ClassNotFoundException e) {
+                        msg = "Cannot find class: " + className;
+                        log.error(msg);
+                        throw new ServletException(msg, e);
+                    } catch (InstantiationException e) {
+                        msg = "Cannot instantiate class: " + className;
+                        log.error(msg);
+                        throw new ServletException(msg, e);
+                    } catch (IllegalAccessException e) {
+                        msg = "Cannot access class: " + className;
+                        log.error(msg);
+                        throw new ServletException(msg, e);
+                    } catch (ClassCastException e) {
+                        msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
+                        log.error(msg);
+                        throw new ServletException(msg, e);
+                    } catch (Exception e) {
+                        msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+                        log.error(msg);
+                        throw new ServletException(msg, e);
 
+                    }
+
+                    dispatchHandlers.add(dh);
                 }
-
-                dispatchHandlers.add(dh);
+                else {
+                    log.error("buildHandlers() - FAILED to locate the required 'className' attribute in Handler element. SKIPPING.");
+                }
             }
         }
 
