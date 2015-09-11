@@ -72,36 +72,42 @@ public class ApplicationRegistry {
 
         for (Object o : webStartConfig.getChildren("JwsHandler")) {
             Element handlerElement = (Element) ((Element) o).clone();
-            String className = handlerElement.getAttribute("className").getValue();
-            JwsHandler dh;
-            try {
 
-                log.debug("Building Handler: " + className);
-                Class classDefinition = Class.forName(className);
-                dh = (JwsHandler) classDefinition.newInstance();
+            String className = handlerElement.getAttributeValue("className");
+            if(className!=null) {
+                JwsHandler dh;
+                try {
 
-            } catch (ClassNotFoundException e) {
-                msg = "Cannot find class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (InstantiationException e) {
-                msg = "Cannot instantiate class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (IllegalAccessException e) {
-                msg = "Cannot access class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.webstart.JwsHandler";
-                log.error(msg);
-                throw new ServletException(msg, e);
+                    log.debug("Building Handler: " + className);
+                    Class classDefinition = Class.forName(className);
+                    dh = (JwsHandler) classDefinition.newInstance();
+
+                } catch (ClassNotFoundException e) {
+                    msg = "Cannot find class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (InstantiationException e) {
+                    msg = "Cannot instantiate class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (IllegalAccessException e) {
+                    msg = "Cannot access class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (ClassCastException e) {
+                    msg = "Cannot cast class: " + className + " to opendap.webstart.JwsHandler";
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                }
+
+                log.debug("Initializing Handler: " + className);
+                dh.init(handlerElement, resourcesDir);
+
+                jwsHandlers.add(dh);
             }
-
-            log.debug("Initializing Handler: " + className);
-            dh.init(handlerElement,resourcesDir);
-
-            jwsHandlers.add(dh);
+            else {
+                log.error("buildJwsHandlers() - FAILED to locate the required 'className' attribute in JWSHandler element. SKIPPING.");
+            }
         }
 
         log.debug("JwsHandlers have been built.");
