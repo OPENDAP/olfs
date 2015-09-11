@@ -456,9 +456,8 @@ public class ReqInfo {
 
 
 
-        String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
-
-        Matcher m = Pattern.compile(_regexToMatchLastDotSuffixString).matcher(s);
+        //String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$";
+        //Matcher m = Pattern.compile(_regexToMatchLastDotSuffixString).matcher(s);
 
 
 
