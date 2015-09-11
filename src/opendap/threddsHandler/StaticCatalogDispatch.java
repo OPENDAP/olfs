@@ -525,6 +525,13 @@ public class StaticCatalogDispatch implements DispatchHandler {
                                 "    prefix: " + _prefix
                 );
                 catDoc = cat.getCatalogAsXdmNode(_catalogToHtmlTransform.getProcessor());
+                if(catDoc==null){
+                    String msg = "FAILED to retrieve catalog document associated with file '"+cat.getFileName()+"' UNABLE TO FORMULATE A RESPONSE.";
+                    _log.error("sendCatalogHTML() - {}",msg);
+                    throw new BadConfigurationException(msg);
+
+                }
+
                 _log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
             } else {
                 _log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +

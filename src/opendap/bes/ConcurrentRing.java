@@ -361,6 +361,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
                     for(int i=0; i<strokes_to_give ;i++){
                         TestThing tt = _cr.getNext();
+                        if(tt==null){
+
+                            throw new Exception("FAILED TO GET TestThing instance. That's Bad Billy!");
+
+                        }
                         int strokesReceived = tt.stroke();
                         System.out.println(_name+ " stroked "+tt.getName()+" which now has received "+ strokesReceived +" strokes.");
                     }
@@ -370,6 +375,8 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
                 } catch (InterruptedException e) {
                     System.err.println("run() - Caught Interrupted exception. Bailing... Msg: " + e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     _doneSignal.countDown();
                 }
@@ -428,6 +435,12 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
             last = -1;
             for(int i=0; i<ringSize ;i++){
                 TestThing thisThing = cr.getNext();
+                if(thisThing==null){
+
+                    throw new Exception("FAILED TO GET TestThing instance. That's Bad Billy!");
+
+                }
+
                 name = thisThing.getName();
                 number = name.substring(name.length() - 2, name.length());
                 int thisVal = Integer.parseInt(number);
@@ -454,6 +467,8 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
         } catch (InterruptedException e) {
             System.err.println("main() - Caught Interrupted exception. Bailing... Msg: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
