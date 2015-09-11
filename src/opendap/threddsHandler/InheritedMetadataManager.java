@@ -311,7 +311,7 @@ public class InheritedMetadataManager {
                     if(serviceName != null){
                         service = serviceByName.get(serviceName.getTextTrim());
                         if(service != null)
-                            inheritedService = getServiceDefintion(service);
+                            inheritedService = getServiceDefinition(service);
                         else {
                             log.error("ingestInheritedMetadata() - Failed to locate service {}", serviceName.getTextTrim());
                         }
@@ -374,8 +374,9 @@ public class InheritedMetadataManager {
             log.debug("ingestInheritedMetadata() - Adding mapping of catalog '"+catalogKey+"' to a collection of metadataRootPaths to inventory.");
             _catalog2MetadataMap.put(catalogKey, metadataRootPaths.toArray(new String[metadataRootPaths.size()]));
 
-        }
-        finally {
+        } catch (MissingServiceDefinitionException e) {
+            e.printStackTrace();
+        } finally {
             writeLock.unlock();
         }
     }
@@ -624,15 +625,20 @@ public class InheritedMetadataManager {
     }
 
 
-    private static Element getServiceDefintion(Element service){
+    private static Element getServiceDefinition(Element service) throws MissingServiceDefinitionException {
         Element serviceParent = service.getParentElement();
+        if(serviceParent==null){
+            String msg = "FAILED to find THREDDS service definition.";
+            log.error("getServiceDefinition() - {}",msg);
+            throw new MissingServiceDefinitionException();
+        }
         if(!serviceParent.getName().equals("service") ||  serviceParent.getNamespacePrefix().equals("thredds")){
 
             return service;
 
         }
 
-        return getServiceDefintion(serviceParent);
+        return getServiceDefinition(serviceParent);
 
 
 
