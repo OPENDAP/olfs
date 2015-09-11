@@ -155,6 +155,11 @@ public class CatalogManager {
 
 
         Document catDoc = catalog.getRawCatalogDocument();
+        if(catDoc==null){
+            String msg = "FAILED to get catalog Document object for the catalog associated with file "+catalog.getFileName()+"'";
+            _log.error("addCatalog() - {}", msg);
+            throw new BadConfigurationException(msg);
+        }
         _log.debug("addCatalog() - Loaded Catalog document: \n{}",new XMLOutputter(Format.getPrettyFormat()).outputString(catDoc));
 
         Element catRef;
