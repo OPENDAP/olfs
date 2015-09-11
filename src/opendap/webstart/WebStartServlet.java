@@ -207,37 +207,43 @@ public class WebStartServlet extends HttpServlet {
 
         for (Object o : webStartConfig.getChildren("JwsHandler")) {
             Element handlerElement = (Element) o;
-            String className = handlerElement.getAttribute("className").getValue();
-            JwsHandler dh;
-            try {
+            String className = handlerElement.getAttributeValue("className");
+            if(className!=null) {
 
-                log.debug("Building Handler: " + className);
-                Class classDefinition = Class.forName(className);
-                dh = (JwsHandler) classDefinition.newInstance();
+                JwsHandler dh;
+                try {
 
-            } catch (ClassNotFoundException e) {
-                msg = "Cannot find class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (InstantiationException e) {
-                msg = "Cannot instantiate class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (IllegalAccessException e) {
-                msg = "Cannot access class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
-                log.error(msg);
-                throw new ServletException(msg, e);
+                    log.debug("Building Handler: " + className);
+                    Class classDefinition = Class.forName(className);
+                    dh = (JwsHandler) classDefinition.newInstance();
+
+                } catch (ClassNotFoundException e) {
+                    msg = "Cannot find class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (InstantiationException e) {
+                    msg = "Cannot instantiate class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (IllegalAccessException e) {
+                    msg = "Cannot access class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (ClassCastException e) {
+                    msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                }
+
+                log.debug("Initializing Handler: " + className);
+                dh.init(handlerElement, resourcesDir);
+
+
+                jwsHandlers.put(dh.getServiceId(), dh);
             }
-
-            log.debug("Initializing Handler: " + className);
-            dh.init(handlerElement, resourcesDir);
-
-
-            jwsHandlers.put(dh.getServiceId(), dh);
+            else {
+                log.error("buildJwsHandlers() - FAILED to locate the required 'className' attribute in JwsHandler element. SKIPPING.");
+            }
         }
 
         log.debug("JwsHandlers have been built.");
