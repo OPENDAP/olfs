@@ -290,37 +290,42 @@ public class ViewersServlet extends HttpServlet {
         int i = 0;
         for (Object o : webStartConfig.getChildren("WebServiceHandler")) {
             Element handlerElement = (Element) ((Element) o).clone();
-            String className = handlerElement.getAttribute("className").getValue();
-            WebServiceHandler wsh;
-            try {
+            String className = handlerElement.getAttributeValue("className");
+            if(className!=null) {
+                WebServiceHandler wsh;
+                try {
 
-                _log.debug("Building Handler: " + className);
-                Class classDefinition = Class.forName(className);
-                wsh = (WebServiceHandler) classDefinition.newInstance();
+                    _log.debug("Building Handler: " + className);
+                    Class classDefinition = Class.forName(className);
+                    wsh = (WebServiceHandler) classDefinition.newInstance();
 
-            } catch (ClassNotFoundException e) {
-                msg = "Cannot find class: " + className;
-                _log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (InstantiationException e) {
-                msg = "Cannot instantiate class: " + className;
-                _log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (IllegalAccessException e) {
-                msg = "Cannot access class: " + className;
-                _log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.webstart.WebServiceHandler";
-                _log.error(msg);
-                throw new ServletException(msg, e);
+                } catch (ClassNotFoundException e) {
+                    msg = "Cannot find class: " + className;
+                    _log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (InstantiationException e) {
+                    msg = "Cannot instantiate class: " + className;
+                    _log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (IllegalAccessException e) {
+                    msg = "Cannot access class: " + className;
+                    _log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (ClassCastException e) {
+                    msg = "Cannot cast class: " + className + " to opendap.webstart.WebServiceHandler";
+                    _log.error(msg);
+                    throw new ServletException(msg, e);
+                }
+
+                _log.debug("Initializing Handler: " + className);
+                wsh.init(this, handlerElement);
+
+                ServicesRegistry.addService(wsh);
+                i++;
             }
-
-            _log.debug("Initializing Handler: " + className);
-            wsh.init(this, handlerElement);
-
-            ServicesRegistry.addService(wsh);
-            i++;
+            else {
+                _log.error("buildWebServiceHandlers() - FAILED to locate the required 'className' attribute in WebServiceHandler element. SKIPPING.");
+            }
         }
 
         _log.debug(i + " WebServiceHandlers have been built.");
