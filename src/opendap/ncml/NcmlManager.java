@@ -132,7 +132,7 @@ public class NcmlManager {
         Document catDoc = catalog.getCatalogDocument();
 
         if(catDoc==null){
-            log.error("ingestNcml() - FAILED to locate catalog document {}", catalog.getFileName());
+            log.error("ingestNcml() - FAILED to locate catalog document '{}' SKIPPING!!!", catalog.getFileName());
             return;
         }
 

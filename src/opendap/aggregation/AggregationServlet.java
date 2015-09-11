@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
@@ -131,7 +132,7 @@ public class AggregationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Logger _log;
     private BesApi _besApi;
-    private Set<String> _granuleNames;
+    private ConcurrentSkipListSet<String> _granuleNames;
 
     private static final String invocationError =
             "I expected the operation to be one of: version, file, netcdf3, netcdf4, ascii or csv but got: ";
@@ -150,7 +151,7 @@ public class AggregationServlet extends HttpServlet {
 
         _log = LoggerFactory.getLogger(this.getClass());
         _besApi = new BesApi();
-        _granuleNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        _granuleNames = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 
         _log.info(versionInfo);
 
