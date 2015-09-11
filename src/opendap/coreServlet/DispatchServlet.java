@@ -377,29 +377,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    private void identifyRequiredGetHandlers(Vector<DispatchHandler> dhv) throws ServletException {
-        String msg;
-        for (DispatchHandler dh : dhv) {
-            if (dh instanceof OpendapHttpDispatchHandler) {
-                if (odh == null)
-                    odh = (OpendapHttpDispatchHandler) dh;
-                else {
-                    msg = "Only one instance of OpendapHttpDispatchHandler is allowed in a configuration!";
-                    log.error(msg);
-                    throw new ServletException(msg);
-                }
-            }
-        }
-        if (odh == null) {
-            msg = "There must be an instance OpendapHttpDispatchHandler in the configuration!";
-            log.error(msg);
-            throw new ServletException(msg);
-        }
-
-
-
-    }
-
 
     /**
      * ************************************************************************
