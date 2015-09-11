@@ -125,6 +125,10 @@ public class PersistentContentHandler {
         toDir.mkdirs();
 
       File[] files = fromDir.listFiles();
+      if(files==null){
+          log.error("Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+          return;
+      }
       for (int i=0; i<files.length; i++) {
         File f = files[i];
         if (f.isDirectory())
