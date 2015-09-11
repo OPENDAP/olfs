@@ -543,7 +543,6 @@ public class LocalFileCatalog implements Catalog {
                 is = new ByteArrayInputStream(_rawCatalogBuffer);
                 log.debug("getCatalogDocument(): Reading catalog from memory cache.");
             } else {
-                is = new FileInputStream(_pathPrefix + _fileName);
 
                 if (_ingestTransformer != null) {
                     log.debug("getCatalogDocument(): Applying catalog ingestTransform.");
@@ -552,6 +551,9 @@ public class LocalFileCatalog implements Catalog {
                     _ingestTransformer.transform(catalog, baos);
 
                     is = new ByteArrayInputStream(baos.toByteArray());
+                }
+                else {
+                    is = new FileInputStream(_pathPrefix + _fileName);
                 }
 
             }
@@ -641,8 +643,6 @@ public class LocalFileCatalog implements Catalog {
                 is = new ByteArrayInputStream(_rawCatalogBuffer);
                 log.debug("getCatalogAsXdmNode(): Reading raw catalog from memory cache.");
             } else {
-                is = new FileInputStream(_pathPrefix + _fileName);
-                log.debug("getCatalogAsXdmNode(): Reading catalog from file.");
 
                 if (_ingestTransformer != null) {
                     log.debug("getCatalogAsXdmNode(): Applying catalog ingestTransform.");
@@ -651,6 +651,10 @@ public class LocalFileCatalog implements Catalog {
                     _ingestTransformer.transform(catalog, baos);
 
                     is = new ByteArrayInputStream(baos.toByteArray());
+                }
+                else {
+                    is = new FileInputStream(_pathPrefix + _fileName);
+                    log.debug("getCatalogAsXdmNode(): Reading catalog from file.");
                 }
             }
 
