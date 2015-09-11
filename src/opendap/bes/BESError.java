@@ -397,27 +397,30 @@ public class BESError extends OPeNDAPException {
 
 
         try {
+            if(!response.isCommitted())
+                response.reset();
+
+
             String xsltDoc = systemPath + "/xsl/error"+errorVal+".xsl";
 
 
+            boolean done = false;
             File xsltFile = new File(xsltDoc);
-
             if(xsltFile.exists()){
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
                 Document errorPage = transformer.transform(besError);
+                if(errorPage!=null){
+                    response.setContentType("text/html");
+                    response.setStatus(errorVal);
+                    xmlo.output(errorPage, response.getOutputStream());
+                    xmlo.output(errorPage, System.out);
+                    xmlo.output(besError, System.out);
+                    done = true;
+                }
 
-                if(!response.isCommitted())
-                    response.reset();
-
-                response.setContentType("text/html");
-                response.setStatus(errorVal);
-                xmlo.output(errorPage, response.getOutputStream());
-                xmlo.output(errorPage, System.out);
-                xmlo.output(besError, System.out);
             }
-            else {
-                if(!response.isCommitted())
-                    response.reset();
+
+            if(!done) {
                 HttpResponder.sendHttpErrorResponse(
                         errorVal,
                         getMessage(),
