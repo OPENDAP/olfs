@@ -843,6 +843,15 @@ public class BES {
 
         OPeNDAPClient oc = getClient();
 
+        if(oc==null){
+            String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
+                    "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
+            log.error("besTransaction() - {}",msg);
+            throw new IOException(msg);
+
+        }
+
+
         Procedure timedProc = Timer.start();
 
         try {
