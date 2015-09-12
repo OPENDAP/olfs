@@ -381,7 +381,7 @@ public class Transformer {
                 Transformer.printUsage(System.err);
                 System.exit(-1);
             }
-            jdomXsltTransfom(args[0], args[1], System.out);
+            jdomXsltTransform(args[0], args[1], System.out);
             saxonXsltTransform(args[0], args[1], System.out);
 
         } catch (Exception e) {
@@ -392,7 +392,7 @@ public class Transformer {
     }
 
 
-    public static void jdomXsltTransfom(String srcDocUri, String xslDocUri, OutputStream os) throws Exception {
+    public static void jdomXsltTransform(String srcDocUri, String xslDocUri, OutputStream os) throws Exception {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -405,26 +405,38 @@ public class Transformer {
 
         Document sourceDoc, xsltDoc;
 
-        log.debug("Loading source document "+srcDocUri);
+        log.debug("jdomXsltTransform() - Loading source document "+srcDocUri);
         sourceDoc = getXMLDoc(srcDocUri);
-        log.debug("Got and parsed XML document: "+srcDocUri);
+        if(sourceDoc==null){
+            String msg = "FAILED to get source document! srcDocUri: "+srcDocUri;
+            log.error("jdomXsltTransform() - {}",msg);
+            throw new IOException(msg);
+
+        }
+        log.debug("jdomXsltTransform() - Got and parsed XML document: "+srcDocUri);
         log.debug(xmlo.outputString(sourceDoc));
 
-        log.debug("Loading transform document "+srcDocUri);
+        log.debug("jdomXsltTransform() - Loading transform document "+srcDocUri);
         xsltDoc = getXMLDoc(xslDocUri);
-        log.debug("Got and parsed XSL document: "+xslDocUri);
+        log.debug("jdomXsltTransform() - Got and parsed XSL document: "+xslDocUri);
         log.debug(xmlo.outputString(xsltDoc));
 
 
-        System.err.println("Applying transform...");
+        log.debug("jdomXsltTransform() - Applying transform...");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
-        System.err.println("Transformer is an instance of  "+transformer.getClass().getName());
+        log.debug("jdomXsltTransform() - Transformer is an instance of  "+transformer.getClass().getName());
 
 
 
         Document result = transformer.transform(sourceDoc);
+        if(result==null){
+            String msg = "FAILED to get result document from transform! srcDocUri: "+srcDocUri+" xsltDocUri: "+xslDocUri;
+            log.error("jdomXsltTransform() - {}",msg);
+            throw new IOException(msg);
+
+        }
         xmlo.output(result, os);
         log.debug(xmlo.outputString(result));
 
@@ -550,6 +562,12 @@ public class Transformer {
         Processor proc = new Processor(false);
 
         XsltTransformer trans = Transformer.getXsltTransformer(proc, xslTransformUri);
+        if(trans==null){
+            String msg = "FAILED to get XsltTransformer instance! srcDocUri: "+srcDocUri+" xslTransformUri: "+xslTransformUri;
+            log.error("saxonXsltTransform() - {}",msg);
+            throw new IOException(msg);
+
+        }
 
         XdmNode source = Transformer.getXdmNode(proc,srcDocUri);
 
