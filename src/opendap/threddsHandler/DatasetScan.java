@@ -6,6 +6,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -102,7 +103,14 @@ public class DatasetScan  extends Dataset {
 
     private Element getServiceByName(String name) throws JDOMException, SaxonApiException, IOException {
 
-        Element catalogElement = _parentCatalog.getCatalogDocument().getRootElement();
+        Document catalogDoc = _parentCatalog.getCatalogDocument();
+
+        if(catalogDoc==null) {
+            _log.error("getServiceByName() - FAILED to locate catalog document for catalog with key '{}' RETURNING NULL",_parentCatalog.getCatalogKey());
+            return null;
+        }
+
+        Element catalogElement = catalogDoc.getRootElement();
 
         Iterator<Element> i = catalogElement.getDescendants(new ElementFilter(THREDDS.SERVICE, THREDDS.NS));
 
