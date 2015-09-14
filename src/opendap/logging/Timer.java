@@ -71,11 +71,8 @@ public class Timer {
      */
     private static StringBuilder getThreadLog(){
         String threadName = Thread.currentThread().getName();
-        if(!threadLogs.containsKey(threadName)){
-            threadLogs.put(threadName, new StringBuilder());
-        }
+        threadLogs.putIfAbsent(threadName, new StringBuilder());
         return threadLogs.get(threadName);
-
     }
 
 
