@@ -539,6 +539,10 @@ public class OPeNDAPClient {
             if (cmd.hasOption("c")) {
                 maxCmds = Integer.parseInt(cmd.getOptionValue("c"));
             }
+            if(maxCmds<1){
+                log.error("main() - The variable maxCmds has been set (via the -c option) to an unacceptable value of {}. Resetting to 1.",maxCmds);
+                maxCmds = 1;
+            }
             log.info("The connection to the BES will be dropped and a new one opened after every "
                     + maxCmds+" command" + (maxCmds>1?"s.":"."));
 
