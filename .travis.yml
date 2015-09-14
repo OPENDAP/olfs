@@ -38,3 +38,18 @@ script:
   - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
   
 # after_script:
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
+
+addons:
+  coverity_scan:
+    project:
+      name: "OPENDAP/olfs"
+      description: "Build submitted via Travis CI"
+    notification_email: ndp@opendap.org
+    build_command_prepend: "ant clean"
+    build_command:   "ant server -DHYRAX_VERSION=Coverity_Build -DOLFS_VERSION=Coverity_Build"
+    branch_pattern: coverity_scan
