@@ -342,7 +342,7 @@ public class InheritedMetadataManager {
                         if(inheritedService!=null){
                             log.debug("ingestInheritedMetadata() - Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
 
-                            if (!_inheritedServices.contains(metadataRootPath)) {
+                            if (!_inheritedServices.containsKey(metadataRootPath)) {
                                 log.debug("ingestInheritedMetadata() - Creating inherited services storage HashMap for " +
                                         "metadataRootPath: '"+metadataRootPath+"'");
                                 _inheritedServices.put(metadataRootPath, new HashMap<String, Vector<Element>>());

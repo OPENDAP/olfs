@@ -1256,15 +1256,13 @@ public class BES {
 
             try {
                 _clientsMapLock.lock();
-                for (int i = 0; i < totalClients; i++) {
-                    OPeNDAPClient oc = _clients.get(i);
+                for (OPeNDAPClient oc: _clients.values()) {
                     if (oc != null) {
                         log.debug("destroy() Killing BES Client (id:" +
                                 oc.getID() + ")");
                         oc.killClient();
                     } else {
-                        log.debug("destroy() BES Client (id:" +
-                                i + ")already discarded.");
+                        log.debug("destroy() BES Client (id:"+ oc.getID()+ ")already discarded.");
 
                     }
 
