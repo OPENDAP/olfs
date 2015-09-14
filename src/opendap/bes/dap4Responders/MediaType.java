@@ -117,7 +117,7 @@ public class MediaType implements Comparable {
     }
     
     public MediaType(String acceptMediaType){
-        HashMap<String,String> params = new HashMap<String,String>();
+        HashMap<String,String> params = new HashMap<>();
         String[] parts = acceptMediaType.split(";");
 
         this._quality =1.0;
