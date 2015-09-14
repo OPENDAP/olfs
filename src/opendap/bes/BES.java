@@ -68,7 +68,7 @@ public class BES {
     private BESConfig _config;
     private int totalClients;
     private ReentrantLock _adminLock;
-    private OPeNDAPClient adminClient;
+    // private OPeNDAPClient adminClient;
 
 
     private Document _serverVersionDocument;
@@ -85,7 +85,7 @@ public class BES {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(), true);
+        _clientQueue = new ArrayBlockingQueue<>(getMaxClients(), true);
         _clientCheckoutLock = new ReentrantLock(true);
 
         _checkOutFlag = new Semaphore(getMaxClients(), true);
@@ -94,7 +94,7 @@ public class BES {
         _adminLock = new ReentrantLock(true);
         _versionDocLock = new ReentrantLock(true);
         _clientsMapLock = new ReentrantLock(true);
-        _clients = new ConcurrentHashMap<String, OPeNDAPClient>();
+        _clients = new ConcurrentHashMap<>();
 
 
         log.debug("BES built with configuration: \n" + _config);
