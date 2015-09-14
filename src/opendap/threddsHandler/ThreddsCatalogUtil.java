@@ -377,17 +377,18 @@ public class ThreddsCatalogUtil {
 
 	public Vector<String> getDDXUrls(String catalogUrlString, boolean recurse)  throws InterruptedException {
 
-		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,
-				SERVICE.OPeNDAP, recurse);
+        Vector<String> dataAccessUrls = getDataAccessURLs(catalogUrlString, SERVICE.OPeNDAP, recurse);;
+        Vector<String> ddxUrls = new Vector<>();
+
 		String url;
 
-		for (int i = 0; i < datasetUrls.size(); i++) {
-			url = datasetUrls.get(i);
+		for (int i = 0; i < dataAccessUrls.size(); i++) {
+			url = dataAccessUrls.get(i);
 			log.debug("Found DAP dataset URL: " + url);
-			datasetUrls.set(i, url + ".ddx");
+            ddxUrls.add(url + ".ddx");
 		}
 
-		return datasetUrls;
+		return ddxUrls;
 
 	}
 
