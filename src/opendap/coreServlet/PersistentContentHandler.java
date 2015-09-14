@@ -90,7 +90,12 @@ public class PersistentContentHandler {
       File contentFile = new File(toDir+semaphore);
       if (!contentFile.exists()) {
         copyDirTree(fromDir, toDir);
-        contentFile.createNewFile();
+        if(!contentFile.createNewFile()){
+            String msg = "FAILED to create semaphore file '"+contentFile.getAbsolutePath()+"'";
+            log.error("copyDirTree() - {}",msg);
+            throw new IOException(msg);
+
+        }
         return true;
       }
       return false;
@@ -117,25 +122,31 @@ public class PersistentContentHandler {
      * @throws java.io.IOException on io error
      */
     static public void copyDirTree(String fromDirName, String toDirName) throws IOException {
-      File fromDir = new File(fromDirName);
-      File toDir = new File(toDirName);
-      if (!fromDir.exists())
-        return;
-      if (!toDir.exists())
-        toDir.mkdirs();
+        File fromDir = new File(fromDirName);
+        File toDir = new File(toDirName);
+        if (!fromDir.exists())
+            return;
+        if (!toDir.exists()) {
+            if(!toDir.mkdirs()){
+                String msg = "FAILED to create target directory '"+toDir.getAbsolutePath()+
+                              "' Unable to copy content from '"+fromDir.getAbsolutePath()+"'";
+                log.error("copyDirTree() - {}",msg);
+                throw new IOException(msg);
+            }
+        }
 
-      File[] files = fromDir.listFiles();
-      if(files==null){
-          log.error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
-          return;
-      }
-      for (int i=0; i<files.length; i++) {
-        File f = files[i];
-        if (f.isDirectory())
-          copyDirTree(f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
-        else
-          copyFile( f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
-      }
+        File[] files = fromDir.listFiles();
+        if(files==null){
+            log.error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+            return;
+        }
+        for (int i=0; i<files.length; i++) {
+            File f = files[i];
+            if (f.isDirectory())
+                copyDirTree(f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
+            else
+                copyFile( f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
+        }
     }
     /**
      * copy one file to another.
