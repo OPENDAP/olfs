@@ -88,7 +88,7 @@ public class JsonDR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String xmlBase = getXmlBase(request);
+        // String xmlBase = getXmlBase(request);
         QueryParameters qp = new  QueryParameters(request);
 
         String resourceID = getResourceId(requestedResourceId, false);

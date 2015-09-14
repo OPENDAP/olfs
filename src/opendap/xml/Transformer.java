@@ -188,9 +188,11 @@ public class Transformer {
         transform.setDestination(destination.getCurrentTransform());
     }
 
+
+    /*    Unused method, dumping.    ndp - 09/14/2015
     public void transform(Source inputDocumentSource,  StreamSource transformDocumentSource, OutputStream os) throws SaxonApiException {
 
-        Transformer t = new Transformer(transformDocumentSource);
+        // Transformer t = new Transformer(transformDocumentSource);
 
         serializer.setOutputStream(os);
         transform.setSource(inputDocumentSource);
@@ -198,7 +200,7 @@ public class Transformer {
         transform.transform();
 
     }
-
+  */
 
     public static ByteArrayInputStream transform(Source inputDocumentSource,  StreamSource transformDocumentSource) throws SaxonApiException {
 
@@ -397,10 +399,10 @@ public class Transformer {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-        Element e = new Element("test");
-        char c = 0x18;
-        //e.setText("Here is that bad thing: "+c);
-        //System.out.println(xmlo.outputString(e));
+        // Element e = new Element("test");
+        // char c = 0x18;
+        // e.setText("Here is that bad thing: "+c);
+        // System.out.println(xmlo.outputString(e));
 
 
         Document sourceDoc, xsltDoc;

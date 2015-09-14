@@ -194,7 +194,7 @@ public class HexAsciiEncoder implements Encoder {
 
 
     public static void test(){
-        byte[] b = {0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xf};
+        // byte[] b = {0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xf};
 
         String tests[] = {
                            "http://www.google.com",

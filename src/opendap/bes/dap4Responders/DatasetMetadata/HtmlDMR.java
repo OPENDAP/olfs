@@ -116,7 +116,7 @@ public class HtmlDMR extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
 

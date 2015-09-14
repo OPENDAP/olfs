@@ -243,7 +243,7 @@ public class DatasetScan  extends Dataset {
         if(!matches(catalogKey))
             return null;
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String catalogPath = catalogKey;
         if(!catalogPath.endsWith("/")){

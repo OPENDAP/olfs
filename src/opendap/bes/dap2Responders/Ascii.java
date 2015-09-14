@@ -110,7 +110,6 @@ public class Ascii extends Dap4Responder {
 
 
         User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
 
 
 

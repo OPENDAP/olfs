@@ -85,7 +85,7 @@ public class Json extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String xmlBase = getXmlBase(request);
+        // String xmlBase = getXmlBase(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String resourceID = getResourceId(requestedResourceId, false);

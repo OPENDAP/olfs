@@ -335,7 +335,7 @@ public class WebStartServlet extends HttpServlet {
 
 
         String query = req.getQueryString();
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params;
 
         try {
 

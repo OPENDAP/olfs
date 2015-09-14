@@ -162,8 +162,8 @@ public class W10nServlet extends HttpServlet   {
 
             String localUrl = ReqInfo.getLocalUrl(req);
 
-            @SuppressWarnings("unchecked")
-            Map<String,String[]> queryParameters = req.getParameterMap();
+            // @SuppressWarnings("unchecked")
+            // Map<String,String[]> queryParameters = req.getParameterMap();
 
 
             ServletUtil.probeRequest(this, req);

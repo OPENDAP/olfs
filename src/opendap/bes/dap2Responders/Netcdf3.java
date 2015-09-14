@@ -121,7 +121,6 @@ public class Netcdf3 extends Dap4Responder {
         String xdap_accept = "3.2";
 
         User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
 
 
 

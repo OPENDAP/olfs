@@ -221,10 +221,10 @@ public class ThreddsCatalogUtil {
 	public static void main(String[] args) throws Exception {
 
 		try {
-			Options options = createCmdLineOptions();
+			//Options options = createCmdLineOptions();
 
-			CommandLineParser parser = new PosixParser();
-			CommandLine cmd = parser.parse(options, args);
+			//CommandLineParser parser = new PosixParser();
+			// CommandLine cmd = parser.parse(options, args);
 
 			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
 
