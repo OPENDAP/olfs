@@ -198,14 +198,21 @@ public class LocalFileCatalog implements Catalog {
 
     public void destroy() {
 
+        ReentrantReadWriteLock.WriteLock lock = _catalogLock.writeLock();
 
-        _name = null;
-        _pathPrefix = null;
-        _urlPrefix = null;
-        _fileName = null;
-        _rawCatalogBuffer = null;
-        _useMemoryCache = false;
-        _cacheTime = null;
+        try {
+            lock.lock();
+            _name = null;
+            _pathPrefix = null;
+            _urlPrefix = null;
+            _fileName = null;
+            _rawCatalogBuffer = null;
+            _useMemoryCache = false;
+            _cacheTime = null;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 
