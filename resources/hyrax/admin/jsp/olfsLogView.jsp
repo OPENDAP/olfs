@@ -31,6 +31,7 @@
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
 <html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
@@ -49,7 +50,15 @@
         currentPrefix = "/";
 
 
-    BES bes = BESManager.getBES(currentPrefix);
+    BES bes;
+    try {
+        bes = BESManager.getBES(currentPrefix);
+    } catch (BadConfigurationException e) {
+        String msg = "FAILED to get a valid BES for the prefix: "+currentPrefix;
+        log.error("olfsLogView.jsp - {}",msg);
+        out.append("<h1>ERROR: ").append(msg).append("</h1>");
+        return;
+    }
 
     currentPrefix = bes.getPrefix();
     log.debug("olfsLogView.jsp - currentPrefix: "+currentPrefix);

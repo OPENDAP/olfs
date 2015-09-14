@@ -1553,13 +1553,6 @@ public class BesApi {
 
 
         BES bes = BESManager.getBES(dataSource);
-
-        if (bes == null) {
-            String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(dataSource);
-            log.error(msg);
-            throw new BadConfigurationException(msg);
-        }
-
         return bes.besTransaction(request,response);
 
 
@@ -1594,14 +1587,7 @@ public class BesApi {
 
 
         BES bes = BESManager.getBES(dataSource);
-        if (bes == null)
-            throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataSource);
-
-
-
         return bes.besTransaction(request, os, err);
-
-
     }
 
 
@@ -2525,17 +2511,11 @@ public class BesApi {
 
     public BES getBES(String dataSource) throws BadConfigurationException {
         BES bes = BESManager.getBES(dataSource);
-
-        if (bes == null)
-            throw new BadConfigurationException("There is no BES associated with the data source: " + dataSource);
         return bes;
     }
 
     public String getBESprefix(String dataSource) throws BadConfigurationException {
         BES bes = BESManager.getBES(dataSource);
-
-        if (bes == null)
-            throw new BadConfigurationException("There is no BES associated with the data source: " + dataSource);
         return bes.getPrefix();
     }
 

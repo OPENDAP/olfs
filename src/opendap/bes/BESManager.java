@@ -27,6 +27,7 @@
 package opendap.bes;
 
 import opendap.coreServlet.DispatchHandler;
+import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -175,7 +176,7 @@ public class BESManager {
 
 
 
-    public static BES getBES(String path) {
+    public static BES getBES(String path) throws BadConfigurationException {
 
         if(path==null)
             path = "/";
@@ -202,10 +203,21 @@ public class BESManager {
             }
         }
 
-        if(besGroupToServicePath==null)
-            return null;
-        else
-            return besGroupToServicePath.getNext();
+        BES bes = null;
+
+        if(besGroupToServicePath!=null)
+            bes =  besGroupToServicePath.getNext();
+
+
+
+        if (bes == null) {
+            String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(path);
+            log.error(msg);
+            throw new BadConfigurationException(msg);
+        }
+
+        return bes;
+
 
     }
 

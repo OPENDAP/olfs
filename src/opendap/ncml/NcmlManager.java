@@ -220,7 +220,7 @@ public class NcmlManager {
         return lmt;
     }
 
-    public static Element getNcmlDatasetContainer(String dapAccessID){
+    public static Element getNcmlDatasetContainer(String dapAccessID) throws BadConfigurationException{
 
         opendap.bes.BES bes = BESManager.getBES(dapAccessID);
         String besDatasetID = bes.trimPrefix(dapAccessID);

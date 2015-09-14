@@ -26,7 +26,9 @@
 
 package opendap.dap;
 
+import opendap.bes.BES;
 import opendap.bes.BESManager;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +59,14 @@ public class User {
 
 
         if(userName==null) {
-            return BESManager.getBES(relativeUrl).getMaxResponseSize();
+
+            BES bes;
+            try {
+                bes = BESManager.getBES(relativeUrl);
+            } catch (BadConfigurationException e) {
+                return 0;
+            }
+            return bes.getMaxResponseSize();
         }
 
         return 0;
