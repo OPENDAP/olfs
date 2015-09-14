@@ -759,9 +759,6 @@ public class LocalFileCatalog implements Catalog {
         return _transformOnIngestFilename;
     }
 
-    public Transformer getIngestTransformer() {
-        return _ingestTransformer;
-    }
 
 
 }
