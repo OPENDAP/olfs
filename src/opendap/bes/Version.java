@@ -177,29 +177,33 @@ public class Version  {
 
 
         String responseDAP = null;
-
         String clientDapVer = null;
+        BesGroup besGroup;
 
-        if (request != null)
+        if (request != null) {
             clientDapVer = request.getHeader("X-DAP");
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
+            String relativeUrl = ReqInfo.getLocalUrl(request);
 
 
-        BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
+            besGroup = BESManager.getBesGroup(relativeUrl);
 
+        }
+        else {
+            besGroup = BESManager.getBesGroup("/");
+
+        }
         TreeSet<String> commonDapVersions = besGroup.getCommonDapVersions();
 
-        for(String version: commonDapVersions){
-            if (clientDapVer != null && clientDapVer.equals(version)){
+        for (String version : commonDapVersions) {
+            if (clientDapVer != null && clientDapVer.equals(version)) {
                 responseDAP = version;
             }
         }
-
         String highestVersionString = commonDapVersions.last();
 
         if (responseDAP == null)
-            return (highestVersionString);
+            responseDAP = highestVersionString;
 
         return (responseDAP);
 
