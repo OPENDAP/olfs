@@ -300,47 +300,6 @@ public class LocalFileCatalog implements Catalog {
 
     }
 
-    /**
-     * CAREFUL! Only call this function if you have acquired a WriteLock for
-     * the catalog!!
-     *
-     * @throws Exception When it can't read the file.
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   <p/>
-     *                   InputStream catDocIs = request.getResponseBodyAsStream();
-     *                   <p/>
-     *                   <p/>
-     *                   try {
-     *                   catalogToHtmlTransformLock.lock();
-     *                   catalogToHtmlTransform.reloadTransformIfRequired();
-     *                   <p/>
-     *                   // Build the catalog document as an XdmNode.
-     *                   XdmNode catDoc = catalogToHtmlTransform.build(new StreamSource(catDocIs));
-     *                   <p/>
-     *                   catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
-     *                   catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
-     *                   catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
-     *                   <p/>
-     *                   // Set up the Http headers.
-     *                   response.setContentType("text/html");
-     *                   response.setHeader("Content-Description", "thredds_catalog");
-     *                   response.setStatus(HttpServletResponse.SC_OK);
-     *                   <p/>
-     *                   // Send the transformed documet.
-     *                   catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
-     *                   <p/>
-     *                   log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-     */
 
     public boolean needsRefresh() {
 
@@ -699,8 +658,9 @@ public class LocalFileCatalog implements Catalog {
         Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
-            String index = getUrlPrefix() + getFileName();
-            return index;
+            String key = getUrlPrefix() + getFileName();
+            log.debug("getCatalogKey() - Catalog key value: {}",key);
+            return key;
         }
         finally {
             lock.unlock();
