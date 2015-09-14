@@ -58,15 +58,18 @@ public class MediaType implements Comparable {
     public String getPrimaryType() { return _primaryType;}
     public String getSubType() { return _subType;}
     public double getQuality(){ return _quality;}
-    public double getScore(){ return score;}
-    public void   setScore(double s){ score=s;}
+    // public double getScore(){ return score;}
+    // public void   setScore(double s){ score=s;}
 
     public String getMediaSuffix(){ return _mediaSuffix;}
 
-    public boolean isWildcardSubtype(){ return _stwc; }
-    public boolean isWildcardType(){ return _ptwc; }
+    // public boolean isWildcardSubtype(){ return _stwc; }
+    // public boolean isWildcardType(){ return _ptwc; }
 
 
+
+
+    @Override
     public int compareTo(Object o) throws ClassCastException {
         MediaType otherType = (MediaType)o;
         if(_quality >otherType._quality)
@@ -76,6 +79,11 @@ public class MediaType implements Comparable {
             return -1;
 
         return 0;
+    }
+
+    @Override
+    public  boolean equals(Object o) {
+        return o instanceof MediaType && compareTo(o) == 0;
     }
 
     public void setName(String name){
