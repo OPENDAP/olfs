@@ -1,6 +1,9 @@
 
 # Initial Travic-CI control file. 6.11.15 jhrg
 
+# Use the docker container-based build systems
+sudo: false
+
 language: java
 
 # I don't think travis-ci has openjdk8 yet (6.11.15 jhrg)
