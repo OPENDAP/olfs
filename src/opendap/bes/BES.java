@@ -688,6 +688,12 @@ public class BES {
 
         OPeNDAPClient oc = getClient();
 
+        if(oc==null){
+            String msg = "FAILED to retrieve valid OPeNDAPClient (connection to BES)!";
+            log.error("besTransaction() - {}", msg);
+            throw new IOException(msg);
+        }
+
         Procedure timedProc = Timer.start();
 
         try {
