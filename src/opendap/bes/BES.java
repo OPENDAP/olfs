@@ -1262,7 +1262,7 @@ public class BES {
                                 oc.getID() + ")");
                         oc.killClient();
                     } else {
-                        log.debug("destroy() BES Client (id:"+ oc.getID()+ ")already discarded.");
+                        log.error("destroy() Retrieved a 'null' BES Client instance from _clients collection!");
 
                     }
 
