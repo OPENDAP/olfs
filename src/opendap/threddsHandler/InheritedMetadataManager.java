@@ -342,19 +342,19 @@ public class InheritedMetadataManager {
                         if(inheritedService!=null){
                             log.debug("ingestInheritedMetadata() - Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
 
-                            if (!_inheritedServices.containsKey(metadataRootPath)) {
-                                log.debug("ingestInheritedMetadata() - Creating inherited services storage HashMap for " +
+                            int size = _inheritedServices.size();
+                            _inheritedServices.putIfAbsent(metadataRootPath, new HashMap<String, Vector<Element>>());
+                            if(size < _inheritedServices.size())
+                                log.debug("ingestInheritedMetadata() - Added new inherited services storage HashMap for " +
                                         "metadataRootPath: '"+metadataRootPath+"'");
-                                _inheritedServices.put(metadataRootPath, new HashMap<String, Vector<Element>>());
-                            }
+
 
                             inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
-
-                            if(!inheritedServicesForThisRootPath.containsKey(catalogKey)){
-                                log.debug("ingestInheritedMetadata() - Creating inherited services storage Vector for " +
+                            size = inheritedServicesForThisRootPath.size();
+                            inheritedServicesForThisRootPath.putIfAbsent(catalogKey, new Vector<Element>());
+                            if(size < _inheritedServices.size())
+                                log.debug("ingestInheritedMetadata() - Added new inherited services storage Vector for " +
                                         "metadataRootPath: '"+metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
-                                inheritedServicesForThisRootPath.put(catalogKey, new Vector<Element>());
-                            }
 
 
 
