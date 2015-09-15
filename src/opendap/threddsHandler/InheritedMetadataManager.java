@@ -350,11 +350,14 @@ public class InheritedMetadataManager {
 
 
                             inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
-                            size = inheritedServicesForThisRootPath.size();
-                            inheritedServicesForThisRootPath.putIfAbsent(catalogKey, new Vector<Element>());
-                            if(size < _inheritedServices.size())
+
+                            if (!inheritedServicesForThisRootPath.containsKey(catalogKey)) {
+                                inheritedServicesForThisRootPath.put(catalogKey, new Vector<Element>());
                                 log.debug("ingestInheritedMetadata() - Added new inherited services storage Vector for " +
-                                        "metadataRootPath: '"+metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
+                                        "metadataRootPath: '" + metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
+                            }
+
+
 
 
 
