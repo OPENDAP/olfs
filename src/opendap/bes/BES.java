@@ -41,10 +41,8 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -379,15 +377,24 @@ public class BES {
 
             admin.executeCommand(besCmd, baos, baos);
 
-            log.debug("BES returned:\n{}", baos.toString());
 
-            return baos.toString();
+            String besResponse;
+            try {
+                besResponse = baos.toString(StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                besResponse = "Unable to encode BES response as "+StandardCharsets.UTF_8.name();
+            }
+
+            log.debug("BES returned:\n{}", besResponse);
+
+            return besResponse;
 
         } catch (PPTException e) {
 
             sb.append("Failed to execute BES command. Message: ")
                     .append(e.getMessage());
 
+            _adminLock.unlock();
 
             throw new BesAdminFail("Failed to execute BES command. Message: " + e.getMessage(), e);
 
