@@ -325,9 +325,11 @@ public class NcmlManager {
 
             HashMap<String, Element> services = collectServices(catalog,opendapService);
             msg = "#### collectServices Found services:\n";
-            for (String srvcName : services.keySet())
+            for (Element service : services.values()) {
+                String srvcName = service.getAttributeValue(THREDDS.NAME);
                 msg += "####     Service Name: " + srvcName + "\n"
-                        + xmlo.outputString(services.get(srvcName)) + "\n";
+                        + xmlo.outputString(service) + "\n";
+            }
             log.debug(msg);
 
             collectLocalDatasetAccessUrls(dataset, services, null, "", serviceURLs);
@@ -388,19 +390,18 @@ public class NcmlManager {
         // If they aren't asking for everything...
         if (s != ThreddsCatalogUtil.SERVICE.ALL) {
             /* boolean done = false; */
-            Element service;
 
             Vector<String> taggedForRemoval = new Vector<String>();
 
-            for (String serviceName : services.keySet()) {
-                service = services.get(serviceName);
-                if (service.getAttributeValue("serviceType").equalsIgnoreCase(
+            for (Element service : services.values()) {
+                String serviceName = service.getAttributeValue(THREDDS.NAME);
+                if (service.getAttributeValue(THREDDS.SERVICE_TYPE).equalsIgnoreCase(
                         ThreddsCatalogUtil.SERVICE.Compound.toString())) {
                     childSrvcs = collectServices(service, s);
                     if (childSrvcs.isEmpty()) {
                         taggedForRemoval.add(serviceName);
                     }
-                } else if (!service.getAttributeValue("serviceType")
+                } else if (!service.getAttributeValue(THREDDS.SERVICE_TYPE)
                         .equalsIgnoreCase(s.toString())) {
                     taggedForRemoval.add(serviceName);
                 }
@@ -423,7 +424,7 @@ public class NcmlManager {
         Element srvcElem;
         while (i.hasNext()) {
             srvcElem = (Element) i.next();
-            services.put(srvcElem.getAttributeValue("name"), srvcElem);
+            services.put(srvcElem.getAttributeValue(THREDDS.NAME), srvcElem);
         }
 
         return services;

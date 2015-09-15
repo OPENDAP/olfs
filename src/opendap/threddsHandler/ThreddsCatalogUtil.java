@@ -584,9 +584,12 @@ public class ThreddsCatalogUtil {
 			HashMap<String, Element> services = collectServices(catalog,
 					service);
 			msg = "#### collectServices Found services:\n";
-			for (String srvcName : services.keySet())
-				msg += "####     Service Name: " + srvcName + "\n"
-						+ xmlo.outputString(services.get(srvcName)) + "\n";
+
+            for (Element srvc : services.values())
+         				msg += "####     Service Name: " + srvc.getAttributeValue("name") + "\n"
+         						+ xmlo.outputString(srvc) + "\n";
+
+
 			log.debug(msg);
 
 			Element dataset;
@@ -801,20 +804,17 @@ public class ThreddsCatalogUtil {
 		// If they aren't asking for everything...
 		if (s != SERVICE.ALL) {
 			/* boolean done = false; */
-			Element service;
 
 			Vector<String> taggedForRemoval = new Vector<String>();
 
-			for (String serviceName : services.keySet()) {
-				service = services.get(serviceName);
-				if (service.getAttributeValue("serviceType").equalsIgnoreCase(
-						SERVICE.Compound.toString())) {
+			for (Element service : services.values()) {
+                String serviceName = service.getAttributeValue("name");
+				if (service.getAttributeValue("serviceType").equalsIgnoreCase(SERVICE.Compound.toString())) {
 					childSrvcs = collectServices(service, s);
 					if (childSrvcs.isEmpty()) {
 						taggedForRemoval.add(serviceName);
 					}
-				} else if (!service.getAttributeValue("serviceType")
-						.equalsIgnoreCase(s.toString())) {
+				} else if (!service.getAttributeValue("serviceType").equalsIgnoreCase(s.toString())) {
 					taggedForRemoval.add(serviceName);
 				}
 

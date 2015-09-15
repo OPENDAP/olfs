@@ -546,8 +546,8 @@ public class InheritedMetadataManager {
                     // Found applicable metadata collection
                     metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                    for (String sourceCatalogKey : metadataForThisRootPath.keySet()) {
-                        for (Element metadata : metadataForThisRootPath.get(sourceCatalogKey)) {
+                    for (Vector<Element> metadataVec : metadataForThisRootPath.values()) {
+                        for (Element metadata : metadataVec) {
                             log.debug("Adding metadata element to returned collection.");
 
                             metadataElements.add((Element) metadata.clone());
@@ -595,9 +595,8 @@ public class InheritedMetadataManager {
                     // Found applicable metadata collection
                     servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
 
-                    for (String sourceCatalogKey : servicesForThisRootPath.keySet()) {
 
-                        Vector<Element> services =  servicesForThisRootPath.get(sourceCatalogKey);
+                    for (Vector<Element> services : servicesForThisRootPath.values()) {
                         for(Element service:  services){
                             String serviceName = service.getAttributeValue("name");
                             if(!serviceElements.containsKey(serviceName)){

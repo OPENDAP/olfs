@@ -663,14 +663,15 @@ public class ViewersServlet extends HttpServlet {
         Element webServicesElement = new Element("WebServices");
         Element wsElement;
 
-        for(String key : webServicesForDataset.keySet()){
-            WebServiceHandler wsh = webServicesForDataset.get(key);
+
+        for(WebServiceHandler wsh: webServicesForDataset.values()){
             wsElement = new Element("webService");
             wsElement.setAttribute("id",wsh.getServiceId());
             wsElement.setAttribute("applicationName",wsh.getName());
             wsElement.setAttribute("serviceUrl",wsh.getServiceLink(datasetId));
 
             webServicesElement.addContent(wsElement);
+
         }
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

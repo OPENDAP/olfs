@@ -325,13 +325,13 @@ public class BesCatalog implements Catalog {
 
             // Rebuild document in the correct order.
             if(_ascendingOrder) {
-                for (String nme : elementsByName.keySet()) {
-                    topDataset.addContent(elementsByName.get(nme));
+                for (Element e : elementsByName.values()) {
+                    topDataset.addContent(e);
                 }
             }
             else {
-                for (String nme : elementsByName.descendingKeySet()) {
-                    topDataset.addContent(elementsByName.get(nme));
+                for (Element e : elementsByName.descendingMap().values()) {
+                    topDataset.addContent(e);
                 }
 
             }
