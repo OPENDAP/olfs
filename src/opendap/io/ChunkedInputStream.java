@@ -57,7 +57,7 @@ public class ChunkedInputStream  {
 
     private int currentChunkType;
 
-    private ChunkProtocol chunkProtocol;
+    //private ChunkProtocol chunkProtocol;
 
 
 
@@ -71,7 +71,7 @@ public class ChunkedInputStream  {
 
         this(stream);
 
-        this.chunkProtocol = chunkProtocol;
+        //this.chunkProtocol = chunkProtocol;
     }
 
 

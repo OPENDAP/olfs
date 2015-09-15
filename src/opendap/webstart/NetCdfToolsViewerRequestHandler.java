@@ -42,8 +42,8 @@ import java.io.IOException;
 public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
     private Logger log;
-    private String resourcesDir;
-    private Element config;
+    //private String resourcesDir;
+    //private Element config;
 
     private String HTTP = "http://";
 
@@ -57,8 +57,8 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        resourcesDir = resourcesDirectory;
-        this.config = config;
+        //resourcesDir = resourcesDirectory;
+        //this.config = config;
         _jnlpFileName = resourcesDirectory+"/"+ _serviceId+".jnlp";
 
         File f = new File(_jnlpFileName);

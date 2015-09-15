@@ -60,7 +60,7 @@ public class NormativeDR extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".dap";
 
-    private String storedResultPrefix = "storedResults/";
+    //private String storedResultPrefix = "storedResults/";
 
 
     public NormativeDR(String sysPath, BesApi besApi) {

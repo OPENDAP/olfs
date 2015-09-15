@@ -38,8 +38,8 @@ import java.util.Iterator;
 public class IdvViewerRequestHandler extends JwsHandler {
 
     private Logger log;
-    private String resourcesDir;
-    private Element config;
+   // private String resourcesDir;
+    //private Element config;
 
     private String _serviceId = "idv";
     private String _base = "/opendap/viewers/idv";
@@ -50,8 +50,8 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        resourcesDir = resourcesDirectory;
-        this.config = config;
+        //resourcesDir = resourcesDirectory;
+        //this.config = config;
         _jnlpFileName = resourcesDirectory+"/"+ _serviceId+".jnlp";
 
         File f = new File(_jnlpFileName);

@@ -67,7 +67,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
     private String ncmlRequestPatternRegexString;
     private Pattern ncmlRequestPattern;
 
-    private Element _config;
+    //private Element _config;
 
     private BesApi _besApi;
 
@@ -83,7 +83,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         if(initialized) return;
 
-        _config = config;
+        //_config = config;
         dispatchServlet = servlet;
 
         ncmlRequestPatternRegexString = ".*\\.ncml";

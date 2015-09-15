@@ -51,7 +51,7 @@ import java.util.Set;
 public class AutoplotRequestHandler  extends JwsHandler {
 
     private Logger log;
-    private Element config;
+    //private Element config;
 
     private String _serviceId = "Autoplot";
     private String _applicationName = "Autoplot Data Viewer";
@@ -63,7 +63,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        this.config = config;
+        //this.config = config;
     }
 
 

@@ -67,7 +67,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
     private org.slf4j.Logger _log;
-    private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
+    //private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
 
     private boolean _initialized;
 
