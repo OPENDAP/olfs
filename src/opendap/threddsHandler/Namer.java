@@ -34,7 +34,7 @@ public class Namer {
     }
 
 
-    public class NamerWorker {
+    public static class NamerWorker {
 
         private Logger _log;
         String regExp;

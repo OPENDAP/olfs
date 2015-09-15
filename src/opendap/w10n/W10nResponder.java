@@ -71,7 +71,7 @@ public class W10nResponder  {
 
     private Logger _log;
 
-    private final String DAP2_TYPE = "dap.2";
+    private static final String DAP2_TYPE = "dap.2";
 
     TreeMap<String,MediaType> _supportedMetaMediaTypes;
     TreeMap<String,MediaType> _supportedDataMediaTypes;

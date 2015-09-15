@@ -291,7 +291,7 @@ public class BES {
         return xmlo.outputString(besCmdDoc);
     }
 
-    public class BesLogger {
+    public static class BesLogger {
 
         public BesLogger(String name, boolean enabled) {
             loggerName = name;

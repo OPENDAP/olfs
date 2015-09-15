@@ -153,7 +153,7 @@ public class AggregationParams {
      * the roi() function. The result is box(var,min,max) or
      * bbox_union(box(var,min,max),bbox(next_var,min,max), ...,"intersection")
      */
-    private class RoiConstraintBuilder implements BBoxConstraintBuilder {
+    private static class RoiConstraintBuilder implements BBoxConstraintBuilder {
         public void outputClause(int bboxNumber, String var, String min, String max, StringBuilder ce) {
             // Write out the comma as a separator - don't write this with only one bbox()
             if (bboxNumber > 1)
@@ -176,7 +176,7 @@ public class AggregationParams {
      * response from the BES. The result is '&var>=min&var<=max' for one
      * var or ''&var1>=min&var1<=max'&var2>=min&var2<=max&...' for N vars
      */
-    private class TabularConstraintBuilder implements BBoxConstraintBuilder {
+    private static class TabularConstraintBuilder implements BBoxConstraintBuilder {
         public void outputClause(int bboxNumber, String var, String min, String max, StringBuilder ce) {
             ce.append("&").append(var).append(">=").append(min);
             ce.append("&").append(var).append("<=").append(max);

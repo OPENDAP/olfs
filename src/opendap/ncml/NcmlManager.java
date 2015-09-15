@@ -343,6 +343,7 @@ public class NcmlManager {
     }
 
 
+    /*
     private static String getServerUrlString(String url)  throws InterruptedException, MalformedURLException {
 
         URL u = new URL(url);
@@ -350,6 +351,7 @@ public class NcmlManager {
         return getServerUrlString(u);
 
     }
+    */
 
     private static String getServerUrlString(URL url)  throws InterruptedException{
 

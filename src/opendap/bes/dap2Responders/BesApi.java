@@ -1510,7 +1510,7 @@ public class BesApi {
 
     }
 
-    public class NoSuchDatasource {
+    public static class NoSuchDatasource {
         Document err;
         public NoSuchDatasource(Document besError){
             err = besError;
