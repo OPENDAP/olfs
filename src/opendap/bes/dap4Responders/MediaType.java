@@ -81,10 +81,10 @@ public class MediaType implements Comparable {
         return 0;
     }
 
-    @Override
-    public  boolean equals(Object o) {
-        return o instanceof MediaType && compareTo(o) == 0;
-    }
+ //   @Override
+ //   public  boolean equals(Object o) {
+ //       return o instanceof MediaType && compareTo(o) == 0;
+ //   }
 
     public void setName(String name){
         _name = name;

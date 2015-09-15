@@ -49,7 +49,7 @@ public class JsonDR extends Dap4Responder {
 
     private Logger log;
     private static String defaultRequestSuffix = ".json";
-    private String requestSuffix;
+    // private String requestSuffix;
 
 
 
