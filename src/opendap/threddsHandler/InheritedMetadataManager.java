@@ -323,7 +323,7 @@ public class InheritedMetadataManager {
                     while (metadataRootPathIterator.hasNext()) {
                         metadataRootPathElement = (Element) metadataRootPathIterator.next();
                         metadataRootPath = metadataRootPathElement.getTextTrim();
-                        if (!_inheritedMetadata.contains(metadataRootPath)) {
+                        if (!_inheritedMetadata.containsKey(metadataRootPath)) {
                             log.debug("ingestInheritedMetadata() - Found new metadataRootPath: '"+metadataRootPath+"' Creating storage HashMap");
                             _inheritedMetadata.put(metadataRootPath, new HashMap<String, Vector<Element>>());
                         }
