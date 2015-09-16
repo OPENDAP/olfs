@@ -152,7 +152,6 @@ public class DispatchServlet extends HttpServlet {
             String enabled = timer.getAttributeValue("enabled");
             if(enabled!=null && enabled.equalsIgnoreCase("true")){
                 Timer.enable();
-                Timer.enable();
             }
         }
 
