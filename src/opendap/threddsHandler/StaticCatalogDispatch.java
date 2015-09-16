@@ -276,56 +276,58 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         InputStream catDocIs = null;
 
+        _datasetToHtmlTransformLock.lock();
+
         try {
-            catDocIs = request.getResponseBodyAsStream();
-            _datasetToHtmlTransformLock.lock();
-            _datasetToHtmlTransform.reloadTransformIfRequired();
+            try {
+                catDocIs = request.getResponseBodyAsStream();
+                _datasetToHtmlTransform.reloadTransformIfRequired();
 
-            // Build the catalog document as an XdmNode.
-            XdmNode catDoc = _datasetToHtmlTransform.build(new StreamSource(catDocIs));
+                // Build the catalog document as an XdmNode.
+                XdmNode catDoc = _datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
-            _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
-            _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
-            _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
-            _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
-            _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
-
-
-            // Set up the Http headers.
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
-
-            // Send the transformed document.
-            _datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
-
-            _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+                _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
+                _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
 
 
-        }
-        catch (SaxonApiException sapie) {
-            if (response.isCommitted()) {
-                return;
+                // Set up the Http headers.
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "thredds_catalog");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+                // Send the transformed document.
+                _datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
+
+                _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+
+            } catch (SaxonApiException sapie) {
+                if (response.isCommitted()) {
+                    return;
+                }
+                // Set up the Http headers.
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "ERROR");
+                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+
+                // Responed with error.
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
+            } finally {
+                _datasetToHtmlTransform.clearAllParameters();
+
+                if (catDocIs != null) {
+                    try {
+                        catDocIs.close();
+                    } catch (IOException e) {
+                        _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
+                    }
+                }
             }
-            // Set up the Http headers.
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "ERROR");
-            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-
-            // Responed with error.
-            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-            _datasetToHtmlTransform.clearAllParameters();
-
-            if (catDocIs != null) {
-                try {
-                    catDocIs.close();
-                }
-                catch (IOException e) {
-                    _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
-                }
-            }
             _datasetToHtmlTransformLock.unlock();
         }
 
@@ -374,59 +376,60 @@ public class StaticCatalogDispatch implements DispatchHandler {
         InputStream catDocIs = null;
 
 
+        _catalogToHtmlTransformLock.lock();
         try {
-            catDocIs = request.getResponseBodyAsStream();
-            _catalogToHtmlTransformLock.lock();
-            _catalogToHtmlTransform.reloadTransformIfRequired();
+            try {
+                catDocIs = request.getResponseBodyAsStream();
+                _catalogToHtmlTransform.reloadTransformIfRequired();
 
-            // Build the catalog document as an XdmNode.
-            XdmNode catDoc = _catalogToHtmlTransform.build(new StreamSource(catDocIs));
+                // Build the catalog document as an XdmNode.
+                XdmNode catDoc = _catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
-            _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
-            _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
-            _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
-            _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+                _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
+                _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
+                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
 
-            _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
-            _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
-            _catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
+                _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
+                _catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
 
 
-            // Set up the Http headers.
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
+                // Set up the Http headers.
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "thredds_catalog");
+                response.setStatus(HttpServletResponse.SC_OK);
 
-            // Send the transformed documet.
-            _catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
+                // Send the transformed documet.
+                _catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
 
-            _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+                _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-        }
-        catch (SaxonApiException sapie) {
-            if (response.isCommitted()) {
-                return;
+            } catch (SaxonApiException sapie) {
+                if (response.isCommitted()) {
+                    return;
+                }
+                // Set up the Http headers.
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "ERROR");
+                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+
+                // Responed with error.
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
+            } finally {
+                // Clean up the transform before releasing it.
+                _catalogToHtmlTransform.clearAllParameters();
+
+                if (catDocIs != null) {
+                    try {
+                        catDocIs.close();
+                    } catch (IOException e) {
+                        _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
+                    }
+                }
             }
-            // Set up the Http headers.
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "ERROR");
-            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-
-            // Responed with error.
-            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-            // Clean up the transform before releasing it.
-            _catalogToHtmlTransform.clearAllParameters();
-
-            if (catDocIs != null) {
-                try {
-                    catDocIs.close();
-                }
-                catch (IOException e) {
-                    _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
-                }
-            }
             _catalogToHtmlTransformLock.unlock();
         }
 
@@ -442,71 +445,74 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         XdmNode catDoc;
 
+        _datasetToHtmlTransformLock.lock();
         try {
-            _datasetToHtmlTransformLock.lock();
-            _datasetToHtmlTransform.reloadTransformIfRequired();
+            try {
+                _datasetToHtmlTransform.reloadTransformIfRequired();
 
-            Request orq = new Request(null,request);
+                Request orq = new Request(null, request);
 
 
+                Catalog cat = CatalogManager.getCatalog(catalogKey);
 
-            Catalog cat = CatalogManager.getCatalog(catalogKey);
+                if (cat != null) {
+                    _log.debug("\nFound catalog: " + catalogKey + "   " +
+                                    "    prefix: " + _prefix
+                    );
+                    catDoc = cat.getCatalogAsXdmNode(_datasetToHtmlTransform.getProcessor());
+                    if (catDoc == null) {
+                        String msg = "FAILED to retrieve catalog document associated with file '" + cat.getFileName() + "' UNABLE TO FORMULATE A RESPONSE.";
+                        _log.error("sendCatalogHTML() - {}", msg);
+                        throw new BadConfigurationException(msg);
 
-            if (cat != null) {
-                _log.debug("\nFound catalog: " + catalogKey + "   " +
-                                "    prefix: " + _prefix
-                );
-                catDoc = cat.getCatalogAsXdmNode(_datasetToHtmlTransform.getProcessor());
-                if(catDoc==null){
-                    String msg = "FAILED to retrieve catalog document associated with file '"+cat.getFileName()+"' UNABLE TO FORMULATE A RESPONSE.";
-                    _log.error("sendCatalogHTML() - {}",msg);
-                    throw new BadConfigurationException(msg);
-
+                    }
+                    _log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
+                } else {
+                    _log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
+                                    "    prefix: " + _prefix
+                    );
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
+                    return;
                 }
-                _log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
-            } else {
-                _log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
-                                "    prefix: " + _prefix
-                );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
-                return;
+
+                String targetDataset = query.substring("dataset=".length(), query.length());
+
+                //query = "//*";
+
+                _log.debug("targetDataset: " + targetDataset);
+
+                // Pass the docsService  parameter to the transform
+                _datasetToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
+                _datasetToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
+                _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
+
+
+                AuthenticationControls.setLoginParameters(_datasetToHtmlTransform, request);
+
+
+                // Set up the http headers.
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "thredds_catalog");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+
+                // Send the transformed documet.
+                _datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
+
+                _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+
+            } catch (BadConfigurationException e) {
+                e.printStackTrace();
+            } catch (PPTException e) {
+                e.printStackTrace();
+            } finally {
+                _datasetToHtmlTransform.clearAllParameters();
+
             }
-
-            String targetDataset = query.substring("dataset=".length(), query.length());
-
-            //query = "//*";
-
-            _log.debug("targetDataset: " + targetDataset);
-
-            // Pass the docsService  parameter to the transform
-            _datasetToHtmlTransform.setParameter("serviceContext",_dispatchServlet.getServletContext().getContextPath());
-            _datasetToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
-            _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
-
-
-            AuthenticationControls.setLoginParameters(_datasetToHtmlTransform, request);
-
-
-            // Set up the http headers.
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
-
-
-            // Send the transformed documet.
-            _datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
-
-            _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-
-
-        } catch (BadConfigurationException e) {
-            e.printStackTrace();
-        } catch (PPTException e) {
-            e.printStackTrace();
-        } finally {
-            _datasetToHtmlTransform.clearAllParameters();
+        }
+        finally {
             _datasetToHtmlTransformLock.unlock();
-
         }
 
 
@@ -514,59 +520,62 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private void sendCatalogHTML(HttpServletRequest request, HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException, JDOMException, BadConfigurationException, PPTException {
 
-
+        _catalogToHtmlTransformLock.lock();
         try {
-            Request orq = new Request(null,request);
+
+            try {
+                Request orq = new Request(null, request);
 
 
-            _catalogToHtmlTransformLock.lock();
-            _catalogToHtmlTransform.reloadTransformIfRequired();
+                _catalogToHtmlTransform.reloadTransformIfRequired();
 
-            XdmNode catDoc;
+                XdmNode catDoc;
 
-            Catalog cat = CatalogManager.getCatalog(catalogKey);
+                Catalog cat = CatalogManager.getCatalog(catalogKey);
 
-            if (cat != null) {
-                _log.debug("\nFound catalog: " + catalogKey + "   " +
-                                "    prefix: " + _prefix
-                );
-                catDoc = cat.getCatalogAsXdmNode(_catalogToHtmlTransform.getProcessor());
-                if(catDoc==null){
-                    String msg = "FAILED to retrieve catalog document associated with file '"+cat.getFileName()+"' UNABLE TO FORMULATE A RESPONSE.";
-                    _log.error("sendCatalogHTML() - {}",msg);
-                    throw new BadConfigurationException(msg);
+                if (cat != null) {
+                    _log.debug("\nFound catalog: " + catalogKey + "   " +
+                                    "    prefix: " + _prefix
+                    );
+                    catDoc = cat.getCatalogAsXdmNode(_catalogToHtmlTransform.getProcessor());
+                    if (catDoc == null) {
+                        String msg = "FAILED to retrieve catalog document associated with file '" + cat.getFileName() + "' UNABLE TO FORMULATE A RESPONSE.";
+                        _log.error("sendCatalogHTML() - {}", msg);
+                        throw new BadConfigurationException(msg);
 
+                    }
+
+                    _log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
+                } else {
+                    _log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
+                                    "    prefix: " + _prefix
+                    );
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
+                    return;
                 }
 
-                _log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
-            } else {
-                _log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
-                                "    prefix: " + _prefix
-                );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
-                return;
+
+                // Send the catalog using the transform.
+
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "thredds_catalog");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+                _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
+                _catalogToHtmlTransform.setParameter("dapService", orq.getServiceLocalId());
+                _catalogToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
+
+                AuthenticationControls.setLoginParameters(_catalogToHtmlTransform, request);
+
+                _catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
+
+                _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+            } finally {
+                _catalogToHtmlTransform.clearAllParameters();
             }
-
-
-            // Send the catalog using the transform.
-
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
-
-            _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
-            _catalogToHtmlTransform.setParameter("dapService", orq.getServiceLocalId());
-            _catalogToHtmlTransform.setParameter("docsService", orq.getDocsServiceLocalID());
-
-            AuthenticationControls.setLoginParameters(_catalogToHtmlTransform, request);
-
-            _catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
-
-            _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-
         }
         finally {
-            _catalogToHtmlTransform.clearAllParameters();
             _catalogToHtmlTransformLock.unlock();
         }
 
