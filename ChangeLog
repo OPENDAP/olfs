@@ -1,3 +1,461 @@
+commit e7407c81fc5782839613e90e0c6ed010dd3078a7
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 13:32:26 2015 -0700
+
+    olfs: Added copyright headers where missing.
+
+commit 69da4e35f2486b94846e6b71759455962acf7a27
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 13:08:17 2015 -0700
+
+    olfs: Updated olfs.xml file in the deployment respources by commneting the Timer option.
+
+commit 37ff6a8c6fee4040ac39e3f8bdb3c029a7b5f2fc
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 13:02:05 2015 -0700
+
+    olfs: In DispatchServlet.init() - Dropped redunant call to Timer.enable()
+
+commit 283d1f63912eb417cb66d7e78d98037a73659df8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 12:45:02 2015 -0700
+
+    olfs: Updated error message for failure to encode a string as UTF-8.
+
+commit 5b0f86ec415595b70e42e6abe37ccebdbd2b7770
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 09:31:26 2015 -0700
+
+    olfs: Changed manner in which Map content is iterated over.
+
+commit 4a5be44c57e9505db60af07a285ea240fa9ebb22
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 09:20:03 2015 -0700
+
+    olfs: Dropped catch of java.lang.Exception in favor of catching catagorized exceptions.
+
+commit d12b97ce65b61ed0853ba76f390e1ede3768427c
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 09:18:37 2015 -0700
+
+    olfs: Dropped use of unused field.
+
+commit 7fdc78ea414d26db1b7c103f8b85b1463df99991
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 09:16:51 2015 -0700
+
+    olfs: Repaired concuurent modification of Map issue..
+
+commit 852866f0980514e8126fef16a343e67bfd0ba6fd
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 09:16:24 2015 -0700
+
+    olfs: Repaired lock release problem with nesting try/catch/finally blocks.
+
+commit ca880434966ab328fcf65185c01aa85e94a1abd0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 05:32:57 2015 -0700
+
+    olfs: Sorted javadoc comments. Dropped unused method, unused field.
+
+commit afc501c295492c699e3f565de1ac906f7c6e7569
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 05:28:51 2015 -0700
+
+    olfs: Removed overly broad catch clause.
+
+commit 2fcee902268dcd22de8b4bbd357ef720e6c835ac
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 17:46:03 2015 -0700
+
+    olfs: Tried to mitigate dubious method calls.
+
+commit a52e15c47b72829689e5549877abe380ab4905c8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 17:30:45 2015 -0700
+
+    olfs: Migrated string concatenation from using '+' to StringBuilder.append()
+
+commit 68d27c73705fcff02e6142d33b9b8009ee539eb4
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 17:04:51 2015 -0700
+
+    olfs: Minor code reorganiztion for legibility.
+
+commit f182bbe0fb9e0c83681aead62bb98a85b4f3bc29
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 16:54:58 2015 -0700
+
+    olfs: Removed unused fields, made inner classes static..
+
+commit f8b8d61ceee2cf4e2656bd98f686e7aa3341675f
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 16:33:20 2015 -0700
+
+    olfs: Removed unused fields, and two unused classes.
+
+commit 549ef099e9281acab4f657f6ba4d773326ffea36
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 16:33:05 2015 -0700
+
+    olfs: Removed unused fields, and two unused classes.
+
+commit 753bbb5628354c21e28e61f2bff403ae355bff0d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 15:24:17 2015 -0700
+
+    olfs: Rewound Java8 code to Java7.
+
+commit 8bfc8f69883fa7e6787850fbc4e1c7f5af6b81b8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 15:13:25 2015 -0700
+
+    Unwound patch to MediaType, removed unused field from JsonDR
+
+commit 402fa14f7a0bb11119eb700f0146eff612ee52f3
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 14:59:19 2015 -0700
+
+    olfs: Fixed inefficient use of keySet() in favor of values() methods.
+
+commit 210e2810196df00831810f5bc4d9a393860f01e9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 14:32:26 2015 -0700
+
+    olfs: Attempted to fix problem with unreleased locks. Attempted to addres String encoding issue. There are multiple instances of these problems here and in other classes and I need to determine if these changes are in fact remedies.
+
+commit 1a72c254f40792c23d6e552ab2101d4514899486
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 14:04:08 2015 -0700
+
+    olfs: Repaired bad call to HashMap.contains() - needed to be HashMap.containsKey(). and it is now.
+
+commit 63e31379b60097dd35b7fcfaf1c69105b587ba99
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 13:58:47 2015 -0700
+
+    olfs: Repaired concurrency porblems with modifications of HashMaps
+
+commit fe3c1a8e41358db88c24dfd179a6caa69a2045d9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 15 13:49:12 2015 -0700
+
+    olfs: Fixed potential null pointer dereference."
+
+commit da408690530718c8453caa619ba58630383bdf49
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 16:14:34 2015 -0700
+
+    olfs: Refactored BESManager so that calls to getBES() that fail cause a BadConfigurationException to be thrown. Additional modified classes represent the ripple effect of this change."
+
+commit ef02787c41776a413fc53113e4537b8613065fe0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 15:31:16 2015 -0700
+
+    olfs: Updated instance creation syntax .
+
+commit 817712a691845d4a49cf20745d5bf522961214a9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 15:23:04 2015 -0700
+
+    olfs: Implemented equals() method to correctly complete the implementation of the Comparable interface .
+
+commit 9ed61c52edc9895787b0c5b27e7a2247b2871657
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 15:12:03 2015 -0700
+
+    olfs: Improved error checking for file and directory creation.
+
+commit dc1d7ec5d971f6dc62c3b639590f60053359da9e
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 14:35:16 2015 -0700
+
+    olfs: Dropped unused private variable. Updated syntax for templated variable assignment.
+
+commit 4aa3d7dfa50a35fdaed807a0f1da42cb7cae022d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 14:33:56 2015 -0700
+
+    olfs: Fixed minor bugs.
+
+commit 104c21ca3573ab07218fcee73e68ec408d02e78e
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 13:55:09 2015 -0700
+
+    olfs: Eliminated unused variables.
+
+commit 13c6c513f94814594fc4f0b18ac6936b6e5c7170
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 13:28:21 2015 -0700
+
+    olfs: Repaired  concurrent modification issue in Timer.
+
+commit 2fb583a99a0fd02ad886af98e993cf6dfefcf94f
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 13:13:03 2015 -0700
+
+    Switched .travis.yml file to use docker containers.
+
+commit 604d1fe1835faf238d09c9c8b3d129bf9d927de8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 13:06:39 2015 -0700
+
+    Added coverity_scan branch to .travis.yml file
+
+commit 8bdc94f942773fc14473a050a5e3857e8e8df318
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 11:10:09 2015 -0700
+
+    Added coverity info to .travis.yml
+
+commit d949021f2416510f121c42a308f2287d9c2efd10
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:35:50 2015 -0700
+
+    Moved unused class out of production
+
+commit 21a64a34097c1a7ad492d2c1d0bb4ed88de25012
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:31:05 2015 -0700
+
+    olfs: Repaired  concurrent modification of Vector membership error.
+
+commit 7d98011f0be695e9a3810102fbb8f8ff69a16c22
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:22:33 2015 -0700
+
+    olfs: Repaired potential (although unlikely) divide by zero problem...
+
+commit 656bbb018eb4a81ec9be77988aeb750e7bc762bb
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:15:16 2015 -0700
+
+    olfs: Repaired null pointer dereference issue.
+
+commit e3947da3170537d33cb459c8d21b0e320d8b69d8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:09:19 2015 -0700
+
+    olfs: Added write lock protection to destroy() method.
+
+commit 555881c36a7617a767900cd916109235c69cd40c
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:05:27 2015 -0700
+
+    olfs: Removed commented out code section, added debugging.
+
+commit 36ec8d1f82bd0d38f9fc773d2a92aa5e59a59103
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:02:53 2015 -0700
+
+    olfs: Removed unused (and potentially un-threadsafe) method.
+
+commit 1276629d7c2033012e4354d960d42cabd224f2c5
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon Sep 14 06:01:03 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issue.
+
+commit 6f9d810e41b8d41f8ed87818ee2054112b24ad44
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 17:16:55 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues. Repaired bad spelling in method name
+
+commit 47f3a86339c09e44ad0d30b1a681653197a5f4b3
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 17:08:33 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 250df6af72b205c349dfe2b8542ed82e626a0782
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 17:02:45 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 280fbde1c4e162c9aa808fec49335786955ae06d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:59:08 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 81cbef81b770adf196e54b60cc4c5805d7ab05e8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:54:53 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit db3097e68678fe1a0ce60b5c06ed982ef77891d6
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:52:29 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 1d71cb35b59a5cde57ed954b607ddbd7ab567785
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:50:49 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 07ca069a65fa7d740c18c7f62ff8b623a7ce2440
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:49:36 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit c58bdc77de6b764c55bf7351b206a776d243fc8a
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:47:51 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 49043fb245fe989db6f84c7c74655692f2ce1118
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:44:54 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 6d0a587c5de0869bf164e8b24707e96e017578df
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:40:48 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 57616c562c43cf0970471cfe042316335c7aaf0d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:27:13 2015 -0700
+
+    olfs: Repaired null pointer dereferencing issues.
+
+commit 1806fa5a3968e979f90333484fef3185ec864750
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 16:13:23 2015 -0700
+
+    olfs: Repaired concurrency issue in AggregationServlet. Modified log messages.
+
+commit 8c942fe732b3c52591ba1e18c0b851b7e011549d
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 15:19:10 2015 -0700
+
+    olfs: Repaired potential null pointer dereference.
+
+commit e6e8da730f253d6af12c1934dd1c23eb4c7f8572
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 15:07:23 2015 -0700
+
+    olfs: Repaired potential null pointer dereference.
+
+commit 62bd60c3f7994963ae84f4060da7f4ba0db56c22
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 14:54:50 2015 -0700
+
+    olfs: Repaired potential null pointer dereference.
+
+commit fd339d84fac6dd4662765de08520e8d06f1e7f61
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 14:50:31 2015 -0700
+
+    olfs: Repaired potential null pointer dereference. Adjusted error messages.
+
+commit 10530fb9e9b9d2b0e169c97610beac20b221e2b0
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 14:47:25 2015 -0700
+
+    olfs: Removed unused method.
+
+commit 7ba9e82c47cef60ccbf08dfb23e26dc4888dcefd
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 14:46:09 2015 -0700
+
+    olfs: Repaired potential null pointer dereferencing issue.
+
+commit 39fe41176d19d3791d20115a81c5b1593039a5a7
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri Sep 11 14:18:06 2015 -0700
+
+    olfs: Repaired use of FileInputStream to avoid opening and then never using said stream.
+
+commit 503d03751918dbffbd2f21374d2c57f9ff6bcbc2
+Merge: 2bd5895 f2dc6c9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 8 14:37:14 2015 -0700
+
+    Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+commit 2bd589503ac4d6fbb6561e0659da6df3fa195ce2
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue Sep 8 14:36:36 2015 -0700
+
+    Fixed issue HR-45 in which the OLFS had stopped setting Content-Disposition headers for fileout-netdcf responses.
+
+commit f2dc6c90903d81587e9b7198bc3b3ae00796043f
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Jun 11 09:04:07 2015 -0400
+
+    Added 'notifications' to the travis.yml file
+
+commit df702bd09c1911485425b67ff664e434fe2e0975
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Jun 11 08:39:04 2015 -0400
+
+    Added travis.yml
+
+commit ff3eda6f2fae4f96875f6470159cbcea552ddabd
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Jun 11 08:38:46 2015 -0400
+
+    Added tests/demo text files for teh aggregation servlet
+
+commit a454863d759a9c1fc33cd1625e6291a1a5cee781
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri May 22 15:12:31 2015 -0700
+
+    olfs: Changed content of request IDs.
+
+commit 3a47983c737958b721ed04b53634bd4c8a271c4f
+Merge: 3c4c147 05a665e
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed May 20 17:29:50 2015 -0600
+
+    Merge branch 'master' of https://github.com/opendap/olfs
+
+commit 3c4c1470524b1d69237663fe423890d52d83b344
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Wed May 20 17:29:01 2015 -0600
+
+    Added the aggregation handler/servlet demo info to git
+
+commit 05a665ef222dbee7e2196fe3f1f1a542fa357741
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Tue May 19 12:25:56 2015 -0700
+
+    olfs: Improved Timer class for better reporting.
+
+commit 8c805c58fe214cd3ffe55bdbf78c7733f5d01915
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Mon May 11 15:18:54 2015 -0700
+
+    olfs: Dropped Java 8 syntax for accessing Vector.
+
+commit becdc058900b6e9cdfac80519c72e510cba2b616
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri May 8 16:00:26 2015 -0700
+
+    olfs: Fixed DSR response so that it's available not only from the dataset URL in DAP4 mode, but also from the datasetURL with a .dsr suffix, even when in DAP2 mode.
+
+commit db140b34b8c55b7e98934cf8c18d8be773ed61da
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Fri May 8 15:23:52 2015 -0700
+
+    olfs: Improved conversion of wildcard to regex in Filter
+
+commit 7b7ba0c7376bf46f0a96fa072b64de0d2e62fdc8
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu May 7 14:15:17 2015 -0700
+
+    olfs: Updated version for release 1.13.2
+
 commit 8e5cbd037c2506c54f1bf098da25c6eb0f8c56b5
 Author: Nathan Potter <ndp@opendap.org>
 Date:   Thu May 7 14:12:56 2015 -0700

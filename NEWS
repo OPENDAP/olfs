@@ -1,3 +1,10 @@
+Version 1.14.0 (18 September 2015)
+
+  Rollback from Java 8 requirement. Now only Java 7 is needed for the OLFS and Hyrax.
+  Many bug fixes.
+  Removal of unused parts of the API.
+
+
 Version 1.13.2 (07 May 2015)
 
   New patched bugs in datasetScan implementation.
