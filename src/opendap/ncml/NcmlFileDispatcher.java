@@ -63,7 +63,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
     private Logger log;
     private boolean initialized;
-    private HttpServlet dispatchServlet;
+    // private HttpServlet dispatchServlet;
     private String ncmlRequestPatternRegexString;
     private Pattern ncmlRequestPattern;
 
@@ -84,7 +84,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         if(initialized) return;
 
         //_config = config;
-        dispatchServlet = servlet;
+        // dispatchServlet = servlet;
 
         ncmlRequestPatternRegexString = ".*\\.ncml";
         ncmlRequestPattern = Pattern.compile(ncmlRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
