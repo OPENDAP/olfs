@@ -383,7 +383,7 @@ public class BES {
                 try {
                     besResponse = baos.toString(StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    besResponse = "Unable to encode BES response as " + StandardCharsets.UTF_8.name();
+                    besResponse = "FAILED to encode BES response as " + StandardCharsets.UTF_8.name();
                 }
 
                 log.debug("BES returned:\n{}", besResponse);
