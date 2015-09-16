@@ -160,7 +160,7 @@ public class W10nServlet extends HttpServlet   {
                                                       HttpServletResponse res)
                 throws IOException {
 
-            String localUrl = ReqInfo.getLocalUrl(req);
+            // String localUrl = ReqInfo.getLocalUrl(req);
 
             // @SuppressWarnings("unchecked")
             // Map<String,String[]> queryParameters = req.getParameterMap();

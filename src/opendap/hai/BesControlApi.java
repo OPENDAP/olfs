@@ -478,7 +478,7 @@ public class BesControlApi extends HttpResponder {
         if(!loggerState.equals(besCmds.on.toString()))
             loggerState = besCmds.off.toString();
 
-        return besCmds.on.toString();
+        return loggerState;
 
     }
 

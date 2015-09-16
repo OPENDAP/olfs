@@ -995,8 +995,8 @@ public class BES {
         if (_checkOutFlag == null)
             return null;
 
+        _clientCheckoutLock.lock();
         try {
-            _clientCheckoutLock.lock();
 
             // Acquiring this semaphore is what limits the number
             // of clients that will be in the pool. The number of

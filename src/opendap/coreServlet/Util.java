@@ -212,7 +212,7 @@ public class Util {
         msg += "  file:          "+url.getFile()+"\n";
         msg += "  ref:           "+url.getRef()+"\n";
         msg += "  user info:     "+url.getUserInfo()+"\n";
-        msg += "  hash code:     "+url.hashCode()+"\n";
+        //msg += "  hash code:     "+url.hashCode()+"\n";  // Commented out because hasCode() method can block for Domain Name resolution
 
         try {
             msg += "  URI:           "+url.toURI().toASCIIString()+"\n";
