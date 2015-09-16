@@ -323,25 +323,21 @@ public class InheritedMetadataManager {
                     while (metadataRootPathIterator.hasNext()) {
                         metadataRootPathElement = (Element) metadataRootPathIterator.next();
                         metadataRootPath = metadataRootPathElement.getTextTrim();
-                        if (!_inheritedMetadata.containsKey(metadataRootPath)) {
-                            log.debug("ingestInheritedMetadata() - Found new metadataRootPath: '"+metadataRootPath+"' Creating storage HashMap");
-                            _inheritedMetadata.put(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
+
+                        int size =  _inheritedMetadata.size();
+                        _inheritedMetadata.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
+                        if (size<_inheritedMetadata.size()) {
+                            log.debug("ingestInheritedMetadata() - Added new metadataRootPath: '" + metadataRootPath + "' ConcurrentHashMap storage.");
                         }
+
                         metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                        // New way
-                        int size = metadataForThisRootPath.size();
+                        size = metadataForThisRootPath.size();
                         metadataForThisRootPath.putIfAbsent(catalogKey, new Vector<Element>());
                         if(size<metadataForThisRootPath.size()){
                             log.debug("ingestInheritedMetadata() - The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Added storage Vector");
                         }
 
-                        /*   OLD WAY
-                        if (!metadataForThisRootPath.containsKey(catalogKey)) {
-                            log.debug("ingestInheritedMetadata() - The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Creating storage Vector");
-                            metadataForThisRootPath.put(catalogKey, new Vector<Element>());
-                        }
-                        */
                         metadataElements = metadataForThisRootPath.get(catalogKey);
 
                         log.debug("ingestInheritedMetadata() - Adding metadata element to inventory.");
@@ -354,7 +350,7 @@ public class InheritedMetadataManager {
                             size = _inheritedServices.size();
                             _inheritedServices.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
                             if(size < _inheritedServices.size()) {
-                                log.debug("ingestInheritedMetadata() - Added new inherited services storage HashMap for " +
+                                log.debug("ingestInheritedMetadata() - Added new inherited services ConcurrentHashMap storage for " +
                                         "metadataRootPath: '" + metadataRootPath + "'");
                             }
 
