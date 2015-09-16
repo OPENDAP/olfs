@@ -79,21 +79,23 @@ public class OlfsControlApi extends HttpResponder {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
 
-        String msg = "";
+        if(log.isDebugEnabled()) {
+            StringBuilder msg = new StringBuilder();
 
-        for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
-            msg += "   Logger: " + logger.getName() + "\n";
+            for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
+                msg.append("   Logger: ").append(logger.getName()).append("\n");
 
-            Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
-            while (i.hasNext()) {
-                Appender<ILoggingEvent> a = i.next();
-                msg += "        Appender: " + a.getName() + "\n";
+                Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
+                while (i.hasNext()) {
+                    Appender<ILoggingEvent> a = i.next();
+                    msg.append("        Appender: ").append(a.getName()).append("\n");
+
+                }
+
 
             }
-
-
+            log.debug("Initializing ViewLastLog Servlet. \n" + msg);
         }
-        log.debug("Initializing ViewLastLog Servlet. \n" + msg);
 
         ch.qos.logback.classic.Logger rootLogger = lc.getLogger(ROOT_NAME);
 

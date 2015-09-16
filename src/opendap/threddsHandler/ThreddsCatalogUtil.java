@@ -579,38 +579,36 @@ public class ThreddsCatalogUtil {
 
 			URL catalogURL = new URL(catalogUrlString);
 			String serverURL = getServerUrlString(catalogURL);
-			String msg;
+			StringBuilder msg = new StringBuilder();
 
 			HashMap<String, Element> services = collectServices(catalog,
 					service);
-			msg = "#### collectServices Found services:\n";
 
-            for (Element srvc : services.values())
-         				msg += "####     Service Name: " + srvc.getAttributeValue("name") + "\n"
-         						+ xmlo.outputString(srvc) + "\n";
+            if(log.isDebugEnabled()) {
+                msg.append("getDataAccessURLs() - Found services:\n");
+                for (Element srvc : services.values())
+                    msg.append("         Service Name: ").append(srvc.getAttributeValue("name"))
+                            .append("\n").append(xmlo.outputString(srvc)).append("\n");
 
-
-			log.debug(msg);
+                log.debug(msg.toString());
+            }
 
 			Element dataset;
-			Iterator i = catalog.getChildren(THREDDS.DATASET, THREDDS.NS)
-					.iterator();
-			while (i.hasNext()) {
-				dataset = (Element) i.next();
-				collectDatasetAccessUrls(dataset, services, null, serverURL,
-						serviceURLs);
-			}
+            for (Object o : catalog.getChildren(THREDDS.DATASET, THREDDS.NS)) {
+                dataset = (Element) o;
+                collectDatasetAccessUrls(dataset, services, null, serverURL,
+                        serviceURLs);
+            }
 
-			log.debug("#### Accumulated " + serviceURLs.size()
-					+ " access URLs.");
+			log.debug("getDataAccessURLs() - Accumulated {} access URLs.",serviceURLs.size());
 
 			if (serverURL != null && recurse) {
 
 				String href;
 				Element catalogRef;
 				String newCatalogURL;
-				i = catalog.getDescendants(new ElementFilter("catalogRef",
-						THREDDS.NS));
+                Iterator i = catalog.getDescendants(new ElementFilter("catalogRef",
+                            THREDDS.NS));
 				while (i.hasNext()) {
 					catalogRef = (Element) i.next();
 					href = catalogRef.getAttributeValue("href", XLINK.NS);
@@ -622,8 +620,7 @@ public class ThreddsCatalogUtil {
 			}
 
 		} catch (MalformedURLException e) {
-            log.error("Unable to load THREDDS catalog: " + catalogUrlString
-                    + " msg: " + e.getMessage());
+            log.error("getDataAccessURLs() - Unable to load THREDDS catalog: {} msg: {}",catalogUrlString, e.getMessage());
             
         }
 
@@ -932,7 +929,7 @@ public class ThreddsCatalogUtil {
 				base = service.getAttributeValue("base");
 				access = baseServerURL + base + urlPath;
 				accessURLs.add(access);
-				log.debug("####  Found access URL: " + access);
+				log.debug("getAccessURLs() - Found access URL: " + access);
 
 			}
 		}

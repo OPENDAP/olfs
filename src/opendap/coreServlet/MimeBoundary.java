@@ -103,15 +103,15 @@ public class MimeBoundary {
 
         byte[] val = uid.toString().getBytes();
 
-        String suid  = "";
+        StringBuilder suid  = new StringBuilder();
         int v;
 
         for (byte aVal : val) {
             v = aVal;
-            suid += Integer.toHexString(v);
+            suid.append(Integer.toHexString(v));
         }
 
-        return suid;
+        return suid.toString();
     }
 
 

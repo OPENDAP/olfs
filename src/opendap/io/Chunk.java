@@ -101,15 +101,15 @@ public class Chunk {
      * @throws IOException
      */
     public static int getDataSize(byte[] chunkHeader) throws IOException{
-        String sizestr = "";
+        StringBuilder sizestr = new StringBuilder();
         for(int i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
-            sizestr += (char)chunkHeader[i];
+            sizestr.append((char) chunkHeader[i]);
         }
 
 
         //System.out.println("ChunkSizeString: "+sizestr);
 
-        int chunkSize = Integer.valueOf(sizestr,16);
+        int chunkSize = Integer.valueOf(sizestr.toString(),16);
 
         //System.out.println("ChunkSize:       "+chunkSize);
 
@@ -126,15 +126,15 @@ public class Chunk {
 
     public static boolean isLastChunk(byte[] chunkHeader){
 
-        String sizestr = "";
+        StringBuilder sizestr = new StringBuilder();
         for(int i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
-            sizestr += (char)chunkHeader[i];
+            sizestr.append((char) chunkHeader[i]);
         }
 
 
         //System.out.println("ChunkSizeString: "+sizestr);
 
-        int chunkSize = Integer.valueOf(sizestr,16);
+        int chunkSize = Integer.valueOf(sizestr.toString(),16);
 
         //System.out.println("ChunkSize:       "+chunkSize);
 

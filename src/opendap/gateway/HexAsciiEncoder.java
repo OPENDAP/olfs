@@ -42,15 +42,15 @@ import java.io.PrintStream;
 public class HexAsciiEncoder implements Encoder {
 
     public static String stringToHex(String s){
-        String es = "";
+        StringBuilder es = new StringBuilder();
 
         byte[] b =  s.getBytes();
         for (byte aB : b) {
             if(aB < 0x10)
-                es+="0";
-            es += Integer.toHexString(aB);
+                es.append("0");
+            es.append(Integer.toHexString(aB));
         }
-        return es;
+        return es.toString();
     }
 
 
@@ -91,22 +91,22 @@ public class HexAsciiEncoder implements Encoder {
         if(s==null)
             return null;
 
-        String ds = "";
-        String achar="";
-        byte b=0;
-        int i=0;
+        StringBuilder ds = new StringBuilder();
+        String aChar;
+        byte b;
+        int i;
 
 
         for(i=0; i<s.length();i+=2){
             if(s.length() >= i+2)
-                achar = s.substring(i,i+2);
+                aChar = s.substring(i,i+2);
             else
-                achar = s.substring(i,i+1);
-            b = Byte.parseByte(achar,16);
-            ds += String.valueOf((char)b);
+                aChar = s.substring(i,i+1);
+            b = Byte.parseByte(aChar,16);
+            ds.append(String.valueOf((char) b));
         }
 
-        return ds;
+        return ds.toString();
     }
 
     public static void hexToString(InputStream is, OutputStream os) throws Exception {

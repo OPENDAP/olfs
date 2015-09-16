@@ -321,21 +321,21 @@ public class NcmlManager {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-            String msg;
 
-            HashMap<String, Element> services = collectServices(catalog,opendapService);
-            msg = "#### collectServices Found services:\n";
+        HashMap<String, Element> services = collectServices(catalog,opendapService);
+
+        if(log.isDebugEnabled()) {
+            StringBuilder msg = new StringBuilder("getLocalDapAccessIDs() - Found services:\n");
             for (Element service : services.values()) {
                 String srvcName = service.getAttributeValue(THREDDS.NAME);
-                msg += "####     Service Name: " + srvcName + "\n"
-                        + xmlo.outputString(service) + "\n";
+                msg.append("     Service Name: ").append(srvcName).append("\n").append(xmlo.outputString(service)).append("\n");
             }
-            log.debug(msg);
+            log.debug(msg.toString());
+        }
 
-            collectLocalDatasetAccessUrls(dataset, services, null, "", serviceURLs);
+        collectLocalDatasetAccessUrls(dataset, services, null, "", serviceURLs);
 
-            log.debug("#### Accumulated " + serviceURLs.size()
-                    + " access URLs.");
+        log.debug("getLocalDapAccessIDs() -  Accumulated {} access URLs.",serviceURLs.size());
 
 
 
@@ -543,7 +543,7 @@ public class NcmlManager {
                 if(!access.startsWith("/"))
                     access = "/" + access;
                 accessURLs.add(access);
-                log.debug("####  Found access URL: " + access);
+                log.debug("getLocalAccessURLs() -  Found access URL: " + access);
 
             }
         }

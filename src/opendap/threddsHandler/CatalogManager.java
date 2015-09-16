@@ -481,18 +481,18 @@ public class CatalogManager {
 
 
     public String toString() {
-        String s = "THREDDS Catalog Manager:\n";
+        StringBuilder s = new StringBuilder("THREDDS Catalog Manager:\n");
 
-        s += "    ContentPath: " + _contentPath + "\n";
+        s.append("    ContentPath: " + _contentPath + "\n");
 
         for (Catalog c : _catalogs.values()) {
-            s += "    Catalog Name: " + c.getName() + "\n";
-            s += "        file:        " + c.getFileName() + "\n";
-            s += "        pathPrefix:  " + c.getPathPrefix() + "\n";
-            s += "        urlPrefix:   " + c.getUrlPrefix() + "\n";
+            s.append("    Catalog Name: ").append(c.getName()).append("\n");
+            s.append("        file:        ").append(c.getFileName()).append("\n");
+            s.append("        pathPrefix:  ").append(c.getPathPrefix()).append("\n");
+            s.append("        urlPrefix:   ").append(c.getUrlPrefix()).append("\n");
         }
 
-        return s;
+        return s.toString();
     }
 
 

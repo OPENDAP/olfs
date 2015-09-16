@@ -334,24 +334,25 @@ public class ChunkedOutputStream  extends OutputStream {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        ChunkedOutputStream cs = new ChunkedOutputStream(baos,50);
+        ChunkedOutputStream chunkedOutputStream = new ChunkedOutputStream(baos,50);
 
-        System.out.println(cs);
+        System.out.println(chunkedOutputStream);
 
         String s = "I'm in ur code, testin' ur methods.";
 
-        cs.write(s.getBytes());
+        chunkedOutputStream.write(s.getBytes());
 
         s = "Another value: ";
 
-        String val = "";
+        StringBuilder val = new StringBuilder();
         for(int i=1; i<10 ;i++){
-            cs.write(s.getBytes());
-            val += i;
-            for (byte b : val.getBytes()) cs.write(b);
+            chunkedOutputStream.write(s.getBytes());
+            val.append(i);
+            for (byte b : val.toString().getBytes())
+                chunkedOutputStream.write(b);
         }
 
-        cs.finish();
+        chunkedOutputStream.finish();
         String buffer = new String(baos.toByteArray());
         System.out.println("Buffer: "+buffer);
 
