@@ -186,7 +186,13 @@
 
     </DispatchHandlers>
 
-    <Timer enabled="false" />
+    <!--
+      This enables or disables the generation of internal timing metrics for the OLFS
+      If commented out the timing is disabled. If you want timing metrics to be output
+      to the log then uncomment the Timer and set the enabled attribute's value to "true"
+      WARNING: There is some performance cost to utilizing the Timer.
+    -->
+    <!-- Timer enabled="false" / -->
 
 
 </OLFSConfig>
