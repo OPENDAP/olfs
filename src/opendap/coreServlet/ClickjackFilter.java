@@ -1,4 +1,3 @@
-package opendap.coreServlet;
 /**
  *  Software published by the Open Web Application Security Project (http://www.owasp.org)
  *  This software is licensed under the new BSD license.
@@ -6,6 +5,8 @@ package opendap.coreServlet;
  * @author     Jeff Williams <a href="http://www.aspectsecurity.com">Aspect Security</a>
  * @created    February 6, 2009
  */
+
+package opendap.coreServlet;
 
 import java.io.IOException;
 
