@@ -32,6 +32,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.Html;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
@@ -167,13 +168,9 @@ public class BESError extends OPeNDAPException {
                 setErrorMessage("Unable to locate <BESError> object in stream.");
             }
 
-        } catch (Exception e) {
-
+        } catch (JDOMException | IOException e) {
             setErrorCode(INVALID_ERROR);
-
             setErrorMessage("Unable to process <BESError> object in stream.");
-
-
         }
 
 
