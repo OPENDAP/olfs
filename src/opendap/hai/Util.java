@@ -51,9 +51,10 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         Map<String,String[]> params = request.getParameterMap();
         if(params != null){
-            for(String name: params.keySet()){
-                sb.append(name).append(" = ");
-                String[] values = params.get(name);
+
+            for(Map.Entry<String,String[]> e: params.entrySet()){
+                String name = e.getKey();
+                String values[] = e.getValue();
                 if(values.length>1){
                     log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", Scrub.urlContent(name));
                 }
