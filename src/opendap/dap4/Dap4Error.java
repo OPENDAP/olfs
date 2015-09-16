@@ -30,6 +30,7 @@ import opendap.coreServlet.HttpResponder;
 import opendap.namespaces.DAP4;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -141,8 +142,8 @@ public class Dap4Error {
     }
 
     public Dap4Error( InputStream is) {
+        boolean parseFailure = false;
         SAXBuilder sb = new SAXBuilder();
-
         try {
             Document error = sb.build(is);
 
@@ -153,13 +154,10 @@ public class Dap4Error {
                 setMessage("Unable to locate <Error> object in stream.");
             }
 
-        } catch (Exception e) {
 
+        } catch (JDOMException | IOException e) {
             setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-            setMessage("Unable to process <Error> object in stream.");
-
-
+            setMessage("Unable to read/parse BES <Error> object in stream. Something BAD happened and no additional information is available. :(");
         }
 
 
