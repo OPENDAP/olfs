@@ -142,7 +142,6 @@ public class Dap4Error {
     }
 
     public Dap4Error( InputStream is) {
-        boolean parseFailure = false;
         SAXBuilder sb = new SAXBuilder();
         try {
             Document error = sb.build(is);
@@ -233,9 +232,7 @@ public class Dap4Error {
 
 
 
-    public boolean notFound(){
-        return getHttpCode()==HttpServletResponse.SC_NOT_FOUND;
-    }
+    // public boolean notFound(){ return getHttpCode()==HttpServletResponse.SC_NOT_FOUND;  }
 
     public boolean forbidden(){
         return getHttpCode()==HttpServletResponse.SC_FORBIDDEN;
@@ -329,8 +326,9 @@ public class Dap4Error {
 
 
     /**
-     *
-     * @param response
+     * @param systemPath The location, on disk, of the top level directory that holds the required XSLT documents.
+     * @param context The "context" in which the server is running.
+     * @param response The response object to populate with the error.
      * @return The HTTP status code returned to client.
      * @throws java.io.IOException
      */
