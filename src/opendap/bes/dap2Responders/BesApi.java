@@ -113,8 +113,16 @@ public class BesApi {
 
     public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
 
+    /**
+     * The name of the BES Exception Element.
+     */
+    private static String BES_ERROR = "BESError";
+
+
+    private boolean _initialized = false;
 
     private Logger log;
+
 
     public BesApi() {
         super();
@@ -122,18 +130,6 @@ public class BesApi {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
-
-
-
-    private static boolean _initialized = false;
-
-
-    public boolean isInitialized(){ return _initialized; }
-
-    /**
-     * The name of the BES Exception Element.
-     */
-    private static String BES_ERROR = "BESError";
 
     /**
      * Initializes logging for the BesApi class.
@@ -147,6 +143,9 @@ public class BesApi {
 
 
     }
+
+    public boolean isInitialized(){ return _initialized; }
+
 
 
     public boolean isConfigured() {
