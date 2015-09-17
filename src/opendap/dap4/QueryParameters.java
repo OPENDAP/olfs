@@ -26,14 +26,12 @@
 
 package opendap.dap4;
 
-import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import opendap.dap.Request;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -136,7 +134,8 @@ public class QueryParameters {
      */
     public void ingestDap4Query(HttpServletRequest req) throws IOException {
 
-        Map<String,String[]> params = req.getParameterMap();
+        Map<String,String[]> params = new HashMap<>();
+        params.putAll(req.getParameterMap());
 
         if(params !=null ){
             String asyncHttpHeader = req.getHeader("X-DAP-Async-Accept");
