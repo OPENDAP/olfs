@@ -1,0 +1,7 @@
+## directories
+
+## OS-X Finder spoo
+*.DS_Store
+
+*.log
+*.sum
