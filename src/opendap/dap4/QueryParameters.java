@@ -26,17 +26,13 @@
 
 package opendap.dap4;
 
-import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import opendap.dap.Request;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
 
 /**
