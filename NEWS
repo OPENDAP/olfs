@@ -1,4 +1,4 @@
-Version 1.14.0 (18 September 2015)
+Version 1.14.0 (21 September 2015)
 
   Rollback from Java 8 requirement. Now only Java 7 is needed for the OLFS and Hyrax.
   Many bug fixes.
