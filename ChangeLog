@@ -1,3 +1,56 @@
+commit 53258ff2731e99983aafb5a5aa468ef4142dada5
+Merge: c514cf7 48a6ec9
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Sep 17 15:26:08 2015 -0600
+
+    Merge branch 'version-1.14' of https://github.com/opendap/olfs into version-1.14
+
+commit c514cf741d8ff0ae2aed173d078cc03d80edbe9b
+Author: James Gallagher <jgallagher@opendap.org>
+Date:   Thu Sep 17 15:23:50 2015 -0600
+
+    3B42...HDF is now called 3B42...HDF.gz
+    
+    This was changed in the bes/module/hdf4_handler code to
+    reduce the space needed by the source code. I updated
+    the tests and baselines as needed here.
+
+commit 48a6ec9026916d5ced843e501be03d0f2c82a2c4
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Sep 17 12:58:48 2015 -0700
+
+    olfs: Clenaed up imports
+
+commit 469cfa20610a196d2d763f47a07ba1e32f068334
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Sep 17 12:56:47 2015 -0700
+
+    olfs: Fixed bug in opendap.dap4.QueryParameters in which an immutable object was modified.
+
+commit 592e0333b187e33c8fe37c6f1568b112a68b9059
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Sep 17 12:40:08 2015 -0700
+
+    Added testsuite/logs/.gitignore to make sure the directory testsuite/logs gets into the soup
+
+commit 66149bbea905a8d33da2779a0fd6d6cf6a1bdf7c
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Thu Sep 17 06:37:22 2015 -0700
+
+    olfs: Updated release date in README and NEWS
+
+commit 7385aa4d00826358120b281064c34a10f396c325
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 19:38:14 2015 -0700
+
+    olfs: Updated WAR file read me for current version and ncWMS inclusion.
+
+commit 8669e072f4bd28be39d106ea2fa74c313efd45c9
+Author: Nathan Potter <ndp@opendap.org>
+Date:   Wed Sep 16 13:36:06 2015 -0700
+
+    olfs: Updated version for release 1.14.0
+
 commit e7407c81fc5782839613e90e0c6ed010dd3078a7
 Author: Nathan Potter <ndp@opendap.org>
 Date:   Wed Sep 16 13:32:26 2015 -0700
