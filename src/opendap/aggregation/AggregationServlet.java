@@ -32,6 +32,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 
 import org.jdom.Document;
@@ -404,7 +405,8 @@ public class AggregationServlet extends HttpServlet {
             // as the value of the file in the Zip archive. This provides a way for
             // most of a request to work even if some of the files are broken.
             String msg = new String(errors.toByteArray());
-            os.write(msg.getBytes());
+
+            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
             _log.error("Aggregation Error in writeSingleFormattedGranule(): {}", msg);
         }
