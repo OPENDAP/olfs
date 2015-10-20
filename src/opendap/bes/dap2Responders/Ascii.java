@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -122,9 +123,9 @@ public class Ascii extends Dap4Responder {
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);
             log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
+            os.write(besError.getMessage().getBytes(HyraxStringEncoding.getCharset()));
+
         }
-
-
 
 
         os.flush();
