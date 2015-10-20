@@ -32,6 +32,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
+import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -244,7 +245,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
 
         if(!_besApi.writeFile(name, baos, erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error(msg);
             ByteArrayInputStream errorDoc = new ByteArrayInputStream(erros.toByteArray());
             ncmlDocument = sb.build(errorDoc);

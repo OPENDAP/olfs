@@ -26,6 +26,7 @@
 
 package opendap.webstart;
 
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -170,7 +171,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
                                        // display the given dataset
             BufferedReader jnlpReader = 
                 new BufferedReader(
-                    new InputStreamReader(jnlpUrl.openStream()));
+                    new InputStreamReader(jnlpUrl.openStream(), HyraxStringEncoding.getCharset()));
                                        // reader to get the jnlp
             StringBuilder jnlpStringBuilder = new StringBuilder(4 * 1024);
                                        // StringBuilder into which the

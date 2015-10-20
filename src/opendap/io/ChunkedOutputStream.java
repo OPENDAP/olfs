@@ -209,7 +209,7 @@ public class ChunkedOutputStream  extends OutputStream {
         if(cacheSize>0){
             Chunk.writeChunkHeader(_rawOS,cacheSize,currentChunkType);
             StringBuilder msg = new StringBuilder();
-            msg.append("flushCache() - cache contains: \"").append(new String(cache,0,cacheSize)+"\"");
+            msg.append("flushCache() - cache contains: \"").append(new String(cache,0,cacheSize,HyraxStringEncoding.getCharset())+"\"");
             log.debug(msg.toString());
             _rawOS.write(cache,0,cacheSize);
             cacheSize = 0;
@@ -340,20 +340,20 @@ public class ChunkedOutputStream  extends OutputStream {
 
         String s = "I'm in ur code, testin' ur methods.";
 
-        chunkedOutputStream.write(s.getBytes());
+        chunkedOutputStream.write(s.getBytes(HyraxStringEncoding.getCharset()));
 
         s = "Another value: ";
 
         StringBuilder val = new StringBuilder();
         for(int i=1; i<10 ;i++){
-            chunkedOutputStream.write(s.getBytes());
+            chunkedOutputStream.write(s.getBytes(HyraxStringEncoding.getCharset()));
             val.append(i);
-            for (byte b : val.toString().getBytes())
+            for (byte b : val.toString().getBytes(HyraxStringEncoding.getCharset()))
                 chunkedOutputStream.write(b);
         }
 
         chunkedOutputStream.finish();
-        String buffer = new String(baos.toByteArray());
+        String buffer = new String(baos.toByteArray(),HyraxStringEncoding.getCharset());
         System.out.println("Buffer: "+buffer);
 
 

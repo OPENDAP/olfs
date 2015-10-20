@@ -27,6 +27,7 @@
 package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.THREDDS;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -180,7 +181,7 @@ public class InheritedMetadataManager {
 
     static {
         try {
-            ByteArrayInputStream is = new ByteArrayInputStream(transform.getBytes());
+            ByteArrayInputStream is = new ByteArrayInputStream(transform.getBytes(HyraxStringEncoding.getCharset()));
             _dsIngestTransformer = new Transformer(new StreamSource(is));
         } catch (SaxonApiException e) {
             log.error("FAILED to build transform! Msg: " + e.getMessage());

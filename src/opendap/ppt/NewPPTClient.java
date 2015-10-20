@@ -28,6 +28,7 @@ package opendap.ppt;
 import opendap.bes.BES;
 import opendap.bes.BESChunkedOutputStream;
 import opendap.io.ChunkedInputStream;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -184,7 +185,7 @@ public class NewPPTClient {
         log.debug("initConnection() -  START");
 
         try {
-            _rawOut.write(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION.getBytes());
+            _rawOut.write(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION.getBytes(HyraxStringEncoding.getCharset()));
             _rawOut.flush();
         }
         catch (IOException e) {
@@ -233,7 +234,7 @@ public class NewPPTClient {
 
 
         try {
-            String status = new String(inBuff, 0, bytesRead);
+            String status = new String(inBuff, 0, bytesRead, HyraxStringEncoding.getCharset());
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 log.error("initConnection() -  Received '"+PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED+"' from server. That's a bad thing!");
                 throw new PPTException("Could not connect to server, server may be down or busy");
@@ -304,7 +305,7 @@ public class NewPPTClient {
     public boolean sendRequest(String buffer) throws PPTException {
         try {
             //System.out.println("Sending: "+buffer);
-            _out.write(buffer.getBytes());
+            _out.write(buffer.getBytes(HyraxStringEncoding.getCharset()));
             _out.finish();
             _out.flush();
         } catch (IOException e) {

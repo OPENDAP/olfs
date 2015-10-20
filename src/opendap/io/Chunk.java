@@ -239,7 +239,7 @@ public class Chunk {
             throw new IOException("Chunk.writeClosingChunkHeader() - Passed " +
                     "OutputStream reference is null.");
 
-        log.debug("writeClosingChunkHeader(): "+new String(closingChunk));
+        log.debug("writeClosingChunkHeader(): "+new String(closingChunk,HyraxStringEncoding.getCharset()));
         os.write(closingChunk);
         os.flush();
 
@@ -281,7 +281,7 @@ public class Chunk {
 
         log.debug("writeChunkHeader() - size: "+size+" size.length: "+size.length()+" type: "+(char)type);
 
-        System.arraycopy(size.getBytes(),0,header,0,Chunk.HEADER_SIZE-1);
+        System.arraycopy(size.getBytes(HyraxStringEncoding.getCharset()),0,header,0,Chunk.HEADER_SIZE-1);
 
         header[Chunk.HEADER_SIZE-1] = (byte) type;
 

@@ -32,6 +32,7 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;
@@ -391,7 +392,7 @@ public class BesCatalog implements Catalog {
 
 
             String catalogString  = xmlo.outputString(catalog);
-            _clientResponseCatalogBuffer = catalogString.getBytes();
+            _clientResponseCatalogBuffer = catalogString.getBytes(HyraxStringEncoding.getCharset());
             _log.debug("getCatalog() - Built THREDDS catalog from BES catalog response: \n{}",catalogString);
 
 
@@ -506,7 +507,7 @@ public class BesCatalog implements Catalog {
 
             _rawCatalogBuffer = baos.toByteArray();
 
-            _log.debug("loadBesCatalog() - Loaded BES catalog response: \n{}", baos.toString());
+            _log.debug("loadBesCatalog() - Loaded BES catalog response: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
 
             return besShowCatalogDoc;
 
@@ -567,7 +568,8 @@ public class BesCatalog implements Catalog {
             lock.lock();
             if (_clientResponseCatalogBuffer != null) {
                 is = new ByteArrayInputStream(_clientResponseCatalogBuffer);
-                _log.debug("getCatalogAsXdmNode(): Reading ingestTransform processed catalog from memory cache. \n{}",new String(_clientResponseCatalogBuffer));
+                _log.debug("getCatalogAsXdmNode(): Reading ingestTransform processed catalog from memory cache. \n{}",
+                        new String(_clientResponseCatalogBuffer, HyraxStringEncoding.getCharset()));
             } else {
                 throw new IOException("getCatalogAsXdmNode() - Catalog file was not previously ingested.");
             }

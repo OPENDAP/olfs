@@ -27,6 +27,7 @@ package opendap.xml;
 
 
 import net.sf.saxon.s9api.*;
+import opendap.io.HyraxStringEncoding;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -339,7 +340,7 @@ public class Transformer {
         // Build the remoteHost parameter to pass into the XSLT
         String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
         nodeString += "<"+name+">" + value + "</"+name+">";
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes(HyraxStringEncoding.getCharset()));
         XdmNode valueNode = build(new StreamSource(reader));
         // Pass the remoteHost parameter
         setParameter(new QName(name), valueNode);
@@ -357,7 +358,7 @@ public class Transformer {
         nodeString += "<"+name+" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" >" +
                       "<xsl:import href=\""+ importFile +"\" />" + "SMOOTCHYSMOOTCHYWOO"+
                       "</"+name+">";
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes(HyraxStringEncoding.getCharset()));
         XdmNode valueNode = build(new StreamSource(reader));
         // Pass the remoteHost parameter
         setParameter(new QName(name), valueNode);

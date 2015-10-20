@@ -26,6 +26,7 @@
 
 package opendap.ppt;
 
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 /**
@@ -48,7 +49,7 @@ public class MarkFinder {
         _mark = mark.clone();
         _markIndex = 0;
 
-        log.debug("New MarkFinder. _mark="+new String(_mark));
+        log.debug("New MarkFinder. _mark="+new String(_mark, HyraxStringEncoding.getCharset()));
     }
 
     public byte[] getMark(){

@@ -25,12 +25,15 @@
  */
 package opendap.webstart;
 
+import opendap.io.HyraxStringEncoding;
 import opendap.services.Service;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public abstract class JwsHandler implements Service {
@@ -47,7 +50,13 @@ public abstract class JwsHandler implements Service {
 
     public static String readFileAsString(String pathname) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(pathname));
+        Scanner scanner =
+                new Scanner(
+                new InputStreamReader(
+                        new FileInputStream(pathname),
+                        HyraxStringEncoding.getCharset()
+                )
+        );
 
         try {
             while (scanner.hasNextLine()) {

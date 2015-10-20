@@ -27,6 +27,7 @@
 package opendap.ppt;
 
 
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
@@ -133,7 +134,7 @@ class PPTClient {
         try {
             byte[] inBuff = new byte[4096];
             int bytesRead = this.readBuffer(inBuff);
-            String status = new String(inBuff, 0, bytesRead);
+            String status = new String(inBuff, 0, bytesRead,HyraxStringEncoding.getCharset());
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 throw new PPTException("Could not connect to server, server may be down or busy");
             }
@@ -207,7 +208,7 @@ class PPTClient {
 
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
-            byte[] a = buffer.getBytes();
+            byte[] a = buffer.getBytes(HyraxStringEncoding.getCharset());
             log.debug("Writing " + a.length + "  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
@@ -237,7 +238,7 @@ class PPTClient {
 
             int bytesRead, markBufBytes, i;
 
-            MarkFinder mfinder = new MarkFinder(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.getBytes());
+            MarkFinder mfinder = new MarkFinder(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.getBytes(HyraxStringEncoding.getCharset()));
             byte[] markBuffer = new byte[PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length()];
             markBufBytes = 0; // zero byte count in the mark buffer
 
@@ -324,7 +325,7 @@ class PPTClient {
                 throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.  ");
 
 
-            log.debug("Read: " + new String(inBuff));
+            log.debug("Read: " + new String(inBuff,HyraxStringEncoding.getCharset()));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server.  ";

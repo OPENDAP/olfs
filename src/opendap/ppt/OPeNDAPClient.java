@@ -27,6 +27,7 @@
 
 package opendap.ppt;
 
+import opendap.io.HyraxStringEncoding;
 import opendap.xml.Util;
 import org.apache.commons.cli.*;
 import org.jdom.Document;
@@ -358,7 +359,7 @@ public class OPeNDAPClient {
 
 
         try {
-            reader = new BufferedReader(new FileReader(inputFile));
+            reader = new BufferedReader( new InputStreamReader( new FileInputStream(inputFile), HyraxStringEncoding.getCharset()));
         }
         catch (FileNotFoundException e) {
             throw (new PPTException(e.getMessage()));
@@ -436,7 +437,7 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void interact(OutputStream out, OutputStream err) throws PPTException {
-        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in, HyraxStringEncoding.getCharset()));
         try {
             boolean done = false;
             while (!done) {

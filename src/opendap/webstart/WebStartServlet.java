@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -488,7 +489,7 @@ public class WebStartServlet extends HttpServlet {
         String handlers = getHandlersParam(ddx);
         log.debug("Handlers: "+handlers);
         if(handlers!=null){
-            ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes());
+            ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes(HyraxStringEncoding.getCharset()));
             XdmNode valueNode = transformer.build(new StreamSource(reader));
             transformer.setParameter("webStartApplications",valueNode);
         }

@@ -40,6 +40,7 @@ import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.*;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -819,9 +820,9 @@ public class W10nResponder  {
                 erros)){
 
 
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
             _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
         }
 
@@ -876,9 +877,9 @@ public class W10nResponder  {
                 os,
                 erros)){
 
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
             _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
         }
 

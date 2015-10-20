@@ -264,7 +264,7 @@ public class ChunkedInputStream  {
                     case Chunk.EXTENSION:
 
                         // Build a String from the content of the chunk extension.
-                        extensionContent =  new String(chunkBuffer,0,bytesReceived);
+                        extensionContent =  new String(chunkBuffer,0,bytesReceived,HyraxStringEncoding.getCharset());
 
                         // Process the extension content & preserve any previously encountered errors found in the message.
                         isError = processExtensionContent(extensionContent) || isError;
