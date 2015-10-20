@@ -35,6 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -167,9 +168,9 @@ public class NormativeDR extends Dap4Responder {
             if(!response.isCommitted())
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
 
         }
         else if(qp.isStoreResultRequest()){
@@ -205,9 +206,9 @@ public class NormativeDR extends Dap4Responder {
             Dap4Error d4e = new Dap4Error();
             d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
-            d4e.setOtherInformation(besResponse.toString());
+            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            sos.write(d4e.toString().getBytes());
+            sos.write(d4e.toString().getBytes(HyraxStringEncoding.getCharset()));
             sos.flush();
             return;
         }

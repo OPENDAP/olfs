@@ -33,6 +33,7 @@ import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -146,9 +147,9 @@ public class Dap2Data extends Dap4Responder {
 
 
         if(!besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os,erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("sendNormativeRepresentation() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
 
         }
         else  if(qp.isStoreResultRequest()){
@@ -188,7 +189,7 @@ public class Dap2Data extends Dap4Responder {
             Dap4Error d4e = new Dap4Error();
             d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
-            d4e.setOtherInformation(besResponse.toString());
+            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             sos.print(d4e.toString());
             sos.flush();

@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -120,9 +121,9 @@ public class XmlDR extends Dap4Responder{
 
 
         if(!besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
         }
 
 

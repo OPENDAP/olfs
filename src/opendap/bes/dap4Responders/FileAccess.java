@@ -35,6 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
+import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 // import org.apache.commons.httpclient.HttpStatus;
 import org.jdom.Element;
@@ -181,7 +182,7 @@ public class FileAccess extends Dap4Responder {
 
         ServletOutputStream sos = response.getOutputStream();
         if (!besApi.writeFile(dataSourceId, sos, erros)) {
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         }
@@ -208,7 +209,7 @@ public class FileAccess extends Dap4Responder {
         response.setHeader("Content-Description", "BadURL");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), HyraxStringEncoding.getCharset()));
 
         String serviceUrl = new Request(null,request).getServiceUrl();
 

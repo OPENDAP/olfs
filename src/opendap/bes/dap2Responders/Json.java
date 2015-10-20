@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -127,9 +128,9 @@ public class Json extends Dap4Responder {
                 os,
                 erros);
         if(!result){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
 
         }
 

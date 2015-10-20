@@ -27,6 +27,7 @@
 package opendap.bes.dap4Responders;
 
 import opendap.bes.dap2Responders.BesApi;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -94,7 +95,7 @@ public class Version extends Dap4Responder {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        PrintStream ps = new PrintStream(response.getOutputStream());
+        PrintStream ps = new PrintStream(response.getOutputStream(), false, HyraxStringEncoding.getCharset().name());
 
         Document vdoc = besApi.getCombinedVersionDocument();
 
@@ -109,10 +110,6 @@ public class Version extends Dap4Responder {
 
         log.debug("respondToHttpGetRequest() - Sent Version response.");
 
-
-
-
-        ps.flush();
         log.info("Sent {}",getServiceTitle());
 
 

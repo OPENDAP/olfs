@@ -34,6 +34,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;

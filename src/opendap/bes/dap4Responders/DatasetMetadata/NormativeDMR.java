@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -114,9 +115,9 @@ public class NormativeDMR extends Dap4Responder {
 
 
         if(!besApi.writeDMR(resourceID,qp,xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
 
         }
 

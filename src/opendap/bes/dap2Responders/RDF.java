@@ -29,6 +29,7 @@ import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
+import opendap.io.HyraxStringEncoding;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -107,7 +108,7 @@ public class RDF extends Dap4Responder {
         log.debug(xmlo.outputString(ddx));
 
         ServletOutputStream os = response.getOutputStream();
-        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
+        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes( HyraxStringEncoding.getCharset())));
 
         /*
          Because we are going to daisy chain the XSLT's we have to be careful here!

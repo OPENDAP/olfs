@@ -29,6 +29,7 @@ import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -107,9 +108,9 @@ public class DDX extends Dap4Responder {
 
 
         if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
+            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
         }
 

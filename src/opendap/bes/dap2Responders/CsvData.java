@@ -115,9 +115,9 @@ public class CsvData extends Dap4Responder {
 
 
         if(!besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
-            String msg = new String(erros.toByteArray());
+            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
             log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
+            os.write(msg.getBytes());
 
         }
 

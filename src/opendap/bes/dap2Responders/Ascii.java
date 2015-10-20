@@ -123,7 +123,6 @@ public class Ascii extends Dap4Responder {
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);
             log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-            os.write(besError.getMessage().getBytes(HyraxStringEncoding.getCharset()));
 
         }
 
