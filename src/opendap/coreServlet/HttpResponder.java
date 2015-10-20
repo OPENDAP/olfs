@@ -25,6 +25,7 @@
  */
 package opendap.coreServlet;
 
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -140,7 +141,7 @@ public abstract class HttpResponder {
 
     public static String readFileAsString(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(fileName));
+        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
 
         try {
             while (scanner.hasNextLine()) {
@@ -155,7 +156,7 @@ public abstract class HttpResponder {
 
     public static String streamToString(InputStream is) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(is);
+        Scanner scanner = new Scanner(is, HyraxStringEncoding.getCharset().name());
 
         try {
             while (scanner.hasNextLine()) {

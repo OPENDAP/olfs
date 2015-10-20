@@ -27,6 +27,7 @@
 package opendap.dap4;
 
 import opendap.coreServlet.HttpResponder;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP4;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -267,7 +268,7 @@ public class Dap4Error {
 
 
     public void print(OutputStream os) throws IOException {
-        os.write(toString().getBytes());
+        os.write(toString().getBytes(HyraxStringEncoding.getCharset()));
     }
 
 

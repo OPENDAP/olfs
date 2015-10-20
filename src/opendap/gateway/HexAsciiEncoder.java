@@ -25,6 +25,7 @@
  */
 package opendap.gateway;
 
+import opendap.io.HyraxStringEncoding;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -44,7 +45,7 @@ public class HexAsciiEncoder implements Encoder {
     public static String stringToHex(String s){
         StringBuilder es = new StringBuilder();
 
-        byte[] b =  s.getBytes();
+        byte[] b =  s.getBytes(HyraxStringEncoding.getCharset());
         for (byte aB : b) {
             if(aB < 0x10)
                 es.append("0");
@@ -81,7 +82,7 @@ public class HexAsciiEncoder implements Encoder {
             if(b<0)
                 done = true;
             else
-                os.write(Integer.toHexString(b).getBytes());
+                os.write(Integer.toHexString(b).getBytes(HyraxStringEncoding.getCharset()));
         }
     }
 
@@ -126,12 +127,12 @@ public class HexAsciiEncoder implements Encoder {
             }
             else if(ret!=0){
 
-                achar = new String(b);
+                achar = new String(b,HyraxStringEncoding.getCharset());
                 //System.err.println("achar: "+achar);
                 //System.err.println("ret: "+ret);
 
                 b1 = Byte.parseByte(achar,16);
-                os.write(String.valueOf((char)b1).getBytes());
+                os.write(String.valueOf((char)b1).getBytes(HyraxStringEncoding.getCharset()));
             }
         }
 

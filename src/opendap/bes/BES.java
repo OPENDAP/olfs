@@ -27,6 +27,7 @@
 package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
 import opendap.ppt.OPeNDAPClient;
@@ -111,7 +112,7 @@ public class BES {
 
         String configString = getConfiguration(null);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(configString.getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream(configString.getBytes( HyraxStringEncoding.getCharset()));
 
         try {
             Document confDoc = opendap.xml.Util.getDocument(bais);
@@ -209,7 +210,7 @@ public class BES {
         String getLogContextsCmd = getSimpleBesAdminCommand("GetLogContexts");
 
         String besResponse = executeBesAdminCommand(getLogContextsCmd);
-        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes( HyraxStringEncoding.getCharset()));
 
         SAXBuilder saxBuilder = new SAXBuilder(false);
 
@@ -255,7 +256,7 @@ public class BES {
         String setLoggerStateCmd = getSetBesLoggersStateCommand(loggerName, loggerState);
 
         String besResponse = executeBesAdminCommand(setLoggerStateCmd);
-        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes( HyraxStringEncoding.getCharset()));
 
         SAXBuilder saxBuilder = new SAXBuilder(false);
 

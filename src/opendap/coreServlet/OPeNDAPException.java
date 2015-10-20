@@ -27,10 +27,12 @@
 package opendap.coreServlet;
 
 
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -43,6 +45,8 @@ import java.io.*;
  * @author ndp
  */
 public class OPeNDAPException extends Exception {
+
+    Logger _log;
 
     /**
      * Undefined error.
@@ -95,6 +99,7 @@ public class OPeNDAPException extends Exception {
         // this should never be seen, since this class overrides getMessage()
         // to display its own error message.
         super("OPeNDAPException");
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**
@@ -108,6 +113,7 @@ public class OPeNDAPException extends Exception {
         super(msg);
         errorCode = UNKNOWN_ERROR;
         errorMessage = msg;
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -122,6 +128,7 @@ public class OPeNDAPException extends Exception {
         super(msg, cause);
         errorCode = UNKNOWN_ERROR;
         errorMessage = msg;
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -137,6 +144,7 @@ public class OPeNDAPException extends Exception {
         super(cause);
         errorCode = UNKNOWN_ERROR;
         errorMessage = cause.getMessage();
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -150,6 +158,7 @@ public class OPeNDAPException extends Exception {
         super(msg);
         errorCode = code;
         errorMessage = msg;
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -225,7 +234,7 @@ public class OPeNDAPException extends Exception {
      *
      * @param os the <code>PrintWriter</code> to use for output.
      */
-    public void print(PrintWriter os) {
+    public void print(PrintStream os) {
 
         os.println(getDAP2Error(errorCode,errorMessage));
     }
@@ -234,12 +243,18 @@ public class OPeNDAPException extends Exception {
      * Print the DAP2 Error object on the given <code>OutputStream</code>.
      *
      * @param os the <code>OutputStream</code> to use for output.
-     * @see OPeNDAPException#print(PrintWriter)
      */
     public final void print(OutputStream os) {
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
-        print(pw);
-        pw.flush();
+        try {
+            PrintStream pw;
+            pw = new PrintStream(os, true,  HyraxStringEncoding.getCharset().name());
+            print(pw);
+            pw.flush();
+        } catch (UnsupportedEncodingException e) {
+            // Oh well...
+            _log.error("Unable to print error because the character set '{}' is an unsupported encoding. msg: {}",
+                    HyraxStringEncoding.getCharset().displayName(), e.getMessage());
+        }
     }
 
 
@@ -263,9 +278,9 @@ public class OPeNDAPException extends Exception {
 
 
             ByteArrayOutputStream baos =new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream( baos);
+            PrintStream ps = new PrintStream( baos,  true, HyraxStringEncoding.getCharset().name());
             t.printStackTrace(ps);
-            log.debug(baos.toString());
+            log.debug(baos.toString(HyraxStringEncoding.getCharset().name()));
 
             OPeNDAPException oe;
 

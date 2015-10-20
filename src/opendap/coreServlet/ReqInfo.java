@@ -29,6 +29,7 @@ package opendap.coreServlet;
 
 
 import opendap.dap.Request;
+import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -330,7 +331,7 @@ public class ReqInfo {
 
         // Using the scanner with the \A delimiter basically says "from the beginning of the input"
         // So then we get one big token from teh scanner and (see comment below)
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharset().name()).useDelimiter("\\A");
 
         // Since the Scanner is going to make one token from the whole shebang, either the  InputStream
         // is empty (in which case we return an empty string, or it's not empty and we return the single token.

@@ -27,6 +27,7 @@
 package opendap.bes;
 
 import opendap.coreServlet.Scrub;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -499,7 +500,7 @@ public class BESConfig  {
     public static void userConfigure(BESConfig bc) throws IOException {
         boolean done = false;
         String k;
-        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in, HyraxStringEncoding.getCharset()));
 
         while(!done){
 
@@ -542,7 +543,7 @@ public class BESConfig  {
     public static void config(BESConfig bc) throws IOException {
 
         String k;
-        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in, HyraxStringEncoding.getCharset()));
         boolean done;
 
 

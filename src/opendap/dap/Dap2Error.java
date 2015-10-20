@@ -41,10 +41,11 @@
 package opendap.dap;
 
 
-import java.io.BufferedWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import opendap.io.HyraxStringEncoding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 
 /**
  * Holds an exception thrown by OPeNDAP server to a client.
@@ -64,6 +65,9 @@ import java.io.PrintWriter;
  *
  */
 public class Dap2Error extends Exception {
+
+    Logger _log;
+
 
     /**
      * Undefined error.
@@ -153,6 +157,7 @@ public class Dap2Error extends Exception {
         // this should never be seen, since this class overrides getMessage()
         // to display its own error message.
         super("Dap2Error");
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**
@@ -162,6 +167,7 @@ public class Dap2Error extends Exception {
         this();
         errorCode = UNKNOWN_ERROR;
         errorMessage = msg;
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -175,6 +181,7 @@ public class Dap2Error extends Exception {
         this();
         errorCode = code;
         errorMessage = msg;
+        _log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**
@@ -264,7 +271,7 @@ public class Dap2Error extends Exception {
      *
      * @param os the <code>PrintWriter</code> to use for output.
      */
-    public void print(PrintWriter os) {
+    public void print(PrintStream os) {
         os.println("Error {");
         os.println("    code = " + errorCode + ";");
 
@@ -282,12 +289,19 @@ public class Dap2Error extends Exception {
      * Print the Error message on the given <code>OutputStream</code>.
      *
      * @param os the <code>OutputStream</code> to use for output.
-     * @see Dap2Error#print(PrintWriter)
+     * @see Dap2Error#print(PrintStream)
      */
     public final void print(OutputStream os) {
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
-        print(pw);
-        pw.flush();
+        PrintStream pw = null;
+        try {
+            pw = new PrintStream(os, true, HyraxStringEncoding.getCharset().name());
+            print(pw);
+            pw.flush();
+        } catch (UnsupportedEncodingException e) {
+            // Oh well...
+            _log.error("Unable to print error because the character set '{}' is an unsupported encoding. msg: {}",
+                    HyraxStringEncoding.getCharset().displayName(), e.getMessage());
+        }
     }
 }
 

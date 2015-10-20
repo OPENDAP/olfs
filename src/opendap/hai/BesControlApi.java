@@ -32,6 +32,7 @@ import opendap.bes.BesGroup;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
+import opendap.io.HyraxStringEncoding;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -157,7 +158,7 @@ public class BesControlApi extends HttpResponder {
 
         StringBuilder s = new StringBuilder();
         SAXBuilder sb = new SAXBuilder(false);
-        ByteArrayInputStream bais = new ByteArrayInputStream(status.getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream(status.getBytes(HyraxStringEncoding.getCharset()));
 
 
         try {
@@ -199,7 +200,7 @@ public class BesControlApi extends HttpResponder {
 
         StringBuilder s = new StringBuilder();
         SAXBuilder sb = new SAXBuilder(false);
-        ByteArrayInputStream bais = new ByteArrayInputStream(logResponse.getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream(logResponse.getBytes(HyraxStringEncoding.getCharset()));
 
 
         try {

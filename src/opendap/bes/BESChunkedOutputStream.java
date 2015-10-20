@@ -27,6 +27,7 @@ package opendap.bes;
 
 import opendap.io.Chunk;
 import opendap.io.ChunkedOutputStream;
+import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTSessionProtocol;
 import org.slf4j.Logger;
 
@@ -80,7 +81,7 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
 
         // send extension chunk with BES/PPT exit command
         setChunkTypeToEXTENSION();
-        write(exitMsg.getBytes());
+        write(exitMsg.getBytes( HyraxStringEncoding.getCharset()));
         log.debug("close() - SENT extension chunk with BES/PPT exit command.");
         log.debug("close() - Flushing Cache.");
         flushCache();

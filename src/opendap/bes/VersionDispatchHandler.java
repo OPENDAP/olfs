@@ -29,6 +29,7 @@ package opendap.bes;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
+import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -170,7 +171,7 @@ public class VersionDispatchHandler implements DispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        PrintStream ps = new PrintStream(response.getOutputStream());
+        PrintStream ps = new PrintStream(response.getOutputStream(), false,  HyraxStringEncoding.getCharset().name());
 
         Document vdoc = _besApi.getCombinedVersionDocument();
 

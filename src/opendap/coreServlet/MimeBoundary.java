@@ -25,6 +25,8 @@
  */
 package opendap.coreServlet;
 
+import opendap.io.HyraxStringEncoding;
+
 import java.rmi.server.UID;
 
 /**
@@ -101,7 +103,7 @@ public class MimeBoundary {
     public static String newUidString(){
         UID uid = new UID();
 
-        byte[] val = uid.toString().getBytes();
+        byte[] val = uid.toString().getBytes(HyraxStringEncoding.getCharset());
 
         StringBuilder suid  = new StringBuilder();
         int v;

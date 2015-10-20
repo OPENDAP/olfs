@@ -317,7 +317,7 @@ public class AggregationServlet extends HttpServlet {
         ByteArrayOutputStream errors = new ByteArrayOutputStream();
 
         if (!_besApi.writeFile(granule, os, errors)) {
-            String msg = new String(errors.toByteArray());
+            String msg = new String(errors.toByteArray(), HyraxStringEncoding.getCharset());
             os.write(msg.getBytes());
 
             _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
@@ -404,7 +404,7 @@ public class AggregationServlet extends HttpServlet {
             // some function, e.g., the CE is bad, that error message will be used
             // as the value of the file in the Zip archive. This provides a way for
             // most of a request to work even if some of the files are broken.
-            String msg = new String(errors.toByteArray());
+            String msg = new String(errors.toByteArray(), HyraxStringEncoding.getCharset());
 
             os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
