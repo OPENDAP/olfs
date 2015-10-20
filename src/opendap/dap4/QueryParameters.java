@@ -137,7 +137,7 @@ public class QueryParameters {
         Map<String,String[]> params = new HashMap<>();
         params.putAll(req.getParameterMap());
 
-        if(params !=null ){
+        if(!params.isEmpty()){
             String asyncHttpHeader = req.getHeader("X-DAP-Async-Accept");
 
 
