@@ -318,7 +318,7 @@ public class AggregationServlet extends HttpServlet {
 
         if (!_besApi.writeFile(granule, os, errors)) {
             String msg = new String(errors.toByteArray(), HyraxStringEncoding.getCharset());
-            os.write(msg.getBytes());
+            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
             _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
         }
