@@ -51,8 +51,6 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
