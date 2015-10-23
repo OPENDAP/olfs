@@ -216,7 +216,7 @@ public class FileAccess extends Dap4Responder {
 
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");
         pw.println("<head>  ");
-        pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />");
+        pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />");
         pw.println("    <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css' />");
         pw.println("<title>Hyrax:  Access Denied</title>");
         pw.println("</head>");

@@ -102,7 +102,7 @@ public class LicenseManager {
 
         pageContent.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
         pageContent.append("<head>");
-        pageContent.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />");
+        pageContent.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />");
         pageContent.append("    <link rel='stylesheet' href='").append(contextPath).append("/docs/css/contents.css' type='text/css' />");
         pageContent.append("<title>Hyrax:  License Expired</title>");
         pageContent.append("</head>");

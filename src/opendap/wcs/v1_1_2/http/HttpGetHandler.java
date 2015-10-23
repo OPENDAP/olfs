@@ -330,7 +330,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     private XdmNode getServerIDs(DocumentBuilder build) throws SaxonApiException {
 
 
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        String nodeString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         nodeString += "<ServerIDs>";
 
         String serverID;

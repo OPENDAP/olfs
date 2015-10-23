@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -43,7 +43,7 @@
         <html>
             <head>
                 <meta http-equiv="Content-Type"
-                      content="text/html; charset=ISO-8859-1"/>
+                      content="text/html; charset=UTF-8"/>
                 <link rel='stylesheet' href='{$serviceContext}{$docsService}/css/contents.css'
                       type='text/css' />
                 <title>Hyrax: Bad Request</title>

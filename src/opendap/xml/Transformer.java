@@ -338,7 +338,7 @@ public class Transformer {
 
     public void setParameter(String name, String value) throws SaxonApiException {
         // Build the remoteHost parameter to pass into the XSLT
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        String nodeString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         nodeString += "<"+name+">" + value + "</"+name+">";
         ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes(HyraxStringEncoding.getCharset()));
         XdmNode valueNode = build(new StreamSource(reader));
@@ -354,7 +354,7 @@ public class Transformer {
 
     public void setImportXMLParameter(String name, String importFile) throws SaxonApiException {
         // Build the remoteHost parameter to pass into the XSLT
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        String nodeString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         nodeString += "<"+name+" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" >" +
                       "<xsl:import href=\""+ importFile +"\" />" + "SMOOTCHYSMOOTCHYWOO"+
                       "</"+name+">";

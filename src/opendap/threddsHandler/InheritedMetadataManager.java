@@ -69,7 +69,7 @@ public class InheritedMetadataManager {
      * computed for each applicable service and added  to the response.
      */
     private static String transform =
-            "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                     "<!DOCTYPE xsl:stylesheet []>\n" +
                     "<xsl:stylesheet version=\"2.0\"\n" +
                     "                xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +

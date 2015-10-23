@@ -529,7 +529,7 @@ public class WebStartServlet extends HttpServlet {
 
         for(JwsHandler jwsh : jwsHandlers){
             if(nodeString==null)
-                nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><WebStartApplications>";
+                nodeString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><WebStartApplications>";
 
             nodeString +=  "<wsApp id=\"" +jwsh.getServiceId()+"\" applicationName=\""+jwsh.getName()+"\" />";
         }
