@@ -1,3 +1,7 @@
+Version 1.14.1 (28 October 2015)
+
+  Worked uner the hood to ensure tat Hyrax's character encoding is actually UTF-8.
+
 Version 1.14.0 (21 September 2015)
 
   Rollback from Java 8 requirement. Now only Java 7 is needed for the OLFS and Hyrax.

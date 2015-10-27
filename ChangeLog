@@ -1,3 +1,81 @@
+2015-10-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Switched to UTF-8 encoding.
+
+2015-10-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped unused imports
+
+	olfs: Conversion to UTF-8 Charset.
+
+2015-10-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Conversion to UTF-8 Charset.
+
+	Fixed test target for newly functioning test
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-9 Charset.
+
+	olfs: More comments.
+
+	olfs: Started managing the String encodings of the Hyrax output. Previously this has been left to the platform's default encoding. Now it will be specified.
+
+	olfs: Comments added to viewers.xml
+
+	olfs: Repaired bad test in the ingest method.
+
+	Commented out WMS and Godiva configurations in default config. This way they are not enabled in the default distribution.
+
+2015-09-21  Nathan Potter  <ndp@opendap.org>
+
+	Updated ChangeLog
+
+2015-09-17  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'version-1.14' of https://github.com/opendap/olfs into version-1.14
+2015-10-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Switched to UTF-8 encoding.
+
+2015-10-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped unused imports
+
+	olfs: Conversion to UTF-8 Charset.
+
+2015-10-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Conversion to UTF-8 Charset.
+
+	Fixed test target for newly functioning test
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-9 Charset.
+
+	olfs: More comments.
+
+	olfs: Started managing the String encodings of the Hyrax output. Previously this has been left to the platform's default encoding. Now it will be specified.
+
+	olfs: Comments added to viewers.xml
+
+	olfs: Repaired bad test in the ingest method.
+
+	Commented out WMS and Godiva configurations in default config. This way they are not enabled in the default distribution.
+
+2015-09-21  Nathan Potter  <ndp@opendap.org>
+
+	Updated ChangeLog
+
+2015-09-17  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'version-1.14' of https://github.com/opendap/olfs into version-1.14
 commit 53258ff2731e99983aafb5a5aa468ef4142dada5
 Merge: c514cf7 48a6ec9
 Author: James Gallagher <jgallagher@opendap.org>
