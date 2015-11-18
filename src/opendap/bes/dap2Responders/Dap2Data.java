@@ -108,7 +108,17 @@ public class Dap2Data extends Dap4Responder {
 
         QueryParameters qp = new  QueryParameters(request);
 
-        String dap2CE = qp.getQueryRemainder();
+
+        // Here we must use the ReqInfo.getConstraintExpression() call
+        // because tht is where the {}{}{} notation support is located.
+        // Using the query remainder, post DAP4 processing:
+        //
+        //   String dap2CE = qp.getQueryRemainder();
+        //
+        // Will only work if we migrate the {}{}{} support into
+        // the  QueryParameters class.
+        //
+        String dap2CE = ReqInfo.getConstraintExpression(request);
 
         User user = new User(request);
 
