@@ -593,7 +593,7 @@
     <!--            Actions Buttons Row           -->
     <xsl:template name="dataRequestButtonsRow">
         <tr>
-            <td align="right"><div class="medium_bold"><a href="opendap_form_help.html#disposition" target="help">Actions</a> </div>
+            <td align="right"><div class="medium_bold"><a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition" target="help">Actions</a> </div>
             </td>
             <td >
                 <div style="width:100%;margin-left:10px;">
@@ -616,7 +616,7 @@
         <xsl:param name="datasetUrl"/>
         <tr>
             <td align="right">
-                <div class="medium_bold"><a href="opendap_form_help.html#data_url" target="help">Data URL</a> </div>
+                <div class="medium_bold"><a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url" target="help">Data URL</a> </div>
             </td>
             <td>
                 <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"></input>
@@ -630,7 +630,7 @@
     <xsl:template name="globalAttributesRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
-                <div class="medium_bold" ><a href="opendap_form_help.html#global_attr" target="help">Global Attributes</a> </div>
+                <div class="medium_bold" ><a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr" target="help">Global Attributes</a> </div>
             </td>
             <td width="100%">
                 <div style="width:100%;margin-left:10px;">
@@ -657,7 +657,7 @@
     <xsl:template name="VariablesRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
-                <div class="medium_bold"><a href="opendap_form_help.html#dataset_variables" target="help">Variables</a> </div>
+                <div class="medium_bold"><a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables" target="help">Variables</a> </div>
             </td>
            
             <td >
@@ -673,7 +673,7 @@
     <xsl:template name="DimensionsRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
-                <div class="medium_bold"><a href="opendap_form_help.html#shared_dimesions" target="help">Shared Dimensions</a> </div>
+                <div class="medium_bold"><a href="http://www.opendap.org/online_help_files/opendap_form_help.html#shared_dimesions" target="help">Shared Dimensions</a> </div>
             </td>
 
             <td >
