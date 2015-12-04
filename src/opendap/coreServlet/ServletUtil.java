@@ -61,8 +61,8 @@ public class ServletUtil {
      * @param servlet  The HttpServlet that is running.
      * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
-    public static String getContentPath(HttpServlet servlet) {
-      return getContentPath(servlet.getServletContext());
+    public static String getConfigPath(HttpServlet servlet) {
+      return getConfigPath(servlet.getServletContext());
     }
 
 
@@ -82,7 +82,49 @@ public class ServletUtil {
      * @param sc  The ServletContext for this servlet that is running.
      * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
-    public static String getContentPath(ServletContext sc) {
+    public static String getConfigPath(ServletContext sc) {
+
+        //*
+        String envVarName = "OLFS_CONFIG_DIR";
+        String defaultConfigDir = "/etc/olfs/";
+        String webappConfDir = "WEB-INF/conf";
+
+        String configDirName = System.getenv(envVarName);
+
+
+        if(configDirName==null){
+            log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
+            configDirName = defaultConfigDir;
+        }
+
+        if(!configDirName.endsWith("/")){
+            configDirName += "/";
+        }
+
+        File configDir = new File(configDirName);
+
+        if(configDir.exists() && configDir.isDirectory()) {
+            log.info("Using config location: " + configDirName);
+            return configDirName;
+        }
+
+        configDirName = sc.getRealPath(webappConfDir);
+
+        log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}",configDirName );
+
+        String configPath="FAILED_To_Determine_Config_Path!";
+
+        File cf = new File( configDirName );
+        try{
+            configPath = cf.getCanonicalPath() +"/";
+          // @TODO Understand (again) why the backslash replacement happens below and investigate if ask for a path separator from some java api the way to go.
+            configPath = configPath.replace('\\','/');
+        } catch (IOException e) {
+            log.error("Failed to produce a config path! Error: "+e.getMessage());
+         }
+
+
+        /*
         String contentPath="FAILED_To_Determine_Content_Path!";
         String tmpContentPath = "../../content" + sc.getContextPath() + "/";
         String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
@@ -95,70 +137,16 @@ public class ServletUtil {
             log.error("Failed to produce a content path! Error: "+e.getMessage());
          }
         log.debug("content path: '"+contentPath+"'");
-      return contentPath;
+
+        */
+
+
+      return configPath;
     }
 
 
 
 
-    /**
-     * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
-     * keep service related content such as:
-     *   <ui>
-     *     <li>Configuration information</li>
-     *     <li>THREDDS catalog files.</li>
-     *     <li>Log files</li>
-     *   </ui>
-     *
-     * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
-     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
-     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
-     *
-     * @param sc  The ServletContext for this servlet that is running.
-     * @return  A String containing the content path (aka the peristent content path) for the web application.
-     */
-    public static String getConfigPath(ServletContext sc, String configDirPropertyName) {
-
-
-
-        String confDir = System.getProperty(configDirPropertyName);
-
-        if(confDir!=null) {
-            if(pathIsGood(confDir)){
-                return confDir;
-            }
-        }
-
-        confDir  = "/etc/olfs"+ sc.getContextPath();
-        if(pathIsGood(confDir)){
-            return confDir;
-        }
-
-        confDir ="FAILED_To_Determine_Config_Path!";
-        String webappConfig = "WEB-INF/conf/";
-
-        String filename =  Scrub.fileName(getRootPath(sc) + webappConfig);
-
-        File cf = new File( filename );
-        try{
-            confDir = cf.getCanonicalPath() +"/";
-            confDir = confDir.replace('\\','/');
-
-        } catch (IOException e) {
-            log.error("Failed to produce a confDir! Error: "+e.getMessage());
-         }
-        log.debug("confDir: '"+confDir+"'");
-      return confDir;
-    }
-
-    private static boolean pathIsGood(String path){
-
-        File confDirPath = new File(path);
-
-        return  confDirPath.exists() || confDirPath.canRead();
-
-
-    }
 
 
 
@@ -254,7 +242,7 @@ public class ServletUtil {
     public static String toString(HttpServlet servlet){
         StringBuilder s = new StringBuilder("ServletUtil:\n");
 
-        s.append("    getContentPath(): ").append(getContentPath(servlet)).append("\n");
+        s.append("    getContentPath(): ").append(getConfigPath(servlet)).append("\n");
         s.append("    getContextPath(): ").append(getContextPath(servlet)).append("\n");
         s.append("    getRootPath(): ").append(getRootPath(servlet)).append("\n");
         s.append("    getSystemPath(): ").append(getSystemPath(servlet, "/")).append("\n");

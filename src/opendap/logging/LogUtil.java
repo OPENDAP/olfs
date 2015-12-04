@@ -89,7 +89,7 @@ public class LogUtil {
         ServletContext servletContext = servlet.getServletContext();
 
         // set up the log path
-        String logPath = ServletUtil.getContentPath(servlet) + "logs";
+        String logPath = ServletUtil.getConfigPath(servlet) + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
             if (!logPathFile.mkdirs()) {
@@ -104,10 +104,10 @@ public class LogUtil {
 
             String logbackConfig = servletContext.getInitParameter("logbackConfig");
             if (logbackConfig == null){
-                logbackConfig = ServletUtil.getContentPath(servlet) + "logback-test.xml";
+                logbackConfig = ServletUtil.getConfigPath(servlet) + "logback-test.xml";
                 File f = new File(logbackConfig);
                 if (!f.exists()) {
-                    logbackConfig = ServletUtil.getContentPath(servlet) + "logback.xml";
+                    logbackConfig = ServletUtil.getConfigPath(servlet) + "logback.xml";
                     f = new File(logbackConfig);
                     if (!f.exists()) {
                         logbackConfig = ServletUtil.getRootPath(servlet) + "WEB-INF/logback.xml";

@@ -690,7 +690,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
-        String contentPath = ServletUtil.getContentPath(servlet);
+        String contentPath = ServletUtil.getConfigPath(servlet);
         CatalogManager.init(contentPath, ingestTransformFile, besCatalogToDatasetScanCatalogTransformFile, _besApi);
 
 

@@ -141,7 +141,7 @@ public class DispatchServlet extends HttpServlet {
         LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
-        PersistentContentHandler.installInitialContent(this);
+        PersistentContentHandler.installDefaultContent(this);
 
 
         loadConfig();
@@ -219,7 +219,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         log.debug("Loading Configuration File: " + filename);
 

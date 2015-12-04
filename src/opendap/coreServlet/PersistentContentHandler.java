@@ -33,22 +33,27 @@ import javax.servlet.http.HttpServlet;
 import java.io.*;
 
 /**
- * Provides methods for detecting the presence of the peristent content directory and moving an initial
- * copy of the persistent content to that directory if it does not already exist.
+ * Provides methods for detecting the presence of a localized content directory and moving an initial
+ * copy of the default content to that directory if it does not already exist.
  */
 public class PersistentContentHandler {
 
     private static Logger log;
+
+    private static String defaultContentLocation="WEB-INF/conf/";
+
+
+
     static{
         log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
     }
 
     /**
-     * Checks to see if the persistent content directory exists, if it doesn't it is created and populated
+     * Checks to see if the local content directory exists, if it doesn't it is created and populated
      * with initial content from the distribution.
      * @param servlet
      */
-    public static void installInitialContent(HttpServlet servlet) {
+    public static void installDefaultContent(HttpServlet servlet) {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
 
@@ -56,24 +61,24 @@ public class PersistentContentHandler {
         String semaphore = ".INIT";
 
         log.debug("PersistentContentHandler:");
-        log.debug("    contentPath:        " + ServletUtil.getContentPath(servlet));
-        log.debug("    initialContentPath: " + getInitialContentPath(servlet));
+        log.debug("    contentPath:        " + ServletUtil.getConfigPath(servlet));
+        log.debug("    initialContentPath: " + getDefaultContentPath(servlet));
         log.debug("    semaphore:          " + semaphore);
 
 
         // -------------
         // first time, create content directory
-        String initialContentPath = getInitialContentPath(servlet);
+        String initialContentPath = getDefaultContentPath(servlet);
         File initialContentFile = new File(initialContentPath);
 
         if (initialContentFile.exists()) {
             try {
-                if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getContentPath(servlet), semaphore)) {
-                    log.info("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
+                if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getConfigPath(servlet), semaphore)) {
+                    log.info("Copied default content directory " + initialContentPath + " to " + ServletUtil.getConfigPath(servlet));
                 }
             }
             catch (IOException ioe) {
-                    log.error("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet),ioe);
+                    log.error("Failed to copy default content directory " + initialContentPath + " to " + ServletUtil.getConfigPath(servlet),ioe);
             }
         }
         //-------------
@@ -90,8 +95,8 @@ public class PersistentContentHandler {
       File contentFile = new File(toDir+semaphore);
       if (!contentFile.exists()) {
         copyDirTree(fromDir, toDir);
-        if(!contentFile.createNewFile()){
-            String msg = "FAILED to create semaphore file '"+contentFile.getAbsolutePath()+"'";
+        if(!contentFile.exists()){
+            String msg = "FAILED to locate semaphore file '"+contentFile.getAbsolutePath()+"'";
             log.error("copyDirTree() - {}",msg);
             throw new IOException(msg);
 
@@ -109,8 +114,8 @@ public class PersistentContentHandler {
   *
   */
 
-    private static String getInitialContentPath(HttpServlet servlet) {
-      return ServletUtil.getRootPath(servlet) + "initialContent/";
+    private static String getDefaultContentPath(HttpServlet servlet) {
+      return ServletUtil.getRootPath(servlet) + defaultContentLocation;
     }
 
 

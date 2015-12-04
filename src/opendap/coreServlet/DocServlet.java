@@ -62,7 +62,7 @@ public class DocServlet extends HttpServlet {
 
         reqNumber = new AtomicInteger(0);
 
-        String dir = ServletUtil.getContentPath(this) + "docs";
+        String dir = ServletUtil.getConfigPath(this) + "docs";
 
         File f = new File(dir);
 

@@ -78,7 +78,7 @@ public class Servlet extends HttpServlet {
         String resourcePath = ServletUtil.getSystemPath(this, "/");
         log.debug("resourcePath: "+resourcePath);
 
-        String contentPath = ServletUtil.getContentPath(this);
+        String contentPath = ServletUtil.getConfigPath(this);
         log.debug("contentPath: "+contentPath);
 
         String configFilename = this.getInitParameter("ConfigFileName");

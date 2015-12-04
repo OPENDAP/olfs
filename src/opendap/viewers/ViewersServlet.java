@@ -104,7 +104,7 @@ public class ViewersServlet extends HttpServlet {
 
         reqNumber = new AtomicInteger(0);
 
-        String webStartDir = ServletUtil.getContentPath(this) + "WebStart";
+        String webStartDir = ServletUtil.getConfigPath(this) + "WebStart";
 
         File f = new File(webStartDir);
 
@@ -163,7 +163,7 @@ public class ViewersServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         _log.debug("Loading Dataset Viewers Configuration File: " + filename);
 
