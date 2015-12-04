@@ -95,17 +95,20 @@ public class ServletUtil {
         if(configDirName==null){
             log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
             configDirName = defaultConfigDir;
+            if(pathIsGood(defaultConfigDir)){
+                log.info("Using config location: " + configDirName);
+                return defaultConfigDir;
+            }
         }
+        else {
 
-        if(!configDirName.endsWith("/")){
-            configDirName += "/";
-        }
-
-        File configDir = new File(configDirName);
-
-        if(configDir.exists() && configDir.isDirectory()) {
-            log.info("Using config location: " + configDirName);
-            return configDirName;
+            if (!configDirName.endsWith("/")) {
+                configDirName += "/";
+            }
+            if (pathIsGood(configDirName)) {
+                log.info("Using config location: " + configDirName);
+                return configDirName;
+            }
         }
 
         configDirName = sc.getRealPath(webappConfDir);
@@ -142,6 +145,14 @@ public class ServletUtil {
 
 
       return configPath;
+    }
+    private static boolean pathIsGood(String path){
+
+        File confDirPath = new File(path);
+
+        return  confDirPath.exists() || confDirPath.canRead();
+
+
     }
 
 
