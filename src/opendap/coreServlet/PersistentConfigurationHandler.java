@@ -33,10 +33,10 @@ import javax.servlet.http.HttpServlet;
 import java.io.*;
 
 /**
- * Provides methods for detecting the presence of a localized content directory and moving an initial
- * copy of the default content to that directory if it does not already exist.
+ * Provides methods for detecting the presence of a localized configuration directory and moving an initial
+ * copy of the default configuration to that directory if it does not already exist.
  */
-public class PersistentContentHandler {
+public class PersistentConfigurationHandler {
 
     private static Logger log;
 
@@ -45,7 +45,7 @@ public class PersistentContentHandler {
 
 
     static{
-        log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+        log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
     }
 
     /**
@@ -53,9 +53,9 @@ public class PersistentContentHandler {
      * with initial content from the distribution.
      * @param servlet
      */
-    public static void installDefaultContent(HttpServlet servlet) {
+    public static void installDefaultConfiguration(HttpServlet servlet) {
 
-        Logger log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+        Logger log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
 
         //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
@@ -63,13 +63,13 @@ public class PersistentContentHandler {
 
         log.debug("PersistentContentHandler:");
         log.debug("    contentPath:        " + ServletUtil.getConfigPath(servlet));
-        log.debug("    initialContentPath: " + getDefaultContentPath(servlet));
+        log.debug("    initialContentPath: " + getDefaultConfigurationPath(servlet));
         log.debug("    semaphore:          " + semaphore);
 
 
         // -------------
         // first time, create content directory
-        String initialContentPath = getDefaultContentPath(servlet);
+        String initialContentPath = getDefaultConfigurationPath(servlet);
         File initialContentFile = new File(initialContentPath);
 
         if (initialContentFile.exists()) {
@@ -115,7 +115,7 @@ public class PersistentContentHandler {
   *
   */
 
-    private static String getDefaultContentPath(HttpServlet servlet) {
+    private static String getDefaultConfigurationPath(HttpServlet servlet) {
       return ServletUtil.getRootPath(servlet) + defaultContentLocation;
     }
 

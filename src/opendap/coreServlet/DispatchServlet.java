@@ -141,7 +141,7 @@ public class DispatchServlet extends HttpServlet {
         LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
-        PersistentContentHandler.installDefaultContent(this);
+        PersistentConfigurationHandler.installDefaultConfiguration(this);
 
 
         loadConfig();

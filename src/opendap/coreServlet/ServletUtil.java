@@ -127,7 +127,9 @@ public class ServletUtil {
          }
 
 
-        /*
+        /**
+         * OLD WAY - used a path relative application's deployment dir which sux for rpm installed Tomcat
+         *
         String contentPath="FAILED_To_Determine_Content_Path!";
         String tmpContentPath = "../../content" + sc.getContextPath() + "/";
         String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
