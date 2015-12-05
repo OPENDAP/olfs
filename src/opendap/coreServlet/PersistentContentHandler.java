@@ -57,6 +57,7 @@ public class PersistentContentHandler {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
 
+        //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
         String semaphore = ".INIT";
 
