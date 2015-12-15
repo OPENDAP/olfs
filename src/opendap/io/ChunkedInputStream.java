@@ -122,9 +122,9 @@ public class ChunkedInputStream  {
 
 
         log.debug("Chunk Data Size: " + currentChunkDataSize +
-                           "    Chunk Type: "+(char)currentChunkType);
+                           "    Chunk Type: "+ (char)currentChunkType);
 
-        chunkReadPosition = 0;
+         chunkReadPosition = 0;
 
         if(largestChunkDataSize< currentChunkDataSize)
             largestChunkDataSize = currentChunkDataSize;

@@ -274,14 +274,40 @@ public class NewPPTClient {
      * A false value will simple cause the client to close connections with out informing the server.
      */
     public void closeConnection(boolean informServer) {
+
+        String msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
+
+        /*
         try {
-            if(informServer && _out != null)
+            if (!_mySock.isClosed()) {
+                InputStream is = _mySock.getInputStream();
+                _mySock.shutdownOutput();  // Send 'FIN' to the other end of TCP connection
+                while (is != null && is.read() >= 0) ;     // Drain the pipe
+                _mySock.close();           // Close the socket
+
+            }
+        }
+        catch (IOException se) {
+            log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
+        }
+        */
+
+
+        log.error(msg);
+        try {
+            if(informServer && _out != null) {
                 _out.close();
-            _out = null;
+            }
         }
         catch (IOException e) {
             log.error("closeConnection(): Unable to inform server that client is exiting, continuing. Base message: '" + e.getMessage()+"'");
         }
+        finally {
+            _out = null;
+        }
+
+        msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
+        log.error(msg);
 
         try {
             if (_in != null)
@@ -291,14 +317,30 @@ public class NewPPTClient {
         catch (IOException e) {
             log.error("closeConnection(): Unable to close input stream, continuing. Base message: '" + e.getMessage()+"'");
         }
+        finally {
+            _in = null;
+        }
+        msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
+        log.error(msg);
 
         try {
-            if (_mySock != null)
-                _mySock.close();
-            _mySock = null;
+            if (_mySock != null) {
+                InputStream is = null;
+                try {
+                    is = _mySock.getInputStream();
+                } catch (SocketException se) {
+                    log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
+                }
+                _mySock.shutdownOutput();  // Send 'FIN' to the other end of TCP connection
+                while(is!=null && is.read() >=0) ;     // Drain the pipe
+                _mySock.close();           // Close the socket
+            }
         }
         catch (IOException e) {
             log.error("closeConnection(): Unable to close socket, continuing. Base message: '" + e.getMessage()+"'");
+        }
+        finally {
+            _mySock = null;
         }
     }
 
@@ -343,8 +385,7 @@ public class NewPPTClient {
         }
         catch (IOException e) {
             closeConnection(true);
-            throw new PPTException("Cannot read response from designated " +
-                    "stream. ", e);
+            throw new PPTException("Cannot read response from designated stream. ", e);
         }
     }
 
@@ -363,7 +404,7 @@ public class NewPPTClient {
             _out.finish();
             _out.flush();
         } catch (IOException e) {
-            String msg = "Failed to write to socket:  ";
+            String msg = "Failed to write to socket: ";
             msg += e.getMessage();
             closeConnection(false);
             throw new PPTException(msg, e);

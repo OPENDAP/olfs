@@ -694,6 +694,7 @@ public class BES {
     public boolean besTransaction(Document request, Document response )
             throws IOException, PPTException, BadConfigurationException, JDOMException {
 
+        log.debug("besTransaction() -  BEGIN.");
 
         boolean trouble = false;
         Document doc;
@@ -794,7 +795,7 @@ public class BES {
             returnClient(oc, trouble);
 
             Timer.stop(timedProc);
-            log.debug("besTransaction complete.");
+            log.debug("besTransaction() -  END.");
         }
 
 
@@ -856,7 +857,7 @@ public class BES {
 
 
 
-        log.debug("besTransaction() started.");
+        log.debug("besTransaction() - Started.");
         log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
 
 
@@ -877,7 +878,9 @@ public class BES {
         Procedure timedProc = Timer.start();
 
         try {
-            return oc.sendRequest(request,os,err);
+            boolean result = oc.sendRequest(request,os,err);
+            log.debug("besGetTransaction() - Complete.");
+            return result;
 
         }
         catch (PPTException e) {
@@ -889,14 +892,14 @@ public class BES {
                     "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
             log.error(msg);
 
+
+            err.write(msg.getBytes(HyraxStringEncoding.getCharset()));
             throw new PPTException(msg,e);
         }
         finally {
             returnClient(oc, besTrouble);
 
             Timer.stop(timedProc);
-
-            log.debug("besGetTransaction complete.");
 
         }
 

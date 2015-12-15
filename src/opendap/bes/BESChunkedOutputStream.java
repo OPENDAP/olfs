@@ -94,7 +94,7 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
 
         // Close underlying stream
         log.debug("close() - closing underlying stream.");
-        _rawOS.close();
+        _rawOS.close(); // This call will close any associated socket.
         log.debug("close() - closed underlying stream.");
 
         // Flag this Chunked stream as closed.
