@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import java.io.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provides methods for detecting the presence of a localized configuration directory and moving an initial
@@ -41,6 +42,8 @@ public class PersistentConfigurationHandler {
     private static Logger log;
 
     private static String defaultContentLocation="WEB-INF/conf/";
+
+    private static final ReentrantLock _installDefaultConfigLock = new ReentrantLock();
 
 
 
@@ -55,34 +58,41 @@ public class PersistentConfigurationHandler {
      */
     public static void installDefaultConfiguration(HttpServlet servlet) {
 
-        Logger log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
 
-        //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
+        _installDefaultConfigLock.lock();     // Only one thread allowed in at a time.
+        try {
 
-        String semaphore = ".INIT";
+            //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
-        log.debug("PersistentContentHandler:");
-        log.debug("    contentPath:        " + ServletUtil.getConfigPath(servlet));
-        log.debug("    initialContentPath: " + getDefaultConfigurationPath(servlet));
-        log.debug("    semaphore:          " + semaphore);
+            String semaphore = ".INIT";
+
+            log.debug("PersistentContentHandler:");
+            log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
+            log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
+            log.debug("    semaphore:                " + semaphore);
+            log.debug("    ThreadName:               " + Thread.currentThread().getName());
 
 
-        // -------------
-        // first time, create content directory
-        String initialContentPath = getDefaultConfigurationPath(servlet);
-        File initialContentFile = new File(initialContentPath);
+            // -------------
+            // first time, create content directory
+            String defaultConfigurationPath = getDefaultConfigurationPath(servlet);
+            File defaultConfigurationFile = new File(defaultConfigurationPath);
 
-        if (initialContentFile.exists()) {
-            try {
-                if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getConfigPath(servlet), semaphore)) {
-                    log.info("Copied default content directory " + initialContentPath + " to " + ServletUtil.getConfigPath(servlet));
+            if (defaultConfigurationFile.exists()) {
+                try {
+                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphore)) {
+                        log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
+                    } else {
+                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
+                    }
+                } catch (IOException ioe) {
+                    log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
                 }
             }
-            catch (IOException ioe) {
-                    log.error("Failed to copy default content directory " + initialContentPath + " to " + ServletUtil.getConfigPath(servlet),ioe);
-            }
+            //-------------
+        } finally {
+            _installDefaultConfigLock.unlock();
         }
-        //-------------
 
     }
 
@@ -93,18 +103,18 @@ public class PersistentConfigurationHandler {
             String semaphore)
             throws IOException {
 
-      File contentFile = new File(toDir+semaphore);
-      if (!contentFile.exists()) {
-        copyDirTree(fromDir, toDir);
-        if(!contentFile.exists()){
-            String msg = "FAILED to locate semaphore file '"+contentFile.getAbsolutePath()+"'";
-            log.error("copyDirTree() - {}",msg);
-            throw new IOException(msg);
+            File contentFile = new File(toDir + semaphore);
+            if (!contentFile.exists()) {
+                copyDirTree(fromDir, toDir);
+                if (!contentFile.exists()) {
+                    String msg = "FAILED to locate semaphore file '" + contentFile.getAbsolutePath() + "' after copy completed.";
+                    log.error("copyDirIfSemaphoreNotPresent() - {}", msg);
+                    throw new IOException(msg);
 
-        }
-        return true;
-      }
-      return false;
+                }
+                return true;
+            }
+            return false;
     }
 
 

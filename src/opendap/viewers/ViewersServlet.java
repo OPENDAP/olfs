@@ -93,6 +93,10 @@ public class ViewersServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
+
+        PersistentConfigurationHandler.installDefaultConfiguration(this);
+
+
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         _serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();

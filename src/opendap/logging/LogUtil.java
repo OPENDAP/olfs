@@ -81,6 +81,8 @@ public class LogUtil {
      * @param servlet - the servlet.
      */
     public static void initLogging(HttpServlet servlet) {
+
+
         // Initialize logging if not already done.
         if (isLogInit)
             return;
@@ -88,8 +90,10 @@ public class LogUtil {
         System.out.println("+++LogUtil.initLogging()");
         ServletContext servletContext = servlet.getServletContext();
 
+        String configPath = ServletUtil.getConfigPath(servlet);
+
         // set up the log path
-        String logPath = ServletUtil.getConfigPath(servlet) + "logs";
+        String logPath =  configPath + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
             if (!logPathFile.mkdirs()) {
@@ -104,13 +108,13 @@ public class LogUtil {
 
             String logbackConfig = servletContext.getInitParameter("logbackConfig");
             if (logbackConfig == null){
-                logbackConfig = ServletUtil.getConfigPath(servlet) + "logback-test.xml";
+                logbackConfig = configPath + "logback-test.xml";
                 File f = new File(logbackConfig);
                 if (!f.exists()) {
-                    logbackConfig = ServletUtil.getConfigPath(servlet) + "logback.xml";
+                    logbackConfig = configPath + "logback.xml";
                     f = new File(logbackConfig);
                     if (!f.exists()) {
-                        logbackConfig = ServletUtil.getRootPath(servlet) + "WEB-INF/logback.xml";
+                        logbackConfig = configPath + "WEB-INF/logback.xml";
                         f = new File(logbackConfig);
                         if (!f.exists())
                             logbackConfig = null;
