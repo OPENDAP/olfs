@@ -351,6 +351,9 @@
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
+        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
+        <echo level="info" message="OLFS_VERSION:  ${OLFS_VERSION}"/>
+        <echo level="info" message=""/>
 
 
         <copy todir="${build.src}" filtering="true">

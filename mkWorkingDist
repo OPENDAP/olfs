@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+bes_location=$1
+
+
+bes_version="bes_"`cd $bes_location; git branch | grep "*" | awk '{print $2}' -`"_"`cd $bes_location; git log | head -1 | awk '{print $2}' -`
+
+echo $bes_version
+
+olfs_version="olfs_"`git branch | grep "*" | awk '{print $2}' -`"_"`git log | head -1 | awk '{print $2}' -`
+
+
+echo $olfs_version
+
+
+
+ant -DHYRAX_VERSION=$bes_version -DOLFS_VERSION=$olfs_version server
+
+
+
+
