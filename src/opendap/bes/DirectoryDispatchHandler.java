@@ -91,18 +91,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Element loginControls = config.getChild("AuthenticationControls");
 
-        if( loginControls!= null){
-
-            Element e = loginControls.getChild("login");
-            if(e!=null){
-                _loginPath = e.getTextTrim();
-            }
-            e = loginControls.getChild("logout");
-            if(e!=null){
-                _logoutPath = e.getTextTrim();
-            }
-
-        }
+        AuthenticationControls.init(loginControls);
 
         initialized = true;
     }
