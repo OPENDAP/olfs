@@ -885,9 +885,11 @@ public class BES {
             // e.printStackTrace();
             besTrouble = true;
 
-            String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
-                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-            log.error(msg);
+            String msg = "Problem encountered with BES connection. Message: '"  + e.getMessage() + "' " +
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
+            String logMsg  = "besGetTransaction() - " + msg;
+
+            log.error(logMsg);
 
             throw new PPTException(msg,e);
         }
@@ -945,7 +947,7 @@ public class BES {
         } else {
 
             BESError besError = new BESError(version);
-            log.error(besError.getErrorMessage());
+            log.error(besError.getMessage());
             throw besError;
 
         }
@@ -1065,11 +1067,15 @@ public class BES {
 
             _checkOutFlag.release(); // Release the client permit because this client is hosed...
 
-            StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
-            msg.append(" msg: '").append(ppte.getMessage()).append("'");
+            StringBuilder msg = new StringBuilder().append("BES Client Failed To Start. ");
+            msg.append("Message: '").append(ppte.getMessage()).append("' ");
+
+
             besClient.setID(new Date().toString() + msg);
-            msg.insert(0, "getNewClient() - ");
-            log.error(msg.toString());
+
+            String logMsg = "getNewClient() - " + msg;
+            log.error(logMsg);
+
             throw new PPTException(msg.toString(),ppte);
         }
 

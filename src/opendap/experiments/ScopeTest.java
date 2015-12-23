@@ -73,7 +73,7 @@ public class ScopeTest extends HttpServlet {
             pw.println("</html>");
         }
         catch(Throwable t){
-            OPeNDAPException.anyExceptionHandler(t, resp);
+            OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
 
         }
 

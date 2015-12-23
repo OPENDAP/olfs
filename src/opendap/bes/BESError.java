@@ -240,6 +240,7 @@ public class BESError extends OPeNDAPException {
 
 
 
+    @Override
     public int getHttpStatus(){
         int httpStatus;
         switch(getErrorCode()){

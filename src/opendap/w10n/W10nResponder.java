@@ -210,7 +210,7 @@ public class W10nResponder  {
         boolean result = _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), pathInfoDoc);
         if(!result){
             BESError besError = new BESError(pathInfoDoc);
-            _log.error("send_w10n_response() encountered a BESError: {}"+besError.getErrorMessage());
+            _log.error("send_w10n_response() encountered a BESError: {}"+besError.getMessage());
 
             besError.sendErrorResponse(_systemPath,request.getContextPath(),response);
             return; // Because it broke already....
@@ -1031,7 +1031,7 @@ public class W10nResponder  {
 
             BESError berr = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
-            _log.error("sendFile() - ERROR. msg: "+ berr.getErrorMessage());
+            _log.error("sendFile() - ERROR. msg: "+ berr.getMessage());
             berr.sendErrorResponse(_systemPath, req.getContextPath(), response);
 
         }

@@ -393,7 +393,7 @@ public class Servlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {
@@ -430,7 +430,7 @@ public class Servlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {

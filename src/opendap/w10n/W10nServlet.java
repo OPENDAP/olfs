@@ -136,7 +136,7 @@ public class W10nServlet extends HttpServlet   {
             }
             catch (Throwable t) {
                 try {
-                    OPeNDAPException.anyExceptionHandler(t, response);
+                    OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
                 }
                 catch(Throwable t2) {
                 	try {

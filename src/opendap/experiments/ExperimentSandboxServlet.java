@@ -177,7 +177,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         }
         catch(Throwable t){
-            OPeNDAPException.anyExceptionHandler(t, response);
+            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
 
         }
 

@@ -527,7 +527,7 @@ public class ViewersServlet extends HttpServlet {
         }
         catch (Throwable t){
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch (Throwable t2) {
                 try {

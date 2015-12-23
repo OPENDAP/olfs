@@ -43,14 +43,16 @@
     <tr>
         <td><a href="<%= contextPath %>/docs/images/largeEarth.jpg"><img src="<%= contextPath %>/docs/images/smallEarth.jpg"
                                                                     alt="I looked everywhere!" border="0"/></a></td>
-        <td><p align="center">The URL requested does not describe a resource that can be found on this server.</p>
+        <td>
+            <p align="center">The URL requested does not describe a resource that can be found on this server.</p>
 
             <p align="center">If you would like to start at the top level of this server, go <a
                     href="<%= contextPath %>/"><strong>HERE</strong></a>.</p>
 
             <p align="center">If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at: <a href="mailto:support@opendap.org">support@opendap.org</a>
-            </p></td>
+            </p>
+        </td>
     </tr>
 </table>
 <hr align="left" size="1" noshade="noshade"/>

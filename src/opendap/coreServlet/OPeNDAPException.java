@@ -31,9 +31,13 @@ import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
@@ -171,14 +175,6 @@ public class OPeNDAPException extends Exception {
         return errorCode;
     }
 
-    /**
-     * Returns the error message.
-     *
-     * @return the error message.
-     */
-    public final String getErrorMessage() {
-        return errorMessage;
-    }
 
 
     /**
@@ -267,7 +263,7 @@ public class OPeNDAPException extends Exception {
      * @param t        The Exception that caused the problem.
      * @param response The <code>HttpServletResponse</code> for the client.
      */
-    public static void anyExceptionHandler(Throwable t, HttpServletResponse response) {
+    public static void anyExceptionHandler(Throwable t, HttpServlet servlet, String context, HttpServletResponse response) {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
 
@@ -307,13 +303,16 @@ public class OPeNDAPException extends Exception {
 
 
             if(!response.isCommitted()){
+
                 response.reset();
-                response.setHeader("XDODS-Server", "dods/3.2");
-                response.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
-                response.setHeader("XDAP", "3.2");
-                response.setHeader("Content-Description", "dods_error");
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        oe.getMessage());
+
+                String systemPath = ServletUtil.getSystemPath(servlet,"");
+
+                HttpResponder.sendHttpErrorResponse(
+                        oe.getHttpStatus(),
+                        oe.getMessage(),
+                        systemPath + "/error/error.html.proto",
+                        context, response);
             }
             else {
                 OutputStream eOut = response.getOutputStream();
@@ -327,7 +326,11 @@ public class OPeNDAPException extends Exception {
 
 
     }
-    /***************************************************************************/
+
+    public int getHttpStatus(){
+        return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+    }
+
 
 
     /**

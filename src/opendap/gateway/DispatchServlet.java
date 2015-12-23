@@ -224,7 +224,7 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
