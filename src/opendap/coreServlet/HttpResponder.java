@@ -114,6 +114,7 @@ public abstract class HttpResponder {
         String template = loadHtmlTemplate(errorPageTemplate, context);
 
         template = template.replaceAll("<ERROR_MESSAGE />",errorMessage);
+        template = template.replaceAll("<ERROR_CODE />",Integer.toString(httpStatus));
 
         log.debug("respondToHttpGetRequest(): Sending Error Page ");
 

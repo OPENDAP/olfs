@@ -42,18 +42,18 @@
 
 <body>
 <p>&nbsp;</p>
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error (<ERROR_CODE />)</h1>
 <hr size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
     <td><img src="<CONTEXT />/docs/images/superman.jpg" alt="Bad things are happening" width="320" height="426" /></td>
-    <td><p align="left" class="style1">OUCH!</p>
+    <td><p align="left" class="style1">Ouch!</p>
         <ERROR_MESSAGE />
     </td>
   </tr>
 </table>
 <hr size="1" noshade="noshade" />
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error (<ERROR_CODE />)</h1>
 </body>
 </html>
 

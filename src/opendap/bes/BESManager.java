@@ -26,14 +26,13 @@
 
 package opendap.bes;
 
-import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.Scrub;
+import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -273,7 +272,7 @@ public class BESManager {
     }
 
 
-    public static Document getCombinedVersionDocument() throws Exception {
+    public static Document getCombinedVersionDocument() throws JDOMException, IOException, PPTException, BadConfigurationException, BESError {
 
 
 
