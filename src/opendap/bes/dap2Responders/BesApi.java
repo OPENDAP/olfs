@@ -161,6 +161,15 @@ public class BesApi {
         return BESManager.getCombinedVersionDocument();
     }
 
+    public String getAdministrator(String path) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
+
+        BES bes = getBES(path);
+
+        Document verDoc = bes.getVersionDocument();
+
+        return "btfom_buddy";
+    }
+
     //public static void configure(OLFSConfig olfsConfig) throws Exception {
 
     //    BESManager.configure(olfsConfig.getBESConfig());
