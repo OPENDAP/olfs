@@ -31,9 +31,10 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
+    <xsl:param name="serviceContext" />
+
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
     <xsl:variable name="docsService">/docs</xsl:variable>
     <xsl:variable name="dapService">/hyrax</xsl:variable>
 

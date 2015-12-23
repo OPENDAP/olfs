@@ -30,6 +30,8 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.Html;
+import opendap.viewers.ViewersServlet;
+import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -38,6 +40,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.jdom.transform.XSLTransformer;
 
 import javax.servlet.http.HttpServletResponse;
@@ -401,22 +404,21 @@ public class BESError extends OPeNDAPException {
 
             String xsltDoc = systemPath + "/xsl/error"+errorVal+".xsl";
 
-
             boolean done = false;
             File xsltFile = new File(xsltDoc);
-            if(xsltFile.exists()){
-                XSLTransformer transformer = new XSLTransformer(xsltDoc);
-                Document errorPage = transformer.transform(besError);
-                if(errorPage!=null){
-                    response.setContentType("text/html");
-                    response.setStatus(errorVal);
-                    xmlo.output(errorPage, response.getOutputStream());
-                    xmlo.output(errorPage, System.out);
-                    xmlo.output(besError, System.out);
-                    done = true;
-                }
+            if(xsltFile.exists()) {
+                Transformer transformer = new Transformer(xsltDoc);
+                transformer.setParameter("serviceContext", context);
+                JDOMSource error = new JDOMSource(besError);
+                response.setContentType("text/html");
+                response.setStatus(errorVal);
+                transformer.transform(error, response.getOutputStream());
+                done = true;
+
+
 
             }
+
 
             if(!done) {
                 HttpResponder.sendHttpErrorResponse(
