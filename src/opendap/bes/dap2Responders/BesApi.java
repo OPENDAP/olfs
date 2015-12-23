@@ -1552,6 +1552,7 @@ public class BesApi {
 
 
         BES bes = BESManager.getBES(dataSource);
+        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes.getTimeout())));
         return bes.besTransaction(request,response);
 
 
@@ -1586,6 +1587,7 @@ public class BesApi {
 
 
         BES bes = BESManager.getBES(dataSource);
+        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes.getTimeout())));
         return bes.besTransaction(request, os, err);
     }
 
