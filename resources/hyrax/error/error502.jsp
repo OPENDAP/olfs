@@ -1,3 +1,5 @@
+<%@ page import="opendap.bes.dap2Responders.BesApi" %>
+<%@ page import="opendap.coreServlet.ReqInfo" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -25,7 +27,14 @@
   --%>
 
 <%@page session="false" %>
-<% String contextPath = request.getContextPath(); %>
+<%
+    String contextPath = request.getContextPath();
+
+    String localUrl = ReqInfo.getLocalUrl(request);
+
+    BesApi besApi = new BesApi();
+    String adminEmail = besApi.getAdministrator(localUrl);
+%>
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" href="<%= contextPath %>/docs/css/contents.css" type="text/css" />
@@ -52,7 +61,7 @@
     <p align="center">If
 you think that the server is broken (that the URL you submitted should
 have worked), then please contact the OPeNDAP user support coordinator
-at: <a href="mailto:support@opendap.org">support@opendap.org</a></p></td>
+at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>
   </tr>
 </tbody></table>
 <hr noshade="noshade" size="1" />

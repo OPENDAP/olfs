@@ -1,3 +1,5 @@
+<%@ page import="opendap.bes.dap2Responders.BesApi" %>
+<%@ page import="opendap.coreServlet.ReqInfo" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -27,7 +29,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <%@page session="false" %>
-<% String contextPath = request.getContextPath(); %>
+<%
+    String contextPath = request.getContextPath();
+
+    String localUrl = ReqInfo.getLocalUrl(request);
+
+    BesApi besApi = new BesApi();
+    String adminEmail = besApi.getAdministrator(localUrl);
+%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -37,7 +46,7 @@
 
 <body>
 <p align="left">&nbsp;</p>
-<h1 align="center">Hyrax : Bad Request (400) </h1>
+<h1 align="center">Hyrax : Bad Request GORF (400) </h1>
 <hr align="left" size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
@@ -58,7 +67,7 @@
     <p align="left">In addition <strong>Hyrax</strong> and other new servers support:</p>
     <ul>
         <li ><strong>ddx</strong></li>
-    </ul>    <p align="left"> If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:support@opendap.org">support@opendap.org</a> </p></td>
+    </ul>    <p align="left"> If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a> </p></td>
   </tr>
 </table>
 <hr align="left" size="1" noshade="noshade" />

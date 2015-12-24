@@ -1,3 +1,5 @@
+<%@ page import="opendap.coreServlet.ReqInfo" %>
+<%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -26,7 +28,14 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@page session="false" %>
-<% String contextPath = request.getContextPath(); %>
+<%
+    String contextPath = request.getContextPath();
+
+    String localUrl = ReqInfo.getLocalUrl(request);
+
+    BesApi besApi = new BesApi();
+    String adminEmail = besApi.getAdministrator(localUrl);
+%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -51,7 +60,7 @@
     <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="That's not going to work..." width="350" height="313" /></td>
     <td><p align="center" class="style1">Hmmmm...</p>
       <p align="center">You asked for a service that is not provided here.</p>
-    <p align="center">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:support@opendap.org">support@opendap.org</a></p></td>
+    <p align="center">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>
   </tr>
 </table>
 <hr size="1" noshade="noshade" />

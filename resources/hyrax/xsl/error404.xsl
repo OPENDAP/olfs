@@ -69,7 +69,10 @@
                                     href="{$serviceContext}"><strong>HERE</strong></a>.</p>
 
                             <p align="left">If you think that the server is broken (that the URL you submitted should have worked),
-                                then please contact the OPeNDAP user support coordinator at: <a href="mailto:support@opendap.org">support@opendap.org</a>
+                                then please contact the OPeNDAP user support coordinator at:
+                                <a href="mailto:{bes:Administrator}">
+                                    <xsl:value-of select="bes:Administrator"/>
+                                </a>
                             </p>
 
                             <p align="left">The specific message associated with your request was:

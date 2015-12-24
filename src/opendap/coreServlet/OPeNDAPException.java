@@ -312,7 +312,8 @@ public class OPeNDAPException extends Exception {
                         oe.getHttpStatus(),
                         oe.getMessage(),
                         systemPath + "/error/error.html.proto",
-                        context, response);
+                        context,
+                        response);
             }
             else {
                 OutputStream eOut = response.getOutputStream();

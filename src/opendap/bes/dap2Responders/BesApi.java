@@ -27,12 +27,14 @@
 package opendap.bes.dap2Responders;
 
 import opendap.bes.*;
+import opendap.bes.BES;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap4.QueryParameters;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
+import opendap.namespaces.*;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -163,11 +165,30 @@ public class BesApi {
 
     public String getAdministrator(String path) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
 
+        String adminEmail = "support@opendap.org";
+
+
         BES bes = getBES(path);
 
         Document verDoc = bes.getVersionDocument();
 
-        return "btfom_buddy";
+        if(verDoc==null)
+            return adminEmail;
+
+
+        Element besElement = verDoc.getRootElement();
+
+        if(besElement==null)
+            return adminEmail;
+
+
+        Element adminElement = besElement.getChild("Administrator", opendap.namespaces.BES.BES_NS);
+
+
+        if(adminElement!=null)
+            adminEmail = adminElement.getTextTrim();
+
+        return adminEmail;
     }
 
     //public static void configure(OLFSConfig olfsConfig) throws Exception {
