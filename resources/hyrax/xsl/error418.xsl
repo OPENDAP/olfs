@@ -59,7 +59,7 @@
                         <td>
                             <img alt="I'm a teapot!!"
                                  src="{$serviceContext}{$docsService}/images/teapot.jpg"
-                                 width="350" height="313" />
+                                 width="350" height="300" />
                         </td>
                         <td>
                             <p align="left">I'm sorry, the request you made just took way too long.</p>

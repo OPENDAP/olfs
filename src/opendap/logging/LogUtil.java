@@ -120,6 +120,8 @@ public class LogUtil {
                         f = new File(defaultLogbackConfig);
                         if (!f.exists())
                             logbackConfig = null;
+                        else
+                            logbackConfig = defaultLogbackConfig;
                     }
 
                 }
