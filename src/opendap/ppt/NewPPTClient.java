@@ -73,6 +73,9 @@ public class NewPPTClient {
             _mySock = new Socket();
             _mySock.connect(address,timeOut);
             _mySock.setSoTimeout(timeOut);
+
+            log.info("NewPPTClient() - Set socket timeout and SoTimeout to: {}",timeOut);
+
         }
         catch (IOException e) {
             String msg = "Could not connect to host " + hostStr + " on port " + portVal + ".  ";
