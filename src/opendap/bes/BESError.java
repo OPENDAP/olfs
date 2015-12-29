@@ -111,6 +111,12 @@ public class BESError extends OPeNDAPException {
      */
     public static final int NOT_FOUND_ERROR       = 5;
 
+    /**
+     * The BES timed out.
+     *
+     */
+    public static final int TIME_OUT              = 6;
+
 
     Document besError = null;
 
@@ -259,7 +265,10 @@ public class BESError extends OPeNDAPException {
 
             case BESError.USER_SYNTAX_ERROR:
                 httpStatus = HttpServletResponse.SC_BAD_REQUEST;
+                break;
 
+            case BESError.TIME_OUT:
+                httpStatus = 418; // I'm a Teapot!!
                 break;
 
             default:
