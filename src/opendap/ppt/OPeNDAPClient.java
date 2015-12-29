@@ -137,7 +137,8 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void startClient(String hostStr, int portVal, int timeOut) throws PPTException {
-        _client = new NewPPTClient(hostStr, portVal, timeOut);
+        int paddedTimeout = (int)(timeOut * 1.1);
+        _client = new NewPPTClient(hostStr, portVal, paddedTimeout);
         _client.initConnection();
         _isRunning = true;
     }

@@ -30,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,8 +115,9 @@ public class LogUtil {
                     logbackConfig = configPath + "logback.xml";
                     f = new File(logbackConfig);
                     if (!f.exists()) {
-                        logbackConfig = configPath + "WEB-INF/logback.xml";
-                        f = new File(logbackConfig);
+                        // Try to use the one that shipped with the webapp
+                        String defaultLogbackConfig = ServletUtil.getSystemPath(servlet, "WEB-INF/logback.xml");
+                        f = new File(defaultLogbackConfig);
                         if (!f.exists())
                             logbackConfig = null;
                     }
