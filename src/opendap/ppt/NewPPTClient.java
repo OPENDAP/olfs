@@ -331,9 +331,9 @@ public class NewPPTClient {
                 } catch (SocketException se) {
                     log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
                 }
-                _mySock.shutdownOutput();  // Send 'FIN' to the other end of TCP connection
-                while(is!=null && is.read() >=0) ;     // Drain the pipe
-                _mySock.close();           // Close the socket
+                _mySock.shutdownOutput();           // Send 'FIN' to the other end of TCP connection
+                while(is!=null && is.read() >=0) ;  // Drain the pipe
+                _mySock.close();                    // Close the socket
             }
         }
         catch (IOException e) {
