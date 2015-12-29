@@ -274,7 +274,14 @@ public class NewPPTClient {
      */
     public void closeConnection(boolean informServer) {
 
-        String msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
+        StringBuilder msg = new StringBuilder("Closing Connection.");
+        if(_mySock != null) {
+            msg.append(" Socket.isClosed(): ").append(_mySock.isClosed());
+        }
+        else {
+            msg.append(" _mySock is null");
+        }
+
 
         /*
         try {
@@ -292,7 +299,7 @@ public class NewPPTClient {
         */
 
 
-        log.error(msg);
+        log.error(msg.toString());
         try {
             if(informServer && _out != null) {
                 _out.close();
@@ -305,8 +312,9 @@ public class NewPPTClient {
             _out = null;
         }
 
-        msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
-        log.error(msg);
+        msg.setLength(0);
+        msg.append("Closing Connection. Socket.isClosed(): ").append(_mySock.isClosed());
+        log.error(msg.toString());
 
         try {
             if (_in != null)
@@ -319,8 +327,9 @@ public class NewPPTClient {
         finally {
             _in = null;
         }
-        msg = "Closing Connection. Socket.isClosed(): "+_mySock.isClosed();
-        log.error(msg);
+        msg.setLength(0);
+        msg.append("Closing Connection. Socket.isClosed(): ").append(_mySock.isClosed());
+        log.error(msg.toString());
 
         try {
             if (_mySock != null) {
