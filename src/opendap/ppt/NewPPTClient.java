@@ -310,9 +310,6 @@ public class NewPPTClient {
             _out = null;
         }
 
-        msg.setLength(0);
-        msg.append("Closing Connection. Socket.isClosed(): ").append(_mySock.isClosed());
-        log.error(msg.toString());
 
         try {
             if (_in != null)
@@ -325,9 +322,6 @@ public class NewPPTClient {
         finally {
             _in = null;
         }
-        msg.setLength(0);
-        msg.append("Closing Connection. Socket.isClosed(): ").append(_mySock.isClosed());
-        log.error(msg.toString());
 
         try {
             if (_mySock != null) {
