@@ -115,7 +115,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         log.debug("Loading Configuration File: " + filename);
 
@@ -266,7 +266,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
@@ -311,7 +311,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }

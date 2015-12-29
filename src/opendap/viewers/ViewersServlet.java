@@ -93,6 +93,10 @@ public class ViewersServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
+
+        PersistentConfigurationHandler.installDefaultConfiguration(this);
+
+
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         _serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();
@@ -104,7 +108,7 @@ public class ViewersServlet extends HttpServlet {
 
         reqNumber = new AtomicInteger(0);
 
-        String webStartDir = ServletUtil.getContentPath(this) + "WebStart";
+        String webStartDir = ServletUtil.getConfigPath(this) + "WebStart";
 
         File f = new File(webStartDir);
 
@@ -163,7 +167,7 @@ public class ViewersServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         _log.debug("Loading Dataset Viewers Configuration File: " + filename);
 
@@ -523,7 +527,7 @@ public class ViewersServlet extends HttpServlet {
         }
         catch (Throwable t){
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch (Throwable t2) {
                 try {

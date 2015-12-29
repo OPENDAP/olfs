@@ -87,7 +87,7 @@ public class WebStartServlet extends HttpServlet {
 
         reqNumber = new AtomicInteger(0);
 
-        String dir = ServletUtil.getContentPath(this) + "WebStart";
+        String dir = ServletUtil.getConfigPath(this) + "WebStart";
 
         File f = new File(dir);
 
@@ -150,7 +150,7 @@ public class WebStartServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         log.debug("Loading Configuration File: " + filename);
 
@@ -439,7 +439,7 @@ public class WebStartServlet extends HttpServlet {
         }
         catch (Throwable t){
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch (Throwable t2) {
                 try {

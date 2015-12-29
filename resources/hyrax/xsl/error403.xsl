@@ -30,74 +30,57 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
-        >
+                >
     <xsl:param name="serviceContext" />
 
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:variable name="docsService">/docs</xsl:variable>
     <xsl:variable name="dapService">/hyrax</xsl:variable>
-    
+
 
     <xsl:template match="/bes:BESError">
+
         <html>
             <head>
                 <meta http-equiv="Content-Type"
                       content="text/html; charset=UTF-8"/>
                 <link rel='stylesheet' href='{$serviceContext}{$docsService}/css/contents.css'
                       type='text/css' />
-                <title>Hyrax: ERROR</title>
+                <title>Hyrax: Bad Request</title>
             </head>
 
             <body>
-                <p> &NBSP; </p>
-                <h1 align="center">Hyrax Error</h1>
-                <hr size="1" noshade="noshade"/>
+                <p align="left"> &NBSP; </p>
+                <h1 align="center">Hyrax : Forbidden (403)</h1>
+                <hr align="left" size="1" noshade="noshade"/>
                 <table width="100%" border="0">
                     <tr>
                         <td>
-                            <img alt="A Bad Thing Happened Here..."
-                                 src="{$serviceContext}{$docsService}/images/superman.jpg"
-                                 width="320" height="426"/>
+                            <img alt="Forbidden!"
+                                 src="{$serviceContext}{$docsService}/images/forbidden.png"
+                                 width="350" height="313" />
                         </td>
                         <td>
-                            <p align="center"><strong>OUCH!</strong></p>
-                            <p align="center">
-                                <strong>
-                                    Something Bad Happened On This Server.
-                                </strong>
+                            <p align="left">You do not have permission to access the requested resource.</p>
+                            <p align="left">The specific message associated with your request was:
                             </p>
-                            <p> &NBSP; </p>
-                            <p> &NBSP; </p>
-                            <p align="center">
-                                The error message associated with this error is:
-                            </p>
-
                             <blockquote>
-                                <p align="center">
+                                <p>
                                     <strong>
                                         <xsl:value-of select="bes:Message"/>
                                     </strong>
                                 </p>
                             </blockquote>
-                            <p> &NBSP; </p>
-                            <p> &NBSP; </p>
-                            <p align="center">If you think that the server is
-                                broken (that the URL you submitted should have
-                                worked), then please contact the user
-                                support coordinator for this server at:
-                                <a href="mailto:{bes:Administrator}">
-                                    <xsl:value-of select="bes:Administrator"/>
-                                </a>
-                            </p>
-
                         </td>
                     </tr>
                 </table>
-                <hr size="1" noshade="noshade"/>
-                <h1 align="center">Hyrax Error</h1>
-                <p align="center"></p>
+                <hr align="left" size="1" noshade="noshade"/>
+                <h1 align="center">Hyrax : Forbidden (403)</h1>
+                <p align="left"></p>
             </body>
         </html>
-    </xsl:template>
+
+
+    </xsl:template >
 </xsl:stylesheet>

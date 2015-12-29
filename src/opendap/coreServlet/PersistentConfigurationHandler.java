@@ -31,52 +31,68 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import java.io.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Provides methods for detecting the presence of the peristent content directory and moving an initial
- * copy of the persistent content to that directory if it does not already exist.
+ * Provides methods for detecting the presence of a localized configuration directory and moving an initial
+ * copy of the default configuration to that directory if it does not already exist.
  */
-public class PersistentContentHandler {
+public class PersistentConfigurationHandler {
 
     private static Logger log;
+
+    private static String defaultContentLocation="WEB-INF/conf/";
+
+    private static final ReentrantLock _installDefaultConfigLock = new ReentrantLock();
+
+
+
     static{
-        log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+        log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
     }
 
     /**
-     * Checks to see if the persistent content directory exists, if it doesn't it is created and populated
+     * Checks to see if the local content directory exists, if it doesn't it is created and populated
      * with initial content from the distribution.
      * @param servlet
      */
-    public static void installInitialContent(HttpServlet servlet) {
-
-        Logger log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+    public static void installDefaultConfiguration(HttpServlet servlet) {
 
 
-        String semaphore = ".INIT";
+        _installDefaultConfigLock.lock();     // Only one thread allowed in at a time.
+        try {
 
-        log.debug("PersistentContentHandler:");
-        log.debug("    contentPath:        " + ServletUtil.getContentPath(servlet));
-        log.debug("    initialContentPath: " + getInitialContentPath(servlet));
-        log.debug("    semaphore:          " + semaphore);
+            //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
+
+            String semaphore = ".INIT";
+
+            log.debug("PersistentContentHandler:");
+            log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
+            log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
+            log.debug("    semaphore:                " + semaphore);
+            log.debug("    ThreadName:               " + Thread.currentThread().getName());
 
 
-        // -------------
-        // first time, create content directory
-        String initialContentPath = getInitialContentPath(servlet);
-        File initialContentFile = new File(initialContentPath);
+            // -------------
+            // first time, create content directory
+            String defaultConfigurationPath = getDefaultConfigurationPath(servlet);
+            File defaultConfigurationFile = new File(defaultConfigurationPath);
 
-        if (initialContentFile.exists()) {
-            try {
-                if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getContentPath(servlet), semaphore)) {
-                    log.info("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
+            if (defaultConfigurationFile.exists()) {
+                try {
+                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphore)) {
+                        log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
+                    } else {
+                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
+                    }
+                } catch (IOException ioe) {
+                    log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
                 }
             }
-            catch (IOException ioe) {
-                    log.error("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet),ioe);
-            }
+            //-------------
+        } finally {
+            _installDefaultConfigLock.unlock();
         }
-        //-------------
 
     }
 
@@ -87,18 +103,18 @@ public class PersistentContentHandler {
             String semaphore)
             throws IOException {
 
-      File contentFile = new File(toDir+semaphore);
-      if (!contentFile.exists()) {
-        copyDirTree(fromDir, toDir);
-        if(!contentFile.createNewFile()){
-            String msg = "FAILED to create semaphore file '"+contentFile.getAbsolutePath()+"'";
-            log.error("copyDirTree() - {}",msg);
-            throw new IOException(msg);
+            File contentFile = new File(toDir + semaphore);
+            if (!contentFile.exists()) {
+                copyDirTree(fromDir, toDir);
+                if (!contentFile.exists()) {
+                    String msg = "FAILED to locate semaphore file '" + contentFile.getAbsolutePath() + "' after copy completed.";
+                    log.error("copyDirIfSemaphoreNotPresent() - {}", msg);
+                    throw new IOException(msg);
 
-        }
-        return true;
-      }
-      return false;
+                }
+                return true;
+            }
+            return false;
     }
 
 
@@ -109,8 +125,8 @@ public class PersistentContentHandler {
   *
   */
 
-    private static String getInitialContentPath(HttpServlet servlet) {
-      return ServletUtil.getRootPath(servlet) + "initialContent/";
+    private static String getDefaultConfigurationPath(HttpServlet servlet) {
+      return ServletUtil.getRootPath(servlet) + defaultContentLocation;
     }
 
 

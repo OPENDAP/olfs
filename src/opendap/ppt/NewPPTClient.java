@@ -66,8 +66,7 @@ public class NewPPTClient {
             address = new InetSocketAddress(host,portVal);
         }
         catch (UnknownHostException e) {
-            String msg = "Don't know about host: " + hostStr + "\n";
-            msg += e.getMessage();
+            String msg = "Unknown Host: " + e.getMessage();
             closeConnection(true);
             throw new PPTException(msg, e);
         }
@@ -385,7 +384,7 @@ public class NewPPTClient {
         }
         catch (IOException e) {
             closeConnection(true);
-            throw new PPTException("Cannot read response from designated stream. ", e);
+            throw new PPTException(e.getMessage(), e);
         }
     }
 

@@ -27,6 +27,7 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.PersistentConfigurationHandler;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
@@ -73,7 +74,7 @@ public class Servlet extends HttpServlet {
         String resourcePath = ServletUtil.getSystemPath(this, "/");
         log.debug("resourcePath: "+resourcePath);
 
-        String contentPath = ServletUtil.getContentPath(this);
+        String contentPath = ServletUtil.getConfigPath(this);
         log.debug("contentPath: "+contentPath);
 
         String configFilename = this.getInitParameter("ConfigFileName");
@@ -258,7 +259,7 @@ public class Servlet extends HttpServlet {
             String initialContentDir = resourcePath + "initialContent/";
             log.info("Attempting to copy initial content for WCS from "+initialContentDir+" to "+serviceContentPath);
             try {
-                opendap.coreServlet.PersistentContentHandler.copyDirTree(initialContentDir,serviceContentPath);
+                PersistentConfigurationHandler.copyDirTree(initialContentDir, serviceContentPath);
                 semaphore.createNewFile();
             } catch (IOException e) {
                 log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
@@ -283,7 +284,7 @@ public class Servlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {
@@ -320,7 +321,7 @@ public class Servlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, resp);
+                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {

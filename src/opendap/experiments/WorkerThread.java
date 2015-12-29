@@ -62,7 +62,7 @@ public class WorkerThread implements Runnable, ServletContextListener {
 
         ServletContext sc = arg0.getServletContext();
 
-        String contentPath = ServletUtil.getContentPath(sc);
+        String contentPath = ServletUtil.getConfigPath(sc);
         _log.debug("contentPath: " + contentPath);
 
         String serviceContentPath = contentPath;

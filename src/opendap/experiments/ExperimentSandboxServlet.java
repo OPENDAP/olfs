@@ -177,7 +177,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         }
         catch(Throwable t){
-            OPeNDAPException.anyExceptionHandler(t, response);
+            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
 
         }
 
@@ -191,7 +191,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
 
         String contextPath = ServletUtil.getContextPath(this);
-        String contentPath = ServletUtil.getContentPath(this);
+        String contentPath = ServletUtil.getConfigPath(this);
         Date startTime, endTime;
 
         String filename=contentPath + "CEOP/ReferenceSite/catalog.xml";

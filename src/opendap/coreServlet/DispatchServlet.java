@@ -141,7 +141,7 @@ public class DispatchServlet extends HttpServlet {
         LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
-        PersistentContentHandler.installInitialContent(this);
+        PersistentConfigurationHandler.installDefaultConfiguration(this);
 
 
         loadConfig();
@@ -219,7 +219,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         log.debug("Loading Configuration File: " + filename);
 
@@ -506,7 +506,7 @@ public class DispatchServlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             }
             catch(Throwable t2) {
             	try {
@@ -657,7 +657,7 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             }
             catch(Throwable t2) {
             	try {

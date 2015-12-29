@@ -28,13 +28,15 @@
 package opendap.ppt ;
 
 
+import opendap.coreServlet.OPeNDAPException;
+
 /**
  * Exception used with DODS client and server request handline.
  *
  * @author Patrick West <A * HREF="mailto:pwest@hao.ucar.edu">pwest@hao.ucar.edu</A>
  */
 
-public class PPTException  extends Exception{
+public class PPTException  extends OPeNDAPException {
     /**
      * Exception used with OPeNDAP client and server request handling where the
      * msg passed to the constructor represents the error that has occurred

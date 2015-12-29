@@ -26,10 +26,13 @@
 
 package opendap.bes;
 
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.Html;
+import opendap.viewers.ViewersServlet;
+import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -38,6 +41,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.jdom.transform.XSLTransformer;
 
 import javax.servlet.http.HttpServletResponse;
@@ -63,6 +67,10 @@ public class BESError extends OPeNDAPException {
 
     private MediaType _mt;
 
+    private String _adminEmail;
+    private String _message;
+    private String _file;
+    private String _line;
 
     public static final String BES_ERROR = "BESError";
 
@@ -112,10 +120,18 @@ public class BESError extends OPeNDAPException {
     }
 
 
+    private BESError() {
+        _adminEmail = "support@opendap.org";
+        _message = "Unknown Error";
+        _file = "Unknown File";
+        _line = "Unknown Line";
+        setErrorCode(-1);
+    }
+
 
 
     public BESError(Document error, MediaType mt) {
-
+        this();
         _mt = mt;
 
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
@@ -132,19 +148,6 @@ public class BESError extends OPeNDAPException {
 
     }
 
-    public BESError(Element error) {
-        this(error,new Html());
-
-    }
-    public BESError(Element error, MediaType mt) {
-
-        _mt = mt;
-
-        besError = new Document(error);
-        processError(error);
-
-    }
-
     public BESError( InputStream is) {
 
         this(is,new Html());
@@ -152,6 +155,7 @@ public class BESError extends OPeNDAPException {
 
     }
     public BESError( InputStream is, MediaType mt) {
+        this();
 
 
         _mt = mt;
@@ -178,40 +182,32 @@ public class BESError extends OPeNDAPException {
 
 
 
-    public BESError(String msg) {
-        this(msg, new Html());
+    public BESError(String error) {
+        this(error, new Html());
     }
 
-    public BESError(String msg, MediaType mt) {
-        super(msg);
-        _mt = mt;
-    }
-    public BESError(String msg, Exception e) {
-        this(msg, e, new Html());
-    }
-
-    public BESError(String msg, Exception e, MediaType mt) {
-        super(msg, e);
-        _mt = mt;
-    }
-
-    public BESError(String msg, Throwable cause) {
-        this(msg,cause, new Html());
-    }
-
-    public BESError(String msg, Throwable cause, MediaType mt) {
-        super(msg, cause);
-        _mt = mt;
-    }
-
-    public BESError(Throwable cause) {
-        this(cause, new Html());
-    }
-    public BESError(Throwable cause, MediaType mt) {
-        super(cause);
+    public BESError(String error, MediaType mt) {
+        this();
         _mt = mt;
 
+        SAXBuilder sb = new SAXBuilder();
+
+        try {
+            Document edoc = sb.build(error);
+
+            besError = processError(edoc);
+
+            if(besError==null){
+                setErrorCode(INVALID_ERROR);
+                setErrorMessage("Unable to locate <BESError> object in stream.");
+            }
+
+        } catch (JDOMException | IOException e) {
+            setErrorCode(INVALID_ERROR);
+            setErrorMessage("Unable to process <BESError> object in stream.");
+        }
     }
+
 
 
     public void setReturnMediaType(MediaType mt){
@@ -240,6 +236,7 @@ public class BESError extends OPeNDAPException {
 
 
 
+    @Override
     public int getHttpStatus(){
         int httpStatus;
         switch(getErrorCode()){
@@ -319,25 +316,66 @@ public class BESError extends OPeNDAPException {
     }
 
 
+
     private void processError(Element error){
         try {
-            Element e = error.getChild("Type",BES_NS);
+
+            Element e;
+
+
+            // <Type>
+            e = error.getChild("Type",BES_NS);
             if(e!=null){
                 String s = e.getTextTrim();
                 setErrorCode(Integer.valueOf(s));
             }
-            else {
-                setErrorCode(-1);
+
+            // <Administrator>
+            e = error.getChild("Administrator",BES_NS);
+            if(e!=null){
+                _adminEmail = e.getTextTrim();
             }
+
+
+
+            // <Message>
+            e = error.getChild("Message",BES_NS);
+            if(e!=null){
+                setErrorMessage(e.getTextTrim());
+            }
+
+            // <Location>
+            Element location = error.getChild("Location",BES_NS);
+            if(location!=null){
+
+                // <File>
+                e = error.getChild("File",BES_NS);
+                if(e!=null){
+                    _file = e.getTextTrim();
+                }
+
+                // <Line>
+                e = error.getChild("Line",BES_NS);
+                if(e!=null){
+                    _line = e.getTextTrim();
+                }
+
+
+            }
+
+            // </Location>
+
+
         }
         catch(NumberFormatException nfe){
             setErrorCode(-1);
         }
 
 
-        setErrorMessage(makeBesErrorMsg(error));
+        // setErrorMessage(makeBesErrorMsg(error));
 
     }
+
 
 
     private Document processError(Document error){
@@ -388,6 +426,8 @@ public class BESError extends OPeNDAPException {
 
 
     private int sendHtmlErrorResponse(String systemPath, String context, HttpServletResponse response) throws IOException {
+
+
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         int errorVal =  getHttpStatus();
@@ -400,22 +440,21 @@ public class BESError extends OPeNDAPException {
 
             String xsltDoc = systemPath + "/xsl/error"+errorVal+".xsl";
 
-
             boolean done = false;
             File xsltFile = new File(xsltDoc);
-            if(xsltFile.exists()){
-                XSLTransformer transformer = new XSLTransformer(xsltDoc);
-                Document errorPage = transformer.transform(besError);
-                if(errorPage!=null){
-                    response.setContentType("text/html");
-                    response.setStatus(errorVal);
-                    xmlo.output(errorPage, response.getOutputStream());
-                    xmlo.output(errorPage, System.out);
-                    xmlo.output(besError, System.out);
-                    done = true;
-                }
+            if(xsltFile.exists()) {
+                Transformer transformer = new Transformer(xsltDoc);
+                transformer.setParameter("serviceContext", context);
+                JDOMSource error = new JDOMSource(besError);
+                response.setContentType("text/html");
+                response.setStatus(errorVal);
+                transformer.transform(error, response.getOutputStream());
+                done = true;
+
+
 
             }
+
 
             if(!done) {
                 HttpResponder.sendHttpErrorResponse(
