@@ -58,6 +58,7 @@
                     <tr>
                         <td>
                             <img alt="I'm a teapot!!"
+                                 title="I can't make coffee. I'm a teapot!"
                                  src="{$serviceContext}{$docsService}/images/teapot.jpg"
                                  width="350" height="300" />
                         </td>

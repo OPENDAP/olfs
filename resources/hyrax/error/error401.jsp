@@ -41,7 +41,7 @@
 <hr align="left" size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
-    <td><img src="<%= contextPath %>/docs/images/sonofman.jpg" alt="I don't know who you are..." width="300" height="400" /></td>
+    <td><img src="<%= contextPath %>/docs/images/sonofman.jpg" alt="I don't know who you are..." title="I don't know who you are..." width="300" height="400" /></td>
     <td>
         <p align="left">You must be identified to access the resource you requested.</p>
         <p align="left">Currently you are not authenticated at all or authenticated incorrectly.</p>

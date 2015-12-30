@@ -59,8 +59,13 @@
 <hr size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
-        <td><img src="<%= contextPath %>/docs/images/superman.jpg" alt="Bad things are happening"
-                             width="320" height="426"/></td>
+        <td>
+            <img src="<%= contextPath %>/docs/images/superman.jpg"
+                 alt="Bad things are happening"
+                 title="Bad things are happening"
+                 width="320"
+                 height="426"/>
+        </td>
         <td>
             <p align="center" class="style1">OUCH!</p>
 

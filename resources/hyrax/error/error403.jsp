@@ -43,7 +43,7 @@
 <hr align="left" size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
-    <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="Forbidden!" width="350" height="313" /></td>
+    <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="Forbidden!" title="Forbidden!" width="350" height="313" /></td>
     <td align="center"><strong>You do not have permission to access the requested resource. </strong>
       <p align="left">&nbsp;</p>
       <p align="left">&nbsp;</p></td>

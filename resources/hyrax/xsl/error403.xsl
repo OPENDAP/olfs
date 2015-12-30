@@ -58,6 +58,7 @@
                     <tr>
                         <td>
                             <img alt="Forbidden!"
+                                 title="Forbidden!"
                                  src="{$serviceContext}{$docsService}/images/forbidden.png"
                                  width="350" height="313" />
                         </td>

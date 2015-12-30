@@ -46,11 +46,11 @@
 
 <body>
 <p align="left">&nbsp;</p>
-<h1 align="center">Hyrax : Bad Request GORF (400) </h1>
+<h1 align="center">Hyrax : Bad Request (400) </h1>
 <hr align="left" size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
-    <td><img src="<%= contextPath %>/docs/images/BadDapRequest.gif" alt="Bad Dap Request" width="323" height="350" /></td>
+    <td><img src="<%= contextPath %>/docs/images/BadDapRequest.gif" alt="Bad DAP Request" title="Bad DAP Request" width="323" height="350" /></td>
     <td><p align="left">It appears that you have submitted a Bad Request. </p>
       <p align="left">There may problem with the syntax of your OPeNDAP URL. If you are using server side functions in your constraint expression you
           should double check the syntax of the functions that you are attempting to use.</p>

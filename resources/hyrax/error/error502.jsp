@@ -55,7 +55,13 @@
 <hr noshade="noshade" size="1" />
 <table border="0" width="100%">
   <tbody><tr>
-    <td><img style="width: 320px; height: 426px;" src="<%= contextPath %>/docs/images/BadGateway.png" alt="Error 502 - Bad Gateway" /></td>
+    <td>
+        <img style="width: 320px; height: 426px;"
+             src="<%= contextPath %>/docs/images/BadGateway.png"
+             alt="Error 502 - Bad Gateway"
+             title="Bad Gateway"
+                />
+    </td>
     <td><p class="style1" align="center">Oops!</p>
       <p align="center">The remote resource does not appear to reference a THREDDS Catalog.</p>
     <p align="center">If

@@ -50,8 +50,15 @@
 <hr align="left" size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
-        <td><a href="<%= contextPath %>/docs/images/largeEarth.jpg"><img src="<%= contextPath %>/docs/images/smallEarth.jpg"
-                                                                    alt="I looked everywhere!" border="0"/></a></td>
+        <td>
+            <a href="<%= contextPath %>/docs/images/largeEarth.jpg">
+            <img src="<%= contextPath %>/docs/images/smallEarth.jpg"
+                 alt="I looked everywhere!"
+                 title="I looked everywhere!"
+                 border="0"/>
+            </a>
+        </td>
+
         <td>
             <p align="center">The URL requested does not describe a resource that can be found on this server.</p>
 

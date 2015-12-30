@@ -60,6 +60,7 @@
                     <tr>
                         <td>
                             <img alt="BadRequest"
+                                 title="Bad Request"
                                  src="{$serviceContext}{$docsService}/images/BadDapRequest.gif"
                                  width="323" height="350"/>
                         </td>

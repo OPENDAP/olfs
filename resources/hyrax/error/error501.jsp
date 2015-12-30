@@ -57,7 +57,12 @@
 <hr size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
-    <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="That's not going to work..." width="350" height="313" /></td>
+    <td>
+        <img src="<%= contextPath %>/docs/images/forbidden.png"
+             alt="That's not going to work..."
+             title="That's not going to work..."
+             width="350" height="313" /><
+        /td>
     <td><p align="center" class="style1">Hmmmm...</p>
       <p align="center">You asked for a service that is not provided here.</p>
     <p align="center">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>

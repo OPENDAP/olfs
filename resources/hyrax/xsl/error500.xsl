@@ -57,6 +57,7 @@
                     <tr>
                         <td>
                             <img alt="A Bad Thing Happened Here..."
+                                 title="A Bad Thing Happened Here..."
                                  src="{$serviceContext}{$docsService}/images/superman.jpg"
                                  width="320" height="426"/>
                         </td>

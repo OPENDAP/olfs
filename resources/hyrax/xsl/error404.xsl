@@ -59,6 +59,7 @@
                     <tr>
                         <td>
                             <img alt="Not Found"
+                                 title="Not Found"
                                  src="{$serviceContext}{$docsService}/images/largeEarth.jpg"
                                  width="350" height="313" />
                         </td>
