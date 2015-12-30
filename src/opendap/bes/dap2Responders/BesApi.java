@@ -1580,9 +1580,9 @@ public class BesApi {
         log.debug("besTransaction started.");
         log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
 
-
         BES bes = BESManager.getBES(dataSource);
-        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes.getTimeout())));
+        int bes_timeout_seconds = bes.getTimeout()/1000;
+        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes_timeout_seconds)));
         return bes.besTransaction(request,response);
 
 
@@ -1617,7 +1617,8 @@ public class BesApi {
 
 
         BES bes = BESManager.getBES(dataSource);
-        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes.getTimeout())));
+        int bes_timeout_seconds = bes.getTimeout()/1000;
+        request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes_timeout_seconds)));
         return bes.besTransaction(request, os, err);
     }
 

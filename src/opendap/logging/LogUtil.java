@@ -145,7 +145,7 @@ public class LogUtil {
 
             }
             else {
-                System.out.println("+++LogUtil.initLogging() - Logback configuration using logback " +
+                System.out.println("+++LogUtil.initLogging() - Logback configuration using logback's " +
                         "default configuration mechanism");
             }
 
