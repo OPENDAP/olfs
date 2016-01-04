@@ -59,7 +59,7 @@
             <!-- The ClientPool maximum number of concurrent
               -  BES client connections allowed.
               -->
-            <ClientPool maximum="10" maxCmds="2000" />
+            <ClientPool maximum="200" maxCmds="2000" />
 
         </BES>
     </BESManager>
