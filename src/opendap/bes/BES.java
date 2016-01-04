@@ -879,7 +879,11 @@ public class BES {
 
         try {
             boolean result = oc.sendRequest(request,os,err);
-            log.debug("besGetTransaction() - Complete.");
+            log.debug("besTransaction() - Completed.");
+            if(!result){
+                // @TODO Determine from the BESError if the value of besTrouble should be set to true. This should be the case for BESInternalFatalError and BESTimeOut
+                log.error("besTransaction() -  BES Transaction received a BESError Object");
+            }
             return result;
 
         }

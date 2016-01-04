@@ -26,12 +26,10 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.Html;
-import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -42,7 +40,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
-import org.jdom.transform.XSLTransformer;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -118,7 +115,7 @@ public class BESError extends OPeNDAPException {
     public static final int TIME_OUT              = 6;
 
 
-    Document besError = null;
+    Document besErrorDoc = null;
 
 
     public BESError(Document error) {
@@ -149,7 +146,7 @@ public class BESError extends OPeNDAPException {
             error.setRootElement(e);
         }
 
-        besError = processError(error);
+        besErrorDoc = processError(error);
 
 
     }
@@ -171,9 +168,9 @@ public class BESError extends OPeNDAPException {
         try {
             Document error = sb.build(is);
 
-            besError = processError(error);
+            besErrorDoc = processError(error);
 
-            if(besError==null){
+            if(besErrorDoc ==null){
                 setErrorCode(INVALID_ERROR);
                 setErrorMessage("Unable to locate <BESError> object in stream.");
             }
@@ -201,9 +198,9 @@ public class BESError extends OPeNDAPException {
         try {
             Document edoc = sb.build(error);
 
-            besError = processError(edoc);
+            besErrorDoc = processError(edoc);
 
-            if(besError==null){
+            if(besErrorDoc ==null){
                 setErrorCode(INVALID_ERROR);
                 setErrorMessage("Unable to locate <BESError> object in stream.");
             }
@@ -454,7 +451,7 @@ public class BESError extends OPeNDAPException {
             if(xsltFile.exists()) {
                 Transformer transformer = new Transformer(xsltDoc);
                 transformer.setParameter("serviceContext", context);
-                JDOMSource error = new JDOMSource(besError);
+                JDOMSource error = new JDOMSource(besErrorDoc);
                 response.setContentType("text/html");
                 response.setStatus(errorVal);
                 transformer.transform(error, response.getOutputStream());

@@ -52,7 +52,7 @@
 
             <body>
                 <p align="left"> &NBSP; </p>
-                <h1 align="center">Hyrax : BES Timed Out (418)</h1>
+                <h1 align="center">Hyrax : BES Timeout Error (418)</h1>
                 <hr align="left" size="1" noshade="noshade"/>
                 <table width="100%" border="0">
                     <tr>
@@ -77,7 +77,7 @@
                     </tr>
                 </table>
                 <hr align="left" size="1" noshade="noshade"/>
-                <h1 align="center">Hyrax : BES Timed Out (418)</h1>
+                <h1 align="center">Hyrax : BES Timeout Error (418)</h1>
                 <p align="left"></p>
             </body>
         </html>
