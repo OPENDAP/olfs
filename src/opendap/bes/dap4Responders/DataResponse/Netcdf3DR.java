@@ -103,7 +103,8 @@ public class Netcdf3DR extends Dap4Responder{
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -129,16 +130,10 @@ public class Netcdf3DR extends Dap4Responder{
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
-        if(!besApi.writeDap4DataAsNetcdf3(resourceID, qp, user.getMaxResponseSize(), os, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
+        besApi.writeDap4DataAsNetcdf3(resourceID, qp, user.getMaxResponseSize(), responseMediaType, os);
 
 
         os.flush();

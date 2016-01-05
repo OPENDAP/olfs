@@ -27,6 +27,7 @@ package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.PathBuilder;
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.RequestCache;
@@ -293,7 +294,7 @@ public class CatalogManager {
 
 
 
-    public static Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+    public static Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
         Catalog cat = getCatalogAndUpdateIfRequired(catalogKey);
 
         if(cat == null){

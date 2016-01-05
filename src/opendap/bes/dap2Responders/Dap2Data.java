@@ -126,7 +126,8 @@ public class Dap2Data extends Dap4Responder {
         log.debug("sendNormativeRepresentation() For: " + resourceID+
                 "    CE: '" + dap2CE + "'");
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_data");
 
@@ -156,22 +157,15 @@ public class Dap2Data extends Dap4Responder {
         }
 
 
-        if(!besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os,erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("sendNormativeRepresentation() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
+        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),responseMediaType,os);
 
-        }
-        else  if(qp.isStoreResultRequest()){
 
+        if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
-
-
         }
-        else {
-            os.flush();
 
-        }
+        os.flush();
+
 
 
         log.info("sendNormativeRepresentation() Sent DAP2 data response.");

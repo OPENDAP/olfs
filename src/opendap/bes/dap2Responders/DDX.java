@@ -91,7 +91,8 @@ public class DDX extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         //response.setContentType("application/vnd.opendap.org.dap4.description+xml");
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ddx");
@@ -107,41 +108,7 @@ public class DDX extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-
-        }
-
-        /*
-
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DDX,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        0,
-                        xmlBase,
-                        null,
-                        null,
-                        BesApi.XML_ERRORS);
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-        */
-
-
+        besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,responseMediaType,os);
 
         os.flush();
         log.info("Sent DAP DDX.");

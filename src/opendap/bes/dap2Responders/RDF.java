@@ -29,6 +29,7 @@ import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
+import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -97,11 +98,25 @@ public class RDF extends Dap4Responder {
         BesApi besApi = getBesApi();
 
 
+
+        // Set the response headers
+
+        MediaType responseMediaType =  getNormativeMediaType();
+        String accepts = request.getHeader("Accepts");
+        if(accepts==null|| !accepts.equalsIgnoreCase("application/rdf+xml"))
+            responseMediaType = new TextXml();
+        response.setContentType(responseMediaType.getMimeType());
+
+
+        Version.setOpendapMimeHeaders(request,response,besApi);
+        response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
+
+
         String xdap_accept = "3.2";
 
         Document ddx = new Document();
 
-        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);
+        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, responseMediaType, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
@@ -133,17 +148,6 @@ public class RDF extends Dap4Responder {
         // Set the destination of the 2nd transform to be the response OutputStream
         xml2rdf.setOutputStream(os);
 
-        // Set the response headers
-
-        String accepts = request.getHeader("Accepts");
-
-        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
-            response.setContentType(getNormativeMediaType().getMimeType());
-        else
-            response.setContentType("text/xml");
-
-        Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "text/xml");
 
 
         // run the 1st transform. This will send the result through the 2nd transform and

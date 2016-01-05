@@ -27,6 +27,7 @@ package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.PathBuilder;
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.namespaces.THREDDS;
@@ -262,7 +263,7 @@ public class DatasetScan  extends Dataset {
     }
 
 
-    public Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+    public Catalog getCatalog(String catalogKey) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
 
 
         if(!matches(catalogKey))

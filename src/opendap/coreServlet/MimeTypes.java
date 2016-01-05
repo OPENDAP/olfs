@@ -26,6 +26,8 @@
 
 package opendap.coreServlet;
 
+import opendap.bes.dap4Responders.MediaType;
+
 import java.util.TreeMap;
 
 /**
@@ -36,7 +38,7 @@ import java.util.TreeMap;
  */
 public class MimeTypes {
 
-    private static TreeMap<String, String> typeMap = new TreeMap<String, String>();
+    private static TreeMap<String, String[]> typeMap = new TreeMap<>();
 
 
     /**
@@ -45,175 +47,175 @@ public class MimeTypes {
     static {
 
         // Plain Text
-        typeMap.put("txt", "text/plain");
-        typeMap.put("text","text/plain");
+        typeMap.put("txt",   new String[] {"text", "plain"});
+        typeMap.put("text",  new String[] {"text", "plain"});
 
         // Human Readable Rich Text
-        typeMap.put("rtf",   "text/rtf");
+        typeMap.put("rtf",   new String[] {"text", "rtf"});
 
-        typeMap.put("html",  "text/html");
-        typeMap.put("htm",   "text/html");
-        typeMap.put("xhtml", "text/xhtml");
-        typeMap.put("xhtm",  "text/xhtml");
-        typeMap.put("shtml", "text/xhtml");
-        typeMap.put("shtm",  "text/xhtml");
+        typeMap.put("html",  new String[] {"text", "html"});
+        typeMap.put("htm",   new String[] {"text", "html"});
+        typeMap.put("xhtml", new String[] {"text", "xhtml"});
+        typeMap.put("xhtm",  new String[] {"text", "xhtml"});
+        typeMap.put("shtml", new String[] {"text", "xhtml"});
+        typeMap.put("shtm",  new String[] {"text", "xhtml"});
 
-        typeMap.put("xml",   "text/xml");
-        typeMap.put("jsp",   "text/jsp");
-        typeMap.put("css",   "text/css");
+        typeMap.put("xml",   new String[] {"text", "xml"});
+        typeMap.put("jsp",   new String[] {"text", "jsp"});
+        typeMap.put("css",   new String[] {"text", "css"});
 
 
         // Images
-        typeMap.put("jpeg",  "image/jpeg");
-        typeMap.put("jpg",   "image/jpeg");
-        typeMap.put("jfif",  "image/jpeg");
-        typeMap.put("jpe",   "image/jpeg");
+        typeMap.put("jpeg",  new String[] {"image", "jpeg"});
+        typeMap.put("jpg",   new String[] {"image", "jpeg"});
+        typeMap.put("jfif",  new String[] {"image", "jpeg"});
+        typeMap.put("jpe",   new String[] {"image", "jpeg"});
 
-        typeMap.put("gif",   "image/gif");
+        typeMap.put("gif",   new String[] {"image", "gif"});
 
-        typeMap.put("png",   "image/png");
+        typeMap.put("png",   new String[] {"image", "png"});
 
-        typeMap.put("tiff",  "image/tiff");
-        typeMap.put("tif",   "image/tiff");
+        typeMap.put("tiff",  new String[] {"image", "tiff"});
+        typeMap.put("tif",   new String[] {"image", "tiff"});
 
-        typeMap.put("bmp",   "image/bmp");
+        typeMap.put("bmp",   new String[] {"image", "bmp"});
 
-        typeMap.put("psd",   "image/psd");
+        typeMap.put("psd",   new String[] {"image", "psd"});
 
 
         // Video
-        typeMap.put("mov",   "video/quicktime");
-        typeMap.put("qt",    "video/quicktime");
+        typeMap.put("mov",   new String[] {"video", "quicktime"});
+        typeMap.put("qt",    new String[] {"video", "quicktime"});
 
-        typeMap.put("avi",   "video/avi");
+        typeMap.put("avi",   new String[] {"video", "avi"});
 
-        typeMap.put("mpeg",  "video/mpeg");
-        typeMap.put("mpg",   "video/mpeg");
-        typeMap.put("mpe",   "video/mpeg");
+        typeMap.put("mpeg",  new String[] {"video", "mpeg"});
+        typeMap.put("mpg",   new String[] {"video", "mpeg"});
+        typeMap.put("mpe",   new String[] {"video", "mpeg"});
 
-        typeMap.put("mp4",   "video/mp4");
-        typeMap.put("m4v",   "video/mp4v");
+        typeMap.put("mp4",   new String[] {"video", "mp4"});
+        typeMap.put("m4v",   new String[] {"video", "mp4v"});
 
 
         // Audio
-        typeMap.put("mp3",   "audio/mp3");
+        typeMap.put("mp3",   new String[] {"audio", "mp3"});
 
-        typeMap.put("m4a",   "audio/mp4");
-        typeMap.put("aac",   "audio/mp4");
+        typeMap.put("m4a",   new String[] {"audio", "mp4"});
+        typeMap.put("aac",   new String[] {"audio", "mp4"});
 
-        typeMap.put("aiff",  "audio/x-aiff");
-        typeMap.put("aif",   "audio/x-aiff");
-        typeMap.put("aifc",  "audio/x-aiff");
+        typeMap.put("aiff",  new String[] {"audio", "x-aiff"});
+        typeMap.put("aif",   new String[] {"audio", "x-aiff"});
+        typeMap.put("aifc",  new String[] {"audio", "x-aiff"});
 
-        typeMap.put("wav",  "audio/wave");
+        typeMap.put("wav",   new String[] {"audio", "wave"});
 
-        typeMap.put("midi",  "audio/midi");
-        typeMap.put("mid",   "audio/midi");
+        typeMap.put("midi",  new String[] {"audio", "midi"});
+        typeMap.put("mid",   new String[] {"audio", "midi"});
 
 
         // PDF and Postscript
-        typeMap.put("pdf",   "application/pdf");
-        typeMap.put("ps",    "application/postscript");
-        typeMap.put("eps",   "application/postscript");
-        typeMap.put("ai",    "application/illustrator");
+        typeMap.put("pdf",   new String[] {"application", "pdf"});
+        typeMap.put("ps",    new String[] {"application", "postscript"});
+        typeMap.put("eps",   new String[] {"application", "postscript"});
+        typeMap.put("ai",    new String[] {"application", "illustrator"});
 
 
         // Windows Media
-        typeMap.put("asx",    "video/x-ms-asf");
-        typeMap.put("asf",    "video/x-ms-asf");
-        typeMap.put("wma",    "video/x-ms-wma");
-        typeMap.put("wax",    "video/x-ms-wax");
-        typeMap.put("wmv",    "video/x-ms-wmv");
-        typeMap.put("wvx",    "video/x-ms-wvx");
-        typeMap.put("wm",     "video/x-ms-wm");
-        typeMap.put("wmx",    "video/x-ms-wmx");
-        typeMap.put("wmz",    "video/x-ms-wmz");
-        typeMap.put("wmd",    "video/x-ms-wmd");
+        typeMap.put("asx",    new String[] {"video", "x-ms-asf"});
+        typeMap.put("asf",    new String[] {"video", "x-ms-asf"});
+        typeMap.put("wma",    new String[] {"video", "x-ms-wma"});
+        typeMap.put("wax",    new String[] {"video", "x-ms-wax"});
+        typeMap.put("wmv",    new String[] {"video", "x-ms-wmv"});
+        typeMap.put("wvx",    new String[] {"video", "x-ms-wvx"});
+        typeMap.put("wm",     new String[] {"video", "x-ms-wm"});
+        typeMap.put("wmx",    new String[] {"video", "x-ms-wmx"});
+        typeMap.put("wmz",    new String[] {"video", "x-ms-wmz"});
+        typeMap.put("wmd",    new String[] {"video", "x-ms-wmd"});
 
 
         // Microsoft Office
-        typeMap.put("doc",   "application/msword");
-        typeMap.put("xls",   "application/vnd.ms-excel");
-        typeMap.put("ppt",   "application/vnd.ms-powerpoint");
+        typeMap.put("doc",   new String[] {"application", "msword"});
+        typeMap.put("xls",   new String[] {"application", "vnd.ms-excel"});
+        typeMap.put("ppt",   new String[] {"application", "vnd.ms-powerpoint"});
 
 
         // OpenDocument
-        typeMap.put("odb",   "application/vnd.oasis.opendocument.database");
-        typeMap.put("odc",   "application/vnd.oasis.opendocument.chart");
-        typeMap.put("odf",   "application/vnd.oasis.opendocument.formula");
-        typeMap.put("odg",   "application/vnd.oasis.opendocument.graphics");
-        typeMap.put("otg",   "application/vnd.oasis.opendocument.graphics-template");
+        typeMap.put("odb",   new String[] {"application", "vnd.oasis.opendocument.database"});
+        typeMap.put("odc",   new String[] {"application", "vnd.oasis.opendocument.chart"});
+        typeMap.put("odf",   new String[] {"application", "vnd.oasis.opendocument.formula"});
+        typeMap.put("odg",   new String[] {"application", "vnd.oasis.opendocument.graphics"});
+        typeMap.put("otg",   new String[] {"application", "vnd.oasis.opendocument.graphics-template"});
 
-        typeMap.put("odi",   "application/vnd.oasis.opendocument.image");
-        typeMap.put("odm",   "application/vnd.oasis.opendocument.text-master");
-        typeMap.put("odp",   "application/vnd.oasis.opendocument.presentation");
-        typeMap.put("otp",   "application/vnd.oasis.opendocument.presentation-template");
+        typeMap.put("odi",   new String[] {"application", "vnd.oasis.opendocument.image"});
+        typeMap.put("odm",   new String[] {"application", "vnd.oasis.opendocument.text-master"});
+        typeMap.put("odp",   new String[] {"application", "vnd.oasis.opendocument.presentation"});
+        typeMap.put("otp",   new String[] {"application", "vnd.oasis.opendocument.presentation-template"});
 
-        typeMap.put("ods",   "application/vnd.oasis.opendocument.spreadsheet");
-        typeMap.put("ots",   "application/vnd.oasis.opendocument.spreadsheet-template");
+        typeMap.put("ods",   new String[] {"application", "vnd.oasis.opendocument.spreadsheet"});
+        typeMap.put("ots",   new String[] {"application", "vnd.oasis.opendocument.spreadsheet-template"});
 
-        typeMap.put("odt",   "application/vnd.oasis.opendocument.text");
-        typeMap.put("ott",   "application/vnd.oasis.opendocument.text-template");
-        typeMap.put("oth",   "application/vnd.oasis.opendocument.text-web");
+        typeMap.put("odt",   new String[] {"application", "vnd.oasis.opendocument.text"});
+        typeMap.put("ott",   new String[] {"application", "vnd.oasis.opendocument.text-template"});
+        typeMap.put("oth",   new String[] {"application", "vnd.oasis.opendocument.text-web"});
 
 
         // StarOffice/OpenOffice.org/NeoOffice
-        typeMap.put("sxc",   "application/vnd.sun.xml.calc");
-        typeMap.put("stc",   "application/vnd.sun.xml.calc-template");
+        typeMap.put("sxc",   new String[] {"application", "vnd.sun.xml.calc"});
+        typeMap.put("stc",   new String[] {"application", "vnd.sun.xml.calc-template"});
 
-        typeMap.put("sxd",   "application/vnd.sun.xml.draw");
-        typeMap.put("std",   "application/vnd.sun.xml.draw-template");
+        typeMap.put("sxd",   new String[] {"application", "vnd.sun.xml.draw"});
+        typeMap.put("std",   new String[] {"application", "vnd.sun.xml.draw-template"});
 
-        typeMap.put("sxg",   "application/vnd.sun.xml.writer.global");
+        typeMap.put("sxg",   new String[] {"application", "vnd.sun.xml.writer.global"});
 
-        typeMap.put("sxi",   "application/vnd.sun.xml.impress");
-        typeMap.put("sti",   "application/vnd.sun.xml.impress-template");
+        typeMap.put("sxi",   new String[] {"application", "vnd.sun.xml.impress"});
+        typeMap.put("sti",   new String[] {"application", "vnd.sun.xml.impress-template"});
 
-        typeMap.put("sxm",   "application/vnd.sun.xml.math");
+        typeMap.put("sxm",   new String[] {"application", "vnd.sun.xml.math"});
 
-        typeMap.put("sxw",   "application/vnd.sun.xml.writer");
-        typeMap.put("stw",   "application/vnd.sun.xml.writer-template");
+        typeMap.put("sxw",   new String[] {"application", "vnd.sun.xml.writer"});
+        typeMap.put("stw",   new String[] {"application", "vnd.sun.xml.writer-template"});
 
 
         // Java
-        typeMap.put("class", "application/java");
-        typeMap.put("java",  "application/x-java-source");
-        typeMap.put("jar",   "application/java");
+        typeMap.put("class", new String[] {"application", "java"});
+        typeMap.put("java",  new String[] {"application", "x-java-source"});
+        typeMap.put("jar",   new String[] {"application", "java"});
 
 
         // Miscellaneous
 
-        typeMap.put("torrent", "application/x-bittorrent");
-        typeMap.put("m3u",     "audio/mpegurl");
-        typeMap.put("pls",     "audio/scpls");
-        typeMap.put("djvu",    "image/x-djvu");
-        typeMap.put("djv",     "image/x-djvu");
-        typeMap.put("vcf",     "text/x-vcard");
-        typeMap.put("vcs",     "text/x-vcalander");
-        typeMap.put("ics",     "text/calander");
+        typeMap.put("torrent", new String[] {"application", "x-bittorrent"});
+        typeMap.put("m3u",     new String[] {"audio", "mpegurl"});
+        typeMap.put("pls",     new String[] {"audio", "scpls"});
+        typeMap.put("djvu",    new String[] {"image", "x-djvu"});
+        typeMap.put("djv",     new String[] {"image", "x-djvu"});
+        typeMap.put("vcf",     new String[] {"text", "x-vcard"});
+        typeMap.put("vcs",     new String[] {"text", "x-vcalander"});
+        typeMap.put("ics",     new String[] {"text", "calander"});
 
 
         // OPeNDAP DAP2
 
-        typeMap.put("das",     "text/x-dods_das");
-        typeMap.put("dds",     "text/x-dods_dds");
-        typeMap.put("dods",    "application/octet-stream");
-        typeMap.put("xdods",   "text/xml");
+        typeMap.put("das",     new String[] {"text", "x-dods_das"});
+        typeMap.put("dds",     new String[] {"text", "x-dods_dds"});
+        typeMap.put("dods",    new String[] {"application","octet-stream"});
+        typeMap.put("xdods",   new String[] {"text","xml"});
 
 
-        typeMap.put("jnlp",    "application/x-java-jnlp-file");
+        typeMap.put("jnlp",    new String[] {"application","x-java-jnlp-file"});
 
 
-        typeMap.put("hdf",     "application/x-hdf");
-        typeMap.put("hdf4",    "application/x-hdf");
+        typeMap.put("hdf",     new String[] {"application","x-hdf"});
+        typeMap.put("hdf4",    new String[] {"application","x-hdf"});
 
-        typeMap.put("h5",      "application/x-hdf5");
-        typeMap.put("hdf5",    "application/x-hdf5");
+        typeMap.put("h5",      new String[] {"application","x-hdf5"});
+        typeMap.put("hdf5",    new String[] {"application","x-hdf5"});
 
-        typeMap.put("nc",      "application/x-netcdf");
+        typeMap.put("nc",      new String[] {"application","x-netcdf"});
+        typeMap.put("nc4",     new String[] {"application","x-netcdf;ver=4"});
 
-
-
+        typeMap.put("ncml",      new String[] {"text","xml"});
 
 
 
@@ -225,7 +227,24 @@ public class MimeTypes {
      * @return The MIME type associated with the passed file extension. Null if no mapping can be found.
      */
     public static String getMimeType(String fileExtension){
-        return typeMap.get(fileExtension.toLowerCase());
+        String mimeTypeString = null;
+        String type[] =  typeMap.get(fileExtension.toLowerCase());
+        if(type!=null){
+            mimeTypeString = type[0] + "/" + type[1] ;
+
+        }
+        return mimeTypeString;
+    }
+
+    public static MediaType getMediaType(String fileExtension){
+
+        MediaType mediaType = null;
+        String type[] =  typeMap.get(fileExtension.toLowerCase());
+        if(type!=null){
+            mediaType = new MediaType(type[0], type[1], fileExtension);
+        }
+
+         return mediaType;
     }
 
 

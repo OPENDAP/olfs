@@ -99,7 +99,8 @@ public class Netcdf4 extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
@@ -128,12 +129,7 @@ public class Netcdf4 extends Dap4Responder {
 
 
 
-        if(!besApi.writeDap2DataAsNetcdf4(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
+        besApi.writeDap2DataAsNetcdf4(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), responseMediaType, os);
 
 
         os.flush();

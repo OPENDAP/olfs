@@ -27,6 +27,7 @@
 package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -692,7 +693,7 @@ public class BES {
      * @throws JDOMException
      */
     public boolean besTransaction(Document request, Document response )
-            throws IOException, PPTException, BadConfigurationException, JDOMException {
+            throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
 
@@ -715,10 +716,11 @@ public class BES {
 
         try {
 
+            BESError besError = null;
+
             if(oc.sendRequest(request,baos,erros)){
 
-                log.debug("BES returned this document:\n" +
-                        "-----------\n" + baos + "-----------");
+                log.debug("besTransaction() The BES returned this document:\n{}",baos);
 
                 if(baos.size() != 0){
 
@@ -740,12 +742,12 @@ public class BES {
 
                 return true;
 
-            }
-            else {
+            } else {
 
                 log.debug("BES returned this ERROR document:\n" +
                         "-----------\n" + erros + "-----------");
 
+                /*
 
                 if(erros.size()!=0){
                     doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
@@ -774,15 +776,45 @@ public class BES {
 
                 return false;
 
+                   */
+
+
+                // log.debug("BESError: \n{}",baos.toString());
+                if (erros.size() != 0) {
+
+                    ByteArrayInputStream bais = new ByteArrayInputStream(erros.toByteArray());
+                    besError = new BESError(bais);
+
+                    log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
+
+                    int besErrCode = besError.getErrorCode();
+                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                        trouble = true;
+                    }
+                } else {
+                    String reqId = request.getRootElement().getAttributeValue("reqID");
+                    Document errDoc = getMissingBesResponseError(reqId);
+                    besError = new BESError(errDoc);
+
+                }
+
+
+                int besErrCode = besError.getErrorCode();
+                if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                    trouble = true;
+
+                }
+
+                throw besError;
+
             }
 
 
-        }
-        catch (PPTException e) {
+        } catch (PPTException e) {
 
             trouble = true;
 
-            log.debug("OLFS Encountered a PPT Problem!",e);
+            log.debug("OLFS Encountered a PPT Problem!", e);
             //e.printStackTrace();
 
             String msg = "besTransaction() Problem with OPeNDAPClient. " +
@@ -790,49 +822,12 @@ public class BES {
 
             log.error(msg);
             throw new PPTException(msg);
-        }
-        finally {
+        } finally {
             returnClient(oc, trouble);
 
             Timer.stop(timedProc);
             log.debug("besTransaction() -  END.");
         }
-
-
-    }
-
-    String showRequest(Document request) throws IOException{
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        return xmlo.outputString(request);
-
-    }
-
-    private Element getMissingBesResponseError(String reqId){
-
-
-        Element errorResponse = new Element("response",BES_NS);
-        Element bes       = new Element("BES",BES_NS);
-        Element besError  = new Element("BESError",BES_NS);
-        Element type      = new Element("Type",BES_NS);
-        Element message   = new Element("Message",BES_NS);
-        Element admin     = new Element("Administrator",BES_NS);
-
-        errorResponse.addNamespaceDeclaration(BES_NS);
-        errorResponse.setAttribute("reqID", reqId);
-
-        type.setText("1");
-        message.setText("BES returned an empty error document! That's a bad thing!");
-        admin.setText("UNKNOWN Administrator - BES Error response was empty!");
-
-        besError.addContent(type);
-        besError.addContent(message);
-        besError.addContent(admin);
-        bes.addContent(besError);
-
-        errorResponse.addContent(bes);
-
-        return errorResponse;
 
 
     }
@@ -843,17 +838,15 @@ public class BES {
      *
      * @param request   The BES request document.
      * @param os   The outputstream to write the BES response to.
-     * @param err  The output stream to which BES errors should be written
-     * @return true if the request is successful, false if there is a problem fulfilling the request. If false, then
+     * @param mt  The MediaType for the response that was negotiated with the client. This is used in the event that
+     *            an error object needs to be sent.
      * any error information will be written to the OutputStream err.
      * @throws BadConfigurationException
      * @throws IOException
      * @throws PPTException
      */
-    public boolean besTransaction(Document request,
-                                             OutputStream os,
-                                             OutputStream err)
-            throws BadConfigurationException, IOException, PPTException {
+    public void besTransaction(Document request, MediaType mt, OutputStream os)
+            throws BadConfigurationException, IOException, PPTException, BESError {
 
 
 
@@ -878,13 +871,26 @@ public class BES {
         Procedure timedProc = Timer.start();
 
         try {
-            boolean result = oc.sendRequest(request,os,err);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            boolean result = oc.sendRequest(request,os,baos);
             log.debug("besTransaction() - Completed.");
             if(!result){
                 // @TODO Determine from the BESError if the value of besTrouble should be set to true. This should be the case for BESInternalFatalError and BESTimeOut
-                log.error("besTransaction() -  BES Transaction received a BESError Object");
+
+                // log.debug("BESError: \n{}",baos.toString());
+                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                BESError besError = new BESError(bais,mt);
+
+                log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}",besError.getMessage());
+
+                int besErrCode = besError.getErrorCode();
+                if( besErrCode==BESError.INTERNAL_FATAL_ERROR || besErrCode==BESError.TIME_OUT ){
+                    besTrouble = true;
+                }
+
+                throw besError;
             }
-            return result;
 
         }
         catch (PPTException e) {
@@ -894,20 +900,55 @@ public class BES {
 
             String msg = "Problem encountered with BES connection. Message: '"  + e.getMessage() + "' " +
                     "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
-            String logMsg  = "besGetTransaction() - " + msg;
 
-            log.error(logMsg);
+            log.error("besGetTransaction() - {}",msg);
 
+            e.setErrorMessage(msg);
 
-            err.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-            throw new PPTException(msg,e);
+            throw e;
         }
         finally {
             returnClient(oc, besTrouble);
-
             Timer.stop(timedProc);
-
         }
+
+    }
+
+
+
+    String showRequest(Document request) throws IOException{
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(request);
+
+    }
+
+    private Document getMissingBesResponseError(String reqId){
+
+
+        Element errorResponse = new Element("response",BES_NS);
+        Element bes       = new Element("BES",BES_NS);
+        Element besError  = new Element("BESError",BES_NS);
+        Element type      = new Element("Type",BES_NS);
+        Element message   = new Element("Message",BES_NS);
+        Element admin     = new Element("Administrator",BES_NS);
+
+        errorResponse.addNamespaceDeclaration(BES_NS);
+        errorResponse.setAttribute("reqID", reqId);
+
+        type.setText("1");
+        message.setText("BES returned an empty error document! That's a bad thing!");
+        admin.setText("UNKNOWN Administrator - BES Error response was empty!");
+
+        besError.addContent(type);
+        besError.addContent(message);
+        besError.addContent(admin);
+        bes.addContent(besError);
+
+        errorResponse.addContent(bes);
+
+        return new Document(errorResponse);
+
 
     }
 

@@ -29,9 +29,15 @@ package opendap.aggregation;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.MimeTypes;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.http.mediaTypes.Netcdf3;
+import opendap.http.mediaTypes.Netcdf4;
+import opendap.http.mediaTypes.TextHtml;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 
@@ -259,7 +265,7 @@ public class AggregationServlet extends HttpServlet {
      */
     private void writeAggregationVersion(HttpServletRequest request, HttpServletResponse response,
                                          ServletOutputStream out)
-            throws IOException, PPTException, BadConfigurationException, JDOMException {
+            throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         response.setContentType("text/plain");
 
@@ -310,16 +316,25 @@ public class AggregationServlet extends HttpServlet {
      * @throws BESError
      */
     private void writeSinglePlainGranule(String granule, OutputStream os)
-            throws IOException, PPTException, BadConfigurationException, BESError {
+            throws IOException, BadConfigurationException {
 
-        ByteArrayOutputStream errors = new ByteArrayOutputStream();
 
-        if (!_besApi.writeFile(granule, os, errors)) {
-            String msg = new String(errors.toByteArray(), HyraxStringEncoding.getCharset());
+        MediaType responseMediaType = null;
+        String suffix = ReqInfo.getSuffix(granule);
+
+        if (suffix != null) {
+            responseMediaType = MimeTypes.getMediaType(suffix);
+        }
+
+        try {
+            _besApi.writeFile(granule, responseMediaType, os);
+        }
+        catch (BESError | PPTException | IOException | BadConfigurationException e) {
+            String msg = e.getMessage();
             os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-
             _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
         }
+
     }
 
     /**
@@ -380,34 +395,21 @@ public class AggregationServlet extends HttpServlet {
             throws IOException, PPTException, BadConfigurationException, BESError {
 
         String xdap_accept = "3.2";
-        ByteArrayOutputStream errors = new ByteArrayOutputStream();
-        boolean status = false;
 
         switch (format) {
             case netcdf3:
-                status = _besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                _besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, new Netcdf3(), os);
                 break;
             case netcdf4:
-                status = _besApi.writeDap2DataAsNetcdf4(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                _besApi.writeDap2DataAsNetcdf4(granule, ce, xdap_accept, maxResponseSize, new Netcdf4(), os);
                 break;
             case ascii:
-                status = _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, os, errors);
+                _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, new TextHtml(), os);
                 break;
             default:
             	break;
         }
 
-        if (!status) {
-            // Processing errors this way means that if the BES fails to perform
-            // some function, e.g., the CE is bad, that error message will be used
-            // as the value of the file in the Zip archive. This provides a way for
-            // most of a request to work even if some of the files are broken.
-            String msg = new String(errors.toByteArray(), HyraxStringEncoding.getCharset());
-
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-
-            _log.error("Aggregation Error in writeSingleFormattedGranule(): {}", msg);
-        }
     }
 
     /**

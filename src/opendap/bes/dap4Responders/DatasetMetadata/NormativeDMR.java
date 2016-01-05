@@ -101,7 +101,8 @@ public class NormativeDMR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -109,20 +110,11 @@ public class NormativeDMR extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
 
-        if(!besApi.writeDMR(resourceID,qp,xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
-
-
-
+        besApi.writeDMR(resourceID,qp,xmlBase,responseMediaType, os);
 
         os.flush();
         log.info("Sent {}",getServiceTitle());

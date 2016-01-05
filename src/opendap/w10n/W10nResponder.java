@@ -61,6 +61,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Handles w10n services. Performs  HTTP server/client content negotiation, evaluates w10n requests
@@ -104,7 +105,7 @@ public class W10nResponder  {
 
         _supportedMetaMediaTypes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        mt = new Html();
+        mt = new TextHtml();
         _supportedMetaMediaTypes.put(mt.getName(), mt);
 
 
@@ -148,7 +149,7 @@ public class W10nResponder  {
 
         // If they aren't asking for html then set the Content-Disposition header which will trigger a browser
         // to download the response and save it to a file.
-        if(!mt.getName().equalsIgnoreCase(Html.NAME) && !mt.getName().equalsIgnoreCase(Json.NAME)) {
+        if(!mt.getName().equalsIgnoreCase(TextHtml.NAME) && !mt.getName().equalsIgnoreCase(Json.NAME)) {
             while(requestedResourceId.endsWith("/") && requestedResourceId.length()>=0){
                 requestedResourceId = requestedResourceId.substring(0,requestedResourceId.lastIndexOf("/"));
             }
@@ -198,6 +199,7 @@ public class W10nResponder  {
         W10nRequest w10nRequest = new W10nRequest(request);
         User user = new User(request);
 
+        MediaType responseMediaType = w10nRequest.getBestMediaType();
 
         /**
          * This section asks the BES to evaluate the requested resource and return a report that indicates what
@@ -207,14 +209,8 @@ public class W10nResponder  {
          *
          */
         Document pathInfoDoc =  new Document();
-        boolean result = _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), pathInfoDoc);
-        if(!result){
-            BESError besError = new BESError(pathInfoDoc);
-            _log.error("send_w10n_response() encountered a BESError: {}"+besError.getMessage());
 
-            besError.sendErrorResponse(_systemPath,request.getContextPath(),response);
-            return; // Because it broke already....
-        }
+        _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), responseMediaType, pathInfoDoc);
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -256,7 +252,7 @@ public class W10nResponder  {
 
             setResponseHeaders(request,w10nRequest.getRequestedResourceId(), w10nRequest.getBestMediaType(), response);
 
-            _log.debug("send_w10n_response() - Sending w10n meta response for resource: {} Response type: {}",w10nRequest.getRequestedResourceId(),w10nRequest.getBestMediaType().getMimeType());
+            _log.debug("send_w10n_response() - Sending w10n meta response for resource: {} Response type: {}", w10nRequest.getRequestedResourceId(), responseMediaType.getMimeType());
 
 
             // First we QC the request
@@ -365,7 +361,7 @@ public class W10nResponder  {
 
         if(!response.isCommitted())
             response.reset();
-        response.setContentType(new Html().getMimeType());
+        response.setContentType(new TextHtml().getMimeType());
         response.setHeader("Content-Description","ERROR");
 
         response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
@@ -398,7 +394,7 @@ public class W10nResponder  {
      */
     private void sendW10nMetaResponseForFileOrDir(W10nRequest w10nRequest,
                                                   HttpServletResponse response)
-            throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+            throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
 
 
         MediaType mt = w10nRequest.getBestMediaType();
@@ -419,7 +415,7 @@ public class W10nResponder  {
                 sendBesCatalogAsJson(showCatalogDoc, w10nRequest, response);
 
             }
-            else if(mt.getName().equalsIgnoreCase(Html.NAME)){
+            else if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
                 _log.debug("sendMetaResponseForFileOrDir() - Sending as HTML");
                 sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
             }
@@ -800,35 +796,49 @@ public class W10nResponder  {
 
 
 
-        _log.debug("Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
+        _log.debug("sendNetCDF_3() - Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
 
 
         String xdap_accept = "3.2";
 
 
+
+        String resourceID = w10nRequest.getRequestedResourceId();
+        MediaType responseMediaType = new Netcdf4();
+
+        response.setContentType(responseMediaType.getMimeType());
+
+        response.setHeader("Content-Description", responseMediaType.getMimeType());
+
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        downloadFileName = downloadFileName+".nc";
+
+        _log.debug("sendNetCDF_3() - NetCDF file downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+        response.setHeader("Content-Disposition", contentDisposition);
+
+
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
-        if(!_besApi.writeDap2DataAsNetcdf3(
+        _besApi.writeDap2DataAsNetcdf3(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 xdap_accept,
                 maxResponseSize,
-                os,
-                erros)){
+                responseMediaType,
+                os);
 
-
-            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
-            _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-
-        }
 
 
         os.flush();
-        _log.debug("Sent NetCDF-3 for {}",w10nRequest.getValidResourcePath());
+        _log.debug("sendNetCDF_3() - Sent NetCDF-3 for {}",w10nRequest.getValidResourcePath());
 
 
 
@@ -857,7 +867,7 @@ public class W10nResponder  {
 
 
 
-        _log.debug("Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
+        _log.debug("sendNetCDF_4() - Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
 
 
 
@@ -866,26 +876,42 @@ public class W10nResponder  {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        String resourceID = w10nRequest.getRequestedResourceId();
+        MediaType responseMediaType = new Netcdf4();
 
 
-        if (!_besApi.writeDap2DataAsNetcdf4(
+        response.setContentType(responseMediaType.getMimeType());
+
+        response.setHeader("Content-Description", responseMediaType.getMimeType());
+
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        downloadFileName = downloadFileName+".nc4";
+
+        _log.debug("sendNetCDF_4() - NetCDF file downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+        response.setHeader("Content-Disposition", contentDisposition);
+
+
+
+        _besApi.writeDap2DataAsNetcdf4(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 xdap_accept,
                 maxResponseSize,
-                os,
-                erros)){
+                responseMediaType,
+                os);
 
-            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
-            _log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
 
-        }
 
 
         os.flush();
-        _log.debug("Sent NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
+        _log.debug("sendNetCDF_4() - Sent NetCDF-4 for dataset: {}", w10nRequest.getValidResourcePath());
 
 
 
@@ -923,7 +949,7 @@ public class W10nResponder  {
         ServletOutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if (!_besApi.writeDap2DataAsW10nJson(
+        _besApi.writeDap2DataAsW10nJson(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nMetaObject,
@@ -931,14 +957,8 @@ public class W10nResponder  {
                 w10nRequest.flatten(),
                 "3.2",
                 maxResponseSize,
-                os,
-                erros)) {
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()),w10nRequest.getBestMediaType());
-            besError.sendErrorResponse(_systemPath, "opendap", response);
-            return;
-        }
-
+                _defaultDataMediaType,
+                os);
 
 
         os.flush();
@@ -962,18 +982,17 @@ public class W10nResponder  {
                               HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-        _log.debug("Sending DAP2 data response for dataset: {}",w10nRequest.getValidResourcePath());
+        _log.debug("sendDap2Data() - Sending DAP2 data response for dataset: {}",w10nRequest.getValidResourcePath());
 
 
         ServletOutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if (!_besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, os, erros)) {
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()),w10nRequest.getBestMediaType());
-            besError.sendErrorResponse(_systemPath, "opendap", response);
-            return;
-        }
+        MediaType responseMediaType = new Dap2Data();
+        response.setContentType(responseMediaType.getMimeType());
 
+        response.setHeader("Content-Description", responseMediaType.getMimeType());
+
+        _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, responseMediaType, os);
 
         os.flush();
 
@@ -1009,32 +1028,23 @@ public class W10nResponder  {
 
         String suffix = ReqInfo.getRequestSuffix(req);
 
+        MediaType responseMediaType = null;
+
         if (suffix != null) {
-            String mType = MimeTypes.getMimeType(suffix);
-
-            if (mType != null)
-                response.setContentType(mType);
-
-            _log.debug("   MIME type: " + mType + "  ");
+            responseMediaType = MimeTypes.getMediaType(suffix);
+            if (responseMediaType != null) {
+                response.setContentType(responseMediaType.getMimeType());
+                _log.debug("sendFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
+            }
         }
-
-
-
-
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         ServletOutputStream sos = response.getOutputStream();
-        if(!_besApi.writeFile(name, sos, erros)){
+        _besApi.writeFile(name, responseMediaType, sos);
 
-            BESError berr = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+        sos.flush();
 
-            _log.error("sendFile() - ERROR. msg: "+ berr.getMessage());
-            berr.sendErrorResponse(_systemPath, req.getContextPath(), response);
 
-        }
 
 
     }
@@ -1063,7 +1073,7 @@ public class W10nResponder  {
 
         MediaType mt = w10nRequest.getBestMediaType();
 
-        if(mt.getName().equalsIgnoreCase(Html.NAME)){
+        if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
             sendDap2MetadataAsW10nHtml(w10nRequest, response);
             return;
         }
@@ -1108,9 +1118,7 @@ public class W10nResponder  {
 
         ServletOutputStream os = response.getOutputStream();
 
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-        if (!_besApi.writeDap2MetadataAsW10nJson(
+        _besApi.writeDap2MetadataAsW10nJson(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nMetaObject,
@@ -1119,13 +1127,8 @@ public class W10nResponder  {
                 w10nRequest.traverse(),
                 "3.2",
                 maxResponseSize,
-                os,
-                erros)) {
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()),w10nRequest.getBestMediaType());
-            besError.sendErrorResponse(_systemPath, "opendap", response);
-            return;
-        }
+                _defaultDataMediaType,
+                os);
 
         os.flush();
 
@@ -1150,11 +1153,7 @@ public class W10nResponder  {
 
         Document besResponse = new Document();
 
-        if (!_besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(), besResponse)) {
-            BESError besError = new BESError(besResponse,w10nRequest.getBestMediaType());
-            besError.sendErrorResponse(_systemPath, "opendap", response);
-            return;
-        }
+        _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(), new TextHtml(), besResponse);
 
 
         boolean isNode = true;

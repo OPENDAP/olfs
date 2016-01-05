@@ -30,8 +30,10 @@ import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.BesDapDispatcher;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
+import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -206,6 +208,10 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         String location;
         Element e;
 
+
+
+
+
         Iterator i = ncml.getDescendants(new ElementFilter());
         while(i.hasNext()){
             e  = (Element) i.next();
@@ -223,6 +229,9 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         XMLOutputter xmlo = new XMLOutputter();
 
 
+        MediaType responseMediaType = new TextXml();
+        response.setContentType(responseMediaType.getMimeType());
+
         xmlo.output(ncml,response.getOutputStream());
 
 
@@ -235,25 +244,15 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         SAXBuilder sb = new SAXBuilder();
 
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
         Document ncmlDocument;
-
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+        _besApi.writeFile(name, new TextXml(), baos);
 
+        ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        if(!_besApi.writeFile(name, baos, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error(msg);
-            ByteArrayInputStream errorDoc = new ByteArrayInputStream(erros.toByteArray());
-            ncmlDocument = sb.build(errorDoc);
-        }
-        else {
-            ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
-            ncmlDocument = sb.build(is);
-        }
+        ncmlDocument = sb.build(is);
 
         return ncmlDocument;
 

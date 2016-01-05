@@ -106,7 +106,8 @@ public class DDS extends Dap4Responder {
 
         log.debug("Sending DDS for dataset: " + resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -117,34 +118,8 @@ public class DDS extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os, erros)){
-            String msg = new String(erros.toByteArray(),HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
-
-        }
-
-        /*
-        Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.DDS,
-                                                        resourceID,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        0,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesApi.DAP2_ERRORS);
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-        }
-         */
+        besApi.writeDDS(resourceID, constraintExpression, xdap_accept, responseMediaType, os);
 
         os.flush();
         log.debug("Sent DAP DDS.");

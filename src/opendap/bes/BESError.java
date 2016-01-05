@@ -29,7 +29,7 @@ package opendap.bes;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
-import opendap.http.mediaTypes.Html;
+import opendap.http.mediaTypes.TextHtml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -119,7 +119,7 @@ public class BESError extends OPeNDAPException {
 
 
     public BESError(Document error) {
-        this(error,new Html());
+        this(error,new TextHtml());
     }
 
 
@@ -153,7 +153,7 @@ public class BESError extends OPeNDAPException {
 
     public BESError( InputStream is) {
 
-        this(is,new Html());
+        this(is,new TextHtml());
 
 
     }
@@ -186,7 +186,7 @@ public class BESError extends OPeNDAPException {
 
 
     public BESError(String error) {
-        this(error, new Html());
+        this(error, new TextHtml());
     }
 
     public BESError(String error, MediaType mt) {

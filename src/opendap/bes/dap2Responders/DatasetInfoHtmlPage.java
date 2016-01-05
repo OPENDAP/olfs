@@ -85,15 +85,16 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
 
-        String context = request.getContextPath();
 
         BesApi besApi = getBesApi();
 
         log.debug("sendINFO() for dataset: " + resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_dds");
+        response.setHeader("Content-Description", "DAP2 Dataset Information Page");
 
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -101,19 +102,8 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
-
-        if(!besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, os, erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath, context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-
-        }
-
-
+        besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, responseMediaType, os);
 
 
         os.flush();

@@ -99,7 +99,9 @@ public class Ascii extends Dap4Responder {
 
         log.debug("sendASCII() for dataset: " + resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -115,17 +117,8 @@ public class Ascii extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
-        if(!besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-
-        }
-
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), responseMediaType, os);
 
         os.flush();
         log.debug("Sent DAP ASCII data response.");

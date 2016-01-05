@@ -104,7 +104,8 @@ public class CsvDR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
@@ -116,12 +117,7 @@ public class CsvDR extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        if(!besApi.writeDap4DataAsCsv(resourceID, qp, user.getMaxResponseSize(), os, erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
-        }
+        besApi.writeDap4DataAsCsv(resourceID, qp, user.getMaxResponseSize(), responseMediaType,os);
 
 
         os.flush();

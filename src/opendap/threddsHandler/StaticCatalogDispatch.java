@@ -27,6 +27,7 @@ package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
@@ -440,7 +441,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private void sendDatasetHtmlPage(HttpServletRequest request,
                                      HttpServletResponse response,
                                      String catalogKey,
-                                     String query) throws IOException, JDOMException, SaxonApiException {
+                                     String query) throws IOException, JDOMException, SaxonApiException, BESError {
 
 
         XdmNode catDoc;
@@ -518,7 +519,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-    private void sendCatalogHTML(HttpServletRequest request, HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException, JDOMException, BadConfigurationException, PPTException {
+    private void sendCatalogHTML(HttpServletRequest request, HttpServletResponse response, String catalogKey)
+            throws SaxonApiException, IOException, JDOMException, BadConfigurationException, PPTException, BESError {
 
         _catalogToHtmlTransformLock.lock();
         try {

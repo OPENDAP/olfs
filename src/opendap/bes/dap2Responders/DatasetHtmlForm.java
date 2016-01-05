@@ -90,10 +90,11 @@ public class DatasetHtmlForm extends Dap4Responder {
         BesApi besApi = getBesApi();
 
         log.debug("Sending DAP2 Dataset HTML Form for dataset: " + resourceID);
+        MediaType responseMediaType =  getNormativeMediaType();
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_dataset_form");
+        response.setHeader("Content-Description", "DAP2 Data Request Form");
 
         
         response.setStatus(HttpServletResponse.SC_OK);
@@ -101,19 +102,8 @@ public class DatasetHtmlForm extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
-
-        if(!besApi.writeDap2DataRequestForm(resourceID, xdap_accept, xmlBase, os, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
-
-
-
+        besApi.writeDap2DataRequestForm(resourceID, xdap_accept, xmlBase, responseMediaType, os);
 
         os.flush();
         log.info("Sent DAP2 Dataset HTML Form page.");

@@ -94,7 +94,8 @@ public class DAS extends Dap4Responder {
 
         log.debug("sendDAS() for dataset: " + resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -107,36 +108,9 @@ public class DAS extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
+        besApi.writeDAS(resourceID, constraintExpression, xdap_accept, responseMediaType, os);
 
-        }
-
-        /*
-
-        Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.DAS,
-                                                        resourceID,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        0,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesApi.DAP2_ERRORS);
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-        */
 
         os.flush();
         log.debug("Sent DAP DAS.");

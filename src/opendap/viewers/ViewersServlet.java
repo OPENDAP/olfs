@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.ppt.PPTException;
@@ -700,18 +701,16 @@ public class ViewersServlet extends HttpServlet {
 
         Document ddx = new Document();
 
-        if(!_besApi.getDDXDocument(
+        _besApi.getDDXDocument(
                 datasetID,
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
-                ddx)){
-            _log.error("Unable unable to load DDX dataset: '" + datasetID + "'");
-            return null;
-        }
-
+                new TextXml(),
+                ddx);
 
         return ddx;
+
 
 
 

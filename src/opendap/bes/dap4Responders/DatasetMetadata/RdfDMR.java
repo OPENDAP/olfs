@@ -108,7 +108,8 @@ public class RdfDMR extends Dap4Responder {
 
         log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -120,13 +121,7 @@ public class RdfDMR extends Dap4Responder {
         Document dmr = new Document();
 
 
-        if(!besApi.getDMRDocument(resourceID,qp,xmlBase,dmr)){
-            BESError besError = new BESError(xmlo.outputString(dmr));
-            besError.sendErrorResponse(_systemPath, context, response);
-            log.error("sendNormativeRepresentation() - Encountered a BESError:\n" + xmlo.outputString(dmr));
-            return;
-
-        }
+        besApi.getDMRDocument(resourceID,qp,xmlBase,responseMediaType, dmr);
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
 

@@ -121,7 +121,8 @@ public class NormativeDR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -153,34 +154,22 @@ public class NormativeDR extends Dap4Responder {
 
 
 
-        boolean worked = besApi.writeDap4Data(
+        besApi.writeDap4Data(
                 resourceID,
                 qp,
                 user.getMaxResponseSize(),
                 xmlBase,
                 startID,
                 mb.getBoundary(),
-                os,
-                erros);
+                responseMediaType,
+                os);
 
 
-        if(!worked){
-            if(!response.isCommitted())
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
-        else if(qp.isStoreResultRequest()){
-
+        if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }
-        else {
-            os.flush();
-        }
 
+        os.flush();
 
         log.info("Sent {}.",getServiceTitle());
 

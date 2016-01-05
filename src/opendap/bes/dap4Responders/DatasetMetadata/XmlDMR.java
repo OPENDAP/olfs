@@ -95,7 +95,8 @@ public class XmlDMR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         ;
@@ -108,13 +109,7 @@ public class XmlDMR extends Dap4Responder {
 
 
 
-        if(!besApi.writeDMR(resourceID,qp,xmlBase,os,erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
-
+        besApi.writeDMR(resourceID,qp,xmlBase,responseMediaType,os);
 
 
         os.flush();

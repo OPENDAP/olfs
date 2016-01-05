@@ -27,6 +27,7 @@
 package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.io.HyraxStringEncoding;
@@ -184,34 +185,22 @@ public class FileDispatchHandler implements DispatchHandler {
         //String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         //response.setHeader("Content-Disposition",contentDisposition);
 
-
+        MediaType responseMediaType = null;
         String suffix = ReqInfo.getRequestSuffix(req);
 
         if (suffix != null) {
-            String mType = MimeTypes.getMimeType(suffix);
-
-            if (mType != null)
-                response.setContentType(mType);
-
-            log.debug("   MIME type: " + mType + "  ");
+            responseMediaType = MimeTypes.getMediaType(suffix);
+            if (responseMediaType != null) {
+                response.setContentType(responseMediaType.getMimeType());
+                log.debug("sendFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
+            }
         }
-
-
-
-
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         ServletOutputStream sos = response.getOutputStream();
-        if(!_besApi.writeFile(name, sos, erros)){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
-        }
+        _besApi.writeFile(name, responseMediaType, sos);
 
-
+        sos.flush();
     }
 
 

@@ -109,7 +109,8 @@ public class IjsonDR extends Dap4Responder {
 
         Version.setOpendapMimeHeaders(request, response, besApi);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
 
         Version.setOpendapMimeHeaders(request, response, besApi);
 
@@ -123,18 +124,12 @@ public class IjsonDR extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeDap4DataAsIjsn(
-                        resourceID,
-                        qp,
-                        user.getMaxResponseSize(),
-                        os,
-                        erros);
-        if(!result){
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes( HyraxStringEncoding.getCharset()));
-
-        }
+        besApi.writeDap4DataAsIjsn(
+            resourceID,
+            qp,
+            user.getMaxResponseSize(),
+            responseMediaType,
+            os);
 
 
 

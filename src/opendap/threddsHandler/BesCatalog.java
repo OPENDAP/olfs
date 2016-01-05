@@ -29,6 +29,7 @@ import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
@@ -103,7 +104,7 @@ public class BesCatalog implements Catalog {
                Vector<Proxy> proxies,
                Vector<Element> catalogServices,
                boolean useServiceRegistryServices
-    ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+    ) throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
 
         _log = LoggerFactory.getLogger(this.getClass());
 
@@ -184,7 +185,7 @@ public class BesCatalog implements Catalog {
     }
 
 
-    private void loadCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException {
+    private void loadCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
 
 
         ReentrantReadWriteLock.WriteLock lock = _catalogLock.writeLock();
@@ -484,7 +485,7 @@ public class BesCatalog implements Catalog {
 
 
 
-    private Document loadBesCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException {
+    private Document loadBesCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
 
         ReentrantReadWriteLock.WriteLock lock = _catalogLock.writeLock();
 

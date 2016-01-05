@@ -159,7 +159,7 @@ public class FileAccess extends Dap4Responder {
 
         String downloadFileName = Scrub.fileName(dataSourceId.substring(dataSourceId.lastIndexOf("/") + 1));
 
-        log.debug("respondToHttpGetRequest() - downloadFileName: " + downloadFileName);
+        log.debug("sendDatasetFile() - downloadFileName: " + downloadFileName);
 
         String contentDisposition = " attachment; filename=\"" + downloadFileName + "\"";
 
@@ -167,28 +167,25 @@ public class FileAccess extends Dap4Responder {
 
 
         String suffix = ReqInfo.getSuffix(dataSourceId);
-
-        if (suffix != null) {
-            String mType = MimeTypes.getMimeType(suffix);
-
-            if (mType != null)
-                response.setContentType(mType);
-
-            log.debug("respondToHttpGetRequest() -    MIME type: " + mType + "  ");
-        }
-
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
         BesApi besApi = getBesApi();
 
-        ServletOutputStream sos = response.getOutputStream();
-        if (!besApi.writeFile(dataSourceId, sos, erros)) {
-            String msg = new String(erros.toByteArray(), HyraxStringEncoding.getCharset());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+        MediaType responseMediaType = null;
+
+        if (suffix != null) {
+            responseMediaType = MimeTypes.getMediaType(suffix);
+            if (responseMediaType != null)
+                response.setContentType(responseMediaType.getMimeType());
+            log.debug("sendDatasetFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
         }
 
+
+        ServletOutputStream sos = response.getOutputStream();
+        besApi.writeFile(dataSourceId, responseMediaType, sos);
+
         sos.flush();
-        log.debug("Sent {}",getServiceTitle());
+
+
+        log.debug("sendDatasetFile() - Sent {}",getServiceTitle());
 
 
     }

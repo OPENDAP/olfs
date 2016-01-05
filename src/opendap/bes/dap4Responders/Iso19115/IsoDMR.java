@@ -174,7 +174,8 @@ public class IsoDMR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType =  getNormativeMediaType();
+        response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
@@ -185,49 +186,43 @@ public class IsoDMR extends Dap4Responder {
         Document dmr = new Document();
 
 
-        if(!besApi.getDMRDocument(
+        besApi.getDMRDocument(
                 resourceID,
                 qp,
                 xmlBase,
-                dmr)){
-            response.setHeader("Content-Description", "application/vnd.opendap.dap4.error+xml");
+                responseMediaType,
+                dmr);
 
-            BESError error = new BESError(dmr);
-            error.sendErrorResponse(_systemPath, context, response);
-        }
-        else {
+        dmr.getRootElement().setAttribute("dataset_id",resourceID);
 
-            dmr.getRootElement().setAttribute("dataset_id",resourceID);
-
-            String currentDir = System.getProperty("user.dir");
-            log.debug("Cached working directory: "+currentDir);
+        String currentDir = System.getProperty("user.dir");
+        log.debug("Cached working directory: "+currentDir);
 
 
-            String xslDir = _systemPath + "/nciso/xsl";
+        String xslDir = _systemPath + "/nciso/xsl";
 
 
-            log.debug("Changing working directory to "+ xslDir);
-            System.setProperty("user.dir",xslDir);
+        log.debug("Changing working directory to "+ xslDir);
+        System.setProperty("user.dir",xslDir);
 
-            String xsltDocName = "ddx2iso.xsl";
+        String xsltDocName = "ddx2iso.xsl";
 
 
-            // This Transformer class is an attempt at making the use of the saxon-9 API
-            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-            // See the source code for opendap.xml.Transformer for more.
-            Transformer transformer = new Transformer(xsltDocName);
+        // This Transformer class is an attempt at making the use of the saxon-9 API
+        // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+        // See the source code for opendap.xml.Transformer for more.
+        Transformer transformer = new Transformer(xsltDocName);
 
-            // Transform the BES  showCatalog response into a HTML page for the browser
-            transformer.transform( new JDOMSource(dmr),os);
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform( new JDOMSource(dmr),os);
 
 
 
 
-            os.flush();
-            log.info("Sent {}",getServiceTitle());
-            log.debug("Restoring working directory to "+ currentDir);
-            System.setProperty("user.dir",currentDir);
-        }
+        os.flush();
+        log.info("Sent {}",getServiceTitle());
+        log.debug("Restoring working directory to "+ currentDir);
+        System.setProperty("user.dir",currentDir);
 
 
 
