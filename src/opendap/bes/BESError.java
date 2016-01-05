@@ -444,7 +444,7 @@ public class BESError extends OPeNDAPException {
                 response.reset();
 
 
-            String xsltDoc = systemPath + "/xsl/error"+errorVal+".xsl";
+            String xsltDoc = systemPath + "/xsl/besError"+errorVal+".xsl";
 
             boolean done = false;
             File xsltFile = new File(xsltDoc);
