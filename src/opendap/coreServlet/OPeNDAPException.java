@@ -575,6 +575,7 @@ public class OPeNDAPException extends Exception {
 
         sos.println(template);
 
+        sos.flush();
 
     }
 

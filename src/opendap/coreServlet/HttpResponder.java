@@ -172,12 +172,6 @@ public abstract class HttpResponder {
 
     public String getDownloadFileName(String resourceID){
         String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
-        Pattern startsWithNumber = Pattern.compile("[0-9].*");
-        if(startsWithNumber.matcher(downloadFileName).matches())
-            downloadFileName = "nc_"+downloadFileName;
-
-        downloadFileName = downloadFileName+".nc";
-
         log.debug("getDownloadFileName() - input: {} output: {}",resourceID,downloadFileName );
 
         return downloadFileName;

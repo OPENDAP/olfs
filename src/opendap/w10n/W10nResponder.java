@@ -197,7 +197,7 @@ public class W10nResponder {
         W10nRequest w10nRequest = new W10nRequest(request);
         User user = new User(request);
 
-        w10nRequest.setBestMediaType(_defaultMetaMediaType, _supportedMetaMediaTypes);
+       // w10nRequest.setBestMediaType(_defaultMetaMediaType, _supportedMetaMediaTypes);
 
 
         /**
@@ -896,7 +896,7 @@ public class W10nResponder {
 
         downloadFileName = downloadFileName+".nc4";
 
-        _log.debug("sendNetCDF_4() - NetCDF file downloadFileName: " + downloadFileName );
+        _log.debug("sendNetCDF_4() - NetCDF file downloadFileName: " + downloadFileName);
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
@@ -1347,12 +1347,14 @@ public class W10nResponder {
     }
 
     public String getDownloadFileName(String resourceID){
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
-        Pattern startsWithNumber = Pattern.compile("[0-9].*");
-        if(startsWithNumber.matcher(downloadFileName).matches())
-            downloadFileName = "nc_"+downloadFileName;
+        String downloadFileName = (resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
 
-        downloadFileName = downloadFileName+".nc";
+
+
+        int lastOpenBracketIndex = downloadFileName.lastIndexOf("[");
+        int lastSlashIndex = downloadFileName.lastIndexOf("/");
+        if ( lastOpenBracketIndex>0 && lastSlashIndex < lastOpenBracketIndex)
+            downloadFileName = downloadFileName.substring(0,lastOpenBracketIndex);
 
         _log.debug("getDownloadFileName() - input: {} output: {}",resourceID,downloadFileName );
 
