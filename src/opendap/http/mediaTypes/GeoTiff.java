@@ -30,22 +30,17 @@ import opendap.bes.dap4Responders.MediaType;
 /**
  * Created by ndp on 1/27/15.
  */
-public class Netcdf3 extends MediaType {
+public class GeoTiff extends MediaType {
+    public static final String NAME = "tiff";
+    public static final String PRIMARY_TYPE = "image";
+    public static final String SUB_TYPE = "tiff;application=geotiff";
 
-    public static final String NAME = "nc";
-
-    public static final String PRIMARY_TYPE = "application";
-    public static final String SUB_TYPE = "x-netcdf";
-
-
-    public Netcdf3(){
-
+    public GeoTiff(){
         this("."+ NAME);
         setName(NAME);
-
     }
 
-    public Netcdf3(String typeMatchString){
+    public GeoTiff(String typeMatchString){
         super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 

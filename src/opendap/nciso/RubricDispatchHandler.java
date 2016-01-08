@@ -30,9 +30,7 @@ import opendap.bes.BESResource;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.ResourceInfo;
-import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.http.mediaTypes.TextXml;
@@ -218,7 +216,10 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         log.debug("Sending rubric Response() for dataset: " + dataSourceId);
 
 
-        MediaType responseMediaType = new TextHtml();
+        MediaType responseMediaType = new TextXml();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
 
@@ -241,7 +242,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
-                responseMediaType, ddx);
+                ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",dataSourceId);
 

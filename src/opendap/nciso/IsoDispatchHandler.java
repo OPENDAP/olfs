@@ -25,14 +25,11 @@
  */
 package opendap.nciso;
 
-import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.ResourceInfo;
-import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.*;
 import opendap.http.mediaTypes.TextXml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -113,7 +110,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
     /**
      * See the contract for this method in opendap.coreServlet.IsoDispatchHandler
      * @param req The request for which we need to get a last modified date.
-     * @return
+     * @return  The last modified time for the requested resource
      */
     public long getLastModified(HttpServletRequest req) {
 
@@ -185,8 +182,8 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     /**
      * This method is responsible for sending ISO metadata responses to the client.
-     * @param request
-     * @param response
+     * @param request     The client request object
+     * @param response    The response object to use to respond (duh)
      * @throws Exception
      */
     private void sendIsoResponse(HttpServletRequest request,
@@ -202,7 +199,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
 
 
         String xmlBase = request.getRequestURL().toString();
@@ -214,6 +211,9 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
         MediaType responseMediaType = new TextXml();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY,responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, _besApi);
@@ -235,7 +235,6 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
-                responseMediaType,
                 ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",dataSourceId);

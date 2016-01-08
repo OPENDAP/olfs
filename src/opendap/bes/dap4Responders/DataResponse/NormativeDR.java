@@ -27,14 +27,17 @@
 package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.MimeBoundary;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.Dap4Data;
 import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -83,9 +86,9 @@ public class NormativeDR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
 
-        setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
+        setNormativeMediaType(new Dap4Data(getRequestSuffix()));
 
-        addAltRepResponder(new CsvDR          (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR          (sysPath, pathPrefix, besApi));
         addAltRepResponder(new Netcdf3DR      (sysPath, pathPrefix, besApi));
         addAltRepResponder(new Netcdf4DR      (sysPath, pathPrefix, besApi));
@@ -122,6 +125,10 @@ public class NormativeDR extends Dap4Responder {
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -161,7 +168,6 @@ public class NormativeDR extends Dap4Responder {
                 xmlBase,
                 startID,
                 mb.getBoundary(),
-                responseMediaType,
                 os);
 
 

@@ -28,7 +28,9 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
@@ -78,7 +80,7 @@ public class Dap2Data extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
 
-        setNormativeMediaType(new MediaType("application","octet-stream", getRequestSuffix()));
+        setNormativeMediaType(new opendap.http.mediaTypes.Dap2Data(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -127,14 +129,16 @@ public class Dap2Data extends Dap4Responder {
                 "    CE: '" + dap2CE + "'");
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_data");
 
 
-        String downloadFileName = Scrub.fileName(relativeUrl.substring(relativeUrl.lastIndexOf("/") + 1, relativeUrl.length()));
-        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-        response.setHeader("Content-Disposition", contentDisposition);
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
 
         String xdap_accept = request.getHeader("XDAP-Accept");
@@ -144,7 +148,6 @@ public class Dap2Data extends Dap4Responder {
 
         OutputStream os;
         ByteArrayOutputStream srr = null;
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
@@ -157,7 +160,7 @@ public class Dap2Data extends Dap4Responder {
         }
 
 
-        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),responseMediaType,os);
+        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os);
 
 
         if(qp.isStoreResultRequest()){

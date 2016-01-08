@@ -28,9 +28,12 @@ package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.bes.BESManager;
 import opendap.bes.BesGroup;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.DSR;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
 import org.jdom.Document;
@@ -87,7 +90,7 @@ public class NormativeDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4_Dataset_Services_Response");
         //setPreferredServiceSuffix("");
 
-        setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.dataset-services+xml", getRequestSuffix()));
+        setNormativeMediaType(new DSR(getRequestSuffix()));
 
         addAltRepResponder(new HtmlDSR(sysPath, pathPrefix, besApi, this));
         addAltRepResponder(new XmlDSR(sysPath, pathPrefix, besApi, this));
@@ -120,7 +123,7 @@ public class NormativeDSR extends Dap4Responder {
 
         Document serviceDescription = new Document();
 
-        HashMap<String,String> piMap = new HashMap<String,String>( 2 );
+        HashMap<String,String> piMap = new HashMap<>( 2 );
         piMap.put( "type", "text/xsl" );
         piMap.put( "href", context+"xsl/datasetServices.xsl" );
         ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
@@ -133,7 +136,12 @@ public class NormativeDSR extends Dap4Responder {
 
         serviceDescription.setRootElement(datasetServices);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType = getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+        response.setContentType(responseMediaType.getMimeType());
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -173,7 +181,7 @@ public class NormativeDSR extends Dap4Responder {
 
         Element serverVersion = new Element("ServerSoftwareVersion",DAP.DAPv40_DatasetServices_NS);
 
-        Element hyraxVersion = null;
+        Element hyraxVersion;
         try {
             hyraxVersion = besApi.getCombinedVersionDocument().getRootElement();
             hyraxVersion.detach();
@@ -201,7 +209,7 @@ public class NormativeDSR extends Dap4Responder {
 
     private Vector<Element> getDapVersionElements(String resourceId) {
 
-        Vector<Element> dapVersions = new Vector<Element>();
+        Vector<Element> dapVersions = new Vector<>();
 
         BesGroup besGroup = BESManager.getBesGroup(resourceId);
 
@@ -224,7 +232,7 @@ public class NormativeDSR extends Dap4Responder {
 
     private Vector<String> getDapVersions(List serviceVersionList ){
 
-        Vector<String> dapVersions = new Vector<String>();
+        Vector<String> dapVersions = new Vector<>();
 
         for(Object o_serviceVersion : serviceVersionList){
             Element serviceVersion = (Element) o_serviceVersion;
@@ -248,7 +256,7 @@ public class NormativeDSR extends Dap4Responder {
     private  Vector<Element> getServerSideFunctions(String datasetUrl){
 
 
-        Vector<Element> extensions = new Vector<Element>();
+        Vector<Element> extensions = new Vector<>();
 
         Element function;
 

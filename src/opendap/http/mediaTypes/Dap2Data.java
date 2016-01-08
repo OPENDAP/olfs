@@ -34,6 +34,9 @@ public class Dap2Data extends MediaType {
 
     public static final String NAME = "dods";
 
+    public static final String PRIMARY_TYPE = "application";
+    public static final String SUB_TYPE = "octet-stream";
+
     public Dap2Data(){
         this("."+ NAME);
         setName(NAME);
@@ -41,7 +44,7 @@ public class Dap2Data extends MediaType {
 
 
     public Dap2Data(String typeMatchString){
-        super("application","octet-stream", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 

@@ -25,6 +25,7 @@
  */
 package opendap.auth;
 
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -252,10 +253,8 @@ public class PDPService extends HttpServlet {
         }
         catch (Throwable t) {
             try {
+                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
                 _log.error("doEvaluate() - The Bad Things have happened. Message: {}", t.getMessage());
-                if(!response.isCommitted()){
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                }
             }
             catch(Throwable t2){
                 // It's boned now.. Leave it be.

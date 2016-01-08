@@ -25,17 +25,17 @@
  */
 package opendap.bes.dap2Responders;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.TextHtml;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
@@ -70,7 +70,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         setServiceDescription("DAP2 Dataset Information HTML Page.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Info_Service");
 
-        setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
+        setNormativeMediaType(new TextHtml(getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
@@ -92,6 +92,9 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
 
         MediaType responseMediaType =  getNormativeMediaType();
 
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "DAP2 Dataset Information Page");
@@ -103,7 +106,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, responseMediaType, os);
+        besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, os);
 
 
         os.flush();

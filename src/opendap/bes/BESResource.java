@@ -99,12 +99,13 @@ public class BESResource implements ResourceInfo {
 
 
 
-        if(besApi.getBesCatalog(dataSourceName, info)){
+        try {
+            besApi.getBesCatalog(dataSourceName, info);
 
-            exists      = true;
-            accessible  = true;
-           
-            Element dataset = info.getRootElement().getChild("showCatalog",BES_NS).getChild("dataset",BES_NS);
+            exists = true;
+            accessible = true;
+
+            Element dataset = info.getRootElement().getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
 
             name = dataset.getAttributeValue("name");
             String s = dataset.getAttributeValue("size");
@@ -117,31 +118,25 @@ public class BESResource implements ResourceInfo {
             node = isNode == null || isNode.equalsIgnoreCase("true");
 
 
-
             Element e;
-            List srvcList = dataset.getChildren("serviceRef",BES_NS);
+            List srvcList = dataset.getChildren("serviceRef", BES_NS);
 
-            if(!srvcList.isEmpty()){
+            if (!srvcList.isEmpty()) {
                 serviceRefs = new String[srvcList.size()];
                 int i = 0;
                 Iterator iterator = srvcList.iterator();
-                while(iterator.hasNext()){
+                while (iterator.hasNext()) {
                     e = (Element) iterator.next();
                     serviceRefs[i++] = e.getTextTrim();
                 }
                 data = true;
 
 
-            }
-            else {
+            } else {
                 data = false;
             }
-            
         }
-        else {
-
-
-            BESError err = new BESError(info);
+        catch (BESError err ){
 
             exists        = !err.notFound();
             accessible    = !err.forbidden();
@@ -154,7 +149,6 @@ public class BESResource implements ResourceInfo {
             log.debug("BES request for info document for: \""+dataSourceName+"\" returned an error");
 
         }
-
 
 
 

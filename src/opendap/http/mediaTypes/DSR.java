@@ -30,22 +30,20 @@ import opendap.bes.dap4Responders.MediaType;
 /**
  * Created by ndp on 1/27/15.
  */
-public class Netcdf3 extends MediaType {
+public class DSR extends MediaType {
 
-    public static final String NAME = "nc";
+    public static final String NAME = "dsr";
 
     public static final String PRIMARY_TYPE = "application";
-    public static final String SUB_TYPE = "x-netcdf";
+    public static final String SUB_TYPE = "vnd.opendap.dap4.dataset-services+xml";
 
-
-    public Netcdf3(){
-
+    public DSR(){
         this("."+ NAME);
         setName(NAME);
 
     }
 
-    public Netcdf3(String typeMatchString){
+    public DSR(String typeMatchString){
         super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 

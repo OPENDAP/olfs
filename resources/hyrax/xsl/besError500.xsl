@@ -51,7 +51,7 @@
 
             <body>
                 <p> &NBSP; </p>
-                <h1 align="center">Hyrax Error</h1>
+                <h1 align="center">Hyrax Error (500)</h1>
                 <hr size="1" noshade="noshade"/>
                 <table width="100%" border="0">
                     <tr>
@@ -96,7 +96,7 @@
                     </tr>
                 </table>
                 <hr size="1" noshade="noshade"/>
-                <h1 align="center">Hyrax Error</h1>
+                <h1 align="center">Hyrax Error (500)</h1>
                 <p align="center"></p>
             </body>
         </html>

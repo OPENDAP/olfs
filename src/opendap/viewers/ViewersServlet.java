@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.mediaTypes.TextHtml;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
@@ -701,12 +702,15 @@ public class ViewersServlet extends HttpServlet {
 
         Document ddx = new Document();
 
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextHtml());
+
+
         _besApi.getDDXDocument(
                 datasetID,
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
-                new TextXml(),
                 ddx);
 
         return ddx;

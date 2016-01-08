@@ -449,6 +449,7 @@ public class DispatchServlet extends HttpServlet {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
+
         try {
             Procedure timedProcedure = Timer.start();
 
@@ -493,12 +494,12 @@ public class DispatchServlet extends HttpServlet {
                     LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
     
                 } else {
-                    send404(request,response);
+                    //send404(request,response);
+                    OPeNDAPException oe = new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
+                    throw oe;
                 }
             }
             finally {
-                RequestCache.closeThreadCache();
-                log.info("doGet(): Response completed.\n");
                 Timer.stop(timedProcedure);
             }
 
@@ -521,6 +522,10 @@ public class DispatchServlet extends HttpServlet {
             	}
             }
         }
+        finally {
+            RequestCache.closeThreadCache();
+            log.info("doGet(): Response completed.\n");
+        }
 
         log.info("doGet() - Timing Report: \n{}", Timer.report());
         Timer.reset();
@@ -531,21 +536,24 @@ public class DispatchServlet extends HttpServlet {
     private void send404(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
         // Build a regex to use to see if they are looking for a DAP2 response:
-        String dap2Regex = ".*.(";
-        dap2Regex += "dds";
-        dap2Regex += "|das";
-        dap2Regex += "|dods";
-        dap2Regex += "|asc(ii)?";
-        dap2Regex += ")";
-        Pattern dap2Pattern = Pattern.compile(dap2Regex,Pattern.CASE_INSENSITIVE);
+        StringBuilder dap2Regex = new StringBuilder(".*.(");
+        dap2Regex.append("dds");
+        dap2Regex.append("|das");
+        dap2Regex.append("|dods");
+        dap2Regex.append("|asc(ii)?");
+        dap2Regex.append(")");
+        Pattern dap2Pattern = Pattern.compile(dap2Regex.toString(),Pattern.CASE_INSENSITIVE);
 
 
         // Build a regex to use to see if they are looking for a DAP3/4 response:
-        String dap4Regex = ".*.(";
-        dap4Regex += "ddx";
-        dap4Regex += "|rdf";
-        dap4Regex += ")";
-        Pattern dap4Pattern = Pattern.compile(dap4Regex,Pattern.CASE_INSENSITIVE);
+        StringBuilder dap4Regex = new StringBuilder(".*.(");
+        dap4Regex.append("ddx");
+        dap4Regex.append("|dmr");
+        dap4Regex.append("|dap");
+        dap4Regex.append("|ddx");
+        dap4Regex.append("|rdf");
+        dap4Regex.append(")");
+        Pattern dap4Pattern = Pattern.compile(dap4Regex.toString(),Pattern.CASE_INSENSITIVE);
 
 
         String requestURL = req.getRequestURL().toString();
@@ -557,9 +565,8 @@ public class DispatchServlet extends HttpServlet {
             resp.setHeader("Content-Description", "dods_error");
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getOutputStream().print(
-                    OPeNDAPException.getDAP2Error(
-                            OPeNDAPException.NO_SUCH_FILE,
-                            "Cannot locate resource: "+Scrub.completeURL(requestURL)));
+                    OPeNDAPException.getDap2Error(HttpServletResponse.SC_NOT_FOUND,
+                            "Cannot locate resource: " + Scrub.completeURL(requestURL)));
         }
         else if (dap4Pattern.matcher(requestURL).matches()){  // Is it a DAP3/4 request?
             resp.setHeader("XDODS-Server", "dods/3.2");
@@ -579,8 +586,13 @@ public class DispatchServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
+
+
+
         log.info("Sent Resource Not Found (404) - nothing left to check.");
         LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+
+
 
     }
 
@@ -651,7 +663,6 @@ public class DispatchServlet extends HttpServlet {
 
             }
             finally {
-                RequestCache.closeThreadCache();
                 log.info("doPost(): Response completed.\n");
             }
 
@@ -667,6 +678,9 @@ public class DispatchServlet extends HttpServlet {
             		// It's boned now.. Leave it be.
             	}
             }
+        }
+        finally{
+            RequestCache.closeThreadCache();
         }
 
 

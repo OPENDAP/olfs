@@ -27,21 +27,19 @@
 package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.io.HyraxStringEncoding;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import opendap.http.mediaTypes.TextXml;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -77,7 +75,7 @@ public class XmlDR extends Dap4Responder{
         setServiceDescription("XML representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
-        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new TextXml(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -107,6 +105,9 @@ public class XmlDR extends Dap4Responder{
 
         MediaType responseMediaType =  getNormativeMediaType();
 
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -121,7 +122,7 @@ public class XmlDR extends Dap4Responder{
         OutputStream os = response.getOutputStream();
 
 
-        besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,responseMediaType,os);
+        besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,os);
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());

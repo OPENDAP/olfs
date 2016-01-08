@@ -28,13 +28,14 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
-import opendap.io.HyraxStringEncoding;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.TextPlain;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -54,13 +55,6 @@ public class DDS extends Dap4Responder {
     private static String _defaultRequestSuffix = ".dds";
 
 
-    public boolean needsBesToMatch(){
-        return true;
-    }
-
-    public boolean needsBesToRespond(){
-        return true;
-    }
 
     public DDS(String sysPath, BesApi besApi) {
         this(sysPath,null, _defaultRequestSuffix,besApi);
@@ -80,7 +74,7 @@ public class DDS extends Dap4Responder {
         setServiceDescription("DAP2 Data Description Structure (DDS).");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDS_Service");
 
-        setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
+        setNormativeMediaType(new TextPlain(getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
@@ -107,19 +101,22 @@ public class DDS extends Dap4Responder {
         log.debug("Sending DDS for dataset: " + resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDDS(resourceID, constraintExpression, xdap_accept, responseMediaType, os);
+        besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os);
 
         os.flush();
         log.debug("Sent DAP DDS.");

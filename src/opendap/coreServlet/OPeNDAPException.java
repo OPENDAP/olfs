@@ -27,19 +27,23 @@
 package opendap.coreServlet;
 
 
+import opendap.bes.dap4Responders.MediaType;
+import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP;
+import opendap.namespaces.DAP4;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Scanner;
 
 /**
  * Wraps the Exception class so that it can be serialized as a DAP2 error object.
@@ -52,48 +56,42 @@ public class OPeNDAPException extends Exception {
 
     Logger _log;
 
+    public static final String ERROR_RESPONSE_MEDIA_TYPE_KEY = "ErrorResponseMediaType";
+
     /**
      * Undefined error.
      */
     public static final int UNDEFINED_ERROR = -1;
-    /**
-     * Unknown error.
-     */
-    public static final int UNKNOWN_ERROR = 0;
-    /**
-     * The file specified by the OPeNDAP URL does not exist.
-     */
-    public static final int NO_SUCH_FILE = 1;
-    /**
-     * The variable specified in the OPeNDAP URL does not exist.
-     */
-    public static final int NO_SUCH_VARIABLE = 2;
-    /**
-     * The expression specified in the OPeNDAP URL is not valid.
-     */
-    public static final int MALFORMED_EXPR = 3;
-    /**
-     * The user has no authorization to read the OPeNDAP URL.
-     */
-    public static final int NO_AUTHORIZATION = 4;
-    /**
-     * The file specified by the OPeNDAP URL can not be read.
-     */
-    public static final int CANNOT_READ_FILE = 5;
 
 
-    /**
-     * The error code.
-     *
-     * @serial
-     */
-    private int errorCode;
     /**
      * The error message.
      *
      * @serial
      */
-    private String errorMessage;
+    private String _errorMessage;
+
+
+    private int _httpStatusCode;
+
+
+    private MediaType _responseType;
+
+
+    public void setResponseMediaType(MediaType mt){
+        _responseType = mt;
+    }
+
+    public MediaType getResponseMediaType(){
+        return _responseType;
+    }
+
+
+    protected String _systemPath;
+
+    public void setSystemPath(String sysPath){
+        _systemPath = sysPath;
+    }
 
 
     /**
@@ -103,6 +101,9 @@ public class OPeNDAPException extends Exception {
         // this should never be seen, since this class overrides getMessage()
         // to display its own error message.
         super("OPeNDAPException");
+        _responseType = new TextPlain();
+        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -115,8 +116,10 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(String msg) {
         super(msg);
-        errorCode = UNKNOWN_ERROR;
-        errorMessage = msg;
+        _responseType = new TextPlain();
+        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _errorMessage = msg;
+        _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -130,8 +133,10 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(String msg, Throwable cause) {
         super(msg, cause);
-        errorCode = UNKNOWN_ERROR;
-        errorMessage = msg;
+        _responseType = new TextPlain();
+        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _errorMessage = msg;
+        _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -146,8 +151,10 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(Throwable cause) {
         super(cause);
-        errorCode = UNKNOWN_ERROR;
-        errorMessage = cause.getMessage();
+        _responseType = new TextPlain();
+        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _errorMessage = cause.getMessage();
+        _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -160,20 +167,15 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(int code, String msg) {
         super(msg);
-        errorCode = code;
-        errorMessage = msg;
+        _responseType = new TextPlain();
+        _httpStatusCode =  code;
+        _errorMessage = msg;
+        _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
 
-    /**
-     * Returns the error code.
-     *
-     * @return the error code.
-     */
-    public final int getErrorCode() {
-        return errorCode;
-    }
+
 
 
 
@@ -183,17 +185,9 @@ public class OPeNDAPException extends Exception {
      * @return the detail message of this throwable object.
      */
     public String getMessage() {
-        return errorMessage;
+        return _errorMessage;
     }
 
-    /**
-     * Sets the error code.
-     *
-     * @param code the error code.
-     */
-    public final void setErrorCode(int code) {
-        errorCode = code;
-    }
 
     /**
      * Sets the error message.
@@ -201,26 +195,27 @@ public class OPeNDAPException extends Exception {
      * @param msg the error message.
      */
     public final void setErrorMessage(String msg) {
-        errorMessage = msg;
+        _errorMessage = msg;
     }
 
 
-    public static String getDAP2Error(int errorCode, String errorMessage) {
+    public static String getDap2Error(int code, String errorMessage) {
 
-        String err = "Error {\n";
+        StringBuilder err = new StringBuilder("Error {\n");
+        err.append("     code = ").append(code).append(";\n");
 
-        err += "    code = " + errorCode + ";\n";
 
         // If the error message is wrapped in double quotes, print it, else,
         // add wrapping double quotes.
         if ((errorMessage != null) && (errorMessage.charAt(0) == '"'))
-            err += "    message = " + errorMessage + ";\n";
+            err.append("    message = ").append(errorMessage).append(";\n");
         else
-            err += "    message = \"" + errorMessage + "\";\n";
+            err.append("    message = \"").append(errorMessage).append("\";\n");
 
-        err += "};\n";
 
-        return err;
+        err.append("};\n");
+
+        return err.toString();
 
     }
 
@@ -232,7 +227,7 @@ public class OPeNDAPException extends Exception {
      */
     public void print(PrintStream os) {
 
-        os.println(getDAP2Error(errorCode,errorMessage));
+        os.println(getDap2Error(-1,_errorMessage));
     }
 
     /**
@@ -293,8 +288,7 @@ public class OPeNDAPException extends Exception {
                         "]";
 
 
-                if (msg != null)
-                    msg = msg.replace('\"', '\'');
+                msg = msg.replace('\"', '\'');
 
 
                 oe = new OPeNDAPException(UNDEFINED_ERROR, msg);
@@ -306,18 +300,12 @@ public class OPeNDAPException extends Exception {
 
                 response.reset();
 
-                String systemPath = ServletUtil.getSystemPath(servlet,"");
+                oe.setSystemPath(ServletUtil.getSystemPath(servlet,""));
 
-                HttpResponder.sendHttpErrorResponse(
-                        oe.getHttpStatus(),
-                        oe.getMessage(),
-                        systemPath + "/error/error.html.proto",
-                        context,
-                        response);
+                oe.sendHttpErrorResponse(context, response);
             }
             else {
-                OutputStream eOut = response.getOutputStream();
-                oe.print(eOut);
+                oe.sendAsDap2Error(response);
             }
 
         } catch (Throwable ioe) {
@@ -328,9 +316,83 @@ public class OPeNDAPException extends Exception {
 
     }
 
-    public int getHttpStatus(){
-        return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+
+
+
+    public void sendHttpErrorResponse(String context,  HttpServletResponse response) throws Exception {
+
+        MediaType errorResponseMediaType = (MediaType) RequestCache.get(ERROR_RESPONSE_MEDIA_TYPE_KEY);
+
+        if(errorResponseMediaType==null)
+            errorResponseMediaType = new TextHtml();
+
+        if(errorResponseMediaType.getPrimaryType().equalsIgnoreCase("text")) {
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextHtml.SUB_TYPE)) {
+                sendAsHtmlErrorPage(context, response);
+                return;
+            }
+
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextPlain.SUB_TYPE)) {
+                sendAsDap2Error(response);
+                return;
+            }
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextXml.SUB_TYPE)) {
+                sendAsDap4Error(response);
+                return;
+            }
+        }
+        if(errorResponseMediaType.getPrimaryType().equalsIgnoreCase("application")) {
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(Json.SUB_TYPE)) {
+                sendAsJsonError(response);
+                return;
+            }
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(DMR.SUB_TYPE)) {
+                sendAsDap4Error(response);
+                return;
+            }
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(Dap4Data.SUB_TYPE)) {
+                sendAsDap4Error(response);
+                return;
+            }
+
+
+        }
+        sendAsHtmlErrorPage(context, response);
+
     }
+
+
+
+    public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
+        String template = readFileAsString(htmlTemplateFile);
+        template = template.replaceAll("<CONTEXT />",context);
+        return template;
+    }
+
+
+
+
+
+    public static String readFileAsString(String fileName) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
+
+        try {
+            while (scanner.hasNextLine()) {
+                stringBuilder.append(scanner.nextLine()).append("\n");
+            }
+        } finally {
+            scanner.close();
+        }
+        return stringBuilder.toString();
+    }
+
+
 
 
 
@@ -350,6 +412,169 @@ public class OPeNDAPException extends Exception {
         err.setText(errorMessage);
 
         return new Document(err);
+
+    }
+
+
+    public int setHttpStatusCode(int code){
+        //@TODO Make this thing look at the code and QC it's HTTP codyness.
+
+        _httpStatusCode = code;
+        return getHttpStatusCode();
+
+    }
+
+
+
+    public int getHttpStatusCode(){
+
+        return _httpStatusCode;
+    }
+
+
+    /**
+     * Error {
+     *    code = 1005;
+     *    message = "libdap error transmitting DDS: Constraint expression parse error: No such identifier in dataset: foo";
+     * };
+     *
+     *
+     * @param response
+     * @throws IOException
+     */
+    public void sendAsDap2Error(HttpServletResponse response) throws IOException {
+
+        _log.debug("sendAsDap2Error(): Sending DAP2 Error Object.");
+
+        MediaType mt = new TextPlain();
+        response.setContentType(mt.getMimeType());
+        response.setHeader("Content-Description", "DAP2 Error Object");
+        response.setStatus(getHttpStatusCode());
+
+        ServletOutputStream sos  = response.getOutputStream();
+
+        sos.println("Error { ");
+
+        sos.print("    code =  ");
+        sos.print(getHttpStatusCode());
+        sos.println(";");
+
+        sos.print("    message =  ");
+        sos.print(getMessage());
+        sos.println(";");
+        sos.println("}");
+
+        sos.flush();
+
+    }
+
+    public void sendAsDap4Error(HttpServletResponse response) throws IOException{
+
+        Dap4Error d4e = new Dap4Error();
+
+        response.setContentType(d4e.getMimeType());
+        response.setHeader("Content-Description", "DAP4 Error Object");
+        response.setStatus(getHttpStatusCode());
+
+
+        Element error = new Element("Error", DAP4.NS);
+
+        error.setAttribute("httpcode",Integer.toString(getHttpStatusCode()));
+
+        Element message = new Element("Message", DAP4.NS);
+
+        message.setText(getMessage());
+
+        error.addContent(message);
+
+
+        ServletOutputStream sos  = response.getOutputStream();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(error,sos);
+
+        sos.flush();
+
+
+
+    }
+
+
+    /**
+     * {
+     *   "name": "ERROR",
+     *   "type": "String",
+     *   "data": "Message"
+     * }
+     *
+     * @param response
+     * @throws IOException
+     */
+    public void sendAsJsonError(HttpServletResponse response) throws IOException {
+
+        _log.debug("sendAsJsonError(): Sending JSON Error Object.");
+
+        Json jsonMediaType = new Json();
+        response.setContentType(jsonMediaType.getMimeType());
+        // response.setContentType("text/plain");
+        response.setHeader("Content-Description", "DAP2 Error Object");
+        response.setStatus(getHttpStatusCode());
+
+        ServletOutputStream sos  = response.getOutputStream();
+
+        sos.println("{");
+
+        sos.println("  \"name\":  =  \"ERROR\",");
+        sos.println("  \"type\":  =  \"node\",");
+        sos.println("  \"attributes\":  =  \"[]\",");
+        sos.println("  \"leaves\":  =  [\"");
+
+        sos.println("    {");
+        sos.println("      \"name\":  =  \"Message\",");
+        sos.println("      \"type\":  =  \"String\",");
+        sos.println("      \"attributes\":  =  \"[]\",");
+        sos.print("      \"data\":  =  \"");
+        sos.print(getMessage());
+        sos.println("\"");
+        sos.println("    },");
+
+        sos.println("      \"name\":  =  \"HttpStatus\",");
+        sos.println("      \"type\":  =  \"Int32\",");
+        sos.println("      \"attributes\":  =  \"[]\",");
+        sos.print("      \"data\":  =  ");
+        sos.print(getHttpStatusCode());
+        sos.println("");
+        sos.println("    }");
+
+
+
+        sos.println("}");
+
+        sos.flush();
+    }
+
+    public void sendAsHtmlErrorPage(String context, HttpServletResponse response) throws Exception {
+
+
+        String errorPageTemplate = _systemPath + "/error/error.html.proto";
+
+
+        String template = loadHtmlTemplate(errorPageTemplate, context);
+
+        template = template.replaceAll("<ERROR_MESSAGE />",getMessage());
+        template = template.replaceAll("<ERROR_CODE />",Integer.toString(getHttpStatusCode()));
+
+        _log.debug("sendHttpErrorResponse(): Sending Error Page ");
+
+        MediaType responseType = new TextHtml();
+        response.setContentType(responseType.getMimeType());
+        response.setHeader("Content-Description", "error_page");
+        response.setStatus(getHttpStatusCode());
+
+        ServletOutputStream sos  = response.getOutputStream();
+
+        sos.println(template);
+
 
     }
 

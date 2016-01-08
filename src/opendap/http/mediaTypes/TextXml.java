@@ -32,6 +32,8 @@ import opendap.bes.dap4Responders.MediaType;
  */
 public class TextXml extends MediaType {
     public static final String NAME = "xml";
+    public static final String PRIMARY_TYPE = "text";
+    public static final String SUB_TYPE = "xml";
 
     public TextXml(){
         this("."+ NAME);
@@ -39,7 +41,7 @@ public class TextXml extends MediaType {
     }
 
     public TextXml(String typeMatchString){
-        super("text","xml", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

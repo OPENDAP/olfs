@@ -25,19 +25,18 @@
  */
 package opendap.bes.dap2Responders;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.io.HyraxStringEncoding;
+import opendap.http.mediaTypes.TextPlain;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
@@ -66,7 +65,7 @@ public class Ascii extends Dap4Responder {
         setServiceDescription("The DAP2 Data response in ASCII form.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_ASCII_Data_Service");
 
-        setNormativeMediaType(new MediaType("text", "plain", getRequestSuffix()));
+        setNormativeMediaType(new TextPlain(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -87,12 +86,13 @@ public class Ascii extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
+        // String context = request.getContextPath();
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         String resourceID = getResourceId(relativeUrl, false);
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String context = request.getContextPath();
 
         BesApi besApi = getBesApi();
 
@@ -100,6 +100,9 @@ public class Ascii extends Dap4Responder {
         log.debug("sendASCII() for dataset: " + resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
@@ -118,7 +121,7 @@ public class Ascii extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), responseMediaType, os);
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent DAP ASCII data response.");

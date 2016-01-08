@@ -26,13 +26,15 @@
 
 package opendap.bes.dap4Responders.DatasetMetadata;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.RDF;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -78,7 +80,7 @@ public class RdfDMR extends Dap4Responder {
         setServiceDescription("RDF representation of the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
-        setNormativeMediaType(new MediaType("application","rdf+xml", getRequestSuffix()));
+        setNormativeMediaType(new RDF(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -109,6 +111,10 @@ public class RdfDMR extends Dap4Responder {
         log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -121,7 +127,7 @@ public class RdfDMR extends Dap4Responder {
         Document dmr = new Document();
 
 
-        besApi.getDMRDocument(resourceID,qp,xmlBase,responseMediaType, dmr);
+        besApi.getDMRDocument(resourceID,qp,xmlBase, dmr);
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
 

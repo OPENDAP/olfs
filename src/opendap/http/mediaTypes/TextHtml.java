@@ -32,6 +32,8 @@ import opendap.bes.dap4Responders.MediaType;
  */
 public class TextHtml extends MediaType {
     public static final String NAME = "html";
+    public static final String PRIMARY_TYPE = "text";
+    public static final String SUB_TYPE = "html";
 
     public TextHtml(){
         this("."+ NAME);
@@ -39,7 +41,7 @@ public class TextHtml extends MediaType {
     }
 
     public TextHtml(String typeMatchString){
-        super("text","html", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

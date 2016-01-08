@@ -34,9 +34,7 @@ import opendap.bes.BesDapDispatcher;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.MimeTypes;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.*;
@@ -69,7 +67,7 @@ import java.util.regex.Pattern;
  *
  * Created by ndp on 1/22/15.
  */
-public class W10nResponder  {
+public class W10nResponder {
 
     private Logger _log;
 
@@ -88,6 +86,7 @@ public class W10nResponder  {
 
 
     public W10nResponder(String systemPath){
+        super();
 
 
         _log = LoggerFactory.getLogger(this.getClass());
@@ -155,8 +154,7 @@ public class W10nResponder  {
             }
 
 
-            String downloadFileName = requestedResourceId.substring(requestedResourceId.lastIndexOf("/") + 1,
-                                      requestedResourceId.length());
+            String downloadFileName = getDownloadFileName(requestedResourceId);
 
 
             String suffix = "";
@@ -199,7 +197,8 @@ public class W10nResponder  {
         W10nRequest w10nRequest = new W10nRequest(request);
         User user = new User(request);
 
-        MediaType responseMediaType = w10nRequest.getBestMediaType();
+        w10nRequest.setBestMediaType(_defaultMetaMediaType, _supportedMetaMediaTypes);
+
 
         /**
          * This section asks the BES to evaluate the requested resource and return a report that indicates what
@@ -210,7 +209,8 @@ public class W10nResponder  {
          */
         Document pathInfoDoc =  new Document();
 
-        _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), responseMediaType, pathInfoDoc);
+
+        _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), pathInfoDoc);
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -247,10 +247,11 @@ public class W10nResponder  {
         if(w10nRequest.isMetaRequest()){
             // yup - build a meta response.
             w10nRequest.setBestMediaType(_defaultMetaMediaType, _supportedMetaMediaTypes);
+            MediaType responseMediaType = w10nRequest.getBestMediaType();
 
-            // MediaType mt = w10nRequest.getBestMediaType();
-
-            setResponseHeaders(request,w10nRequest.getRequestedResourceId(), w10nRequest.getBestMediaType(), response);
+            // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+            RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+            setResponseHeaders(request,w10nRequest.getRequestedResourceId(), responseMediaType, response);
 
             _log.debug("send_w10n_response() - Sending w10n meta response for resource: {} Response type: {}", w10nRequest.getRequestedResourceId(), responseMediaType.getMimeType());
 
@@ -329,6 +330,7 @@ public class W10nResponder  {
             else {
 
                 w10nRequest.setBestMediaType(_defaultDataMediaType, _supportedDataMediaTypes);
+                MediaType responseMediaType = w10nRequest.getBestMediaType();
 
                 _log.debug("send_w10n_response() - Sending w10n data response for resource: {} Response type: {}",w10nRequest.getRequestedResourceId(),w10nRequest.getBestMediaType().getMimeType());
 
@@ -405,31 +407,25 @@ public class W10nResponder  {
 
         Document showCatalogDoc = new Document();
 
-        if(_besApi.getBesCatalog(w10nRequest.getValidResourcePath(), showCatalogDoc)){
-
-            _log.debug("sendMetaResponseForFileOrDir() - Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+        _besApi.getBesCatalog(w10nRequest.getValidResourcePath(), showCatalogDoc);
 
 
-            if(mt.getName().equalsIgnoreCase(Json.NAME)){
-                _log.debug("sendMetaResponseForFileOrDir() - Sending as JSON");
-                sendBesCatalogAsJson(showCatalogDoc, w10nRequest, response);
+        _log.debug("sendMetaResponseForFileOrDir() - Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
 
-            }
-            else if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
-                _log.debug("sendMetaResponseForFileOrDir() - Sending as HTML");
-                sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
-            }
-            else {
-                sendBadMediaTypeError(mt,response);
-            }
 
+        if(mt.getName().equalsIgnoreCase(Json.NAME)){
+            _log.debug("sendMetaResponseForFileOrDir() - Sending as JSON");
+            sendBesCatalogAsJson(showCatalogDoc, w10nRequest, response);
+
+        }
+        else if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
+            _log.debug("sendMetaResponseForFileOrDir() - Sending as HTML");
+            sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
         }
         else {
-            BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(_systemPath, w10nRequest.getServiceContextPath(), response);
-            _log.error(besError.getMessage());
-
+            sendBadMediaTypeError(mt,response);
         }
+
 
     }
 
@@ -746,8 +742,15 @@ public class W10nResponder  {
             throws IOException, PPTException, BadConfigurationException, BESError {
 
 
+        // Handle Response Media Type...
         MediaType mt = w10nRequest.getBestMediaType();
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, mt);
+        response.setContentType(mt.getMimeType());
+        response.setHeader("Content-Description", mt.getMimeType());
 
+
+        // Call the best responder for the requested media type
         if(mt.getName().equalsIgnoreCase(Json.NAME)) {
             sendDap2DataAsW10nJson(w10nRequest, maxResponseSize, response);
             return;
@@ -801,16 +804,16 @@ public class W10nResponder  {
 
         String xdap_accept = "3.2";
 
-
-
         String resourceID = w10nRequest.getRequestedResourceId();
-        MediaType responseMediaType = new Netcdf4();
+
+        MediaType responseMediaType =  new Netcdf3();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
 
-        response.setHeader("Content-Description", responseMediaType.getMimeType());
-
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
@@ -832,7 +835,6 @@ public class W10nResponder  {
                 w10nRequest.getDap2CE(),
                 xdap_accept,
                 maxResponseSize,
-                responseMediaType,
                 os);
 
 
@@ -880,12 +882,14 @@ public class W10nResponder  {
         String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType = new Netcdf4();
 
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
 
-        response.setHeader("Content-Description", responseMediaType.getMimeType());
 
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+
+        String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
@@ -904,7 +908,6 @@ public class W10nResponder  {
                 w10nRequest.getDap2CE(),
                 xdap_accept,
                 maxResponseSize,
-                responseMediaType,
                 os);
 
 
@@ -936,6 +939,27 @@ public class W10nResponder  {
 
         _log.debug("Sending w10n JSON data response for dataset: {}",w10nRequest.getValidResourcePath());
 
+
+        String resourceID = w10nRequest.getRequestedResourceId();
+
+
+        MediaType responseMediaType =  new Json();
+        RequestCache.put("ResponseMediaType", responseMediaType);
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+        response.setContentType(responseMediaType.getMimeType());
+        response.setHeader("Content-Description", "w10n (json)  data");
+
+        String downloadFileName = getDownloadFileName(resourceID)+".json";
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
+        _log.debug("sendDap2DataAsW10nJson() - JSON file downloadFileName: " + downloadFileName);
+
+
+
+
+
         Gson gson = new Gson();
 
         String w10nMetaObject = "\"w10n\":"+ gson.toJson(
@@ -947,7 +971,6 @@ public class W10nResponder  {
                         _supportedDataMediaTypes));
 
         ServletOutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
         _besApi.writeDap2DataAsW10nJson(
                 w10nRequest.getValidResourcePath(),
@@ -957,7 +980,6 @@ public class W10nResponder  {
                 w10nRequest.flatten(),
                 "3.2",
                 maxResponseSize,
-                _defaultDataMediaType,
                 os);
 
 
@@ -987,12 +1009,22 @@ public class W10nResponder  {
 
         ServletOutputStream os = response.getOutputStream();
 
+        String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType = new Dap2Data();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
 
-        response.setHeader("Content-Description", responseMediaType.getMimeType());
+        String downloadFileName = getDownloadFileName(resourceID)+".dods";
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
+        _log.debug("sendDap2Data() - DAP2 Data file downloadFileName: " + downloadFileName);
 
-        _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, responseMediaType, os);
+
+        response.setHeader("Content-Description", "DAP2 Data Response");
+
+        _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, os);
 
         os.flush();
 
@@ -1071,7 +1103,17 @@ public class W10nResponder  {
             throws BESError, BadConfigurationException, PPTException, IOException, JDOMException, SaxonApiException {
 
 
+        // Handle Response Media Type...
         MediaType mt = w10nRequest.getBestMediaType();
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, mt);
+        response.setContentType(mt.getMimeType());
+        response.setHeader("Content-Description", mt.getMimeType());
+
+
+
+        response.setContentType(mt.getMimeType());
+
 
         if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
             sendDap2MetadataAsW10nHtml(w10nRequest, response);
@@ -1127,7 +1169,6 @@ public class W10nResponder  {
                 w10nRequest.traverse(),
                 "3.2",
                 maxResponseSize,
-                _defaultDataMediaType,
                 os);
 
         os.flush();
@@ -1153,7 +1194,7 @@ public class W10nResponder  {
 
         Document besResponse = new Document();
 
-        _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(), new TextHtml(), besResponse);
+        _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(),  besResponse);
 
 
         boolean isNode = true;
@@ -1305,6 +1346,18 @@ public class W10nResponder  {
         return formatter.toString();
     }
 
+    public String getDownloadFileName(String resourceID){
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        downloadFileName = downloadFileName+".nc";
+
+        _log.debug("getDownloadFileName() - input: {} output: {}",resourceID,downloadFileName );
+
+        return downloadFileName;
+    }
 
 
 }

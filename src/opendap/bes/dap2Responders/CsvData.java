@@ -28,14 +28,15 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.io.HyraxStringEncoding;
+import opendap.http.mediaTypes.Csv;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -70,7 +71,7 @@ public class CsvData extends Dap4Responder {
         setServiceDescription("Comma Separated Values representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
-        setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
+        setNormativeMediaType(new Csv(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -99,6 +100,9 @@ public class CsvData extends Dap4Responder {
 
         MediaType responseMediaType =  getNormativeMediaType();
 
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -113,7 +117,7 @@ public class CsvData extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), responseMediaType, os);
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());

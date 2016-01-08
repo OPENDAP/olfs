@@ -26,7 +26,6 @@
 
 package opendap.dap4;
 
-import opendap.coreServlet.HttpResponder;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP4;
 import org.jdom.Document;
@@ -36,10 +35,8 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.XSLTransformer;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -87,7 +84,7 @@ public class Dap4Error {
     private String context;
     private String otherInfo;
 
-    private int httpcode;
+    private int _httpStatusCode;
 
 
 
@@ -174,7 +171,7 @@ public class Dap4Error {
     public int setHttpCode(int code){
         //@TODO Make this thing look at the code and QC it's HTTP codyness.
 
-        httpcode = code;
+        _httpStatusCode = code;
         return getHttpCode();
 
     }
@@ -197,7 +194,7 @@ public class Dap4Error {
 
     public int getHttpCode(){
 
-        return httpcode;
+        return _httpStatusCode;
     }
 
 
@@ -333,6 +330,7 @@ public class Dap4Error {
      * @return The HTTP status code returned to client.
      * @throws java.io.IOException
      */
+    /*
     public int sendErrorResponse(String systemPath, String context, HttpServletResponse response)
             throws IOException {
 
@@ -389,6 +387,7 @@ public class Dap4Error {
         return errorVal;
 
     }
+    */
 
 
 }

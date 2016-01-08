@@ -34,6 +34,9 @@ public class Json extends MediaType {
 
     public static final String NAME = "json";
 
+    public static final String PRIMARY_TYPE = "application";
+    public static final String SUB_TYPE = "json";
+
 
     public Json(){
         this("."+ NAME);
@@ -42,7 +45,7 @@ public class Json extends MediaType {
     }
 
     public Json(String typeMatchString){
-        super("application","json", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

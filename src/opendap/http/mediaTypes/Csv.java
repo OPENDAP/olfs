@@ -33,13 +33,17 @@ import opendap.bes.dap4Responders.MediaType;
 public class Csv extends MediaType {
     public static final String NAME = "csv";
 
+    public static final String PRIMARY_TYPE = "text";
+    public static final String SUB_TYPE = "csv";
+
+
     public Csv(){
         this("."+ NAME);
         setName(NAME);
     }
 
     public Csv(String typeMatchString){
-        super("text","csv", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

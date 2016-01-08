@@ -180,153 +180,147 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         Document showCatalogDoc = new Document();
 
-        if (_besApi.getBesCatalog(besCatalogName, showCatalogDoc)) {
+        _besApi.getBesCatalog(besCatalogName, showCatalogDoc);
 
 
-            _log.debug(xmlo.outputString(showCatalogDoc));
+        _log.debug(xmlo.outputString(showCatalogDoc));
 
-            String xsltDoc = _systemPath + "/xsl/catalog.xsl";
-            Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
-
-
-            showCatalogToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
+        String xsltDoc = _systemPath + "/xsl/catalog.xsl";
+        Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
 
-            String base = null;
-            String dsId = null;
+        showCatalogToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
 
-            Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
-            if(s!=null && s instanceof NcWmsService){
-                NcWmsService nws = (NcWmsService) s;
-                base  = nws.getBase();
-                dsId = nws.getDynamicServiceId();
-                showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
-                showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
+
+        String base = null;
+        String dsId = null;
+
+        Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
+        if(s!=null && s instanceof NcWmsService){
+            NcWmsService nws = (NcWmsService) s;
+            base  = nws.getBase();
+            dsId = nws.getDynamicServiceId();
+            showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
+            showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
+        }
+        _log.debug("ncWMS service base:"+base);
+
+
+
+
+        if(BesDapDispatcher.allowDirectDataSourceAccess())
+            showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
+
+        if(BesDapDispatcher.useDAP2ResourceUrlResponse())
+            showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
+
+        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
+
+        String threddsCatalogID = oreq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
+
+
+        response.setContentType("text/xml");
+        Version.setOpendapMimeHeaders(request,response,_besApi);
+        response.setHeader("Content-Description", "thredds_catalog");
+
+
+        if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
+            _log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
+
+            // Go get the inherited metadata elements.
+            Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
+
+            // Transform the BES  showCatalog response into a thredds catalog
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            showCatalogToThreddsCatalog.transform(besCatalog, baos);
+
+            // Parse the thredds catalog into a JDOM document.
+            SAXBuilder sb = new SAXBuilder();
+            Document threddsCatalog = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+            // Get the top level dataset
+            Element catalog = threddsCatalog.getRootElement();
+            Element topDataset = catalog.getChild("dataset", THREDDS.NS);
+
+            // Add the metadata content to the dataset element.
+            _log.debug("Adding inherited metadata to catalog");
+            topDataset.addContent(1,metadata);
+
+            // Get the service definitions (if any) used by the inherited metadata?
+            Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
+            _log.debug("Collecting inherited services.");
+            Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
+            HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
+            Element service;
+            while(i.hasNext()){
+                service = (Element)i.next();
+                inheritedServices.put(service.getAttributeValue("name"),service);
             }
-            _log.debug("ncWMS service base:"+base);
+
+            if(!inheritedServices.isEmpty()){
 
 
 
-
-            if(BesDapDispatcher.allowDirectDataSourceAccess())
-                showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
-
-            if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-                showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
-
-            JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
-
-            String threddsCatalogID = oreq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
-
-
-            response.setContentType("text/xml");
-            Version.setOpendapMimeHeaders(request,response,_besApi);
-            response.setHeader("Content-Description", "thredds_catalog");
-
-
-            if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
-                _log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
-
-                // Go get the inherited metadata elements.
-                Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
-
-                // Transform the BES  showCatalog response into a thredds catalog
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                showCatalogToThreddsCatalog.transform(besCatalog, baos);
-
-                // Parse the thredds catalog into a JDOM document.
-                SAXBuilder sb = new SAXBuilder();
-                Document threddsCatalog = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-                // Get the top level dataset
-                Element catalog = threddsCatalog.getRootElement();
-                Element topDataset = catalog.getChild("dataset", THREDDS.NS);
-
-                // Add the metadata content to the dataset element.
-                _log.debug("Adding inherited metadata to catalog");
-                topDataset.addContent(1,metadata);
-
-                // Get the service definitions (if any) used by the inherited metadata?
-                Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
-                _log.debug("Collecting inherited services.");
-                Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
-                HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
-                Element service;
+                _log.debug("Collecting existing services.");
+                i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
+                HashMap<String, Element> existingServices = new HashMap<String, Element>();
                 while(i.hasNext()){
                     service = (Element)i.next();
-                    inheritedServices.put(service.getAttributeValue("name"),service);
+                    existingServices.put(service.getAttributeValue("name"),service);
                 }
 
-                if(!inheritedServices.isEmpty()){
 
+                String iServiceName;
 
-                    
-                    _log.debug("Collecting existing services.");
-                    i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
-                    HashMap<String, Element> existingServices = new HashMap<String, Element>();
-                    while(i.hasNext()){
-                        service = (Element)i.next();
-                        existingServices.put(service.getAttributeValue("name"),service);
-                    }
+                for(Element inheritedService: inheritedServices.values()){
+                    iServiceName = inheritedService.getAttributeValue("name");
+                    _log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
 
+                    Element existingService = existingServices.get(iServiceName);
 
-                    String iServiceName;
+                    if(existingService!=null){
+                        String iServiceType = inheritedService.getAttributeValue("serviceType");
+                        String iServiceBase = inheritedService.getAttributeValue("base");
 
-                    for(Element inheritedService: inheritedServices.values()){
-                        iServiceName = inheritedService.getAttributeValue("name");
-                        _log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
+                        String eServiceType = existingService.getAttributeValue("serviceType");
+                        String eServiceBase = existingService.getAttributeValue("base");
 
-                        Element existingService = existingServices.get(iServiceName);
-
-                        if(existingService!=null){
-                            String iServiceType = inheritedService.getAttributeValue("serviceType");
-                            String iServiceBase = inheritedService.getAttributeValue("base");
-
-                            String eServiceType = existingService.getAttributeValue("serviceType");
-                            String eServiceBase = existingService.getAttributeValue("base");
-
-                            if(!iServiceType.equalsIgnoreCase(eServiceType) || !iServiceBase.equals(eServiceBase)){
-                                _log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
-                                inheritedService.detach();
-                            }
-
+                        if(!iServiceType.equalsIgnoreCase(eServiceType) || !iServiceBase.equals(eServiceBase)){
+                            _log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
+                            inheritedService.detach();
                         }
+
                     }
-
-                    Collection<Element> servicesToAdd = inheritedServicesElement.getChildren("service",THREDDS.NS);
-                    Vector<Element> services = new Vector<Element>();
-                    for(Element e : servicesToAdd){
-                        services.add(e);
-                    }
-
-                    for(Element e : services){
-                        e.detach();
-                    }
-
-                   threddsCatalog.getRootElement().addContent(1,services);
-
-
-
                 }
 
+                Collection<Element> servicesToAdd = inheritedServicesElement.getChildren("service",THREDDS.NS);
+                Vector<Element> services = new Vector<Element>();
+                for(Element e : servicesToAdd){
+                    services.add(e);
+                }
+
+                for(Element e : services){
+                    e.detach();
+                }
+
+               threddsCatalog.getRootElement().addContent(1,services);
 
 
-                // Transmit the catalog.
-                xmlo.output(threddsCatalog,response.getOutputStream());
+
             }
-            else {
-                // Transform the BES showCatalog response intp a THREDDS catalog and send it off to the client.
-                showCatalogToThreddsCatalog.transform(besCatalog, response.getOutputStream());
-            }
 
 
 
-        } else {
-            BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(_systemPath, context, response);
-            _log.error(besError.getMessage());
-
+            // Transmit the catalog.
+            xmlo.output(threddsCatalog,response.getOutputStream());
         }
+        else {
+            // Transform the BES showCatalog response intp a THREDDS catalog and send it off to the client.
+            showCatalogToThreddsCatalog.transform(besCatalog, response.getOutputStream());
+        }
+
+
+
 
         _log.debug("THREDDS showCatalogDoc request processed.");
 

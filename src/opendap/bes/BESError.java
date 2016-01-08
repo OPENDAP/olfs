@@ -27,9 +27,10 @@
 package opendap.bes;
 
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.namespaces.*;
+import opendap.namespaces.BES;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -62,7 +63,6 @@ public class BESError extends OPeNDAPException {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
-    private MediaType _mt;
 
     private String _adminEmail;
     private String _message;
@@ -71,6 +71,12 @@ public class BESError extends OPeNDAPException {
 
     public static final String BES_ERROR = "BESError";
 
+    /**
+     * The error code.
+     *
+     * @serial
+     */
+    private int _besErrorCode;
 
     /**
      * The error is of an known type. This should NEVER happen and represents
@@ -128,14 +134,14 @@ public class BESError extends OPeNDAPException {
         _message = "Unknown Error";
         _file = "Unknown File";
         _line = "Unknown Line";
-        setErrorCode(-1);
+        setBesErrorCode(INVALID_ERROR);
     }
 
 
 
     public BESError(Document error, MediaType mt) {
         this();
-        _mt = mt;
+        setResponseMediaType(mt);
 
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
 
@@ -161,7 +167,7 @@ public class BESError extends OPeNDAPException {
         this();
 
 
-        _mt = mt;
+        setResponseMediaType(mt);
 
         SAXBuilder sb = new SAXBuilder();
 
@@ -171,19 +177,23 @@ public class BESError extends OPeNDAPException {
             besErrorDoc = processError(error);
 
             if(besErrorDoc ==null){
-                setErrorCode(INVALID_ERROR);
-                setErrorMessage("Unable to locate <BESError> object in stream.");
+                becomeInvalidError("Unable to locate <BESError> object in stream.");
             }
 
         } catch (JDOMException | IOException e) {
-            setErrorCode(INVALID_ERROR);
-            setErrorMessage("Unable to process <BESError> object in stream.");
+            becomeInvalidError("Unable to process <BESError> object in stream.");
         }
 
 
     }
 
 
+    private void becomeInvalidError(String message){
+
+        besErrorDoc = makeBesErrorDoc(INVALID_ERROR,message,null, null, -1);
+        processError(besErrorDoc);
+
+    }
 
     public BESError(String error) {
         this(error, new TextHtml());
@@ -191,7 +201,7 @@ public class BESError extends OPeNDAPException {
 
     public BESError(String error, MediaType mt) {
         this();
-        _mt = mt;
+        setResponseMediaType(mt);
 
         SAXBuilder sb = new SAXBuilder();
 
@@ -201,48 +211,55 @@ public class BESError extends OPeNDAPException {
             besErrorDoc = processError(edoc);
 
             if(besErrorDoc ==null){
-                setErrorCode(INVALID_ERROR);
-                setErrorMessage("Unable to locate <BESError> object in stream.");
+                becomeInvalidError("Unable to locate <BESError> object in stream.");
             }
 
         } catch (JDOMException | IOException e) {
-            setErrorCode(INVALID_ERROR);
-            setErrorMessage("Unable to process <BESError> object in stream.");
+            becomeInvalidError("Unable to process <BESError> object in stream.");
         }
     }
 
 
-
-    public void setReturnMediaType(MediaType mt){
-        _mt = mt;
+    /**
+     * Returns the error code.
+     *
+     * @return the error code.
+     */
+    public final int getBesErrorCode() {
+        return _besErrorCode;
+    }
+    /**
+     * Sets the error code.
+     *
+     * @param code the error code.
+     */
+    public final void setBesErrorCode(int code) {
+        _besErrorCode = code;
     }
 
-    public MediaType getReturnMediaType(){
-        return _mt;
-    }
+
 
     public boolean notFound(){
-        return getErrorCode()==NOT_FOUND_ERROR;
+        return getBesErrorCode()==NOT_FOUND_ERROR;
     }
 
     public boolean forbidden(){
-        return getErrorCode()==FORBIDDEN_ERROR;
+        return getBesErrorCode()==FORBIDDEN_ERROR;
     }
 
     public boolean syntax(){
-        return getErrorCode()==USER_SYNTAX_ERROR;
+        return getBesErrorCode()==USER_SYNTAX_ERROR;
     }
 
     public boolean internal(){
-        return getErrorCode()==INTERNAL_FATAL_ERROR || getErrorCode()==INTERNAL_ERROR;
+        return getBesErrorCode()==INTERNAL_FATAL_ERROR || getBesErrorCode()==INTERNAL_ERROR;
     }
 
 
 
-    @Override
-    public int getHttpStatus(){
+    public int convertBesErrorCodeToHttpStatusCode(){
         int httpStatus;
-        switch(getErrorCode()){
+        switch(getBesErrorCode()){
 
             case BESError.INTERNAL_ERROR:
                 httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -280,45 +297,43 @@ public class BESError extends OPeNDAPException {
 
 
 
+    private Document makeBesErrorDoc(int besErrorCode, String message, String admin, String file, int line) {
 
 
-    private  String makeBesErrorMsg(Element besErrorElement) {
-        Element e1, e2;
+        Element besErrorElement = new Element("BESError", BES.BES_NS);
 
-        String msg = "";
+        Element typeElement = new Element("Type", BES.BES_NS);
+        typeElement.setText(Integer.toString(besErrorCode));
+        besErrorElement.addContent(typeElement);
 
-        msg += "[";
-        msg += "[BESError]";
+        Element messageElement = new Element("Message", BES.BES_NS);
+        messageElement.setText(message);
+        besErrorElement.addContent(messageElement);
 
-        e1 = besErrorElement.getChild("Type",BES_NS);
-        if(e1!=null)
-            msg += "[Type: " + e1.getTextTrim() + "]";
-
-
-        e1 = besErrorElement.getChild("Message",BES_NS);
-        if(e1!=null)
-            msg += "[Message: " + e1.getTextTrim() + "]";
-
-        e1 = besErrorElement.getChild("Administrator",BES_NS);
-        if(e1!=null)
-            msg += "[Administrator: " + e1.getTextTrim() + "]";
-
-        e1 = besErrorElement.getChild("Location",BES_NS);
-        if(e1!=null){
-            msg += "[Location: ";
-            e2 = e1.getChild("File",BES_NS);
-            if(e2!=null)
-                msg += e2.getTextTrim();
-
-            e2 = e1.getChild("Line",BES_NS);
-            if(e2!=null)
-                msg += " line " + e2.getTextTrim();
-
-            msg += "]";
+        if (admin != null) {
+            Element administratorElement = new Element("Administrator", BES.BES_NS);
+            administratorElement.setText(admin);
+            besErrorElement.addContent(administratorElement);
         }
-        msg += "]";
 
-        return msg;
+        if (file != null) {
+            Element locationElement = new Element("Location", BES.BES_NS);
+
+            Element fileElement = new Element("File", BES.BES_NS);
+            fileElement.setText(file);
+            locationElement.addContent(fileElement);
+
+            Element lineElement = new Element("Line", BES.BES_NS);
+            lineElement.setText(Integer.toString(line));
+            locationElement.addContent(lineElement);
+
+            besErrorElement.addContent(locationElement);
+
+        }
+
+        return new Document(besErrorElement);
+
+
     }
 
 
@@ -333,7 +348,7 @@ public class BESError extends OPeNDAPException {
             e = error.getChild("Type",BES_NS);
             if(e!=null){
                 String s = e.getTextTrim();
-                setErrorCode(Integer.valueOf(s));
+                setBesErrorCode(Integer.valueOf(s));
             }
 
             // <Administrator>
@@ -374,9 +389,11 @@ public class BESError extends OPeNDAPException {
 
         }
         catch(NumberFormatException nfe){
-            setErrorCode(-1);
+            setBesErrorCode(-1);
         }
 
+        int httpStatus = convertBesErrorCodeToHttpStatusCode();
+        setHttpStatusCode(httpStatus);
 
         // setErrorMessage(makeBesErrorMsg(error));
 
@@ -402,41 +419,14 @@ public class BESError extends OPeNDAPException {
     }
 
 
-    /**
-     *
-     * @param response
-     * @return The HTTP status code returned to client.
-     * @throws IOException
-     */
-    public int sendErrorResponse(String systemPath, String context, HttpServletResponse response)
-            throws IOException{
-
-        if(_mt.getSubType().equalsIgnoreCase("html"))
-            return  sendHtmlErrorResponse(systemPath,context,response);
 
 
-        if(_mt.getSubType().equalsIgnoreCase("json"))
-            return  sendJsonErrorResponse(systemPath, context, response);
-
-        return  sendHtmlErrorResponse(systemPath,context,response);
-
-    }
-
-    private int sendJsonErrorResponse(String systemPath, String context, HttpServletResponse response) throws IOException  {
-        int errorVal =  getHttpStatus();
+    @Override
+    public void sendAsHtmlErrorPage(String context, HttpServletResponse response) throws IOException {
 
 
-        return errorVal;
 
-    }
-
-
-    private int sendHtmlErrorResponse(String systemPath, String context, HttpServletResponse response) throws IOException {
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        int errorVal =  getHttpStatus();
+        int errorVal =  getHttpStatusCode();
 
 
         try {
@@ -444,7 +434,7 @@ public class BESError extends OPeNDAPException {
                 response.reset();
 
 
-            String xsltDoc = systemPath + "/xsl/besError"+errorVal+".xsl";
+            String xsltDoc = _systemPath + "/xsl/besError"+errorVal+".xsl";
 
             boolean done = false;
             File xsltFile = new File(xsltDoc);
@@ -452,7 +442,8 @@ public class BESError extends OPeNDAPException {
                 Transformer transformer = new Transformer(xsltDoc);
                 transformer.setParameter("serviceContext", context);
                 JDOMSource error = new JDOMSource(besErrorDoc);
-                response.setContentType("text/html");
+                MediaType responseType = new TextHtml();
+                response.setContentType(responseType.getMimeType());
                 response.setStatus(errorVal);
                 transformer.transform(error, response.getOutputStream());
                 done = true;
@@ -463,12 +454,7 @@ public class BESError extends OPeNDAPException {
 
 
             if(!done) {
-                HttpResponder.sendHttpErrorResponse(
-                        errorVal,
-                        getMessage(),
-                        systemPath + "/error/error.html.proto",
-                        context,
-                        response);
+                super.sendHttpErrorResponse(context, response);
             }
 
         }
@@ -476,11 +462,8 @@ public class BESError extends OPeNDAPException {
             if(!response.isCommitted())
                 response.reset();
             try {
-                HttpResponder.sendHttpErrorResponse(
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        e.getMessage(),
-                        systemPath + "/error/error.html.proto",
-                        context,response);
+                setBesErrorCode(INTERNAL_ERROR);
+                super.sendHttpErrorResponse(context, response);
             }
             catch(Exception e1){
                 response.sendError(errorVal,e1.getMessage());
@@ -488,8 +471,11 @@ public class BESError extends OPeNDAPException {
 
         }
 
-        return errorVal;
+    }
 
+
+    public Document getErrorDoc(){
+        return (Document) besErrorDoc.clone();
     }
 
 

@@ -34,6 +34,9 @@ public class Netcdf4 extends MediaType {
 
     public static final String NAME = "nc4";
 
+    public static final String PRIMARY_TYPE = "application";
+    public static final String SUB_TYPE = "x-netcdf;ver=4";
+
     public Netcdf4(){
 
         this("."+ NAME);
@@ -42,7 +45,7 @@ public class Netcdf4 extends MediaType {
     }
 
     public Netcdf4(String typeMatchString){
-        super("application","x-netcdf;ver=4", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

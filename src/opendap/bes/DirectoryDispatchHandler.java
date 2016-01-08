@@ -272,41 +272,34 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Document showCatalogDoc = new Document();
 
-        if(_besApi.getBesCatalog(collectionName, showCatalogDoc)){
+        _besApi.getBesCatalog(collectionName, showCatalogDoc);
 
-            log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+        log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
 
-            JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
+        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
+        String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
 
-            if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-                xsltDoc = systemPath + "/xsl/contents.xsl";
+        if(BesDapDispatcher.useDAP2ResourceUrlResponse())
+            xsltDoc = systemPath + "/xsl/contents.xsl";
 
-            Transformer transformer = new Transformer(xsltDoc);
+        Transformer transformer = new Transformer(xsltDoc);
 
-            transformer.setParameter("dapService",oreq.getServiceLocalId());
-            transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-            transformer.setParameter("viewersService", ViewersServlet.getServiceId());
-            if(BesDapDispatcher.allowDirectDataSourceAccess())
-                transformer.setParameter("allowDirectDataSourceAccess","true");
-
-
-            AuthenticationControls.setLoginParameters(transformer,request);
-
-            // Transform the BES  showCatalog response into a HTML page for the browser
-            transformer.transform(besCatalog, response.getOutputStream());
-            // transformer.transform(besCatalog, System.out);
+        transformer.setParameter("dapService",oreq.getServiceLocalId());
+        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+        transformer.setParameter("viewersService", ViewersServlet.getServiceId());
+        if(BesDapDispatcher.allowDirectDataSourceAccess())
+            transformer.setParameter("allowDirectDataSourceAccess","true");
 
 
+        AuthenticationControls.setLoginParameters(transformer,request);
 
-        }
-        else {
-            BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(systemPath, context, response);
-            log.error(besError.getMessage());
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform(besCatalog, response.getOutputStream());
+        // transformer.transform(besCatalog, System.out);
 
-        }
+
+
 
     }
 

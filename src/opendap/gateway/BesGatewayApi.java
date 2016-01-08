@@ -26,9 +26,11 @@
 
 package opendap.gateway;
 
+import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap4.Dap4Error;
@@ -45,6 +47,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -329,13 +332,8 @@ public class BesGatewayApi extends BesApi {
     }
 
 
-
     @Override
-    public boolean getBesCatalog(String dataSourceUrl, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
+    public void getBesCatalog(String dataSourceUrl, Document response) throws IOException {
 
 
         // Go get the HEAD for the catalog:
@@ -347,54 +345,54 @@ public class BesGatewayApi extends BesApi {
 
             if (statusCode != HttpStatus.SC_OK) {
                 log.error("Unable to HEAD remote resource: " + dataSourceUrl);
-                Dap4Error error = new Dap4Error();
-                error.setMessage("OLFS: Unable to access requested resource.");
-                error.setContext(dataSourceUrl);
-                error.setHttpCode(statusCode);
+                OPeNDAPException oe = new OPeNDAPException();
+                oe.setErrorMessage("OLFS: Unable to access requested resource: " + dataSourceUrl);
+                oe.setHttpStatusCode(statusCode);
+                throw oe;
 
-                return false;
             }
 
             Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
-            if (lastModifiedHeader == null) {
-                return false;
+            Date lastModified = new Date();
+
+            if (lastModifiedHeader != null) {
+                String lmtString = lastModifiedHeader.getValue();
+                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                try {
+                    lastModified = format.parse(lmtString);
+                } catch (ParseException e) {
+                    log.warn("Failed to parse last modified time. LMT String: {}, resource URL: {}", lmtString, dataSourceUrl);
+                }
             }
-            String lmtString = lastModifiedHeader.getValue();
-            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-            Date lastModified = format.parse(lmtString);
 
             int size = -1;
-            Header contentLengthHeader =  headReq.getResponseHeader("Content-Length");
+            Header contentLengthHeader = headReq.getResponseHeader("Content-Length");
 
-            if(contentLengthHeader!=null){
+            if (contentLengthHeader != null) {
                 String sizeStr = contentLengthHeader.getValue();
                 try {
                     size = Integer.parseInt(sizeStr);
-                }
-                catch (NumberFormatException nfe){
-                    log.warn("Received invalid content length from datasource: {}: ",dataSourceUrl);
+                } catch (NumberFormatException nfe) {
+                    log.warn("Received invalid content length from datasource: {}: ", dataSourceUrl);
                 }
             }
 
-            Element catalogElement = getShowCatalogResponseDocForDatasetUrl(dataSourceUrl,size,lastModified);
+            Element catalogElement = getShowCatalogResponseDocForDatasetUrl(dataSourceUrl, size, lastModified);
 
 
             response.detachRootElement();
             response.setRootElement(catalogElement);
 
-            return true;
 
         } catch (Exception e) {
             log.warn("Unable to HEAD the remote resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
         }
 
-        Element catalogElement = getShowCatalogResponseDocForDatasetUrl("",0,new Date());
+
+        Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
 
         response.detachRootElement();
         response.setRootElement(catalogElement);
-
-
-        return false;
 
 
     }

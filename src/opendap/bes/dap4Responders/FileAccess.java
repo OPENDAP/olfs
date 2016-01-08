@@ -157,13 +157,7 @@ public class FileAccess extends Dap4Responder {
     private void sendDatasetFile(String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
         log.debug("sendDatasetFile() - Sending dataset file \"" + dataSourceId + "\"");
 
-        String downloadFileName = Scrub.fileName(dataSourceId.substring(dataSourceId.lastIndexOf("/") + 1));
-
-        log.debug("sendDatasetFile() - downloadFileName: " + downloadFileName);
-
-        String contentDisposition = " attachment; filename=\"" + downloadFileName + "\"";
-
-        response.setHeader("Content-Disposition", contentDisposition);
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(dataSourceId)+"\"");
 
 
         String suffix = ReqInfo.getSuffix(dataSourceId);

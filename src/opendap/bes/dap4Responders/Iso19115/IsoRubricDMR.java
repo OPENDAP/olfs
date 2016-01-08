@@ -26,14 +26,16 @@
 
 package opendap.bes.dap4Responders.Iso19115;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.TextHtml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -75,7 +77,7 @@ public class IsoRubricDMR extends Dap4Responder {
         setServiceDescription("ISO-19115 Conformance Score for the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
-        setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
+        setNormativeMediaType(new TextHtml(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -92,7 +94,7 @@ public class IsoRubricDMR extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         QueryParameters qp = new QueryParameters(request);
         String xmlBase = getXmlBase(request);
@@ -106,7 +108,11 @@ public class IsoRubricDMR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        MediaType responseMediaType =  getNormativeMediaType();
+        MediaType responseMediaType = getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -123,7 +129,6 @@ public class IsoRubricDMR extends Dap4Responder {
                 resourceID,
                 qp,
                 xmlBase,
-                responseMediaType,
                 dmr);
 
         OutputStream os = response.getOutputStream();

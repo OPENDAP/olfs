@@ -27,7 +27,6 @@
 package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
-import opendap.bes.dap4Responders.MediaType;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -37,7 +36,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -692,7 +690,7 @@ public class BES {
      * @throws BadConfigurationException
      * @throws JDOMException
      */
-    public boolean besTransaction(Document request, Document response )
+    public void  besTransaction(Document request, Document response )
             throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
@@ -716,7 +714,6 @@ public class BES {
 
         try {
 
-            BESError besError = null;
 
             if(oc.sendRequest(request,baos,erros)){
 
@@ -740,44 +737,15 @@ public class BES {
                     response.setRootElement(root);
                 }
 
-                return true;
+                return;
 
             } else {
 
                 log.debug("BES returned this ERROR document:\n" +
                         "-----------\n" + erros + "-----------");
 
-                /*
 
-                if(erros.size()!=0){
-                    doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
-
-                    Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
-
-                    Element err;
-                    if(i.hasNext()){
-                        err = (Element)i.next();
-                    }
-                    else {
-                        err = doc.getRootElement();
-                    }
-
-                    err.detach();
-                    response.detachRootElement();
-                    response.setRootElement(err);
-
-                }
-                else {
-                    // Build and return an error object for the BES that isn't sending back stuff
-                    String reqId = request.getRootElement().getAttributeValue("reqID");
-                    Element errResponseElement = getMissingBesResponseError(reqId);
-                    response.setRootElement(errResponseElement);
-                }
-
-                return false;
-
-                   */
-
+                BESError besError;
 
                 // log.debug("BESError: \n{}",baos.toString());
                 if (erros.size() != 0) {
@@ -787,19 +755,19 @@ public class BES {
 
                     log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
 
-                    int besErrCode = besError.getErrorCode();
+                    int besErrCode = besError.getBesErrorCode();
                     if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
                         trouble = true;
                     }
                 } else {
                     String reqId = request.getRootElement().getAttributeValue("reqID");
-                    Document errDoc = getMissingBesResponseError(reqId);
+                    Document errDoc = getMissingBesResponseErrorDoc(reqId);
                     besError = new BESError(errDoc);
 
                 }
 
 
-                int besErrCode = besError.getErrorCode();
+                int besErrCode = besError.getBesErrorCode();
                 if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
                     trouble = true;
 
@@ -817,11 +785,14 @@ public class BES {
             log.debug("OLFS Encountered a PPT Problem!", e);
             //e.printStackTrace();
 
-            String msg = "besTransaction() Problem with OPeNDAPClient. " +
+            String msg = "Problem with OPeNDAPClient. " +
                     "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
 
-            log.error(msg);
-            throw new PPTException(msg);
+            log.error("besTransaction() - {}",msg);
+
+            e.setErrorMessage(msg);
+            throw e;
+
         } finally {
             returnClient(oc, trouble);
 
@@ -838,14 +809,12 @@ public class BES {
      *
      * @param request   The BES request document.
      * @param os   The outputstream to write the BES response to.
-     * @param mt  The MediaType for the response that was negotiated with the client. This is used in the event that
-     *            an error object needs to be sent.
      * any error information will be written to the OutputStream err.
      * @throws BadConfigurationException
      * @throws IOException
      * @throws PPTException
      */
-    public void besTransaction(Document request, MediaType mt, OutputStream os)
+    public void besTransaction(Document request, OutputStream os)
             throws BadConfigurationException, IOException, PPTException, BESError {
 
 
@@ -876,15 +845,14 @@ public class BES {
             boolean result = oc.sendRequest(request,os,baos);
             log.debug("besTransaction() - Completed.");
             if(!result){
-                // @TODO Determine from the BESError if the value of besTrouble should be set to true. This should be the case for BESInternalFatalError and BESTimeOut
 
-                // log.debug("BESError: \n{}",baos.toString());
+                log.debug("BESError: \n{}",baos.toString());
                 ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                BESError besError = new BESError(bais,mt);
+                BESError besError = new BESError(bais);
 
                 log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}",besError.getMessage());
 
-                int besErrCode = besError.getErrorCode();
+                int besErrCode = besError.getBesErrorCode();
                 if( besErrCode==BESError.INTERNAL_FATAL_ERROR || besErrCode==BESError.TIME_OUT ){
                     besTrouble = true;
                 }
@@ -923,7 +891,7 @@ public class BES {
 
     }
 
-    private Document getMissingBesResponseError(String reqId){
+    private Document getMissingBesResponseErrorDoc(String reqId){
 
 
         Element errorResponse = new Element("response",BES_NS);
@@ -973,32 +941,25 @@ public class BES {
 
         BesApi besApi = new BesApi();
 
-        if (besApi.getBesVersion(getPrefix(), version)) {
+        besApi.getBesVersion(getPrefix(), version);
 
 
-            Element ver = version.getRootElement().getChild("showVersion", BES_NS);
+        Element ver = version.getRootElement().getChild("showVersion", BES_NS);
 
 
-            // Disconnect it from it's parent.
-            ver.detach();
+        // Disconnect it from it's parent.
+        ver.detach();
 
-            ver.setName("BES");
-            ver.setAttribute("prefix", getPrefix());
-            if(getNickName()!=null)
-                ver.setAttribute("name",getNickName());
+        ver.setName("BES");
+        ver.setAttribute("prefix", getPrefix());
+        if(getNickName()!=null)
+            ver.setAttribute("name",getNickName());
 
-            version.detachRootElement();
-            version.setRootElement(ver);
+        version.detachRootElement();
+        version.setRootElement(ver);
 
 
-            _serverVersionDocument = version;
-        } else {
-
-            BESError besError = new BESError(version);
-            log.error(besError.getMessage());
-            throw besError;
-
-        }
+        _serverVersionDocument = version;
 
 
     }

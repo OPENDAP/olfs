@@ -27,17 +27,18 @@
 package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
-import opendap.io.HyraxStringEncoding;
+import opendap.http.mediaTypes.DMR;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
@@ -66,7 +67,7 @@ public class NormativeDMR extends Dap4Responder {
         setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
-        setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.dataset-metadata+xml", getRequestSuffix()));
+        setNormativeMediaType(new DMR(getRequestSuffix()));
 
         addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi));
         addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi));
@@ -102,6 +103,10 @@ public class NormativeDMR extends Dap4Responder {
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -114,7 +119,7 @@ public class NormativeDMR extends Dap4Responder {
 
 
 
-        besApi.writeDMR(resourceID,qp,xmlBase,responseMediaType, os);
+        besApi.writeDMR(resourceID, qp, xmlBase, os);
 
         os.flush();
         log.info("Sent {}",getServiceTitle());

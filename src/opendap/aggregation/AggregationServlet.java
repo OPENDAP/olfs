@@ -30,14 +30,12 @@ import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.MimeTypes;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.http.mediaTypes.Netcdf3;
 import opendap.http.mediaTypes.Netcdf4;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.http.mediaTypes.TextPlain;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 
@@ -290,12 +288,7 @@ public class AggregationServlet extends HttpServlet {
         // ...the bes version info.
         // This is here primarily to show that we are talking to the BES.
         Document version = new Document();
-        if (!_besApi.getBesVersion("/", version)) {
-            String err = "Aggregation: Error getting version information from the BES";
-            out.println(err);
-
-            _log.error(err);
-        }
+        _besApi.getBesVersion("/", version);
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String besVer = xmlo.outputString(version);
@@ -398,13 +391,19 @@ public class AggregationServlet extends HttpServlet {
 
         switch (format) {
             case netcdf3:
-                _besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, new Netcdf3(), os);
+                // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+                RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
+                _besApi.writeDap2DataAsNetcdf3(granule, ce, xdap_accept, maxResponseSize, os);
                 break;
             case netcdf4:
-                _besApi.writeDap2DataAsNetcdf4(granule, ce, xdap_accept, maxResponseSize, new Netcdf4(), os);
+                // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+                RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
+                _besApi.writeDap2DataAsNetcdf4(granule, ce, xdap_accept, maxResponseSize, os);
                 break;
             case ascii:
-                _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, new TextHtml(), os);
+                // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+                RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextPlain());
+                _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, os);
                 break;
             default:
             	break;
@@ -551,18 +550,8 @@ public class AggregationServlet extends HttpServlet {
                     throw new Exception(invocationError + requestKind);
             }
         }
-        catch (BadConfigurationException | PPTException | JDOMException e) {
-            out.println("Aggregation Error: " + e.getMessage());
-
-            logError(e, "in doGet(), caught an BadConfiguration, PPT or JDOM Exception:");
-        }
-        catch (Exception e) {
-            out.println("Aggregation Error: " + e.getMessage());
-
-            logError(e, "in doGet(), caught an Exception:");
-        }
         catch (Throwable t) {
-            out.println("Aggregation Error: " + t.getMessage());
+            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
 
             logError(t, "in doGet():");
         }
@@ -634,8 +623,7 @@ public class AggregationServlet extends HttpServlet {
             }
         }
         catch (Throwable t) {
-            out.println("Aggregation Error: " + t.getMessage());
-
+            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             logError(t, "in doHead():");
         }
         finally {

@@ -26,9 +26,12 @@
 
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.TextXml;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
@@ -76,7 +79,7 @@ public class XmlDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4_Dataset_Services_Response");
         //setPreferredServiceSuffix(defaultRequestSuffix);
 
-        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new TextXml(getRequestSuffix()));
 
         normDSR = dsr;
 
@@ -105,7 +108,7 @@ public class XmlDSR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
-        HashMap<String,String> piMap = new HashMap<String,String>( 2 );
+        HashMap<String,String> piMap = new HashMap<>( 2 );
         piMap.put( "type", "text/xsl" );
         piMap.put( "href", context+"xsl/datasetServices.xsl" );
         ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
@@ -118,7 +121,12 @@ public class XmlDSR extends Dap4Responder {
 
         serviceDescription.setRootElement(datasetServices);
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType = getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+        response.setContentType(responseMediaType.getMimeType());
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

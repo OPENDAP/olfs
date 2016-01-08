@@ -30,22 +30,20 @@ import opendap.bes.dap4Responders.MediaType;
 /**
  * Created by ndp on 1/27/15.
  */
-public class Netcdf3 extends MediaType {
+public class RDF extends MediaType {
 
-    public static final String NAME = "nc";
+    public static final String NAME = "rdf";
 
     public static final String PRIMARY_TYPE = "application";
-    public static final String SUB_TYPE = "x-netcdf";
+    public static final String SUB_TYPE = "rdf+xml";
 
-
-    public Netcdf3(){
-
+    public RDF(){
         this("."+ NAME);
         setName(NAME);
 
     }
 
-    public Netcdf3(String typeMatchString){
+    public RDF(String typeMatchString){
         super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 

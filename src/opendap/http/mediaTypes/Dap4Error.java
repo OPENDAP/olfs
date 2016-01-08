@@ -30,22 +30,21 @@ import opendap.bes.dap4Responders.MediaType;
 /**
  * Created by ndp on 1/27/15.
  */
-public class Netcdf3 extends MediaType {
+public class Dap4Error extends MediaType {
 
-    public static final String NAME = "nc";
+    public static final String NAME = "error";
 
     public static final String PRIMARY_TYPE = "application";
-    public static final String SUB_TYPE = "x-netcdf";
+    public static final String SUB_TYPE = "vnd.opendap.dap4.error.xml";
 
 
-    public Netcdf3(){
-
+    public Dap4Error(){
         this("."+ NAME);
         setName(NAME);
 
     }
 
-    public Netcdf3(String typeMatchString){
+    public Dap4Error(String typeMatchString){
         super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 

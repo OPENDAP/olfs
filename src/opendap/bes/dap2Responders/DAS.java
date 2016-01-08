@@ -28,13 +28,14 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
-import opendap.io.HyraxStringEncoding;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.TextPlain;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -72,7 +73,7 @@ public class DAS extends Dap4Responder {
         setServiceDescription("DAP2 Dataset Attribute Structure (DAS).");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DAS_Service");
 
-        setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
+        setNormativeMediaType(new TextPlain(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -95,6 +96,10 @@ public class DAS extends Dap4Responder {
         log.debug("sendDAS() for dataset: " + resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_das");
@@ -109,7 +114,7 @@ public class DAS extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDAS(resourceID, constraintExpression, xdap_accept, responseMediaType, os);
+        besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os);
 
 
         os.flush();

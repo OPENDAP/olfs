@@ -28,15 +28,15 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
 
@@ -72,7 +72,7 @@ public class Netcdf3 extends Dap4Responder {
         setServiceDescription("NetCDF-3 representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
-        setNormativeMediaType(new MediaType("application","x-netcdf", getRequestSuffix()));
+        setNormativeMediaType(new opendap.http.mediaTypes.Netcdf3(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -100,24 +100,18 @@ public class Netcdf3 extends Dap4Responder {
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
-        Pattern startsWithNumber = Pattern.compile("[0-9].*");
-        if(startsWithNumber.matcher(downloadFileName).matches())
-            downloadFileName = "nc_"+downloadFileName;
 
-        downloadFileName = downloadFileName+".nc";
-
-        log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
-
-        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-
-        response.setHeader("Content-Disposition", contentDisposition);
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
 
         String xdap_accept = "3.2";
@@ -129,7 +123,7 @@ public class Netcdf3 extends Dap4Responder {
         OutputStream os = response.getOutputStream();
 
 
-        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), responseMediaType, os);
+        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
 
 
         os.flush();

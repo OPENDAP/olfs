@@ -27,19 +27,20 @@
 package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.io.HyraxStringEncoding;
+import opendap.http.mediaTypes.GeoTiff;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -74,7 +75,7 @@ public class GeoTiffDR extends Dap4Responder {
         setServiceDescription("GeoTIFF representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
-        setNormativeMediaType(new MediaType("image","tiff;application=geotiff", getRequestSuffix()));
+        setNormativeMediaType(new GeoTiff(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -97,15 +98,15 @@ public class GeoTiffDR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        String downloadFileName = requestedResourceId.substring(requestedResourceId.lastIndexOf("/") + 1,
-                                  requestedResourceId.length());
-        downloadFileName = Scrub.fileName(downloadFileName);
-        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-        response.setHeader("Content-Disposition", contentDisposition);
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         Version.setOpendapMimeHeaders(request,response,besApi);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
 
         Version.setOpendapMimeHeaders(request, response, besApi);
@@ -117,14 +118,13 @@ public class GeoTiffDR extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         besApi.writeDap4DataAsGeoTiff(
             resourceID,
             qp,
             user.getMaxResponseSize(),
-            responseMediaType, os);
+            os);
 
 
 

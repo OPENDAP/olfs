@@ -32,6 +32,8 @@ import opendap.bes.dap4Responders.MediaType;
  */
 public class TextPlain  extends MediaType {
     public static final String NAME = "txt";
+    public static final String PRIMARY_TYPE = "text";
+    public static final String SUB_TYPE = "plain";
 
     public TextPlain(){
         this("."+ NAME);
@@ -39,7 +41,7 @@ public class TextPlain  extends MediaType {
     }
 
     public TextPlain(String typeMatchString){
-        super("text","plain", typeMatchString);
+        super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 
 }

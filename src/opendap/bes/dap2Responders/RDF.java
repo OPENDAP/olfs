@@ -28,7 +28,9 @@ package opendap.bes.dap2Responders;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Transformer;
@@ -68,7 +70,7 @@ public class RDF extends Dap4Responder {
         setServiceDescription("An RDF representation of the DAP2 Dataset response (DDX) document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_DDX_Service");
 
-        setNormativeMediaType(new MediaType("application","rdf+xml", getRequestSuffix()));
+        setNormativeMediaType(new opendap.http.mediaTypes.RDF(getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
@@ -105,6 +107,10 @@ public class RDF extends Dap4Responder {
         String accepts = request.getHeader("Accepts");
         if(accepts==null|| !accepts.equalsIgnoreCase("application/rdf+xml"))
             responseMediaType = new TextXml();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
 
 
@@ -116,7 +122,7 @@ public class RDF extends Dap4Responder {
 
         Document ddx = new Document();
 
-        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, responseMediaType, ddx);
+        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 

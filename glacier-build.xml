@@ -162,7 +162,7 @@
     <property name="lib.dir" location="lib"/>
     <property name="aws.resources" location="resources/experiments/AWS"/>
     <property name="glacier.resources" location="${aws.resources}/Glacier"/>
-    <property name="nciso.resources"   location="resources/nciso"/>
+    <property name="nciso.resources"   location="resources/hyrax/nciso"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
 
@@ -325,7 +325,7 @@
         </copy>
 
         <copy todir="${build.resources}/nciso" filtering="true">
-            <fileset dir="${nciso.resources}">
+            <fileset dir="/nciso">
                 <!-- include all the files -->
                 <include name="xsl/**"/>
             </fileset>

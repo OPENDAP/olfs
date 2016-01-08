@@ -27,19 +27,20 @@
 package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.io.HyraxStringEncoding;
+import opendap.http.mediaTypes.Netcdf3;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
 
@@ -75,7 +76,7 @@ public class Netcdf3DR extends Dap4Responder{
         setServiceDescription("NetCDF-3 representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
-        setNormativeMediaType(new MediaType("application","x-netcdf", getRequestSuffix()));
+        setNormativeMediaType(new Netcdf3(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -104,6 +105,10 @@ public class Netcdf3DR extends Dap4Responder{
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -111,7 +116,7 @@ public class Netcdf3DR extends Dap4Responder{
         //response.setHeader("Content-Encoding", "plain");
 
 
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
@@ -133,7 +138,7 @@ public class Netcdf3DR extends Dap4Responder{
 
 
 
-        besApi.writeDap4DataAsNetcdf3(resourceID, qp, user.getMaxResponseSize(), responseMediaType, os);
+        besApi.writeDap4DataAsNetcdf3(resourceID, qp, user.getMaxResponseSize(), os);
 
 
         os.flush();

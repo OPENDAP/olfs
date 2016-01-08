@@ -26,13 +26,15 @@
 
 package opendap.bes.dap4Responders.Iso19115;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.TextXml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -73,7 +75,7 @@ public class IsoDMR extends Dap4Responder {
         setServiceDescription("ISO-19115 metadata extracted form the normative DMR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
 
-        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new TextXml(getRequestSuffix()));
 
         IsoRubricDMR rubric =  new IsoRubricDMR(sysPath, pathPrefix, besApi);
 
@@ -161,7 +163,7 @@ public class IsoDMR extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
 
         QueryParameters qp = new QueryParameters(request);
@@ -174,7 +176,11 @@ public class IsoDMR extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        MediaType responseMediaType =  getNormativeMediaType();
+        MediaType responseMediaType = getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
@@ -190,7 +196,6 @@ public class IsoDMR extends Dap4Responder {
                 resourceID,
                 qp,
                 xmlBase,
-                responseMediaType,
                 dmr);
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);

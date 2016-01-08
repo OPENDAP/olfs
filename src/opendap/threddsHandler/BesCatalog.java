@@ -495,11 +495,7 @@ public class BesCatalog implements Catalog {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
             Document besShowCatalogDoc = new Document();
-            if (!_besApi.getBesCatalog(_besCatalogResourceId, besShowCatalogDoc)) {
-
-                _log.error(xmlo.outputString(besShowCatalogDoc));
-
-            }
+            _besApi.getBesCatalog(_besCatalogResourceId, besShowCatalogDoc);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

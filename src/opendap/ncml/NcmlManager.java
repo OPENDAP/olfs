@@ -271,9 +271,8 @@ public class NcmlManager {
             log.debug("Sending NcML to BES '{}'. BES command: \n{}",bes.getNickName(),xmlo.outputString(besCmd));
 
             try {
-                if(!bes.besTransaction(besCmd,response)){
-                    log.error("BES '"+bes.getNickName()+"' failed to ingest NcML dataset '"+dapAccessID+"' BES Error Object: \n"+xmlo.outputString(response));
-                }
+                bes.besTransaction(besCmd,response);
+
             } catch (Exception e) {
                 log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
             }

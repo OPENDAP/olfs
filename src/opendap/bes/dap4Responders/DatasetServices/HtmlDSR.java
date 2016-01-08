@@ -26,9 +26,12 @@
 
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.RequestCache;
+import opendap.http.mediaTypes.TextHtml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -77,7 +80,7 @@ public class HtmlDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4_Dataset_Services_Response");
         //setPreferredServiceSuffix(getRequestSuffix());
 
-        setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
+        setNormativeMediaType(new TextHtml(getRequestSuffix()));
 
         normDSR = dsr;
 
@@ -107,7 +110,7 @@ public class HtmlDSR extends Dap4Responder {
 
         Document responseDoc = new Document();
 
-        HashMap<String,String> piMap = new HashMap<String,String>( 2 );
+        HashMap<String,String> piMap = new HashMap<>( 2 );
         piMap.put( "type", "text/xsl" );
         piMap.put( "href", context+"xsl/datasetServices.xsl" );
         ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
@@ -135,7 +138,12 @@ public class HtmlDSR extends Dap4Responder {
 
         ServletOutputStream os = response.getOutputStream();
 
-        response.setContentType(getNormativeMediaType().getMimeType());
+        MediaType responseMediaType = getNormativeMediaType();
+
+        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+        response.setContentType(responseMediaType.getMimeType());
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 

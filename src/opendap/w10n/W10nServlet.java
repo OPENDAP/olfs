@@ -127,7 +127,6 @@ public class W10nServlet extends HttpServlet   {
 
                 }
                 finally {
-                    RequestCache.closeThreadCache();
                     _log.info("doGet(): Response completed.\n");
                     Timer.stop(timedProc);
                 }
@@ -150,6 +149,9 @@ public class W10nServlet extends HttpServlet   {
                         // It's boned now.. Leave it be.
                 	}
                 }
+            }
+            finally {
+                RequestCache.closeThreadCache();
             }
 
             _log.info(Timer.report());
