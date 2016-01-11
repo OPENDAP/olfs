@@ -323,13 +323,6 @@
             </fileset>
         </copy>
 
-        <copy todir="${build.resources}/nciso" filtering="true">
-            <fileset dir="/nciso">
-                <!-- include all the files -->
-                <include name="xsl/**"/>
-            </fileset>
-
-        </copy>
 
         <copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyrax.resources}">
@@ -341,6 +334,7 @@
                 <include name="xsl/version.xsl"/>
                 <include name="jsp/help.jsp"/>
                 <include name="js/CollapsibleLists.js"/>
+                <include name="nciso"/>
             </fileset>
         </copy>
 
