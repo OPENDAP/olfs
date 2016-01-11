@@ -389,27 +389,6 @@
         <copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyraxResources.dir}"/>
         </copy>
-
-        <!--
-        #Copy and filter all of the gateway resources#
-        <copy todir="${build.resources}/gateway" filtering="true">
-            <fileset dir="${GatewayResources.dir}"/>
-        </copy>
-
-
-        #Copy and filter all of the WebStart resources #
-        <copy todir="${build.resources}/WebStart" filtering="true">
-            <fileset dir="${WebStartResources.dir}"/>
-        </copy>
-
-
-        #Copy and filter all of the ncISO resources #
-        <copy todir="${build.resources}/nciso" filtering="true">
-            <fileset dir="/nciso"/>
-        </copy>
-
-
-        -->
     </target>
 
 
