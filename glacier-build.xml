@@ -162,7 +162,6 @@
     <property name="lib.dir" location="lib"/>
     <property name="aws.resources" location="resources/experiments/AWS"/>
     <property name="glacier.resources" location="${aws.resources}/Glacier"/>
-    <property name="nciso.resources"   location="resources/hyrax/nciso"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
 
