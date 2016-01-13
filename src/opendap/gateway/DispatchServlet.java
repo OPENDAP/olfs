@@ -183,7 +183,7 @@ public class DispatchServlet extends HttpServlet {
 
         }
         finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "GATEWAY_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "GATEWAY_SERVICE_ACCESS");
 
         }
 
@@ -206,6 +206,8 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
+        int request_status = HttpServletResponse.SC_OK;
+
         try {
 
             LogUtil.logServerAccessStart(request, "GATEWAY_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
@@ -224,13 +226,13 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
+            LogUtil.logServerAccessEnd(request_status, "GATEWAY_SERVICE_ACCESS");
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "GATEWAY_SERVICE_ACCESS");
         }
     }
 

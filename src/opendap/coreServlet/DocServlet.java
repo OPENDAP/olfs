@@ -27,6 +27,7 @@
 package opendap.coreServlet;
 
 
+import opendap.http.error.NotFound;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import org.slf4j.Logger;
@@ -85,20 +86,18 @@ public class DocServlet extends HttpServlet {
 
     public long getLastModified(HttpServletRequest req) {
 
-        long lmt;
+        long lmt = -1;
 
 
         String name = Scrub.fileName(getName(req));
 
 
-        File f = new File(name);
+        if(name!=null) {
+            File f = new File(name);
+            if (f.exists())
+                lmt = f.lastModified();
 
-        if (f.exists())
-            lmt = f.lastModified();
-        else
-            lmt = -1;
-
-
+        }
         //log.debug("getLastModified() - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
 
         return lmt;
@@ -135,12 +134,14 @@ public class DocServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
+        int request_status = HttpServletResponse.SC_OK;
+
 
         try {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
 
-            LogUtil.logServerAccessStart(request, "DocServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -148,6 +149,9 @@ public class DocServlet extends HttpServlet {
 
                 log.debug("DocServlet - The client requested this: " + name);
 
+                if(name == null){
+                    throw new NotFound("Unable to locate: "+name);
+                }
 
                 File f = new File(name);
 
@@ -179,8 +183,7 @@ public class DocServlet extends HttpServlet {
                             response.setContentType(mType);
 
 
-                        ServletOutputStream sos = null;
-                        sos = response.getOutputStream();
+                        ServletOutputStream sos  = response.getOutputStream();
 
 
                         if (mType != null && mType.startsWith("text/")) {
@@ -198,6 +201,7 @@ public class DocServlet extends HttpServlet {
                         } else {
 
                             FileInputStream fis = new FileInputStream(f);
+
                             try {
                                 byte buff[] = new byte[8192];
                                 int rc;
@@ -221,8 +225,6 @@ public class DocServlet extends HttpServlet {
                             }
                         }
 
-                        LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
-
                     } else if (f.isDirectory()) {
                         log.debug("   Requested directory exists.");
                         response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString())+"/");
@@ -236,19 +238,17 @@ public class DocServlet extends HttpServlet {
 
 
                 } else {
-                    log.debug("   Requested item does not exist. Returning '404 Not Found'");
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
-
+                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+name);
                 }
 
-            } else
-                LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
+            } else {
 
+                // throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+name);
+            }
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
@@ -256,6 +256,9 @@ public class DocServlet extends HttpServlet {
                     // Never mind we can't manage anything sensible at this point....
                 }
             }
+        }
+        finally {
+            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
         }
     }
 
@@ -267,7 +270,7 @@ public class DocServlet extends HttpServlet {
 
         try {
             while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine() + "\n");
+                stringBuilder.append(scanner.nextLine()).append("\n");
             }
         } finally {
             scanner.close();
@@ -281,7 +284,7 @@ public class DocServlet extends HttpServlet {
 
         try {
             while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine() + "\n");
+                stringBuilder.append(scanner.nextLine()).append("\n");
             }
         } finally {
             scanner.close();

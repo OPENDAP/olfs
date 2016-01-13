@@ -307,7 +307,6 @@
                 <!-- include all the java files -->
                 <include  name="opendap/**/*.java"/>
                 <exclude  name="opendap/experiments/**"/>
-                <exclude  name="opendap/semantics/**"/>
                 <exclude  name="opendap/metacat/**"/>
                 <exclude  name="opendap/wcs/**"/>
                 <exclude  name="opendap/hai/**"/>

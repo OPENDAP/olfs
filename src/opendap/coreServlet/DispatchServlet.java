@@ -449,6 +449,7 @@ public class DispatchServlet extends HttpServlet {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
+        int request_status = HttpServletResponse.SC_OK;
 
         try {
             Procedure timedProcedure = Timer.start();
@@ -491,12 +492,10 @@ public class DispatchServlet extends HttpServlet {
                 if (dh != null) {
                     log.debug("Request being handled by: " + dh.getClass().getName());
                     dh.handleRequest(request, response);
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
-    
+
                 } else {
                     //send404(request,response);
-                    OPeNDAPException oe = new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
-                    throw oe;
+                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
                 }
             }
             finally {
@@ -507,7 +506,7 @@ public class DispatchServlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             }
             catch(Throwable t2) {
             	try {
@@ -523,6 +522,7 @@ public class DispatchServlet extends HttpServlet {
             }
         }
         finally {
+            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
             RequestCache.closeThreadCache();
             log.info("doGet(): Response completed.\n");
         }
@@ -533,6 +533,8 @@ public class DispatchServlet extends HttpServlet {
     //**************************************************************************
 
 
+
+    /*
     private void send404(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
         // Build a regex to use to see if they are looking for a DAP2 response:
@@ -595,6 +597,8 @@ public class DispatchServlet extends HttpServlet {
 
 
     }
+    */
+
 
 
     private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
@@ -627,6 +631,8 @@ public class DispatchServlet extends HttpServlet {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
+        int request_status = HttpServletResponse.SC_OK;
+
         try {
             try {
 
@@ -651,12 +657,9 @@ public class DispatchServlet extends HttpServlet {
                 if (dh != null) {
                     log.debug("Request being handled by: " + dh.getClass().getName());
                     dh.handleRequest(request, response);
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    log.error("Failed to locate default NoPostHandler!!");
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, -1, "HyraxAccess");
+                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
                 }
 
 
@@ -668,7 +671,7 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             }
             catch(Throwable t2) {
             	try {
@@ -680,6 +683,7 @@ public class DispatchServlet extends HttpServlet {
             }
         }
         finally{
+            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
             RequestCache.closeThreadCache();
         }
 
@@ -724,8 +728,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
-
+        LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
 
         long lmt = -1;
 
@@ -733,8 +736,7 @@ public class DispatchServlet extends HttpServlet {
         try {
 
             if (ReqInfo.isServiceOnlyRequest(req)) {
-                LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
-                return -1;
+                return lmt;
             }
 
 
@@ -751,7 +753,7 @@ public class DispatchServlet extends HttpServlet {
             log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
             lmt = -1;
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "HyraxAccess");
             Timer.stop(timedProcedure);
 
         }

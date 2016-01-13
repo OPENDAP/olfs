@@ -205,7 +205,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         } catch (Exception e) {
             return -1;
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "ADMIN_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "ADMIN_SERVICE_ACCESS");
 
         }
 
@@ -231,6 +231,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
+
+        int request_status = HttpServletResponse.SC_OK;
 
         try {
 
@@ -266,18 +268,20 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
+            LogUtil.logServerAccessEnd(request_status, "ADMIN_SERVICE_ACCESS");
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
         }
     }
 
     public void doPost(HttpServletRequest request,
                       HttpServletResponse response) {
+
+        int request_status = HttpServletResponse.SC_OK;
 
         try {
 
@@ -311,13 +315,13 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
             } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, "ADMIN_SERVICE_ACCESS");
         }
     }
 

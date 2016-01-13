@@ -86,7 +86,7 @@
         </rollingPolicy>
 
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</Pattern>
+            <pattern>[%X{host}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </layout>
     </appender>
 
@@ -100,7 +100,7 @@
         </rollingPolicy>
 
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</Pattern>
+            <Pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}]      %m</Pattern>
         </layout>
     </appender>
 

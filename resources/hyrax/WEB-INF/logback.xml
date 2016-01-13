@@ -70,13 +70,13 @@
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
 
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</pattern>
+            <pattern>[%X{host}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
 
     </appender>
@@ -92,7 +92,7 @@
 
 
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</pattern>
+            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}]      %m</pattern>
         </encoder>
 
     </appender>
@@ -103,10 +103,12 @@
     <!-- OPeNDAP Hyrax Logging -->
 
 
+
     <logger name="opendap" level="error" >
         <appender-ref ref="stdout"/>
     </logger>
 
+    <logger name="opendap.logging" level="all"/>
 
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="all">

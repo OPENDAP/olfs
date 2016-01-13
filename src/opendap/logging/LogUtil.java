@@ -30,7 +30,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -378,25 +377,23 @@ public class LogUtil {
 
         HttpSession session = req.getSession(false);
 
-        Logger log = org.slf4j.LoggerFactory.getLogger(logName);
 
         MDC.put("ID", reqID);
         MDC.put("SOURCE", reqSource);
         MDC.put("host", req.getRemoteHost());
         MDC.put("ident", (session == null) ? "-" : session.getId());
-        MDC.put("userid", req.getRemoteUser() != null ? req.getRemoteUser() : "-");
+        MDC.put("userid", req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put("startTime", System.currentTimeMillis() + "");
+
+        String resourceID =  req.getRequestURI();
+        MDC.put("resourceID",resourceID);
+
         String query = req.getQueryString();
-        query = (query != null) ? "?" + query : "";
-        StringBuffer request = new StringBuffer();
-        request.append("\"").append(req.getMethod()).append(" ")
-                .append(req.getRequestURI()).append(query)
-                .append(" ").append(req.getProtocol()).append("\"");
+        query = (query == null) ? "" : query;
+        MDC.put("query", query);
 
-        MDC.put("request", request.toString());
+        log.info("REQUEST START - Remote host: " + req.getRemoteHost() + " - RequestedResource: '" + resourceID + "'  QueryString: '" + query +"' Access_Log: "+logName);
 
-
-        log.info("Remote host: " + req.getRemoteHost() + " - Request: " + request);
     }
 
 
@@ -405,31 +402,31 @@ public class LogUtil {
     /**
      * Write log entry to named log.
      *
-     * @param resCode        - the result code for this request.
-     * @param resSizeInBytes - the number of bytes returned in this result, -1 if unknown.
+     * @param httpStatus        - the result code for this request.
      * @param logName the name of the Logger to which to write stuff.
      */
-    public static void logServerAccessEnd(int resCode,
-                                          long resSizeInBytes,
+    public static void logServerAccessEnd(int httpStatus,
                                           String logName) {
 
         long endTime = System.currentTimeMillis();
+
+        MDC.put("http_status", Integer.toString(httpStatus));
 
         String sTime = MDC.get("startTime");
         long startTime = Long.valueOf(sTime);
         long duration = endTime - startTime;
 
+        MDC.put("duration", Long.toString(duration)+" ms");
 
-        Logger log = org.slf4j.LoggerFactory.getLogger(logName);
 
+        // Doesn't matter what we write to the access_log because the access log formatter ignores
+        // it in lieu of the stuff in MDC. All that matters is that we write something.
+        Logger access_log = org.slf4j.LoggerFactory.getLogger(logName);
+        access_log.info("");
 
-        log.info(   "Request Completed - [" +
-                    resCode +
-                    "] [" +
-                    resSizeInBytes +
-                    "] [" +
-                    duration +
-                    "]");
+        log.info("REQUEST COMPLETE - http_status: " + httpStatus + " duration: "+ duration + " ms");
+
     }
+
 
 }

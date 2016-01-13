@@ -38,7 +38,6 @@ import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.*;
-import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -54,8 +53,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -353,34 +350,6 @@ public class W10nResponder {
     }
 
 
-    /**
-     * Transmits a bad media type error to the client.
-     * @param mt  The MediaType that we can't give them.
-     * @param response The outgoing response.
-     * @throws IOException
-     */
-    private void sendBadMediaTypeError(MediaType mt, HttpServletResponse response) throws IOException {
-
-        if(!response.isCommitted())
-            response.reset();
-        response.setContentType(new TextHtml().getMimeType());
-        response.setHeader("Content-Description","ERROR");
-
-        response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
-
-        ServletOutputStream sos = response.getOutputStream();
-
-        sos.println("<html>");
-        sos.println("<head><title>ERROR: Unsupported media type</title></head>");
-        sos.println("<body>");
-        sos.println("<h2>ERROR</h2>");
-        sos.println("You have requested an unsupported return type of "+ mt.getMimeType());
-        sos.println("</body></html>");
-
-    }
-
-
-
 
     /**
      *
@@ -396,7 +365,7 @@ public class W10nResponder {
      */
     private void sendW10nMetaResponseForFileOrDir(W10nRequest w10nRequest,
                                                   HttpServletResponse response)
-            throws JDOMException, BadConfigurationException, PPTException, IOException, SaxonApiException, BESError {
+            throws OPeNDAPException, JDOMException, IOException, SaxonApiException {
 
 
         MediaType mt = w10nRequest.getBestMediaType();
@@ -423,7 +392,9 @@ public class W10nResponder {
             sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
         }
         else {
-            sendBadMediaTypeError(mt,response);
+            OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
+            oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
+            throw oe;
         }
 
 
@@ -739,7 +710,7 @@ public class W10nResponder {
             W10nRequest w10nRequest,
             int maxResponseSize,
             HttpServletResponse response)
-            throws IOException, PPTException, BadConfigurationException, BESError {
+            throws IOException, OPeNDAPException {
 
 
         // Handle Response Media Type...
@@ -771,9 +742,9 @@ public class W10nResponder {
             return;
         }
 
-        sendBadMediaTypeError(mt, response);
-
-        return;
+        OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
+        oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
+        throw oe;
 
 
     }
@@ -1100,7 +1071,7 @@ public class W10nResponder {
     private void sendW10nMetaResponseForDap2Metadata(W10nRequest w10nRequest,
                                                     int maxResponseSize,
                                                     HttpServletResponse response)
-            throws BESError, BadConfigurationException, PPTException, IOException, JDOMException, SaxonApiException {
+            throws OPeNDAPException, IOException, JDOMException, SaxonApiException {
 
 
         // Handle Response Media Type...
@@ -1129,7 +1100,9 @@ public class W10nResponder {
 
 
 
-        sendBadMediaTypeError(mt, response);
+        OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
+        oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
+        throw oe;
 
     }
 

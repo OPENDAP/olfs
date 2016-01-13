@@ -165,7 +165,7 @@ public class PDPService extends HttpServlet {
             return -1;
 
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, _accessLogName);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, _accessLogName);
         }
 
 
@@ -261,8 +261,8 @@ public class PDPService extends HttpServlet {
             }
         }
         finally {
+            LogUtil.logServerAccessEnd(status, _accessLogName);
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(status, msg.length(), _accessLogName);
         }
 
     }

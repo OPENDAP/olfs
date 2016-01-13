@@ -25,7 +25,14 @@
  */
 package opendap.w10n;
 
-import opendap.coreServlet.*;
+import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.LicenseManager;
+import opendap.coreServlet.Util;
+import opendap.coreServlet.Debug;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -37,7 +44,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -46,39 +52,93 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class W10nServlet extends HttpServlet   {
 
     private org.slf4j.Logger _log;
-    private AtomicInteger _reqNumber;
 
     private W10nResponder _responder;
 
-        /**
-         * ************************************************************************
-         *
-         * @throws javax.servlet.ServletException
-         */
-        @Override
-        public void init() throws ServletException {
-            super.init();
 
-            _log = LoggerFactory.getLogger(this.getClass());
+    /**
+     * ************************************************************************
+     * A thread safe hit counter
+     *
+     * @serial
+     */
+    private AtomicInteger _reqNumber;
 
 
-            _reqNumber = new AtomicInteger(0);
+    /**
+     * ************************************************************************
+     *
+     * @throws javax.servlet.ServletException
+     */
+    @Override
+    public void init() throws ServletException {
+        super.init();
 
-            _responder = new W10nResponder(ServletUtil.getSystemPath(this,""));
+        _reqNumber = new AtomicInteger(0);
 
-            W10nService w10nService = new W10nService();
+        _log = LoggerFactory.getLogger(this.getClass());
 
-            w10nService.init(this,null);
 
-            ServicesRegistry.addService(w10nService);
+        _reqNumber = new AtomicInteger(0);
+
+        _responder = new W10nResponder(ServletUtil.getSystemPath(this,""));
+
+        W10nService w10nService = new W10nService();
+
+        w10nService.init(this,null);
+
+        ServicesRegistry.addService(w10nService);
+
+    }
+
+    /**
+     * Gets the last modified date of the requested resource. Because the data handler is really
+     * the only entity capable of determining the last modified date the job is passed  through to it.
+     *
+     * @param req The current request
+     * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
+     *         since midnight January 1, 1970 GMT
+     */
+    @Override
+    protected long getLastModified(HttpServletRequest req) {
+
+
+        RequestCache.openThreadCache();
+
+        long reqno = _reqNumber.incrementAndGet();
+        LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
+
+        long lmt = -1;
+
+        Procedure timedProcedure = Timer.start();
+        try {
+
+            if (ReqInfo.isServiceOnlyRequest(req)) {
+                return lmt;
+            }
+
+            // @TODO Create a meaningful implementation of getLastModified for w10n service.
+
+        } catch (Exception e) {
+            _log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
+            lmt = -1;
+        } finally {
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "HyraxAccess");
+            Timer.stop(timedProcedure);
 
         }
+
+
+        return lmt;
+
+    }
 
         @Override
         public void doGet(HttpServletRequest request,
                           HttpServletResponse response) {
 
 
+            int request_status = HttpServletResponse.SC_OK;
             try {
                 Procedure timedProc = Timer.start();
                 try {
@@ -135,7 +195,7 @@ public class W10nServlet extends HttpServlet   {
             }
             catch (Throwable t) {
                 try {
-                    OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                    request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
                 }
                 catch(Throwable t2) {
                 	try {
@@ -151,6 +211,7 @@ public class W10nServlet extends HttpServlet   {
                 }
             }
             finally {
+                LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
                 RequestCache.closeThreadCache();
             }
 

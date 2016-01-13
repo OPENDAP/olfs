@@ -258,7 +258,7 @@ public class OPeNDAPException extends Exception {
      * @param t        The Exception that caused the problem.
      * @param response The <code>HttpServletResponse</code> for the client.
      */
-    public static void anyExceptionHandler(Throwable t, HttpServlet servlet, String context, HttpServletResponse response) {
+    public static int anyExceptionHandler(Throwable t, HttpServlet servlet, String context, HttpServletResponse response) {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
 
@@ -292,6 +292,7 @@ public class OPeNDAPException extends Exception {
 
 
                 oe = new OPeNDAPException(UNDEFINED_ERROR, msg);
+                oe.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
             }
 
@@ -308,11 +309,14 @@ public class OPeNDAPException extends Exception {
                 oe.sendAsDap2Error(response);
             }
 
+            return oe.getHttpStatusCode();
+
         } catch (Throwable ioe) {
             log.error("Bad things happened! Cannot process incoming " +
                     "exception! New Exception thrown: " + ioe);
         }
 
+        return -1;
 
     }
 
@@ -357,6 +361,11 @@ public class OPeNDAPException extends Exception {
             }
             if (errorResponseMediaType.getSubType().equalsIgnoreCase(Dap4Data.SUB_TYPE)) {
                 sendAsDap4Error(response);
+                return;
+            }
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(Dap2Data.SUB_TYPE)) {
+                sendAsDap2Error(response);
                 return;
             }
 
@@ -571,9 +580,11 @@ public class OPeNDAPException extends Exception {
         response.setHeader("Content-Description", "error_page");
         response.setStatus(getHttpStatusCode());
 
+
+        _log.debug(template);
         ServletOutputStream sos  = response.getOutputStream();
 
-        sos.println(template);
+        sos.write(template.getBytes(HyraxStringEncoding.getCharset()));
 
         sos.flush();
 
