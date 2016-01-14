@@ -1,0 +1,11 @@
+# Process with autom4te to create an -*- Autotest -*- test suite.
+
+AT_INIT([olfs tests])
+
+# replace 'besstandalone' with the name or names of the programs you're
+# using as test drivers (curl, ...)
+AT_TESTED([besstandalone])
+
+m4_include([handler_tests_macros.m4])
+
+AT_BESCMD_RESPONSE_TEST(bescmd/versionFunction.dds.bescmd)

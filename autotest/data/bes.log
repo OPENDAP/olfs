@@ -1,0 +1,569 @@
+[MST Wed Feb  4 16:20:13 2015 id: 92724] 92724 from standalone request received
+[MST Wed Feb  4 16:20:13 2015 id: 92724] 92724 from standalone [set context xdap_accept to 3.2;] received
+92724 from standalone [set context dap_explicit_containers to no;] received
+92724 from standalone [set context errors to xml;] received
+92724 from standalone [set context max_response_size to 0;] received
+92724 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92724 from standalone [define d1 in default as c;] received
+92724 from standalone [get dods for d1 return as dap2;] received
+[MST Wed Feb  4 16:22:24 2015 id: 92733] 92733 from standalone request received
+[MST Wed Feb  4 16:22:24 2015 id: 92733] 92733 from standalone [set context xdap_accept to 3.2;] received
+92733 from standalone [set context dap_explicit_containers to no;] received
+92733 from standalone [set context errors to xml;] received
+92733 from standalone [set context max_response_size to 0;] received
+92733 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92733 from standalone [define d1 in default as c;] received
+92733 from standalone [get das for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAS>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: Error parsing the text on line 1
+The attribute object returned from the dataset was null
+Check that the URL is correct.
+</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>NCRequestHandler.cc</File>
+                <Line>195</Line>
+            </Location>
+        </BESError>
+    </getDAS>
+</response>
+
+[MST Wed Feb  4 16:22:42 2015 id: 92736] 92736 from standalone request received
+[MST Wed Feb  4 16:22:42 2015 id: 92736] 92736 from standalone [set context xdap_accept to 3.2;] received
+92736 from standalone [set context dap_explicit_containers to no;] received
+92736 from standalone [set context errors to xml;] received
+92736 from standalone [set context max_response_size to 0;] received
+92736 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92736 from standalone [define d1 in default as c;] received
+92736 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: Error parsing the text on line 17
+The attribute object returned from the dataset was null
+Check that the URL is correct.
+</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>NCRequestHandler.cc</File>
+                <Line>386</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MST Wed Feb  4 16:24:35 2015 id: 92744] 92744 from standalone request received
+[MST Wed Feb  4 16:24:35 2015 id: 92744] 92744 from standalone [set context xdap_accept to 3.2;] received
+92744 from standalone [set context dap_explicit_containers to no;] received
+92744 from standalone [set context errors to xml;] received
+92744 from standalone [set context max_response_size to 0;] received
+92744 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92744 from standalone [define d1 in default as c;] received
+92744 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: Error parsing the text on line 17
+The attribute object returned from the dataset was null
+Check that the URL is correct.
+</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>NCRequestHandler.cc</File>
+                <Line>386</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MST Wed Feb  4 16:25:45 2015 id: 92746] 92746 from standalone request received
+[MST Wed Feb  4 16:25:45 2015 id: 92746] 92746 from standalone [set context xdap_accept to 3.2;] received
+92746 from standalone [set context dap_explicit_containers to no;] received
+92746 from standalone [set context errors to xml;] received
+92746 from standalone [set context max_response_size to 0;] received
+92746 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92746 from standalone [define d1 in default as c;] received
+92746 from standalone [get das for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAS>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: Error parsing the text on line 17
+The attribute object returned from the dataset was null
+Check that the URL is correct.
+</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>NCRequestHandler.cc</File>
+                <Line>195</Line>
+            </Location>
+        </BESError>
+    </getDAS>
+</response>
+
+[MST Wed Feb  4 16:26:08 2015 id: 92748] 92748 from standalone request received
+[MST Wed Feb  4 16:26:08 2015 id: 92748] 92748 from standalone [set context xdap_accept to 3.2;] received
+92748 from standalone [set context dap_explicit_containers to no;] received
+92748 from standalone [set context errors to xml;] received
+92748 from standalone [set context max_response_size to 0;] received
+92748 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92748 from standalone [define d1 in default as c;] received
+92748 from standalone [get das for d1 return as dap2;] received
+[MST Wed Feb  4 16:26:18 2015 id: 92749] 92749 from standalone request received
+[MST Wed Feb  4 16:26:18 2015 id: 92749] 92749 from standalone [set context xdap_accept to 3.2;] received
+92749 from standalone [set context dap_explicit_containers to no;] received
+92749 from standalone [set context errors to xml;] received
+92749 from standalone [set context max_response_size to 0;] received
+92749 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92749 from standalone [define d1 in default as c;] received
+92749 from standalone [get das for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAS>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: Error parsing the text on line 1
+The attribute object returned from the dataset was null
+Check that the URL is correct.
+</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>NCRequestHandler.cc</File>
+                <Line>195</Line>
+            </Location>
+        </BESError>
+    </getDAS>
+</response>
+
+[MST Wed Feb  4 16:26:59 2015 id: 92753] 92753 from standalone request received
+[MST Wed Feb  4 16:26:59 2015 id: 92753] 92753 from standalone [set context xdap_accept to 3.2;] received
+92753 from standalone [set context dap_explicit_containers to no;] received
+92753 from standalone [set context errors to xml;] received
+92753 from standalone [set context max_response_size to 0;] received
+92753 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92753 from standalone [define d1 in default as c;] received
+92753 from standalone [get das for d1 return as dap2;] received
+[MST Wed Feb  4 16:32:45 2015 id: 92771] 92771 from standalone request received
+[MST Wed Feb  4 16:32:45 2015 id: 92771] 92771 from standalone [set context xdap_accept to 3.2;] received
+92771 from standalone [set context dap_explicit_containers to no;] received
+92771 from standalone [set context errors to xml;] received
+92771 from standalone [set context max_response_size to 0;] received
+92771 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92771 from standalone [define d1 in default as c;] received
+92771 from standalone [get dap for d1 return as dap2;] received
+[MST Wed Feb  4 16:37:54 2015 id: 92782] 92782 from standalone request received
+[MST Wed Feb  4 16:37:54 2015 id: 92782] 92782 from standalone [set context xdap_accept to 3.2;] received
+92782 from standalone [set context dap_explicit_containers to no;] received
+92782 from standalone [set context errors to xml;] received
+92782 from standalone [set context max_response_size to 0;] received
+92782 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92782 from standalone [define d1 in default as c;] received
+92782 from standalone [get dap for d1 return as dap2;] received
+[MST Wed Feb  4 16:38:02 2015 id: 92783] 92783 from standalone request received
+[MST Wed Feb  4 16:38:02 2015 id: 92783] 92783 from standalone [set context xdap_accept to 3.2;] received
+92783 from standalone [set context dap_explicit_containers to no;] received
+92783 from standalone [set context errors to xml;] received
+92783 from standalone [set context max_response_size to 0;] received
+92783 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92783 from standalone [define d1 in default as c;] received
+92783 from standalone [get das for d1 return as dap2;] received
+[MST Wed Feb  4 16:38:10 2015 id: 92784] 92784 from standalone request received
+[MST Wed Feb  4 16:38:10 2015 id: 92784] 92784 from standalone [set context xdap_accept to 3.2;] received
+92784 from standalone [set context dap_explicit_containers to no;] received
+92784 from standalone [set context errors to xml;] received
+92784 from standalone [set context max_response_size to 0;] received
+92784 from standalone [set container in catalog values c,/functions/tests/data/coads_climatology.nc;] received
+92784 from standalone [define d1 in default as c;] received
+92784 from standalone [get dods for d1 return as dap2;] received
+[MST Wed Feb  4 16:55:53 2015 id: 3944] 3944 from standalone request received
+[MST Wed Feb  4 16:55:53 2015 id: 3944] 3944 from standalone [set context xdap_accept to 3.2;] received
+3944 from standalone [set context dap_explicit_containers to no;] received
+3944 from standalone [set context errors to xml;] received
+3944 from standalone [set context max_response_size to 0;] received
+3944 from standalone [set container in catalog values c,/functions/tests/data/fnoc1.nc;] received
+3944 from standalone [define d1 in default as c;] received
+3944 from standalone [get dods for d1 return as dap2;] received
+[MST Wed Feb  4 16:56:00 2015 id: 3945] 3945 from standalone request received
+[MST Wed Feb  4 16:56:00 2015 id: 3945] 3945 from standalone [set context xdap_accept to 3.2;] received
+3945 from standalone [set context dap_explicit_containers to no;] received
+3945 from standalone [set context errors to xml;] received
+3945 from standalone [set context max_response_size to 0;] received
+3945 from standalone [set container in catalog values c,/functions/tests/data/fnoc1.nc;] received
+3945 from standalone [define d1 in default as c;] received
+3945 from standalone [get das for d1 return as dap2;] received
+[MST Wed Feb  4 16:56:06 2015 id: 3946] 3946 from standalone request received
+[MST Wed Feb  4 16:56:06 2015 id: 3946] 3946 from standalone [set context xdap_accept to 3.2;] received
+3946 from standalone [set context dap_explicit_containers to no;] received
+3946 from standalone [set context errors to xml;] received
+3946 from standalone [set context max_response_size to 0;] received
+3946 from standalone [set container in catalog values c,/functions/tests/data/fnoc1.nc;] received
+3946 from standalone [define d1 in default as c;] received
+3946 from standalone [get dap for d1 return as dap2;] received
+[MST Thu Feb 26 08:39:25 2015 id: 81437] 81437 from standalone request received
+[MST Thu Feb 26 08:39:25 2015 id: 81437] 81437 from standalone [set context xdap_accept to 3.2;] received
+81437 from standalone [set context dap_explicit_containers to no;] received
+81437 from standalone [set context errors to xml;] received
+81437 from standalone [set context max_response_size to 0;] received
+81437 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+81437 from standalone [define d1 in default as c;] received
+81437 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <setContainer>
+        <BESError>
+            <Type>1</Type>
+            <Message>Unable to add container, type of data must be specified</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>BESContainerStorageVolatile.cc</File>
+                <Line>126</Line>
+            </Location>
+        </BESError>
+    </setContainer>
+</response>
+
+[MST Thu Feb 26 08:47:19 2015 id: 86361] 86361 from standalone request received
+[MST Thu Feb 26 08:47:19 2015 id: 86361] 86361 from standalone [set context xdap_accept to 3.2;] received
+86361 from standalone [set context dap_explicit_containers to no;] received
+86361 from standalone [set context errors to xml;] received
+86361 from standalone [set context max_response_size to 0;] received
+86361 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+86361 from standalone [define d1 in default as c;] received
+86361 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>Request handler &quot;h4&quot; does not handle the response type &quot;get.dap&quot;</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>BESRequestHandlerList.cc</File>
+                <Line>300</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MST Thu Feb 26 08:47:50 2015 id: 86364] 86364 from standalone request received
+[MST Thu Feb 26 08:47:50 2015 id: 86364] 86364 from standalone [set context xdap_accept to 3.2;] received
+86364 from standalone [set context dap_explicit_containers to no;] received
+86364 from standalone [set context errors to xml;] received
+86364 from standalone [set context max_response_size to 0;] received
+86364 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+86364 from standalone [define d1 in default as c;] received
+86364 from standalone [get dods for d1 return as dap2;] received
+[MST Thu Feb 26 08:58:08 2015 id: 91022] 91022 from standalone request received
+[MST Thu Feb 26 08:58:08 2015 id: 91022] 91022 from standalone [set context xdap_accept to 3.2;] received
+91022 from standalone [set context dap_explicit_containers to no;] received
+91022 from standalone [set context errors to xml;] received
+91022 from standalone [set context max_response_size to 0;] received
+91022 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+91022 from standalone [define d1 in default as c;] received
+91022 from standalone [get dods for d1 return as dap2;] received
+[MST Thu Feb 26 09:03:43 2015 id: 91064] 91064 from standalone request received
+[MST Thu Feb 26 09:03:43 2015 id: 91064] 91064 from standalone [set context xdap_accept to 3.2;] received
+91064 from standalone [set context dap_explicit_containers to no;] received
+91064 from standalone [set context errors to xml;] received
+91064 from standalone [set context max_response_size to 0;] received
+91064 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+91064 from standalone [define d1 in default as c;] received
+91064 from standalone [get dods for d1 return as dap2;] received
+[MST Thu Feb 26 09:05:56 2015 id: 91072] 91072 from standalone request received
+[MST Thu Feb 26 09:05:56 2015 id: 91072] 91072 from standalone [set context xdap_accept to 3.2;] received
+91072 from standalone [set context dap_explicit_containers to no;] received
+91072 from standalone [set context errors to xml;] received
+91072 from standalone [set context max_response_size to 0;] received
+91072 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+91072 from standalone [define d1 in default as c;] received
+91072 from standalone [get das for d1 return as dap2;] received
+[MST Thu Feb 26 09:19:54 2015 id: 95751] 95751 from standalone request received
+[MST Thu Feb 26 09:19:54 2015 id: 95751] 95751 from standalone [set context xdap_accept to 3.2;] received
+95751 from standalone [set context dap_explicit_containers to no;] received
+95751 from standalone [set context errors to xml;] received
+95751 from standalone [set context max_response_size to 0;] received
+95751 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+95751 from standalone [define d1 in default as c;] received
+95751 from standalone [get das for d1 return as dap2;] received
+[MST Thu Feb 26 09:20:09 2015 id: 95753] 95753 from standalone request received
+[MST Thu Feb 26 09:20:09 2015 id: 95753] 95753 from standalone [set context xdap_accept to 3.2;] received
+95753 from standalone [set context dap_explicit_containers to no;] received
+95753 from standalone [set context errors to xml;] received
+95753 from standalone [set context max_response_size to 0;] received
+95753 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+95753 from standalone [define d1 in default as c;] received
+95753 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 14:25:46 2015 id: 76867] 76867 from standalone request received
+[MDT Wed Jun  3 14:25:46 2015 id: 76867] 76867 from standalone [set context xdap_accept to 3.2;] received
+76867 from standalone [set context dap_explicit_containers to no;] received
+76867 from standalone [set context errors to xml;] received
+76867 from standalone [set context max_response_size to 0;] received
+76867 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+76867 from standalone [define d1 in default as c;] received
+76867 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <setContainer>
+        <BESError>
+            <Type>1</Type>
+            <Message>Unable to add container, type of data must be specified</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>BESContainerStorageVolatile.cc</File>
+                <Line>126</Line>
+            </Location>
+        </BESError>
+    </setContainer>
+</response>
+
+[MDT Wed Jun  3 14:26:54 2015 id: 76871] 76871 from standalone request received
+[MDT Wed Jun  3 14:26:54 2015 id: 76871] 76871 from standalone [set context xdap_accept to 3.2;] received
+76871 from standalone [set context dap_explicit_containers to no;] received
+76871 from standalone [set context errors to xml;] received
+76871 from standalone [set context max_response_size to 0;] received
+76871 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+76871 from standalone [define d1 in default as c;] received
+76871 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <setContainer>
+        <BESError>
+            <Type>1</Type>
+            <Message>Unable to add container, type of data must be specified</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>BESContainerStorageVolatile.cc</File>
+                <Line>126</Line>
+            </Location>
+        </BESError>
+    </setContainer>
+</response>
+
+[MDT Wed Jun  3 14:27:13 2015 id: 76873] 76873 from standalone request received
+[MDT Wed Jun  3 14:27:13 2015 id: 76873] 76873 from standalone [set context xdap_accept to 3.2;] received
+76873 from standalone [set context dap_explicit_containers to no;] received
+76873 from standalone [set context errors to xml;] received
+76873 from standalone [set context max_response_size to 0;] received
+76873 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+76873 from standalone [define d1 in default as c;] received
+76873 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <setContainer>
+        <BESError>
+            <Type>1</Type>
+            <Message>Unable to add container, type of data must be specified</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>BESContainerStorageVolatile.cc</File>
+                <Line>126</Line>
+            </Location>
+        </BESError>
+    </setContainer>
+</response>
+
+[MDT Wed Jun  3 14:27:32 2015 id: 76874] 76874 from standalone request received
+[MDT Wed Jun  3 14:27:32 2015 id: 76874] 76874 from standalone [set context xdap_accept to 3.2;] received
+76874 from standalone [set context dap_explicit_containers to no;] received
+76874 from standalone [set context errors to xml;] received
+76874 from standalone [set context max_response_size to 0;] received
+76874 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+76874 from standalone [define d1 in default as c;] received
+76874 from standalone [get dap for d1 return as dap2;] received
+[MDT Wed Jun  3 14:28:16 2015 id: 76877] 76877 from standalone request received
+[MDT Wed Jun  3 14:28:16 2015 id: 76877] 76877 from standalone [set context xdap_accept to 3.2;] received
+76877 from standalone [set context dap_explicit_containers to no;] received
+76877 from standalone [set context errors to xml;] received
+76877 from standalone [set context max_response_size to 0;] received
+76877 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+76877 from standalone [define d1 in default as c;] received
+76877 from standalone [get dap for d1 return as dap2;] received
+[MDT Wed Jun  3 14:55:08 2015 id: 83537] 83537 from standalone request received
+[MDT Wed Jun  3 14:55:08 2015 id: 83537] 83537 from standalone [set context xdap_accept to 3.2;] received
+83537 from standalone [set context dap_explicit_containers to no;] received
+83537 from standalone [set context errors to xml;] received
+83537 from standalone [set context max_response_size to 0;] received
+83537 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+83537 from standalone [define d1 in default as c;] received
+83537 from standalone [get dap for d1 return as dap2;] received
+[MDT Wed Jun  3 14:58:53 2015 id: 87824] 87824 from standalone request received
+[MDT Wed Jun  3 14:58:53 2015 id: 87824] 87824 from standalone [set context xdap_accept to 3.2;] received
+87824 from standalone [set context dap_explicit_containers to no;] received
+87824 from standalone [set context errors to xml;] received
+87824 from standalone [set context max_response_size to 0;] received
+87824 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+87824 from standalone [define d1 in default as c;] received
+87824 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: The dimension 'dim10' was not found while parsing the variable 'd'.</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>DapRequestHandler.cc</File>
+                <Line>335</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MDT Wed Jun  3 15:00:30 2015 id: 89251] 89251 from standalone request received
+[MDT Wed Jun  3 15:00:30 2015 id: 89251] 89251 from standalone [set context xdap_accept to 3.2;] received
+89251 from standalone [set context dap_explicit_containers to no;] received
+89251 from standalone [set context errors to xml;] received
+89251 from standalone [set context max_response_size to 0;] received
+89251 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+89251 from standalone [define d1 in default as c;] received
+89251 from standalone [get dap for d1 return as dap2;] received
+[MDT Wed Jun  3 16:56:56 2015 id: 94303] 94303 from standalone request received
+[MDT Wed Jun  3 16:56:56 2015 id: 94303] 94303 from standalone [set context xdap_accept to 3.2;] received
+94303 from standalone [set context dap_explicit_containers to no;] received
+94303 from standalone [set context errors to xml;] received
+94303 from standalone [set context max_response_size to 0;] received
+94303 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dds;] received
+94303 from standalone [define d1 in default as c;] received
+94303 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 16:59:40 2015 id: 94313] 94313 from standalone request received
+[MDT Wed Jun  3 16:59:40 2015 id: 94313] 94313 from standalone [set context xdap_accept to 3.2;] received
+94313 from standalone [set context dap_explicit_containers to no;] received
+94313 from standalone [set context errors to xml;] received
+94313 from standalone [set context max_response_size to 0;] received
+94313 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+94313 from standalone [define d1 in default as c;] received
+94313 from standalone [get dods for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDODS>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: The dapreader module can only return DDS/DODS responses for files ending in .dods, .data or .dds</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>DapRequestHandler.cc</File>
+                <Line>450</Line>
+            </Location>
+        </BESError>
+    </getDODS>
+</response>
+
+[MDT Wed Jun  3 17:14:08 2015 id: 97433] 97433 from standalone request received
+[MDT Wed Jun  3 17:14:08 2015 id: 97433] 97433 from standalone [set context xdap_accept to 3.2;] received
+97433 from standalone [set context dap_explicit_containers to no;] received
+97433 from standalone [set context errors to xml;] received
+97433 from standalone [set context max_response_size to 0;] received
+97433 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dds;] received
+97433 from standalone [define d1 in default as c;] received
+97433 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 17:15:20 2015 id: 97436] 97436 from standalone request received
+[MDT Wed Jun  3 17:15:20 2015 id: 97436] 97436 from standalone [set context xdap_accept to 3.2;] received
+97436 from standalone [set context dap_explicit_containers to no;] received
+97436 from standalone [set context errors to xml;] received
+97436 from standalone [set context max_response_size to 0;] received
+97436 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dds;] received
+97436 from standalone [define d1 in default as c;] received
+97436 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 17:16:16 2015 id: 97587] 97587 from standalone request received
+[MDT Wed Jun  3 17:16:16 2015 id: 97587] 97587 from standalone [set context xdap_accept to 3.2;] received
+97587 from standalone [set context dap_explicit_containers to no;] received
+97587 from standalone [set context errors to xml;] received
+97587 from standalone [set context max_response_size to 0;] received
+97587 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dds;] received
+97587 from standalone [define d1 in default as c;] received
+97587 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 17:48:37 2015 id: 929] 929 from standalone request received
+[MDT Wed Jun  3 17:48:37 2015 id: 929] 929 from standalone [set context xdap_accept to 3.2;] received
+929 from standalone [set context dap_explicit_containers to no;] received
+929 from standalone [set context errors to xml;] received
+929 from standalone [set context max_response_size to 0;] received
+929 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dds;] received
+929 from standalone [define d1 in default as c;] received
+929 from standalone [get dods for d1 return as dap2;] received
+[MDT Wed Jun  3 17:50:48 2015 id: 935] 935 from standalone request received
+[MDT Wed Jun  3 17:50:48 2015 id: 935] 935 from standalone [set context xdap_accept to 3.2;] received
+935 from standalone [set context dap_explicit_containers to no;] received
+935 from standalone [set context errors to xml;] received
+935 from standalone [set context max_response_size to 0;] received
+935 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+935 from standalone [define d1 in default as c;] received
+935 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: The dimension 'dim3' was not found while parsing the variable 'f'.</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>DapRequestHandler.cc</File>
+                <Line>335</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MDT Wed Jun  3 17:51:13 2015 id: 938] 938 from standalone request received
+[MDT Wed Jun  3 17:51:13 2015 id: 938] 938 from standalone [set context xdap_accept to 3.2;] received
+938 from standalone [set context dap_explicit_containers to no;] received
+938 from standalone [set context errors to xml;] received
+938 from standalone [set context max_response_size to 0;] received
+938 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+938 from standalone [define d1 in default as c;] received
+938 from standalone [get dap for d1 return as dap2;] received
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response reqID="[http-8080-1:27:bes_request]" xmlns="http://xml.opendap.org/ns/bes/1.0#">
+    <getDAP>
+        <BESError>
+            <Type>1</Type>
+            <Message>libdap exception building response: error_code = 1001: The dimension 'dim3' was not found while parsing the variable 'f'.</Message>
+            <Administrator>support@opendap.org</Administrator>
+            <Location>
+                <File>DapRequestHandler.cc</File>
+                <Line>335</Line>
+            </Location>
+        </BESError>
+    </getDAP>
+</response>
+
+[MDT Wed Jun  3 17:51:31 2015 id: 940] 940 from standalone request received
+[MDT Wed Jun  3 17:51:31 2015 id: 940] 940 from standalone [set context xdap_accept to 3.2;] received
+940 from standalone [set context dap_explicit_containers to no;] received
+940 from standalone [set context errors to xml;] received
+940 from standalone [set context max_response_size to 0;] received
+940 from standalone [set container in catalog values c,/functions/tests/data/mask_array_data.dmr;] received
+940 from standalone [define d1 in default as c;] received
+940 from standalone [get dap for d1 return as dap2;] received
+[PDT Fri Jun  5 18:07:07 2015 id: 79754] 79754 from standalone request received
+[PDT Fri Jun  5 18:07:07 2015 id: 79754] 79754 from standalone [set context xdap_accept to 3.2;] received
+79754 from standalone [set context dap_explicit_containers to no;] received
+79754 from standalone [set context errors to xml;] received
+79754 from standalone [set context max_response_size to 0;] received
+79754 from standalone [set container in catalog values c,/functions/tests/data/MOD04_L2.A2015021.0020.051.NRT.hdf;] received
+79754 from standalone [define d1 in default as c;] received
+79754 from standalone [get dods for d1 return as dap2;] received
+[PDT Fri Jun  5 18:58:59 2015 id: 1203] 1203 from standalone request received
+[PDT Fri Jun  5 18:58:59 2015 id: 1203] 1203 from standalone [set context xdap_accept to 3.2;] received
+1203 from standalone [set context dap_explicit_containers to no;] received
+1203 from standalone [set context errors to xml;] received
+1203 from standalone [set context max_response_size to 0;] received
+1203 from standalone [set container in catalog values c,/functions/tests/data/coads.dap;] received
+1203 from standalone [define d1 in default as c;] received
+1203 from standalone [get dap for d1 return as dap2;] received
+[PDT Fri Jun  5 19:03:17 2015 id: 7897] 7897 from standalone request received
+[PDT Fri Jun  5 19:03:17 2015 id: 7897] 7897 from standalone [set context xdap_accept to 3.2;] received
+7897 from standalone [set context dap_explicit_containers to no;] received
+7897 from standalone [set context errors to xml;] received
+7897 from standalone [set context max_response_size to 0;] received
+7897 from standalone [set container in catalog values c,/functions/tests/data/coads.dap;] received
+7897 from standalone [define d1 in default as c;] received
+7897 from standalone [get dap for d1 return as dap2;] received
