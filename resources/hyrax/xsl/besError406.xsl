@@ -63,8 +63,8 @@
                                  width="350" height="200" />
                         </td>
                         <td>
-                            <p align="left">I'm sorry, the requested respource is not available in the format/media type/encoding that you requested.</p>
-                            <p align="left">The specific message associated with your request was:</p>
+                            <p align="left">I'm sorry, the requested resource is not available in the format/media type/encoding that you requested.</p>
+                            <p align="left">The specific error message associated with your request was:</p>
                             <blockquote>
                                 <p>
                                     <strong>

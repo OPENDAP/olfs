@@ -30,6 +30,7 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
+import opendap.http.error.BadRequest;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -230,7 +231,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         log.info("Sent WCS Capabilities Response Presentation Page.");
                     }
                     else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        String msg = "The request does not resolve to a WCS service operation that this server supports.";
+                        log.error("wcsRequestDispatch() - {}",msg);
+                        throw new BadRequest(msg);
                     }
 
                 }

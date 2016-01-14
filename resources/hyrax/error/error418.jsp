@@ -26,39 +26,55 @@
   --%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <%@page session="false" %>
 <%
     String contextPath = request.getContextPath();
+
     String message = OPeNDAPException.ERROR_MESSAGE;
+
+
+
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css' />
-<title>Hyrax:  Unauthorized</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
+    <title>Hyrax: Resource Not Found</title>
 </head>
 
 <body>
 <p align="left">&nbsp;</p>
-<h1 align="center">Hyrax : Unauthorized (401) </h1>
-<hr align="left" size="1" noshade="noshade" />
-<table width="100%" border="0">
-  <tr>
-    <td><img src="<%= contextPath %>/docs/images/sonofman.jpg" alt="I don't know who you are..." title="I don't know who you are..." width="300" height="400" /></td>
-    <td>
-        <p align="left">You must be identified to access the resource you requested.</p>
-        <p align="left">Currently you are not authenticated at all or authenticated incorrectly.</p>
-        <p align="left">Please re-authenticate and try again. </p>
-            <% if (message != null) { %>
-            <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
-            <% } %>
 
-  </tr>
+<h1 align="center">Hyrax : BES Timeout Error (418) </h1>
+<hr align="left" size="1" noshade="noshade"/>
+<table width="100%" border="0">
+    <tr>
+        <td>
+            <a href="<%= contextPath %>/docs/images/teapot.jpg">
+            <img src="<%= contextPath %>/docs/images/teapot.jpg"
+                 alt="I can't make coffee, I'm a teapot!"
+                 title="I can't make coffee, I'm a teapot!"
+                 width="350" height="300"
+                 border="0"/>
+            </a>
+        </td>
+
+        <td>
+            <p align="left">I'm sorry, the request you made just took way too long.</p>
+
+            <% if(message != null) { %>
+            <p align="left">The specific error message associated with your request was:</p>
+            <blockquote>
+                <p>
+                    <strong><%= message %></strong>
+                </p>
+            </blockquote>
+            <% } %>
+        </td>
+    </tr>
 </table>
-<hr align="left" size="1" noshade="noshade" />
-<h1 align="center">Hyrax : Unauthorized (401) </h1>
+<hr align="left" size="1" noshade="noshade"/>
+<h1 align="center">Hyrax : BES Timeout Error (418) </h1>
 </body>
 </html>

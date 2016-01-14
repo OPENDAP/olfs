@@ -421,8 +421,7 @@ public class BESError extends OPeNDAPException {
 
 
 
-    @Override
-    public void sendAsHtmlErrorPage(String context, HttpServletResponse response) throws IOException {
+    public void sendAsHtmlE33rrorPage(String context, HttpServletResponse response) throws IOException {
 
 
 

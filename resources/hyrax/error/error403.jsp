@@ -1,3 +1,4 @@
+<%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -29,6 +30,7 @@
 <%@page session="false" %>
 <%
     String contextPath = request.getContextPath();
+    String message = OPeNDAPException.ERROR_MESSAGE;
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -46,7 +48,13 @@
     <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="Forbidden!" title="Forbidden!" width="350" height="313" /></td>
     <td align="center"><strong>You do not have permission to access the requested resource. </strong>
       <p align="left">&nbsp;</p>
-      <p align="left">&nbsp;</p></td>
+      <p align="left">&nbsp;</p>
+        <% if (message != null) { %>
+        <p align="left">The specific error message associated with your request was:</p>
+        <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
+        <% } %>
+
+    </td>
   </tr>
 </table>
 <hr align="left" size="1" noshade="noshade" />

@@ -26,6 +26,7 @@
 package opendap.hai;
 
 import opendap.coreServlet.*;
+import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -262,8 +263,11 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                     }
                 }
 
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+
+                String msg = "BAD URL - not an OPeNDAP request suffix.";
+                log.error("doGet() - {}",msg);
+                throw new BadRequest(msg);
+
             }
 
         } catch (Throwable t) {
@@ -309,8 +313,9 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                     }
                 }
 
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+                String msg = "BAD URL - not an OPeNDAP request suffix.";
+                log.error("doGet() - {}", msg);
+                throw new BadRequest(msg);
             }
 
         } catch (Throwable t) {
@@ -320,8 +325,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            RequestCache.closeThreadCache();
             LogUtil.logServerAccessEnd(request_status, "ADMIN_SERVICE_ACCESS");
+            RequestCache.closeThreadCache();
         }
     }
 
@@ -340,7 +345,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             throws javax.servlet.ServletException, java.io.IOException {
 
         if (!req.isSecure()) {
-            log.error("Connection is NOT secure. Protocol: "+req.getProtocol());
+            String msg = "Connection is NOT secure. Protocol: "+req.getProtocol();
+            log.error(msg);
             resp.sendError(403);
         }
         else {

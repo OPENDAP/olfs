@@ -25,6 +25,8 @@
  */
 package opendap.http.error;
 
+import opendap.coreServlet.OPeNDAPException;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -41,26 +43,10 @@ import javax.servlet.http.HttpServletResponse;
  * information. HTTP access authentication is explained in
  * "HTTP Authentication: Basic and Digest Access Authentication" [43].
  */
-public class Unauthorized extends HttpError {
-    private static final int _status = HttpServletResponse.SC_UNAUTHORIZED;
+public class Unauthorized extends OPeNDAPException {
 
     public Unauthorized(String msg) {
-        super(msg);
-        super._status = _status;
+        super(HttpServletResponse.SC_UNAUTHORIZED,msg);
     }
 
-    public Unauthorized(String msg, Exception e) {
-        super(msg, e);
-        super._status = _status;
-    }
-
-    public Unauthorized(String msg, Throwable cause) {
-        super(msg, cause);
-        super._status = _status;
-    }
-
-    public Unauthorized(Throwable cause) {
-        super(cause);
-        super._status = _status;
-    }
 }

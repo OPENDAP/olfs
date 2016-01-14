@@ -26,6 +26,7 @@
 package opendap.gateway;
 
 import opendap.coreServlet.*;
+import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -216,8 +217,8 @@ public class DispatchServlet extends HttpServlet {
 
                 if(!_gatewayDispatchHandler.requestDispatch(request,response,true)){
                     if(!response.isCommitted()){
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                         log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+                        throw new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix");
                     }
 
                 }

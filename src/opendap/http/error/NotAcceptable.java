@@ -25,6 +25,8 @@
  */
 package opendap.http.error;
 
+import opendap.coreServlet.OPeNDAPException;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -52,30 +54,11 @@ import javax.servlet.http.HttpServletResponse;
  * stop receipt of more data and query the user for a decision on further
  * actions.
  */
-public class NotAcceptable extends HttpError {
-
-    private static final int _status = HttpServletResponse.SC_NOT_ACCEPTABLE;
+public class NotAcceptable extends OPeNDAPException {
 
     public NotAcceptable(String msg) {
-        super(msg);
-        super._status = _status;
+        super(HttpServletResponse.SC_NOT_ACCEPTABLE,msg);
     }
 
-    public NotAcceptable(String msg, Exception e) {
-        super(msg, e);
-        super._status = _status;
-
-    }
-
-    public NotAcceptable(String msg, Throwable cause) {
-        super(msg, cause);
-        super._status = _status;
-
-    }
-
-    public NotAcceptable(Throwable cause) {
-        super(cause);
-        super._status = _status;
-    }
 
 }

@@ -37,6 +37,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
+import opendap.http.error.*;
 import opendap.http.mediaTypes.*;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
@@ -271,7 +272,7 @@ public class W10nResponder {
                     // It's not a file! That's a BAD THING.
                     // It's not possible for a directory to be data.
                     // Since that indicates something serious is busted somewhere: Internal ERROR.
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    throw new opendap.http.error.InternalError("The request for data identifies a resource which is NOT a file. Only files can contain data.");
                 }
             }
             else {
@@ -281,7 +282,7 @@ public class W10nResponder {
                 if(remainder.length()>0){
                     // Dang - given that the BES doesn't see this thing as data
                     // and there is a path remainder we're in a NotFound situation
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    throw new NotFound("The request for data identifies a resource which the server identifies as data.");
                 }
                 else {
 
@@ -304,13 +305,13 @@ public class W10nResponder {
                 if(isDir){
                     // Data request are not valid for nodes (datasets or directories)
                     // So if it's a directory, that's a fail.
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    throw new BadRequest("In w10n data requests are only valid for 'leaves', the requested resource is a node or is not data.");
 
                 }
                 // It's not data. But did they try to w10n access it anyway?
                 else if(remainder.length()>0 && !isDir){
                     // Yup, but that's a fail so - 400!
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    throw new BadRequest("The requested resource is not a data w10n leaf (data) object.");
                 }
                 else {
                     // Fine, let's just send them the thang.
@@ -321,7 +322,7 @@ public class W10nResponder {
                 // The BES thinks this thing is data.
                 // BUT, if remainder is empty the user  didn't specify a
                 // variable within the dataset. And that's verboten.
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                throw new BadRequest("The requested resource does not identify a w10n leaf (data) object and thus cannot be retrieved as data.");
 
             }
             else {
@@ -392,9 +393,7 @@ public class W10nResponder {
             sendBesCatalogAsHtml(w10nRequest, showCatalogDoc, response);
         }
         else {
-            OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
-            oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
-            throw oe;
+            throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
         }
 
 
@@ -742,10 +741,7 @@ public class W10nResponder {
             return;
         }
 
-        OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
-        oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
-        throw oe;
-
+        throw new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
 
     }
 
@@ -1100,9 +1096,7 @@ public class W10nResponder {
 
 
 
-        OPeNDAPException oe =  new OPeNDAPException("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
-        oe.setHttpStatusCode(HttpServletResponse.SC_BAD_REQUEST);
-        throw oe;
+        throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
 
     }
 

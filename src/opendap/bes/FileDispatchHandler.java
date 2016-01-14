@@ -30,6 +30,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.error.Forbidden;
 import opendap.io.HyraxStringEncoding;
 import org.jdom.Element;
 
@@ -150,11 +151,11 @@ public class FileDispatchHandler implements DispatchHandler {
                         if (!dsi.isDataset() ){
                             sendFile(request, response);
                         } else {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                            throw new Forbidden("Datasets may not be accessed directly.");
                         }
                     }
                     else {
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                        throw new Forbidden("You do not have permission to access the requested resource.");
                     }
                 }
             }

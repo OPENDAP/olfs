@@ -29,6 +29,8 @@ package opendap.bes;
 
 import opendap.coreServlet.OPeNDAPException;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  *
  */
@@ -38,23 +40,8 @@ public class BadConfigurationException extends OPeNDAPException {
     // serializable: static final long serialVersionUID;
 
     public BadConfigurationException(String msg) {
-        super(msg);
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,msg);
     }
-
-    public BadConfigurationException(String msg, Exception e) {
-        super(msg, e);
-    }
-
-    public BadConfigurationException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    public BadConfigurationException(Throwable cause) {
-        super(cause);
-    }
-
-
-
 
 
 }

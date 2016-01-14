@@ -30,6 +30,8 @@ package opendap.ppt ;
 
 import opendap.coreServlet.OPeNDAPException;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Exception used with DODS client and server request handline.
  *
@@ -48,7 +50,7 @@ public class PPTException  extends OPeNDAPException {
      *            errors, send and receive error messages, etc...
      */
     public PPTException(String msg) {
-        super(msg);
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,msg);
     }
     /**
      * Exception used with OPeNDAP client and server request handling where the
@@ -64,7 +66,8 @@ public class PPTException  extends OPeNDAPException {
      * that the cause is nonexistent or unknown.)
      */
     public PPTException(String msg,Throwable cause) {
-        super(msg,cause);
+
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,msg,cause);
     }
 
     /**
@@ -77,7 +80,7 @@ public class PPTException  extends OPeNDAPException {
      * that the cause is nonexistent or unknown.)
      */
     public PPTException(Throwable cause) {
-        super(cause);
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,cause);
     }
 }
 

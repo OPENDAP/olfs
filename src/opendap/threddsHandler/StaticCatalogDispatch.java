@@ -33,6 +33,9 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.http.AuthenticationControls;
+import opendap.http.error.BadGateway;
+import opendap.http.error.BadRequest;
+import opendap.http.error.NotFound;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
 import opendap.ppt.PPTException;
@@ -147,10 +150,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
                 // browseRemoteCatalog(response, query);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                // response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                throw new BadRequest("Remote Catalog Browsing is not supported.");
             } else if (query != null && query.startsWith("browseDataset=")) {
                 // browseRemoteDataset(response, query);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                throw new BadRequest("Remote Dataset Browsing is not supported.");
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -228,7 +232,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private void browseRemoteDataset(Request oRequest,
                                      HttpServletResponse response,
-                                     String query) throws IOException, SaxonApiException {
+                                     String query) throws IOException, SaxonApiException, BadRequest, BadGateway {
 
 
         String http = "http://";
@@ -252,8 +256,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         if (!remoteCatalog.startsWith(http)) {
             _log.error("Catalog Must be remote: " + remoteCatalog);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + remoteCatalog);
-            return;
+           throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
         }
 
 
@@ -306,16 +309,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
             } catch (SaxonApiException sapie) {
-                if (response.isCommitted()) {
-                    return;
-                }
-                // Set up the Http headers.
-                response.setContentType("text/html");
-                response.setHeader("Content-Description", "ERROR");
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-
-                // Responed with error.
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
             } finally {
                 _datasetToHtmlTransform.clearAllParameters();
 
@@ -337,7 +331,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
-                                     String query) throws IOException, SaxonApiException {
+                                     String query) throws OPeNDAPException, IOException, SaxonApiException {
 
 
         String http = "http://";
@@ -349,8 +343,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         if (!remoteCatalog.startsWith(http)) {
             _log.error("Catalog Must be remote: " + Scrub.completeURL(remoteCatalog));
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + remoteCatalog);
-            return;
+            throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
         }
 
         // Build URL for remote system:
@@ -407,16 +400,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
             } catch (SaxonApiException sapie) {
-                if (response.isCommitted()) {
-                    return;
-                }
-                // Set up the Http headers.
-                response.setContentType("text/html");
-                response.setHeader("Content-Description", "ERROR");
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-
-                // Responed with error.
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
             } finally {
                 // Clean up the transform before releasing it.
                 _catalogToHtmlTransform.clearAllParameters();

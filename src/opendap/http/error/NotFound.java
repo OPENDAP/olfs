@@ -25,6 +25,8 @@
  */
 package opendap.http.error;
 
+import opendap.coreServlet.OPeNDAPException;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -36,30 +38,12 @@ import javax.servlet.http.HttpServletResponse;
  * does not wish to reveal exactly why the request has been refused, or when no
  * other response is applicable.
  */
-public class NotFound extends HttpError {
+public class NotFound extends OPeNDAPException {
 
-    private static final int _status = HttpServletResponse.SC_NOT_FOUND;
 
     public NotFound(String msg) {
-        super(msg);
-        super._status = _status;
+        super(HttpServletResponse.SC_NOT_FOUND,msg);
     }
 
-    public NotFound(String msg, Exception e) {
-        super(msg, e);
-        super._status = _status;
-
-    }
-
-    public NotFound(String msg, Throwable cause) {
-        super(msg, cause);
-        super._status = _status;
-
-    }
-
-    public NotFound(Throwable cause) {
-        super(cause);
-        super._status = _status;
-    }
 
 }

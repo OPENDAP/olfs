@@ -32,6 +32,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.Util;
+import opendap.http.error.*;
 import opendap.namespaces.DAP;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -290,20 +291,19 @@ public abstract class Dap4Responder extends BesDapResponder  {
                 //If an Accept header field is present, and if the server cannot send a response
                 // which is acceptable according to the combined Accept field value, then the server
                 // SHOULD send a 406 (not acceptable) response.
-                _log.error("Server-driven content negotiation failed. Returning status 406. Client request 'Accept: {}'",
-                        Scrub.urlContent(request.getHeader("Accept")));
-                response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
-                return;
+
+                String msg = "Server-driven content negotiation failed. Returning status 406. Client request 'Accept: "+ Scrub.urlContent(request.getHeader("Accept"))+"'";
+                _log.error("respondToHttpGetRequest() - {} ", msg);
+                throw new NotAcceptable(msg);
             }
-            _log.debug("Target Responder: {} normative media-type: {}", targetResponder.getClass().getName(), targetResponder.getNormativeMediaType());
+            _log.debug("respondToHttpGetRequest() - Target Responder: {} normative media-type: {}", targetResponder.getClass().getName(), targetResponder.getNormativeMediaType());
 
             targetResponder.sendNormativeRepresentation(request,response);
             return;
         }
-        _log.error("Something Bad Happened. Unable to respond to request for : {}'", Scrub.urlContent(relativeUrl));
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-
+        String msg ="Something Bad Happened. Unable to respond to request for : '" + Scrub.urlContent(relativeUrl) + "'";
+        _log.error("respondToHttpGetRequest() - {}",msg);
+        throw new opendap.http.error.InternalError(msg);
 
     }
 

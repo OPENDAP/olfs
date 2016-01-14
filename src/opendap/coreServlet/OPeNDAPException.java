@@ -56,6 +56,8 @@ public class OPeNDAPException extends Exception {
 
     Logger _log;
 
+    public static String ERROR_MESSAGE = null;
+
     public static final String ERROR_RESPONSE_MEDIA_TYPE_KEY = "ErrorResponseMediaType";
 
     /**
@@ -97,7 +99,7 @@ public class OPeNDAPException extends Exception {
     /**
      * Construct an empty <code>OPeNDAPException</code>.
      */
-    public OPeNDAPException() {
+    protected OPeNDAPException() {
         // this should never be seen, since this class overrides getMessage()
         // to display its own error message.
         super("OPeNDAPException");
@@ -107,21 +109,6 @@ public class OPeNDAPException extends Exception {
         _log = LoggerFactory.getLogger(this.getClass());
     }
 
-    /**
-     *
-     * Construct a <code>OPeNDAPException</code>.
-     *
-     * @param msg A message describing the error.
-     *
-     */
-    public OPeNDAPException(String msg) {
-        super(msg);
-        _responseType = new TextPlain();
-        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-        _errorMessage = msg;
-        _systemPath=null;
-        _log = LoggerFactory.getLogger(this.getClass());
-    }
 
 
     /**
@@ -131,10 +118,10 @@ public class OPeNDAPException extends Exception {
      * Throwable.getCause() method). (A null value is permitted, and indicates
      * that the cause is nonexistent or unknown.)
      */
-    public OPeNDAPException(String msg, Throwable cause) {
+    public OPeNDAPException(int httpStatus, String msg, Throwable cause) {
         super(msg, cause);
         _responseType = new TextPlain();
-        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _httpStatusCode =  httpStatus;
         _errorMessage = msg;
         _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
@@ -149,10 +136,10 @@ public class OPeNDAPException extends Exception {
      * Throwable.getCause() method). (A null value is permitted, and indicates
      * that the cause is nonexistent or unknown.)
      */
-    public OPeNDAPException(Throwable cause) {
+    public OPeNDAPException(int httpStatus,Throwable cause) {
         super(cause);
         _responseType = new TextPlain();
-        _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        _httpStatusCode =  httpStatus;
         _errorMessage = cause.getMessage();
         _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
@@ -464,13 +451,13 @@ public class OPeNDAPException extends Exception {
 
         sos.println("Error { ");
 
-        sos.print("    code =  ");
+        sos.print("    code = ");
         sos.print(getHttpStatusCode());
         sos.println(";");
 
-        sos.print("    message =  ");
+        sos.print("    message = \"");
         sos.print(getMessage());
-        sos.println(";");
+        sos.println("\";");
         sos.println("}");
 
         sos.flush();
@@ -565,28 +552,37 @@ public class OPeNDAPException extends Exception {
     public void sendAsHtmlErrorPage(String context, HttpServletResponse response) throws Exception {
 
 
-        String errorPageTemplate = _systemPath + "/error/error.html.proto";
+        int httpStatus = getHttpStatusCode();
+
+        ERROR_MESSAGE = getMessage();
+        response.sendError(httpStatus);
 
 
-        String template = loadHtmlTemplate(errorPageTemplate, context);
+        /*
 
-        template = template.replaceAll("<ERROR_MESSAGE />",getMessage());
-        template = template.replaceAll("<ERROR_CODE />",Integer.toString(getHttpStatusCode()));
-
-        _log.debug("sendHttpErrorResponse(): Sending Error Page ");
-
-        MediaType responseType = new TextHtml();
-        response.setContentType(responseType.getMimeType());
-        response.setHeader("Content-Description", "error_page");
-        response.setStatus(getHttpStatusCode());
+            String errorPageTemplate = _systemPath + "/error/error.html.proto";
 
 
-        _log.debug(template);
-        ServletOutputStream sos  = response.getOutputStream();
+            String template = loadHtmlTemplate(errorPageTemplate, context);
 
-        sos.write(template.getBytes(HyraxStringEncoding.getCharset()));
+            template = template.replaceAll("<ERROR_MESSAGE />", errorMessage);
+            template = template.replaceAll("<ERROR_CODE />", Integer.toString(httpStatus));
 
-        sos.flush();
+            _log.debug("sendHttpErrorResponse(): Sending Error Page ");
+
+            MediaType responseType = new TextHtml();
+            response.setContentType(responseType.getMimeType());
+            response.setHeader("Content-Description", "error_page");
+            response.setStatus(getHttpStatusCode());
+
+
+            _log.debug(template);
+            ServletOutputStream sos = response.getOutputStream();
+
+            sos.write(template.getBytes(HyraxStringEncoding.getCharset()));
+
+            sos.flush();
+        */
 
     }
 

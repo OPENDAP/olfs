@@ -281,21 +281,20 @@ public class PDPService extends HttpServlet {
     protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        if (_requireSecureTransport){
-            if(!req.isSecure()) {
-                        _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
-                        resp.sendError(403);
-                    }
-                    else {
-                        _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
-                    }
+        if (_requireSecureTransport) {
+            if (!req.isSecure()) {
+                _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
+
+                resp.sendError(403);
+            } else {
+                _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
+            }
         } else {
             _log.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
 
         }
 
-        super.service(req,resp);
-
+        super.service(req, resp);
 
 
     }

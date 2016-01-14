@@ -32,6 +32,8 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
+import opendap.http.error.BadRequest;
+import opendap.http.error.NotFound;
 import opendap.semantics.IRISail.ProcessController;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Document;
@@ -216,7 +218,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         log.info("Sent WCS Capabilities Response Presentation Page.");
                     }
                     else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        String msg = "The request does not resolve to a WCS service operation that this server supports.";
+                        log.error("doPost() - {}",msg);
+                        throw new BadRequest(msg);
                     }
 
                 }
@@ -277,8 +281,10 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         String id = request.getQueryString();
         Element cde = CatalogWrapper.getCoverageDescriptionElement(id);
-        if(cde==null)
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        if(cde==null) {
+            String msg = "Unable to locate the WCS Coverage Description for "+id;
+            throw new NotFound(msg);
+        }
         Document coverageDescription = new Document(cde);
 
         response.setContentType("text/html");

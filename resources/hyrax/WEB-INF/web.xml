@@ -295,6 +295,14 @@
         <location>/error/error404.jsp</location>
     </error-page>
     <error-page>
+        <error-code>406</error-code>
+        <location>/error/error406.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>418</error-code>
+        <location>/error/error418.jsp</location>
+    </error-page>
+    <error-page>
         <error-code>500</error-code>
         <location>/error/error500.jsp</location>
     </error-page>

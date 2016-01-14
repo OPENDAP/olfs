@@ -26,10 +26,8 @@
 
 package opendap.wcs.v2_0.http;
 
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.PersistentConfigurationHandler;
-import opendap.coreServlet.Scrub;
-import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.*;
+import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
 import opendap.wcs.v2_0.CatalogWrapper;
 import opendap.wcs.v2_0.WcsCatalog;
@@ -48,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,12 +63,15 @@ public class Servlet extends HttpServlet {
     private FormHandler formService = null;
     private XmlRequestHandler wcsPostService = null;
     private SoapHandler wcsSoapService = null;
+    private AtomicInteger reqNumber;
 
     //private Document configDoc;
 
 
     public void init() throws ServletException {
         super.init();
+        reqNumber = new AtomicInteger(0);
+
         LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -388,12 +390,15 @@ public class Servlet extends HttpServlet {
 
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+
+        int request_status = HttpServletResponse.SC_OK;
         try {
+            LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {
@@ -408,11 +413,18 @@ public class Servlet extends HttpServlet {
             	}
             }
         }
+        finally {
+            LogUtil.logServerAccessEnd(request_status, "WCS_2.0_ACCESS");
+            RequestCache.closeThreadCache();
+
+        }
     }
 
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
+        int request_status = HttpServletResponse.SC_OK;
         try {
+            LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -424,13 +436,15 @@ public class Servlet extends HttpServlet {
                 formService.handleRequest(req,resp);
             }
             else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                String msg = "The request does not resolve to a WCS service operation that this server supports.";
+                log.error("doPost() - {}",msg);
+                throw new BadRequest(msg);
             }
 
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch(Throwable t2) {
             	try {
@@ -445,6 +459,31 @@ public class Servlet extends HttpServlet {
             	}
             }
         }
+        finally {
+            LogUtil.logServerAccessEnd(request_status, "WCS_2.0_ACCESS");
+            RequestCache.closeThreadCache();
+
+        }
+    }
+    protected long getLastModified(HttpServletRequest req) {
+
+        RequestCache.openThreadCache();
+
+        long reqno = reqNumber.incrementAndGet();
+        LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "LastModified", Long.toString(reqno));
+
+
+        try {
+            return -1;
+
+        } catch (Exception e) {
+            return -1;
+        } finally {
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "WCS_2.0_ACCESS");
+
+        }
+
+
     }
 
 

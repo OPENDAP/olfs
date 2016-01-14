@@ -232,13 +232,14 @@ public class DocServlet extends HttpServlet {
 
                     }
                     else {
-                        log.error("Unable to determine type of requested item: "+f.getName());
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        String msg = "Unable to determine type of requested item: "+f.getName();
+                        log.error("doGet() - {}",msg);
+                        throw new NotFound(msg);
                     }
 
 
                 } else {
-                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+name);
+                    throw new NotFound("Failed to locate resource: "+name);
                 }
 
             } else {

@@ -32,6 +32,7 @@ import opendap.bes.BESManager;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
+import opendap.http.error.NotFound;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -520,7 +521,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
                 if(now.after(startTime)){
                     if(now.before(endTime) ){
-                        // The request if for an available resource. I.e. The requested resource is in the cache,
+                        // The request is for an available resource. I.e. The requested resource is in the cache,
                         // it's start has past and it's end time has not yet arrived. So - send the data.
 
                         // And because this is hack to add DAP4 functionality to a DAP2 server, make the request
@@ -535,11 +536,12 @@ public class AsyncDispatcher extends BesDapDispatcher {
                             // Async Response is expired. Return GONE!
                             Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
                             sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
+                            asyncCache.remove(xmlBase, startTime);
                         }
                         else {
-                            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                            asyncCache.remove(xmlBase, startTime);
+                            throw new NotFound("The requested resource is no longer available.");
                         }
-                        asyncCache.remove(xmlBase, startTime);
 
                         return true;
                     }
@@ -551,7 +553,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
                         sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
                     }
                     else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        throw new NotFound("The requested resource is not yet available.");
                     }
                     return true;
 

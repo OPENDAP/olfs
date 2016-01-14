@@ -1,5 +1,6 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
+<%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -35,7 +36,12 @@
     String localUrl = ReqInfo.getLocalUrl(request);
 
     BesApi besApi = new BesApi();
-    String adminEmail = besApi.getAdministrator(localUrl);
+    String adminEmail = "support@opendap.org";
+    try {
+        adminEmail = besApi.getAdministrator(localUrl);
+    } catch (Exception e) { }
+
+    String message = OPeNDAPException.ERROR_MESSAGE;
 %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -55,7 +61,7 @@
 <body>
 <p>&nbsp;</p>
 
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error (500)</h1>
 <hr size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
@@ -70,6 +76,10 @@
             <p align="center" class="style1">OUCH!</p>
 
             <p align="center">Something Bad Happened On This Server.</p>
+            <% if (message != null) { %>
+            <p align="left">The specific error message associated with your request was:</p>
+            <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
+            <% } %>
 
             <p align="center">If you think that the server is broken (that the URL you submitted should have
                 worked), then please contact the OPeNDAP user support coordinator at:
@@ -80,6 +90,6 @@
 
 </table>
 <hr size="1" noshade="noshade"/>
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error (500)</h1>
 </body>
 </html>

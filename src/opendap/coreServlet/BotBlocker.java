@@ -25,6 +25,7 @@
  */
 package opendap.coreServlet;
 
+import opendap.http.error.Forbidden;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServlet;
@@ -230,12 +231,14 @@ public class BotBlocker implements DispatchHandler {
                               HttpServletResponse response)
             throws Exception {
 
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
-        log.info("Denied access to "+request.getRemoteAddr()+" because it is " +
-                "either on the list, or matches a blocking pattern.");
+        String msg = "Denied access to "+request.getRemoteAddr()+" because it is " +
+                "either on the list, or matches a blocking pattern.";
+
+        log.info("handleRequest() - {}",msg);
 
 
+        throw new Forbidden(msg);
 
     }
 

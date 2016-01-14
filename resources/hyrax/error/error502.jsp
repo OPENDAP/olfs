@@ -1,5 +1,6 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
+<%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -33,43 +34,66 @@
     String localUrl = ReqInfo.getLocalUrl(request);
 
     BesApi besApi = new BesApi();
-    String adminEmail = besApi.getAdministrator(localUrl);
-%>
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" href="<%= contextPath %>/docs/css/contents.css" type="text/css" />
+    String adminEmail = "support@opendap.org";
+    try {
+        adminEmail = besApi.getAdministrator(localUrl);
+    } catch (Exception e) {
+    }
 
-<title>Hyrax: ERROR</title><style type="text/css">
-<!--
-.style1 {
-	font-size: 24px;
-	font-weight: bold;
-}
--->
-</style></head>
+
+    String message = OPeNDAPException.ERROR_MESSAGE;
+%>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="<%= contextPath %>/docs/css/contents.css" type="text/css"/>
+
+    <title>Hyrax: ERROR</title>
+    <style type="text/css">
+        <!--
+        .style1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        -->
+    </style>
+</head>
 
 
 <body>
 <p>&nbsp;</p>
+
 <h1 align="center">Hyrax Error - 502</h1>
-<hr noshade="noshade" size="1" />
+<hr noshade="noshade" size="1"/>
 <table border="0" width="100%">
-  <tbody><tr>
-    <td>
-        <img style="width: 320px; height: 426px;"
-             src="<%= contextPath %>/docs/images/BadGateway.png"
-             alt="Error 502 - Bad Gateway"
-             title="Bad Gateway"
-                />
-    </td>
-    <td><p class="style1" align="center">Oops!</p>
-      <p align="center">The remote resource does not appear to reference a THREDDS Catalog.</p>
-    <p align="center">If
-you think that the server is broken (that the URL you submitted should
-have worked), then please contact the OPeNDAP user support coordinator
-at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>
-  </tr>
-</tbody></table>
-<hr noshade="noshade" size="1" />
+    <tbody>
+    <tr>
+        <td>
+            <img style="width: 320px; height: 426px;"
+                 src="<%= contextPath %>/docs/images/BadGateway.png"
+                 alt="Error 502 - Bad Gateway"
+                 title="Bad Gateway"
+                    />
+        </td>
+        <td><p class="style1" align="center">Oops!</p>
+
+            <p align="center">Drat! I was unable to act as a gateway to the requested remote resource..</p>
+            <% if (message != null) { %>
+            <p align="left">The specific error message associated with your request was:</p>
+            <blockquote><p><strong><%= message %>
+            </strong></p></blockquote>
+            <% } %>
+
+            <p align="center">If
+                you think that the server is broken (that the URL you submitted should
+                have worked), then please contact the OPeNDAP user support coordinator
+                at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %>
+                </a></p></td>
+    </tr>
+    </tbody>
+</table>
+<hr noshade="noshade" size="1"/>
 <h1 align="center">Hyrax Error - 502</h1>
-</body></html>
+</body>
+</html>

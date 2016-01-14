@@ -32,6 +32,8 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.http.error.BadRequest;
+import opendap.http.error.NotFound;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
@@ -415,7 +417,7 @@ public class ViewersServlet extends HttpServlet {
 
         RequestCache.openThreadCache();
 
-        LogUtil.logServerAccessStart(req, "WebStartServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
+        LogUtil.logServerAccessStart(req, "WebStartServletAccess", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
 
         _log.debug(ServletUtil.showRequest(req, reqNumber.get()));
@@ -428,6 +430,7 @@ public class ViewersServlet extends HttpServlet {
         String query = req.getQueryString();
         HashMap<String, String> params;
 
+        int request_status = HttpServletResponse.SC_OK;
         try {
 
 
@@ -445,10 +448,9 @@ public class ViewersServlet extends HttpServlet {
             String besDatasetId = Scrub.fileName(params.get("datasetID"));
 
             if(dapService==null || besDatasetId==null){
-                _log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(), Scrub.simpleQueryString(query));
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-
+                String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+  Scrub.simpleQueryString(query) +"'";
+                _log.error("doGet() - {}",msg);
+                throw new BadRequest(msg);
             }
 
 
@@ -464,9 +466,9 @@ public class ViewersServlet extends HttpServlet {
             Document ddx = getDDX(serverURL, dapService, besDatasetId);
 
             if(ddx == null){
-                _log.error("Failed to locate dataset: " + besDatasetId);
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                String msg = "Failed to locate dataset: " + besDatasetId;
+                _log.error("doGet() - {}", msg);
+                throw new NotFound(msg);
             }
 
 
@@ -484,9 +486,9 @@ public class ViewersServlet extends HttpServlet {
             }
 
             if(applicationID == null){
-                _log.error("No applicationID found in WebStart request.");
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                String msg = "No applicationID found in WebStart request.";
+                _log.error("doGet() - {}", msg);
+                throw new NotFound(msg);
             }
 
             if (applicationID.equals("viewers")) {
@@ -518,9 +520,9 @@ public class ViewersServlet extends HttpServlet {
                     pw.print(jnlpContent);
 
                 } else {
-                    _log.error("Unable to locate a Java WebStart handler to respond to: '{}?{}'", Scrub.simpleString(applicationID), Scrub.simpleQueryString(query));
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
+                    String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+Scrub.simpleQueryString(query);
+                    _log.error("doGet() - {}", msg);
+                    throw new NotFound(msg);
                 }
 
 
@@ -529,7 +531,7 @@ public class ViewersServlet extends HttpServlet {
         }
         catch (Throwable t){
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
             }
             catch (Throwable t2) {
                 try {
@@ -545,6 +547,7 @@ public class ViewersServlet extends HttpServlet {
             }
         }
         finally {
+            LogUtil.logServerAccessEnd(request_status, "WebStartServletAccess");
             RequestCache.closeThreadCache();
              this.destroy();
         }

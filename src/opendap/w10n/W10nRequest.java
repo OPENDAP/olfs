@@ -29,13 +29,11 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.dap.Request;
 import opendap.http.error.BadRequest;
-import opendap.http.error.HttpError;
 import opendap.http.error.NotAcceptable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -439,7 +437,7 @@ class W10nRequest {
      *
      * @param defaultMediaType The default media type for the request
      * @param altMediaTypes  The alternate media types for the request
-     * @throws HttpError
+     * @throws NotAcceptable
      */
     public void setBestMediaType(MediaType defaultMediaType, Map<String, MediaType> altMediaTypes) throws OPeNDAPException {
 
@@ -460,7 +458,7 @@ class W10nRequest {
                     String msg = "You have requested an unsupported output media type of '" + outputParam+"'";
                     _log.debug("getBestMediaType() - {}",msg);
 
-                    throw new OPeNDAPException(HttpServletResponse.SC_NOT_ACCEPTABLE,msg);
+                    throw new NotAcceptable(msg);
 
                 }
                 _log.debug("getMediaTypeForHttpRequest() - 'output' query parameter matches MediaType of '{}'",bestMT.getMimeType());

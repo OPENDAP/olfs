@@ -345,11 +345,8 @@ public class BesGatewayApi extends BesApi {
 
             if (statusCode != HttpStatus.SC_OK) {
                 log.error("Unable to HEAD remote resource: " + dataSourceUrl);
-                OPeNDAPException oe = new OPeNDAPException();
-                oe.setErrorMessage("OLFS: Unable to access requested resource: " + dataSourceUrl);
-                oe.setHttpStatusCode(statusCode);
-                throw oe;
-
+                String msg = "OLFS: Unable to access requested resource: " + dataSourceUrl;
+                throw new OPeNDAPException(statusCode,msg);
             }
 
             Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
