@@ -38,12 +38,12 @@ dnl AM_CONDITIONAL([DAP_MODULES], [test x$with_dap_modules = xyes])
 dnl These are tests that only apply if the modules are being built too.
 dnl AM_COND_IF([DAP_MODULES], [
 
-AC_CONFIG_FILES([Makefile autotest/Makefile autotest/atlocal])
+AC_CONFIG_FILES([Makefile hyrax_tests/Makefile hyrax_tests/atlocal])
 
 dnl Parameter two is used as the value of AUTOTEST_PATH when the 
 dnl shell script built from the *.at file is run. That script will
 dnl look for executables using $PATH and $AUTOTEST_PATH.
-AC_CONFIG_TESTDIR(autotest, [$abs_top_builddir])
+AC_CONFIG_TESTDIR(hyrax_tests, [$abs_top_builddir])
 
 AC_OUTPUT
 
