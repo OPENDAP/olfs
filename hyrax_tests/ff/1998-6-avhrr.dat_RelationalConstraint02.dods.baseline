@@ -1,0 +1,51 @@
+The data:
+Sequence {
+    String satellite;
+    Int32 year;
+    Int32 day_num;
+    Int32 hh;
+    Int32 mm;
+    Int32 ss;
+    String DODS_URL;
+} GSO_AVHRR = { 
+0: { "f", 98, 161, 7, 46, 40, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98161074640.pvu.Z" }, 
+1: { "f", 98, 161, 19, 12, 32, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98161191232.pvu.Z" }, 
+2: { "f", 98, 162, 7, 35, 46, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98162073546.pvu.Z" }, 
+3: { "f", 98, 162, 19, 0, 24, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98162190024.pvu.Z" }, 
+4: { "f", 98, 163, 7, 24, 28, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98163072428.pvu.Z" }, 
+5: { "f", 98, 163, 18, 49, 23, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98163184923.pvu.Z" }, 
+6: { "f", 98, 164, 7, 13, 38, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98164071338.pvu.Z" }, 
+7: { "f", 98, 164, 18, 38, 27, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98164183827.pvu.Z" }, 
+8: { "f", 98, 165, 7, 2, 57, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98165070257.pvu.Z" }, 
+9: { "f", 98, 165, 18, 27, 35, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98165182735.pvu.Z" }, 
+10: { "f", 98, 166, 6, 52, 18, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98166065218.pvu.Z" }, 
+11: { "f", 98, 166, 8, 34, 34, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98166083434.pvu.Z" }, 
+12: { "f", 98, 166, 18, 17, 2, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98166181702.pvu.Z" }, 
+13: { "f", 98, 167, 6, 41, 39, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98167064139.pvu.Z" }, 
+14: { "f", 98, 167, 8, 22, 43, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98167082243.pvu.Z" }, 
+15: { "f", 98, 167, 18, 7, 1, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98167180701.pvu.Z" }, 
+16: { "f", 98, 168, 8, 10, 18, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98168081018.pvu.Z" }, 
+17: { "f", 98, 168, 17, 55, 57, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98168175557.pvu.Z" }, 
+18: { "f", 98, 169, 7, 58, 46, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98169075846.pvu.Z" }, 
+19: { "f", 98, 169, 17, 45, 20, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98169174520.pvu.Z" }, 
+20: { "f", 98, 169, 19, 25, 49, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98169192549.pvu.Z" }, 
+21: { "h", 98, 161, 11, 33, 39, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98161113339.pvu.Z" }, 
+22: { "h", 98, 161, 21, 14, 29, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98161211429.pvu.Z" }, 
+23: { "h", 98, 162, 11, 10, 6, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98162111006.pvu.Z" }, 
+24: { "h", 98, 162, 22, 30, 38, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98162223038.pvu.Z" }, 
+25: { "h", 98, 163, 10, 48, 6, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98163104806.pvu.Z" }, 
+26: { "h", 98, 163, 22, 8, 7, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98163220807.pvu.Z" }, 
+27: { "h", 98, 164, 10, 26, 24, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98164102624.pvu.Z" }, 
+28: { "h", 98, 164, 21, 46, 14, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98164214614.pvu.Z" }, 
+29: { "h", 98, 165, 10, 5, 0, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98165100500.pvu.Z" }, 
+30: { "h", 98, 165, 11, 46, 23, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98165114623.pvu.Z" }, 
+31: { "h", 98, 165, 21, 25, 5, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98165212505.pvu.Z" }, 
+32: { "h", 98, 166, 11, 22, 37, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98166112237.pvu.Z" }, 
+33: { "h", 98, 166, 22, 43, 43, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98166224343.pvu.Z" }, 
+34: { "h", 98, 167, 11, 0, 11, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98167110011.pvu.Z" }, 
+35: { "h", 98, 167, 22, 19, 49, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98167221949.pvu.Z" }, 
+36: { "h", 98, 168, 10, 38, 13, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98168103813.pvu.Z" }, 
+37: { "h", 98, 168, 21, 58, 4, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98168215804.pvu.Z" }, 
+38: { "h", 98, 169, 10, 16, 21, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98169101621.pvu.Z" }, 
+39: { "h", 98, 169, 21, 36, 31, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98169213631.pvu.Z" } };
+

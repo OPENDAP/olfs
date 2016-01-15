@@ -1,0 +1,27 @@
+The data:
+Sequence {
+    String DODS_URL;
+} GSO_AVHRR = { 
+0: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98160174500.pvu.Z" }, 
+1: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98160192448.pvu.Z" }, 
+2: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98161074640.pvu.Z" }, 
+3: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98161191232.pvu.Z" }, 
+4: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98162073546.pvu.Z" }, 
+5: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98162190024.pvu.Z" }, 
+6: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98163072428.pvu.Z" }, 
+7: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98163184923.pvu.Z" }, 
+8: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98164071338.pvu.Z" }, 
+9: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98164183827.pvu.Z" }, 
+10: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/f98165070257.pvu.Z" }, 
+11: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98160213520.pvu.Z" }, 
+12: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98161113339.pvu.Z" }, 
+13: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98161211429.pvu.Z" }, 
+14: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98162111006.pvu.Z" }, 
+15: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98162223038.pvu.Z" }, 
+16: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98163104806.pvu.Z" }, 
+17: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98163220807.pvu.Z" }, 
+18: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98164102624.pvu.Z" }, 
+19: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98164214614.pvu.Z" }, 
+20: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98165100500.pvu.Z" }, 
+21: { "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98165114623.pvu.Z" } };
+

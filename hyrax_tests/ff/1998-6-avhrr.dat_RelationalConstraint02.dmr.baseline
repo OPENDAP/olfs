@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" xml:base="http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" dapVersion="4.0" dmrVersion="1.0" name="1998-6-avhrr.dat">
+    <Sequence name="GSO_AVHRR">
+        <String name="satellite"/>
+        <Int32 name="year"/>
+        <Int32 name="day_num"/>
+        <Int32 name="hh"/>
+        <Int32 name="mm"/>
+        <Int32 name="ss"/>
+        <String name="DODS_URL"/>
+    </Sequence>
+    <Attribute name="FF_GLOBAL" type="Container">
+        <Attribute name="Server" type="String">
+            <Value>DODS FreeFrom based on FFND release 4.2.3</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_Time" type="Container">
+        <Attribute name="hours_variable" type="String">
+            <Value>GSO_AVHRR.hh</Value>
+        </Attribute>
+        <Attribute name="minutes_variable" type="String">
+            <Value>GSO_AVHRR.mm</Value>
+        </Attribute>
+        <Attribute name="seconds_variable" type="String">
+            <Value>GSO_AVHRR.ss</Value>
+        </Attribute>
+        <Attribute name="gmt_time" type="String">
+            <Value>true</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_Date" type="Container">
+        <Attribute name="year_variable" type="String">
+            <Value>GSO_AVHRR.year</Value>
+        </Attribute>
+        <Attribute name="year_base" type="Int32">
+            <Value>1900</Value>
+        </Attribute>
+        <Attribute name="year_day_variable" type="String">
+            <Value>GSO_AVHRR.day_num</Value>
+        </Attribute>
+    </Attribute>
+</Dataset>

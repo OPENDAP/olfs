@@ -1,0 +1,6 @@
+Dataset: bears.nc
+/i, 10, 20
+/bears[0], "ind", "ist", "ing"
+/bears[1], "uis", "hab", "le"
+/aloan[0], 3, 4, 5
+/aloan[1], 6, 7, 1e+12

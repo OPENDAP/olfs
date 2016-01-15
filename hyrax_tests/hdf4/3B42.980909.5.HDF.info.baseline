@@ -1,0 +1,18 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>DATA_GRANULE_PlanetaryGrid_percipitate</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>long_name: percipitate<br>
+</td>
+</tr><tr><td align=right valign=top><b>DATA_GRANULE_PlanetaryGrid_relError</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>long_name: relError<br>
+</td>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>

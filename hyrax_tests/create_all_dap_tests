@@ -1,0 +1,91 @@
+#!/bin/sh
+#
+# Creates curl test files for all of the standard dap2 and dap4 responses.
+# The 1st parameter should be the base name of the files to be written 
+# The 2nd parameter should be the dataset URL 
+# The 3rd parameter should be the DAP2 constraint expression  (if any) for the request
+# The 4th parameter should be the DAP4 constraint expression  (if any) for the request
+# 
+base_name=$1;
+url=$2;
+ce=$3;
+dap4ce=$4;
+
+echo "base_name: "$base_name;
+echo "url:       "$url;
+echo "ce:        "$ce;
+echo "dap4ce:    "$dap4ce;
+
+if [ "$ce" != "" ]
+then
+    ce=?$ce;
+fi
+    
+if [ "$dap4ce" != "" ]
+then
+    dap4ce=?$dap4ce;
+fi
+    
+echo "" >>  hyraxTest.at
+echo "####################################################" >>  hyraxTest.at
+echo "# TestName: $base_name" >>  hyraxTest.at
+echo "# BaseUrl:  $url" >>  hyraxTest.at
+echo "# DAP2 CE:  $ce" >>  hyraxTest.at
+echo "# DAP4 CE:  $dap4ce" >>  hyraxTest.at
+echo "#" >>  hyraxTest.at
+
+# DAP2 Textual (ASCII) responses
+for dap_suffix in dds das html info ascii  html info
+do
+    test_cmd_file=$base_name.$dap_suffix
+    echo "test_cmd_file: "$test_cmd_file
+    echo "url = $url.$dap_suffix$ce" > $test_cmd_file
+    echo "-s" >> $test_cmd_file
+    #echo "-i" >> $test_cmd_file
+    
+    echo "AT_CURL_RESPONSE_TEST($test_cmd_file)" >>  hyraxTest.at
+    
+done
+
+# DAP2 data responses
+for dap_suffix in  dods  
+do
+    test_cmd_file=$base_name.$dap_suffix
+    echo "url = $url.$dap_suffix$ce" > $test_cmd_file
+    echo "-s" >> $test_cmd_file
+    #echo "-i" >> $test_cmd_file
+    
+    echo "AT_CURL_DAP2_DATA_RESPONSE_TEST($test_cmd_file)" >>  hyraxTest.at
+    
+done
+     
+
+
+# DAP4 Textual (ASCII) responses
+for dap_suffix in dmr dmr.html dmr.xml dap.csv
+do
+    test_cmd_file=$base_name.$dap_suffix
+    echo "test_cmd_file: "$test_cmd_file
+    echo "url = $url.$dap_suffix$dap4ce" > $test_cmd_file
+    echo "-s" >> $test_cmd_file
+    #echo "-i" >> $test_cmd_file
+    
+    echo "AT_CURL_RESPONSE_TEST($test_cmd_file)" >>  hyraxTest.at
+    
+done
+     
+
+
+
+# DAP4 data responses
+for dap_suffix in dap
+do
+    test_cmd_file=$base_name.$dap_suffix
+    echo "url = $url.$dap_suffix$dap4ce" > $test_cmd_file
+    echo "-s" >> $test_cmd_file
+    #echo "-i" >> $test_cmd_file
+    
+    echo "AT_CURL_DAP4_DATA_RESPONSE_TEST($test_cmd_file)" >>  hyraxTest.at
+    
+done
+     

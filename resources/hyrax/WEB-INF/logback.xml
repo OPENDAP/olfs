@@ -108,7 +108,6 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.logging" level="all"/>
 
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="all">

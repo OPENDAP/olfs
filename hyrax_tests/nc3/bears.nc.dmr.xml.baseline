@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" xml:base="http://localhost:8080/opendap/data/nc/bears.nc" dapVersion="4.0" dmrVersion="1.0" name="bears.nc">
+    <Dimension name="i" size="2"/>
+    <Dimension name="j" size="3"/>
+    <Dimension name="l" size="3"/>
+    <Int32 name="i">
+        <Dim name="/i"/>
+        <Attribute name="attr1" type="String">
+            <Value>1</Value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <Value>1</Value>
+            <Value>2</Value>
+            <Value>3</Value>
+            <Value>4</Value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <Value>17</Value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <Value>19</Value>
+                <Value>23</Value>
+                <Value>27</Value>
+            </Attribute>
+        </Attribute>
+    </Int32>
+    <Float32 name="j">
+        <Dim name="/j"/>
+    </Float32>
+    <String name="bears">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="act" type="String">
+            <Value>text string\012\011123</Value>
+        </Attribute>
+        <Attribute name="acs" type="Int16">
+            <Value>-40</Value>
+        </Attribute>
+        <Attribute name="acl" type="Int32">
+            <Value>17000</Value>
+        </Attribute>
+        <Attribute name="acf" type="Float32">
+            <Value>-2.00000000</Value>
+            <Value>1.00000000</Value>
+            <Value>0.00000000</Value>
+        </Attribute>
+        <Attribute name="acd" type="Float64">
+            <Value>-1.000000000000000</Value>
+            <Value>0.7500000000000000</Value>
+        </Attribute>
+        <Attribute name="string_length" type="Int32">
+            <Value>3</Value>
+        </Attribute>
+        <Map name="i"/>
+        <Map name="j"/>
+    </String>
+    <Int16 name="order">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Map name="i"/>
+        <Map name="j"/>
+    </Int16>
+    <Int32 name="shot">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Map name="i"/>
+        <Map name="j"/>
+    </Int32>
+    <Float32 name="aloan">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Map name="i"/>
+        <Map name="j"/>
+    </Float32>
+    <Float64 name="cross">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Map name="i"/>
+        <Map name="j"/>
+    </Float64>
+    <Int32 name="i">
+        <Dim name="/i"/>
+        <Attribute name="attr1" type="String">
+            <Value>1</Value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <Value>1</Value>
+            <Value>2</Value>
+            <Value>3</Value>
+            <Value>4</Value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <Value>17</Value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <Value>19</Value>
+                <Value>23</Value>
+                <Value>27</Value>
+            </Attribute>
+        </Attribute>
+    </Int32>
+    <Float32 name="j">
+        <Dim name="/j"/>
+    </Float32>
+    <Int16 name="l">
+        <Dim name="/l"/>
+    </Int16>
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <Value>This is an example of a multi-line global\012attribute.  It could be used for representing the\012processing history of the data, for example.</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <Value>k</Value>
+        </Attribute>
+    </Attribute>
+</Dataset>

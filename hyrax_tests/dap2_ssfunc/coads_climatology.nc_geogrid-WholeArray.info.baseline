@@ -1,0 +1,155 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Dataset Information</h3>
+<center>
+<table>
+
+<tr><td align=right valign=top><b>history</b>:</td>
+<td align=left>FERRET V4.30 (debug/no GUI) 15-Aug-96<br></td></tr>
+
+<tr><td align=right valign=top><b>Unlimited_Dimension</b>:</td>
+<td align=left>TIME<br></td></tr>
+</table>
+</center><p>
+
+<hr>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>SST</b>:</td>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: SEA SURFACE TEMPERATURE<br>
+history: From coads_climatology<br>
+units: Deg C<br>
+<table>
+<td align=right valign=top><b>SST</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: SEA SURFACE TEMPERATURE<br>
+history: From coads_climatology<br>
+units: Deg C<br>
+</td>
+<tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>AIRT</b>:</td>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: AIR TEMPERATURE<br>
+history: From coads_climatology<br>
+units: DEG C<br>
+<table>
+<td align=right valign=top><b>AIRT</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: AIR TEMPERATURE<br>
+history: From coads_climatology<br>
+units: DEG C<br>
+</td>
+<tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>UWND</b>:</td>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: ZONAL WIND<br>
+history: From coads_climatology<br>
+units: M/S<br>
+<table>
+<td align=right valign=top><b>UWND</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: ZONAL WIND<br>
+history: From coads_climatology<br>
+units: M/S<br>
+</td>
+<tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>VWND</b>:</td>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: MERIDIONAL WIND<br>
+history: From coads_climatology<br>
+units: M/S<br>
+<table>
+<td align=right valign=top><b>VWND</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
+long_name: MERIDIONAL WIND<br>
+history: From coads_climatology<br>
+units: M/S<br>
+</td>
+<tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr></table>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>

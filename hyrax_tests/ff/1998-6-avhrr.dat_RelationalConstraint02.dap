@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dap?dap4.ce=GSO_AVHRR|160<GSO_AVHRR.day_num<170
+-s

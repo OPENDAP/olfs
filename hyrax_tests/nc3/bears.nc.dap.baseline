@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" xml:base="http://localhost:8080/opendap/data/nc/bears.nc" dapVersion="4.0" dmrVersion="1.0" name="bears.nc">
+    <Dimension name="i" size="2"/>
+    <Dimension name="j" size="3"/>
+    <Dimension name="l" size="3"/>
+    <Int32 name="i">
+        <Dim name="/i"/>
+        <Attribute name="attr1" type="String">
+            <Value>1</Value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <Value>1</Value>
+            <Value>2</Value>
+            <Value>3</Value>
+            <Value>4</Value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <Value>17</Value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <Value>19</Value>
+                <Value>23</Value>
+                <Value>27</Value>
+            </Attribute>
+        </Attribute>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>2b990369</Value>
+        </Attribute>
+    </Int32>
+    <Float32 name="j">
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>5e221f27</Value>
+        </Attribute>
+    </Float32>
+    <String name="bears">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="act" type="String">
+            <Value>text string\012\011123</Value>
+        </Attribute>
+        <Attribute name="acs" type="Int16">
+            <Value>-40</Value>
+        </Attribute>
+        <Attribute name="acl" type="Int32">
+            <Value>17000</Value>
+        </Attribute>
+        <Attribute name="acf" type="Float32">
+            <Value>-2.00000000</Value>
+            <Value>1.00000000</Value>
+            <Value>0.00000000</Value>
+        </Attribute>
+        <Attribute name="acd" type="Float64">
+            <Value>-1.000000000000000</Value>
+            <Value>0.7500000000000000</Value>
+        </Attribute>
+        <Attribute name="string_length" type="Int32">
+            <Value>3</Value>
+        </Attribute>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>3642380c</Value>
+        </Attribute>
+        <Map name="/i"/>
+        <Map name="/j"/>
+    </String>
+    <Int16 name="order">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>901f487c</Value>
+        </Attribute>
+        <Map name="/i"/>
+        <Map name="/j"/>
+    </Int16>
+    <Int32 name="shot">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>c279414c</Value>
+        </Attribute>
+        <Map name="/i"/>
+        <Map name="/j"/>
+    </Int32>
+    <Float32 name="aloan">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>da30faa5</Value>
+        </Attribute>
+        <Map name="/i"/>
+        <Map name="/j"/>
+    </Float32>
+    <Float64 name="cross">
+        <Dim name="/i"/>
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>c77fe110</Value>
+        </Attribute>
+        <Map name="/i"/>
+        <Map name="/j"/>
+    </Float64>
+    <Int32 name="i">
+        <Dim name="/i"/>
+        <Attribute name="attr1" type="String">
+            <Value>1</Value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <Value>1</Value>
+            <Value>2</Value>
+            <Value>3</Value>
+            <Value>4</Value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <Value>17</Value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <Value>19</Value>
+                <Value>23</Value>
+                <Value>27</Value>
+            </Attribute>
+        </Attribute>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>2b990369</Value>
+        </Attribute>
+    </Int32>
+    <Float32 name="j">
+        <Dim name="/j"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>5e221f27</Value>
+        </Attribute>
+    </Float32>
+    <Int16 name="l">
+        <Dim name="/l"/>
+        <Attribute name="DAP4_Checksum_CRC32" type="String">
+            <Value>a5884747</Value>
+        </Attribute>
+    </Int16>
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <Value>This is an example of a multi-line global\012attribute.  It could be used for representing the\012processing history of the data, for example.</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <Value>k</Value>
+        </Attribute>
+    </Attribute>
+</Dataset>
+
+The data:
+Int32 i[i = 2] = {10, 20};
+Float32 j[j = 3] = {2, 4, 6};
+String bears[i = 2][j = 3] = {{"ind", "ist", "ing"},{"uis", "hab", "le"}};
+Int16 order[i = 2][j = 3] = {{1, 2, 3},{4, 5, 6}};
+Int32 shot[i = 2][j = 3] = {{2, 3, 4},{5, 6, 7}};
+Float32 aloan[i = 2][j = 3] = {{3, 4, 5},{6, 7, 1e+12}};
+Float64 cross[i = 2][j = 3] = {{4, 5, 0.000244140625},{7, 8, 10000000000}};
+Int32 i[i = 2] = {10, 20};
+Float32 j[j = 3] = {2, 4, 6};
+Int16 l[l = 3] = {10, 9, 8};
+

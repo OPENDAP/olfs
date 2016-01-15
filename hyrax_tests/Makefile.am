@@ -34,7 +34,6 @@ check-local: atconfig atlocal $(HYRAX_TEST_SUITE)
 	
 clean-local:
 	test ! -f '$(HYRAX_TEST_SUITE)' || $(SHELL) '$(HYRAX_TEST_SUITE)' --clean
-	-rm -rf dap_cache/*
 	-rm -f $(HYRAX_TEST_SUITE) $(srcdir)/package.m4
 
 AUTOTEST = $(AUTOM4TE) --language=autotest

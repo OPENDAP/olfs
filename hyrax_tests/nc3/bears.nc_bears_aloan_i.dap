@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/nc/bears.nc.dap?dap4.ce=bears;aloan;i
+-s

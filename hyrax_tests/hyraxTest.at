@@ -8,11 +8,383 @@ AT_TESTED([curl besstandalone])
 
 m4_include([handler_tests_macros.m4])
 
-AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dds.curl)
-AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.das.curl)
-AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dmr.curl)
-AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dods.curl)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dap.curl)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dds)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.das)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dmr)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dods)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dap)
+AT_CURL_RESPONSE_PATTERN_MATCH_TEST(nc3/fnoc1.nc.html)
+########################################################################################################
 
 
-AT_CURL_RESPONSE_PATTERN_MATCH_TEST(nc3/fnoc1.nc.html.curl)
+
+####################################################
+# TestName: nc3/fnoc1.nc_lat
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?lat
+# DAP4 CE:  ?dap4.ce=lat
+#
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.dds)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.das)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.html)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.info)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.ascii)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.html)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/fnoc1.nc_lat.dods)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.dmr)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.dmr.html)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.dmr.xml)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc_lat.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/fnoc1.nc_lat.dap)
+
+####################################################
+# TestName: nc3/bears.nc
+# BaseUrl:  http://localhost:8080/opendap/data/nc/bears.nc
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.dds)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.das)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.info)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.ascii)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/bears.nc.dods)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.dmr)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.dmr.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.dmr.xml)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/bears.nc.dap)
+
+####################################################
+# TestName: nc3/bears.nc_bears_aloan_i
+# BaseUrl:  http://localhost:8080/opendap/data/nc/bears.nc
+# DAP2 CE:  ?bears,aloan,i
+# DAP4 CE:  ?dap4.ce=bears;aloan;i
+#
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dds)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.das)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.info)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.ascii)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dods)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr.html)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr.xml)
+AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap)
+
+####################################################
+# TestName: ff/1998-6-avhrr.dat
+# BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.dds)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.das)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.info)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.ascii)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat.dods)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.dmr)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat.dap)
+
+####################################################
+# TestName: ff/1998-6-avhrr.dat_RelationalConstraint01
+# BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
+# DAP2 CE:  ?&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<162
+# DAP4 CE:  ?dap4.ce=GSO_AVHRR|GSO_AVHRR.day_num>160,GSO_AVHRR.day_num<162
+#
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dds)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.das)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.info)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.ascii)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dods)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap)
+
+####################################################
+# TestName: ff/1998-6-avhrr.dat_RelationalConstraint02
+# BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
+# DAP2 CE:  ?&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170
+# DAP4 CE:  ?dap4.ce=GSO_AVHRR|160<GSO_AVHRR.day_num<170
+#
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dds)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.das)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.info)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.ascii)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dods)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap)
+
+####################################################
+# TestName: ff/avhrr.dat
+# BaseUrl:  http://localhost:8080/opendap/data/ff/avhrr.dat
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.dds)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.das)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.html)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.info)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.ascii)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.html)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/avhrr.dat.dods)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.dmr)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/avhrr.dat.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/avhrr.dat.dap)
+
+####################################################
+# TestName: ff/gsodock.dat
+# BaseUrl:  http://localhost:8080/opendap/data/ff/gsodock.dat
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.dds)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.das)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.info)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.ascii)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/gsodock.dat.dods)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.dmr)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/gsodock.dat.dap)
+
+####################################################
+# TestName: ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth
+# BaseUrl:  http://localhost:8080/opendap/data/ff/gsodock.dat
+# DAP2 CE:  ?URI_GSO-Dock.Air_Temp,URI_GSO-Dock.Depth
+# DAP4 CE:  ?dap4.ce=URI_GSO-Dock.Air_Temp;URI_GSO-Dock.Depth
+#
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dds)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.das)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.info)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.ascii)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dods)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dmr)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dmr.html)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dmr.xml)
+AT_CURL_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dap)
+
+####################################################
+# TestName: hdf5/3B42.980909.5.HDF
+# BaseUrl:  http://localhost:8080/opendap/data/hdf4/3B42.980909.5.HDF.gz
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dds)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.das)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.html)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.info)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.ascii)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.html)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dods)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dmr)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dmr.html)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dmr.xml)
+AT_CURL_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf5/3B42.980909.5.HDF.dap)
+
+####################################################
+# TestName: hdf5/S2000415.hdf
+# BaseUrl:  http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.dds)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.das)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.html)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.info)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.ascii)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.html)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf5/S2000415.hdf.dods)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.dmr)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.dmr.html)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.dmr.xml)
+AT_CURL_RESPONSE_TEST(hdf5/S2000415.hdf.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf5/S2000415.hdf.dap)
+
+####################################################
+# TestName: hdf4/1990104h09da-gdm.hdf_ArraySubset
+# BaseUrl:  http://localhost:8080/opendap/data/hdf4/1990104h09da-gdm.hdf.gz
+# DAP2 CE:  ?Sea_Surface_Temperature\[0:100:4095\]\[0:100:2047\]
+# DAP4 CE:  ?dap4.ce=Sea_Surface_Temperature\[0:100:4095\]\[0:100:2047\]
+#
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dds)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.das)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.html)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.info)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.ascii)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.html)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dods)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr.html)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr.xml)
+AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dap)
+
+####################################################
+# TestName: dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01
+# BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
+# DAP2 CE:  ?DODS_URL&date_time("1998/160:17:45:00")
+# DAP4 CE:  ?dap4.ce=GSO_AVHRR.DODS_URL&dap4.function=date_time("1998/160:17:45:00")
+#
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dds)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.das)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.info)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.ascii)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dods)
+
+####################################################
+# TestName: dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01
+# BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
+# DAP2 CE:  ?DODS_URL&date_time("1998/160:17:45:00","1998/165:17:45:00")
+# DAP4 CE:  ?dap4.ce=DODS_URL&dap4.function=date_time("1998/160:17:45:00","1998/165:17:45:00")
+#
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dds)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.das)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.info)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.ascii)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dods)
+
+####################################################
+# TestName: dap2_ssfunc/coads_climatology.nc_geogrid-Basic
+# BaseUrl:  http://localhost:8080/opendap/data/nc/coads_climatology.nc
+# DAP2 CE:  ?geogrid(SST,61,-82,38,-19)
+# DAP4 CE:  ?dap4.function=geogrid(SST,61,-82,38,-19)
+#
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dds)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.das)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.info)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.ascii)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dods)
+
+####################################################
+# TestName: dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect
+# BaseUrl:  http://localhost:8080/opendap/data/nc/coads_climatology.nc
+# DAP2 CE:  ?geogrid(SST,61,-82,38,-19,"TIME<1500")
+# DAP4 CE:  ?dap4.function=geogrid(SST,61,-82,38,-19,"TIME<1500")
+#
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dds)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.das)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.info)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.ascii)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dods)
+
+####################################################
+# TestName: dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray
+# BaseUrl:  http://localhost:8080/opendap/data/nc/coads_climatology.nc
+# DAP2 CE:  ?geogrid(SST,379,-89,0,89)
+# DAP4 CE:  ?dap4.function=geogrid(SST,379,-89,0,89)
+#
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dds)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.das)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.info)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.ascii)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.html)
+AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dods)
+
+
+#################################################################################
+#################################################################################
+#
+#     DISABLED FUNCTION TESTS
+#  -  -  -  - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+#
+#
+# date_time not registered DAP4 function
+#
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dmr)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dmr.html)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dmr.xml)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01.dap)
+#
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# date_time not registered DAP4 function
+#
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dmr)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dmr.html)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dmr.xml)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/1998-6-avhrr.dat_DateTimeRange_01.dap)
+#
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# geogrid not registered DAP4 function
+#
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dmr)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dmr.html)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dmr.xml)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-Basic.dap)
+#
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# geogrid not registered DAP4 function
+#
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dmr)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dmr.html)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dmr.xml)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-TimeSelect.dap)
+#
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# geogrid not registered DAP4 function
+#
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dmr)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dmr.html)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dmr.xml)
+#AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dap)

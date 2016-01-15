@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/nc/fnoc1.nc.info?lat
+-s

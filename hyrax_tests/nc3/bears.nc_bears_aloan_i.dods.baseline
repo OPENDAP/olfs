@@ -1,0 +1,17 @@
+The data:
+Grid {
+  Array:
+    String bears[i = 2][j = 3];
+  Maps:
+    Int32 i[i = 2];
+    Float32 j[j = 3];
+} bears = {  Array: {{"ind", "ist", "ing"},{"uis", "hab", "le"}}  Maps: {10, 20}, {2, 4, 6} };
+Grid {
+  Array:
+    Float32 aloan[i = 2][j = 3];
+  Maps:
+    Int32 i[i = 2];
+    Float32 j[j = 3];
+} aloan = {  Array: {{3, 4, 5},{6, 7, 1e+12}}  Maps: {10, 20}, {2, 4, 6} };
+Int32 i[i = 2] = {10, 20};
+
