@@ -229,17 +229,17 @@ m4_define([_AT_BESCMD_NETCDF_TEST],  [dnl
 # Curl Testing Macro Definitions
 #
 m4_define([AT_CURL_RESPONSE_TEST],
-[_AT_CURL_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+[_AT_CURL_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 m4_define([AT_CURL_DAP2_DATA_RESPONSE_TEST],
-[_AT_CURL_DAP2_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+[_AT_CURL_DAP2_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 m4_define([AT_CURL_DAP4_DATA_RESPONSE_TEST],
-[_AT_CURL_DAP4_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+[_AT_CURL_DAP4_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 
 m4_define([AT_CURL_RESPONSE_PATTERN_MATCH_TEST],
-[_AT_CURL_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+[_AT_CURL_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 
 

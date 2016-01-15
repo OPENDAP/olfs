@@ -76,7 +76,7 @@ AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr)
 AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr.html)
 AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dmr.xml)
 AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap.csv)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap,xfail)
 
 ####################################################
 # TestName: ff/1998-6-avhrr.dat
