@@ -15,27 +15,126 @@ AT_ARG_OPTION_ARG([baselines],
 
 # Usage: _AT_TEST_*(<bescmd source>, <baseline file>, <xpass/xfail> [default is xpass])
 
-m4_define([_AT_BESCMD_TEST], [dnl
+#######################################################################################
+#
+#   CURL TESTS
 
-    AT_SETUP([BESCMD $1])
-    AT_KEYWORDS([bescmd])
+
+#--------------------------------------------------------------------------------------
+#
+# Basic test using diff  Response output should be text!!
+#
+m4_define([_AT_CURL_TEST], [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
 
     input=$1
     baseline=$2
 
     AS_IF([test -n "$baselines" -a x$baselines = xyes],
         [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [0], [stdout])
+        AT_CHECK([curl -K $input], [0], [stdout])
         AT_CHECK([mv stdout $baseline.tmp])
         ],
         [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [0], [stdout])
+        AT_CHECK([curl -K $input], [0], [stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
         ])
 
     AT_CLEANUP
 ])
+
+
+#--------------------------------------------------------------------------------------
+#
+# DAP2 Data response test
+#
+m4_define([_AT_CURL_DAP2_DATA_TEST],  [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
+
+    input=$1
+    baseline=$2
+
+    AS_IF([test -n "$baselines" -a x$baselines = xyes],
+        [
+        AT_CHECK([curl -K $input | getdap -Ms -], [0], [stdout])
+        AT_CHECK([mv stdout $baseline.tmp])
+        ],
+        [
+        AT_CHECK([curl -K $input | getdap -Ms -], [0], [stdout])
+        AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
+        AT_XFAIL_IF([test "$3" = "xfail"])
+        ])
+
+    AT_CLEANUP
+])
+
+
+#--------------------------------------------------------------------------------------
+#
+# DAP4 Data response test
+#
+m4_define([_AT_CURL_DAP4_DATA_TEST],  [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
+
+    input=$1
+    baseline=$2
+
+    AS_IF([test -n "$baselines" -a x$baselines = xyes],
+        [
+        AT_CHECK([curl -K $input | getdap4 -D -M -s -], [0], [stdout])
+        AT_CHECK([mv stdout $baseline.tmp])
+        ],
+        [
+        AT_CHECK([curl -K $input | getdap4  -D -M -s -], [0], [stdout])
+        AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
+        AT_XFAIL_IF([test "$3" = "xfail"])
+        ])
+
+    AT_CLEANUP
+])
+
+
+#--------------------------------------------------------------------------------------
+#
+# ASCII Regex test
+#
+m4_define([_AT_CURL_PATTERN_TEST], [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
+
+    input=$1
+    baseline=$2
+
+    AS_IF([test -n "$baselines" -a x$baselines = xyes],
+        [
+        AT_CHECK([curl -K $input], [0], [stdout])
+        AT_CHECK([mv stdout $baseline.tmp])
+        ],
+        [
+        AT_CHECK([curl -K $input], [0], [stdout])
+        AT_CHECK([grep -f $baseline stdout], [0], [ignore])
+        AT_XFAIL_IF([test "$3" = "xfail"])
+        ])
+
+    AT_CLEANUP
+])
+
+
+
+
+#######################################################################################
+#
+#   OLD (UNUSED) BESSTANDALONE TESTS
+#     (Keeping them in as templates for yet to be written curl tests)
+#
 
 m4_define([_AT_BESCMD_PATTERN_TEST], [dnl
 
@@ -81,49 +180,7 @@ m4_define([_AT_BESCMD_ERROR_TEST], [dnl
     AT_CLEANUP
 ])
 
-m4_define([_AT_BESCMD_BINARYDATA_TEST],  [dnl
 
-    AT_SETUP([BESCMD $1])
-    AT_KEYWORDS([bescmd])
-    
-    input=$1
-    baseline=$2
-
-    AS_IF([test -n "$baselines" -a x$baselines = xyes],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input | getdap -Ms -], [0], [stdout])
-        AT_CHECK([mv stdout $baseline.tmp])
-        ],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input | getdap -Ms -], [0], [stdout])
-        AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
-        AT_XFAIL_IF([test "$3" = "xfail"])
-        ])
-
-    AT_CLEANUP
-])
-    
-m4_define([_AT_BESCMD_DAP4_BINARYDATA_TEST],  [dnl
-
-    AT_SETUP([BESCMD $1])
-    AT_KEYWORDS([binary])
-    
-    input=$1
-    baseline=$2
-
-    AS_IF([test -n "$baselines" -a x$baselines = xyes],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input | getdap4 -D -M -s -], [], [stdout])
-        AT_CHECK([mv stdout $baseline.tmp])
-        ],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input | getdap4 -D -M -s -], [], [stdout])
-        AT_CHECK([diff -b -B $baseline stdout])
-        AT_XFAIL_IF([test "$3" = "xfail"])
-        ])
-
-    AT_CLEANUP
-])
 
 dnl AT_CHECK (commands, [status = `0'], [stdout = `'], [stderr = `'], [run-if-fail], [run-if-pass])
 
@@ -166,7 +223,31 @@ m4_define([_AT_BESCMD_NETCDF_TEST],  [dnl
 
     AT_CLEANUP
 ])
-    
+
+#######################################################################################
+#
+# Curl Testing Macro Definitions
+#
+m4_define([AT_CURL_RESPONSE_TEST],
+[_AT_CURL_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+
+m4_define([AT_CURL_DAP2_DATA_RESPONSE_TEST],
+[_AT_CURL_DAP2_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+
+m4_define([AT_CURL_DAP4_DATA_RESPONSE_TEST],
+[_AT_CURL_DAP4_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+
+
+m4_define([AT_CURL_RESPONSE_PATTERN_MATCH_TEST],
+[_AT_CURL_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
+
+
+
+
+#######################################################################################
+#
+# Besstandalone Testing Macro Definitions
+#
 m4_define([AT_BESCMD_RESPONSE_TEST],
 [_AT_BESCMD_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
 
@@ -186,3 +267,4 @@ m4_define([AT_BESCMD_BINARY_DAP4_RESPONSE_TEST],
 
 m4_define([AT_BESCMD_NETCDF_RESPONSE_TEST],
 [_AT_BESCMD_NETCDF_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+#######################################################################################

@@ -5,7 +5,7 @@ noinst_DATA = bes.conf
 
 CLEANFILES = bes.conf
 
-EXTRA_DIST = data bescmd $(TESTSUITE).at $(TESTSUITE) \
+EXTRA_DIST = data bescmd $(HYRAX_TEST_SUITE).at $(HYRAX_TEST_SUITE) \
 $(srcdir)/package.m4 atlocal.in bes.conf.in handler_tests_macros.m4
 
 DISTCLEANFILES = atconfig
@@ -22,20 +22,20 @@ bes.conf: bes.conf.in $(top_srcdir)/configure.ac
 
 AUTOM4TE = autom4te
 
-TESTSUITE = $(srcdir)/functionsTest
-TESTSUITEFLAGS =
+HYRAX_TEST_SUITE = $(srcdir)/hyraxTest
+HYRAX_TEST_SUITE_FLAGS =
 
-$(TESTSUITE): $(TESTSUITE).at $(srcdir)/handler_tests_macros.m4 $(srcdir)/package.m4
+$(HYRAX_TEST_SUITE): $(HYRAX_TEST_SUITE).at $(srcdir)/handler_tests_macros.m4 $(srcdir)/package.m4
 
-check-local: atconfig atlocal $(TESTSUITE)
+check-local: atconfig atlocal $(HYRAX_TEST_SUITE)
 	@echo "Run tests with an empty cache"
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+	$(SHELL) '$(HYRAX_TEST_SUITE)' $(HYRAX_TEST_SUITE_FLAGS)
 	-rm -rf dap_cache/*
 	
 clean-local:
-	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
+	test ! -f '$(HYRAX_TEST_SUITE)' || $(SHELL) '$(HYRAX_TEST_SUITE)' --clean
 	-rm -rf dap_cache/*
-	-rm -f $(TESTSUITE) $(srcdir)/package.m4 
+	-rm -f $(HYRAX_TEST_SUITE) $(srcdir)/package.m4
 
 AUTOTEST = $(AUTOM4TE) --language=autotest
 

@@ -1,0 +1,18 @@
+# Process with autom4te to create an -*- Autotest -*- test suite.
+
+AT_INIT([olfs tests])
+
+# replace 'besstandalone' with the name or names of the programs you're
+# using as test drivers (curl, ...)
+AT_TESTED([curl besstandalone])
+
+m4_include([handler_tests_macros.m4])
+
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dds.curl)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.das.curl)
+AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dmr.curl)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dods.curl)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/fnoc1.nc.dap.curl)
+
+
+AT_CURL_RESPONSE_PATTERN_MATCH_TEST(nc3/fnoc1.nc.html.curl)
