@@ -23,3 +23,21 @@ build
 
 ## aggregation servlet
 src/opendap/aggregation/AggregationServletTest.java.broken
+
+
+# Autoconf spew
+Makefile
+Makefile.in
+atlocal
+atconfig
+aclocal.m4
+conf
+config.log
+config.status
+configure
+autom4te.cache
+
+
+# Random temp files
+foo
+foo.*
