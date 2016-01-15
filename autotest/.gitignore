@@ -1,3 +1,9 @@
-/functionsTest
+/hyraxTest
+/hyraxTest.log
 /bes.conf
-/functionsTest.dir/
+/hyraxTest.dir/
+/Makefile
+/Makefile.in
+
+/atconfig
+/atlocal
