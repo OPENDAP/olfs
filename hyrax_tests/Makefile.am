@@ -6,7 +6,7 @@ noinst_DATA = bes.conf
 CLEANFILES = bes.conf
 
 EXTRA_DIST = data bescmd $(HYRAX_TEST_SUITE).at $(HYRAX_TEST_SUITE) \
-$(srcdir)/package.m4 atlocal.in bes.conf.in handler_tests_macros.m4
+$(srcdir)/package.m4 atlocal.in bes.conf.in curl_test_macros.m4
 
 DISTCLEANFILES = atconfig
 
