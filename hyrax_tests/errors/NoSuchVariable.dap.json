@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/nc/fnoc1.nc.dap.json?dap4.ce=k
+-s 

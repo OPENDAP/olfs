@@ -32,7 +32,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.http.mediaTypes.Csv;
+import opendap.http.mediaTypes.TextCsv;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +71,7 @@ public class CsvData extends Dap4Responder {
         setServiceDescription("Comma Separated Values representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
 
-        setNormativeMediaType(new Csv(getRequestSuffix()));
+        setNormativeMediaType(new TextCsv(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

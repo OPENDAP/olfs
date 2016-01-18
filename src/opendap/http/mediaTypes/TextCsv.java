@@ -28,21 +28,23 @@ package opendap.http.mediaTypes;
 import opendap.bes.dap4Responders.MediaType;
 
 /**
- * Created by ndp on 1/27/15.
+ * Comma Separated Values
+ * https://tools.ietf.org/html/rfc4180
+ *
  */
-public class Csv extends MediaType {
+public class TextCsv extends MediaType {
     public static final String NAME = "csv";
 
     public static final String PRIMARY_TYPE = "text";
     public static final String SUB_TYPE = "csv";
 
 
-    public Csv(){
+    public TextCsv(){
         this("."+ NAME);
         setName(NAME);
     }
 
-    public Csv(String typeMatchString){
+    public TextCsv(String typeMatchString){
         super(PRIMARY_TYPE,SUB_TYPE, typeMatchString);
     }
 

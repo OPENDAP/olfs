@@ -1,2 +1,2 @@
-url = http://localhost:8080/opendap/NWAtlanticDec_1km.nc.dmr?dap4.ce=k
+url = http://localhost:8080/opendap/data/nc/fnoc1.nc.dmr?dap4.ce=k
 -s 

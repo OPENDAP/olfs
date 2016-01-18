@@ -1,0 +1,17 @@
+{
+  "name":  =  "ERROR",
+  "type":  =  "node",
+  "attributes":  =  "[]",
+  "leaves":  =  ["
+    {
+      "name":  =  "Message",
+      "type":  =  "String",
+      "attributes":  =  "[]",
+      "data":  =  "Unable to transmit response, no transmitter for dap"
+    },
+      "name":  =  "HttpStatus",
+      "type":  =  "Int32",
+      "attributes":  =  "[]",
+      "data":  =  500
+    }
+}

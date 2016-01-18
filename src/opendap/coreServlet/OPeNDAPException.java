@@ -334,6 +334,11 @@ public class OPeNDAPException extends Exception {
                 sendAsDap4Error(response);
                 return;
             }
+
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextCsv.SUB_TYPE)) {
+                sendAsDap2Error(response);
+                return;
+            }
         }
         if(errorResponseMediaType.getPrimaryType().equalsIgnoreCase("application")) {
 

@@ -1,0 +1,17 @@
+{
+  "name":  =  "ERROR",
+  "type":  =  "node",
+  "attributes":  =  "[]",
+  "leaves":  =  ["
+    {
+      "name":  =  "Message",
+      "type":  =  "String",
+      "attributes":  =  "[]",
+      "data":  =  "libdap exception building response: error_code = 1004: Failed to parse the constraint expression. Msg: Constraint expression parse error: No such identifier in dataset: k"
+    },
+      "name":  =  "HttpStatus",
+      "type":  =  "Int32",
+      "attributes":  =  "[]",
+      "data":  =  400
+    }
+}

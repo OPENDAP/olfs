@@ -1,0 +1,3 @@
+<dap4:Error xmlns:dap4="http://xml.opendap.org/ns/DAP/4.0#" httpcode="400">
+  <dap4:Message>libdap exception building response: error_code = 1004: libdap error transmitting DAP4Data: k: The variable k was not found in the dataset (id).</dap4:Message>
+</dap4:Error>

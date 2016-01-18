@@ -396,9 +396,21 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeAr
 #
 #     ERROR TESTS
 #  -  -  -  - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
-#
+
+#   .   .   .   .   .   .   .   .   .   .   .  .   .   .   .   .   .   . 
+# No such variable Error
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dods)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.w10n)
+# -- DAP4 
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dmr)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dmr.html)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.csv)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.json)
 
 
 
