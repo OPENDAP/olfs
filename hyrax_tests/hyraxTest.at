@@ -6,7 +6,7 @@ AT_INIT([olfs tests])
 # using as test drivers (curl, ...)
 AT_TESTED([curl besstandalone])
 
-m4_include([handler_tests_macros.m4])
+m4_include([curl_test_macros.m4])
 
 AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.dds)
 AT_CURL_RESPONSE_TEST(nc3/fnoc1.nc.das)
@@ -397,8 +397,8 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeAr
 #     ERROR TESTS
 #  -  -  -  - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 #
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable_ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable_dmr)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dmr)
 
 
 
