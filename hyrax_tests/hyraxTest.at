@@ -388,3 +388,21 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeAr
 #AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dmr.xml)
 #AT_CURL_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dap.csv)
 #AT_CURL_DAP4_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeArray.dap)
+
+
+
+
+#################################################################################
+#
+#     ERROR TESTS
+#  -  -  -  - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+#
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable_ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable_dmr)
+
+
+
+
+
+
+

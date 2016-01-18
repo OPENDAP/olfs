@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/NWAtlanticDec_1km.nc.dmr?dap4.ce=k
+-s 

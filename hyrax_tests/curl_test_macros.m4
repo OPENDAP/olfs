@@ -129,6 +129,79 @@ m4_define([_AT_CURL_PATTERN_TEST], [dnl
 
 
 
+#--------------------------------------------------------------------------------------
+#
+# ASCII Compare PLUS Check HTTP Header using REGEX
+# The http_header baseline MUST be edited to make a correct regular expression
+#
+m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST], [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
+
+    input=$1
+    baseline=$2
+
+    AS_IF([test -n "$baselines" -a x$baselines = xyes],
+        [
+        AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        AT_CHECK([mv stdout $baseline.tmp])
+        AT_CHECK([echo "^\c" > $baseline.http_header.tmp; head -1 http_header | sed "s/\./\\\./g" >> $baseline.http_header.tmp])
+        ],
+        [
+        AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
+        AT_CHECK([grep -f $baseline.http_header http_header], [0], [ignore])
+        AT_XFAIL_IF([test "$3" = "xfail"])
+        ])
+
+    AT_CLEANUP
+])
+
+
+
+
+#######################################################################################
+#
+# Curl Testing Macro Definitions
+#
+m4_define([AT_CURL_RESPONSE_TEST],
+[_AT_CURL_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+m4_define([AT_CURL_DAP2_DATA_RESPONSE_TEST],
+[_AT_CURL_DAP2_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+m4_define([AT_CURL_DAP4_DATA_RESPONSE_TEST],
+[_AT_CURL_DAP4_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+
+m4_define([AT_CURL_RESPONSE_PATTERN_MATCH_TEST],
+[_AT_CURL_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+
+m4_define([AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST],
+[_AT_CURL_HEADER_AND_RESPONSE_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #######################################################################################
 #
@@ -223,26 +296,6 @@ m4_define([_AT_BESCMD_NETCDF_TEST],  [dnl
 
     AT_CLEANUP
 ])
-
-#######################################################################################
-#
-# Curl Testing Macro Definitions
-#
-m4_define([AT_CURL_RESPONSE_TEST],
-[_AT_CURL_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
-m4_define([AT_CURL_DAP2_DATA_RESPONSE_TEST],
-[_AT_CURL_DAP2_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
-m4_define([AT_CURL_DAP4_DATA_RESPONSE_TEST],
-[_AT_CURL_DAP4_DATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
-
-m4_define([AT_CURL_RESPONSE_PATTERN_MATCH_TEST],
-[_AT_CURL_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
-
-
 
 #######################################################################################
 #
