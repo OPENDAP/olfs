@@ -395,12 +395,12 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.ascii)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.json)
 #
 # -- DAP4 
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr.html)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr, xfail)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr.html, xfail)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap, xfail)
 #
 # -- Alternate DAP4 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap.csv)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap.csv, xfail)
 
 
 
