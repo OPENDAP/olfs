@@ -414,9 +414,27 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap)
 #
 # -- Alternate DAP4 encodings
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.csv)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.json)
 # -- w10n response
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.w10n)
+
+
+#   .   .   .   .   .   .   .   .   .   .   .  .   .   .   .   .   .   . 
+# Bad Constraint Expression Syntax
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.ascii)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.json)
+#
+# -- DAP4 
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dmr.html)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap)
+#
+# -- Alternate DAP4 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/BadConstraintSyntax.dap.csv)
 
 
 

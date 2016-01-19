@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/nc/fnoc1.nc.dap.csv?dap4.ce=u,v
+-s 
