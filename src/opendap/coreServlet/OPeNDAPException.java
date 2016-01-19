@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wraps the Exception class so that it can be serialized as a DAP2 error object.
@@ -56,9 +57,15 @@ public class OPeNDAPException extends Exception {
 
     Logger _log;
 
-    public static String ERROR_MESSAGE = null;
 
     public static final String ERROR_RESPONSE_MEDIA_TYPE_KEY = "ErrorResponseMediaType";
+
+
+    private static ConcurrentHashMap<Thread, String> errorMessageCache;
+    static {
+        errorMessageCache = new ConcurrentHashMap<>();
+    }
+
 
     /**
      * Undefined error.
@@ -559,7 +566,8 @@ public class OPeNDAPException extends Exception {
 
         int httpStatus = getHttpStatusCode();
 
-        ERROR_MESSAGE = getMessage();
+
+        errorMessageCache.put(Thread.currentThread(),getMessage());
         response.sendError(httpStatus);
 
 
@@ -592,5 +600,10 @@ public class OPeNDAPException extends Exception {
     }
 
 
+    public static String getAndClearCachedErrorMessage(){
+        String errmsg = errorMessageCache.get(Thread.currentThread());
+        errorMessageCache.remove(Thread.currentThread());
+        return errmsg;
+    }
 
 }
