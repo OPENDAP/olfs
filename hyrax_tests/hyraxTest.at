@@ -398,21 +398,206 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(dap2_ssfunc/coads_climatology.nc_geogrid-WholeAr
 #  -  -  -  - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 
 #   .   .   .   .   .   .   .   .   .   .   .  .   .   .   .   .   .   . 
-# No such variable Error
+# No such variable 
 # -- DAP2
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dds)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dods)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.ascii)
+#
+# -- Alternate DAP2 encodings
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.json)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.w10n)
+#
 # -- DAP4 
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dmr)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dmr.html)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap)
+#
+# -- Alternate DAP4 encodings
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.csv)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.json)
+# -- w10n response
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.w10n)
+
+####################################################
+# TestName: errors/bes_internal_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(1)
+# DAP4 CE:  ?dap4.func=error(1)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.w10n)
 
 
+
+####################################################
+# TestName: errors/bes_internal_fatal_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(2)
+# DAP4 CE:  ?dap4.func=error(2)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.w10n)
+
+
+
+####################################################
+# TestName: errors/bes_syntax_user_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(3)
+# DAP4 CE:  ?dap4.func=error(3)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.w10n)
+
+
+
+
+
+####################################################
+# TestName: errors/bes_forbidden_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(4)
+# DAP4 CE:  ?dap4.func=error(4)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.w10n)
+
+
+
+
+####################################################
+# TestName: errors/bes_not_found_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(5)
+# DAP4 CE:  ?dap4.func=error(5)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.w10n)
+
+
+
+####################################################
+# TestName: errors/bes_timeout_error
+# BaseUrl:  http://localhost:8080/opendap/data/nc/fnoc1.nc
+# DAP2 CE:  ?error(6)
+# DAP4 CE:  ?dap4.func=error(6)
+#
+#
+# -- DAP2
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dods)
+#
+# -- Alternate DAP2 encodings
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.json)
+#
+# --------------- DAP4 Functions to yet able to do this -------------------------
+# -- DAP4
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap)
+#
+# -- Alternate DAP4 encodings
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap.json)
+#
+# -- w10n Response
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.w10n)
 
 
 

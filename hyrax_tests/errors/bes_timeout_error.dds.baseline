@@ -1,0 +1,4 @@
+Error { 
+    code = 418;
+    message = "A BESTimeOutError was requested.";
+}

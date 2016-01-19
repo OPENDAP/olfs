@@ -1,0 +1,17 @@
+{
+  "name":  =  "ERROR",
+  "type":  =  "node",
+  "attributes":  =  "[]",
+  "leaves":  =  ["
+    {
+      "name":  =  "Message",
+      "type":  =  "String",
+      "attributes":  =  "[]",
+      "data":  =  "A BESNotFoundError was requested."
+    },
+      "name":  =  "HttpStatus",
+      "type":  =  "Int32",
+      "attributes":  =  "[]",
+      "data":  =  404
+    }
+}

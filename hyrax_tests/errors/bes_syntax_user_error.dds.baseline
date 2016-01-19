@@ -1,0 +1,4 @@
+Error { 
+    code = 400;
+    message = "A BESSyntaxUserError was requested.";
+}
