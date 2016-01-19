@@ -183,79 +183,16 @@ m4_define([AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST],
 [_AT_CURL_HEADER_AND_RESPONSE_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #######################################################################################
 #
 #   OLD (UNUSED) BESSTANDALONE TESTS
 #     (Keeping them in as templates for yet to be written curl tests)
 #
 
-m4_define([_AT_BESCMD_PATTERN_TEST], [dnl
-
-    AT_SETUP([BESCMD $1])
-    AT_KEYWORDS([bescmd])
-
-    input=$1
-    baseline=$2
-
-    AS_IF([test -n "$baselines" -a x$baselines = xyes],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [0], [stdout])
-        AT_CHECK([mv stdout $baseline.tmp])
-        ],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [0], [stdout])
-        AT_CHECK([grep -f $baseline stdout], [0], [ignore])
-        AT_XFAIL_IF([test "$3" = "xfail"])
-        ])
-
-    AT_CLEANUP
-])
-
-m4_define([_AT_BESCMD_ERROR_TEST], [dnl
-
-    AT_SETUP([BESCMD $1])
-    AT_KEYWORDS([bescmd])
-
-    input=$1
-    baseline=$2
-
-    AS_IF([test -n "$baselines" -a x$baselines = xyes],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [ignore], [stdout], [ignore])
-        AT_CHECK([mv stdout $baseline.tmp])
-        ],
-        [
-        AT_CHECK([besstandalone -c $abs_builddir/bes.conf -i $input], [ignore], [stdout], [ignore])
-        AT_CHECK([diff -b -B $baseline stdout])
-        AT_XFAIL_IF([test "$3" = "xfail"])
-        ])
-
-    AT_CLEANUP
-])
-
-
-
-dnl AT_CHECK (commands, [status = `0'], [stdout = `'], [stderr = `'], [run-if-fail], [run-if-pass])
 
 dnl This is similar to the "binary data" macro above, but instead assumes the
 dnl output of besstandalone is a netcdf3 file. The binary stream is read using
@@ -301,23 +238,6 @@ m4_define([_AT_BESCMD_NETCDF_TEST],  [dnl
 #
 # Besstandalone Testing Macro Definitions
 #
-m4_define([AT_BESCMD_RESPONSE_TEST],
-[_AT_BESCMD_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])])
-
-m4_define([AT_BESCMD_RESPONSE_PATTERN_TEST],
-[_AT_BESCMD_PATTERN_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])
-])
-
-m4_define([AT_BESCMD_ERROR_RESPONSE_TEST],
-[_AT_BESCMD_ERROR_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline])
-])
-
-m4_define([AT_BESCMD_BINARYDATA_RESPONSE_TEST],
-[_AT_BESCMD_BINARYDATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
-m4_define([AT_BESCMD_BINARY_DAP4_RESPONSE_TEST],
-[_AT_BESCMD_DAP4_BINARYDATA_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
-
 m4_define([AT_BESCMD_NETCDF_RESPONSE_TEST],
 [_AT_BESCMD_NETCDF_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 #######################################################################################

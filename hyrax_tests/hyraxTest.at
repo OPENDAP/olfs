@@ -4,7 +4,7 @@ AT_INIT([olfs tests])
 
 # replace 'besstandalone' with the name or names of the programs you're
 # using as test drivers (curl, ...)
-AT_TESTED([curl besstandalone])
+AT_TESTED([curl])
 
 m4_include([curl_test_macros.m4])
 
@@ -417,6 +417,8 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.csv)
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.dap.json)
 # -- w10n response
 AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/NoSuchVariable.w10n)
+
+
 
 ####################################################
 # TestName: errors/bes_internal_error
