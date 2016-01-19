@@ -41,7 +41,7 @@
     }
 
 
-    String message = OPeNDAPException.ERROR_MESSAGE;
+    String message = OPeNDAPException.getAndClearCachedErrorMessage();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -64,7 +64,7 @@
 <body>
 <p>&nbsp;</p>
 
-<h1 align="center">Hyrax Error - 502</h1>
+<h1 align="center">Hyrax Error - Bad Gateway (502)</h1>
 <hr noshade="noshade" size="1"/>
 <table border="0" width="100%">
     <tbody>
@@ -78,14 +78,14 @@
         </td>
         <td><p class="style1" align="center">Oops!</p>
 
-            <p align="center">Drat! I was unable to act as a gateway to the requested remote resource..</p>
+            <p align="left">Drat! I was unable to act as a gateway to the requested remote resource..</p>
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
             <blockquote><p><strong><%= message %>
             </strong></p></blockquote>
             <% } %>
 
-            <p align="center">If
+            <p align="left">If
                 you think that the server is broken (that the URL you submitted should
                 have worked), then please contact the OPeNDAP user support coordinator
                 at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %>
@@ -94,6 +94,6 @@
     </tbody>
 </table>
 <hr noshade="noshade" size="1"/>
-<h1 align="center">Hyrax Error - 502</h1>
+<h1 align="center">Hyrax Error - Bad Gateway (502)</h1>
 </body>
 </html>

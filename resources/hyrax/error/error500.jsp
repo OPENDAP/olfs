@@ -41,7 +41,8 @@
         adminEmail = besApi.getAdministrator(localUrl);
     } catch (Exception e) { }
 
-    String message = OPeNDAPException.ERROR_MESSAGE;
+    String message = OPeNDAPException.getAndClearCachedErrorMessage();
+
 %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -61,7 +62,7 @@
 <body>
 <p>&nbsp;</p>
 
-<h1 align="center">Hyrax Error (500)</h1>
+<h1 align="center">Hyrax Error - Internal Error (500)</h1>
 <hr size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
@@ -73,15 +74,15 @@
                  height="426"/>
         </td>
         <td>
-            <p align="center" class="style1">OUCH!</p>
+            <p align="left" class="style1">OUCH!</p>
 
-            <p align="center">Something Bad Happened On This Server.</p>
+            <p align="left">Something Bad Happened On This Server.</p>
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
             <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
             <% } %>
 
-            <p align="center">If you think that the server is broken (that the URL you submitted should have
+            <p align="left">If you think that the server is broken (that the URL you submitted should have
                 worked), then please contact the OPeNDAP user support coordinator at:
                 <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a>
             </p>
@@ -90,6 +91,6 @@
 
 </table>
 <hr size="1" noshade="noshade"/>
-<h1 align="center">Hyrax Error (500)</h1>
+<h1 align="center">Hyrax Error - Internal Error (500)</h1>
 </body>
 </html>

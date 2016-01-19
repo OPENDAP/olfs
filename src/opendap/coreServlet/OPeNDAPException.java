@@ -570,33 +570,6 @@ public class OPeNDAPException extends Exception {
         errorMessageCache.put(Thread.currentThread(),getMessage());
         response.sendError(httpStatus);
 
-
-        /*
-
-            String errorPageTemplate = _systemPath + "/error/error.html.proto";
-
-
-            String template = loadHtmlTemplate(errorPageTemplate, context);
-
-            template = template.replaceAll("<ERROR_MESSAGE />", errorMessage);
-            template = template.replaceAll("<ERROR_CODE />", Integer.toString(httpStatus));
-
-            _log.debug("sendHttpErrorResponse(): Sending Error Page ");
-
-            MediaType responseType = new TextHtml();
-            response.setContentType(responseType.getMimeType());
-            response.setHeader("Content-Description", "error_page");
-            response.setStatus(getHttpStatusCode());
-
-
-            _log.debug(template);
-            ServletOutputStream sos = response.getOutputStream();
-
-            sos.write(template.getBytes(HyraxStringEncoding.getCharset()));
-
-            sos.flush();
-        */
-
     }
 
 

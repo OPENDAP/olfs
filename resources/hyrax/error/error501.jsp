@@ -40,7 +40,7 @@
         adminEmail = besApi.getAdministrator(localUrl);
     } catch (Exception e) { }
 
-    String message = OPeNDAPException.ERROR_MESSAGE;
+    String message = OPeNDAPException.getAndClearCachedErrorMessage();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -59,7 +59,7 @@
 
 <body>
 <p>&nbsp;</p>
-<h1 align="center">Hyrax Error: No Such Service</h1>
+<h1 align="center">Hyrax Error - No Such Service (501)</h1>
 <hr size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
@@ -69,17 +69,17 @@
              title="That's not going to work..."
              width="350" height="313" /><
         /td>
-    <td><p align="center" class="style1">Hmmmm...</p>
-      <p align="center">You asked for a service that is not provided here.</p>
+    <td><p align="left" class="style1">Hmmmm...</p>
+      <p align="left">You asked for a service that is not provided here.</p>
       <% if (message != null) { %>
       <p align="left">The specific error message associated with your request was:</p>
       <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
       <% } %>
 
-    <p align="center">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>
+    <p align="left">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a></p></td>
   </tr>
 </table>
 <hr size="1" noshade="noshade" />
-<h1 align="center">Hyrax Error: No Such Service</h1>
+<h1 align="center">Hyrax Error - No Such Service (501)</h1>
 </body>
 </html>

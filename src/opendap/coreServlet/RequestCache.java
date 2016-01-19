@@ -46,7 +46,7 @@ public class RequestCache {
 
     private static ConcurrentHashMap<Thread, HashMap<String,CachedObj>> cache;
     static {
-        cache = new ConcurrentHashMap<Thread, HashMap<String,CachedObj>>();
+        cache = new ConcurrentHashMap<>();
     }
 
     //private static long maxCacheTime = 10000; // in milliseconds
@@ -84,12 +84,12 @@ public class RequestCache {
         }
         HashMap<String, CachedObj> hm = new HashMap<String, CachedObj>();
         cache.put(Thread.currentThread(),hm);
-        log.info("Created request cache for thread: "+Thread.currentThread());
+        log.info("Created request cache for thread: {}",Thread.currentThread());
     }
 
     public static void closeThreadCache(){
         cache.remove(Thread.currentThread());
-        log.info("Destroyed request cache for thread: "+Thread.currentThread());
+        log.info("Destroyed request cache for thread: {}",Thread.currentThread());
     }
 
 

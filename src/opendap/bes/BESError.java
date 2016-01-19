@@ -421,57 +421,6 @@ public class BESError extends OPeNDAPException {
 
 
 
-    public void sendAsHtmlE33rrorPage(String context, HttpServletResponse response) throws IOException {
-
-
-
-        int errorVal =  getHttpStatusCode();
-
-
-        try {
-            if(!response.isCommitted())
-                response.reset();
-
-
-            String xsltDoc = _systemPath + "/xsl/besError"+errorVal+".xsl";
-
-            boolean done = false;
-            File xsltFile = new File(xsltDoc);
-            if(xsltFile.exists()) {
-                Transformer transformer = new Transformer(xsltDoc);
-                transformer.setParameter("serviceContext", context);
-                JDOMSource error = new JDOMSource(besErrorDoc);
-                MediaType responseType = new TextHtml();
-                response.setContentType(responseType.getMimeType());
-                response.setStatus(errorVal);
-                transformer.transform(error, response.getOutputStream());
-                done = true;
-
-
-
-            }
-
-
-            if(!done) {
-                super.sendHttpErrorResponse(context, response);
-            }
-
-        }
-        catch(Exception e){
-            if(!response.isCommitted())
-                response.reset();
-            try {
-                setBesErrorCode(INTERNAL_ERROR);
-                super.sendHttpErrorResponse(context, response);
-            }
-            catch(Exception e1){
-                response.sendError(errorVal,e1.getMessage());
-            }
-
-        }
-
-    }
-
 
     public Document getErrorDoc(){
         return (Document) besErrorDoc.clone();

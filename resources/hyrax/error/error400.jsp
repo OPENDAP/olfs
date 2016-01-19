@@ -45,8 +45,7 @@
         adminEmail = besApi.getAdministrator(localUrl);
     } catch (Exception e) { }
 
-    String message = OPeNDAPException.ERROR_MESSAGE;
-
+    String message = OPeNDAPException.getAndClearCachedErrorMessage();
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -59,7 +58,7 @@
 <body>
 <p align="left">&nbsp;</p>
 
-<h1 align="center">Hyrax : Bad Request (400) </h1>
+<h1 align="center">Hyrax - Bad Request (400) </h1>
 <hr align="left" size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
@@ -104,6 +103,6 @@
     </tr>
 </table>
 <hr align="left" size="1" noshade="noshade"/>
-<h1 align="center">Hyrax : Bad Request (400) </h1>
+<h1 align="center">Hyrax - Bad Request (400) </h1>
 </body>
 </html>
