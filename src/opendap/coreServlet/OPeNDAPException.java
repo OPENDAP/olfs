@@ -343,7 +343,7 @@ public class OPeNDAPException extends Exception {
             }
 
             if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextCsv.SUB_TYPE)) {
-                sendAsDap2Error(response);
+                sendAsCsvError(response);
                 return;
             }
         }
@@ -508,6 +508,22 @@ public class OPeNDAPException extends Exception {
     }
 
 
+
+    public void sendAsCsvError(HttpServletResponse response) throws IOException {
+        TextCsv csvMediaType = new TextCsv();
+        response.setContentType(csvMediaType.getMimeType());
+        response.setHeader("Content-Description", "Error Object");
+        response.setStatus(getHttpStatusCode());
+
+        ServletOutputStream sos  = response.getOutputStream();
+
+        sos.println("Dataset: ERROR");
+        sos.println("status, "+getHttpStatusCode());
+        sos.println("message, \""+getMessage()+"\"");
+    }
+
+
+
     /**
      * {
      *   "name": "ERROR",
@@ -525,7 +541,7 @@ public class OPeNDAPException extends Exception {
         Json jsonMediaType = new Json();
         response.setContentType(jsonMediaType.getMimeType());
         // response.setContentType("text/plain");
-        response.setHeader("Content-Description", "DAP2 Error Object");
+        response.setHeader("Content-Description", "Error Object");
         response.setStatus(getHttpStatusCode());
 
         ServletOutputStream sos  = response.getOutputStream();
@@ -567,16 +583,22 @@ public class OPeNDAPException extends Exception {
         int httpStatus = getHttpStatusCode();
 
 
+        // Because the error messages are utilized by the associated JSP page they must be made available
+        // for the JSP to retrieve. The RequestCache  for this thread gets destroyed when the doGet/doPost
+        // methods exit which is normal and expected behavior, but the JSP page is invoked afterward so we
+        // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
+        // public method for retrieving the message is tied to the thread of execution and it removes the
+        // message from the cache (clears the cache for the thread) once it is retrieved.
         errorMessageCache.put(Thread.currentThread(),getMessage());
+
+        // Invokes the appropriate JSP page.
         response.sendError(httpStatus);
 
     }
 
 
     public static String getAndClearCachedErrorMessage(){
-        String errmsg = errorMessageCache.get(Thread.currentThread());
-        errorMessageCache.remove(Thread.currentThread());
-        return errmsg;
+        return errorMessageCache.remove(Thread.currentThread());
     }
 
 }

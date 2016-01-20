@@ -32,7 +32,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.http.mediaTypes.TextPlain;
+import opendap.http.mediaTypes.TextCsv;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +65,7 @@ public class Ascii extends Dap4Responder {
         setServiceDescription("The DAP2 Data response in ASCII form.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_ASCII_Data_Service");
 
-        setNormativeMediaType(new TextPlain(getRequestSuffix()));
+        setNormativeMediaType(new TextCsv(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

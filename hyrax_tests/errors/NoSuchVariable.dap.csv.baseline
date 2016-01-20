@@ -1,4 +1,3 @@
-Error { 
-    code = 400;
-    message = "libdap exception building response: error_code = 1004: Failed to return values as ascii: k: The variable k was not found in the dataset (id).";
-}
+Dataset: ERROR
+status, 400
+message, "libdap exception building response: error_code = 1004: Failed to return values as ascii: k: The variable k was not found in the dataset (id)."
