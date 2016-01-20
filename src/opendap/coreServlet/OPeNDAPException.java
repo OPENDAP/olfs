@@ -61,9 +61,9 @@ public class OPeNDAPException extends Exception {
     public static final String ERROR_RESPONSE_MEDIA_TYPE_KEY = "ErrorResponseMediaType";
 
 
-    private static ConcurrentHashMap<Thread, String> errorMessageCache;
+    private static ConcurrentHashMap<Thread, String> _errorMessageCache;
     static {
-        errorMessageCache = new ConcurrentHashMap<>();
+        _errorMessageCache = new ConcurrentHashMap<>();
     }
 
 
@@ -589,7 +589,7 @@ public class OPeNDAPException extends Exception {
         // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
         // public method for retrieving the message is tied to the thread of execution and it removes the
         // message from the cache (clears the cache for the thread) once it is retrieved.
-        errorMessageCache.put(Thread.currentThread(),getMessage());
+        _errorMessageCache.put(Thread.currentThread(), getMessage());
 
         // Invokes the appropriate JSP page.
         response.sendError(httpStatus);
@@ -598,7 +598,7 @@ public class OPeNDAPException extends Exception {
 
 
     public static String getAndClearCachedErrorMessage(){
-        return errorMessageCache.remove(Thread.currentThread());
+        return _errorMessageCache.remove(Thread.currentThread());
     }
 
 }
