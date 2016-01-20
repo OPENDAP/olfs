@@ -1,4 +1,3 @@
-Error { 
-    code = 400;
-    message = "libdap exception building response: error_code = 1005: Failed to return values as ascii: Constraint Expression failed to parse: u,v:1.2: syntax error, unexpected ",", expecting end of file";
-}
+Dataset: ERROR
+status, 400
+message, "libdap exception building response: error_code = 1005: Failed to return values as ascii: u,v:1.2: syntax error, unexpected ",", expecting end of file"
