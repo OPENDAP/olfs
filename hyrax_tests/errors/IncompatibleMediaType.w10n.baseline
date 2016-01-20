@@ -1,0 +1,48 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css'/>
+    <title>Hyrax: Resource Not Found</title>
+</head>
+
+<body>
+<p align="left">&nbsp;</p>
+
+<h1 align="center">Hyrax - Not Applicable (406) </h1>
+<hr align="left" size="1" noshade="noshade"/>
+<table width="100%" border="0">
+    <tr>
+        <td>
+            <a href="/opendap/docs/images/IncompatibleMediaType.jpg">
+            <img src="/opendap/docs/images/IncompatibleMediaType.jpg"
+                 alt="Incompatible Media Type!"
+                 title="Incompatible Media Type!"
+                 width="350" height="200"
+                 border="0"/>
+            </a>
+        </td>
+
+        <td>
+            <p align="left">The requested resource is not available in the format/media_type/encoding that you requested.</p>
+
+            
+            <p align="left">The specific error message associated with your request was:</p>
+            <blockquote>
+                <p>
+                    <strong>You have requested an unsupported output media type of 'ascii'</strong>
+                </p>
+            </blockquote>
+            
+        </td>
+    </tr>
+</table>
+<hr align="left" size="1" noshade="noshade"/>
+<h1 align="center">Hyrax - Not Applicable (406) </h1>
+</body>
+</html>
