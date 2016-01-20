@@ -253,7 +253,7 @@ public class PDPService extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                OPeNDAPException.anyExceptionHandler(t, this,  response);
                 _log.error("doEvaluate() - The Bad Things have happened. Message: {}", t.getMessage());
             }
             catch(Throwable t2){

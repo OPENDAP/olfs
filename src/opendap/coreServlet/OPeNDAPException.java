@@ -30,9 +30,7 @@ package opendap.coreServlet;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
-import opendap.namespaces.DAP;
 import opendap.namespaces.DAP4;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -43,7 +41,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -252,7 +249,7 @@ public class OPeNDAPException extends Exception {
      * @param t        The Exception that caused the problem.
      * @param response The <code>HttpServletResponse</code> for the client.
      */
-    public static int anyExceptionHandler(Throwable t, HttpServlet servlet, String context, HttpServletResponse response) {
+    public static int anyExceptionHandler(Throwable t, HttpServlet servlet, HttpServletResponse response) {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
 
@@ -297,7 +294,7 @@ public class OPeNDAPException extends Exception {
 
                 oe.setSystemPath(ServletUtil.getSystemPath(servlet,""));
 
-                oe.sendHttpErrorResponse(context, response);
+                oe.sendHttpErrorResponse(response);
             }
             else {
                 oe.sendAsDap2Error(response);
@@ -317,7 +314,7 @@ public class OPeNDAPException extends Exception {
 
 
 
-    public void sendHttpErrorResponse(String context,  HttpServletResponse response) throws Exception {
+    public void sendHttpErrorResponse(HttpServletResponse response) throws Exception {
 
         MediaType errorResponseMediaType = (MediaType) RequestCache.get(ERROR_RESPONSE_MEDIA_TYPE_KEY);
 
@@ -327,7 +324,7 @@ public class OPeNDAPException extends Exception {
         if(errorResponseMediaType.getPrimaryType().equalsIgnoreCase("text")) {
 
             if (errorResponseMediaType.getSubType().equalsIgnoreCase(TextHtml.SUB_TYPE)) {
-                sendAsHtmlErrorPage(context, response);
+                sendAsHtmlErrorPage(response);
                 return;
             }
 
@@ -370,18 +367,18 @@ public class OPeNDAPException extends Exception {
 
 
         }
-        sendAsHtmlErrorPage(context, response);
+        sendAsHtmlErrorPage(response);
 
     }
 
 
 
+    /*
     public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
         String template = readFileAsString(htmlTemplateFile);
         template = template.replaceAll("<CONTEXT />",context);
         return template;
     }
-
 
 
 
@@ -399,29 +396,11 @@ public class OPeNDAPException extends Exception {
         }
         return stringBuilder.toString();
     }
+      */
 
 
 
 
-
-    /**
-     *
-     * @param errorCode
-     * @param errorMessage
-     * @return Return a Document containing a Dap version 3.2 error object.
-     */
-    public static Document getDAP32Error(int errorCode, String errorMessage) {
-
-
-        Element err = new Element("Error", DAP.DAPv32_NS);
-
-        err.setAttribute("code",errorCode+"");
-
-        err.setText(errorMessage);
-
-        return new Document(err);
-
-    }
 
 
     public int setHttpStatusCode(int code){
@@ -433,7 +412,10 @@ public class OPeNDAPException extends Exception {
     }
 
 
-
+    /**
+     *
+     * @return  The HTTP status code associated with the error.
+     */
     public int getHttpStatusCode(){
 
         return _httpStatusCode;
@@ -441,13 +423,14 @@ public class OPeNDAPException extends Exception {
 
 
     /**
+     * Transmits a DAP2 encoding of the error object.
      * Error {
      *    code = 1005;
      *    message = "libdap error transmitting DDS: Constraint expression parse error: No such identifier in dataset: foo";
      * };
      *
      *
-     * @param response
+     * @param response  The response object to load up with the error response.
      * @throws IOException
      */
     public void sendAsDap2Error(HttpServletResponse response) throws IOException {
@@ -476,6 +459,12 @@ public class OPeNDAPException extends Exception {
 
     }
 
+    /**
+     * Transmits a DAP4 encoding of the error object.
+     *
+     * @param response  The response object to load up with the error response.
+     * @throws IOException
+     */
     public void sendAsDap4Error(HttpServletResponse response) throws IOException{
 
         Dap4Error d4e = new Dap4Error();
@@ -508,17 +497,22 @@ public class OPeNDAPException extends Exception {
     }
 
 
-
+    /**
+     * Transmits a CSV encoding of a DAP error object.
+     *
+     * @param response  The response object to load up with the error response.
+     * @throws IOException
+     */
     public void sendAsCsvError(HttpServletResponse response) throws IOException {
         TextCsv csvMediaType = new TextCsv();
         response.setContentType(csvMediaType.getMimeType());
         response.setHeader("Content-Description", "Error Object");
         response.setStatus(getHttpStatusCode());
 
-        ServletOutputStream sos  = response.getOutputStream();
+        ServletOutputStream sos = response.getOutputStream();
 
         sos.println("Dataset: ERROR");
-        sos.println("status, "+getHttpStatusCode());
+        sos.println("status, " + getHttpStatusCode());
         sos.println("message, \""+getMessage()+"\"");
     }
 
@@ -531,7 +525,7 @@ public class OPeNDAPException extends Exception {
      *   "data": "Message"
      * }
      *
-     * @param response
+     * @param response  The response object to load up with the error response.
      * @throws IOException
      */
     public void sendAsJsonError(HttpServletResponse response) throws IOException {
@@ -577,7 +571,13 @@ public class OPeNDAPException extends Exception {
         sos.flush();
     }
 
-    public void sendAsHtmlErrorPage(String context, HttpServletResponse response) throws Exception {
+
+    /**
+     *
+     * @param response  The response object to load up with the error response.
+     * @throws Exception
+     */
+    public void sendAsHtmlErrorPage(HttpServletResponse response) throws Exception {
 
 
         int httpStatus = getHttpStatusCode();
@@ -597,6 +597,10 @@ public class OPeNDAPException extends Exception {
     }
 
 
+    /**
+     *
+     * @return  The (any?) error message associated with the current thread.
+     */
     public static String getAndClearCachedErrorMessage(){
         return _errorMessageCache.remove(Thread.currentThread());
     }

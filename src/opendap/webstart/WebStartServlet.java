@@ -444,7 +444,7 @@ public class WebStartServlet extends HttpServlet {
         }
         catch (Throwable t){
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, req.getContextPath(), resp);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, resp);
             }
             catch (Throwable t2) {
                 try {

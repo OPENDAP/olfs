@@ -506,7 +506,7 @@ public class DispatchServlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
             }
             catch(Throwable t2) {
             	try {
@@ -671,7 +671,7 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+                request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
             }
             catch(Throwable t2) {
             	try {

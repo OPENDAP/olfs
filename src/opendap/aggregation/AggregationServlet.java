@@ -551,7 +551,7 @@ public class AggregationServlet extends HttpServlet {
             }
         }
         catch (Throwable t) {
-            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+            OPeNDAPException.anyExceptionHandler(t, this,  response);
 
             logError(t, "in doGet():");
         }
@@ -623,7 +623,7 @@ public class AggregationServlet extends HttpServlet {
             }
         }
         catch (Throwable t) {
-            OPeNDAPException.anyExceptionHandler(t, this, request.getContextPath(), response);
+            OPeNDAPException.anyExceptionHandler(t, this,  response);
             logError(t, "in doHead():");
         }
         finally {
