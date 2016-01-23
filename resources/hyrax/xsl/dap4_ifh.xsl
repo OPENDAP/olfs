@@ -212,21 +212,22 @@
     <!-- ######################################## -->
     <!--            CONTAINER TYPES               -->
     
-    <xsl:template match="dap:Structure"> 
+    <xsl:template match="dap:Structure | dap:Sequence">
         <xsl:param name="container"/>       
         <xsl:choose>
             <xsl:when test="$container">
                 <li>
-                    <xsl:call-template name="StructureWorker"><xsl:with-param name="container" select="$container"/></xsl:call-template>
+                    <xsl:call-template name="ContainerTypeWorker"><xsl:with-param name="container" select="$container"/></xsl:call-template>
                 </li>                
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="StructureWorker"/>
+                <xsl:call-template name="ContainerTypeWorker">
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="StructureWorker">
+    <xsl:template name="ContainerTypeWorker">
         <xsl:param name="container"/>
 
         <xsl:call-template name="VariableHeader"><xsl:with-param name="container" select="$container"/></xsl:call-template>
@@ -398,8 +399,8 @@
             <option value="!=">!=</option>
             <option value="&lt;">&lt;</option>
             <option value="&lt;=">&lt;=</option>
-            <option value=">">></option>
-            <option value=">=">>=</option>
+            <option value=">">&gt;</option>
+            <option value=">=">&gt;=</option>
             <option value="-">--</option>
         </select>
         <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()" onChange="DAP4_URL.update_url()"/>
@@ -465,7 +466,7 @@
     -->   
     <xsl:template  name="isContainerType" >
         <xsl:choose>
-            <xsl:when test="self::dap:Structure">true</xsl:when>
+            <xsl:when test="self::dap:Structure | self::dap:Sequence">true</xsl:when>
             <xsl:otherwise>false</xsl:otherwise>
         </xsl:choose>
     </xsl:template>   
@@ -705,7 +706,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2014 OPeNDAP, Inc.
+  ~ // Copyright (c) 2016 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  &lt;ndp@opendap.org&gt;
   ~ //
   ~ // This library is free software; you can redistribute it and/or
