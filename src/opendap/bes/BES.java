@@ -753,7 +753,13 @@ public class BES {
                     ByteArrayInputStream bais = new ByteArrayInputStream(erros.toByteArray());
                     besError = new BESError(bais);
 
-                    log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
+                    // This logging statement is turned down to debug because otherwise when the OLFS probes the
+                    // the BES in an effort to distinguish requests for files in the BES catalog from DAP and catalog
+                    // requests the log gets filled with spurious errors. When we eventually implement a showPathInfo()
+                    // method/model for that will allow the OLFS to do this in a more efficient and non error
+                    // producing manner we should also:
+                    // @TODO Promote this to log.error()
+                    log.debug("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
 
                     int besErrCode = besError.getBesErrorCode();
                     if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
