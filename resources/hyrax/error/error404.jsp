@@ -66,16 +66,16 @@
         </td>
 
         <td>
-            <p align="center">The URL requested does not describe a resource that can be found on this server.</p>
+            <p align="left">The URL requested does not describe a resource that can be found on this server.</p>
 
-            <p align="center">If you would like to start at the top level of this server, go <a
+            <p align="left">If you would like to start at the top level of this server, go <a
                     href="<%= contextPath %>/"><strong>HERE</strong></a>.</p>
 
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
             <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
             <% } %>
-            <p align="center">If you think that the server is broken (that the URL you submitted should have worked),
+            <p align="left">If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a>
             </p>
 
