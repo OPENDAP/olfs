@@ -400,7 +400,6 @@ public class BesApi {
      * @throws PPTException              .
      */
     public void writeFile(String dataSource,
-                             MediaType mt,
                              OutputStream os)
             throws BadConfigurationException,
             BESError,

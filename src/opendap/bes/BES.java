@@ -852,7 +852,7 @@ public class BES {
             log.debug("besTransaction() - Completed.");
             if(!result){
 
-                log.debug("BESError: \n{}",baos.toString());
+                log.debug("BESError: \n{}",baos.toString(HyraxStringEncoding.getCharset().name()));
                 ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
                 BESError besError = new BESError(bais);
 

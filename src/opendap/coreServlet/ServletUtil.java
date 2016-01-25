@@ -95,9 +95,9 @@ public class ServletUtil {
         if(configDirName==null){
             log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
             configDirName = defaultConfigDir;
-            if(pathIsGood(defaultConfigDir)){
+            if(pathIsGood(configDirName)){
                 log.info("Using config location: " + configDirName);
-                return defaultConfigDir;
+                return configDirName;
             }
         }
         else {

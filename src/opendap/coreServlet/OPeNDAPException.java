@@ -81,15 +81,15 @@ public class OPeNDAPException extends Exception {
     private int _httpStatusCode;
 
 
-    private MediaType _responseType;
+    private MediaType _responseMediaType;
 
 
     public void setResponseMediaType(MediaType mt){
-        _responseType = mt;
+        _responseMediaType = mt;
     }
 
     public MediaType getResponseMediaType(){
-        return _responseType;
+        return _responseMediaType;
     }
 
 
@@ -107,7 +107,7 @@ public class OPeNDAPException extends Exception {
         // this should never be seen, since this class overrides getMessage()
         // to display its own error message.
         super("OPeNDAPException");
-        _responseType = new TextPlain();
+        _responseMediaType = new TextPlain();
         _httpStatusCode =  HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
@@ -124,7 +124,7 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(int httpStatus, String msg, Throwable cause) {
         super(msg, cause);
-        _responseType = new TextPlain();
+        _responseMediaType = new TextPlain();
         _httpStatusCode =  httpStatus;
         _errorMessage = msg;
         _systemPath=null;
@@ -142,7 +142,7 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(int httpStatus,Throwable cause) {
         super(cause);
-        _responseType = new TextPlain();
+        _responseMediaType = new TextPlain();
         _httpStatusCode =  httpStatus;
         _errorMessage = cause.getMessage();
         _systemPath=null;
@@ -158,7 +158,7 @@ public class OPeNDAPException extends Exception {
      */
     public OPeNDAPException(int code, String msg) {
         super(msg);
-        _responseType = new TextPlain();
+        _responseMediaType = new TextPlain();
         _httpStatusCode =  code;
         _errorMessage = msg;
         _systemPath=null;

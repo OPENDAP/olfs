@@ -124,8 +124,6 @@ public class JsonDMR extends Dap4Responder {
 
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
 
         besApi.writeDap4MetadataAsJson(
                 resourceID,

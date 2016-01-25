@@ -234,7 +234,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         log.info("sendDIR() request = " + request);
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
 
 
         response.setContentType("text/html");

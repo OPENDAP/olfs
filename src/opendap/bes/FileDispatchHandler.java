@@ -186,11 +186,10 @@ public class FileDispatchHandler implements DispatchHandler {
         //String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         //response.setHeader("Content-Disposition",contentDisposition);
 
-        MediaType responseMediaType = null;
         String suffix = ReqInfo.getRequestSuffix(req);
 
         if (suffix != null) {
-            responseMediaType = MimeTypes.getMediaType(suffix);
+            MediaType responseMediaType = MimeTypes.getMediaType(suffix);
             if (responseMediaType != null) {
                 response.setContentType(responseMediaType.getMimeType());
                 log.debug("sendFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
@@ -199,7 +198,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        _besApi.writeFile(name, responseMediaType, sos);
+        _besApi.writeFile(name, sos);
 
         sos.flush();
     }

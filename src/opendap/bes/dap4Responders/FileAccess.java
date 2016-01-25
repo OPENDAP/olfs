@@ -163,18 +163,17 @@ public class FileAccess extends Dap4Responder {
         String suffix = ReqInfo.getSuffix(dataSourceId);
         BesApi besApi = getBesApi();
 
-        MediaType responseMediaType = null;
-
         if (suffix != null) {
-            responseMediaType = MimeTypes.getMediaType(suffix);
-            if (responseMediaType != null)
+            MediaType responseMediaType = MimeTypes.getMediaType(suffix);
+            if (responseMediaType != null) {
                 response.setContentType(responseMediaType.getMimeType());
-            log.debug("sendDatasetFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
+                log.debug("sendDatasetFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
+            }
         }
 
 
         ServletOutputStream sos = response.getOutputStream();
-        besApi.writeFile(dataSourceId, responseMediaType, sos);
+        besApi.writeFile(dataSourceId, sos);
 
         sos.flush();
 

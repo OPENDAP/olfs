@@ -205,7 +205,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
 
 
         String xmlBase = request.getRequestURL().toString();

@@ -312,15 +312,10 @@ public class AggregationServlet extends HttpServlet {
             throws IOException, BadConfigurationException {
 
 
-        MediaType responseMediaType = null;
         String suffix = ReqInfo.getSuffix(granule);
 
-        if (suffix != null) {
-            responseMediaType = MimeTypes.getMediaType(suffix);
-        }
-
         try {
-            _besApi.writeFile(granule, responseMediaType, os);
+            _besApi.writeFile(granule, os);
         }
         catch (BESError | PPTException | IOException | BadConfigurationException e) {
             String msg = e.getMessage();

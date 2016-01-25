@@ -146,9 +146,6 @@ public class NormativeDR extends Dap4Responder {
 
         OutputStream os;
         ByteArrayOutputStream srr = null;
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
 
         if(qp.isStoreResultRequest()){
             srr = new ByteArrayOutputStream();

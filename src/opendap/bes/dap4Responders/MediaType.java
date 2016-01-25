@@ -26,6 +26,7 @@
 
 package opendap.bes.dap4Responders;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -36,7 +37,7 @@ import java.util.HashMap;
  **/
 
 
-public class MediaType implements Comparable {
+public class MediaType implements Comparable, Serializable {
 
 
     protected String _name;

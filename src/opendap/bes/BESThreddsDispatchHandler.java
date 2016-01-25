@@ -154,7 +154,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         Request oreq = new Request(_servlet,request);
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
 
         
 

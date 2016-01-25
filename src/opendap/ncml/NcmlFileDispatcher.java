@@ -248,7 +248,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        _besApi.writeFile(name, new TextXml(), baos);
+        _besApi.writeFile(name, baos);
 
         ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 

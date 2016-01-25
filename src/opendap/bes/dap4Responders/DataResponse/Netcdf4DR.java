@@ -129,8 +129,6 @@ public class Netcdf4DR extends Dap4Responder{
         User user = new User(request);
 
         OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
 
         besApi.writeDap4DataAsNetcdf4(resourceID, qp, user.getMaxResponseSize(), os);
 

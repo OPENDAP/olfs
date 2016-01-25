@@ -328,7 +328,6 @@ public class W10nResponder {
             else {
 
                 w10nRequest.setBestMediaType(_defaultDataMediaType, _supportedDataMediaTypes);
-                MediaType responseMediaType = w10nRequest.getBestMediaType();
 
                 _log.debug("send_w10n_response() - Sending w10n data response for resource: {} Response type: {}",w10nRequest.getRequestedResourceId(),w10nRequest.getBestMediaType().getMimeType());
 
@@ -1027,10 +1026,9 @@ public class W10nResponder {
 
         String suffix = ReqInfo.getRequestSuffix(req);
 
-        MediaType responseMediaType = null;
 
         if (suffix != null) {
-            responseMediaType = MimeTypes.getMediaType(suffix);
+            MediaType responseMediaType = MimeTypes.getMediaType(suffix);
             if (responseMediaType != null) {
                 response.setContentType(responseMediaType.getMimeType());
                 _log.debug("sendFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
@@ -1039,7 +1037,7 @@ public class W10nResponder {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        _besApi.writeFile(name, responseMediaType, sos);
+        _besApi.writeFile(name, sos);
 
         sos.flush();
 

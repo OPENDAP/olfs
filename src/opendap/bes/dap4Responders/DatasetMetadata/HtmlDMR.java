@@ -91,7 +91,7 @@ public class HtmlDMR extends Dap4Responder {
 
 
 
-        String context = request.getContextPath();
+        // String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
 
