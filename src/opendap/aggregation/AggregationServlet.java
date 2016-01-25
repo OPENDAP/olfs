@@ -312,8 +312,6 @@ public class AggregationServlet extends HttpServlet {
             throws IOException, BadConfigurationException {
 
 
-        // String suffix = ReqInfo.getSuffix(granule);
-
         try {
             _besApi.writeFile(granule, os);
         }
