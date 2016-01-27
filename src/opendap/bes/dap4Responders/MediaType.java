@@ -49,7 +49,7 @@ public class MediaType implements Comparable, Serializable {
     protected Double _quality;
     protected String _wildcard = "*";
     
-    protected boolean _ptwc, _stwc;
+    protected boolean _primaryTypeIsWildCard, _subTypeIsWildCard;
     protected double score;
 
 
@@ -110,8 +110,8 @@ public class MediaType implements Comparable, Serializable {
         _mimeType = primaryType + "/" + subType;
         _primaryType = primaryType;
         _subType = subType;
-        _ptwc = primaryType.equals(_wildcard);
-        _stwc = _subType.equals(_wildcard);
+        _primaryTypeIsWildCard = primaryType.equals(_wildcard);
+        _subTypeIsWildCard = _subType.equals(_wildcard);
         _quality = 1.0;
         score = 0.0;
         _mediaSuffix = suffix;
