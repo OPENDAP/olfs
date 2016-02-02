@@ -73,6 +73,25 @@ AT_CURL_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap.csv)
 AT_CURL_DAP4_DATA_RESPONSE_TEST(nc3/bears.nc_bears_aloan_i.dap,xfail)
 
 ####################################################
+# TestName: nc3/zero_length_array.nc
+# BaseUrl: http://localhost:8080/opendap/data/nc/zero_length_array.nc
+# DAP2 CE:  
+# DAP4 CE:  
+#
+AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.dds])
+AT_CURL_DAP2_DATA_RESPONSE_TEST([nc3/zero_length_array.nc.dods])
+# AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.html])
+# AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.info])
+AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.ascii])
+
+AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.dmr])
+AT_CURL_DAP4_DATA_RESPONSE_TEST([nc3/zero_length_array.nc.dap])
+# AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.dmr.html])
+AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.dmr.xml])
+AT_CURL_RESPONSE_TEST([nc3/zero_length_array.nc.dap.csv])
+
+
+####################################################
 # TestName: ff/1998-6-avhrr.dat
 # BaseUrl:  http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat
 # DAP2 CE:  

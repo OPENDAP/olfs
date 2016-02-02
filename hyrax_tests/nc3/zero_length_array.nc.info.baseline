@@ -1,0 +1,79 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Dataset Information</h3>
+<center>
+<table>
+
+<tr><td align=right valign=top><b>title</b>:</td>
+<td align=left>Hyrax/netcdf handler test file for zero-length arrays<br></td></tr>
+
+<tr><td align=right valign=top><b>version</b>:</td>
+<td align=left>1.000000000000000<br></td></tr>
+
+<tr><td align=right valign=top><b>description</b>:</td>
+<td align=left>Test zero-length arrays in a data handler.<br></td></tr>
+
+<tr><td align=right valign=top><b>Unlimited_Dimension</b>:</td>
+<td align=left>time<br></td></tr>
+</table>
+</center><p>
+
+<hr>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>lat</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lat = 0..5]<br>units: degrees_north<br>
+</td>
+</tr><tr><td align=right valign=top><b>lon</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lon = 0..4]<br>units: degrees_east<br>
+</td>
+</tr><tr><td align=right valign=top><b>time</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [time = 0..-1]<br>units: seconds<br>
+</td>
+</tr><tr><td align=right valign=top><b>z</b>:</td>
+<td align=left valign=top>Grid<br>units: meters<br>
+valid_range: 0.000000000000000, 5000.000000000000<br>
+_FillValue: 1.00000000<br>
+<table>
+<td align=right valign=top><b>z</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [lat = 0..5][lon = 0..4]<br>units: meters<br>
+valid_range: 0.000000000000000, 5000.000000000000<br>
+_FillValue: 1.00000000<br>
+</td>
+<tr><td align=right valign=top><b>lat</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lat = 0..5]<br>units: degrees_north<br>
+</td>
+</tr><tr><td align=right valign=top><b>lon</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lon = 0..4]<br>units: degrees_east<br>
+</td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>t</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>t</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [lat = 0..5][lon = 0..4]<br></td>
+<tr><td align=right valign=top><b>lat</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lat = 0..5]<br>units: degrees_north<br>
+</td>
+</tr><tr><td align=right valign=top><b>lon</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lon = 0..4]<br>units: degrees_east<br>
+</td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>pixel</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>pixel</b>:</td>
+<td align=left valign=top>Array of 16 bit Integers [lat = 0..5][lon = 0..4]<br></td>
+<tr><td align=right valign=top><b>lat</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lat = 0..5]<br>units: degrees_north<br>
+</td>
+</tr><tr><td align=right valign=top><b>lon</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [lon = 0..4]<br>units: degrees_east<br>
+</td>
+</tr></table>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>
