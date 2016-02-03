@@ -35,7 +35,7 @@
 <h1 align="center"><img src="doc/images/logo.gif" width="206" height="93" align="absmiddle"></h1>
 <h1 align="center">Hyrax Installation</h1>
 <p align="center">
-Updated for Hyrax version 1.12.x
+Updated for Hyrax version 1.13.x
 </p>
 <hr>
 <p align="left">Note: For more verbose instructions, see <a href="http://docs.opendap.org/index.php/Hyrax">documentation</a>. </p>
@@ -68,13 +68,41 @@ Updated for Hyrax version 1.12.x
   </p>
 </blockquote>
 <h2><strong>Configure it: </strong></h2>
-<blockquote>
-  <p><span class="style1">vi $CATALINA_HOME/content/opendap/olfs.xml
-              </span><br />
-              <br>
-    (If your beslistener is not running at <span class="style1">localhost:10022</span> then in the <span class="style1">&lt;BES&gt;</span> element adjust the values for <span class="style1">&lt;host&gt;</span> and <span class="style1">&lt;port&gt;</span>)<br>
-  </p>
-</blockquote>
+<p>
+  <b>The OLFS configuration location has changed!</b><br/>
+  By default the OLFS will utilize it's bundled default configuration in
+  the directory <em>$CATALINA_HOME/webapps/opendap/WEB-INF/conf</em></p>
+<p>
+  In order to localize your configuration so that your configuration changes are persistent you will need to do
+  one of the following:
+
+  <ul>
+  <li>For the user that will be running the OLFS (the Tomcat user), set the environment variable <em>OLFS_CONFIG_DIR</em>
+    to an existing directory to which the  Tomcat user has both read and write privileges.</li>
+
+  <li>Create the directory <em>/etc/olfs</em> and set it's permissions/ownership so that the Tomcat user has both read and
+    write permission. </li>
+  </ul>
+  If both of these are done then priority is given to the environment variable.
+</p>
+<p>
+  Restart Tomcat: <br/>
+  <blockquote>
+    <p class="style1">$CATALINA_HOME/bin/shutdown.sh        </p>
+    <p class="style1">$CATALINA_HOME/bin/startup.sh</p>
+  </blockquote>
+
+  When it starts the OLFS will check these locations and then install a copy of its default
+  configuration into the new spot.
+
+  Edit the configuration files as needed.
+
+  (If, for example, your beslistener is not running at <span class="style1">localhost:10022</span> then in the <em>olfs.xml</em>
+  file edit the <span class="style1">&lt;BES&gt;</span> element adjust the values for <span class="style1">&lt;host&gt;</span>
+  and <span class="style1">&lt;port&gt;</span>)<br>
+
+  Once your edits are completed then:
+
 <h2><strong>Relaunch it:</strong>      </h2>
 <blockquote>
   <p class="style1">$CATALINA_HOME/bin/shutdown.sh        </p>

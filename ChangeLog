@@ -1,3 +1,254 @@
+2016-01-27  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Patched tests. When build from my IDE the "normal" ant production rules are not run. 
+	The ant build  utilizes a filter step that applies version numbers to vraious componets of 
+	the software. The old  baselines have the unfiltered values. The new baselines have the 
+	default version values of "Not.A.Release"  Tests should be run against the core code prior 
+	to building with actual release numbers otherwise  the baselines never conform.
+
+2016-01-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved variable names
+
+2016-01-25  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed unused variable.
+
+	olfs: Removed unused variable.
+
+	olfs: Patching various issues such as unused variables, dereferencing null refs, and 
+	serializable problems and baseline updates to reflect the changes I made to the Sequence 
+	representation in the HTML requestfrom for DAP4.
+
+2016-01-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Pretty format changes
+
+	olfs: Turned down the log  for the document handling version of  besTransaction() from error 
+	to debug so that OLFS probing of the BES does flood the loggin with spurious error noise.
+
+2016-01-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed the dap4 ifh for sequence so that it displays and allows the selection of 
+	child variables.
+
+2016-01-20  Nathan Potter  <ndp@opendap.org>
+
+	Updated baselines for fixed CE parseing errors.
+
+	Removed unused paramter from error api
+
+	olfs: Renamed private variable with leading _ char
+
+	Added test for incompatible media type
+
+	Updated error output for ASCII/CSV so that the returned error object format is consistent 
+	with the way that a successful request would have been encoded.
+
+2016-01-19  Nathan Potter  <ndp@opendap.org>
+
+	Added expected fails to DAP4 bad constraint expression tests because the baselines are 
+	correct but the problem is not fixed.
+
+	Updated test baseline to reflect (predicted) change in server response.
+
+	Removed redundant test calls from hyraxTests.at
+
+	Added new tests for bad constraint expression syntax.
+
+	olfs: Repaired race condition in error processing. woot...
+
+	olfs: Repaired race condition in error processing. woot...
+
+	Pruned old bes tests.
+
+	Added error tests that utilize the bes error() function to create errors. Since DAP4 doesn't 
+	yet support this function only DAP2 tests were added.
+
+2016-01-18  Nathan Potter  <ndp@opendap.org>
+
+	Added more error tests, updated server to return a simple DAP2Error when there's a problem 
+	with a csv request.
+
+	Changed error test names to match convention already in use. Renamed test macros file to 
+	reflect it's actual content.
+
+2016-01-17  Nathan Potter  <ndp@opendap.org>
+
+	Changes to Makefiles.am in support od dist(?)
+
+	Added new curl test that checks the returned document AND the http ststus (in the header). 
+	Add initial error responses tests.
+
+2016-01-15  Nathan Potter  <ndp@opendap.org>
+
+	Repaired curl test macros so that they support the optional 'xfail' parameter
+
+	Updated tests to looks for hdf4 tests in the correct location.
+
+	Retiring old test Deja-Gnu test harness.
+
+	Ported all exisiting Deja-Gnu tests to autotest. Woot 
+	git add ../resources/hyrax/WEB-INF/logback.xml 
+	git add ../resources/hyrax/WEB-INF/logback.xml
+
+2016-01-14  Nathan Potter  <ndp@opendap.org>
+
+	Renamed autotest testsuite to hyrax_tests, because that what it's doing.
+
+	More changes for autotest harness
+
+	updated gitignore
+
+	first draft of autotest harness of olfs/hyrax regression testing
+
+	Merge branch 'errorRefactor' of https://github.com/OPENDAP/olfs into errorRefactor
+
+2016-01-14  James Gallagher  <jgallagher@opendap.org>
+
+	Added template code for autotest tests
+
+2016-01-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More error handling changes. Dumped the use of XSLT in BESError processing in favor 
+	of the more reliable set of JSP pages to which all other errors are directed. This greatly 
+	streamlines the error processing, reduces complexity, and allows for a consistent pattern 
+	of error handling at the top level of our various servlets.
+
+2016-01-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Reworked access log so that each request has a single entry and the entries contain 
+	useful information and no duplicate information. Fixed problems in w10n with media types 
+	and errors.
+
+2016-01-11  Nathan Potter  <ndp@opendap.org>
+
+	Repaired broken tests by updating baselines. In each case the change reflected a 
+	server improvement.
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+2016-01-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Working on problems in w0n with media types and errors.
+
+	olfs: I had to step back and change the way that the MediaType object for error processing 
+	were handled. Removed the MEdiaType object as a parameter to the BesApi a (whcih really 
+	didn't need that information) and simply toss it in the Request cache once we knpow what 
+	the target media type should be. This works much better and cleans up the API too.
+
+2016-01-05  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Refactored error handling so that actualll BES error content is caught in the BES class 
+	so that BES client connection life cycles can be better managed. This change also shifted the 
+	work of transmitting the errors to the OPeNDAPException.anyExceptionHandler() chain. By adding 
+	response media type awareness to the system we should now be in a position to handle specific 
+	errors at a high level, and return to the client an error that looks something like what they 
+	are expecting.
+
+2016-01-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed name of error XSL files for BESErrors to better reflect their purpose.
+
+	Merge branch 'master' into BES-38
+
+	olfs: Increased default BES client pool size from 10 to 200.
+
+	olfs: Minor error handling changes
+
+2015-12-29  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added title attribute to error page images.
+
+	Changed bes_timeout units to seconds.
+
+	Repaired bootstrap bug in which the default logback configuration was not found.
+
+	olfs: Bumping timout padding.
+
+	olfs: Bumping timout padding.
+
+	olfs: formatting.
+
+	Fixing null ppointer issue.
+
+	Repaired bootstrap bug in which the default logback configuration was not found.
+
+	Fixing null ppointer issue.
+
+	Adding teapot image for OLFS errors.
+
+	Added Response code for a 418 (I'm a teapot\!) error as a response for a bes timeout.
+
+	Merged master to BES-38 branch
+
+2015-12-23  Nathan Potter  <ndp@opendap.org>
+
+	I think that this collection of changes connects the admin email address in the BES 
+	configuration(s) with the email addresses that appear in the error pages of the server.
+
+	Added a set_context call for bes_timeout based on the value in the olfs.xml file
+
+	olfs: Started adding API methods for acquiring admin email from BES.
+
+	olfs: Added http status / error code to the generic error page..
+
+2015-12-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired deployment dependency on filtering source.
+
+	olfs: Repaired error message issues. Fixed broken web opage generation in BESError."
+
+2015-12-17  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into bootstrapRepair
+
+	Fixed bug in Web UI caused by a failure to correctly initialize a variable.
+
+2015-12-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Made the configuration installer thread safe and added a call in ViewersServlet so that 
+	there is a configuration available for ViewersServlet AND DispatchServlet no matter who starts 
+	first.
+
+	Debugging instrumentation to better understand the hang-up issues.
+
+2015-12-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More changes in support of configuration location.
+
+	olfs: Added missing semaphore file for the default config install during bootstrap.
+
+	olfs: Reworked the way that the OLFS finds a localized configuration. Now it will look for the 
+	environment variable OLFS_CONFIG_DIR and use it. Lacking that it will check for /etc/olfs, and 
+	lacking that it will utilize the default configuration deployed with the OLFS application. This 
+	ensures that the OLFS can start without a new user having to do much."
+
+	olfs: Reworked the way that the OLFS finds a localized configuration. Now it will look for the 
+	environment variable OLFS_CONFIG_DIR and use it. Lacking that it will check for /etc/olfs, and 
+	lacking that it will utilize the default configuration deployed with the OLFS application. This 
+	ensures that the OLFS can start without a new user having to do much."
+
+2015-12-02  Nathan Potter  <ndp@opendap.org>
+
+	Added build script that tags release with git information.
+
+2015-11-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed broken links in the dap4 IFH.
+
+2015-11-18  Nathan Potter  <ndp@opendap.org>
+
+	Repaired a bug in which DAP4 query string handling was being applied to the DAP2 request. This 
+	was causing the {}{}}{} request syntax to be dropped from the request.
+
+2015-10-27  Nathan Potter  <ndp@opendap.org>
+
+	Updating olfs version and release files to version 1.14.1
 2015-10-23  Nathan Potter  <ndp@opendap.org>
 
 	olfs: Switched to UTF-8 encoding.
