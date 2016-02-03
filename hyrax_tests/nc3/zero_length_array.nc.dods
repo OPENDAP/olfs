@@ -1,0 +1,2 @@
+url = http://localhost:8080/opendap/data/nc/zero_length_array.nc.dods
+-s

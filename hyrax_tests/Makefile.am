@@ -23,7 +23,7 @@ bes.conf: bes.conf.in $(top_srcdir)/configure.ac
 AUTOM4TE = autom4te
 
 HYRAX_TEST_SUITE = $(srcdir)/hyraxTest
-HYRAX_TEST_SUITE_FLAGS =
+HYRAX_TEST_SUITE_FLAGS = $(TESTSUITEFLAGS)
 
 $(HYRAX_TEST_SUITE): $(HYRAX_TEST_SUITE).at $(srcdir)/curl_test_macros.m4 $(srcdir)/package.m4
 
