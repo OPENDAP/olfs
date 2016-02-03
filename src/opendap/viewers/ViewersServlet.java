@@ -112,19 +112,26 @@ public class ViewersServlet extends HttpServlet {
 
         reqNumber = new AtomicInteger(0);
 
+
+        // We look in the configuration directory first. Because if they are using a localized configuration and have
+        // localized the web start options then the JNLP should be available there.
         String webStartDir = ServletUtil.getConfigPath(this) + "WebStart";
-
-        File f = new File(webStartDir);
-
         _log.info("Checking for WebStart resources Directory: " + webStartDir);
+        File f = new File(webStartDir);
         if (f.exists() && f.isDirectory()) {
             _webStartResourcesDirectory = webStartDir;
             _log.info("Found WebStart resources Directory: " + webStartDir);
-        } else {
+        }
+        else {
+
             _log.warn("Could not locate WebStart resources Directory: " + webStartDir);
+
+            // We failed to locate a localized WebStart directory, so we will look in our distribution for it.
+            // We find that by asking the servletContext for the real filesystem path of the directory.
+
             webStartDir = this.getServletContext().getRealPath("WebStart");
-            f = new File(webStartDir);
             _log.info("Checking for WebStart resources Directory: " + webStartDir);
+            f = new File(webStartDir);
             if (f.exists() && f.isDirectory()) {
                 _webStartResourcesDirectory = webStartDir;
                 _log.info("Found resources Directory: " + webStartDir);
