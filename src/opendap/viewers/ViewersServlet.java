@@ -35,7 +35,6 @@ import opendap.dap.Request;
 import opendap.http.error.BadRequest;
 import opendap.http.error.NotFound;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.ppt.PPTException;
