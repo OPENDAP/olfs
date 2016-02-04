@@ -1,3 +1,4 @@
-Dataset: ERROR
-status, 500
-message, "A BESInternalError was requested."
+Error { 
+    code = 500;
+    message = "A BESInternalError was requested.";
+}

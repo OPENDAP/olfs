@@ -1,3 +1,4 @@
-Dataset: ERROR
-status, 404
-message, "A BESNotFoundError was requested."
+Error { 
+    code = 404;
+    message = "A BESNotFoundError was requested.";
+}

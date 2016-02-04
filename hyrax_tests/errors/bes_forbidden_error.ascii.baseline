@@ -1,3 +1,4 @@
-Dataset: ERROR
-status, 403
-message, "A BESForbiddenError was requested."
+Error { 
+    code = 403;
+    message = "A BESForbiddenError was requested.";
+}

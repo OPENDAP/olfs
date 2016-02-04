@@ -1,3 +1,4 @@
-Dataset: ERROR
-status, 418
-message, "A BESTimeOutError was requested."
+Error { 
+    code = 418;
+    message = "A BESTimeOutError was requested.";
+}
