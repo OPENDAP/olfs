@@ -71,7 +71,7 @@ public class BESConfig  {
         _BesHost = "HostNameIsNotSet!";
         _BesPort = -1;
         _BesAdminPort = -1;
-        _BesMaxClients = 10;
+        _BesMaxClients = 200;
         _BesMaxCommands = 2000;
         _BesPrefix = "/";
         _BesMaxResponseSize = 0;
@@ -243,7 +243,7 @@ public class BESConfig  {
 
                 if(clients<1){
                     throw new Exception("OLFS configuration document does not " +
-                            "MAY correct content. The <ClientPool> element " +
+                            "contain correct content. The <ClientPool> element " +
                             "MUST contain an Attribute called \"maximum\" whose " +
                             "value MUST be an integer greater than 0 (zero).");
                 }
