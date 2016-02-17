@@ -111,7 +111,7 @@ public class RequestCache {
 
 
         if (co != null) {
-            log.debug("put() - Response cache NOT updated, key already present: \"" + key + "\"");
+            log.warn("put() - Response cache updated with new Object for key: \"" + key + "\"");
         } else {
             log.debug("put() - Response cache updated by adding new object to cache using key \"" +
                     key + "\"");
@@ -120,34 +120,6 @@ public class RequestCache {
 
     }
 
-    public static void putIfAbsent(String key, Object o){
-
-
-        CachedObj co = new CachedObj(o);
-
-        HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
-
-        if(hm == null) {
-            log.warn("putIfAbsent() - Thread cache not initialized. {} object not cached under key '{}'", o.getClass().getName(),key);
-            return;
-        }
-
-        if (!hm.containsKey(key))
-           co = hm.put(key, co);
-        else
-           co = hm.get(key);
-
-
-        if(co != null){
-            log.info("putIfAbsent() - Cache NOT updated, key already present: \"" + key + "\"");
-        }
-        else {
-            log.info("putIfAbsent() - Cache updated by adding new object to cache using key \"" +
-                    key + "\"");
-
-        }
-
-    }
 
     public static Object get(String key){
 
@@ -185,7 +157,64 @@ public class RequestCache {
     }
 
 
+    private static ConcurrentHashMap<String,CachedObj> besResponseCache;
+    static {
+        besResponseCache = new ConcurrentHashMap<>();
+    }
+    public static void putBesResponse(String key, Object o){
+        CachedObj co = new CachedObj(o);
+        co = besResponseCache.put(key, co);
+        if (co != null) {
+            log.warn("putBesResponse() - BES Response cache updated with new object for key: \"" + key + "\"");
+        } else {
+            log.debug("putBesResponse() - BES Response cache updated by adding new object to cache using key \"" +
+                    key + "\"");
+        }
+    }
+
+    public static void putBesResponseIfAbsent(String key, Object o){
+        CachedObj co = new CachedObj(o);
+        co = besResponseCache.putIfAbsent(key, co);
+        if (co != null) {
+            log.debug("putBesResponseIfAbsent() - BES Response cache NOT updated, key already present: \"" + key + "\"");
+        } else {
+            log.debug("putBesResponseIfAbsent() - BES Response cache updated by adding new object to cache using key \"" +
+                    key + "\"");
+        }
+    }
+
+    public static Object getBesResponse(String key){
 
 
+        if(key==null)
+            return null;
+
+        CachedObj co = besResponseCache.get(key);
+
+
+        if(co!=null) {
+            log.debug("getBesResponse() - Found cached BES Response for key \""+ key+"\"");
+
+            /*
+            long now = new Date().getTime();
+            long elapsedCacheTime = now - co.getCreationTime().getTime();
+
+            if(elapsedCacheTime > maxCacheTime ){
+                log.info("Cached document expired "+ elapsedCacheTime+"ms old.");
+                hm.remove(key);
+                log.info("Cached document for  "+ key +" removed from cache.");
+                return null;
+            }
+            */
+            return co.getObj();
+
+        }
+        else {
+            log.debug("getBesResponse() - No BES Response  cached for key \""+ key+"\"");
+        }
+
+
+        return null;
+    }
 
 }

@@ -1240,7 +1240,7 @@ public class BesApi {
 
             log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\"" + responseCacheKey + "\"");
 
-            Object o = RequestCache.get(responseCacheKey);
+            Object o = RequestCache.getBesResponse(responseCacheKey);
 
             if (o == null) {
 
@@ -1256,7 +1256,7 @@ public class BesApi {
 
                 topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                RequestCache.put(responseCacheKey, response.clone());
+                RequestCache.putBesResponse(responseCacheKey, response.clone());
                 log.info("getCatalog(): Cached copy of BES showCatalog response for dataSource: \"" + dataSource + "\"   (responseCacheKey=\"" + responseCacheKey + "\")");
 
 
@@ -1301,6 +1301,7 @@ public class BesApi {
      * @throws IOException               .
      * @throws JDOMException             .
      */
+    /*
     public void getInfo(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
@@ -1315,7 +1316,7 @@ public class BesApi {
 
             log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \"" + dataSource + "\"  (responseCacheKey=\"" + responseCacheKey + "\")");
 
-            Object o = RequestCache.get(responseCacheKey);
+            Object o = RequestCache.getBesResponse(responseCacheKey);
 
             if (o == null) {
                 log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\"" +responseCacheKey + "\"  not found in cache.");
@@ -1334,13 +1335,13 @@ public class BesApi {
                     // Add the prefix attribute for this BES.
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                    RequestCache.put(responseCacheKey, response.clone());
+                    RequestCache.putBesResponse(responseCacheKey, response.clone());
                     log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\"" + responseCacheKey + "\"");
 
                 } catch(BESError e) {
 
                     if(e.convertBesErrorCodeToHttpStatusCode()== HttpServletResponse.SC_NOT_FOUND) {
-                        RequestCache.put(responseCacheKey, new NoSuchDatasource((Document) response.clone()));
+                        RequestCache.putBesResponse(responseCacheKey, new NoSuchDatasource((Document) response.clone()));
                         log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\"" + responseCacheKey + "\"");
                     }
                     else {
@@ -1388,6 +1389,7 @@ public class BesApi {
 
     }
 
+*/
 
 
 
