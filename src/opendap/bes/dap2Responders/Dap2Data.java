@@ -31,7 +31,6 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
@@ -194,7 +193,7 @@ public class Dap2Data extends Dap4Responder {
             String msg = "Failed to parse asynchronous response from BES!";
             log.error("handleStoreResultResponse() - " + msg + " Message: " + e.getMessage());
             Dap4Error d4e = new Dap4Error();
-            d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            d4e.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
             d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
