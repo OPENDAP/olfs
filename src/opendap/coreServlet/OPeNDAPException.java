@@ -29,6 +29,7 @@ package opendap.coreServlet;
 
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
+import opendap.http.mediaTypes.Dap4Error;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP4;
 import org.jdom.Element;
@@ -467,28 +468,20 @@ public class OPeNDAPException extends Exception {
      */
     public void sendAsDap4Error(HttpServletResponse response) throws IOException{
 
-        Dap4Error d4e = new Dap4Error();
 
-        response.setContentType(d4e.getMimeType());
+        opendap.dap4.Dap4Error d4e = new opendap.dap4.Dap4Error();
+        d4e.setHttpStatusCode(getHttpStatusCode());
+        d4e.setMessage(getMessage());
+
+
+        response.setContentType(d4e.getMediaType().getMimeType());
         response.setHeader("Content-Description", "DAP4 Error Object");
         response.setStatus(getHttpStatusCode());
-
-
-        Element error = new Element("Error", DAP4.NS);
-
-        error.setAttribute("httpcode",Integer.toString(getHttpStatusCode()));
-
-        Element message = new Element("Message", DAP4.NS);
-
-        message.setText(getMessage());
-
-        error.addContent(message);
-
 
         ServletOutputStream sos  = response.getOutputStream();
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(error,sos);
+        xmlo.output(d4e.getErrorDocument(),sos);
 
         sos.flush();
 
