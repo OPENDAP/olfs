@@ -48,12 +48,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -734,6 +729,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public HttpSession getSession() { return r.getSession(); }
 
+        @Override
+        public String changeSessionId() {
+            return r.changeSessionId();
+        }
+
         public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
 
         public boolean isRequestedSessionIdFromCookie() { return r.isRequestedSessionIdFromCookie(); }
@@ -760,12 +760,17 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         @Override
         public Collection<Part> getParts() throws IOException, ServletException {
-            return null;
+            return r.getParts();
         }
 
         @Override
         public Part getPart(String s) throws IOException, ServletException {
-            return null;
+            return r.getPart(s);
+        }
+
+        @Override
+        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+            return r.upgrade(aClass);
         }
 
         public Object getAttribute(String s) { return r.getAttribute(s); }
@@ -777,6 +782,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public void setCharacterEncoding(String s) throws UnsupportedEncodingException { r.setCharacterEncoding(s); }
 
         public int getContentLength() { return r.getContentLength(); }
+
+        @Override
+        public long getContentLengthLong() {
+            return r.getContentLengthLong();
+        }
 
         public String getContentType() { return r.getContentType(); }
 

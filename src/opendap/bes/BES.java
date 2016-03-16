@@ -694,6 +694,8 @@ public class BES {
             throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
+        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
+
 
         boolean trouble = false;
         Document doc;

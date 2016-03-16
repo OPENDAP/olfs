@@ -67,7 +67,7 @@ public class Netcdf4 extends Dap4Responder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-3");
+        setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-4");
         setServiceTitle("NetCDF-4 Data Response");
         setServiceDescription("NetCDF-4 representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_Data_Service");
