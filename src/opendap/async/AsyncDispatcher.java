@@ -745,17 +745,19 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         @Override
         public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException {
-            return false;
+            return r.authenticate(httpServletResponse);
         }
 
         @Override
         public void login(String s, String s1) throws ServletException {
 
+            r.login(s,s1);
         }
 
         @Override
         public void logout() throws ServletException {
 
+            r.logout();
         }
 
         @Override
@@ -839,17 +841,17 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         @Override
         public ServletContext getServletContext() {
-            return null;
+            return r.getServletContext();
         }
 
         @Override
         public AsyncContext startAsync() throws IllegalStateException {
-            return null;
+            return r.startAsync();
         }
 
         @Override
         public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
-            return null;
+            return r.startAsync(servletRequest,servletResponse);
         }
 
         @Override
@@ -864,12 +866,12 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         @Override
         public AsyncContext getAsyncContext() {
-            return null;
+            return r.getAsyncContext();
         }
 
         @Override
         public DispatcherType getDispatcherType() {
-            return null;
+            return r.getDispatcherType();
         }
     }
 

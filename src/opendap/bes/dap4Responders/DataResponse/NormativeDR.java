@@ -196,7 +196,7 @@ public class NormativeDR extends Dap4Responder {
             String msg = "Failed to parse asynchronous response from BES!";
             log.error("handleStoreResultResponse() - " + msg + " Message: " + e.getMessage());
             Dap4Error d4e = new Dap4Error();
-            d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            d4e.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
             d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

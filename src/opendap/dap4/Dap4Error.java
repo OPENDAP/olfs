@@ -26,6 +26,7 @@
 
 package opendap.dap4;
 
+import opendap.bes.dap4Responders.MediaType;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.DAP4;
 import org.jdom.Document;
@@ -98,7 +99,7 @@ public class Dap4Error {
 
     public Dap4Error(){
 
-        setHttpCode(-1);
+        setHttpStatusCode(-1);
         message = null;
         context = null;
         otherInfo = null;
@@ -107,7 +108,7 @@ public class Dap4Error {
     public Dap4Error(String msg) {
 
 
-        setHttpCode(-1);
+        setHttpStatusCode(-1);
         message = msg;
         context = null;
         otherInfo = null;
@@ -147,13 +148,13 @@ public class Dap4Error {
             errorDoc = ingestError(error);
 
             if(errorDoc==null){
-                setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 setMessage("Unable to locate <Error> object in stream.");
             }
 
 
         } catch (JDOMException | IOException e) {
-            setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             setMessage("Unable to read/parse BES <Error> object in stream. Something BAD happened and no additional information is available. :(");
         }
 
@@ -163,36 +164,39 @@ public class Dap4Error {
 
 
 
+    public MediaType getMediaType(){
+        return new opendap.http.mediaTypes.Dap4Error();
+    }
 
 
 
 
 
-    public int setHttpCode(int code){
+    public int setHttpStatusCode(int code){
         //@TODO Make this thing look at the code and QC it's HTTP codyness.
 
         _httpStatusCode = code;
-        return getHttpCode();
+        return getHttpStatusCode();
 
     }
 
-    public int setHttpCode(String codeString) {
+    public int setHttpStatusCode(String codeString) {
 
         if (codeString != null) {
             try {
-                setHttpCode(Integer.valueOf(codeString));
+                setHttpStatusCode(Integer.valueOf(codeString));
             } catch (NumberFormatException nfe) {
-                setHttpCode(-1);
+                setHttpStatusCode(-1);
             }
         } else {
-            setHttpCode(-1);
+            setHttpStatusCode(-1);
         }
 
-        return getHttpCode();
+        return getHttpStatusCode();
     }
 
 
-    public int getHttpCode(){
+    public int getHttpStatusCode(){
 
         return _httpStatusCode;
     }
@@ -230,17 +234,17 @@ public class Dap4Error {
 
 
 
-    // public boolean notFound(){ return getHttpCode()==HttpServletResponse.SC_NOT_FOUND;  }
+    // public boolean notFound(){ return getHttpStatusCode()==HttpServletResponse.SC_NOT_FOUND;  }
 
-    public boolean forbidden(){
-        return getHttpCode()==HttpServletResponse.SC_FORBIDDEN;
-    }
+    //public boolean forbidden(){
+    //   return getHttpStatusCode()==HttpServletResponse.SC_FORBIDDEN;
+    //}
 
 
     public Element getErrorElement(){
         Element error = new Element("Error",DAP4.NS);
 
-        error.setAttribute("httpcode",getHttpCode()+"");
+        error.setAttribute("httpcode", getHttpStatusCode()+"");
 
         Element e = new Element("Message",DAP4.NS);
         e.setText(getMessage());
@@ -282,7 +286,7 @@ public class Dap4Error {
     private void ingestError(Element error){
 
 
-        setHttpCode(error.getAttributeValue("httpcode"));
+        setHttpStatusCode(error.getAttributeValue("httpcode"));
 
         Element message = error.getChild("Message",DAP4.NS);
         this.message = null;
@@ -335,7 +339,7 @@ public class Dap4Error {
             throws IOException {
 
 
-        int errorVal = getHttpCode();
+        int errorVal = getHttpStatusCode();
 
 
         try {

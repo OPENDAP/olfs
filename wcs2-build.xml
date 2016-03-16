@@ -191,6 +191,7 @@
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
     <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
 
     <property name="xalan.lib"         value="xalan.jar"/>
     <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
@@ -221,6 +222,7 @@
             <include name="${commons-httpclient.lib}"/>
             <include name="${commons-logging.lib}"/>
             <include name="${commons-codec.lib}"/>
+            <include name="${commons-lang.lib}"/>
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
@@ -284,6 +286,42 @@
                 <!-- include all the java files -->
                 <include name="opendap/wcs/v2_0/**/*.java"/>
                 <!-- include name="opendap/semantics/**/*.java"/ -->
+                
+                <include name="opendap/bes/BESManager.java"/>
+                <include name="opendap/bes/BesGroup.java"/>
+                <include name="opendap/bes/CyclicGroup.java"/>
+                <include name="opendap/bes/BES.java"/>
+                <include name="opendap/bes/BESConfig.java"/>
+                <include name="opendap/bes/BesConfigurationModule.java"/>
+                <include name="opendap/bes/BesAdminFail.java"/>
+                <include name="opendap/bes/BESError.java"/>
+                <include name="opendap/bes/BadConfigurationException.java"/>
+                <include name="opendap/bes/BESChunkedInputStream.java"/>
+                <include name="opendap/bes/BESChunkedOutputStream.java"/>
+                <include name="opendap/bes/dap4Responders/MediaType.java"/>
+                <include name="opendap/bes/Version.java"/>
+                <include name="opendap/bes/BESResource.java"/>
+                
+                <include name="opendap/bes/dap2Responders/BesApi.java"/>
+                
+                <include name="opendap/io/ChunkProtocol.java"/>
+                <include name="opendap/io/ChunkedInputStream.java"/>
+                <include name="opendap/io/ChunkedOutputStream.java"/>
+                <include name="opendap/io/Chunk.java"/>
+                
+
+                <include name="opendap/ppt/PPTException.java"/>
+                <include name="opendap/ppt/OPeNDAPClient.java"/>
+                <include name="opendap/ppt/NewPPTClient.java"/>
+                <include name="opendap/ppt/PPTSessionProtocol.java"/>
+                <include name="opendap/ppt/PPTEndOfStreamException.java"/>
+
+                <include name="opendap/dap4/QueryParameters.java"/>
+                <include name="opendap/dap4/Dap4Error.java"/>
+
+
+
+
 
                 <include name="opendap/coreServlet/DocServlet.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
@@ -294,20 +332,29 @@
                 <include name="opendap/coreServlet/OPeNDAPException.java"/>
                 <include name="opendap/coreServlet/OpendapHttpDispatchHandler.java"/>
                 <include name="opendap/coreServlet/DataSourceInfo.java"/>
-                <include name="opendap/coreServlet/PersistentContentHandler.java"/>
+                <include name="opendap/coreServlet/PersistentConfigurationHandler.java"/>
                 <include name="opendap/coreServlet/Debug.java"/>
                 <include name="opendap/coreServlet/RequestCache.java"/>
                 <include name="opendap/coreServlet/Util.java"/>
                 <include name="opendap/coreServlet/MimeTypes.java"/>
                 <include name="opendap/coreServlet/NoPostHandler.java"/>
                 <include name="opendap/coreServlet/LicenseManager.java"/>
+                <include name="opendap/coreServlet/ResourceInfo.java"/>
 
                 <include name="opendap/dap/Request.java"/>
 
                 <include name="opendap/namespaces/**/*.java"/>
                 <include name="opendap/logging/**/*.java"/>
                 <include name="opendap/xml/**/*.java"/>
+                <include name="opendap/http/**/*.java"/>
+                
                 <include name="opendap/threddsHandler/ThreddsCatalogUtil.java"/>
+
+
+                <include name="opendap/io/HyraxStringEncoding.java"/>
+
+
+
 
             </fileset>
 
@@ -344,34 +391,6 @@
             <classpath refid="compile.classpath"/>
 
             <src path="${build.src}"/>
-
-        </javac>
-
-    </target>
-
-
-    <target
-            name="compile_old"
-            depends="init"
-            description="Compiles the Web Coverage Service."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <compilerarg value="-Xlint:unchecked"/>
-            <classpath refid="compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/wcs/v1_1_2/**/*.java"/>
-            <include name="opendap/semantics/**/*.java"/>
-            <include name="opendap/coreServlet/DocServlet.java"/>
 
         </javac>
 
