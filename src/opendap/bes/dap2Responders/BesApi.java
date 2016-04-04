@@ -1236,39 +1236,50 @@ public class BesApi {
         Procedure timedProc = Timer.start();
         try {
 
-            String responseCacheKey = this.getClass().getName() + ".getCatalog(\"" + dataSource + "\")";
+            String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
+            String logPrefix = this.getClass().getName() + "getBesCatalog() - ";
 
-            log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\"" + responseCacheKey + "\"");
+            log.info(logPrefix + "Looking for cached copy of BES showCatalog response for responseCacheKey=\"" + responseCacheKey + "\"");
 
-            Object o = RequestCache.getBesResponse(responseCacheKey);
+            Object o = BesResponseCache.getBesResponse(responseCacheKey);
 
             if (o == null) {
+                log.info(logPrefix + "No cached copy of BES showCatalog response for responseCacheKey=\"" + responseCacheKey + "\" found.");
 
                 Document getCatalogRequest = getShowCatalogRequestDocument(dataSource);
 
-                besTransaction(dataSource, getCatalogRequest, response);
+                try {
+                    besTransaction(dataSource, getCatalogRequest, response);
+                    // Get the root element.
+                    Element root = response.getRootElement();
 
-                // Get the root element.
-                Element root = response.getRootElement();
+                    // Find the top level dataset Element
+                    Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
 
-                // Find the top level dataset Element
-                Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
+                    topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                topDataset.setAttribute("prefix", getBESprefix(dataSource));
+                    BesResponseCache.putBesResponse(responseCacheKey, response.clone());
+                    log.info(logPrefix + "Cached copy of BES showCatalog response for dataSource: \"" + dataSource + "\"   (responseCacheKey=\"" + responseCacheKey + "\")");
 
-                RequestCache.putBesResponse(responseCacheKey, response.clone());
-                log.info("getCatalog(): Cached copy of BES showCatalog response for dataSource: \"" + dataSource + "\"   (responseCacheKey=\"" + responseCacheKey + "\")");
+                }
+                catch (BESError be){
+                    log.info(logPrefix + "The BES returned a BESError for dataSource: \"" + dataSource + "\"  CACHING. (responseCacheKey=\"" + responseCacheKey + "\")");
+                    BesResponseCache.putBesResponse(responseCacheKey, be);
+                    throw be;
+                }
 
 
 
             } else {
-                log.info("getCatalog(): Using cached copy of BES showCatalog.  responseCacheKey=\"" + responseCacheKey + "\"");
+                log.info(logPrefix + "Using cached copy of BES showCatalog.  responseCacheKey=\"" + responseCacheKey + "\"");
 
 
                 Document result;
 
                 if (o instanceof BESError) {
-                    result = ((BESError) o).getErrorDoc();
+                    log.info(logPrefix + "Cache contains BESError object.  responseCacheKey=\"" + responseCacheKey + "\"");
+                    BESError error = (BESError) o;
+                    throw error;
                 } else {
                     result = (Document) ((Document) o).clone();
                 }
