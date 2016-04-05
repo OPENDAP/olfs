@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by ndp on 4/4/16.
+ * In memory cache for BES responses. In practice this is not designed for data but for BES API stuff like
+ * show catalog, show info, etc. It will cache in memory any object that you wish however and associate it with
+ * what ever "key" string you associate with it..
  */
 public class BesResponseCache {
 
@@ -30,10 +32,16 @@ public class BesResponseCache {
     private static double _cache_reduction_factor = 0.2; // Amount to reduce cache when purging
 
 
-
+    /**
+     * This private class ois used to wrap whatever object is being cached along with data used to
+     * operate in the cache. Most significantly this class implements the Comparable interface such that
+     * the "natural" ordering of instances will be based on the last time each instance was accessed by the server.
+     * This is not an autonomous operation and is tightly coupled with code in "BesResponseCache.getBesResponse()" to
+     * ensure that the ordering remains correct.
+     */
     private static class CachedObj implements Comparable  {
         private Object _myObj;
-        Date _lastAccessedTime;
+        long _lastAccessedTime;
         private String _key;
         private long _serialNumber;
         private static AtomicLong counter = new AtomicLong(0);
@@ -42,7 +50,7 @@ public class BesResponseCache {
         public CachedObj (String key, Object o){
             _key = key;
             _myObj = o;
-            _lastAccessedTime = new Date();
+            _lastAccessedTime = System.nanoTime();
             _serialNumber = counter.getAndIncrement();
         }
 
@@ -54,6 +62,11 @@ public class BesResponseCache {
             return null;
         }
 
+        /**
+         * The evaluation is based on the last accessed time.
+         * @param o
+         * @return
+         */
         @Override
         public int compareTo(Object o) {
             if (!(o instanceof CachedObj))
@@ -62,11 +75,14 @@ public class BesResponseCache {
             if(this==that)
                 return 0;
 
-            if(this._lastAccessedTime.getTime() == that._lastAccessedTime.getTime()){
+            if(this._lastAccessedTime == that._lastAccessedTime){
+                log.warn("compareTo() - Required object serial numbers to differentiate " +
+                        "instances. this: {} that: {}",this._serialNumber, that._serialNumber);
                 return (int) (this._serialNumber - that._serialNumber);
             }
 
-            return (int) (this._lastAccessedTime.getTime() - that._lastAccessedTime.getTime());
+
+            return (this._lastAccessedTime - that._lastAccessedTime)>0?1:-1;
 
 
         }
@@ -83,7 +99,7 @@ public class BesResponseCache {
 
         @Override public int hashCode() {
             int result = 73;
-            result += _lastAccessedTime.hashCode() + (_myObj==null?0: _myObj.hashCode());
+            result += _lastAccessedTime + (_myObj==null?0: _myObj.hashCode());
             return result;
         }
 
@@ -132,37 +148,36 @@ public class BesResponseCache {
             lock.unlock();
         }
 
-
-
-
     }
 
     public static void putBesResponse(String key, Object o) {
         lock.lock();
         try {
-            log.debug("putBesResponse() - BEGIN  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
+            log.debug("putBesResponse() - BEGIN  besResponseCache.size(): {}  " +
+                    "mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
             if (besResponseCache.size() >= _max_cache_size)
                 purgeLeastRecentlyAccessed();
 
             CachedObj co = new CachedObj(key, o);
-            log.debug("putBesResponse() - CachedObj created: {}"+ co._lastAccessedTime.getTime());
+            log.debug("putBesResponse() - CachedObj created: {}", co._lastAccessedTime);
 
             boolean success = mostRecent.add(co);
             if (!success) {
-                log.warn("putBesResponse() - BES Response cache mostRecent list ALREADY contained CachedObj "+ co + "  for key: \"" +
-                        key + "\"");
+                log.warn("putBesResponse() - BES Response cache mostRecent list " +
+                        "ALREADY contained CachedObj {} for key: \"{}\"", co, key);
             }
 
             CachedObj previous = besResponseCache.put(key, co);
             if (co != previous) {
-                log.warn("putBesResponse() - BES Response cache updated with new object for key: \"" + key + "\"");
+                log.warn("putBesResponse() - BES Response cache updated with new object for key: \"{}\"",key);
             } else {
-                log.debug("putBesResponse() - BES Response cache updated by adding new object to cache using key \"" +
-                        key + "\"");
+                log.debug("putBesResponse() - BES Response cache updated by adding " +
+                        "new object to cache using key \"{}\"",key);
             }
 
-            log.debug("putBesResponse() - END  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
+            log.debug("putBesResponse() - END  besResponseCache.size(): {}  " +
+                    "mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
         } finally {
             lock.unlock();
@@ -191,11 +206,7 @@ public class BesResponseCache {
                     log.debug("getBesResponse() - mostRecent list contains CachedObj. Will drop.");
                     mostRecent.remove(co);
                 }
-                co._lastAccessedTime = new Date();
-                if(mostRecent.contains(co)){
-                    log.debug("getBesResponse() - mostRecent list STILL contains CachedObj.");
-                    //mostRecent.remove(co);
-                }
+                co._lastAccessedTime = System.nanoTime();
 
                 boolean status = mostRecent.add(co);
                 if(status){
@@ -240,40 +251,40 @@ public class BesResponseCache {
 
         co = new CachedObj("foo", new String("jhwe"));
         set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime.getTime()+" set.size(): "+set.size());
+        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime+" set.size(): "+set.size());
         a1 = co;
         a2 = co;
         a3 = co;
 
         co = new CachedObj("bar", new String("jhq23fgwe"));
         set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime.getTime()+" set.size(): "+set.size());
+        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
 
         co = new CachedObj("moo", new String("1wqgwebq"));
         set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime.getTime()+" set.size(): "+set.size());
+        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
 
         co = new CachedObj("soo", new String("j223rhwe"));
         set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime.getTime()+" set.size(): "+set.size());
+        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
 
         co = new CachedObj("boo", new String("rv24"));
         set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime.getTime()+" set.size(): "+set.size());
+        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
 
 
         System.out.println("List: ");
         for(CachedObj cco: set){
-            System.out.println(cco._key);
+            System.out.println(cco._key+": "+cco._lastAccessedTime );
         }
 
         set.remove(a1);
-        a1._lastAccessedTime = new Date();
+        a1._lastAccessedTime = System.nanoTime();
         set.add(a1);
 
         System.out.println("List: ");
         for(CachedObj cco: set){
-            System.out.println(cco._key+": "+cco._lastAccessedTime.getTime());
+            System.out.println(cco._key+": "+cco._lastAccessedTime );
         }
 
 
