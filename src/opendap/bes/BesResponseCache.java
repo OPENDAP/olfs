@@ -2,7 +2,6 @@ package opendap.bes;
 
 import org.slf4j.Logger;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -82,6 +81,8 @@ public class BesResponseCache {
             }
 
 
+            // Why return like this? Because the return value is an integer and the computation produces a long
+            // incorrect conversion (over/under flow) could change sign of result.
             return (this._lastAccessedTime - that._lastAccessedTime)>0?1:-1;
 
 
