@@ -35,7 +35,7 @@ public class BesResponseCache {
      * This private class ois used to wrap whatever object is being cached along with data used to
      * operate in the cache. Most significantly this class implements the Comparable interface such that
      * the "natural" ordering of instances will be based on the last time each instance was accessed by the server.
-     * This is not an autonomous operation and is tightly coupled with code in "BesResponseCache.getBesResponse()" to
+     * This is not an autonomous operation and is tightly coupled with code in "BesResponseCache.getCatalog()" to
      * ensure that the ordering remains correct.
      */
     private static class CachedObj implements Comparable  {
@@ -107,6 +107,9 @@ public class BesResponseCache {
     }
 
 
+
+
+
     private static ConcurrentHashMap<String,CachedObj> besResponseCache;
     static {
         besResponseCache = new ConcurrentHashMap<>();
@@ -154,30 +157,30 @@ public class BesResponseCache {
     public static void putBesResponse(String key, Object o) {
         lock.lock();
         try {
-            log.debug("putBesResponse() - BEGIN  besResponseCache.size(): {}  " +
+            log.debug("putCatalogTransaction() - BEGIN  besResponseCache.size(): {}  " +
                     "mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
             if (besResponseCache.size() >= _max_cache_size)
                 purgeLeastRecentlyAccessed();
 
             CachedObj co = new CachedObj(key, o);
-            log.debug("putBesResponse() - CachedObj created: {}", co._lastAccessedTime);
+            log.debug("putCatalogTransaction() - CachedObj created: {}", co._lastAccessedTime);
 
             boolean success = mostRecent.add(co);
             if (!success) {
-                log.warn("putBesResponse() - BES Response cache mostRecent list " +
+                log.warn("putCatalogTransaction() - BES Response cache mostRecent list " +
                         "ALREADY contained CachedObj {} for key: \"{}\"", co, key);
             }
 
             CachedObj previous = besResponseCache.put(key, co);
             if (co != previous) {
-                log.warn("putBesResponse() - BES Response cache updated with new object for key: \"{}\"",key);
+                log.warn("putCatalogTransaction() - BES Response cache updated with new object for key: \"{}\"",key);
             } else {
-                log.debug("putBesResponse() - BES Response cache updated by adding " +
+                log.debug("putCatalogTransaction() - BES Response cache updated by adding " +
                         "new object to cache using key \"{}\"",key);
             }
 
-            log.debug("putBesResponse() - END  besResponseCache.size(): {}  " +
+            log.debug("putCatalogTransaction() - END  besResponseCache.size(): {}  " +
                     "mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
         } finally {
@@ -190,7 +193,7 @@ public class BesResponseCache {
 
         lock.lock();;
         try {
-            log.debug("getBesResponse() - BEGIN  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
+            log.debug("getCatalog() - BEGIN  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
             if(key==null)
                 return null;
@@ -199,36 +202,36 @@ public class BesResponseCache {
             CachedObj co = besResponseCache.get(key);
 
             if(co!=null) {
-                log.debug("getBesResponse() - Found cached BES Response for key \""+ key+"\"");
+                log.debug("getCatalog() - Found cached BES Response for key \""+ key+"\"");
 
-                log.debug("getBesResponse() - Updating mostRecent list.  mostRecent.size(): {}",mostRecent.size());
+                log.debug("getCatalog() - Updating mostRecent list.  mostRecent.size(): {}",mostRecent.size());
                 // Update the mostRecent list.
                 if(mostRecent.contains(co)){
-                    log.debug("getBesResponse() - mostRecent list contains CachedObj. Will drop.");
+                    log.debug("getCatalog() - mostRecent list contains CachedObj. Will drop.");
                     mostRecent.remove(co);
                 }
                 co._lastAccessedTime = System.nanoTime();
 
                 boolean status = mostRecent.add(co);
                 if(status){
-                    log.debug("getBesResponse() - mostRecent list successfully added updated CachedObj.");
+                    log.debug("getCatalog() - mostRecent list successfully added updated CachedObj.");
 
                 }
                 else {
-                    log.debug("getBesResponse() - mostRecent list FAIL to add updated CachedObj as it" +
+                    log.debug("getCatalog() - mostRecent list FAIL to add updated CachedObj as it" +
                             " appears to be already in the mostRecent collection.");
 
                 }
-                log.debug("getBesResponse() - mostRecent list updated.  mostRecent.size(): {}",mostRecent.size());
+                log.debug("getCatalog() - mostRecent list updated.  mostRecent.size(): {}",mostRecent.size());
 
                 return co.getObj();
 
             }
             else {
-                log.debug("getBesResponse() - No BES Response  cached for key \""+ key+"\"");
+                log.debug("getCatalog() - No BES Response  cached for key \""+ key+"\"");
             }
 
-            log.debug("getBesResponse() - END  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
+            log.debug("getCatalog() - END  besResponseCache.size(): {}  mostRecent.size(): {}",besResponseCache.size(),mostRecent.size());
 
         }
         finally {
@@ -290,5 +293,20 @@ public class BesResponseCache {
 
 
 
+    }
+
+
+    private static class CacheUpdater implements Runnable {
+
+
+        @Override
+        public void run() {
+
+        }
+
+
+        public void destroy(){
+
+        }
     }
 }
