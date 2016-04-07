@@ -45,8 +45,11 @@ public class S3CatalogManager {
 
     org.slf4j.Logger log;
 
+    /** The relative URL path to a file, minus hte bucket name */
     private ConcurrentHashMap<String, S3IndexedFile> _indexedFiles;
     private ConcurrentHashMap<String, S3Index> _catalogNodes;
+    
+    /** Mapping between the S3 bucket name and a URL 'context' */
     private ConcurrentHashMap<String, String> _s3BucketList;
 
     private static S3CatalogManager theManager = null;
@@ -65,7 +68,6 @@ public class S3CatalogManager {
         _dapServiceContext = "/dap";
         _catalogServiceContext = "/catalog";
         _s3CatalogCache = "/Users/ndp/scratch/s3Test/catalogCache";
-
     }
 
 
@@ -147,6 +149,14 @@ public class S3CatalogManager {
         return _s3BucketList.get(bucketContext);
     }
 
+    /**
+     * This returns to context (key) of the S3 bucket for this relative URL path. The context
+     * can be used to get the S3 Bucket name. Each S3 bucket maps to its own URL context 
+     * ('context' in the sense generally meant by java servlets).
+     * 
+     * @param relativeUrl The path component of URL, not including the name of the servlet context.
+     * @return A String that contains the 'context' 
+     */
     public String getBucketContext(String relativeUrl){
 
         String bucketContext = "";

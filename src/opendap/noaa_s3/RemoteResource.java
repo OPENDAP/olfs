@@ -49,18 +49,33 @@ import java.util.Date;
  * User: ndp
  * Date: 2/28/13
  * Time: 11:51 AM
- * To change this template use File | Settings | File Templates.
+ * 
+ * Maintain information on a remote resource held by S3 to determine if
+ * the local copy of that remote resource is current or if it needs to
+ * be updated.
+ * 
+ * This class supports getting the resource as a stream. However, its primary
+ * function is (likely) to cache meta-information about the remote resource
+ * such as its last modified time. This information is needed by other parts
+ * of the Hyrax/OLFS software. Caching it can improve performance by limiting
+ * use of the S3 HTTP API.
+ * 
+ * This code was originally written for use with S3 but it is also (likely) 
+ * used with Glacier.
  */
 public class RemoteResource {
 
     Logger log;
-    private String _resourceUrl;
-    private long _lastModified;
-    private String _contentType;
+    
+    private String _resourceUrl;	/// The relative URL of the resource
+    private long _lastModified;		/// The resource's LMT
+    private String _contentType;	/// The Content-Type of the resource
 
-    private Header _responseHeaders[];
+    private Header _responseHeaders[];	/// Headers returned by HTTP GET
 
-
+    /**
+     * Build an empty RemoteResource.
+     */
     public RemoteResource() {
         log = LoggerFactory.getLogger(this.getClass());
         _resourceUrl = null;
@@ -75,8 +90,7 @@ public class RemoteResource {
         _responseHeaders = null;
     }
 
-
-    public String getResourceUrl(){
+    public String getResourceUrl() {
         return _resourceUrl;
     }
 
@@ -87,28 +101,23 @@ public class RemoteResource {
         }
     }
 
-    public void clearResponseHeaders(){
+    public void clearResponseHeaders() {
         _responseHeaders = null;
     }
 
-
-    public void setLastModifiedTime(long lmt){
+    public void setLastModifiedTime(long lmt) {
         _lastModified = lmt;
-
     }
 
     /**
-     *
+     * 
      * @return
      * @throws IOException
-     * @throws JDOMException
      */
     public InputStream getResourceAsStream() throws IOException  {
 
         return getRemoteHttpResourceAsStream();
     }
-
-
 
     /**
      *
