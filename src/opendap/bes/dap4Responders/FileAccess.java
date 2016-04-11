@@ -135,7 +135,7 @@ public class FileAccess extends Dap4Responder {
 
             }
             else {
-                String errMsg = "You may not downloadJobOutput nodes/directories, only files." + Scrub.completeURL(resourceID);
+                String errMsg = "You may not download nodes/directories, only files." + Scrub.completeURL(resourceID);
                 log.info("respondToHttpGetRequest() - {}", errMsg);
                 sendHttpErrorResponse(HttpServletResponse.SC_FORBIDDEN, errMsg, "docs", response);
             }
@@ -277,6 +277,14 @@ public class FileAccess extends Dap4Responder {
 
     }
 
+    @Override
+    public boolean matches(String relativeUrl){
+
+        log.debug("matches() -    BEGIN");
+
+        return super.matches(relativeUrl);
+
+    }
 
 
 }

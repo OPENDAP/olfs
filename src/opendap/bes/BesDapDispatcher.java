@@ -196,13 +196,6 @@ public class BesDapDispatcher implements DispatchHandler {
 
         if (_initialized) return;
 
-
-
-
-
-
-
-
         setBesApi(besApi);
 
         ingestConfig(config);
@@ -212,8 +205,6 @@ public class BesDapDispatcher implements DispatchHandler {
         _dispatchServlet = servlet;
 
         _systemPath = ServletUtil.getSystemPath(_dispatchServlet, "");
-
-
 
         // DAP4 Responses
 
@@ -233,7 +224,6 @@ public class BesDapDispatcher implements DispatchHandler {
 
             _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
         }
-
 
 
         // DAP2 Data Responses
@@ -298,8 +288,6 @@ public class BesDapDispatcher implements DispatchHandler {
 
         }
 
-
-
         _log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") + "  " +
                 "Resource URL returns: " + (_useDAP2ResourceUrlResponse ? "DAP2 File Response" : "DAP4 Service Description"));
 
@@ -358,6 +346,12 @@ public class BesDapDispatcher implements DispatchHandler {
         // String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
 
         _log.debug("The client requested this resource: {}", relativeUrl);
+        if(relativeUrl.endsWith("contents.html") ||
+                relativeUrl.endsWith("catalog.html") ||
+                relativeUrl.endsWith("catalog.xml") ||
+                relativeUrl.endsWith("/"))
+            return false;
+
 
         for (HttpResponder r : _responders) {
             _log.debug("Checking responder: " + r.getClass().getSimpleName() + " (pathPrefix: " + r.getPathPrefix() + ")");

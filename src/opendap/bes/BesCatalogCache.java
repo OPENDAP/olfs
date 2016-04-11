@@ -37,11 +37,13 @@ public class BesCatalogCache {
     private static double _cache_reduction_factor = 0.2; // Amount to reduce cache when purging
 
 
+    private static boolean ENABLED=false;
+
     /**
      * This private class ois used to wrap whatever object is being cached along with data used to
      * operate in the cache. Most significantly this class implements the Comparable interface such that
      * the "natural" ordering of instances will be based on the last time each instance was accessed by the server.
-     * This is not an autonomous operation and is tightly coupled with code in "BesResponseCache.getCatalog()" to
+     * This is not an autonomous operation and is tightly coupled with code in "BesCatalogCache.getCatalog()" to
      * ensure that the ordering remains correct.
      */
     private static class CatalogTransaction implements Comparable  {
@@ -168,6 +170,7 @@ public class BesCatalogCache {
 
     }
     private static  void updateMostRecentlyAccessed(CatalogTransaction cct){
+
         lock.lock();
         try {
             log.debug("updateMostRecentlyAccessed() - Updating mostRecent list.  mostRecent.size(): {}", mostRecent.size());
@@ -195,6 +198,11 @@ public class BesCatalogCache {
     }
 
     public static void putCatalogTransaction(String key, Document request, Object response) {
+
+        if(!ENABLED)
+            return;
+
+
         lock.lock();
         try {
             log.debug("putCatalogTransaction() - BEGIN  catalogTransactionCache.size(): {}  " +
@@ -279,6 +287,32 @@ public class BesCatalogCache {
 
     }
 
+
+    public static void updateCatalogTransaction(String resourceId) throws JDOMException, BadConfigurationException, PPTException, IOException {
+        String logPrefix = "updateCatalogTransaction() - ";
+
+        CatalogTransaction cTransaction = catalogTransactionCache.get(resourceId);
+
+        BesApi besApi = new BesApi();
+        try {
+            Document response =  new Document();
+            besApi.besTransaction(resourceId, cTransaction._request, response);
+            cTransaction._response = response.clone();
+        }
+        catch (BESError be){
+            log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
+                    "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
+            cTransaction._response = be;
+            cTransaction._lastAccessedTime = System.nanoTime();
+        }
+
+        updateMostRecentlyAccessed(cTransaction);
+
+
+    }
+
+
+
     public static void main(String args[]) {
 
 
@@ -349,29 +383,6 @@ public class BesCatalogCache {
             finally {
                 lock.unlock();
             }
-
-        }
-
-        private void updateCatalogTransaction(String resourceId) throws JDOMException, BadConfigurationException, PPTException, IOException {
-            String logPrefix = this.getClass().getName() + "update() - ";
-
-            CatalogTransaction cTransaction = catalogTransactionCache.get(resourceId);
-
-            BesApi besApi = new BesApi();
-            try {
-                Document response =  new Document();
-                besApi.besTransaction(resourceId, cTransaction._request, response);
-                cTransaction._response = response;
-            }
-            catch (BESError be){
-                log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
-                        "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
-                cTransaction._response = be;
-                cTransaction._lastAccessedTime = System.nanoTime();
-            }
-
-            updateMostRecentlyAccessed(cTransaction);
-
 
         }
 

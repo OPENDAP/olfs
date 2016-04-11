@@ -88,7 +88,7 @@ public class NormativeDR extends Dap4Responder {
 
         setNormativeMediaType(new Dap4Data(getRequestSuffix()));
 
-        addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
+        addAltRepResponder(new CsvDR          (sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR          (sysPath, pathPrefix, besApi));
         addAltRepResponder(new Netcdf3DR      (sysPath, pathPrefix, besApi));
         addAltRepResponder(new Netcdf4DR      (sysPath, pathPrefix, besApi));

@@ -1233,16 +1233,18 @@ public class BesApi {
     public void getBesCatalog(String dataSource, Document response)
             throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
 
+        String logPrefix = "getBesCatalog() - ";
+
         Procedure timedProc = Timer.start();
         try {
 
-            //String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
-            String logPrefix = this.getClass().getName() + "getBesCatalog() - ";
+            String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
 
             log.info(logPrefix + "Looking for cached copy of BES showCatalog response for dataSource \"" +
                     dataSource + "\"");
 
-            Object o = BesCatalogCache.getCatalog(dataSource);
+            //Object o = BesCatalogCache.getCatalog(dataSource);
+            Object o = RequestCache.get(responseCacheKey);
 
             if (o == null) {
                 log.info(logPrefix + "No cached copy of BES showCatalog response for dataSource \"" +
@@ -1260,7 +1262,8 @@ public class BesApi {
 
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, (Document) response.clone());
+                    //BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, (Document) response.clone());
+                    RequestCache.put(responseCacheKey, response.clone());
                     log.info(logPrefix + "Cached copy of BES showCatalog response for dataSource: \"" +
                             dataSource + "\"");
 
@@ -1268,7 +1271,8 @@ public class BesApi {
                 catch (BESError be){
                     log.info(logPrefix + "The BES returned a BESError for dataSource: \"" + dataSource +
                             "\"  CACHING. (responseCacheKey=\"" + dataSource + "\")");
-                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, be);
+                    // BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, be);
+                    RequestCache.put(dataSource, be);
                     throw be;
                 }
 
@@ -2514,7 +2518,7 @@ public class BesApi {
 
                 try {
                     ResourceInfo dsi = new BESResource(besDataSourceId, this);
-                    if (!dsi.isDataset()) {
+                    if (!dsi.isDataset()) { // Why this test and not dsi.sourceExists()??
                         besDataSourceId = null;
                     }
                 } catch (Exception e) {
