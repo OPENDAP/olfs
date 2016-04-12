@@ -400,6 +400,7 @@
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="JAVA_HOME:             ${java.home}"/>
         <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
         <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
         <echo level="info" message=""/>
