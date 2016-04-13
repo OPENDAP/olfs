@@ -2518,7 +2518,10 @@ public class BesApi {
 
                 try {
                     ResourceInfo dsi = new BESResource(besDataSourceId, this);
-                    if (!dsi.isDataset()) { // Why this test and not dsi.sourceExists()??
+                    // Q: Why this test and not dsi.sourceExists()??
+                    // A: Because this check is only for things the BES views as data. Regular (non data)
+                    //    files are handled by the "FileDispatchHandler"
+                    if (!dsi.isDataset()) {
                         besDataSourceId = null;
                     }
                 } catch (Exception e) {
