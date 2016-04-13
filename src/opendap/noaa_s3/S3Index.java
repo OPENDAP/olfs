@@ -366,7 +366,13 @@ public class S3Index extends S3Object {
     }
 
 
-
+    /**
+     * 
+     * @param fileName
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     */
     public String getS3ResourceID(String fileName) throws JDOMException, IOException {
 
         StringBuilder resourceId =  new StringBuilder();
