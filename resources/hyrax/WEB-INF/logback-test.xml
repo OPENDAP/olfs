@@ -137,15 +137,16 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.bes.BESManager"               level="all"/>
-    <logger name="opendap.bes.BesXmlAPI"                level="all"/>
-    <logger name="opendap.bes.BES"                      level="all"/>
-    <logger name="opendap.bes.BESCrawlableDataset"      level="all"/>
-    <logger name="opendap.bes.DapDispatchHandler"       level="all"/>
-    <logger name="opendap.bes.DirectoryDispatchHandler" level="all"/>
-    <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"/>
-    
-    
+    <logger name="opendap.bes.BESManager"                  level="error" />
+    <logger name="opendap.bes.dap2Responders.BesApi"       level="error" />
+    <logger name="opendap.bes.BES"                         level="all"   />
+    <logger name="opendap.bes.BesDapDispatcher"            level="all"   />
+    <logger name="opendap.bes.DirectoryDispatchHandler"    level="all"   />
+    <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"   />
+
+    <logger name="opendap.bes.dap4Responders.FileAccess"   level="all"/>
+
+
     <logger name="opendap.gateway" level="all">
                  <appender-ref ref="stdout"/>
     </logger>
