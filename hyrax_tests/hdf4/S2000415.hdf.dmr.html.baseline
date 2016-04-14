@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ /////////////////////////////////////////////////////////////////////////////
-  ~ // This file is part of the "Hyrax Data Server" project.
-  ~ //
-  ~ //
-  ~ // Copyright (c) 2016 OPeNDAP, Inc.
-  ~ // Author: Nathan David Potter  <ndp@opendap.org>
-  ~ //
-  ~ // This library is free software; you can redistribute it and/or
-  ~ // modify it under the terms of the GNU Lesser General Public
-  ~ // License as published by the Free Software Foundation; either
-  ~ // version 2.1 of the License, or (at your option) any later version.
-  ~ //
-  ~ // This library is distributed in the hope that it will be useful,
-  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  ~ // Lesser General Public License for more details.
-  ~ //
-  ~ // You should have received a copy of the GNU Lesser General Public
-  ~ // License along with this library; if not, write to the Free Software
-  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  ~ //
-  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-  ~ /////////////////////////////////////////////////////////////////////////////           
+            ~ /////////////////////////////////////////////////////////////////////////////
+            ~ // This file is part of the "Hyrax Data Server" project.
+            ~ //
+            ~ //
+            ~ // Copyright (c) 2016 OPeNDAP, Inc.
+            ~ // Author: Nathan David Potter <ndp@opendap.org>
+            ~ //
+            ~ // This library is free software; you can redistribute it and/or
+            ~ // modify it under the terms of the GNU Lesser General Public
+            ~ // License as published by the Free Software Foundation; either
+            ~ // version 2.1 of the License, or (at your option) any later version.
+            ~ //
+            ~ // This library is distributed in the hope that it will be useful,
+            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+            ~ // Lesser General Public License for more details.
+            ~ //
+            ~ // You should have received a copy of the GNU Lesser General Public
+            ~ // License along with this library; if not, write to the Free Software
+            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+            ~ //
+            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+            ~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
@@ -53,14 +53,16 @@
       <form action="">
          <input type="checkbox" id="debug_checkbox"/>DEBUG
                     <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);                       
+                        DEBUG = new debug_obj(debug_checkbox);
                     </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition"
-                        target="help">Actions</a>
+                        target="help">
+                        Actions
+                    </a>
                   </div>
                </td>
                <td>
@@ -78,7 +80,9 @@
                <td align="right">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url"
-                        target="help">Data URL</a>
+                        target="help">
+                        Data URL
+                    </a>
                   </div>
                </td>
                <td>
@@ -98,7 +102,9 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr"
-                        target="help">Global Attributes</a>
+                        target="help">
+                        Global Attributes
+                    </a>
                   </div>
                </td>
                <td width="100%">
@@ -110,145 +116,169 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Producer_Agency:</span>
+                                       <span class="bold">Producer_Agency:
+                        </span>
                                        <span class="em">NASA</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Producer_Institution:</span>
+                                       <span class="bold">Producer_Institution:
+                        </span>
                                        <span class="em">JPL</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Sensor_Name:</span>
+                                       <span class="bold">Sensor_Name:
+                        </span>
                                        <span class="em">NSCAT</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Project_ID:</span>
+                                       <span class="bold">Project_ID:
+                        </span>
                                        <span class="em">NSCAT</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">SIS_ID:</span>
+                                       <span class="bold">SIS_ID:
+                        </span>
                                        <span class="em">597-512-24/1996-07-01</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Build_ID:</span>
+                                       <span class="bold">Build_ID:
+                        </span>
                                        <span class="em">3.2.1/1996-11-05</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">ADEOS_Data_Package_ID:</span>
+                                       <span class="bold">ADEOS_Data_Package_ID:
+                        </span>
                                        <span class="em">S2</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">ADEOS_Data_Package_Type:</span>
+                                       <span class="bold">ADEOS_Data_Package_Type:
+                        </span>
                                        <span class="em">S</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Product_Creation_Time:</span>
+                                       <span class="bold">Product_Creation_Time:
+                        </span>
                                        <span class="em">1996-318T01:35:16.000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Data_Type:</span>
+                                       <span class="bold">Data_Type:
+                        </span>
                                        <span class="em">L2</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Data_Status:</span>
+                                       <span class="bold">Data_Status:
+                        </span>
                                        <span class="em">COMPLETE</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">First_Rev_Number:</span>
+                                       <span class="bold">First_Rev_Number:
+                        </span>
                                        <span class="em">415</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">First_Rev_Eq_Crossing_Time:</span>
+                                       <span class="bold">First_Rev_Eq_Crossing_Time:
+                        </span>
                                        <span class="em">1996-259T04:01:28.226</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">First_Rev_Eq_Crossing_Lon:</span>
+                                       <span class="bold">First_Rev_Eq_Crossing_Lon:
+                        </span>
                                        <span class="em">279.9830017</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">First_Data_Time:</span>
+                                       <span class="bold">First_Data_Time:
+                        </span>
                                        <span class="em">1996-259T03:43:48.945</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Last_Data_Time:</span>
+                                       <span class="bold">Last_Data_Time:
+                        </span>
                                        <span class="em">1996-259T05:09:48.997</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Num_Expected_Output_Records:</span>
+                                       <span class="bold">Num_Expected_Output_Records:
+                        </span>
                                        <span class="em">458</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Num_Actual_Output_Records:</span>
+                                       <span class="bold">Num_Actual_Output_Records:
+                        </span>
                                        <span class="em">458</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Ambig_Removal_Method:</span>
+                                       <span class="bold">Ambig_Removal_Method:
+                        </span>
                                        <span class="em">Baseline used</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">HDF_Build_ID:</span>
+                                       <span class="bold">HDF_Build_ID:
+                        </span>
                                        <span class="em">JPL D-xxxxx 12/15/94</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">HDF_SIS_ID:</span>
+                                       <span class="bold">HDF_SIS_ID:
+                        </span>
                                        <span class="em">JPL D-12060 12/15/94</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">HDF_Conversion_Organization:</span>
+                                       <span class="bold">HDF_Conversion_Organization:
+                        </span>
                                        <span class="em">JPL PO.DAAC</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">HDF_Conversion_Time:</span>
+                                       <span class="bold">HDF_Conversion_Time:
+                        </span>
                                        <span class="em">1996-320T17:32:34       </span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Data_Format_Type:</span>
+                                       <span class="bold">Data_Format_Type:
+                        </span>
                                        <span class="em">HDF</span>
                                     </div>
                                  </li>
@@ -263,13 +293,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -284,13 +316,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -305,13 +339,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -326,13 +362,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -347,13 +385,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -368,13 +408,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -389,13 +431,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -410,13 +454,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -431,13 +477,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -452,13 +500,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -473,13 +523,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -494,13 +546,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -515,13 +569,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -536,13 +592,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -557,13 +615,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -578,13 +638,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -599,13 +661,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -620,13 +684,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -641,13 +707,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -662,13 +730,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -683,13 +753,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">position of the ambiguities</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">position</span>
                                     </div>
                                  </li>
@@ -704,13 +776,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -725,13 +799,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -746,13 +822,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">position of the ambiguities</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">position</span>
                                     </div>
                                  </li>
@@ -767,13 +845,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -788,13 +868,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -809,13 +891,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">position of the ambiguities</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">position</span>
                                     </div>
                                  </li>
@@ -830,13 +914,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -851,13 +937,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -872,13 +960,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">position of the ambiguities</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">position</span>
                                     </div>
                                  </li>
@@ -893,13 +983,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -914,13 +1006,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -935,13 +1029,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">position of the ambiguities</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">position</span>
                                     </div>
                                  </li>
@@ -956,13 +1052,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC row</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">row</span>
                                     </div>
                                  </li>
@@ -977,13 +1075,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC index</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">name:</span>
+                                       <span class="bold">name:
+                        </span>
                                        <span class="em">WVC</span>
                                     </div>
                                  </li>
@@ -993,13 +1093,15 @@
                      </ul>
                      <li>
                         <div class="small">
-                           <span class="bold">NSCAT_Rev_20_SwathIndex:</span>
+                           <span class="bold">NSCAT_Rev_20_SwathIndex:
+                        </span>
                            <span class="em"/>
                         </div>
                      </li>
                      <li>
                         <div class="small">
-                           <span class="bold">NSCAT_Rev_20_NSCAT_L2:</span>
+                           <span class="bold">NSCAT_Rev_20_NSCAT_L2:
+                        </span>
                            <span class="em"/>
                         </div>
                      </li>
@@ -1018,25 +1120,54 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#shared_dimesions"
-                        target="help">Shared Dimensions</a>
+                        target="help">Global Dimensions
+                    </a>
                   </div>
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">row = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">WVC = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..23</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">position = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..3</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..819</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>]</span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">row =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">WVC =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..23</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">position =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..3</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..819</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..457</span>
+            ]
+        </span>
                   </div>
                </td>
             </tr>
@@ -1052,23 +1183,35 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
-                        target="help">Variables</a>
+                        target="help">Variables
+                    </a>
                   </div>
                </td>
                <td>
                   <div style="margin-left:25px;">
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lat = new dap_var("NSCAT_Rev_20_WVC_Lat", "org_opendap_NSCAT_Rev_20_WVC_Lat", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lat); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lat);
             org_opendap_NSCAT_Rev_20_WVC_Lat.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Lat";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Lat"
                                onclick="org_opendap_NSCAT_Rev_20_WVC_Lat.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lat)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lat<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lat<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lat_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1089,49 +1232,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">latitude</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">deg</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">22</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">-90007771</span>
                                     </div>
                                  </li>
@@ -1140,17 +1291,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lon = new dap_var("NSCAT_Rev_20_WVC_Lon", "org_opendap_NSCAT_Rev_20_WVC_Lon", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lon); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lon);
             org_opendap_NSCAT_Rev_20_WVC_Lon.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Lon";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Lon"
                                onclick="org_opendap_NSCAT_Rev_20_WVC_Lon.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lon)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lon<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lon<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lon_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1171,49 +1333,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">longitude</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">deg</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">22</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">031242</span>
                                     </div>
                                  </li>
@@ -1222,17 +1392,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Sigma0 = new dap_var("NSCAT_Rev_20_Num_Sigma0", "org_opendap_NSCAT_Rev_20_Num_Sigma0", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Sigma0); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Sigma0);
             org_opendap_NSCAT_Rev_20_Num_Sigma0.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Sigma0";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Sigma0"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Sigma0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Sigma0)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Sigma0<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Sigma0<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Sigma0_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1253,49 +1434,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">The total number of sigma-0 measurements</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">019</span>
                                     </div>
                                  </li>
@@ -1304,17 +1493,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_12 = new dap_var("NSCAT_Rev_20_Num_Beam_12", "org_opendap_NSCAT_Rev_20_Num_Beam_12", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_12); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_12);
             org_opendap_NSCAT_Rev_20_Num_Beam_12.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_12";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_12"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Beam_12.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_12)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_12<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_12<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_12_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1335,49 +1535,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">The total number of sigma-0s received from beam 1 or 2</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">06</span>
                                     </div>
                                  </li>
@@ -1386,17 +1594,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
             org_opendap_NSCAT_Rev_20_Num_Beam_34.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_34";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_34"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Beam_34.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_34)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1417,49 +1636,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">The total number of sigma-0s received from beam 3 or 4</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">06</span>
                                     </div>
                                  </li>
@@ -1468,17 +1695,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_56 = new dap_var("NSCAT_Rev_20_Num_Beam_56", "org_opendap_NSCAT_Rev_20_Num_Beam_56", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_56); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_56);
             org_opendap_NSCAT_Rev_20_Num_Beam_56.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_56";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_56"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Beam_56.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_56)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_56<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_56<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_56_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1499,49 +1737,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">The total number of sigma-0s received from beam 5 or 6</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">06</span>
                                     </div>
                                  </li>
@@ -1550,17 +1796,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_78 = new dap_var("NSCAT_Rev_20_Num_Beam_78", "org_opendap_NSCAT_Rev_20_Num_Beam_78", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_78); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_78);
             org_opendap_NSCAT_Rev_20_Num_Beam_78.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_78";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_78"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Beam_78.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_78)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_78<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_78<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_78_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1581,49 +1838,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">The total number of sigma-0s received from beam 7 or 8</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">06</span>
                                     </div>
                                  </li>
@@ -1632,17 +1897,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Quality_Flag = new dap_var("NSCAT_Rev_20_WVC_Quality_Flag", "org_opendap_NSCAT_Rev_20_WVC_Quality_Flag", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag);
             org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag"
                                onclick="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Quality_Flag<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Quality_Flag<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1663,43 +1939,50 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">WVC Quality Flag</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">03</span>
                                     </div>
                                  </li>
@@ -1708,17 +1991,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Mean_Wind = new dap_var("NSCAT_Rev_20_Mean_Wind", "org_opendap_NSCAT_Rev_20_Mean_Wind", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Mean_Wind); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Mean_Wind);
             org_opendap_NSCAT_Rev_20_Mean_Wind.checkBox = "get_org_opendap_NSCAT_Rev_20_Mean_Wind";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Mean_Wind"
                                onclick="org_opendap_NSCAT_Rev_20_Mean_Wind.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Mean_Wind)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Mean_Wind<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Mean_Wind<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Mean_Wind_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1739,49 +2033,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Mean Wind Speed</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">m/s</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">23</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">02374</span>
                                     </div>
                                  </li>
@@ -1790,18 +2092,34 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Speed = new dap_var("NSCAT_Rev_20_Wind_Speed", "org_opendap_NSCAT_Rev_20_Wind_Speed", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Speed); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Speed);
             org_opendap_NSCAT_Rev_20_Wind_Speed.checkBox = "get_org_opendap_NSCAT_Rev_20_Wind_Speed";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Wind_Speed"
                                onclick="org_opendap_NSCAT_Rev_20_Wind_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Speed)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Speed<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">position=</span>0<span class="medium" style="vertical-align: 10%;">..</span>3]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Speed<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">position=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>3]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Speed_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1828,49 +2146,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Wind speed associated with a WVC</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">m/s</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">23</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">02571</span>
                                     </div>
                                  </li>
@@ -1879,18 +2205,34 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Dir = new dap_var("NSCAT_Rev_20_Wind_Dir", "org_opendap_NSCAT_Rev_20_Wind_Dir", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Dir); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Dir);
             org_opendap_NSCAT_Rev_20_Wind_Dir.checkBox = "get_org_opendap_NSCAT_Rev_20_Wind_Dir";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Wind_Dir"
                                onclick="org_opendap_NSCAT_Rev_20_Wind_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Dir)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Dir<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">position=</span>0<span class="medium" style="vertical-align: 10%;">..</span>3]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Dir<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">position=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>3]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Dir_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -1917,49 +2259,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Wind direction solution associated with a WVC</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">deg</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">23</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">035997</span>
                                     </div>
                                  </li>
@@ -1968,18 +2318,34 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Speed = new dap_var("NSCAT_Rev_20_Error_Speed", "org_opendap_NSCAT_Rev_20_Error_Speed", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Speed); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Speed);
             org_opendap_NSCAT_Rev_20_Error_Speed.checkBox = "get_org_opendap_NSCAT_Rev_20_Error_Speed";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Error_Speed"
                                onclick="org_opendap_NSCAT_Rev_20_Error_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Speed)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Speed<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">position=</span>0<span class="medium" style="vertical-align: 10%;">..</span>3]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Speed<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">position=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>3]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Speed_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -2006,49 +2372,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Uncertainty estimated for the wind speed value</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">m/s</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">23</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">02410</span>
                                     </div>
                                  </li>
@@ -2057,18 +2431,34 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Dir = new dap_var("NSCAT_Rev_20_Error_Dir", "org_opendap_NSCAT_Rev_20_Error_Dir", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Dir); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Dir);
             org_opendap_NSCAT_Rev_20_Error_Dir.checkBox = "get_org_opendap_NSCAT_Rev_20_Error_Dir";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Error_Dir"
                                onclick="org_opendap_NSCAT_Rev_20_Error_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Dir)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Dir<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">position=</span>0<span class="medium" style="vertical-align: 10%;">..</span>3]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Dir<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">position=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>3]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Dir_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -2095,49 +2485,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Uncertainty estimated for the wind direction value</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">deg</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.010000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">23</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">02435</span>
                                     </div>
                                  </li>
@@ -2146,18 +2544,34 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_MLE_Likelihood = new dap_var("NSCAT_Rev_20_MLE_Likelihood", "org_opendap_NSCAT_Rev_20_MLE_Likelihood", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_MLE_Likelihood); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_MLE_Likelihood);
             org_opendap_NSCAT_Rev_20_MLE_Likelihood.checkBox = "get_org_opendap_NSCAT_Rev_20_MLE_Likelihood";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_MLE_Likelihood"
                                onclick="org_opendap_NSCAT_Rev_20_MLE_Likelihood.handle_projection_change(get_org_opendap_NSCAT_Rev_20_MLE_Likelihood)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_MLE_Likelihood<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">position=</span>0<span class="medium" style="vertical-align: 10%;">..</span>3]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int16)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_MLE_Likelihood<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">position=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>3]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -2184,43 +2598,50 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Relative likelihood that a given win vector solution is correct</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">0.10000000000000001</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">22</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">-327682825</span>
                                     </div>
                                  </li>
@@ -2229,17 +2650,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Ambigs = new dap_var("NSCAT_Rev_20_Num_Ambigs", "org_opendap_NSCAT_Rev_20_Num_Ambigs", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Ambigs); 
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Ambigs);
             org_opendap_NSCAT_Rev_20_Num_Ambigs.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Ambigs";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Ambigs"
                                onclick="org_opendap_NSCAT_Rev_20_Num_Ambigs.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Ambigs)"
-                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Ambigs<span class="medium">[<span class="small" style="vertical-align: 15%;">row=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">WVC=</span>0<span class="medium" style="vertical-align: 10%;">..</span>23]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Byte)</span>
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Ambigs<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">row=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">WVC=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>23]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Ambigs_dim_1" size="8"
                             oninput="autoResize(event)"
@@ -2260,49 +2692,57 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">long_name:</span>
+                                       <span class="bold">long_name:
+                        </span>
                                        <span class="em">Number of ambiguous wind vectors reported for a given cell</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">units:</span>
+                                       <span class="bold">units:
+                        </span>
                                        <span class="em">counts</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor:</span>
+                                       <span class="bold">scale_factor:
+                        </span>
                                        <span class="em">1.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">scale_factor_err:</span>
+                                       <span class="bold">scale_factor_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset:</span>
+                                       <span class="bold">add_offset:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">add_offset_err:</span>
+                                       <span class="bold">add_offset_err:
+                        </span>
                                        <span class="em">0.0000000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">calibrated_nt:</span>
+                                       <span class="bold">calibrated_nt:
+                        </span>
                                        <span class="em">21</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">valid_range:</span>
+                                       <span class="bold">valid_range:
+                        </span>
                                        <span class="em">04</span>
                                     </div>
                                  </li>
@@ -2311,16 +2751,22 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = new dap_var("vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", "org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin); 
+                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin);
             org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin"
                                onclick="org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin)"
-                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_SwathIndex_vdf_begin<span class="medium">[<span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin=</span>0<span class="medium" style="vertical-align: 10%;">..</span>819]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int16)</span>
+                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_SwathIndex_vdf_begin<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>819]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin_dim_1"
                             size="8"
@@ -2331,16 +2777,22 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time); 
+                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time);
             org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time"
                                onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time)"
-                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time<span class="medium">[<span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is String)</span>
+                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is String)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time_dim_1"
                             size="8"
@@ -2351,17 +2803,23 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag); 
+                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag);
             org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox"
                                id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag"
                                onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag)"
-                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag<span class="medium">[<span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt32)</span>
+                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt32)
+            </span>
                      </div>
                      <input type="text"
                             id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag_dim_1"
@@ -2373,17 +2831,23 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag); 
+                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag);
             org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox"
                                id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag"
                                onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag)"
-                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag<span class="medium">[<span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag=</span>0<span class="medium" style="vertical-align: 10%;">..</span>457]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is UInt32)</span>
+                               onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>457]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt32)
+            </span>
                      </div>
                      <input type="text"
                             id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag_dim_1"
@@ -2404,12 +2868,20 @@
          <tr>
             <td/>
             <td>
-               <div class="small" align="right"> Hyrax development sponsored by <a href="http://www.nsf.gov/">NSF</a> , <a href="http://www.nasa.gov/">NASA</a> , and <a href="http://www.noaa.gov/">NOAA</a>
+               <div class="small" align="right">Hyrax development sponsored by
+                                <a href="http://www.nsf.gov/">NSF
+                                </a>
+                                ,
+                                <a href="http://www.nasa.gov/">NASA
+                                </a>
+                                , and
+                                <a href="http://www.noaa.gov/">NOAA</a>
                </div>
             </td>
          </tr>
       </table>
-      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
    </body>

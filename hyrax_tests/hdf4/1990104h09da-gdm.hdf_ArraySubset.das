@@ -1,2 +1,0 @@
-url = http://localhost:8080/opendap/data/hdf4/1990104h09da-gdm.hdf.gz.das?Sea_Surface_Temperature\[0:100:4095\]\[0:100:2047\]
--s

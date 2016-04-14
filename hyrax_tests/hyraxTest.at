@@ -203,19 +203,22 @@ AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Doc
 # TestName: hdf4/3B42.980909.5.HDF
 # BaseUrl:  http://localhost:8080/opendap/data/hdf4/3B42.980909.5.HDF.gz
 # DAP2 CE:  
-# DAP4 CE:  
+# DAP4 CE:
 #
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dds)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.das)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.html)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.info)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.ascii)
-AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dods)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr.html)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr.xml)
-AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dap.csv)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dap)
+# I turned this off when I dsiscovered the hdf4 file doesn't get
+# installed when you install the hdf4_handler. - ndp 4/13/16
+#
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dds)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.das)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.html)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.info)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.ascii)
+#AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dods)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr.html)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dmr.xml)
+#AT_CURL_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dap.csv)
+#AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/3B42.980909.5.HDF.dap)
 
 ####################################################
 # TestName: hdf4/S2000415.hdf
@@ -236,22 +239,27 @@ AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf.dap.csv)
 AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/S2000415.hdf.dap)
 
 ####################################################
-# TestName: hdf4/1990104h09da-gdm.hdf_ArraySubset
-# BaseUrl:  http://localhost:8080/opendap/data/hdf4/1990104h09da-gdm.hdf.gz
-# DAP2 CE:  ?Sea_Surface_Temperature\[0:100:4095\]\[0:100:2047\]
-# DAP4 CE:  ?dap4.ce=Sea_Surface_Temperature\[0:100:4095\]\[0:100:2047\]
+# TestName: hdf4/S2000415.hdf
+# BaseUrl:  http://localhost:8080/opendap/data/hdf4/S2000415.hdf
+# DAP2 CE:  ?NSCAT_Rev_20_Num_Beam_34\[0:10:458\]\[0:4:24\]
+# DAP4 CE:  ?dap4.ce=NSCAT_Rev_20_Num_Beam_34\[0:10:458\]\[0:4:24\]
 #
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dds)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.das)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.html)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.info)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.ascii)
-AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dods)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr.html)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dmr.xml)
-AT_CURL_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dap.csv)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/1990104h09da-gdm.hdf_ArraySubset.dap)
+# Byte NSCAT_Rev_20_Num_Beam_34[row = 458][WVC = 24];
+#
+# I turned this off when I dsiscovered the hdf4 file doesn't get
+# installed when you install the hdf4_handler. - ndp 4/13/16
+#
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dds)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.das)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.html)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.info)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.ascii)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dods)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dmr)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dmr.html)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dmr.xml)
+AT_CURL_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(hdf4/S2000415.hdf_ArraySubset.dap)
 
 ####################################################
 # TestName: dap2_ssfunc/1998-6-avhrr.dat_DateTimeConstraint_01
