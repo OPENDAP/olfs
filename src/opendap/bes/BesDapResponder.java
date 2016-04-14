@@ -95,7 +95,7 @@ public abstract class BesDapResponder extends DapResponder {
     @Override
     public boolean matches(String relativeUrl) {
 
-        return matches(relativeUrl,true);
+        return matches(relativeUrl,false);
 
     }
 
