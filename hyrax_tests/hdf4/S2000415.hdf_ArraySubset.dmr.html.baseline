@@ -1,0 +1,1276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+            ~ /////////////////////////////////////////////////////////////////////////////
+            ~ // This file is part of the "Hyrax Data Server" project.
+            ~ //
+            ~ //
+            ~ // Copyright (c) 2016 OPeNDAP, Inc.
+            ~ // Author: Nathan David Potter <ndp@opendap.org>
+            ~ //
+            ~ // This library is free software; you can redistribute it and/or
+            ~ // modify it under the terms of the GNU Lesser General Public
+            ~ // License as published by the Free Software Foundation; either
+            ~ // version 2.1 of the License, or (at your option) any later version.
+            ~ //
+            ~ // This library is distributed in the hope that it will be useful,
+            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+            ~ // Lesser General Public License for more details.
+            ~ //
+            ~ // You should have received a copy of the GNU Lesser General Public
+            ~ // License along with this library; if not, write to the Free Software
+            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+            ~ //
+            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+            ~ /////////////////////////////////////////////////////////////////////////////
+        --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+   <head>
+      <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
+      <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
+      <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
+      <script type="text/javascript" src="/opendap/js/dap4_buttons.js"> </script>
+      <script type="text/javascript">
+                    DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz");
+                </script>
+      <title>DAP4 Data Request Form (beta)S2000415.HDF</title>
+   </head>
+   <body>
+      <table width="100%" border="0">
+         <tr>
+            <td>
+               <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.gif"/>
+            </td>
+            <td>
+               <div class="large">DAP4 Data Access Form</div>
+            </td>
+         </tr>
+      </table>
+      <h1>
+         <span style="font-size: 12px;  vertical-align: 35%; font-weight: normal;">dataset:</span>
+         <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;">S2000415.HDF</span>
+      </h1>
+      <hr size="1" noshade="noshade"/>
+      <form action="">
+         <input type="checkbox" id="debug_checkbox"/>DEBUG
+                    <script type="text/javascript">
+                        DEBUG = new debug_obj(debug_checkbox);
+                    </script>
+         <table width="100%" border="0">
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition"
+                        target="help">
+                        Actions
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="width:100%;margin-left:10px;">
+                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
+                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
+                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
+                     <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Show Help" onclick="help_button()"/>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url"
+                        target="help">
+                        Data URL
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <input name="url" type="text" style="width:98%;margin-left:10;"
+                         value="http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz"/>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr"
+                        target="help">
+                        Global Attributes
+                    </a>
+                  </div>
+               </td>
+               <td width="100%">
+                  <div style="width:100%;margin-left:10px;">
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">HDF_GLOBAL</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Producer_Agency:
+                        </span>
+                                       <span class="em">NASA</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Producer_Institution:
+                        </span>
+                                       <span class="em">JPL</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Sensor_Name:
+                        </span>
+                                       <span class="em">NSCAT</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Project_ID:
+                        </span>
+                                       <span class="em">NSCAT</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">SIS_ID:
+                        </span>
+                                       <span class="em">597-512-24/1996-07-01</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Build_ID:
+                        </span>
+                                       <span class="em">3.2.1/1996-11-05</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">ADEOS_Data_Package_ID:
+                        </span>
+                                       <span class="em">S2</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">ADEOS_Data_Package_Type:
+                        </span>
+                                       <span class="em">S</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Product_Creation_Time:
+                        </span>
+                                       <span class="em">1996-318T01:35:16.000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Data_Type:
+                        </span>
+                                       <span class="em">L2</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Data_Status:
+                        </span>
+                                       <span class="em">COMPLETE</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">First_Rev_Number:
+                        </span>
+                                       <span class="em">415</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">First_Rev_Eq_Crossing_Time:
+                        </span>
+                                       <span class="em">1996-259T04:01:28.226</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">First_Rev_Eq_Crossing_Lon:
+                        </span>
+                                       <span class="em">279.9830017</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">First_Data_Time:
+                        </span>
+                                       <span class="em">1996-259T03:43:48.945</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Last_Data_Time:
+                        </span>
+                                       <span class="em">1996-259T05:09:48.997</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Num_Expected_Output_Records:
+                        </span>
+                                       <span class="em">458</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Num_Actual_Output_Records:
+                        </span>
+                                       <span class="em">458</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Ambig_Removal_Method:
+                        </span>
+                                       <span class="em">Baseline used</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">HDF_Build_ID:
+                        </span>
+                                       <span class="em">JPL D-xxxxx 12/15/94</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">HDF_SIS_ID:
+                        </span>
+                                       <span class="em">JPL D-12060 12/15/94</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">HDF_Conversion_Organization:
+                        </span>
+                                       <span class="em">JPL PO.DAAC</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">HDF_Conversion_Time:
+                        </span>
+                                       <span class="em">1996-320T17:32:34       </span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Data_Format_Type:
+                        </span>
+                                       <span class="em">HDF</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Lat_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Lat_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Lon_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Lon_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Sigma0_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Sigma0_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_12_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_12_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_34_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_34_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_56_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_56_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_78_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Beam_78_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Quality_Flag_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_WVC_Quality_Flag_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Mean_Wind_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Mean_Wind_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Speed_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Speed_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Speed_dim_2</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">position of the ambiguities</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">position</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Dir_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Dir_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Wind_Dir_dim_2</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">position of the ambiguities</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">position</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Speed_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Speed_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Speed_dim_2</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">position of the ambiguities</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">position</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Dir_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Dir_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Error_Dir_dim_2</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">position of the ambiguities</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">position</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_MLE_Likelihood_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_MLE_Likelihood_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_MLE_Likelihood_dim_2</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">position of the ambiguities</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">position</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Ambigs_dim_0</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC row</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">row</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NSCAT_Rev_20_Num_Ambigs_dim_1</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">WVC index</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">name:
+                        </span>
+                                       <span class="em">WVC</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <li>
+                        <div class="small">
+                           <span class="bold">NSCAT_Rev_20_SwathIndex:
+                        </span>
+                           <span class="em"/>
+                        </div>
+                     </li>
+                     <li>
+                        <div class="small">
+                           <span class="bold">NSCAT_Rev_20_NSCAT_L2:
+                        </span>
+                           <span class="em"/>
+                        </div>
+                     </li>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#shared_dimesions"
+                        target="help">Global Dimensions
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="margin-left:25px;"/>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
+                        target="help">Variables
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="margin-left:25px;">
+                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
+            org_opendap_NSCAT_Rev_20_Num_Beam_34.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_34";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_34"
+                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_34.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_34)"
+                               onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[
+                
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>45]
+            </span>
+                        <span class="medium">[
+                
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>5]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1" size="8"
+                            oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1,46);
+            </script>
+                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2" size="8"
+                            oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2,6);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">The total number of sigma-0s received from beam 3 or 4</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">counts</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">scale_factor:
+                        </span>
+                                       <span class="em">1.0000000000000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">scale_factor_err:
+                        </span>
+                                       <span class="em">0.0000000000000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">add_offset:
+                        </span>
+                                       <span class="em">0.0000000000000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">add_offset_err:
+                        </span>
+                                       <span class="em">0.0000000000000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">calibrated_nt:
+                        </span>
+                                       <span class="em">21</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">valid_range:
+                        </span>
+                                       <span class="em">06</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </td>
+            </tr>
+         </table>
+      </form>
+      <hr size="1" noshade="noshade"/>
+      <table width="100%" border="0">
+         <tr>
+            <td/>
+            <td>
+               <div class="small" align="right">Hyrax development sponsored by
+                                <a href="http://www.nsf.gov/">NSF
+                                </a>
+                                ,
+                                <a href="http://www.nasa.gov/">NASA
+                                </a>
+                                , and
+                                <a href="http://www.noaa.gov/">NOAA</a>
+               </div>
+            </td>
+         </tr>
+      </table>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <br/>
+         <a href="/opendap/docs/">Documentation</a>
+      </h3>
+   </body>
+   <script>CollapsibleLists.apply(true);</script>
+</xhtml>

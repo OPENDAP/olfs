@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" xml:base="http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz" dapVersion="4.0" dmrVersion="1.0" name="S2000415.HDF">
+    <Byte name="NSCAT_Rev_20_Num_Beam_34">
+        <Dim size="46"/>
+        <Dim size="6"/>
+        <Attribute name="long_name" type="String">
+            <Value>The total number of sigma-0s received from beam 3 or 4</Value>
+        </Attribute>
+        <Attribute name="units" type="String">
+            <Value>counts</Value>
+        </Attribute>
+        <Attribute name="scale_factor" type="Float64">
+            <Value>1.0000000000000000</Value>
+        </Attribute>
+        <Attribute name="scale_factor_err" type="Float64">
+            <Value>0.0000000000000000</Value>
+        </Attribute>
+        <Attribute name="add_offset" type="Float64">
+            <Value>0.0000000000000000</Value>
+        </Attribute>
+        <Attribute name="add_offset_err" type="Float64">
+            <Value>0.0000000000000000</Value>
+        </Attribute>
+        <Attribute name="calibrated_nt" type="Int32">
+            <Value>21</Value>
+        </Attribute>
+        <Attribute name="valid_range" type="Byte">
+            <Value>0</Value>
+            <Value>6</Value>
+        </Attribute>
+    </Byte>
+    <Attribute name="HDF_GLOBAL" type="Container">
+        <Attribute name="Producer_Agency" type="String">
+            <Value>NASA</Value>
+        </Attribute>
+        <Attribute name="Producer_Institution" type="String">
+            <Value>JPL</Value>
+        </Attribute>
+        <Attribute name="Sensor_Name" type="String">
+            <Value>NSCAT</Value>
+        </Attribute>
+        <Attribute name="Project_ID" type="String">
+            <Value>NSCAT</Value>
+        </Attribute>
+        <Attribute name="SIS_ID" type="String">
+            <Value>597-512-24/1996-07-01</Value>
+        </Attribute>
+        <Attribute name="Build_ID" type="String">
+            <Value>3.2.1/1996-11-05</Value>
+        </Attribute>
+        <Attribute name="ADEOS_Data_Package_ID" type="String">
+            <Value>S2</Value>
+        </Attribute>
+        <Attribute name="ADEOS_Data_Package_Type" type="String">
+            <Value>S</Value>
+        </Attribute>
+        <Attribute name="Product_Creation_Time" type="String">
+            <Value>1996-318T01:35:16.000</Value>
+        </Attribute>
+        <Attribute name="Data_Type" type="String">
+            <Value>L2</Value>
+        </Attribute>
+        <Attribute name="Data_Status" type="String">
+            <Value>COMPLETE</Value>
+        </Attribute>
+        <Attribute name="First_Rev_Number" type="Int32">
+            <Value>415</Value>
+        </Attribute>
+        <Attribute name="First_Rev_Eq_Crossing_Time" type="String">
+            <Value>1996-259T04:01:28.226</Value>
+        </Attribute>
+        <Attribute name="First_Rev_Eq_Crossing_Lon" type="Float32">
+            <Value>279.9830017</Value>
+        </Attribute>
+        <Attribute name="First_Data_Time" type="String">
+            <Value>1996-259T03:43:48.945</Value>
+        </Attribute>
+        <Attribute name="Last_Data_Time" type="String">
+            <Value>1996-259T05:09:48.997</Value>
+        </Attribute>
+        <Attribute name="Num_Expected_Output_Records" type="Int32">
+            <Value>458</Value>
+        </Attribute>
+        <Attribute name="Num_Actual_Output_Records" type="Int32">
+            <Value>458</Value>
+        </Attribute>
+        <Attribute name="Ambig_Removal_Method" type="String">
+            <Value>Baseline used</Value>
+        </Attribute>
+        <Attribute name="HDF_Build_ID" type="String">
+            <Value>JPL D-xxxxx 12/15/94</Value>
+        </Attribute>
+        <Attribute name="HDF_SIS_ID" type="String">
+            <Value>JPL D-12060 12/15/94</Value>
+        </Attribute>
+        <Attribute name="HDF_Conversion_Organization" type="String">
+            <Value>JPL PO.DAAC</Value>
+        </Attribute>
+        <Attribute name="HDF_Conversion_Time" type="String">
+            <Value>1996-320T17:32:34       </Value>
+        </Attribute>
+        <Attribute name="Data_Format_Type" type="String">
+            <Value>HDF</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Lat_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Lat_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Lon_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Lon_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Sigma0_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Sigma0_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_12_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_12_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_34_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_34_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_56_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_56_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_78_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Beam_78_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Quality_Flag_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_WVC_Quality_Flag_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Mean_Wind_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Mean_Wind_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Speed_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Speed_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Speed_dim_2" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>position of the ambiguities</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>position</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Dir_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Dir_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Wind_Dir_dim_2" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>position of the ambiguities</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>position</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Speed_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Speed_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Speed_dim_2" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>position of the ambiguities</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>position</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Dir_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Dir_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Error_Dir_dim_2" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>position of the ambiguities</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>position</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_MLE_Likelihood_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_MLE_Likelihood_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_MLE_Likelihood_dim_2" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>position of the ambiguities</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>position</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Ambigs_dim_0" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC row</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>row</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_Num_Ambigs_dim_1" type="Container">
+        <Attribute name="long_name" type="String">
+            <Value>WVC index</Value>
+        </Attribute>
+        <Attribute name="name" type="String">
+            <Value>WVC</Value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="NSCAT_Rev_20_SwathIndex" type="Container"/>
+    <Attribute name="NSCAT_Rev_20_NSCAT_L2" type="Container"/>
+</Dataset>

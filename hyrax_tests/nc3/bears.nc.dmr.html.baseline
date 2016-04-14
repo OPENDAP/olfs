@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ /////////////////////////////////////////////////////////////////////////////
-  ~ // This file is part of the "Hyrax Data Server" project.
-  ~ //
-  ~ //
-  ~ // Copyright (c) 2016 OPeNDAP, Inc.
-  ~ // Author: Nathan David Potter  <ndp@opendap.org>
-  ~ //
-  ~ // This library is free software; you can redistribute it and/or
-  ~ // modify it under the terms of the GNU Lesser General Public
-  ~ // License as published by the Free Software Foundation; either
-  ~ // version 2.1 of the License, or (at your option) any later version.
-  ~ //
-  ~ // This library is distributed in the hope that it will be useful,
-  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  ~ // Lesser General Public License for more details.
-  ~ //
-  ~ // You should have received a copy of the GNU Lesser General Public
-  ~ // License along with this library; if not, write to the Free Software
-  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  ~ //
-  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-  ~ /////////////////////////////////////////////////////////////////////////////           
+            ~ /////////////////////////////////////////////////////////////////////////////
+            ~ // This file is part of the "Hyrax Data Server" project.
+            ~ //
+            ~ //
+            ~ // Copyright (c) 2016 OPeNDAP, Inc.
+            ~ // Author: Nathan David Potter <ndp@opendap.org>
+            ~ //
+            ~ // This library is free software; you can redistribute it and/or
+            ~ // modify it under the terms of the GNU Lesser General Public
+            ~ // License as published by the Free Software Foundation; either
+            ~ // version 2.1 of the License, or (at your option) any later version.
+            ~ //
+            ~ // This library is distributed in the hope that it will be useful,
+            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+            ~ // Lesser General Public License for more details.
+            ~ //
+            ~ // You should have received a copy of the GNU Lesser General Public
+            ~ // License along with this library; if not, write to the Free Software
+            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+            ~ //
+            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+            ~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
@@ -53,14 +53,16 @@
       <form action="">
          <input type="checkbox" id="debug_checkbox"/>DEBUG
                     <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);                       
+                        DEBUG = new debug_obj(debug_checkbox);
                     </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition"
-                        target="help">Actions</a>
+                        target="help">
+                        Actions
+                    </a>
                   </div>
                </td>
                <td>
@@ -78,7 +80,9 @@
                <td align="right">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url"
-                        target="help">Data URL</a>
+                        target="help">
+                        Data URL
+                    </a>
                   </div>
                </td>
                <td>
@@ -98,7 +102,9 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr"
-                        target="help">Global Attributes</a>
+                        target="help">
+                        Global Attributes
+                    </a>
                   </div>
                </td>
                <td width="100%">
@@ -110,7 +116,8 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">history:</span>
+                                       <span class="bold">history:
+                        </span>
                                        <span class="em">This is an example of a multi-line global\012attribute.  It could be used for representing the\012processing history of the data, for example.</span>
                                     </div>
                                  </li>
@@ -125,7 +132,8 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">Unlimited_Dimension:</span>
+                                       <span class="bold">Unlimited_Dimension:
+                        </span>
                                        <span class="em">k</span>
                                     </div>
                                  </li>
@@ -148,17 +156,30 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#shared_dimesions"
-                        target="help">Shared Dimensions</a>
+                        target="help">Global Dimensions
+                    </a>
                   </div>
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">i = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..1</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">j = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..2</span>]</span>
-                     <span class="large">[<span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">l = </span>
-                        <span class="medium_italic" style="vertical-align: 10%;">0..2</span>]</span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">i =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..1</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">j =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..2</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">l =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..2</span>
+            ]
+        </span>
                   </div>
                </td>
             </tr>
@@ -174,22 +195,29 @@
                <td align="right" style="vertical-align:text-top">
                   <div class="medium_bold">
                      <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
-                        target="help">Variables</a>
+                        target="help">Variables
+                    </a>
                   </div>
                </td>
                <td>
                   <div style="margin-left:25px;">
                      <script type="text/javascript">org_opendap_i = new dap_var("i", "org_opendap_i", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_i); 
+                DAP4_URL.add_dap_var(org_opendap_i);
             org_opendap_i.checkBox = "get_org_opendap_i";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_i"
                                onclick="org_opendap_i.handle_projection_change(get_org_opendap_i)"
-                               onfocus="describe_projection()"/>i<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int32)</span>
+                               onfocus="describe_projection()"/>i<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_i_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -203,13 +231,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">attr1:</span>
+                                       <span class="bold">attr1:
+                        </span>
                                        <span class="em">1</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">attr2:</span>
+                                       <span class="bold">attr2:
+                        </span>
                                        <span class="em">1234</span>
                                     </div>
                                  </li>
@@ -220,13 +250,15 @@
                                           <ul>
                                              <li>
                                                 <div class="small">
-                                                   <span class="bold">attr3_1:</span>
+                                                   <span class="bold">attr3_1:
+                        </span>
                                                    <span class="em">17</span>
                                                 </div>
                                              </li>
                                              <li>
                                                 <div class="small">
-                                                   <span class="bold">attr3_2:</span>
+                                                   <span class="bold">attr3_2:
+                        </span>
                                                    <span class="em">192327</span>
                                                 </div>
                                              </li>
@@ -239,16 +271,22 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_j = new dap_var("j", "org_opendap_j", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_j); 
+                DAP4_URL.add_dap_var(org_opendap_j);
             org_opendap_j.checkBox = "get_org_opendap_j";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_j"
                                onclick="org_opendap_j.handle_projection_change(get_org_opendap_j)"
-                               onfocus="describe_projection()"/>j<span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Float32)</span>
+                               onfocus="describe_projection()"/>j<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_j_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -257,17 +295,28 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_bears = new dap_var("bears", "org_opendap_bears", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_bears); 
+                DAP4_URL.add_dap_var(org_opendap_bears);
             org_opendap_bears.checkBox = "get_org_opendap_bears";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_bears"
                                onclick="org_opendap_bears.handle_projection_change(get_org_opendap_bears)"
-                               onfocus="describe_projection()"/>bears<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is String)</span>
+                               onfocus="describe_projection()"/>bears<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is String)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_bears_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -286,37 +335,43 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">act:</span>
+                                       <span class="bold">act:
+                        </span>
                                        <span class="em">text string\012\011123</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">acs:</span>
+                                       <span class="bold">acs:
+                        </span>
                                        <span class="em">-40</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">acl:</span>
+                                       <span class="bold">acl:
+                        </span>
                                        <span class="em">17000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">acf:</span>
+                                       <span class="bold">acf:
+                        </span>
                                        <span class="em">-2.000000001.000000000.00000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">acd:</span>
+                                       <span class="bold">acd:
+                        </span>
                                        <span class="em">-1.0000000000000000.7500000000000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">string_length:</span>
+                                       <span class="bold">string_length:
+                        </span>
                                        <span class="em">3</span>
                                     </div>
                                  </li>
@@ -325,17 +380,28 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_order = new dap_var("order", "org_opendap_order", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_order); 
+                DAP4_URL.add_dap_var(org_opendap_order);
             org_opendap_order.checkBox = "get_org_opendap_order";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_order"
                                onclick="org_opendap_order.handle_projection_change(get_org_opendap_order)"
-                               onfocus="describe_projection()"/>order<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int16)</span>
+                               onfocus="describe_projection()"/>order<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_order_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -349,17 +415,28 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_shot = new dap_var("shot", "org_opendap_shot", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_shot); 
+                DAP4_URL.add_dap_var(org_opendap_shot);
             org_opendap_shot.checkBox = "get_org_opendap_shot";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_shot"
                                onclick="org_opendap_shot.handle_projection_change(get_org_opendap_shot)"
-                               onfocus="describe_projection()"/>shot<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int32)</span>
+                               onfocus="describe_projection()"/>shot<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_shot_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -373,17 +450,28 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_aloan = new dap_var("aloan", "org_opendap_aloan", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_aloan); 
+                DAP4_URL.add_dap_var(org_opendap_aloan);
             org_opendap_aloan.checkBox = "get_org_opendap_aloan";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_aloan"
                                onclick="org_opendap_aloan.handle_projection_change(get_org_opendap_aloan)"
-                               onfocus="describe_projection()"/>aloan<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Float32)</span>
+                               onfocus="describe_projection()"/>aloan<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_aloan_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -397,17 +485,28 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_cross = new dap_var("cross", "org_opendap_cross", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_cross); 
+                DAP4_URL.add_dap_var(org_opendap_cross);
             org_opendap_cross.checkBox = "get_org_opendap_cross";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_cross"
                                onclick="org_opendap_cross.handle_projection_change(get_org_opendap_cross)"
-                               onfocus="describe_projection()"/>cross<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Float64)</span>
+                               onfocus="describe_projection()"/>cross<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float64)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_cross_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -421,16 +520,22 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_i = new dap_var("i", "org_opendap_i", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_i); 
+                DAP4_URL.add_dap_var(org_opendap_i);
             org_opendap_i.checkBox = "get_org_opendap_i";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_i"
                                onclick="org_opendap_i.handle_projection_change(get_org_opendap_i)"
-                               onfocus="describe_projection()"/>i<span class="medium">[<span class="small" style="vertical-align: 15%;">i=</span>0<span class="medium" style="vertical-align: 10%;">..</span>1]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int32)</span>
+                               onfocus="describe_projection()"/>i<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">i=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>1]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_i_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -444,13 +549,15 @@
                               <ul>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">attr1:</span>
+                                       <span class="bold">attr1:
+                        </span>
                                        <span class="em">1</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
-                                       <span class="bold">attr2:</span>
+                                       <span class="bold">attr2:
+                        </span>
                                        <span class="em">1234</span>
                                     </div>
                                  </li>
@@ -461,13 +568,15 @@
                                           <ul>
                                              <li>
                                                 <div class="small">
-                                                   <span class="bold">attr3_1:</span>
+                                                   <span class="bold">attr3_1:
+                        </span>
                                                    <span class="em">17</span>
                                                 </div>
                                              </li>
                                              <li>
                                                 <div class="small">
-                                                   <span class="bold">attr3_2:</span>
+                                                   <span class="bold">attr3_2:
+                        </span>
                                                    <span class="em">192327</span>
                                                 </div>
                                              </li>
@@ -480,16 +589,22 @@
                         </ul>
                      </div>
                      <script type="text/javascript">org_opendap_j = new dap_var("j", "org_opendap_j", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_j); 
+                DAP4_URL.add_dap_var(org_opendap_j);
             org_opendap_j.checkBox = "get_org_opendap_j";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_j"
                                onclick="org_opendap_j.handle_projection_change(get_org_opendap_j)"
-                               onfocus="describe_projection()"/>j<span class="medium">[<span class="small" style="vertical-align: 15%;">j=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Float32)</span>
+                               onfocus="describe_projection()"/>j<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">j=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_j_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -498,16 +613,22 @@
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">org_opendap_l = new dap_var("l", "org_opendap_l", true,false);
-           
+
             
-                DAP4_URL.add_dap_var(org_opendap_l); 
+                DAP4_URL.add_dap_var(org_opendap_l);
             org_opendap_l.checkBox = "get_org_opendap_l";
             </script>
-                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
                         <input type="checkbox" id="get_org_opendap_l"
                                onclick="org_opendap_l.handle_projection_change(get_org_opendap_l)"
-                               onfocus="describe_projection()"/>l<span class="medium">[<span class="small" style="vertical-align: 15%;">l=</span>0<span class="medium" style="vertical-align: 10%;">..</span>2]</span>
-                        <span class="small" style="vertical-align: 15%; font-size: 25%;"> (Type is Int16)</span>
+                               onfocus="describe_projection()"/>l<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">l=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>2]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
+            </span>
                      </div>
                      <input type="text" id="org_opendap_l_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
@@ -525,12 +646,20 @@
          <tr>
             <td/>
             <td>
-               <div class="small" align="right"> Hyrax development sponsored by <a href="http://www.nsf.gov/">NSF</a> , <a href="http://www.nasa.gov/">NASA</a> , and <a href="http://www.noaa.gov/">NOAA</a>
+               <div class="small" align="right">Hyrax development sponsored by
+                                <a href="http://www.nsf.gov/">NSF
+                                </a>
+                                ,
+                                <a href="http://www.nasa.gov/">NASA
+                                </a>
+                                , and
+                                <a href="http://www.noaa.gov/">NOAA</a>
                </div>
             </td>
          </tr>
       </table>
-      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
    </body>
