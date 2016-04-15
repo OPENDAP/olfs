@@ -27,8 +27,7 @@
 package opendap.bes.dap2Responders;
 
 import opendap.bes.*;
-import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.RequestCache;
+import opendap.bes.caching.BesCatalogCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap4.QueryParameters;
 import opendap.logging.Procedure;
@@ -43,7 +42,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1238,13 +1236,13 @@ public class BesApi {
         Procedure timedProc = Timer.start();
         try {
 
-            String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
+            //String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
 
             log.info(logPrefix + "Looking for cached copy of BES showCatalog response for dataSource \"" +
                     dataSource + "\"");
 
-            //Object o = BesCatalogCache.getCatalog(dataSource);
-            Object o = RequestCache.get(responseCacheKey);
+            Object o = BesCatalogCache.getCatalog(dataSource);
+            //Object o = RequestCache.get(responseCacheKey);
 
             if (o == null) {
                 log.info(logPrefix + "No cached copy of BES showCatalog response for dataSource \"" +
@@ -1262,8 +1260,8 @@ public class BesApi {
 
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                    //BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, (Document) response.clone());
-                    RequestCache.put(responseCacheKey, response.clone());
+                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, response.clone());
+                    // RequestCache.put(responseCacheKey, response.clone());
                     log.info(logPrefix + "Cached copy of BES showCatalog response for dataSource: \"" +
                             dataSource + "\"");
 
@@ -1271,8 +1269,8 @@ public class BesApi {
                 catch (BESError be){
                     log.info(logPrefix + "The BES returned a BESError for dataSource: \"" + dataSource +
                             "\"  CACHING. (responseCacheKey=\"" + dataSource + "\")");
-                    // BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, be);
-                    RequestCache.put(dataSource, be);
+                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, be);
+                    // RequestCache.put(dataSource, be);
                     throw be;
                 }
 

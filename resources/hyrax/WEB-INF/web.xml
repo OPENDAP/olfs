@@ -148,6 +148,9 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <listener>
+        <listener-class>opendap.bes.caching.CatalogCacheUpdater</listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>hyrax</servlet-name>

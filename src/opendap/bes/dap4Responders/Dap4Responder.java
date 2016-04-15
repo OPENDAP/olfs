@@ -404,15 +404,13 @@ public abstract class Dap4Responder extends BesDapResponder  {
     public long getLastModified(HttpServletRequest request) throws Exception {
 
 
-        // String relativeUrl = ReqInfo.getLocalUrl(request);
-        // String dataSource = getResourceId(relativeUrl,true);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSource = getResourceId(relativeUrl,true);
 
-       //  _log.debug("getLastModified(): Determining LastModified time for resource {}", dataSource);
+        _log.debug("getLastModified(): Determining LastModified time for resource {}", dataSource);
 
-        // ResourceInfo ri = getResourceInfo(dataSource);
-        // return ri.lastModified();
-
-        return -1;
+        ResourceInfo ri = getResourceInfo(dataSource);
+        return ri.lastModified();
 
     }
 

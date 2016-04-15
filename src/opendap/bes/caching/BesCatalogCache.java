@@ -1,15 +1,20 @@
-package opendap.caching;
+package opendap.bes.caching;
 
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.ppt.PPTException;
+import opendap.semantics.IRISail.ProcessController;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -19,11 +24,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * In memory cache for BES responses. In practice this is not designed for data but for BES API stuff like
+ * In memory cache for BES show catalog responses. In practice this is not designed for data but for BES API stuff like
  * show catalog, show info, etc. It will cache in memory any object that you wish however and associate it with
  * what ever "key" string you associate with it..
  */
-public class BesCatalogCache {
+public class BesCatalogCache implements Runnable{
 
 
     private static Logger log;
@@ -39,7 +44,9 @@ public class BesCatalogCache {
     private static double _cache_reduction_factor = 0.2; // Amount to reduce cache when purging
 
 
-    private static boolean ENABLED=false;
+    private static boolean ENABLED=true;
+
+    private static boolean halt = false;
 
     /**
      * This private class ois used to wrap whatever object is being cached along with data used to
@@ -171,6 +178,12 @@ public class BesCatalogCache {
         }
 
     }
+
+    /**
+     * Updates the mostRecent list by dropping the passed CatalogTransaction from the mostRecent list, updating
+     * the CatalogTransaction's access time and then adding the updated CatalogTransaction back to the mostRecent list.
+     * @param cct
+     */
     private static  void updateMostRecentlyAccessed(CatalogTransaction cct){
 
         lock.lock();
@@ -290,8 +303,9 @@ public class BesCatalogCache {
     }
 
 
-    public static void updateCatalogTransaction(String resourceId) throws JDOMException, BadConfigurationException, PPTException, IOException {
+    private static void updateCatalogTransaction(String resourceId) throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
         String logPrefix = "updateCatalogTransaction() - ";
+        log.info(logPrefix + "Updating \"{}\"",resourceId);
 
         CatalogTransaction cTransaction = catalogTransactionCache.get(resourceId);
 
@@ -305,12 +319,9 @@ public class BesCatalogCache {
             log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
                     "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
             cTransaction._response = be;
-            cTransaction._lastAccessedTime = System.nanoTime();
         }
-
         updateMostRecentlyAccessed(cTransaction);
-
-
+        log.info(logPrefix + "Finished updating \"{}\"",resourceId);
     }
 
 
@@ -364,33 +375,89 @@ public class BesCatalogCache {
 
 
     }
+    @Override
+    public void run() {
 
+        long firstUpdateDelay = 3000;
+        long catalogUpdateInterval = 10000;
+        Thread thread = Thread.currentThread();
+        boolean interrupted = false;
 
-    private static class CacheUpdater implements Runnable {
+        log.info("run(): ************* CATALOG UPDATE THREAD.("+thread.getName()+") HAS BEEN STARTED.");
+        try {
+            log.info("run(): ************* CATALOG UPDATE THREAD ("+thread.getName()+") will commence in " +
+                    firstUpdateDelay / 1000.0 + " seconds. Sleeping now...");
+            Thread.sleep(firstUpdateDelay);
 
-
-        @Override
-        public void run() {
-
+        } catch (InterruptedException e) {
+            log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
+            interrupted = true;
         }
 
-        void update() throws JDOMException, BadConfigurationException, PPTException, IOException {
-            lock.lock();
+        long updateCounter = 0;
+        while (!interrupted && !halt) {
+
             try {
-                for (String resourceId : catalogTransactionCache.keySet()) {
-                    if (!resourceId.endsWith("contents") && !resourceId.endsWith("contents.html"))
-                        updateCatalogTransaction(resourceId);
+
+                long startTime = new Date().getTime();
+                try {
+                    update();
                 }
-            }
-            finally {
-                lock.unlock();
-            }
+                catch (InterruptedException e) {
+                    log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
+                            "  Message: " + e.getMessage());
+                    interrupted = true;
+                }
+                catch (BadConfigurationException | PPTException | IOException | JDOMException e) {
+                    log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
+                            "  Message: " + e.getMessage());
+                }
 
+                long endTime = new Date().getTime();
+                long elapsedTime = (endTime - startTime);
+                updateCounter++;
+                log.info("run(): Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
+
+                long sleepTime = catalogUpdateInterval - elapsedTime;
+                if (ProcessController.continueProcessing() && sleepTime > 0) {
+                    log.info("run(): "+thread.getName()+" sleeping for " + sleepTime / 1000.0 + " seconds.");
+                    Thread.sleep(sleepTime);
+                }
+
+            } catch (InterruptedException e) {
+                log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
+                interrupted=true;
+                halt=true;
+
+            }
         }
 
+        log.info("run(): ************* CATALOG UPDATE THREAD.("+Thread.currentThread().getName()+") IS EXITING.");
 
-        public void destroy(){
-
-        }
     }
+
+    void update() throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
+        lock.lock();
+        try {
+            for (String resourceId : catalogTransactionCache.keySet()) {
+                updateCatalogTransaction(resourceId);
+                if(halt)
+                    return;
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+
+    }
+
+
+    public void destroy(){
+
+    }
+
+    public void halt(){
+        halt = true;
+    }
+
 }
