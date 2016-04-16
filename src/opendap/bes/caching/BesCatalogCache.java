@@ -8,18 +8,16 @@ import opendap.semantics.IRISail.ProcessController;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,13 +38,24 @@ public class BesCatalogCache implements Runnable{
         lock = new ReentrantLock();
     }
 
+    private static ConcurrentHashMap<String,CatalogTransaction> catalogTransactionCache;
+    static {
+        catalogTransactionCache = new ConcurrentHashMap<>();
+    }
+
+    private static ConcurrentSkipListSet<CatalogTransaction> mostRecent;
+    static {
+        mostRecent = new ConcurrentSkipListSet<>();
+    }
+
+
     private static long _max_cache_size = 50; // # of entries in cache
     private static double _cache_reduction_factor = 0.2; // Amount to reduce cache when purging
 
 
     private static boolean ENABLED=true;
 
-    private static boolean halt = false;
+    private static AtomicBoolean halt=new AtomicBoolean(false);
 
     /**
      * This private class ois used to wrap whatever object is being cached along with data used to
@@ -134,16 +143,6 @@ public class BesCatalogCache implements Runnable{
 
 
 
-
-    private static ConcurrentHashMap<String,CatalogTransaction> catalogTransactionCache;
-    static {
-        catalogTransactionCache = new ConcurrentHashMap<>();
-    }
-
-    private static ConcurrentSkipListSet<CatalogTransaction> mostRecent;
-    static {
-        mostRecent = new ConcurrentSkipListSet<>();
-    }
 
 
 
@@ -378,24 +377,14 @@ public class BesCatalogCache implements Runnable{
     @Override
     public void run() {
 
-        long firstUpdateDelay = 3000;
         long catalogUpdateInterval = 10000;
         Thread thread = Thread.currentThread();
         boolean interrupted = false;
 
         log.info("run(): ************* CATALOG UPDATE THREAD.("+thread.getName()+") HAS BEEN STARTED.");
-        try {
-            log.info("run(): ************* CATALOG UPDATE THREAD ("+thread.getName()+") will commence in " +
-                    firstUpdateDelay / 1000.0 + " seconds. Sleeping now...");
-            Thread.sleep(firstUpdateDelay);
-
-        } catch (InterruptedException e) {
-            log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
-            interrupted = true;
-        }
 
         long updateCounter = 0;
-        while (!interrupted && !halt) {
+        while (!interrupted && !halt.get()) {
 
             try {
 
@@ -411,6 +400,7 @@ public class BesCatalogCache implements Runnable{
                 catch (BadConfigurationException | PPTException | IOException | JDOMException e) {
                     log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
                             "  Message: " + e.getMessage());
+                    halt.set(true);
                 }
 
                 long endTime = new Date().getTime();
@@ -427,7 +417,7 @@ public class BesCatalogCache implements Runnable{
             } catch (InterruptedException e) {
                 log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
                 interrupted=true;
-                halt=true;
+                halt.set(true);
 
             }
         }
@@ -441,7 +431,7 @@ public class BesCatalogCache implements Runnable{
         try {
             for (String resourceId : catalogTransactionCache.keySet()) {
                 updateCatalogTransaction(resourceId);
-                if(halt)
+                if(halt.get())
                     return;
             }
         }
@@ -457,7 +447,7 @@ public class BesCatalogCache implements Runnable{
     }
 
     public void halt(){
-        halt = true;
+        halt.set(true);
     }
 
 }
