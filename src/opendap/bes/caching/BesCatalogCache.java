@@ -4,7 +4,6 @@ import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.ppt.PPTException;
-import opendap.semantics.IRISail.ProcessController;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -49,16 +48,29 @@ public class BesCatalogCache implements Runnable{
     }
 
 
-    private static long _max_cache_size = 50; // # of entries in cache
-    private static double _cache_reduction_factor = 0.2; // Amount to reduce cache when purging
+    private static AtomicLong _maxCacheEntries = new AtomicLong(50); // # of entries in cache
+    private static AtomicLong _updateInterval = new AtomicLong(10); // Update interval
+    private static double _cache_reduction_factor; // Amount to reduce cache when purging
 
 
-    private static boolean ENABLED=true;
+    private static boolean ENABLED=false;
 
     private static AtomicBoolean halt=new AtomicBoolean(false);
 
+
+    public BesCatalogCache(long maxEntries, long updateInterval) {
+        if(ENABLED)
+            return;
+
+        _maxCacheEntries.set(maxEntries);
+        _updateInterval.set(updateInterval);
+        _cache_reduction_factor =  0.2;
+        ENABLED = true;
+        log.debug("BesCatalogCache() - CREATED  _maxCacheEntries: {}  _updateInterval: {}", _maxCacheEntries.get(),_updateInterval.get());
+    }
+
     /**
-     * This private class ois used to wrap whatever object is being cached along with data used to
+     * This private class is used to wrap whatever object is being cached along with data used to
      * operate in the cache. Most significantly this class implements the Comparable interface such that
      * the "natural" ordering of instances will be based on the last time each instance was accessed by the server.
      * This is not an autonomous operation and is tightly coupled with code in "BesCatalogCache.getCatalog()" to
@@ -148,10 +160,15 @@ public class BesCatalogCache implements Runnable{
 
     private static void purgeLeastRecentlyAccessed(){
 
-        int dropNum = (int) (_max_cache_size * _cache_reduction_factor);
 
         lock.lock();
         try {
+
+            // Cache not full? Then return...
+            if (catalogTransactionCache.size() < _maxCacheEntries.get())
+                return;
+
+            int dropNum = (int) (_maxCacheEntries.get() * _cache_reduction_factor);
             log.debug("purgeLeastRecentlyAccessed() - BEGIN  catalogTransactionCache.size(): {}  mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
             log.debug("purgeLeastRecentlyAccessed() - dropNum: {}",dropNum);
             log.debug("purgeLeastRecentlyAccessed() - Before purge catalogTransactionCache.size(): {}", catalogTransactionCache.size());
@@ -181,7 +198,7 @@ public class BesCatalogCache implements Runnable{
     /**
      * Updates the mostRecent list by dropping the passed CatalogTransaction from the mostRecent list, updating
      * the CatalogTransaction's access time and then adding the updated CatalogTransaction back to the mostRecent list.
-     * @param cct
+     * @param cct The CatalogTransaction whose access time needs updating.
      */
     private static  void updateMostRecentlyAccessed(CatalogTransaction cct){
 
@@ -222,8 +239,7 @@ public class BesCatalogCache implements Runnable{
             log.debug("putCatalogTransaction() - BEGIN  catalogTransactionCache.size(): {}  " +
                     "mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
 
-            if (catalogTransactionCache.size() >= _max_cache_size)
-                purgeLeastRecentlyAccessed();
+            purgeLeastRecentlyAccessed();
 
             CatalogTransaction co = new CatalogTransaction(key, request, response);
             log.debug("putCatalogTransaction() - CatalogTransaction created: {}", co._lastAccessedTime);
@@ -377,7 +393,6 @@ public class BesCatalogCache implements Runnable{
     @Override
     public void run() {
 
-        long catalogUpdateInterval = 10000;
         Thread thread = Thread.currentThread();
         boolean interrupted = false;
 
@@ -408,9 +423,12 @@ public class BesCatalogCache implements Runnable{
                 updateCounter++;
                 log.info("run(): Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
 
-                long sleepTime = catalogUpdateInterval - elapsedTime;
-                if (ProcessController.continueProcessing() && sleepTime > 0) {
-                    log.info("run(): "+thread.getName()+" sleeping for " + sleepTime / 1000.0 + " seconds.");
+                long sleepTime = _updateInterval.get() - elapsedTime;
+                if (!halt.get() && sleepTime > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("run(): ").append(thread.getName()).append(" sleeping for ").append(sleepTime/1000.0);
+                    sb.append(" cache: ").append(mostRecent.size()).append("/").append(_maxCacheEntries.get());
+                    log.info(sb.toString());
                     Thread.sleep(sleepTime);
                 }
 
