@@ -27,8 +27,7 @@
 package opendap.bes.dap2Responders;
 
 import opendap.bes.*;
-import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.RequestCache;
+import opendap.bes.caching.BesCatalogCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap4.QueryParameters;
 import opendap.logging.Procedure;
@@ -43,7 +42,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1230,54 +1228,74 @@ public class BesApi {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public void getBesCatalog(String dataSource, Document response) throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
+    public void getBesCatalog(String dataSource, Document response)
+            throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
 
+        String logPrefix = "getBesCatalog() - ";
 
         Procedure timedProc = Timer.start();
         try {
 
-            String responseCacheKey = this.getClass().getName() + ".getCatalog(\"" + dataSource + "\")";
+            //String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
 
-            log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\"" + responseCacheKey + "\"");
+            log.info(logPrefix + "Looking for cached copy of BES showCatalog response for dataSource \"" +
+                    dataSource + "\"");
 
-            Object o = RequestCache.get(responseCacheKey);
+            Object o = BesCatalogCache.getCatalog(dataSource);
+            //Object o = RequestCache.get(responseCacheKey);
 
             if (o == null) {
+                log.info(logPrefix + "No cached copy of BES showCatalog response for dataSource \"" +
+                        dataSource + "\" found. Acquiring now.");
 
                 Document getCatalogRequest = getShowCatalogRequestDocument(dataSource);
 
-                besTransaction(dataSource, getCatalogRequest, response);
+                try {
+                    besTransaction(dataSource, getCatalogRequest, response);
+                    // Get the root element.
+                    Element root = response.getRootElement();
 
-                // Get the root element.
-                Element root = response.getRootElement();
+                    // Find the top level dataset Element
+                    Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
 
-                // Find the top level dataset Element
-                Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
+                    topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                topDataset.setAttribute("prefix", getBESprefix(dataSource));
+                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, response.clone());
+                    // RequestCache.put(responseCacheKey, response.clone());
+                    log.info(logPrefix + "Cached copy of BES showCatalog response for dataSource: \"" +
+                            dataSource + "\"");
 
-                RequestCache.put(responseCacheKey, response.clone());
-                log.info("getCatalog(): Cached copy of BES showCatalog response for dataSource: \"" + dataSource + "\"   (responseCacheKey=\"" + responseCacheKey + "\")");
+                }
+                catch (BESError be){
+                    log.info(logPrefix + "The BES returned a BESError for dataSource: \"" + dataSource +
+                            "\"  CACHING. (responseCacheKey=\"" + dataSource + "\")");
+                    BesCatalogCache.putCatalogTransaction(dataSource, getCatalogRequest, be);
+                    // RequestCache.put(dataSource, be);
+                    throw be;
+                }
 
 
 
             } else {
-                log.info("getCatalog(): Using cached copy of BES showCatalog.  responseCacheKey=\"" + responseCacheKey + "\"");
-
-
-                Document result;
+                log.info(logPrefix + "Using cached copy of BES showCatalog.  dataSource=\"" +
+                        dataSource + "\"");
 
                 if (o instanceof BESError) {
-                    result = ((BESError) o).getErrorDoc();
-                } else {
-                    result = (Document) ((Document) o).clone();
+                    log.info(logPrefix + "Cache contains BESError object.  dataSource=\"" +
+                            dataSource + "\"");
+                    BESError error = (BESError) o;
+                    throw error;
                 }
-
-                Element root = result.getRootElement();
-                root.detach();
-                response.setRootElement(root);
-
-
+                else if(o instanceof Document){
+                    Document cachedCatalogDoc = (Document)o;
+                    Element root = cachedCatalogDoc.getRootElement();
+                    Element newRoot =  (Element) root.clone();
+                    newRoot.detach();
+                    response.setRootElement(newRoot);
+                }
+                else {
+                    throw new IOException("Cached object is of unexpected type! This is a bad thing! Object: "+o.getClass().getCanonicalName());
+                }
             }
         }
         finally {
@@ -1301,6 +1319,7 @@ public class BesApi {
      * @throws IOException               .
      * @throws JDOMException             .
      */
+    /*
     public void getInfo(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
@@ -1315,7 +1334,7 @@ public class BesApi {
 
             log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \"" + dataSource + "\"  (responseCacheKey=\"" + responseCacheKey + "\")");
 
-            Object o = RequestCache.get(responseCacheKey);
+            Object o = RequestCache.getCatalog(responseCacheKey);
 
             if (o == null) {
                 log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\"" +responseCacheKey + "\"  not found in cache.");
@@ -1334,13 +1353,13 @@ public class BesApi {
                     // Add the prefix attribute for this BES.
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
-                    RequestCache.put(responseCacheKey, response.clone());
+                    RequestCache.putCatalogTransaction(responseCacheKey, response.clone());
                     log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\"" + responseCacheKey + "\"");
 
                 } catch(BESError e) {
 
                     if(e.convertBesErrorCodeToHttpStatusCode()== HttpServletResponse.SC_NOT_FOUND) {
-                        RequestCache.put(responseCacheKey, new NoSuchDatasource((Document) response.clone()));
+                        RequestCache.putCatalogTransaction(responseCacheKey, new NoSuchDatasource((Document) response.clone()));
                         log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\"" + responseCacheKey + "\"");
                     }
                     else {
@@ -1388,6 +1407,7 @@ public class BesApi {
 
     }
 
+*/
 
 
 
@@ -2496,6 +2516,9 @@ public class BesApi {
 
                 try {
                     ResourceInfo dsi = new BESResource(besDataSourceId, this);
+                    // Q: Why this test and not dsi.sourceExists()??
+                    // A: Because this check is only for things the BES views as data. Regular (non data)
+                    //    files are handled by the "FileDispatchHandler"
                     if (!dsi.isDataset()) {
                         besDataSourceId = null;
                     }

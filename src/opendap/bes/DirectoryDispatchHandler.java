@@ -118,16 +118,14 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getLocalUrl(req);
+        Request oreq = new Request(null,req);
+        String collectionName = getCollectionName(oreq);
 
-        if(name.endsWith("contents.html"))
-            name = name.substring(0,name.lastIndexOf("contents.html"));
-
-        log.debug("getLastModified():  Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("getLastModified():  Tomcat requesting getlastModified() for collection: " + collectionName );
 
 
         try {
-            ResourceInfo dsi = new BESResource(name,_besApi);
+            ResourceInfo dsi = new BESResource(collectionName,_besApi);
             log.debug("getLastModified():  Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -248,24 +246,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Request oreq = new Request(null,request);
 
-
-
-        String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
-
-        if(collectionName.endsWith("/contents.html")){
-            collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
-        }
-        else if(collectionName.endsWith("/catalog.html")){
-            collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
-        }
-
-        if(!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        while(!collectionName.equals("/") && collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1);
-
-        log.debug("collectionName:  "+collectionName);
+        String collectionName  = getCollectionName(oreq);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -301,6 +282,28 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
+    }
+
+    private String getCollectionName(Request oreq){
+
+        String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
+
+        if(collectionName.endsWith("/contents.html")){
+            collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
+        }
+        else if(collectionName.endsWith("/catalog.html")){
+            collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
+        }
+
+        if(!collectionName.endsWith("/"))
+            collectionName += "/";
+
+        while(!collectionName.equals("/") && collectionName.startsWith("/"))
+            collectionName = collectionName.substring(1);
+
+        log.debug("collectionName:  "+collectionName);
+
+        return collectionName;
     }
 
 

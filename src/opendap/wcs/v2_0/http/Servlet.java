@@ -76,33 +76,30 @@ public class Servlet extends HttpServlet {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         String contextPath = ServletUtil.getContextPath(this);
-        log.debug("contextPath: "+contextPath);
+        log.info("contextPath: "+contextPath);
 
         String resourcePath = ServletUtil.getSystemPath(this, "/");
-        log.debug("resourcePath: "+resourcePath);
+        log.info("resourcePath: "+resourcePath);
 
-        String contentPath = ServletUtil.getConfigPath(this);
-        log.debug("contentPath: "+contentPath);
+        String configPath = ServletUtil.getConfigPath(this);
+        log.info("configPath: "+configPath);
 
         String configFilename = this.getInitParameter("ConfigFileName");
-        log.debug("configFilename: "+configFilename);
+        log.info("configFilename: "+configFilename);
 
-        String semanticPreload = this.getInitParameter("SemanticPreload");
-        log.debug("semanticPreload: "+semanticPreload);
-
-        boolean enableUpdateUrl = false;
+        boolean enableUpdateUrl;
         String s = this.getInitParameter("EnableUpdateUrl");
         enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
         log.debug("enableUpdateUrl: "+enableUpdateUrl);
 
-        String serviceContentPath = contentPath;
-        if(!serviceContentPath.endsWith("/"))
-            serviceContentPath += "/";
-        log.debug("_serviceContentPath: "+serviceContentPath);
+        String _serviceConfigPath = configPath;
+        if(!_serviceConfigPath.endsWith("/"))
+            _serviceConfigPath += "/";
+        log.debug("_serviceConfigPath: "+_serviceConfigPath);
 
-        installInitialContent(resourcePath, serviceContentPath);
+        installInitialContent(resourcePath, _serviceConfigPath);
 
-        initializeCatalog(contextPath, serviceContentPath, configFilename);
+        initializeCatalog(contextPath, _serviceConfigPath, configFilename);
 
 
         // Build Handler Objects
