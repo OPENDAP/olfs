@@ -49,7 +49,7 @@ public class BesCatalogCache implements Runnable{
 
 
     private static AtomicLong _maxCacheEntries = new AtomicLong(50); // # of entries in cache
-    private static AtomicLong _updateInterval = new AtomicLong(10); // Update interval
+    private static AtomicLong _updateInterval = new AtomicLong(10); // Update interval in seconds
     private static double _cache_reduction_factor; // Amount to reduce cache when purging
 
 
@@ -268,6 +268,8 @@ public class BesCatalogCache implements Runnable{
 
 
     public static Object getCatalog(String key){
+        if(!ENABLED)
+            return null;
 
         lock.lock();
         try {
@@ -324,19 +326,25 @@ public class BesCatalogCache implements Runnable{
 
         CatalogTransaction cTransaction = catalogTransactionCache.get(resourceId);
 
-        BesApi besApi = new BesApi();
-        try {
-            Document response =  new Document();
-            besApi.besTransaction(resourceId, cTransaction._request, response);
-            cTransaction._response = response.clone();
+        if(cTransaction!=null) {
+
+            BesApi besApi = new BesApi();
+            try {
+                Document response = new Document();
+                besApi.besTransaction(resourceId, cTransaction._request, response);
+                cTransaction._response = response.clone();
+            } catch (BESError be) {
+                log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
+                        "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
+                cTransaction._response = be;
+            }
+            updateMostRecentlyAccessed(cTransaction);
+            log.info(logPrefix + "Finished updating \"{}\"",resourceId);
         }
-        catch (BESError be){
-            log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
-                    "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
-            cTransaction._response = be;
+        else {
+            log.info(logPrefix + "Nothing to update! The CatalogTransaction for resource \"{}\" is not cached.",resourceId);
+
         }
-        updateMostRecentlyAccessed(cTransaction);
-        log.info(logPrefix + "Finished updating \"{}\"",resourceId);
     }
 
 
@@ -393,6 +401,9 @@ public class BesCatalogCache implements Runnable{
     @Override
     public void run() {
 
+        if(!ENABLED)
+            return;
+
         Thread thread = Thread.currentThread();
         boolean interrupted = false;
 
@@ -444,7 +455,7 @@ public class BesCatalogCache implements Runnable{
 
     }
 
-    void update() throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
+    private void update() throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
         lock.lock();
         try {
             for (String resourceId : catalogTransactionCache.keySet()) {
@@ -461,6 +472,21 @@ public class BesCatalogCache implements Runnable{
 
 
     public void destroy(){
+
+        lock.lock();
+        try {
+
+            halt.set(true);
+
+            catalogTransactionCache.clear();
+            catalogTransactionCache = null;
+
+            mostRecent.clear();
+            mostRecent = null;
+        }
+        finally {
+            lock.unlock();
+        }
 
     }
 

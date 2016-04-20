@@ -150,25 +150,8 @@
 
 
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Catalog Response Cache
-
-    This section configures and declares the Catalog Cache update worker.
-    The configuration happens by adding key value pairs to the current
-    ServletContext and then declaring the CatalogCacheUpdater class as
-    a ContextListener.
+    Catalog Response Cache Updater (worker thread)
 -->
-    <!-- MOVED CONFIGURATION TO olfs.xml
-    <context-param>
-        <param-name>CatalogCache.maxCacheEntries</param-name>
-        <param-value>2001</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>CatalogCache.updateInterval</param-name>
-        <param-value>3601</param-value>
-    </context-param>
-    -->
-
     <listener>
         <listener-class>opendap.bes.caching.CatalogCacheUpdater</listener-class>
     </listener>

@@ -24,8 +24,8 @@ public class CatalogCacheUpdater  implements ServletContextListener {
     private long _upDateInterval_milliseconds;
 
     public CatalogCacheUpdater() {
-        _maxCacheEntries = 51;
-        _upDateInterval_milliseconds = 13000;
+        _maxCacheEntries = 1000;
+        _upDateInterval_milliseconds = 3600000; // One Hour
     }
 
 
@@ -38,30 +38,20 @@ public class CatalogCacheUpdater  implements ServletContextListener {
 
         ServletContext context = arg0.getServletContext();
 
-        if(!loadConfig(context)){
-            try {
-                String maxEntriesString = context.getInitParameter("CatalogCache.maxCacheEntries");
-                log.debug("contextInitialized(): Checking for CatalogCache.maxCacheEntries in web.xml file. value: {}",maxEntriesString);
-                _maxCacheEntries = Long.parseLong(maxEntriesString);
-            } catch (NumberFormatException ignore ) {}
-
-            try {
-                String updateIntervalSeconds = context.getInitParameter("CatalogCache.updateInterval");
-                log.debug("contextInitialized(): Checking for CatalogCache.updateInterval in web.xml file. value:: {}",updateIntervalSeconds);
-                _upDateInterval_milliseconds = Long.parseLong(updateIntervalSeconds);
-                _upDateInterval_milliseconds = _upDateInterval_milliseconds * 1000; // seconds To milliseconds
-                log.debug("contextInitialized(): Set _upDateInterval_milliseconds to {}",_upDateInterval_milliseconds);
-            } catch (NumberFormatException ignore ) {}
+        if(loadConfig(context)){
+            bcc = new BesCatalogCache(_maxCacheEntries,_upDateInterval_milliseconds);
+            catalogUpdateThread = new Thread(bcc);
+            catalogUpdateThread.setName("CatalogCacheUpdateThread");
+            catalogUpdateThread.setDaemon(true);
+            catalogUpdateThread.start();
+            log.info("contextInitialized() - CATALOG CACHE UPDATER RUNNING");
+        }
+        else {
+            log.info("contextInitialized() - CATALOG CACHE UPDATER DID NOT START! CONFIGURATION UNAVAILABLE.");
 
         }
 
-        bcc = new BesCatalogCache(_maxCacheEntries,_upDateInterval_milliseconds);
-        catalogUpdateThread = new Thread(bcc);
-        catalogUpdateThread.setName("CatalogCacheUpdateThread");
-        catalogUpdateThread.setDaemon(true);
-        catalogUpdateThread.start();
 
-        log.info("contextInitialized() - CATALOG CACHE UPDATER RUNNING");
 
     }
 
@@ -134,9 +124,17 @@ public class CatalogCacheUpdater  implements ServletContextListener {
 
     public void contextDestroyed(ServletContextEvent arg0) {
         log.info("contextDestroyed() - STOPPING CATALOG CACHE UPDATER");
-        bcc.halt();
-        catalogUpdateThread.interrupt();
-        bcc.destroy();
+        if(bcc != null) {
+            bcc.halt();
+        }
+        if(catalogUpdateThread!=null) {
+            catalogUpdateThread.interrupt();
+            catalogUpdateThread = null;
+        }
+        if(bcc != null) {
+            bcc.destroy();
+            bcc = null;
+        }
         log.info("contextDestroyed() - CATALOG CACHE UPDATER SHOULD BE FINISHED");
     }
 }
