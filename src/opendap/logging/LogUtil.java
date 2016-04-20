@@ -385,6 +385,9 @@ public class LogUtil {
         MDC.put("userid", req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put("startTime", System.currentTimeMillis() + "");
 
+        String userAgent = req.getHeader("User-Agent");
+        MDC.put("UserAgent",  userAgent==null?"-":userAgent);
+
         String resourceID =  req.getRequestURI();
         MDC.put("resourceID",resourceID);
 
