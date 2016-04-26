@@ -79,6 +79,7 @@ public class BesCatalogCache implements Runnable{
     private static class CatalogTransaction implements Comparable  {
         private Document _request;
         private Object _response;
+        long _lastUpdateTime;
         long _lastAccessedTime;
         private String _key;
         private long _serialNumber;
@@ -90,6 +91,7 @@ public class BesCatalogCache implements Runnable{
             _request = request;
             _response = response;
             _lastAccessedTime = System.nanoTime();
+            _lastUpdateTime = _lastAccessedTime;
             _serialNumber = counter.getAndIncrement();
         }
 
@@ -320,7 +322,8 @@ public class BesCatalogCache implements Runnable{
     }
 
 
-    private static void updateCatalogTransaction(String resourceId) throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
+    private static void updateCatalogTransaction(String resourceId)
+            throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
         String logPrefix = "updateCatalogTransaction() - ";
         log.info(logPrefix + "Updating \"{}\"",resourceId);
 
@@ -338,11 +341,12 @@ public class BesCatalogCache implements Runnable{
                         "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
                 cTransaction._response = be;
             }
-            updateMostRecentlyAccessed(cTransaction);
+            cTransaction._lastUpdateTime = System.nanoTime();
             log.info(logPrefix + "Finished updating \"{}\"",resourceId);
         }
         else {
-            log.info(logPrefix + "Nothing to update! The CatalogTransaction for resource \"{}\" is not cached.",resourceId);
+            log.info(logPrefix + "Nothing to update! The CatalogTransaction " +
+                    "for resource \"{}\" is not cached.",resourceId);
 
         }
     }
