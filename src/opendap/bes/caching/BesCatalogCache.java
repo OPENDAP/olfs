@@ -268,6 +268,15 @@ public class BesCatalogCache implements Runnable{
         }
     }
 
+    public static int getCurrentCacheSize(){
+        lock.lock();
+        try {
+            return mostRecent.size();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
 
     public static Object getCatalog(String key){
         if(!ENABLED)
@@ -442,7 +451,7 @@ public class BesCatalogCache implements Runnable{
                 if (!halt.get() && sleepTime > 0) {
                     StringBuilder sb = new StringBuilder();
                     sb.append("run(): ").append(thread.getName()).append(" sleeping for ").append(sleepTime/1000.0);
-                    sb.append(" cache: ").append(mostRecent.size()).append("/").append(_maxCacheEntries.get());
+                    sb.append(" cache: ").append(getCurrentCacheSize()).append("/").append(_maxCacheEntries.get());
                     log.info(sb.toString());
                     Thread.sleep(sleepTime);
                 }

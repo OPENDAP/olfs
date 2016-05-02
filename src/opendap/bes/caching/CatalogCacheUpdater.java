@@ -130,10 +130,12 @@ public class CatalogCacheUpdater  implements ServletContextListener {
         if(catalogUpdateThread!=null) {
             catalogUpdateThread.interrupt();
             catalogUpdateThread = null;
+            log.info("contextDestroyed() - catalogUpdateThread has been destroyed and the ref null'd");
         }
         if(bcc != null) {
             bcc.destroy();
             bcc = null;
+            log.info("contextDestroyed() - BesCatalogCache instance has been destroyed and the ref null'd");
         }
         log.info("contextDestroyed() - CATALOG CACHE UPDATER SHOULD BE FINISHED");
     }
