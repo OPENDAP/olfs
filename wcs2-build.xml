@@ -301,7 +301,11 @@
                 <include name="opendap/bes/dap4Responders/MediaType.java"/>
                 <include name="opendap/bes/Version.java"/>
                 <include name="opendap/bes/BESResource.java"/>
-                
+
+                <include name="opendap/bes/caching/BesCatalogCache.java"/>
+                <include name="opendap/bes/caching/CatalogCacheUpdater.java"/>
+
+
                 <include name="opendap/bes/dap2Responders/BesApi.java"/>
                 
                 <include name="opendap/io/ChunkProtocol.java"/>
@@ -576,53 +580,6 @@
     </target>
 
     <!-- *******************************************************  -->
-
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >
-        </sourceanalyzer>
-    </target>
-
-
-
-
-
-
 
 
 
