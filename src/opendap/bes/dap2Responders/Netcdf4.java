@@ -55,18 +55,17 @@ public class Netcdf4 extends Dap4Responder {
 
 
 
-    public Netcdf4(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public Netcdf4(String sysPath, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+
+        this(sysPath, null, defaultRequestSuffix, besApi,addFileoutTypeSuffixToDownloadFilename);
     }
 
-    public Netcdf4(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
 
-    public Netcdf4(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public Netcdf4(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-4");
         setServiceTitle("NetCDF-4 Data Response");
         setServiceDescription("NetCDF-4 representation of the DAP2 Data Response object.");
@@ -84,6 +83,16 @@ public class Netcdf4 extends Dap4Responder {
     public boolean isMetadataResponder(){ return false; }
 
 
+    @Override
+    public String getDownloadFileName(String resourceID){
+
+        String downloadFileName = super.getDownloadFileName(resourceID);
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        return downloadFileName;
+    }
 
 
 
@@ -109,16 +118,8 @@ public class Netcdf4 extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         String downloadFileName = getDownloadFileName(resourceID);
-        Pattern startsWithNumber = Pattern.compile("[0-9].*");
-        if(startsWithNumber.matcher(downloadFileName).matches())
-            downloadFileName = "nc_"+downloadFileName;
-
-        downloadFileName = downloadFileName+".nc4";
-
         log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
-
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-
         response.setHeader("Content-Disposition", contentDisposition);
 
 

@@ -48,17 +48,15 @@ public class GeoTiff extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".tiff";
 
-    public GeoTiff(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public GeoTiff(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi,addTypeSuffixToDownloadFilename);
     }
 
-    public GeoTiff(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
 
-    public GeoTiff(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public GeoTiff(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
 
         setServiceRoleId("http://services.opendap.org/dap4/data/geotiff");
         setServiceTitle("GeoTIFF Data Response");

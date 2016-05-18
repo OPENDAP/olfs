@@ -53,16 +53,12 @@ public class RDF extends Dap4Responder {
 
     private static String _defaultRequestSuffix = ".rdf";
 
-    public RDF(String sysPath, BesApi besApi) {
-        this(sysPath,null, _defaultRequestSuffix,besApi);
-    }
-
-    public RDF(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
+    public RDF(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath,null, _defaultRequestSuffix,besApi, addTypeSuffixToDownloadFilename);
     }
 
 
-    public RDF(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public RDF(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         setServiceRoleId("http://services.opendap.org/dap4/rdf");
@@ -116,6 +112,8 @@ public class RDF extends Dap4Responder {
 
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
+
+        // response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
 
         String xdap_accept = "3.2";

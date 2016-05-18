@@ -58,15 +58,25 @@ public abstract class Dap4Responder extends BesDapResponder  {
     private MediaType _normativeMediaType;
     private Vector<Dap4Responder> _altResponders;
     private String _combinedRequestSuffixRegex;
+    private boolean _addTypeSuffixToDownloadFilename;
 
 
 
     public Dap4Responder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         _log = LoggerFactory.getLogger(getClass().getName());
-        _altResponders =  new Vector<Dap4Responder>();
+        _altResponders =  new Vector<>();
+        addTypeSuffixToDownloadFilename(false);
     }
 
+    public void addTypeSuffixToDownloadFilename(boolean value){
+        _addTypeSuffixToDownloadFilename = value;
+    }
+
+
+    public boolean addTypeSuffixToDownloadFilename(){
+        return _addTypeSuffixToDownloadFilename;
+    }
 
 
     public void setNormativeMediaType(MediaType mt){
@@ -499,6 +509,18 @@ public abstract class Dap4Responder extends BesDapResponder  {
                 description.setText(descriptionText);
         }
         return description;
+    }
+
+
+    @Override
+    public String getDownloadFileName(String resourceID){
+        String name = super.getDownloadFileName(resourceID);
+
+        if(addTypeSuffixToDownloadFilename())
+            name += getRequestSuffix();
+
+        return name;
+
     }
 
 
