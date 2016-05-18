@@ -96,8 +96,12 @@ class W10nRequest {
         pmap.putAll(foo);
 
 
-        _output = getParamValue("output", pmap);
-        _callback = getParamValue("callback", pmap);
+        String s = getParamValue("output", pmap);
+        _output = s!=null?Scrub.simpleString(s):null;
+
+        s = getParamValue("callback", pmap);
+        _callback = s!=null?Scrub.simpleString(s):null;
+
         _reCache = pmap.containsKey("reCache");
         _flatten = pmap.containsKey("flatten");
         _traverse = pmap.containsKey("traverse");
@@ -161,11 +165,11 @@ class W10nRequest {
     }
 
     public String output(){
-        return _output!=null?Scrub.simpleString(_output):null;
+        return _output;
     }
 
     public String callback(){
-        return _callback!=null?Scrub.simpleString(_callback):null;
+        return _callback;
     }
 
     public boolean flatten(){
