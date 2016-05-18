@@ -27,6 +27,7 @@ package opendap.w10n;
 
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
 import opendap.http.error.BadRequest;
 import opendap.http.error.NotAcceptable;
@@ -101,17 +102,10 @@ class W10nRequest {
         _flatten = pmap.containsKey("flatten");
         _traverse = pmap.containsKey("traverse");
 
-
-
         Request oreq = new Request(null, request);
         _requestedResourceId = oreq.getRelativeUrl();
 
-
         _w10nArrayConstraint = "[]"; // default is to ask for everything
-
-
-
-
 
     }
 
@@ -167,11 +161,11 @@ class W10nRequest {
     }
 
     public String output(){
-        return _output;
+        return _output!=null?Scrub.simpleString(_output):null;
     }
 
     public String callback(){
-        return _callback;
+        return _callback!=null?Scrub.simpleString(_callback):null;
     }
 
     public boolean flatten(){
@@ -455,6 +449,9 @@ class W10nRequest {
             else {
                 bestMT = altMediaTypes.get(outputParam);
                 if(bestMT == null){
+
+
+
                     String msg = "You have requested an unsupported output media type of '" + outputParam+"'";
                     _log.debug("getBestMediaType() - {}",msg);
 
