@@ -527,7 +527,7 @@ public class W10nResponder {
                 name = name.substring(1);
         }
 
-        long   size = Integer.parseInt(dataset.getAttributeValue("size"));
+        long   size = Long.parseLong(dataset.getAttributeValue("size"));
         String  lmt = dataset.getAttributeValue("lastModified");
 
 
