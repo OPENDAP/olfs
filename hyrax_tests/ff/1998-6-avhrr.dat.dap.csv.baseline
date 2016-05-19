@@ -121,4 +121,5 @@ Dataset: 1998-6-avhrr.dat
 "h", 98, 180, 11, 14, 15, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98180111415.pvu.Z"
 "h", 98, 180, 22, 34, 27, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98180223427.pvu.Z"
 "h", 98, 181, 10, 52, 2, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98181105202.pvu.Z"
+"h", 98, 181, 22, 11, 28, "http://dods.gso.uri.edu/cgi-bin/nph-dsp/avhrr/1998/6/h98181221128.pvu.Z"
 
