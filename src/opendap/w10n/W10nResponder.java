@@ -470,7 +470,7 @@ public class W10nResponder {
         ServletOutputStream sos =  response.getOutputStream();
 
         if(w10nRequest.callback()!=null){
-            sos.print(Scrub.simpleString(w10nRequest.callback())+"(");
+            sos.print(w10nRequest.callback()+"(");
         }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -527,7 +527,7 @@ public class W10nResponder {
                 name = name.substring(1);
         }
 
-        long   size = Integer.parseInt(dataset.getAttributeValue("size"));
+        long   size = Long.parseLong(dataset.getAttributeValue("size"));
         String  lmt = dataset.getAttributeValue("lastModified");
 
 
