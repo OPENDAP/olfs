@@ -124,8 +124,8 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dods)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr.html)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dmr.xml)
-AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap.csv)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap.csv,xfail)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint01.dap,xfail)
 
 ####################################################
 # TestName: ff/1998-6-avhrr.dat_RelationalConstraint02
@@ -142,8 +142,8 @@ AT_CURL_DAP2_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dods)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr.html)
 AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dmr.xml)
-AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap.csv)
-AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap)
+AT_CURL_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap.csv,xfail)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(ff/1998-6-avhrr.dat_RelationalConstraint02.dap,xfail)
 
 ####################################################
 # TestName: ff/avhrr.dat
