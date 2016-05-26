@@ -106,10 +106,16 @@ public class Dap4ResponderTest {
         Assert.assertEquals(old_rule.getDownloadFileName("file.nc"), "file.nc.nc");
         Assert.assertEquals(old_rule.getDownloadFileName("file.hdf"), "file.hdf.nc");
         Assert.assertEquals(old_rule.getDownloadFileName("file.html"), "file.html.nc");
-        
+    	Assert.assertEquals(old_rule.getDownloadFileName("fi"), "fi.nc");
+    	Assert.assertEquals(old_rule.getDownloadFileName("fi.h5"), "fi.h5.nc");
+
         Assert.assertEquals(new_rule.getDownloadFileName("file"), "file.nc");
         Assert.assertEquals(new_rule.getDownloadFileName("file.nc"), "file.nc");
         Assert.assertEquals(new_rule.getDownloadFileName("file.hdf"), "file.nc");
         Assert.assertEquals(new_rule.getDownloadFileName("file.html"), "file.html.nc");
+        
+    	Assert.assertEquals(new_rule.getDownloadFileName("fi"), "fi.nc");
+    	Assert.assertEquals(new_rule.getDownloadFileName("fi.h5"), "fi.nc");
+
     }
 }

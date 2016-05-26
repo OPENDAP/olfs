@@ -532,10 +532,10 @@ public abstract class Dap4Responder extends BesDapResponder  {
         // a reasonable compromise).
         
         if(addTypeSuffixToDownloadFilename()) {
-        	int dotPos = name.lastIndexOf(".");
+        	int dotPos = name.lastIndexOf('.');	// -1 if '.' not found
         	int extLength = name.length() - (dotPos + 1);
 
-        	if (extLength > 0 && extLength < 4) {
+        	if (dotPos != -1 && (extLength > 0 && extLength < 4)) {
         		name = name.substring(0, dotPos);
         	}
         }
