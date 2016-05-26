@@ -81,6 +81,13 @@ public class Netcdf3 extends Dap4Responder {
     public boolean isMetadataResponder(){ return false; }
 
 
+    /**
+     * For netCDF3, examine the name and prefix it with 'nc_' if the 
+     * name would otherwise not be an acceptable filename (in 
+     * practice this means 'if the name starts with a number').
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public String getDownloadFileName(String resourceID){
 

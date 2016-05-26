@@ -512,15 +512,37 @@ public abstract class Dap4Responder extends BesDapResponder  {
     }
 
 
+    /**
+     * If addTypeSuffixToDownloadFilename() is true, append the value of
+     * getRequestSuffix() to the name.
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public String getDownloadFileName(String resourceID){
         String name = super.getDownloadFileName(resourceID);
 
-        if(addTypeSuffixToDownloadFilename())
-            name += getRequestSuffix();
+        // old rule: add the suffix - there was no option
+        // old-new rule: if addTypeSuffixToDownloadFilename() is true, append getRequestSuffix().
+        // new rule: if addType...() is true, then look at 'name' and do one of the following:
+        //              file.<ext>: remove '.<ext>' and append the value of getRequestSuffix()
+        //              file [no ext at all]: append getRequestSuffix()
+        //           else if addType...() is not true, provide the old behavior 
+        // Assume that all <ext> are no more than three characters long (some are, but this is
+        // a reasonable compromise).
+        
+        if(addTypeSuffixToDownloadFilename()) {
+        	int dotPos = name.lastIndexOf(".");
+        	int extLength = name.length() - (dotPos + 1);
+
+        	if (extLength > 0 && extLength < 4) {
+        		name = name.substring(0, dotPos);
+        	}
+        }
+        	
+        name += getRequestSuffix();
 
         return name;
-
     }
 
 
