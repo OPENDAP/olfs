@@ -98,7 +98,7 @@ public class Netcdf4DR extends Dap4Responder{
 
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
-
+        String cf_history_entry = getCFHistoryEntry(request);
 
         BesApi besApi = getBesApi();
 
@@ -130,7 +130,7 @@ public class Netcdf4DR extends Dap4Responder{
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap4DataAsNetcdf4(resourceID, qp, user.getMaxResponseSize(), os);
+        besApi.writeDap4DataAsNetcdf4(resourceID, qp, cf_history_entry, user.getMaxResponseSize(), os);
 
 
         os.flush();

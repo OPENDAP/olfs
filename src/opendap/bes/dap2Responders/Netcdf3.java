@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -94,10 +95,13 @@ public class Netcdf3 extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
+        String cf_history_entry = getCFHistoryEntry(request);
+
+        log.debug("sendNormativeRepresentation(): cf_history_entry: '{}'",cf_history_entry);
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        log.debug("sendNormativeRepresentation(): Sending  {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -123,11 +127,11 @@ public class Netcdf3 extends Dap4Responder {
         OutputStream os = response.getOutputStream();
 
 
-        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, cf_history_entry, xdap_accept, user.getMaxResponseSize(), os);
 
 
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        log.debug("sendNormativeRepresentation(): Sent {}",getServiceTitle());
 
 
 
