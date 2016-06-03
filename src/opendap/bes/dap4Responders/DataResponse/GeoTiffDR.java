@@ -58,18 +58,19 @@ public class GeoTiffDR extends Dap4Responder {
 
 
 
-    public GeoTiffDR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public GeoTiffDR(String sysPath, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addFileoutTypeSuffixToDownloadFilename);
     }
 
-    public GeoTiffDR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public GeoTiffDR(String sysPath, String pathPrefix, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addFileoutTypeSuffixToDownloadFilename);
     }
 
-    public GeoTiffDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public GeoTiffDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/geotiff");
         setServiceTitle("GeoTIFF Data Response");
         setServiceDescription("GeoTIFF representation of the DAP4 Data Response object.");

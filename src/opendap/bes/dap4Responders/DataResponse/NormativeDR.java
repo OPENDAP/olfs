@@ -67,19 +67,17 @@ public class NormativeDR extends Dap4Responder {
     //private String storedResultPrefix = "storedResults/";
 
 
-    public NormativeDR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public NormativeDR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public NormativeDR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
 
-    public NormativeDR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+    public NormativeDR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data");
         setServiceTitle("DAP4 Data Response");
         setServiceDescription("DAP4 Data Response object.");
@@ -88,14 +86,14 @@ public class NormativeDR extends Dap4Responder {
 
         setNormativeMediaType(new Dap4Data(getRequestSuffix()));
 
-        addAltRepResponder(new CsvDR          (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new XmlDR          (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new Netcdf3DR      (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new Netcdf4DR      (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new GeoTiffDR      (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new GmlJpeg2000DR  (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new JsonDR         (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new IjsonDR        (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new CsvDR          (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new XmlDR          (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new Netcdf3DR      (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new Netcdf4DR      (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new GeoTiffDR      (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new GmlJpeg2000DR  (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new JsonDR         (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new IjsonDR        (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
 
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
@@ -135,6 +133,8 @@ public class NormativeDR extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
+        String contentDisposition = " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"";
+        response.setHeader("Content-Disposition", contentDisposition);
 
 
         MimeBoundary mb = new MimeBoundary();

@@ -316,7 +316,8 @@
     </target>
 
 
-
+    <!-- It would be better if this target only copied the files that have chenaged.
+         jhrg 5/26/16 -->
     <target name="check"
             description="Run Unit Tests"
             depends="compile"
@@ -332,6 +333,8 @@
 
           <test name="opendap.coreServlet.Scrub" />
           <test name="opendap.aggregation.AggregationParamsTest" />
+
+          <test name="opendap.bes.dap4Responders.Dap4ResponderTest" />
 
         </junit>
     </target>

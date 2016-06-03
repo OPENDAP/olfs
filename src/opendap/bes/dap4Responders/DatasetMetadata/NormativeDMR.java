@@ -50,18 +50,20 @@ public class NormativeDMR extends Dap4Responder {
     private static String defaultRequestSuffix = ".dmr";
 
 
-    public NormativeDMR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public NormativeDMR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public NormativeDMR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public NormativeDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+    public NormativeDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+
+        addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("Dataset Metadata Response");
         setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
@@ -69,11 +71,11 @@ public class NormativeDMR extends Dap4Responder {
 
         setNormativeMediaType(new DMR(getRequestSuffix()));
 
-        addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi));
-        addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
+        addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
+        addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

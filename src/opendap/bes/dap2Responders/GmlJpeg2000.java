@@ -49,18 +49,15 @@ public class GmlJpeg2000 extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".jp2";
 
-    public GmlJpeg2000(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public GmlJpeg2000(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public GmlJpeg2000(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
-
-    public GmlJpeg2000(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public GmlJpeg2000(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/gmljp2");
         setServiceTitle("GML-JPEG2000 Data Response");
         setServiceDescription("GML-JPEG2000 representation of the DAP4 Data Response object.");

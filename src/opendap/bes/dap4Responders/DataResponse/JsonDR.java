@@ -55,18 +55,19 @@ public class JsonDR extends Dap4Responder {
 
 
 
-    public JsonDR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public JsonDR(String sysPath, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addFileoutTypeSuffixToDownloadFilename);
     }
 
-    public JsonDR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public JsonDR(String sysPath, String pathPrefix, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addFileoutTypeSuffixToDownloadFilename);
     }
 
-    public JsonDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public JsonDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/json");
         setServiceTitle("JSON Data Response");
         setServiceDescription("JSON representation of the DAP4 Data Response object.");

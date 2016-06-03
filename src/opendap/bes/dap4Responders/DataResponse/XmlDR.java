@@ -58,18 +58,19 @@ public class XmlDR extends Dap4Responder{
 
 
 
-    public XmlDR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public XmlDR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public XmlDR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public XmlDR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi,addTypeSuffixToDownloadFilename);
     }
 
-    public XmlDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public XmlDR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/xml");
         setServiceTitle("XML Data Response");
         setServiceDescription("XML representation of the DAP4 Data Response object.");
@@ -113,6 +114,8 @@ public class XmlDR extends Dap4Responder{
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
+
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
 
 

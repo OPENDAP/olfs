@@ -54,20 +54,18 @@ public class XmlData extends Dap4Responder {
     private static String _defaultRequestSuffix = ".xdap";
 
 
-    public XmlData(String sysPath, BesApi besApi) {
-        this(sysPath,null, _defaultRequestSuffix,besApi);
-    }
-
-    public XmlData(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
+    public XmlData(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath,null, _defaultRequestSuffix,besApi, addTypeSuffixToDownloadFilename);
     }
 
 
 
-    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+
+    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap2/xml-data");
         setServiceTitle("DAP2 XML Data Response");
         setServiceDescription("An XML document containing both the DAP2 dataset's structural metadata along with data values.");
@@ -113,6 +111,7 @@ public class XmlData extends Dap4Responder {
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
+        response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
