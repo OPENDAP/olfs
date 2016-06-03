@@ -111,6 +111,7 @@ public class BesApi {
     public static final String EXPLICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
+    public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
 
 
     public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
@@ -483,6 +484,7 @@ public class BesApi {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
+     * @param cf_history_entry The entry to add to the CF "history" attribute in the resulting NetCDF file..
      * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize
      * @param os         The Stream to which to write the response.
@@ -492,7 +494,8 @@ public class BesApi {
      * @throws PPTException              .
      */
     public void writeDap2DataAsNetcdf3(String dataSource,
-                                          String constraintExpression,
+                                       String constraintExpression,
+                                       String cf_history_entry,
                                           String xdap_accept,
                                           int maxResponseSize,
                                           OutputStream os)
@@ -500,7 +503,7 @@ public class BesApi {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf3Request(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2DataAsNetcdf3Request(dataSource, constraintExpression, cf_history_entry, xdap_accept, maxResponseSize),
                 os);
     }
 
@@ -520,13 +523,14 @@ public class BesApi {
      */
     public void writeDap4DataAsNetcdf3(String dataSource,
                                           QueryParameters qp,
+                                           String cf_history_entry,
                                           int maxResponseSize,
                                           OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap4DataAsNetcdf3Request(dataSource, qp, maxResponseSize),
+                getDap4DataAsNetcdf3Request(dataSource, qp, cf_history_entry, maxResponseSize),
                 os);
     }
 
@@ -548,6 +552,7 @@ public class BesApi {
      */
     public void writeDap2DataAsNetcdf4(String dataSource,
                                           String constraintExpression,
+                                          String cf_history_entry,
                                           String xdap_accept,
                                           int maxResponseSize,
                                           OutputStream os)
@@ -555,7 +560,7 @@ public class BesApi {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf4Request(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2DataAsNetcdf4Request(dataSource, constraintExpression, cf_history_entry, xdap_accept, maxResponseSize),
                 os);
     }
 
@@ -574,13 +579,14 @@ public class BesApi {
      */
     public void writeDap4DataAsNetcdf4(String dataSource,
                                           QueryParameters qp,
+                                          String cf_history_entry,
                                           int maxResponseSize,
                                           OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap4DataAsNetcdf4Request(dataSource, qp, maxResponseSize),
+                getDap4DataAsNetcdf4Request(dataSource, qp, cf_history_entry, maxResponseSize),
                 os);
     }
 
@@ -1740,39 +1746,67 @@ public class BesApi {
 
     }
 
-    public Document getDap2DataAsNetcdf3Request(String dataSource, String ce, String xdap_accept, int maxResponseSize)
+    public Document getDap2DataAsNetcdf3Request(String dataSource, String ce, String cf_history_entry, String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
+        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
+
+        if(cf_history_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
+        }
+
+        return besRequest;
+
+    }
+
+
+    public Document getDap4DataAsNetcdf3Request(String dataSource, QueryParameters qp, String cf_history_entry, int maxResponseSize)
+            throws BadConfigurationException {
+
+        Document besRequest = getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
+
+        if(cf_history_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
+        }
+
+        return besRequest;
+
 
 
     }
 
 
-    public Document getDap4DataAsNetcdf3Request(String dataSource, QueryParameters qp, int maxResponseSize)
+    public Document getDap2DataAsNetcdf4Request(String dataSource, String ce, String cf_history_entry, String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
+        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
 
-        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
+        if(cf_history_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
+        }
+
+        return besRequest;
+
+
 
 
     }
-
-
-    public Document getDap2DataAsNetcdf4Request(String dataSource, String ce, String xdap_accept, int maxResponseSize)
+    public Document getDap4DataAsNetcdf4Request(String dataSource, QueryParameters qp, String cf_history_entry, int maxResponseSize)
             throws BadConfigurationException {
 
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
+        Document besRequest = getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
 
+        if(cf_history_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
+        }
 
-    }
-    public Document getDap4DataAsNetcdf4Request(String dataSource, QueryParameters qp, int maxResponseSize)
-            throws BadConfigurationException {
-
-
-        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
+        return besRequest;
 
 
     }
