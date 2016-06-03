@@ -1,8 +1,8 @@
 
 ########################## Hyrax/OLFS ##########################
 
-Hyrax Version 1.13.0  (08 February 2016)
-OLFS  Version 1.15.0  (08 February 2016)
+Hyrax Version 1.13.1  (06 June 2016)
+OLFS  Version 1.16.0  (06 June 2016)
 
 The file install.html or docs/index.html may have additional information...
 
@@ -37,16 +37,17 @@ Configure it:
     By default the OLFS will utilize it's bundled default configuration in the directory
     $CATALINA_HOME/webapps/opendap/WEB-INF/conf
 
-    In order to localize your configuration so that your configuration changes are persistent you will need to do
-    one of the following:
+    In order to configure your system so that your configuration changes are persistent 
+    you will need to do one of the following:
 
-    * For the user that will be running the OLFS (the Tomcat user), set the environment variable OLFS_CONFIG_DIR to
-    an existing directory to which the  Tomcat user has both read and write privileges.
+    * For the user that will be running the OLFS (the Tomcat user), set the 
+      environment variable OLFS_CONFIG_DIR to an existing directory to which 
+      the  Tomcat user has both read and write privileges.
 
     OR
 
-    * Create the directory /etc/olfs and set it's permissions/ownership so that the Tomcat user has both read and
-    write permission.
+    * Create the directory /etc/olfs and set it's permissions/ownership so that 
+      the Tomcat user has both read and write permission.
 
     If both of these steps are done then priority is given to the environment variable.
 

@@ -1,3 +1,26 @@
+Version 1.16.0  (06 June 2016)
+
+ -  Added code to ammend the CF "history" attribute so that fileout_netcdf responses contain the ammended
+    value that shows that Hyrax produced it along withg the constraint and id information of the dataset.
+
+ -  Added new rules for the Content-Disposition header download file names. Now the old behavior (add the netcdf
+    file suffix to very file's basename) can be replaced so that if the suffix will end up as a duplicate 
+    (for example file.nc.nc or file.nc4.nc4), nothing is appended.
+
+ -  Added memory cache for BES Catalog responses. This allows the OLFS to stop asking the same things over and 
+    over again. The size and refresh interval are specified by the "<CatalogCache> element in the olfs.xml file.
+    If the element is missing then the memory cache will be disabled.
+
+ -  Increased the number of simultaneous requests from 10 to 200 , which is the default limit for Tomcat.
+
+ -  Bug fixes
+    - Large file issues in w10n.
+    - Fixed build for WCS-2.0
+
+
+
+
+
 Version 1.15.0  (08 February 2016)
 
  -  The OLFS regression test harness has been migrated from DejaGnu to AutoTest. This makes writing and maintaining

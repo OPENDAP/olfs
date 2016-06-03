@@ -1,3 +1,195 @@
+---  hyrax=1.13.1 olfs=1.16.0 
+ 
+2016-06-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #6 from OPENDAP/history_attribute
+	CF "history" attribute
+
+	Merge branch 'master' into history_attribute
+
+2016-06-03  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #5 from OPENDAP/download_filename
+	Download filename
+
+2016-06-02  Nathan Potter  <ndp@opendap.org>
+
+	3rd draft of hisitory. This time for nc3 & nc4 from DAP, w10n, and the aggregation servlet.
+
+2016-05-26  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed an issue when the filename is < 4 characters
+	Added tests for this case, too.
+
+	Changed the Dap4Responder.addTypeSuffixToDownloadFilename() behavior
+	Now the code will use the original behavior when this is false (always
+	add the suffix), or _replace_ the existing suffix if it's true. I added
+	a unit test file for Dap4Responder and wrote tests for the new code.
+
+2016-05-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Marked failing tests (problem with dap4 fileter expressions) as expected fails.
+
+	Updated test baselines to accomodate code changes.
+
+	Merge pull request #4 from OPENDAP/w10n_patch
+	W10n patch
+
+2016-05-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Patched bug in w10n related to large files.
+
+	olfs:  Candidate patch for w10n xss thing.
+
+	olfs:  Candidate patch for xss issue in w10n.
+
+	olfs:  Added a configuration option that when set attaches the current return type media-type suffix to the download filename  (which appears in the Content-Disposition header of certain  responses and affects the name given to the downloaded file by  a browser)
+
+2016-05-13  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Repaired build for WCS-2.0
+
+2016-05-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed a null pointer issue..
+
+	olfs: Fixinf concurrency isue in BesCatalogCache
+
+2016-04-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Small changes to BesCatalogCache in preparation for improving the update activity.
+
+2016-04-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added User-Agent information to the HyraxAccess.log
+
+	Ensured that the BES Catalog response cache can be disabled simply by omitting its configuration from the olfs.xml file.
+
+2016-04-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #3 from OPENDAP/perfImprov
+	Perf improv
+
+	Wrapped up BesCatalogCache and CatalogCacheUpdater so that the configuration information is read from the olfs.xml file.
+
+2016-04-15  Nathan Potter  <ndp@opendap.org>
+
+	Dropped some uneccessary sleep calls.
+
+	Recomitted to BesCatalogCache, added ContextListener and got it working as a worker thread.
+
+2016-04-14  Nathan Potter  <ndp@opendap.org>
+
+	Testing hack in which LMT is always -1 (no checking with BES)
+
+	Merge branch 'master' into perfImprov
+
+	Repaired tests broken for a number of expected reasons. Removed or rewrote tests that referenced files not delivered via 'make install'
+
+2016-04-13  Nathan Potter  <ndp@opendap.org>
+
+	Improve code docs.
+
+	Merge remote-tracking branch 'origin/master' into perfImprov
+
+	Debugging code for AWS
+
+2016-04-12  Nathan Potter  <ndp@opendap.org>
+
+	More AWS debugging
+
+	Debugging code for AWS
+
+	Moved unused caching classes to retired_source in order to reduce 'cruft' in the active codebase.
+
+	Moved the internally correct but unused caching classes to their own package.
+
+2016-04-11  Nathan Potter  <ndp@opendap.org>
+
+	Discovered a simple way to eliminate the olfs->bes probing  for directory (catalog) responses. This eliminates the need to  utilize a durable (as in beyond a single request) cache. Which   is a very good thing.
+
+2016-04-07  James Gallagher  <jgallagher@opendap.org>
+
+	Added some comments/notes to src/opendap/noaa_s3
+
+2016-04-07  Nathan Potter  <ndp@opendap.org>
+
+	Refactoring Rresponse cache  into a catalog response cache.
+
+2016-04-05  Nathan Potter  <ndp@opendap.org>
+
+	Made BesResponseCache more durable by: - Fixed purging problems.
+
+	Made BesResponseCache more durable by: - Fixed purging problems.
+
+	Made BesResponseCache more durable by:  - Added caching of BESError objects. This reduces the probing/thrashing  of the  BES by the OLFS.  - Set a cache size (in terms of number of items) limit  - Added  a "purgeLeastRecentlyAccessed()" method to control cache size.
+
+2016-04-04  Nathan Potter  <ndp@opendap.org>
+
+	Added new appender definition for the log harvester to the logback configuration.
+
+	Updated for ne BesResponseCache. Fixed problem with the  ways errors were being handled. Errors are now cached and  rethrown (tricksy).
+
+	Factored BesResponse Cache out of RequestCache.
+
+2016-03-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into perfImprov
+
+	Debugging and instrumentation
+
+2016-03-02  Nathan Potter  <ndp@opendap.org>
+
+	Repaired production rules for WCS2
+
+	Fixed bug in dap4 error production that was resulting in the transmitted error document missing the required <xml?...?> declaration.
+
+	Fixed bug in dap4 error production that was resulting in the transmitted error document missing the required <xml?...?> declaration.
+
+2016-02-26  Nathan Potter  <ndp@opendap.org>
+
+	Fixed dap4_ifh.xsl so that Groups are correctly displayed. Also fixed problem with visual alignment of rendered HTML content.
+
+	Updated the Dap4RequestToDap2Request class, wrapper class for HttpServletRequest) to Servlet-3.0
+
+2016-02-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Made temporary non-volatile cache for BES Catalog responses for testing purposes. This replaces all points where the BES responses where being cached in the per Request (volatile) cache.
+
+2016-02-06  Nathan Potter  <ndp@opendap.org>
+
+	Updated BESConfig so that the default number of client connections is 200.
+
+2016-02-03  Nathan Potter  <ndp@opendap.org>
+
+	Updated error test baselines to reflect change in the ASCII response encoding
+
+	olfs: Made the  DAP2 ASCII response media type be text/plain because OMG browsers suck.
+
+	olfs: optimized imports
+
+	olfs: Comments and error checking.
+
+	olfs: Retired WebStartServlet. Duties now handled by ViewersServlet.
+
+	olfs: Updating various release related files for upcoming release.
+
+	Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+2016-02-02  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'BES-97'
+
+2016-02-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated copyright notice in XSLT files.
+
+2016-02-02  James Gallagher  <jgallagher@opendap.org>
+
+	Added several tests for zero-length arrays.
+	Also modified Makefile.am so that it will pick up the env var
+	TESTSUITEFLAGS if it's set
+-----------------------------------------------
 2016-01-27  Nathan Potter  <ndp@opendap.org>
 
 	olfs: Patched tests. When build from my IDE the "normal" ant production rules are not run. 
