@@ -48,18 +48,16 @@ public class Ijson extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".ijsn";
 
-    public Ijson(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public Ijson(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public Ijson(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
 
-    public Ijson(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public Ijson(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap2/data/json");
         setServiceTitle("JSON encoded DAP2 data.");
         setServiceDescription("JSON representation of the DAP2 Data Response object.");

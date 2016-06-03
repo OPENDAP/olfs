@@ -170,6 +170,17 @@ public abstract class HttpResponder {
     }
 
 
+    /**
+     * Extract the 'filename' from the resourceID parameter. Assume that resourceID
+     * is a path in the Unix sense - a string with a series of names separated by 
+     * slashes ('/'). The characters following the last slash are the 'filename' part
+     * of the path. This method extracts those, performs a security 'scrub' and 
+     * returns the result.
+     * 
+     * @param resourceID A pathname or pathname-like string that names the subject
+     * of the current request.
+     * @return The filename part of the resourceID
+     */
     public String getDownloadFileName(String resourceID){
         String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
         log.debug("getDownloadFileName() - input: {} output: {}",resourceID,downloadFileName );

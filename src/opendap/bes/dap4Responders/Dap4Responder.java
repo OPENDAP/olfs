@@ -58,15 +58,25 @@ public abstract class Dap4Responder extends BesDapResponder  {
     private MediaType _normativeMediaType;
     private Vector<Dap4Responder> _altResponders;
     private String _combinedRequestSuffixRegex;
+    private boolean _addTypeSuffixToDownloadFilename;
 
 
 
     public Dap4Responder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         _log = LoggerFactory.getLogger(getClass().getName());
-        _altResponders =  new Vector<Dap4Responder>();
+        _altResponders =  new Vector<>();
+        addTypeSuffixToDownloadFilename(false);
     }
 
+    public void addTypeSuffixToDownloadFilename(boolean value){
+        _addTypeSuffixToDownloadFilename = value;
+    }
+
+
+    public boolean addTypeSuffixToDownloadFilename(){
+        return _addTypeSuffixToDownloadFilename;
+    }
 
 
     public void setNormativeMediaType(MediaType mt){
@@ -499,6 +509,40 @@ public abstract class Dap4Responder extends BesDapResponder  {
                 description.setText(descriptionText);
         }
         return description;
+    }
+
+
+    /**
+     * If addTypeSuffixToDownloadFilename() is true, append the value of
+     * getRequestSuffix() to the name.
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDownloadFileName(String resourceID){
+        String name = super.getDownloadFileName(resourceID);
+
+        // old rule: add the suffix - there was no option
+        // old-new rule: if addTypeSuffixToDownloadFilename() is true, append getRequestSuffix().
+        // new rule: if addType...() is true, then look at 'name' and do one of the following:
+        //              file.<ext>: remove '.<ext>' and append the value of getRequestSuffix()
+        //              file [no ext at all]: append getRequestSuffix()
+        //           else if addType...() is not true, provide the old behavior 
+        // Assume that all <ext> are no more than three characters long (some are, but this is
+        // a reasonable compromise).
+        
+        if(addTypeSuffixToDownloadFilename()) {
+        	int dotPos = name.lastIndexOf('.');	// -1 if '.' not found
+        	int extLength = name.length() - (dotPos + 1);
+
+        	if (dotPos != -1 && (extLength > 0 && extLength < 4)) {
+        		name = name.substring(0, dotPos);
+        	}
+        }
+        	
+        name += getRequestSuffix();
+
+        return name;
     }
 
 

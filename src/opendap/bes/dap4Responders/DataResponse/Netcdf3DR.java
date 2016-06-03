@@ -59,18 +59,19 @@ public class Netcdf3DR extends Dap4Responder{
 
 
 
-    public Netcdf3DR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+    public Netcdf3DR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, null, defaultRequestSuffix, besApi,addTypeSuffixToDownloadFilename);
     }
 
-    public Netcdf3DR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public Netcdf3DR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi,addTypeSuffixToDownloadFilename);
     }
 
-    public Netcdf3DR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public Netcdf3DR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data/netcdf-3");
         setServiceTitle("NetCDF-3 Data Response");
         setServiceDescription("NetCDF-3 representation of the DAP4 Data Response object.");
@@ -88,6 +89,17 @@ public class Netcdf3DR extends Dap4Responder{
     public boolean isMetadataResponder(){ return false; }
 
 
+
+    @Override
+    public String getDownloadFileName(String resourceID){
+
+        String downloadFileName = super.getDownloadFileName(resourceID);
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        return downloadFileName;
+    }
 
 
 
@@ -126,7 +138,6 @@ public class Netcdf3DR extends Dap4Responder{
         log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-
         response.setHeader("Content-Disposition", contentDisposition);
 
 

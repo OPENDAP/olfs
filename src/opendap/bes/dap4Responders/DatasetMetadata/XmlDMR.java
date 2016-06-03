@@ -52,18 +52,19 @@ public class XmlDMR extends Dap4Responder {
 
 
 
-    public XmlDMR(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffix,besApi);
+    public XmlDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath,null, defaultRequestSuffix,besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public XmlDMR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    public XmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public XmlDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public XmlDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("XML representation of the DMR.");
         setServiceDescription("Normative representation of the Dataset Metadata Response document with a generic content type.");
@@ -105,6 +106,7 @@ public class XmlDMR extends Dap4Responder {
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        //response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         OutputStream os = response.getOutputStream();
 

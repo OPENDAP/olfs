@@ -72,6 +72,7 @@ public class BesDapDispatcher implements DispatchHandler {
     private Vector<Dap4Responder> _responders;
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
+    private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
 
 
     private BesApi _besApi;
@@ -147,12 +148,14 @@ public class BesDapDispatcher implements DispatchHandler {
 
             }
 
+            _log.info("ingestConfig() - Using BES API implementation: "+getBesApi().getClass().getName());
 
             _allowDirectDataSourceAccess = false;
             Element dv = _config.getChild("AllowDirectDataSourceAccess");
             if (dv != null) {
                 _allowDirectDataSourceAccess = true;
             }
+            _log.info("ingestConfig() - AllowDirectDataSourceAccess: {}",_allowDirectDataSourceAccess);
 
 
             _useDAP2ResourceUrlResponse = false;
@@ -160,6 +163,14 @@ public class BesDapDispatcher implements DispatchHandler {
             if (dv != null) {
                 _useDAP2ResourceUrlResponse = true;
             }
+            _log.info("ingestConfig() - UseDAP2ResourceUrlResponse: {}",_useDAP2ResourceUrlResponse);
+
+            _addFileoutTypeSuffixToDownloadFilename = false;
+            dv = _config.getChild("AddFileoutTypeSuffixToDownloadFilename");
+            if (dv != null) {
+                _addFileoutTypeSuffixToDownloadFilename = true;
+            }
+            _log.info("ingestConfig() - AddFileoutTypeSuffixToDownloadFilename: {}",_addFileoutTypeSuffixToDownloadFilename);
 
 
             dv = _config.getChild("PostBodyMaxLength");
@@ -173,7 +184,7 @@ public class BesDapDispatcher implements DispatchHandler {
 
                 }
             }
-            _log.info("PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
+            _log.info("ingestConfig() - PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
 
         }
 
@@ -211,8 +222,8 @@ public class BesDapDispatcher implements DispatchHandler {
         NormativeDSR ndsr = new NormativeDSR(_systemPath, null, ".dsr", besApi,_responders);
         _responders.add(ndsr);
 
-        _responders.add(new NormativeDR(_systemPath, besApi));
-        _responders.add(new NormativeDMR(_systemPath, besApi));
+        _responders.add(new NormativeDR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
+        _responders.add(new NormativeDMR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
         _responders.add(new IsoDMR(_systemPath, besApi));
 
         _responders.add(new Version(_systemPath, besApi));
@@ -227,30 +238,30 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
         // DAP2 Data Responses
-        _responders.add(new Dap2Data(_systemPath, besApi));
+        _responders.add(new Dap2Data(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
         _responders.add(   new Ascii(_systemPath, besApi));
         //responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
         _responders.add( new CsvData(_systemPath, besApi));
-        _responders.add( new Netcdf3(_systemPath, besApi));
-        _responders.add( new Netcdf4(_systemPath, besApi));
-        _responders.add( new XmlData(_systemPath, besApi));
+        _responders.add( new Netcdf3(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
+        _responders.add( new Netcdf4(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
+        _responders.add( new XmlData(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
 
 
         // DAP2 GeoTIFF Response
-        Dap4Responder geoTiff = new GeoTiff(_systemPath, besApi);
+        Dap4Responder geoTiff = new GeoTiff(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(geoTiff);
 
 
         // DAP2 JPEG2000 Response
-        Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi);
+        Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(jp2);
 
         // DAP2 w10n JSON Response
-        Dap4Responder json = new Json(_systemPath, besApi);
+        Dap4Responder json = new Json(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(json);
 
         // DAP2 Instance Object JSON Response
-        Dap4Responder ijsn = new Ijson(_systemPath, besApi);
+        Dap4Responder ijsn = new Ijson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(ijsn);
 
 
@@ -259,7 +270,7 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add(d4r);
         _responders.add(new DDS(_systemPath, besApi));
         _responders.add(new DAS(_systemPath, besApi));
-        _responders.add(new RDF(_systemPath, besApi));
+        _responders.add(new RDF(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
         _responders.add(new DatasetInfoHtmlPage(_systemPath, besApi));
 
         Dap4Responder iso = new Iso19115(_systemPath, besApi);

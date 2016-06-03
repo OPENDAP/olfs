@@ -60,19 +60,17 @@ public class Dap2Data extends Dap4Responder {
     private static String _defaultRequestSuffix = ".dods";
 
 
-    public Dap2Data(String sysPath, BesApi besApi) {
-        this(sysPath,null, _defaultRequestSuffix,besApi);
-    }
-
-    public Dap2Data(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
+    public Dap2Data(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath,null, _defaultRequestSuffix,besApi,addTypeSuffixToDownloadFilename);
     }
 
 
-    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+
+    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi,boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap2/data");
         setServiceTitle("DAP2 Data");
         setServiceDescription("DAP2 Data Object.");
