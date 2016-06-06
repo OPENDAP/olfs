@@ -430,7 +430,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
     }
 
 
-    private  final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
+    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
 
     public String getCFHistoryEntry(HttpServletRequest request) throws IOException {
 
