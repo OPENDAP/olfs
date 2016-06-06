@@ -49,14 +49,14 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Dap4ResponderTest {
 
-	private BesApi besApi;
 	private Dap4Responder old_rule, new_rule;
 	
     @Before
     // Dap4responder is abstract; I added stubs for the unimplemented methods
     // so I can test the code I hacked in getDownloadFileName(). jhrg 5/26/16
     public void setUp() throws Exception {
-		besApi = new BesApi();
+
+		BesApi besApi = new BesApi();
     	old_rule = new Dap4Responder("", "", ".nc", besApi) {
 
 			@Override
