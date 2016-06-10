@@ -113,5 +113,14 @@
     </WcsCoverage>
 
 
+    <WcsCoverage fileName="SF_1in100.nc.xml">
+        <DapDatasetUrl>http://localhost:8090/opendap/testbed-12/NETCDF_Flood/SF_1in100.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="degrees_east" />
+        <field name="depth" dapID="depth" />
+    </WcsCoverage>
+
+
 </LocalFileCatalog>
 
