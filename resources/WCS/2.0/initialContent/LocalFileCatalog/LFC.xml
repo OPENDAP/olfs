@@ -115,10 +115,28 @@
 
     <WcsCoverage fileName="SF_1in100.nc.xml">
         <DapDatasetUrl>http://localhost:8090/opendap/testbed-12/NETCDF_Flood/SF_1in100.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="index" />
+        <DomainCoordinate name="rows" dapID="rows" units="index" />
+        <DomainCoordinate name="cols" dapID="cols" units="index" />
+        <field name="depth" dapID="depth" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="newSF_1in100.nc.xml">
+        <DapDatasetUrl>http://localhost:8090/opendap/testbed-12/NETCDF_Flood/hacked/newSF_1in100.nc</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="latitude" units="degrees_north" />
         <DomainCoordinate name="longitude" dapID="longitude" units="degrees_east" />
         <field name="depth" dapID="depth" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="ncep_model_example.xml">
+        <DapDatasetUrl>http://localhost:8090/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="Hours since 2016-06-17T00:00:00.000Z" />
+        <DomainCoordinate name="isobaric" dapID="isobaric" units="Pa" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="degrees_east" />
+        <field name="u_component_of_wind_isobaric" dapID="u-component_of_wind_isobaric" />
+        <field name="v_component_of_wind_isobaric" dapID="v-component_of_wind_isobaric" />
     </WcsCoverage>
 
 
