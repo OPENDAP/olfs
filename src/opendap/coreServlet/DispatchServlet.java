@@ -606,8 +606,7 @@ public class DispatchServlet extends HttpServlet {
             throws IOException {
 
 
-
-        ServletUtil.probeRequest(this, req);
+        // log.debug(ServletUtil.probeRequest(this, req));
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
