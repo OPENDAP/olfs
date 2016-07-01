@@ -56,7 +56,7 @@ public class PersistentConfigurationHandler {
      * with initial content from the distribution.
      * @param servlet
      */
-    public static void installDefaultConfiguration(HttpServlet servlet) {
+    public static void installDefaultConfiguration(HttpServlet servlet, String semaphoreFile) {
 
 
         _installDefaultConfigLock.lock();     // Only one thread allowed in at a time.
@@ -64,26 +64,25 @@ public class PersistentConfigurationHandler {
 
             //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
-            String semaphore = ".INIT";
 
             log.debug("PersistentContentHandler:");
             log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
             log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
-            log.debug("    semaphore:                " + semaphore);
+            log.debug("    semaphore:                " + semaphoreFile);
             log.debug("    ThreadName:               " + Thread.currentThread().getName());
 
 
             // -------------
             // first time, create content directory
             String defaultConfigurationPath = getDefaultConfigurationPath(servlet);
-            File defaultConfigurationFile = new File(defaultConfigurationPath);
+            File defaultConfigurationDir = new File(defaultConfigurationPath);
 
-            if (defaultConfigurationFile.exists()) {
+            if (defaultConfigurationDir.exists()) {
                 try {
-                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphore)) {
+                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphoreFile)) {
                         log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
                     } else {
-                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
+                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphoreFile, ServletUtil.getConfigPath(servlet));
                     }
                 } catch (IOException ioe) {
                     log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);

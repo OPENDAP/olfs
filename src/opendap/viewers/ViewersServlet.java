@@ -97,7 +97,19 @@ public class ViewersServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this);
+
+        String viewersConfigFileName = getInitParameter("ViewersConfigFileName");
+        if (viewersConfigFileName == null) {
+            String msg = "Servlet configuration must include a file name for " +
+                    "the Dataset Viewers configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+
+
+
+        PersistentConfigurationHandler.installDefaultConfiguration(this, viewersConfigFileName);
 
 
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -146,7 +158,7 @@ public class ViewersServlet extends HttpServlet {
 
         }
 
-        _configDoc = loadConfig();
+        _configDoc = loadConfig(viewersConfigFileName);
 
         buildJwsHandlers(_webStartResourcesDirectory,_configDoc.getRootElement());
         buildWebServiceHandlers(_webStartResourcesDirectory, _configDoc.getRootElement());
@@ -165,17 +177,9 @@ public class ViewersServlet extends HttpServlet {
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
      */
-    private Document loadConfig() throws ServletException {
+    private Document loadConfig(String filename) throws ServletException {
 
         Document doc;
-
-        String filename = getInitParameter("ViewersConfigFileName");
-        if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the Dataset Viewers configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
 
         filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 

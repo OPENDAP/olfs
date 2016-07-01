@@ -131,20 +131,33 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-        httpGetDispatchHandlers = new Vector<DispatchHandler>();
-        Vector<Element> httpGetHandlerConfigs = new Vector<Element>();
-        httpPostDispatchHandlers = new Vector<DispatchHandler>();
-        Vector<Element> httpPostHandlerConfig = new Vector<Element>();
+        httpGetDispatchHandlers = new Vector<>();
+        Vector<Element> httpGetHandlerConfigs = new Vector<>();
+        httpPostDispatchHandlers = new Vector<>();
+        Vector<Element> httpPostHandlerConfig = new Vector<>();
 
 
         // init logging
         LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this);
+
+        String olfsConfigFileName = getInitParameter("OLFSConfigFileName");
+        if (olfsConfigFileName == null) {
+            String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
+                    "the OLFS configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
 
 
-        loadConfig();
+        PersistentConfigurationHandler.installDefaultConfiguration(
+                this,
+                olfsConfigFileName /* Here the file is used as the semaphore for the installation. */
+        );
+
+
+        loadConfig(olfsConfigFileName); /* and here the file is going to be read/parsed into stuff */
 
 
         Element timer = configDoc.getRootElement().getChild("Timer");
@@ -209,24 +222,16 @@ public class DispatchServlet extends HttpServlet {
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
      */
-    private void loadConfig() throws ServletException {
+    private void loadConfig(String configFileName) throws ServletException {
 
-        String filename = getInitParameter("OLFSConfigFileName");
-        if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the OLFS configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
+        configFileName = Scrub.fileName(ServletUtil.getConfigPath(this) + configFileName);
 
-        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
-
-        log.debug("Loading Configuration File: " + filename);
+        log.debug("Loading Configuration File: " + configFileName);
 
 
         try {
 
-            File confFile = new File(filename);
+            File confFile = new File(configFileName);
             FileInputStream fis = new FileInputStream(confFile);
 
             try {
@@ -239,15 +244,15 @@ public class DispatchServlet extends HttpServlet {
             }
 
         } catch (FileNotFoundException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" cannot be found.";
+            String msg = "OLFS configuration file \"" + configFileName + "\" cannot be found.";
             log.error(msg);
             throw new ServletException(msg, e);
         } catch (IOException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" is not readable.";
+            String msg = "OLFS configuration file \"" + configFileName + "\" is not readable.";
             log.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" cannot be parsed.";
+            String msg = "OLFS configuration file \"" + configFileName + "\" cannot be parsed.";
             log.error(msg);
             throw new ServletException(msg, e);
         }

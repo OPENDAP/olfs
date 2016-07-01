@@ -84,9 +84,6 @@ public class Servlet extends HttpServlet {
         String configPath = ServletUtil.getConfigPath(this);
         log.info("configPath: "+configPath);
 
-        String configFilename = this.getInitParameter("ConfigFileName");
-        log.info("configFilename: "+configFilename);
-
         boolean enableUpdateUrl;
         String s = this.getInitParameter("EnableUpdateUrl");
         enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
@@ -97,9 +94,25 @@ public class Servlet extends HttpServlet {
             _serviceConfigPath += "/";
         log.debug("_serviceConfigPath: "+_serviceConfigPath);
 
-        installInitialContent(resourcePath, _serviceConfigPath);
 
-        initializeCatalog(contextPath, _serviceConfigPath, configFilename);
+        String configFilename = this.getInitParameter("ConfigFileName");
+        if(configFilename==null) configFilename = "wcs_service.xml";
+        log.info("configFilename: "+configFilename);
+
+        String wcsConfigFileName = getInitParameter("ConfigFileName");
+        if (wcsConfigFileName == null) {
+            String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
+                    "the WCS service configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+
+        PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
+
+        // installDefaultConfiguration(resourcePath, _serviceConfigPath, configFilename);
+
+        initializeCatalog(contextPath, _serviceConfigPath, wcsConfigFileName);
 
 
         // Build Handler Objects
@@ -337,20 +350,20 @@ public class Servlet extends HttpServlet {
 
 
 
-    private void installInitialContent(String resourcePath, String serviceContentPath) throws ServletException{
+    private void installDefaultConfiguration(String serviceResourcePath, String serviceConfigDir, String semaphoreFileName) throws ServletException{
 
         String msg;
-        File f = new File(serviceContentPath);
+        File f = new File(serviceConfigDir);
 
         if(f.exists()){
             if(!f.isDirectory()) {
-                msg = "The service content path "+serviceContentPath+
+                msg = "The service content path "+serviceConfigDir+
                         "exists, but it is not directory and cannot be used.";
                 log.error(msg);
                 throw new ServletException(msg);
             }
             if(!f.canWrite()) {
-                msg = "The service content path "+serviceContentPath+
+                msg = "The service content path "+serviceConfigDir+
                         "exists, but the directory is not writable.";
                 log.error(msg);
                 throw new ServletException(msg);
@@ -358,16 +371,16 @@ public class Servlet extends HttpServlet {
 
         }
         else {
-            log.info("Creating WCS Service content directory: "+serviceContentPath);
+            log.info("Creating WCS Service content directory: "+serviceConfigDir);
             f.mkdirs();
         }
 
-        File semaphore = new File(serviceContentPath+".INIT");
+        File semaphore = new File(serviceConfigDir+semaphoreFileName);
         if(!semaphore.exists()){
-            String initialContentDir = resourcePath + "initialContent/";
-            log.info("Attempting to copy initial content for WCS from "+initialContentDir+" to "+serviceContentPath);
+            String confDir = serviceResourcePath + "WEB-INF/conf/";
+            log.info("Attempting to copy default configuration for WCS from "+confDir+" to "+serviceConfigDir);
             try {
-                PersistentConfigurationHandler.copyDirTree(initialContentDir, serviceContentPath);
+                PersistentConfigurationHandler.copyDirTree(confDir, serviceConfigDir);
                 semaphore.createNewFile();
             } catch (IOException e) {
                 log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
