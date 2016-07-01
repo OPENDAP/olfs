@@ -33,15 +33,14 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 
 /**
@@ -241,6 +240,14 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
 
+    public class NoOpEntityResolver implements EntityResolver {
+        public InputSource resolveEntity(String publicId, String systemId) {
+            return new InputSource(new StringReader(""));
+        }
+    }
+
+
+
     public Document parseWcsRequest(BufferedReader sis, String encoding) throws WcsException {
 
 
@@ -281,6 +288,11 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         try {
             // Parse the XML doc into a Document object.
             SAXBuilder saxBuilder = new SAXBuilder();
+
+            // I added these next two bits to stop ENTITY resolution,
+            // which is important for security reasons - ndp
+            saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            saxBuilder.setEntityResolver(new NoOpEntityResolver());
 
             ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
             requestDoc = saxBuilder.build(baos);
