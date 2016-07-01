@@ -71,9 +71,9 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <hr size="1" noshade="noshade"/>
-                <div class="small" align="right">
+                <!-- div class="small" align="right">
                     OPeNDAP WCS Service development sponsored by <a href='http://www.ioos.gov/'>IOOS</a>
-                </div>
+                </div -->
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
