@@ -318,7 +318,7 @@ public class Servlet extends HttpServlet {
 
         serviceConfigFilename = Scrub.fileName(serviceConfigFilename);
         
-        log.info("Using WCS Service configuration file: "+serviceConfigFilename);
+        log.info("getServiceConfigurationUrl() - Using WCS Service configuration file: "+serviceConfigFilename);
 
         File configFile = new File(serviceConfigFilename);
         if(!configFile.exists()){
