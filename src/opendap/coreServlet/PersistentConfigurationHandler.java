@@ -41,8 +41,6 @@ public class PersistentConfigurationHandler {
 
     private static Logger log;
 
-    private static String defaultContentLocation="WEB-INF/conf/";
-
     private static final ReentrantLock _installDefaultConfigLock = new ReentrantLock();
 
 
@@ -77,15 +75,19 @@ public class PersistentConfigurationHandler {
             File defaultConfigurationDir = new File(defaultConfigurationPath);
 
             if (defaultConfigurationDir.exists()) {
+                log.error("installDefaultConfiguration() - Located {}",defaultConfigurationDir.getAbsolutePath());
                 try {
                     if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphoreFile)) {
-                        log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
+                        log.error("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
                     } else {
-                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphoreFile, ServletUtil.getConfigPath(servlet));
+                        log.error("Located configuration directory semaphore ('{}') in directory '{}'", semaphoreFile, ServletUtil.getConfigPath(servlet));
                     }
                 } catch (IOException ioe) {
                     log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
                 }
+            }
+            else {
+                log.error("installDefaultConfiguration() - FAILED TO LOCATE {}",defaultConfigurationDir.getAbsolutePath());
             }
             //-------------
         } finally {
@@ -124,7 +126,8 @@ public class PersistentConfigurationHandler {
   */
 
     private static String getDefaultConfigurationPath(HttpServlet servlet) {
-      return ServletUtil.getRootPath(servlet) + defaultContentLocation;
+        String defaultConfigurationPath = "WEB-INF/conf/";
+        return ServletUtil.getRootPath(servlet) + defaultConfigurationPath;
     }
 
 
