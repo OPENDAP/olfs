@@ -132,7 +132,8 @@
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
     <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
-    
+    <logger name="opendap.coreServlet.PersistentConfigurationHandler"  level="all"/>
+
     <logger name="opendap.bes" level="error">
         <appender-ref ref="stdout"/>
     </logger>
@@ -189,53 +190,54 @@
 
 
 
-<!--
 
-    
-    <logger name="opendap.WcsCatalog" level="all"/>
-    
-    <logger name="opendap.wcs" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
+    <!--
 
-    <logger name="opendap.wcs.gatewayClient" level="all"/>
-    <logger name="opendap.wcs.v1_1_2" level="all"/>
 
-    
-    
-    
-    
+        <logger name="opendap.WcsCatalog" level="all"/>
 
-    <logger name="opendap.semantics" level="debug">
-        <appender-ref ref="stdout"/>
-        <appender-ref ref="DebugLog"/>
-    </logger>
+        <logger name="opendap.wcs" level="all">
+            <appender-ref ref="stdout"/>
+        </logger>
 
-    <logger name="org.openrdf" level="info">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.xml" level="info">
-        <appender-ref ref="stdout"/>
-    </logger>
+        <logger name="opendap.wcs.gatewayClient" level="all"/>
+        <logger name="opendap.wcs.v1_1_2" level="all"/>
 
 
 
-    <logger name="opendap.semantics">
-        <level value="DEBUG"/>
-        <appender-ref ref="stdout"/>
-    </logger>
 
-    <logger name="org.openrdf">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
 
-    <logger name="org.xml">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
--->
+
+        <logger name="opendap.semantics" level="debug">
+            <appender-ref ref="stdout"/>
+            <appender-ref ref="DebugLog"/>
+        </logger>
+
+        <logger name="org.openrdf" level="info">
+            <appender-ref ref="stdout"/>
+        </logger>
+
+        <logger name="org.xml" level="info">
+            <appender-ref ref="stdout"/>
+        </logger>
+
+
+
+        <logger name="opendap.semantics">
+            <level value="DEBUG"/>
+            <appender-ref ref="stdout"/>
+        </logger>
+
+        <logger name="org.openrdf">
+            <level value="INFO"/>
+            <appender-ref ref="stdout"/>
+        </logger>
+
+        <logger name="org.xml">
+            <level value="INFO"/>
+            <appender-ref ref="stdout"/>
+        </logger>
+    -->
 
 
 
