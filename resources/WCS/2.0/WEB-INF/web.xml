@@ -49,7 +49,7 @@
 
         <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
         <init-param>
-            <param-name>ConfigFileName</param-name>
+            <param-name>WCSConfigFileName</param-name>
             <param-value>wcs_service.xml</param-value>
         </init-param>
 

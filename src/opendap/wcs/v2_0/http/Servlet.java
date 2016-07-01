@@ -95,17 +95,18 @@ public class Servlet extends HttpServlet {
         log.debug("_serviceConfigPath: "+_serviceConfigPath);
 
 
-        String configFilename = this.getInitParameter("ConfigFileName");
-        if(configFilename==null) configFilename = "wcs_service.xml";
-        log.info("configFilename: "+configFilename);
+        //String configFilename = this.getInitParameter("ConfigFileName");
+        //if(configFilename==null) configFilename = "wcs_service.xml";
+        //log.info("configFilename: "+configFilename);
 
-        String wcsConfigFileName = getInitParameter("ConfigFileName");
+        String wcsConfigFileName = getInitParameter("WCSConfigFileName");
         if (wcsConfigFileName == null) {
             String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
                     "the WCS service configuration!\n";
             System.err.println(msg);
             throw new ServletException(msg);
         }
+        log.info("configFilename: "+wcsConfigFileName);
 
 
         PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
