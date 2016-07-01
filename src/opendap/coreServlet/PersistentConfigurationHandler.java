@@ -65,11 +65,10 @@ public class PersistentConfigurationHandler {
             //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
 
-            log.debug("PersistentContentHandler:");
-            log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
-            log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
-            log.debug("    semaphore:                " + semaphoreFile);
-            log.debug("    ThreadName:               " + Thread.currentThread().getName());
+            log.debug("installDefaultConfiguration() - configPath:               " + ServletUtil.getConfigPath(servlet));
+            log.debug("installDefaultConfiguration() - defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
+            log.debug("installDefaultConfiguration() - semaphore:                " + semaphoreFile);
+            log.debug("installDefaultConfiguration() - ThreadName:               " + Thread.currentThread().getName());
 
 
             // -------------
