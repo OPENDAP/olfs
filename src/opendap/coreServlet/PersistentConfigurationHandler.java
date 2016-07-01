@@ -74,8 +74,10 @@ public class PersistentConfigurationHandler {
             String defaultConfigurationPath = getDefaultConfigurationPath(servlet);
             File defaultConfigurationDir = new File(defaultConfigurationPath);
 
+            log.error("installDefaultConfiguration() - Checking for default configuration: {}",defaultConfigurationDir.getAbsolutePath());
+
             if (defaultConfigurationDir.exists()) {
-                log.error("installDefaultConfiguration() - Located {}",defaultConfigurationDir.getAbsolutePath());
+                log.error("installDefaultConfiguration() - Located default configuration {}",defaultConfigurationDir.getAbsolutePath());
                 try {
                     if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphoreFile)) {
                         log.error("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
