@@ -132,7 +132,7 @@ public class GetCoverageRequest {
         WCS.checkVersion(s==null? null : s[0]);
 
 
-        // Make sure the client is acutally asking for this operation
+        // Make sure the client is actually asking for this operation
         s = kvp.get("request");
         if(s == null){
             throw new WcsException("Poorly formatted request URL. Missing " +
@@ -210,7 +210,7 @@ public class GetCoverageRequest {
     public GetCoverageRequest(Element getCoverageRequestElem)
             throws WcsException, InterruptedException {
 
-        subsets = new HashMap<String, DimensionSubset>();
+        subsets = new HashMap<>();
 
         Element e;
         String s;

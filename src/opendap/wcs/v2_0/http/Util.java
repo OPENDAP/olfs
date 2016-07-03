@@ -165,7 +165,6 @@ public class Util {
 
         log.debug("Retrieving URL: "+url);
 
-
         GetMethod contentRequest = new GetMethod(url);
         InputStream is = null;
         try {

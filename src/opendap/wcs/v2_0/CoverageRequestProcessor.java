@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
@@ -396,8 +397,13 @@ public class CoverageRequestProcessor {
 
         }
 
+        try {
+            return URLEncoder.encode(dapCE.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("getDapCE() - Unable to URLEncoder.encode() DAP CE: '{}'",dapCE);
+            throw new WcsException("Failed encode DAP CE: "+dapCE+"'",WcsException.NO_APPLICABLE_CODE);
+        }
 
-        return dapCE.toString();
     }
 
 
