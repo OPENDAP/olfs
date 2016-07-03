@@ -115,7 +115,7 @@ public class Util {
         int totalBytesWritten = 0;
         int bytesRead;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         while (!done) {
             bytesRead = is.read(buf);
@@ -126,7 +126,7 @@ public class Util {
             } else {
                 totalBytesRead += bytesRead;
                 os.write(buf, 0, bytesRead);
-                baos.write(buf,0,bytesRead);
+                // baos.write(buf,0,bytesRead);
                 totalBytesWritten += bytesRead;
             }
         }
@@ -136,9 +136,9 @@ public class Util {
                     "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
 
 
-        System.out.println("################################################################");
-        System.out.write(baos.toByteArray());
-        System.out.println("################################################################");
+        //System.out.println("################################################################");
+        //System.out.write(baos.toByteArray());
+        //System.out.println("################################################################");
 
 
         return totalBytesRead;
