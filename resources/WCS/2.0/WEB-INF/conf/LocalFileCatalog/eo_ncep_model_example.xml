@@ -60,7 +60,7 @@
                         </gml:TimePeriod>
                     </om:phenomenonTime>
                     <om:resultTime>
-                        <gml:TimeInstant gml:id="archivingdate_ncep_model_example">
+                        <gml:TimeInstant gml:id="archiving_date_ncep_model_example">
                             <gml:timePosition>2016-07-03T11:02:47.999</gml:timePosition>
                         </gml:TimeInstant>
                     </om:resultTime>

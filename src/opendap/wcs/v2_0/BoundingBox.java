@@ -57,7 +57,11 @@ public class BoundingBox {
 
         _lowerCorner = lowerCorner.clone();
         _upperCorner = upperCorner.clone();
-        _srsName     =  new URI(srsName.toASCIIString());
+
+        if(srsName!=null)
+            _srsName = new URI(srsName.toASCIIString());
+        else
+            _srsName = null;
 
         _startTime     =  null;
         _endTime       =  null;
@@ -71,7 +75,7 @@ public class BoundingBox {
 
         if(startTime!=null)
             _startTime =  new Date(startTime.getTime());
-        if(_endTime!=null)
+        if(endTime!=null)
             _endTime =  new Date(endTime.getTime());
         if(_startTime!=null && _endTime!=null)
             _hasTimePeriod = true;
@@ -138,11 +142,7 @@ public class BoundingBox {
                             "gml:boundedBy");
 
                 }
-
                 _hasTimePeriod = true;
-
-
-
             }
 
 
@@ -210,40 +210,13 @@ public class BoundingBox {
                             WcsException.INVALID_PARAMETER_VALUE,
                             "gml:Envelope/@srsName");
                 }
-
-
+            }
 
             if(_hasTimePeriod){
-                // Process beginPosition.
-                e = envelope.getChild("beginPosition", WCS.GML_NS);
-                if (e == null) {
-                    throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
-                            "It is missing the required gml:beginPosition.",
-                            WcsException.INVALID_PARAMETER_VALUE,
-                            "gml:EnvelopeWithTimePeriod");
-                }
-
-                s = e.getTextNormalize();
-                _startTime = TimeConversion.parseWCSTimePosition(s);
-
-
-                // Process endPosition.
-                e = envelope.getChild("endPosition", WCS.GML_NS);
-                if (e == null) {
-                    throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
-                            "It is missing the required gml:endPosition.",
-                            WcsException.INVALID_PARAMETER_VALUE,
-                            "gml:EnvelopeWithTimePeriod");
-                }
-
-                s = e.getTextNormalize();
-                _endTime = TimeConversion.parseWCSTimePosition(s);
+                ingestTimePeriod(envelope);
             }
 
 
-
-
-            }
         } catch (NumberFormatException nfe) {
             throw new WcsException(nfe.getMessage(),
                     WcsException.INVALID_PARAMETER_VALUE,
@@ -258,8 +231,38 @@ public class BoundingBox {
 
     }
 
-    // "2010-12-31T23:59:59.999";
-    private static String _timePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S Z";
+    public void ingestTimePeriod(Element timePeriodEnvelope) throws WcsException {
+        String s;
+        Element e;
+
+        // Process beginPosition.
+        e = timePeriodEnvelope.getChild("beginPosition", WCS.GML_NS);
+        if (e == null) {
+            throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
+                    "It is missing the required gml:beginPosition.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:EnvelopeWithTimePeriod");
+        }
+
+        s = e.getTextNormalize();
+        _startTime = TimeConversion.parseWCSTimePosition(s);
+
+
+        // Process endPosition.
+        e = timePeriodEnvelope.getChild("endPosition", WCS.GML_NS);
+        if (e == null) {
+            throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
+                    "It is missing the required gml:endPosition.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:EnvelopeWithTimePeriod");
+        }
+
+        s = e.getTextNormalize();
+        _endTime = TimeConversion.parseWCSTimePosition(s);
+
+        _hasTimePeriod = true;
+
+    }
 
 
     public boolean hasTimePeriod(){
@@ -287,17 +290,16 @@ public class BoundingBox {
         Element timePeriod = null;
 
         if(hasTimePeriod()){
-            SimpleDateFormat sdf = new SimpleDateFormat(_timePeriodFormat);
             timePeriod = new Element("TimePeriod",WCS.GML_NS);
             if(id!=null)
                 timePeriod.setAttribute("id",id,WCS.GML_NS);
 
             Element begin = new Element("beginPosition",WCS.GML_NS);
-            begin.setText(sdf.format(getStartTime()));
+            begin.setText(TimeConversion.formatDateInGmlTimeFormat(getStartTime()));
             timePeriod.addContent(begin);
 
             Element end = new Element("endPosition",WCS.GML_NS);
-            end.setText(sdf.format(getEndTime()));
+            end.setText(TimeConversion.formatDateInGmlTimeFormat(getEndTime()));
             timePeriod.addContent(end);
         }
 

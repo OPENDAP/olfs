@@ -47,7 +47,7 @@ import java.util.*;
  */
 public class CoverageDescription {
 
-    private Element myCD;
+    protected Element myCD;
 
     private Logger log;
 

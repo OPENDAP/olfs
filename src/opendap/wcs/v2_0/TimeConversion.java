@@ -621,6 +621,13 @@ public class TimeConversion {
     }
 
 
+    private static String _gmlTimePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S Z";
+
+
+    public static String formatDateInGmlTimeFormat(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat(_gmlTimePeriodFormat);
+        return sdf.format(date);
+    }
 
 
 

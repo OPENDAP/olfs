@@ -17,7 +17,7 @@ public class EODatasetSeries {
 
     private String myCoverageId;
 
-    private Vector<CoverageDescription> members;
+    private Vector<EOCoverageDescription> members;
 
     String _catalogDir;
 
@@ -61,7 +61,7 @@ public class EODatasetSeries {
 
         while(cvrgList.hasNext()){
             Element  wcsCoverageElement = (Element) cvrgList.next();
-            members.add(new CoverageDescription(wcsCoverageElement, _catalogDir,_validateContent));
+            members.add(new EOCoverageDescription(wcsCoverageElement, _catalogDir,_validateContent));
         }
     }
 
@@ -92,7 +92,7 @@ public class EODatasetSeries {
         BoundingBox seriesBoundingBox = null;
 
         try {
-            for (CoverageDescription cd : members) {
+            for (EOCoverageDescription cd : members) {
                 BoundingBox bb = cd.getBoundingBox();
                 if (seriesBoundingBox == null) {
                     seriesBoundingBox = new BoundingBox(bb);
@@ -107,11 +107,12 @@ public class EODatasetSeries {
         }
 
         if(seriesBoundingBox!=null){
-            Element wgs83BB = seriesBoundingBox.getWgs84BoundingBoxElement();
-            dsSummary.addContent(wgs83BB);
+            Element wgs84BB = seriesBoundingBox.getWgs84BoundingBoxElement();
+            dsSummary.addContent(wgs84BB);
             if(seriesBoundingBox.hasTimePeriod()){
                 Element timePeriod = seriesBoundingBox.getGmlTimePeriod(getCoverageId()+"_timePeriod");
-                dsSummary.addContent(timePeriod);
+                if(timePeriod!=null)
+                    dsSummary.addContent(timePeriod);
             }
         }
 
