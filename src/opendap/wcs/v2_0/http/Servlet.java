@@ -31,6 +31,7 @@ import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
 import opendap.wcs.v2_0.CatalogWrapper;
 import opendap.wcs.v2_0.WcsCatalog;
+import opendap.wcs.v2_0.WcsException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -409,7 +411,23 @@ public class Servlet extends HttpServlet {
         }
         catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this,  resp);
+                WcsException myBadThang =  null;
+                if(t instanceof WcsException){
+                    myBadThang = (WcsException) t;
+                    request_status = HttpServletResponse.SC_BAD_REQUEST;
+                }
+                else {
+                    myBadThang = new WcsException("The bad things have happened in WCS-2.0. Caught "+
+                            t.getClass().getName()+" Message: "+ t.getMessage(),WcsException.NO_APPLICABLE_CODE);
+                    request_status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                }
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                Document errDoc = new Document( myBadThang.getExceptionElement());
+
+                resp.setStatus(request_status);
+
+                xmlo.output(errDoc,resp.getOutputStream());
+
             }
             catch(Throwable t2) {
             	try {

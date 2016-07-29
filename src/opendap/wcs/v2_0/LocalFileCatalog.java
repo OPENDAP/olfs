@@ -73,7 +73,8 @@ public class LocalFileCatalog implements WcsCatalog {
 
     private  boolean  intitialized = false;
 
-    private  ConcurrentHashMap<String,CoverageDescription> coverages = new  ConcurrentHashMap<String,CoverageDescription>();
+    private  ConcurrentHashMap<String,CoverageDescription> coveragesMap = new  ConcurrentHashMap<>();
+    private  ConcurrentHashMap<String,EODatasetSeries> datasetSeriesMap = new  ConcurrentHashMap<>();
 
 
 
@@ -82,7 +83,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
     public String getDataAccessUrl(String coverageID) {
 
-        CoverageDescription cd = coverages.get(coverageID);
+        CoverageDescription cd = coveragesMap.get(coverageID);
 
         if(cd==null)
             return null;
@@ -240,12 +241,14 @@ public class LocalFileCatalog implements WcsCatalog {
 
         validateContent = validate;
 
-
-
-
-        for (Object o : lfcConfig.getChildren("WcsCoverage", NS)) {
+        for (Object o : lfcConfig.getChildren(CoverageDescription.CONFIG_ELEMENT_NAME, NS)) {
             Element wcsCoverageConfig = (Element) o;
             ingestCoverageDescription(wcsCoverageConfig,  validateContent);
+        }
+
+        for (Object o : lfcConfig.getChildren(EODatasetSeries.CONFIG_ELEMENT_NAME, NS)) {
+            Element eoDatasetSeries = (Element) o;
+            ingestDatasetSeries(eoDatasetSeries,  validateContent);
         }
 
         _lastModified = catalogFile.lastModified();
@@ -254,6 +257,38 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     }
+
+    private void ingestDatasetSeries(Element eowcsDatasetSeriesConfig, boolean validateContent)  {
+
+        String msg;
+        EODatasetSeries eoDatasetSeries = null;
+        try {
+            eoDatasetSeries = new EODatasetSeries(eowcsDatasetSeriesConfig, _catalogDir, validateContent);
+        } catch (JDOMException e) {
+            msg = "ingestCoverageDescription(): CoverageDescription file either did not parse or did not validate. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (IOException e) {
+            msg = "ingestCoverageDescription(): Attempting to access CoverageDescription file  generated an IOException. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (ConfigurationException e) {
+            msg = "ingestCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (WcsException e) {
+            msg = "ingestCoverageDescription(): When ingesting the CoverageDescription it failed a validation test. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        }
+
+        if(eoDatasetSeries!=null){
+            String coverageId = eoDatasetSeries.getCoverageId();
+            datasetSeriesMap.put(coverageId,eoDatasetSeries);
+        }
+
+    }
+
 
 
 
@@ -283,7 +318,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         if(coverageDescription!=null){
             String coverageId = coverageDescription.getCoverageId();
-            coverages.put(coverageId,coverageDescription);
+            coveragesMap.put(coverageId,coverageDescription);
         }
 
     }
@@ -295,13 +330,13 @@ public class LocalFileCatalog implements WcsCatalog {
 
         log.debug("Looking for a coverage with ID: "+id);
 
-        return coverages.containsKey(id);
+        return coveragesMap.containsKey(id);
     }
 
 
     public  Element getCoverageDescriptionElement(String id) throws WcsException{
 
-        CoverageDescription coverage = coverages.get(id);
+        CoverageDescription coverage = coveragesMap.get(id);
 
         if(coverage==null){
             throw new WcsException("No such coverage.",
@@ -309,7 +344,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         }
 
-        return coverages.get(id).getElement();
+        return coveragesMap.get(id).getElement();
     }
 
     public List<Element> getCoverageDescriptionElements() throws WcsException {
@@ -319,7 +354,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
     public  CoverageDescription getCoverageDescription(String id) throws WcsException {
 
-        CoverageDescription cd = coverages.get(id);
+        CoverageDescription cd = coveragesMap.get(id);
         if(cd==null)
             throw new WcsException("No such wcs:Coverage: "+ Scrub.fileName(id),
                     WcsException.INVALID_PARAMETER_VALUE,"wcs:CoverageId");
@@ -329,15 +364,15 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     public  Element getCoverageSummaryElement(String id) throws WcsException {
-        return coverages.get(id).getCoverageSummary();
+        return coveragesMap.get(id).getCoverageSummary();
     }
 
     public  Collection<Element> getCoverageSummaryElements() throws WcsException {
 
 
-        TreeMap<String, Element> coverageSummaries = new TreeMap<String,Element>();
+        TreeMap<String, Element> coverageSummaries = new TreeMap<>();
 
-        Enumeration e = coverages.elements();
+        Enumeration e = coveragesMap.elements();
 
         CoverageDescription cd;
 
@@ -351,8 +386,26 @@ public class LocalFileCatalog implements WcsCatalog {
         return coverageSummaries.values();
     }
 
+    @Override
+    public Collection<Element> getDatasetSeriesSummaryElements() throws InterruptedException, WcsException {
 
+        TreeMap<String, Element> datasetSeriesElements = new TreeMap<>();
 
+        Enumeration e = datasetSeriesMap.elements();
+
+        EODatasetSeries dss;
+
+        while(e.hasMoreElements()){
+            dss = (EODatasetSeries) e.nextElement();
+
+            String id = dss.getCoverageId();
+            Element e3 = dss.getDatasetSeriesSummary();
+            datasetSeriesElements.put(id,e3);
+
+        }
+
+        return datasetSeriesElements.values();
+    }
 
 
     public long getLastModified(){

@@ -62,6 +62,7 @@ public class CoverageDescription {
     private URL dapDatasetUrl;
     private HashMap<String,String> _dapGridId;
 
+    public static final String CONFIG_ELEMENT_NAME = "WcsCoverage";
 
     private LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
 

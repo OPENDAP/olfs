@@ -176,6 +176,29 @@ public interface WcsCatalog {
 
 
 
+
+    /**
+     * Queries the catalog and returns all wcs:CoverageOfferingBrief elements
+     * found therin.
+     *
+     * <p><b>
+     * Since the wcs:CoverageOfferingBrief is derivable from the
+     * conent of wcs:CoverageDecription it may be that we want to migrate this
+     * method out of the interface.
+     * </b></p>
+     *
+     * @return A List containing all of the wcs:CoverageOfferingBrief Elements
+     * found in the catalog. The list may be empty.
+     * @throws WcsException When the bad things happen.
+     * @throws InterruptedException
+     */
+    public Collection<Element> getDatasetSeriesSummaryElements() throws InterruptedException, WcsException;
+
+
+
+
+
+
     /**
      * The name of the DAP variable in the target dataset that is asscoiated
      * with the latitude coordinate variable.

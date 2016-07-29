@@ -30,7 +30,10 @@ import org.slf4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  *
@@ -43,12 +46,41 @@ public class BoundingBox {
 
 
     Logger log;
-    private double[] lowerCorner;
-    private double[] upperCorner;
-    private boolean hasTimePeriod;
-    private Date startTime;
-    private Date endTime;
-    private URI srsName;
+    private double[] _lowerCorner;
+    private double[] _upperCorner;
+    private boolean _hasTimePeriod;
+    private Date _startTime;
+    private Date _endTime;
+    private URI _srsName;
+
+    public BoundingBox(double lowerCorner[], double upperCorner[], URI srsName) throws WcsException, URISyntaxException {
+
+        _lowerCorner = lowerCorner.clone();
+        _upperCorner = upperCorner.clone();
+        _srsName     =  new URI(srsName.toASCIIString());
+
+        _startTime     =  null;
+        _endTime       =  null;
+        _hasTimePeriod = false;
+
+
+
+    }
+    public BoundingBox(double _lowerCorner[], double upperCorner[], Date startTime, Date endTime, URI _srsName) throws WcsException, URISyntaxException {
+        this(_lowerCorner, upperCorner, _srsName);
+
+        if(startTime!=null)
+            _startTime =  new Date(startTime.getTime());
+        if(_endTime!=null)
+            _endTime =  new Date(endTime.getTime());
+        if(_startTime!=null && _endTime!=null)
+            _hasTimePeriod = true;
+    }
+
+
+    public BoundingBox(BoundingBox bb) throws WcsException, URISyntaxException {
+        this(bb._lowerCorner,bb._upperCorner,bb._startTime, bb._endTime, bb._srsName);
+    }
 
 
     /**
@@ -56,10 +88,10 @@ public class BoundingBox {
      *
      *
      <boundedBy>
-         <Envelope srsName="http://www.opengis.net/def/srsName/EPSG/0/4326" axisLabels="time latitude longitude"
+         <Envelope _srsName="http://www.opengis.net/def/srsName/EPSG/0/4326" axisLabels="time latitude longitude"
                    uomLabels="h deg deg" srsDimension="3">
-             <lowerCorner>898476 -90.000 0.000</lowerCorner>
-             <upperCorner>899202 90.000 360.000</upperCorner>
+             <_lowerCorner>898476 -90.000 0.000</_lowerCorner>
+             <_upperCorner>899202 90.000 360.000</_upperCorner>
          </Envelope>
      </boundedBy>
 
@@ -89,7 +121,7 @@ public class BoundingBox {
 
         WCS.checkNamespace(bbElement, "boundedBy", WCS.GML_NS);
 
-        hasTimePeriod = false;
+        _hasTimePeriod = false;
         try {
 
             Element envelope = bbElement.getChild("Envelope", WCS.GML_NS);
@@ -107,7 +139,7 @@ public class BoundingBox {
 
                 }
 
-                hasTimePeriod = true;
+                _hasTimePeriod = true;
 
 
 
@@ -181,7 +213,7 @@ public class BoundingBox {
 
 
 
-            if(hasTimePeriod){
+            if(_hasTimePeriod){
                 // Process beginPosition.
                 e = envelope.getChild("beginPosition", WCS.GML_NS);
                 if (e == null) {
@@ -192,7 +224,7 @@ public class BoundingBox {
                 }
 
                 s = e.getTextNormalize();
-                startTime = TimeConversion.parseWCSTimePosition(s);
+                _startTime = TimeConversion.parseWCSTimePosition(s);
 
 
                 // Process endPosition.
@@ -205,7 +237,7 @@ public class BoundingBox {
                 }
 
                 s = e.getTextNormalize();
-                endTime = TimeConversion.parseWCSTimePosition(s);
+                _endTime = TimeConversion.parseWCSTimePosition(s);
             }
 
 
@@ -219,40 +251,66 @@ public class BoundingBox {
         }
 
 
-        this.lowerCorner = lowerCorner;
-        this.upperCorner = upperCorner;
-        this.srsName = srsName;
+        this._lowerCorner = lowerCorner;
+        this._upperCorner = upperCorner;
+        this._srsName = srsName;
 
 
     }
+
+    // "2010-12-31T23:59:59.999";
+    private static String _timePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S Z";
 
 
     public boolean hasTimePeriod(){
-        return hasTimePeriod;
+        return _hasTimePeriod;
     }
 
     public Date getStartTime(){
-        if(startTime==null)
+        if(_startTime ==null)
             return null;
 
-        return (Date) startTime.clone();
+        return (Date) _startTime.clone();
     }
 
 
     public Date getEndTime(){
-        if(endTime==null)
+        if(_endTime ==null)
             return null;
 
-        return (Date) endTime.clone();
+        return (Date) _endTime.clone();
     }
 
+
+    public Element getGmlTimePeriod(String id){
+
+        Element timePeriod = null;
+
+        if(hasTimePeriod()){
+            SimpleDateFormat sdf = new SimpleDateFormat(_timePeriodFormat);
+            timePeriod = new Element("TimePeriod",WCS.GML_NS);
+            if(id!=null)
+                timePeriod.setAttribute("id",id,WCS.GML_NS);
+
+            Element begin = new Element("beginPosition",WCS.GML_NS);
+            begin.setText(sdf.format(getStartTime()));
+            timePeriod.addContent(begin);
+
+            Element end = new Element("endPosition",WCS.GML_NS);
+            end.setText(sdf.format(getEndTime()));
+            timePeriod.addContent(end);
+        }
+
+        return timePeriod;
+
+    }
 
     /**
      *
      * @return  Lower corner array [Minumum Longitude, Minimum Latitude, ...] - the smallest value for each dimension.
      */
     public double[] getLowerCorner() {
-        return lowerCorner;
+        return _lowerCorner.clone();
     }
 
     /**
@@ -260,7 +318,7 @@ public class BoundingBox {
      * @return Upper corner array [Maximum Longitude, Maximum Latitude, ...] - the largest value for each dimension.
      */
     public double[] getUpperCorner() {
-        return upperCorner;
+        return _upperCorner.clone();
     }
 
     /**
@@ -268,7 +326,7 @@ public class BoundingBox {
      * @return The URI in which the BoundingBox coordinates are expressed.
      */
     public URI getCRSURI() {
-        return srsName;
+        return _srsName;
     }
 
 
@@ -278,10 +336,10 @@ public class BoundingBox {
      * suitable for use with the DAP "geogrid()" server side function.
      */
     public String getDapGeogridFunctionBoundingBox(){
-        double minLongitude = lowerCorner[0];
-        double maxLongitude = upperCorner[0];
-        double minLatitude  = lowerCorner[1];
-        double maxLatitude  = upperCorner[1];
+        double minLongitude = _lowerCorner[0];
+        double maxLongitude = _upperCorner[0];
+        double minLatitude  = _lowerCorner[1];
+        double maxLatitude  = _upperCorner[1];
 
         //String bb = minLongitude + "," + maxLatitude + "," + maxLongitude + "," + minLatitude;
         String bb =  maxLatitude + "," + minLongitude  + "," + minLatitude + "," +  maxLongitude;
@@ -300,17 +358,17 @@ public class BoundingBox {
     }
 
     public boolean hasElevation(){
-        if(lowerCorner.length>2 && upperCorner.length>2)
+        if(_lowerCorner.length>2 && _upperCorner.length>2)
             return true;
         return false;
 
     }
     public double getElevationMin(){
-        return lowerCorner[2];
+        return _lowerCorner[2];
     }
 
     public double getElevationMax(){
-        return upperCorner[2];
+        return _upperCorner[2];
     }
 
 
@@ -321,13 +379,13 @@ public class BoundingBox {
     public Element getOwsBoundingBoxElement() {
         Element bbox = new Element("BoundingBox", WCS.OWS_NS);
 
-        if (srsName != null)
-            bbox.setAttribute("crs", srsName.toString());
+        if (_srsName != null)
+            bbox.setAttribute("crs", _srsName.toString());
 
 
         String txt = "";
         Element e = new Element("LowerCorner", WCS.OWS_NS);
-        for (double coordinate : lowerCorner) {
+        for (double coordinate : _lowerCorner) {
             txt += coordinate + "  ";
         }
         e.setText(txt);
@@ -336,7 +394,7 @@ public class BoundingBox {
 
         txt = "";
         e = new Element("UpperCorner", WCS.OWS_NS);
-        for (double coordinate : upperCorner) {
+        for (double coordinate : _upperCorner) {
             txt += coordinate + "  ";
         }
         e.setText(txt);
@@ -352,15 +410,15 @@ public class BoundingBox {
     public Element getWgs84BoundingBoxElement() {
         Element bbox = new Element("WGS84BoundingBox", WCS.OWS_NS);
 
-        if (srsName != null)
-            bbox.setAttribute("crs", srsName.toString());
+        if (_srsName != null)
+            bbox.setAttribute("crs", _srsName.toString());
 
         //@todo transform coordinates!!
 
 
         String txt = "";
         Element e = new Element("LowerCorner", WCS.OWS_NS);
-        for (double coordinate : lowerCorner) {
+        for (double coordinate : _lowerCorner) {
             txt += coordinate + "  ";
         }
         e.setText(txt);
@@ -369,7 +427,7 @@ public class BoundingBox {
 
         txt = "";
         e = new Element("UpperCorner", WCS.OWS_NS);
-        for (double coordinate : upperCorner) {
+        for (double coordinate : _upperCorner) {
             txt += coordinate + "  ";
         }
         e.setText(txt);
@@ -391,13 +449,13 @@ public class BoundingBox {
 
         // @todo transform coordinates of passed BB to those of this one before check intersection
 
-        if(srsName !=null &&
+        if(_srsName !=null &&
                 bb.getCRSURI()!=null &&
-                !srsName.equals(bb.getCRSURI())){
+                !_srsName.equals(bb.getCRSURI())){
 
             String msg = "Cannot check for BoundingBox intersections since the " +
                     "passed BoundingBox is expressed in a different CRS. " +
-                    "My CRS: "+ srsName.toASCIIString()+" " +
+                    "My CRS: "+ _srsName.toASCIIString()+" " +
                     "Passed CRS: "+bb.getCRSURI().toASCIIString();
 
             log.error(msg);
@@ -410,15 +468,15 @@ public class BoundingBox {
 
         boolean lngInt=false, latInt=false;
 
-        double myMinLongitude = lowerCorner[0];
-        double myMaxLongitude = upperCorner[0];
-        double myMinLatitude  = lowerCorner[1];
-        double myMaxLatitude  = upperCorner[1];
+        double myMinLongitude = _lowerCorner[0];
+        double myMaxLongitude = _upperCorner[0];
+        double myMinLatitude  = _lowerCorner[1];
+        double myMaxLatitude  = _upperCorner[1];
 
-        double minLongitude = bb.lowerCorner[0];
-        double maxLongitude = bb.upperCorner[0];
-        double minLatitude  = bb.lowerCorner[1];
-        double maxLatitude  = bb.upperCorner[1];
+        double minLongitude = bb._lowerCorner[0];
+        double maxLongitude = bb._upperCorner[0];
+        double minLatitude  = bb._lowerCorner[1];
+        double maxLatitude  = bb._upperCorner[1];
 
 
         if(myMinLongitude<maxLongitude  && myMaxLongitude>minLongitude)
@@ -428,17 +486,17 @@ public class BoundingBox {
             latInt = true;
 
 
-        if(lowerCorner[0]<bb.upperCorner[0]  && upperCorner[0]>bb.lowerCorner[0])
+        if(_lowerCorner[0]<bb._upperCorner[0]  && _upperCorner[0]>bb._lowerCorner[0])
             lngInt = true;
 
-        if(lowerCorner[1]<bb.lowerCorner[1]  && upperCorner[1]>bb.lowerCorner[1])
+        if(_lowerCorner[1]<bb._lowerCorner[1]  && _upperCorner[1]>bb._lowerCorner[1])
             latInt = true;
 
         */
 
 
-        for(int i=0; i<lowerCorner.length ;i++){
-            overlap = lowerCorner[i]<bb.upperCorner[i]  && upperCorner[i]>bb.lowerCorner[i];
+        for(int i = 0; i< _lowerCorner.length ; i++){
+            overlap = _lowerCorner[i]<bb._upperCorner[i]  && _upperCorner[i]>bb._lowerCorner[i];
             hasIntersection = overlap & hasIntersection;
         }
 
@@ -447,6 +505,19 @@ public class BoundingBox {
     }
 
 
+    public BoundingBox union(BoundingBox bb) throws WcsException {
+        throw new WcsException("BoundingBox.union() not yet supported.",
+                WcsException.OPERATION_NOT_SUPPORTED,
+                "ows:BoundingBox/@crs");
+
+    }
+
+    public BoundingBox intersection(BoundingBox bb) throws WcsException {
+        throw new WcsException("BoundingBox.intersection() not yet supported.",
+                WcsException.OPERATION_NOT_SUPPORTED,
+                "ows:BoundingBox/@crs");
+
+    }
 
 
 }

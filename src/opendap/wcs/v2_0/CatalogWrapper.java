@@ -118,6 +118,11 @@ public class CatalogWrapper {
     }
 
 
+    public static Collection<Element> getDatasetSeriesSummaryElements()  throws InterruptedException, WcsException{
+        return _catalogImpl.getDatasetSeriesSummaryElements();
+    }
+
+
 
     private static void ingestCapabilitiesMetadata(Element config) throws Exception  {
         Element e1, e2;

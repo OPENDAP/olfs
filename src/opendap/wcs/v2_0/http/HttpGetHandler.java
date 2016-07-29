@@ -199,13 +199,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
                 if (sendResponse) {
 
-                    String q = request.getQueryString();
-
                     if (relativeURL.equals("/")) {
                         response.sendRedirect(_contextPath+"/");
                         log.debug("Sent redirect from / to "+_contextPath+"/");
                     }
-                    else if(relativeURL.equals("") && q!=null){
+                    else if(relativeURL.equals("") && query!=null){
                         KvpHandler.processKvpWcsRequest(serviceURL, dataAccessBase,getKVP(request),response);
                         log.info("Sent WCS Response");
                     }
@@ -226,7 +224,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         update(request, response);
                         log.info("Catalog update complete.");
                     }
-                    else if(q==null){
+                    else if(query==null){
                         sendCapabilitesPresentationPage(request, response);
                         log.info("Sent WCS Capabilities Response Presentation Page.");
                     }

@@ -107,4 +107,8 @@
             </ows:AllowedValues>
         </ows:Parameter>
     </ows:Operation>
+    <ows:Constraint>
+        <ows:NoValues />
+        <ows:DefaultValue>1000</ows:DefaultValue>
+    </ows:Constraint>
 </ows:OperationsMetadata>

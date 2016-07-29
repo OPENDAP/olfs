@@ -79,6 +79,12 @@ public class WCS {
     public static final String    SWE_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/sweCommon/2.0/";
 
 
+    public static final String    WCSEO_NAMESPACE_STRING = "http://www.opengis.net/wcs/wcseo/1.0";
+    public static final Namespace WCSEO_NS = Namespace.getNamespace("wcs",WCS_NAMESPACE_STRING);
+    public static final String    WCSEO_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcseo/1.0/";
+
+
+
 
 
     public static final String    XLINK_NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
