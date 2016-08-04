@@ -53,13 +53,26 @@ public class BoundingBox {
     private Date _endTime;
     private URI _srsName;
 
-    public BoundingBox(double lowerCorner[], double upperCorner[], URI srsName) throws WcsException, URISyntaxException {
+    public BoundingBox(double lowerCorner[], double upperCorner[], URI srsName) throws WcsException {
 
+        if(lowerCorner.length != upperCorner.length){
+            throw new WcsException("A Bounding box cannot be construct in which the number of dimensions is inconsistent." +
+                    "The gml:lowerCorner has "+lowerCorner.length+" dimensions and the gml:upperCorner has "+upperCorner.length,
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:Envelope");
+        }
         _lowerCorner = lowerCorner.clone();
         _upperCorner = upperCorner.clone();
 
         if(srsName!=null)
-            _srsName = new URI(srsName.toASCIIString());
+            try {
+                _srsName = new URI(srsName.toASCIIString());
+            }
+            catch (URISyntaxException e) {
+                throw new WcsException("The BoundingBox SRS name is not a proper URI. Message: " + e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "gml:Envelope/@srsName");
+            }
         else
             _srsName = null;
 
@@ -70,7 +83,7 @@ public class BoundingBox {
 
 
     }
-    public BoundingBox(double _lowerCorner[], double upperCorner[], Date startTime, Date endTime, URI _srsName) throws WcsException, URISyntaxException {
+    public BoundingBox(double _lowerCorner[], double upperCorner[], Date startTime, Date endTime, URI _srsName) throws WcsException {
         this(_lowerCorner, upperCorner, _srsName);
 
         if(startTime!=null)
@@ -332,23 +345,7 @@ public class BoundingBox {
     }
 
 
-    /**
-     *
-     * @return A bounding box string representing this BoundingBox
-     * suitable for use with the DAP "geogrid()" server side function.
-     */
-    public String getDapGeogridFunctionBoundingBox(){
-        double minLongitude = _lowerCorner[0];
-        double maxLongitude = _upperCorner[0];
-        double minLatitude  = _lowerCorner[1];
-        double maxLatitude  = _upperCorner[1];
-
-        //String bb = minLongitude + "," + maxLatitude + "," + maxLongitude + "," + minLatitude;
-        String bb =  maxLatitude + "," + minLongitude  + "," + minLatitude + "," +  maxLongitude;
-
-        return bb;
-    }
-
+    /*
 
     public String getDapGeogridFunctionElevationSubset(String dapElevationVariableName){
         String subset=null;
@@ -373,6 +370,7 @@ public class BoundingBox {
         return _upperCorner[2];
     }
 
+*/
 
     /**
      *
@@ -507,10 +505,42 @@ public class BoundingBox {
     }
 
 
+
     public BoundingBox union(BoundingBox bb) throws WcsException {
-        throw new WcsException("BoundingBox.union() not yet supported.",
-                WcsException.OPERATION_NOT_SUPPORTED,
-                "ows:BoundingBox/@crs");
+
+
+        if(_lowerCorner.length != bb._lowerCorner.length || _upperCorner.length != bb._upperCorner.length)
+            throw new WcsException("The union() operation only woeks on BoundingBoxes with the same number of dimensions." +
+                    "The gml:lowerCorner elements have "+_lowerCorner.length+" and "+bb._lowerCorner+" dimensions. "+
+                    "The gml:upperCorner elements have "+_upperCorner.length+" and "+bb._upperCorner+" dimensions. ",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:boundedBy");
+
+
+        if(_srsName!=null && bb._srsName!=null && _srsName.equals(bb._srsName))
+            throw new WcsException("The SRS names do not match and no transformation is provided ",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:boundedBy");
+
+
+
+        double newLowerCorner[] = new double[_lowerCorner.length];
+        for(int i=0; i<_lowerCorner.length ; i++){
+            newLowerCorner[i] = (_lowerCorner[i] <= bb._lowerCorner[i])?_lowerCorner[i]:bb._lowerCorner[i];
+        }
+        double newUpperCorner[] = new double[_upperCorner.length];
+        for(int i=0; i<_upperCorner.length ; i++){
+            newUpperCorner[i] = (_upperCorner[i] >= bb._upperCorner[i])?_lowerCorner[i]:bb._upperCorner[i];
+        }
+
+        Date newStartTime=null, newEndTime=null;
+        if(hasTimePeriod() && bb.hasTimePeriod()){
+
+            newStartTime = (_startTime.before(bb._startTime))?new Date(_startTime.getTime()):new Date(bb._startTime.getTime());
+            newEndTime = (_endTime.after(bb._endTime))?new Date(_endTime.getTime()):new Date(bb._endTime.getTime());
+        }
+
+        return new BoundingBox(newLowerCorner,newUpperCorner,newStartTime,newEndTime,_srsName);
 
     }
 
