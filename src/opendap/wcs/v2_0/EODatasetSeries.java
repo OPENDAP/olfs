@@ -57,11 +57,11 @@ public class EODatasetSeries {
         if(s!=null)
             myCoverageId = s;
 
-        Iterator cvrgList = eodsElement.getChildren(CoverageDescription.CONFIG_ELEMENT_NAME,LocalFileCatalog.NS).iterator();
+        Iterator cvrgList = eodsElement.getChildren(EOCoverageDescription.CONFIG_ELEMENT_NAME,LocalFileCatalog.NS).iterator();
 
         while(cvrgList.hasNext()){
-            Element  wcsCoverageElement = (Element) cvrgList.next();
-            members.add(new EOCoverageDescription(wcsCoverageElement, _catalogDir,_validateContent));
+            Element  eoWcsCoverageElement = (Element) cvrgList.next();
+            members.add(new EOCoverageDescription(eoWcsCoverageElement, _catalogDir,_validateContent));
         }
     }
 
@@ -81,13 +81,13 @@ public class EODatasetSeries {
 
     public Element getDatasetSeriesSummary() throws WcsException {
 
-        Element dsSummary = new Element("DatasetSeriesSummary",WCS.WCSEO_NS);
+        Element datasetSeriesSummary = new Element("DatasetSeriesSummary",WCS.WCSEO_NS);
 
         //         <wcseo:DatasetSeriesId>someDatasetSeries1</wcseo:DatasetSeriesId>
         Element dsId = new Element("DatasetSeriesId",WCS.WCSEO_NS);
         dsId.setText(getCoverageId());
 
-        dsSummary.addContent(dsId);
+        datasetSeriesSummary.addContent(dsId);
 
         BoundingBox seriesBoundingBox = null;
 
@@ -108,16 +108,19 @@ public class EODatasetSeries {
 
         if(seriesBoundingBox!=null){
             Element wgs84BB = seriesBoundingBox.getWgs84BoundingBoxElement();
-            dsSummary.addContent(wgs84BB);
+            datasetSeriesSummary.addContent(wgs84BB);
             if(seriesBoundingBox.hasTimePeriod()){
                 Element timePeriod = seriesBoundingBox.getGmlTimePeriod(getCoverageId()+"_timePeriod");
                 if(timePeriod!=null)
-                    dsSummary.addContent(timePeriod);
+                    datasetSeriesSummary.addContent(timePeriod);
             }
         }
 
-        return dsSummary;
+        return datasetSeriesSummary;
     }
+
+
+
 
 
 }

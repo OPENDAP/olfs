@@ -26,6 +26,7 @@
 package opendap.wcs.v2_0;
 
 import opendap.coreServlet.Scrub;
+import opendap.wcs.v2_0.http.HttpGetHandler;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,9 @@ public class Coverage {
 
     private CoverageDescription _myCD;
 
+    private String _requestUrl;
+
+
 
 
 
@@ -60,20 +64,22 @@ public class Coverage {
 
 
 
-    public Coverage(CoverageDescription cd)throws WcsException {
+    public Coverage( CoverageDescription cd, String requestUrl) throws WcsException, InterruptedException {
+
         _myCD = cd;
 
-        init();
-    }
+        if(_myCD==null)
+            throw new WcsException("Received a null CoverageDescription",WcsException.NO_APPLICABLE_CODE,"java::opendap.wcs.v_2_0.Coverage");
 
-
-    public Coverage(String coverageId) throws WcsException, InterruptedException {
-
-        _myCD = CatalogWrapper.getCoverageDescription(coverageId);
+        _requestUrl = requestUrl;
 
         init();
     }
 
+
+    protected CoverageDescription getCoverageDescription(){
+        return _myCD;
+    }
 
     /**
      *
@@ -92,16 +98,20 @@ public class Coverage {
 
 
         String coverageSubtype = _myCD.getCoverageSubtype();
+        coverage = new Element(coverageSubtype,WCS.GMLCOV_NS);
+
+        /*
+
         if(coverageSubtype.equals("RectifiedGridCoverage")){
             coverage = new Element("RectifiedGridCoverage",WCS.GMLCOV_NS);
-                    }
+        }
         else if(coverageSubtype.equals("GridCoverage")){
             coverage = new Element("GridCoverage",WCS.GMLCOV_NS);
         }
         else
             throw new WcsException("This server does not support gml:CoverageSubtype: "+ Scrub.fileName(coverageSubtype),
                     WcsException.INVALID_PARAMETER_VALUE,"gml:CoverageSubtype");
-
+        */
 
 
         coverage.addNamespaceDeclaration(WCS.WCS_NS);
@@ -132,9 +142,12 @@ public class Coverage {
         Vector<Element> abstractFeatureTypeContent = _myCD.getAbstractFeatureTypeContent();
         coverage.addContent(abstractFeatureTypeContent);
 
+
         coverage.addContent(_myCD.getDomainSet());
         coverage.addContent(getRangeSet(rangeValuesPartID, mimeType));
         coverage.addContent(_myCD.getRangeType());
+
+
 
 
         return coverage;
@@ -143,6 +156,9 @@ public class Coverage {
 
         
     }
+
+
+
 
 
 
@@ -212,6 +228,9 @@ public class Coverage {
 
 
 
+    public String getRequestUrl() {
+        return _requestUrl;
+    }
 
 
 

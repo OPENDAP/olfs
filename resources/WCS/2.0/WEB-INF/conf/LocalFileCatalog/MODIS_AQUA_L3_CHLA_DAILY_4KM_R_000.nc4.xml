@@ -55,7 +55,7 @@
                 <eop:EarthObservation gml:id="eop_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
                     <om:phenomenonTime>
                         <gml:TimePeriod gml:id="tp_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
-                            <gml:beginPosition>2002-07-03T00:00:00Z</gml:beginPosition> <!-- 108 days -->
+                            <gml:beginPosition>2002-07-03T00:00:00Z</gml:beginPosition>
                             <gml:endPosition>2002-07-03T23:59:59Z</gml:endPosition>
                         </gml:TimePeriod>
                     </om:phenomenonTime>

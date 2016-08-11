@@ -246,6 +246,11 @@ public class LocalFileCatalog implements WcsCatalog {
             ingestCoverageDescription(wcsCoverageConfig,  validateContent);
         }
 
+        for (Object o : lfcConfig.getChildren(EOCoverageDescription.CONFIG_ELEMENT_NAME, NS)) {
+            Element eoWcsCoverageConfig = (Element) o;
+            ingestEOCoverageDescription(eoWcsCoverageConfig,  validateContent);
+        }
+
         for (Object o : lfcConfig.getChildren(EODatasetSeries.CONFIG_ELEMENT_NAME, NS)) {
             Element eoDatasetSeries = (Element) o;
             ingestDatasetSeries(eoDatasetSeries,  validateContent);
@@ -325,6 +330,39 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
 
+    private void ingestEOCoverageDescription(Element wcsCoverageConfig, boolean validateContent)  {
+
+        String msg;
+        EOCoverageDescription eoCoverageDescription = null;
+        try {
+            eoCoverageDescription = new EOCoverageDescription(wcsCoverageConfig, _catalogDir, validateContent);
+        } catch (JDOMException e) {
+            msg = "ingestCoverageDescription(): CoverageDescription file either did not parse or did not validate. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (IOException e) {
+            msg = "ingestCoverageDescription(): Attempting to access CoverageDescription file  generated an IOException. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (ConfigurationException e) {
+            msg = "ingestCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (WcsException e) {
+            msg = "ingestCoverageDescription(): When ingesting the CoverageDescription it failed a validation test. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        }
+
+        if(eoCoverageDescription!=null){
+            String coverageId = eoCoverageDescription.getCoverageId();
+            coveragesMap.put(coverageId,eoCoverageDescription);
+        }
+
+    }
+
+
+
 
     public boolean hasCoverage(String id){
 
@@ -344,11 +382,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         }
 
-        return coveragesMap.get(id).getElement();
-    }
-
-    public List<Element> getCoverageDescriptionElements() throws WcsException {
-        throw new WcsException("getCoverageDescriptionElements() method Not Implemented",WcsException.NO_APPLICABLE_CODE);
+        return coverage.getCoverageDescriptionElement();
     }
 
 

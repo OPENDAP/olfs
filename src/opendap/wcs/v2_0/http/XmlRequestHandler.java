@@ -162,13 +162,15 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Element wcsRequest = wcsRequestDoc.getRootElement();
         String serviceUrl = Util.getServiceUrlString(request, _prefix);
 
-        handleWcsRequest(wcsRequest,serviceUrl,response);
+        String requestUrl=HttpGetHandler.getRequestUrl(request);
+
+        handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
 
 
 
     }
 
-    public void handleWcsRequest(Element wcsRequest, String serviceUrl, HttpServletResponse response) throws WcsException, InterruptedException {
+    public void handleWcsRequest(Element wcsRequest, String serviceUrl, String requestUrl, HttpServletResponse response) throws WcsException, InterruptedException {
 
         Document wcsResponse;
         switch (getRequestType(wcsRequest)) {
@@ -187,7 +189,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
             case WCS.GET_COVERAGE:
 
-                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(wcsRequest);
+                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
 
                 /*
                 if (getCoverageRequest.isStore()) {

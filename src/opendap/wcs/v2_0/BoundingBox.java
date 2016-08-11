@@ -530,7 +530,7 @@ public class BoundingBox {
         }
         double newUpperCorner[] = new double[_upperCorner.length];
         for(int i=0; i<_upperCorner.length ; i++){
-            newUpperCorner[i] = (_upperCorner[i] >= bb._upperCorner[i])?_lowerCorner[i]:bb._upperCorner[i];
+            newUpperCorner[i] = (_upperCorner[i] >= bb._upperCorner[i])?_upperCorner[i]:bb._upperCorner[i];
         }
 
         Date newStartTime=null, newEndTime=null;

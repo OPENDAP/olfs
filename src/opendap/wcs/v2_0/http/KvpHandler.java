@@ -49,7 +49,7 @@ public class KvpHandler {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(KvpHandler.class);
 
 
-    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
+    public static void processKvpWcsRequest(String serviceURL, String requestUrl, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
 
 
 
@@ -96,7 +96,7 @@ public class KvpHandler {
 
                 case WCS.GET_COVERAGE:
 
-                    getCoverage(keyValuePairs,response);
+                    getCoverage(requestUrl, keyValuePairs,response);
 
                     break;
 
@@ -159,22 +159,9 @@ public class KvpHandler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public static void getCoverage(Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public static void getCoverage(String requestUrl, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
-        GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
-
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
-
-    }
-
-
-    /**
-     *
-     * @param req    A GetCoverageREquest object.
-     * @throws WcsException  When bad things happen.
-     */
-    public static void getCoverage(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
-
+        GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);
 
         CoverageRequestProcessor.sendCoverageResponse(req, response, false );
 

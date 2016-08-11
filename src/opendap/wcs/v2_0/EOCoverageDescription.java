@@ -14,6 +14,11 @@ public class EOCoverageDescription extends CoverageDescription {
 
     private Logger log;
 
+    public static final String CONFIG_ELEMENT_NAME = "EOWcsCoverage";
+
+
+
+
     public EOCoverageDescription(Element eowcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException, WcsException {
         super(eowcsCoverageConfig,catalogDir,validateContent);
         log = LoggerFactory.getLogger(this.getClass());
@@ -44,15 +49,7 @@ public class EOCoverageDescription extends CoverageDescription {
         if(!bb.hasTimePeriod()){
             // No time period? Check the  EO metadata section for that...
 
-            Element metadata =  myCD.getChild("metadata",WCS.GMLCOV_NS);
-            if(metadata == null)
-                return bb; // Give up on the time thing...
-
-            Element extension =  metadata.getChild("Extension",WCS.GMLCOV_NS);
-            if(extension == null)
-                return bb; // Give up on the time thing...
-
-            Element eoMetadata =  extension.getChild("EOMetadata",WCS.WCSEO_NS);
+            Element eoMetadata =  getEOMetadata();
             if(eoMetadata == null)
                 return bb; // Give up on the time thing...
 
@@ -78,6 +75,37 @@ public class EOCoverageDescription extends CoverageDescription {
         return bb;
     }
 
+    public  Element getEOMetadata(){
+
+        Element coverageDescription = myCD;
+        Element metadata =  coverageDescription.getChild("metadata",WCS.GMLCOV_NS);
+        if(metadata == null)
+            return null; // Give up on the EO Metadata thing...
+
+        Element extension =  metadata.getChild("Extension",WCS.GMLCOV_NS);
+        if(extension == null)
+            return null; // Give up on the EO Metadata thing...
+
+        Element eoMetadata =  extension.getChild("EOMetadata",WCS.WCSEO_NS);
+        if(eoMetadata == null)
+            return null; // Give up on the EO Metadata thing...
+
+
+        return (Element)eoMetadata.clone();
+
+
+
+    }
+
+    @Override
+    public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
+
+        EOCoverage coverage = new EOCoverage(this,requestUrl);
+
+        return coverage;
+
+
+    }
 
 
 }

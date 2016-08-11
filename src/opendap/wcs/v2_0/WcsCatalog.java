@@ -124,7 +124,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    public List<Element> getCoverageDescriptionElements() throws InterruptedException, WcsException;
+    //public List<Element> getCoverageDescriptionElements() throws InterruptedException, WcsException;
 
 
 
@@ -148,7 +148,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
+     // public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -168,7 +168,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
+     public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
 
 
 

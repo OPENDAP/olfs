@@ -26,7 +26,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <wcs:CoverageDescription
-        gml:id="ncep_model_example"
+        gml:id="eo_ncep_model_example"
         xmlns="http://www.opengis.net/gml/3.2"
         xmlns:ows="http://www.opengis.net/ows/2.0"
         xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -48,24 +48,24 @@
             <gml:upperCorner>90.0 359.5</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <wcs:CoverageId>ncep_model_example</wcs:CoverageId>
+    <wcs:CoverageId>eo_ncep_model_example</wcs:CoverageId>
     <gmlcov:metadata>
         <gmlcov:Extension>
             <wcseo:EOMetadata>
-                <eop:EarthObservation gml:id="eop_ncep_model_example">
+                <eop:EarthObservation gml:id="eop_eo_ncep_model_example">
                     <om:phenomenonTime>
-                        <gml:TimePeriod gml:id="tp_ncep_model_example">
+                        <gml:TimePeriod gml:id="tp_eo_ncep_model_example">
                             <gml:beginPosition>2016-06-17T00:00:00.000Z</gml:beginPosition> <!-- 108 days -->
                             <gml:endPosition>2016-07-02T00:00:00.000Z</gml:endPosition>
                         </gml:TimePeriod>
                     </om:phenomenonTime>
                     <om:resultTime>
-                        <gml:TimeInstant gml:id="archiving_date_ncep_model_example">
+                        <gml:TimeInstant gml:id="archiving_date_eo_ncep_model_example">
                             <gml:timePosition>2016-07-03T11:02:47.999</gml:timePosition>
                         </gml:TimeInstant>
                     </om:resultTime>
                     <om:procedure>
-                        <eop:EarthObservationEquipment gml:id="ncep_model_example_eoe">
+                        <eop:EarthObservationEquipment gml:id="eo_ncep_model_example_eoe">
                             <eop:platform>
                                 <eop:Platform>
                                     <eop:shortName>PHR</eop:shortName>
@@ -186,7 +186,7 @@
 
 
     <gml:domainSet>
-        <gml:RectifiedGrid dimension="3" gml:id="ncep_model_example_grid">
+        <gml:RectifiedGrid dimension="3" gml:id="eo_ncep_model_example_grid">
             <gml:limits>
                 <gml:GridEnvelope>
                     <gml:low>0 0 0</gml:low>
@@ -195,7 +195,7 @@
             </gml:limits>
             <gml:axisLabels>isobaric latitude longitude</gml:axisLabels>
             <gml:origin>
-                <gml:Point gml:id="grid_origin_ncep_model_example" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                <gml:Point gml:id="grid_origin_eo_ncep_model_example" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
                     <gml:pos>100.0 90.0 0.0</gml:pos>
                 </gml:Point>
             </gml:origin>

@@ -32,6 +32,8 @@ import opendap.wcs.v2_0.http.MultipartResponse;
 import opendap.wcs.v2_0.http.SoapHandler;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,11 +117,17 @@ public class CoverageRequestProcessor {
 
         String rangePartId = "cid:" + req.getCoverageID();
 
-        Coverage cvg = new Coverage(req.getCoverageID());
+        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
 
-        Element coverage = cvg.getCoverageElement(rangePartId, getReturnMimeType(req));
+        Coverage coverage = coverageDescription.getCoverage(req.getRequestUrl()); // new Coverage(coverageDescription, req.getRequestUrl());
 
-        Document doc = new Document(coverage);
+        Element coverageElement = coverage.getCoverageElement(rangePartId, getReturnMimeType(req));
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        log.debug(xmlo.outputString(coverageElement));
+
+
+        Document doc = new Document(coverageElement);
 
         if (useSoapEnvelope)
             doc = SoapHandler.wrapDocumentInSoapEnvelope(doc);
@@ -314,12 +322,12 @@ public class CoverageRequestProcessor {
 
 
             String fieldId = field.getName();
+            String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
-                dapCE.append(field.getName());
+                dapCE.append(dapGridArrayName);
             }
             else {
-                String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
 
 
                 // So we need to process the value based subsets with a call to grid

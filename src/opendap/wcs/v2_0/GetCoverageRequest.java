@@ -52,6 +52,7 @@ public class GetCoverageRequest {
     private String mediaType = null;
     private HashMap<String, DimensionSubset> subsets = null;
 
+    private String _requestUrl = null;
 
 
 
@@ -95,7 +96,7 @@ public class GetCoverageRequest {
 
     public HashMap<String, DimensionSubset> getDimensionSubsets(){
 
-        HashMap<String, DimensionSubset> newDS = new HashMap<String, DimensionSubset>();
+        HashMap<String, DimensionSubset> newDS = new HashMap<>();
 
 
         for(DimensionSubset ds: subsets.values()){
@@ -117,11 +118,13 @@ public class GetCoverageRequest {
 
 
 
-    public GetCoverageRequest(Map<String,String[]> kvp)
+    public GetCoverageRequest(String requestUrl, Map<String,String[]> kvp)
             throws WcsException, InterruptedException {
 
         subsets = new HashMap<String, DimensionSubset>();
         String s[];
+
+        _requestUrl = requestUrl;
 
         // Make sure the client is looking for a WCS service....
         s = kvp.get("service");
@@ -207,7 +210,7 @@ public class GetCoverageRequest {
     }
 
 
-    public GetCoverageRequest(Element getCoverageRequestElem)
+    public GetCoverageRequest(String requestUrl, Element getCoverageRequestElem)
             throws WcsException, InterruptedException {
 
         subsets = new HashMap<>();
@@ -215,6 +218,7 @@ public class GetCoverageRequest {
         Element e;
         String s;
 
+        _requestUrl = requestUrl;
 
         // Make sure we got the correct request object.
         WCS.checkNamespace(getCoverageRequestElem,"GetCoverage",WCS.WCS_NS);
@@ -367,6 +371,9 @@ public class GetCoverageRequest {
 
 
 
+    public String getRequestUrl(){
+        return _requestUrl;
+    }
 
 
 

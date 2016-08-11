@@ -603,9 +603,29 @@ public class CoverageDescription {
      *
      * @return Returns the wcs:CoverageDescription element that represents this CoverageDescription.
      */
-    public Element getElement(){
-        return (Element) myCD.clone();
+    public Element getCoverageDescriptionElement(){
+       return (Element) myCD.clone();
     }
+
+    /**
+     * @param requestURL The request URL for the current request to be used in constructing lineage content.
+     * @return Returns the wcs:CoverageDescription element that represents this CoverageDescription.
+     */
+   // public Element getCoverageDescriptionElement(String requestURL){
+   //     Element cdElement = (Element) myCD.clone();
+   //     addLineage(cdElement, requestURL);
+   //     return cdElement;
+   // }
+
+    /**
+     * Regular WCS-2.0 doesn't know about lineage, but EO WCS does. So this is a do nothing call in the
+     * general case and it adds the lineage to the EO case. Woot...
+     *
+     * @param requestURL
+     */
+    public void addLineage(Element coverageDescription, String requestURL){}
+
+
 
 
     /**
@@ -785,6 +805,15 @@ public class CoverageDescription {
         return fields;
     }
 
+
+    public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
+
+        Coverage coverage = new Coverage(this,requestUrl);
+
+        return coverage;
+
+
+    }
 
 
 }
