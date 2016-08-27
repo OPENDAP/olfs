@@ -584,19 +584,17 @@ public class DownloadManager {
 
             ServletContext sc = arg0.getServletContext();
 
-            String contentPath = ServletUtil.getContentPath(sc);
-            _log.debug("contentPath: " + contentPath);
+            String configPath = ServletUtil.getConfigPath(sc);
+            _log.debug("configPath: " + configPath);
 
-            String serviceContentPath = contentPath;
-            if(!serviceContentPath.endsWith("/"))
-                serviceContentPath += "/";
-            _log.debug("_serviceContentPath: " + serviceContentPath);
+            String serviceConfigPath = configPath;
+            if(!serviceConfigPath.endsWith("/"))
+                serviceConfigPath += "/";
+            _log.debug("_serviceConfigPath: " + serviceConfigPath);
 
 
             _myThread.start();
             _log.info("contextInitialized(): " + _myThread.getName() + " is started.");
-
-
 
         }
 

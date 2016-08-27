@@ -29,6 +29,7 @@ package opendap.noaa_s3;
 import opendap.bes.BESManager;
 import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
+import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -46,6 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -112,7 +114,7 @@ public class S3CatalogServlet extends HttpServlet {
         LogUtil.logServerStartup("init()");
         _log.info("init() start.");
 
-        PersistentContentHandler.installInitialContent(this);
+        PersistentConfigurationHandler.installDefaultConfiguration(this);
 
 
         ingestConfig();
@@ -247,22 +249,16 @@ public class S3CatalogServlet extends HttpServlet {
                 try {
                     _log.info("Loading Catalog Index Files For AWS S3 Bucket '{}'.",name);
                     S3CatalogManager.theManager().ingestIndex(context,name);
-                } catch (JDOMException e) {
-                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' This does not bode well... ";
-                    throw new ServletException(msg,e);
-                } catch (IOException e) {
-                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' This does not bode well... ";
+                } catch (JDOMException | IOException e) {
+                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' msg: "+e.getMessage();
                     throw new ServletException(msg,e);
                 }
 
                 try {
                     _log.info("Loading Catalog File References From Index Of AWS S3 Bucket '{}'.",name);
                     S3CatalogManager.theManager().ingestIndexedFiles(context, name);
-                } catch (JDOMException e) {
-                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' This does not bode well... ";
-                    throw new ServletException(msg,e);
-                } catch (IOException e) {
-                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' This does not bode well... ";
+                } catch (JDOMException | IOException e) {
+                    String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' msg: "+e.getMessage();
                     throw new ServletException(msg,e);
                 }
 
@@ -305,35 +301,20 @@ public class S3CatalogServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         _log.debug("Loading Configuration File: " + filename);
 
 
         try {
+            _configDoc = opendap.xml.Util.getDocument(filename);
 
-            File confFile = new File(filename);
-            FileInputStream fis = new FileInputStream(confFile);
-
-            try {
-                // Parse the XML doc into a Document object.
-                SAXBuilder sb = new SAXBuilder();
-                _configDoc = sb.build(fis);
-            }
-            finally {
-            	fis.close();
-            }
-
-        } catch (FileNotFoundException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" cannot be found.";
-            _log.error(msg);
-            throw new ServletException(msg, e);
         } catch (IOException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" is not readable.";
+            String msg = "OLFS configuration file \"" + filename + "\" is not readable. msg: "+e.getMessage();
             _log.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
-            String msg = "OLFS configuration file \"" + filename + "\" cannot be parsed.";
+            String msg = "OLFS configuration file \"" + filename + "\" cannot be parsed. msg: "+e.getMessage();
             _log.error(msg);
             throw new ServletException(msg, e);
         }
@@ -438,7 +419,8 @@ public class S3CatalogServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
-        String tKey = Timer.start();
+        Procedure tKey = Timer.start();
+        int status = HttpServletResponse.SC_OK;
 
         try {
             LogUtil.logServerAccessStart(request, "S3_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
@@ -453,7 +435,8 @@ public class S3CatalogServlet extends HttpServlet {
                 if (requestURI.startsWith(catalogServiceContext)) {
                     if (!directoryDispatch(request, response)) {  // Is it a catalog request?
                         // We don't know how to cope, looks like it's time to 404!
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested catalog.");
+                        status = HttpServletResponse.SC_NOT_FOUND;
+                        response.sendError(status, "Unable to locate requested catalog.");
                         _log.info("Sent 404 Response.");
 
                     }
@@ -462,14 +445,16 @@ public class S3CatalogServlet extends HttpServlet {
                     if (!_s3DapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
 
                         // We don't know how to cope, looks like it's time to 404!
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested DAP dataset.");
+                        status = HttpServletResponse.SC_NOT_FOUND;
+                        response.sendError(status, "Unable to locate requested DAP dataset.");
                         _log.info("Sent 404 Response.");
 
                     }
                 }
                 else {   // It's not a catalog request, and it's not a dap request, so:
                     // Looks like it's time to 404!
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                    status = HttpServletResponse.SC_NOT_FOUND;
+                    response.sendError(status, "Unable to locate requested resource.");
                     _log.info("Sent 404 Response.");
                 }
 
@@ -478,13 +463,13 @@ public class S3CatalogServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 _log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "S3_ACCESS");
+            LogUtil.logServerAccessEnd(status, "S3_ACCESS");
             Timer.stop(tKey);
 
         }
@@ -493,7 +478,7 @@ public class S3CatalogServlet extends HttpServlet {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String tKey = Timer.start();
+        Procedure tKey = Timer.start();
 
 
         RequestCache.openThreadCache();

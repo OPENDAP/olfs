@@ -165,6 +165,7 @@
     <property name="aws.resources"     location="resources/experiments/AWS" />
     <property name="glacier.resources" location="${aws.resources}/Glacier"/>
     <property name="s3.resources"      location="${aws.resources}/s3"/>
+    <property name="aws.lib.dir"       location="${aws.resources}/lib"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
 
@@ -267,7 +268,7 @@
 
         </fileset>
 
-        <fileset dir="${aws.resources}/lib">
+        <fileset dir="${aws.lib.dir}">
             <include name="**"/>
         </fileset>
 
