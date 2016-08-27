@@ -36,7 +36,8 @@ public class EODatasetSeries {
     //boolean initialized = false;
 
 
-    public EODatasetSeries(Element eodsElement, String catalogDir, boolean validateContent) throws WcsException, JDOMException, ConfigurationException, IOException {
+    public EODatasetSeries(Element eodsElement, String catalogDir, boolean validateContent)
+            throws WcsException, JDOMException, ConfigurationException, IOException {
 
         log = LoggerFactory.getLogger(this.getClass());
         _validateContent = validateContent;
@@ -46,7 +47,8 @@ public class EODatasetSeries {
         _catalogDir = catalogDir;
 
         if(!eodsElement.getName().equals(CONFIG_ELEMENT_NAME))
-            throw new WcsException("Bad configuration! Unexpected "+eodsElement.getName()+" element. Was expecting "+ CONFIG_ELEMENT_NAME,
+            throw new WcsException("Bad configuration! Unexpected "+eodsElement.getName()+
+                    " element. Was expecting "+ CONFIG_ELEMENT_NAME,
                     WcsException.NO_APPLICABLE_CODE,"eowcs:DatasetSeries");
 
 

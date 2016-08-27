@@ -81,6 +81,16 @@ public class Coverage {
         return _myCD;
     }
 
+
+
+    public Element getCisCoverageElement(String rangeValuesPartID, String mimeType)throws WcsException{
+
+
+
+        return null;
+    }
+
+
     /**
      *
      * @param rangeValuesPartID  The ID of the multipart document part that carries the range values.

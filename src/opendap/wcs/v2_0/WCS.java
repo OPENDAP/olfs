@@ -91,6 +91,9 @@ public class WCS {
     public static final Namespace OM_NS = Namespace.getNamespace("wcs",OM_NAMESPACE_STRING);
     public static final String    OM_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/om/2.0/";
 
+    public static final String    CIS_NAMESPACE_STRING = "http://www.opengis.net/cis/1.1";
+    public static final Namespace CIS_NS = Namespace.getNamespace("cis",CIS_NAMESPACE_STRING);
+    //public static final String    CIS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/om/2.0/";
 
 
     public static final String    XLINK_NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
