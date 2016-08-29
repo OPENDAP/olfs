@@ -146,30 +146,31 @@ public class HtmlDMR extends Dap4Responder {
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
 
-        String xsltDocName = "dap4_ifh.xsl";
+        try {
+            String xsltDocName = "dap4_ifh.xsl";
 
 
-        // This Transformer class is an attempt at making the use of the saxon-9 API
-        // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-        // See the source code for opendap.xml.Transformer for more.
-        Transformer transformer = new Transformer(xsltDocName);
+            // This Transformer class is an attempt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
 
 
-        transformer.setParameter("serviceContext",request.getServletContext().getContextPath());
-        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-        transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
+            transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
+            transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
+            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
-        // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform( new JDOMSource(dmr),os);
-
-
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform(new JDOMSource(dmr), os);
 
 
-        os.flush();
-        log.info("Sent {}",getServiceTitle());
-        log.debug("Restoring working directory to "+ currentDir);
-        System.setProperty("user.dir",currentDir);
-
+            os.flush();
+            log.info("Sent {}", getServiceTitle());
+        }
+        finally {
+            log.debug("Restoring working directory to " + currentDir);
+            System.setProperty("user.dir", currentDir);
+        }
 
 
 

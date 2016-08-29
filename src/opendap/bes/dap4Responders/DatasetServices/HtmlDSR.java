@@ -99,8 +99,6 @@ public class HtmlDSR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-
-
         String requestedResource = request.getRequestURL().toString();
 
         //String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
@@ -128,32 +126,35 @@ public class HtmlDSR extends Dap4Responder {
 
         String currentDir = System.getProperty("user.dir");
         log.debug("Cached working directory: "+currentDir);
-        String xslDir = _systemPath + "/xsl";
+        String xslDir = _systemPath + "xsl";
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
 
 
-        String xsltDocName = "datasetServices.xsl";
-        Transformer transformer = new Transformer(xsltDocName);
+        try {
+            String xsltDocName = "datasetServices.xsl";
+            Transformer transformer = new Transformer(xsltDocName);
 
-        ServletOutputStream os = response.getOutputStream();
+            ServletOutputStream os = response.getOutputStream();
 
-        MediaType responseMediaType = getNormativeMediaType();
+            MediaType responseMediaType = getNormativeMediaType();
 
-        // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
-        RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+            // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
+            RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
-        response.setContentType(responseMediaType.getMimeType());
-        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-
-
-        // Transform the DSR into an HTML page.
-        transformer.transform( new JDOMSource(responseDoc),os);
+            response.setContentType(responseMediaType.getMimeType());
+            response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 
-        log.debug("Sent {}",getServiceTitle());
+            // Transform the DSR into an HTML page.
+            transformer.transform(new JDOMSource(responseDoc), os);
 
-        System.setProperty("user.dir",currentDir);
+
+            log.debug("Sent {}", getServiceTitle());
+        }
+        finally {
+            System.setProperty("user.dir", currentDir);
+        }
 
     }
 
