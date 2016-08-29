@@ -29,7 +29,6 @@ package opendap.noaa_s3;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.gateway.BesGatewayApi;
-import org.apache.catalina.util.URL;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -37,6 +36,7 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;

@@ -59,6 +59,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpUpgradeHandler;
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
  */
@@ -774,6 +775,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
             return r.upgrade(aClass);
         }
+
 
         public Object getAttribute(String s) { return r.getAttribute(s); }
 

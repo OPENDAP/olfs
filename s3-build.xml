@@ -60,6 +60,10 @@
     <property name="compile.debuglevel" value="lines,vars,source"/>
     <property name="compile.deprecation" value="on"/>
 
+    <property name="compile.TARGET" value="1.7"/>
+    <property name="compile.SOURCE" value="1.7"/>
+
+
     <property name="modern.compiler" value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
@@ -117,39 +121,6 @@
     </target>
 
 
-    <target name="show" description="Show build settings.">
-
-        <echo level="info" message="Project Name:         ${ant.project.name}"/>
-        <echo level="info" message="Project File:         ${ant.file}"/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${S3_DAP_SERVICE_SOFTWARE_VERSION}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:       ${src.dir}"/>
-        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
-        <echo level="info" message="    aws.resources:     ${aws.resources}"/>
-        <echo level="info" message="    glacier.resources: ${glacier.resources}"/>
-        <echo level="info" message="    s3dap.resources:   ${s3.resources}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:      ${build.dir}"/>
-        <echo level="info" message="    build.classes:  ${build.classes}"/>
-        <echo level="info" message="    build.doc:      ${build.doc}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="    ant.file:          ${ant.file}"/>
-        <echo level="info" message="    ant.home:          ${ant.home}"/>
-        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
-        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
-        <echo level="info" message="    ant.version:       ${ant.version}"/>
-        <echo level="info" message="    basedir:           ${basedir}"/>
-        <echo level="info" message="    user.name:         ${user.name}"/>
-        <echo level="info" message="    user.home:         ${user.home}"/>
-        <echo level="info" message="    java.home:         ${java.home}"/>
-        <echo level="info" message=""/>
-
-    </target>
 
 
     <!-- ################################################################# -->
@@ -182,6 +153,8 @@
 
 
     <!-- Libraries -->
+    <property name="json.lib"       value="gson-2.3.1.jar"/>
+
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
     <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
@@ -240,6 +213,7 @@
         <fileset dir="${lib.dir}">
             <include name="${servlet-api.lib}"/>
             <include name="${catalina.lib}"/>
+            <include name="${json.lib}"/>
 
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
@@ -278,6 +252,39 @@
 
 
 
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:         ${ant.project.name}"/>
+        <echo level="info" message="Project File:         ${ant.file}"/>
+        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
+        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${S3_DAP_SERVICE_SOFTWARE_VERSION}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    aws.resources:     ${aws.resources}"/>
+        <echo level="info" message="    glacier.resources: ${glacier.resources}"/>
+        <echo level="info" message="    s3dap.resources:   ${s3.resources}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+
+    </target>
 
 
 
@@ -357,27 +364,33 @@
         </copy>
 
 
-        <copy todir="${build.resources}" filtering="true">
+        <!-- copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyrax.resources}">
                 <include name="**"/>
             </fileset>
-        </copy>
+        </copy -->
 
 
 
     </target>
 
+
     <target
             name="compile"
             depends="PreProcessSourceCode"
             description="Compiles the S3 DAP Service software."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling S3 DAP Service"/>
+    >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="java.home (ant):       ${java.home}"/>
+        <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
+        <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
         <echo level="info" message=""/>
 
         <javac compiler="${build.compiler}"
+               target="${compile.TARGET}"
+               source="${compile.SOURCE}"
                destdir="${build.classes}"
                debug="${compile.debug}"
                debuglevel="${compile.debuglevel}"
@@ -390,7 +403,6 @@
         </javac>
 
     </target>
-
 
 
 
@@ -453,32 +465,18 @@
 
     </target>
 
+    <target name="CollectS3Libraries"
+            depends="init"
+    >
 
-
-
-
-    <target
-            name="server"
-            depends="clean,compile"
-            description="Performs a clean build of the core software and assembles the WAR file."
-            >
-
-
-        <echo level="info" message="Building s3 dap service war file."/>
-        <echo level="info" message="build.dist: ${build.dist}"/>
-
-
-        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${s3.resources}/WEB-INF/web.xml"
-                >
-
-
-
-            <lib dir="${lib.dir}">
-
+        <copy todir="${build.lib}" filtering="false">
+            <fileset dir="${lib.dir}">
+                <!-- include all the java files -->
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
                 <include name="${urlRewrite.lib}"/>
+
+                <include name="${json.lib}"/>
 
                 <!-- Apache Commons tools -->
                 <include name="${commons-cli.lib}"/>
@@ -504,7 +502,38 @@
                 <!-- AWS libraries -->
                 <include name="${aws.sdk}"/>
                 <include name="${aws.sdk.tools}"/>
+            </fileset>
 
+            <fileset dir="${aws.lib.dir}">
+                <include name="**"/>
+            </fileset>
+
+        </copy>
+
+    </target>
+
+
+
+
+    <target
+            name="server"
+            depends="clean,compile,CollectS3Libraries"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
+
+
+        <echo level="info" message="Building s3 dap service war file."/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+
+        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
+             webxml="${s3.resources}/WEB-INF/web.xml"
+                >
+
+
+
+            <lib dir="${build.lib}">
+                <include name="**"/>
             </lib>
 
 
@@ -597,50 +626,6 @@
 
     </target>
 
-
-
-    <!-- *******************************************************  -->
-
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >
-        </sourceanalyzer>
-    </target>
 
 
 
