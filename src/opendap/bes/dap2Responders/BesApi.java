@@ -473,7 +473,7 @@ public class BesApi {
 
         besTransaction(
                 dataSource,
-                getDap2RequestDocument(DAP2_DATA, dataSource, constraintExpression, async, storeResult, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS),
+                getDap2RequestDocumentAsync(DAP2_DATA, dataSource, constraintExpression, async, storeResult, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS),
                 os);
     }
 
@@ -2208,12 +2208,12 @@ public class BesApi {
 
 
 
-        return getDap2RequestDocument(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
+        return getDap2RequestDocumentAsync(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
 
     }
 
 
-    public  Document getDap2RequestDocument(String type,
+    public  Document getDap2RequestDocumentAsync(String type,
                                             String dataSource,
                                             String ce,
                                             String async,

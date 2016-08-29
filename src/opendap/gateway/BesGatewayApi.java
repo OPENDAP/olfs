@@ -113,9 +113,11 @@ public class BesGatewayApi extends BesApi {
      * @see opendap.bes.dap2Responders.BesApi
      */
     @Override
-    public Document getDap2RequestDocument(String type,
+    public Document getDap2RequestDocumentAsync(String type,
                                            String remoteDataSourceUrl,
                                            String ce,
+                                           String async,
+                                           String storeResult,
                                            String xdap_accept,
                                            int maxResponseSize,
                                            String xmlBase,
@@ -346,7 +348,7 @@ public class BesGatewayApi extends BesApi {
             if (statusCode != HttpStatus.SC_OK) {
                 log.error("Unable to HEAD remote resource: " + dataSourceUrl);
                 String msg = "OLFS: Unable to access requested resource: " + dataSourceUrl;
-                throw new OPeNDAPException(statusCode,msg);
+                throw new OPeNDAPException(statusCode, msg);
             }
 
             Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
@@ -380,16 +382,14 @@ public class BesGatewayApi extends BesApi {
             response.detachRootElement();
             response.setRootElement(catalogElement);
 
-
-        } catch (Exception e) {
-            log.warn("Unable to HEAD the remote resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
         }
 
-
-        Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
-
-        response.detachRootElement();
-        response.setRootElement(catalogElement);
+        catch (Exception e) {
+            StringBuilder s = new StringBuilder();
+            s.append("Unable to HEAD the remote resource: '").append(dataSourceUrl).append("' ");
+            s.append("Caught ").append(e.getClass().getName()).append("  Error Msg: ").append(e.getMessage());
+            throw new IOException(s.toString(), e);
+        }
 
 
     }
@@ -397,7 +397,6 @@ public class BesGatewayApi extends BesApi {
 
 
     public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified){
-
 
 
         Element root = new Element("response",BES.BES_NS);
