@@ -150,6 +150,7 @@
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
     <property name="build.resources" location="${build.dir}/resources"/>
+    <property name="build.xsl" location="${build.dir}/xsl"/>
 
 
     <!-- Libraries -->
@@ -364,11 +365,26 @@
         </copy>
 
 
-        <!-- copy todir="${build.resources}" filtering="true">
-            <fileset dir="${hyrax.resources}">
+        <copy todir="${build.resources}/xsl" filtering="true">
+            <fileset dir="${hyrax.resources}/xsl">
+                <include name="datasetServices.xsl"/>
+                <include name="dap4_ifh.xsl"/>
+                <include name="version.xsl"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.resources}/nciso" filtering="true">
+            <fileset dir="${hyrax.resources}/nciso">
                 <include name="**"/>
             </fileset>
-        </copy -->
+        </copy>
+
+
+        <copy todir="${build.resources}/js" filtering="true">
+            <fileset dir="${hyrax.resources}/js">
+                <include name="**"/>
+            </fileset>
+        </copy>
 
 
 

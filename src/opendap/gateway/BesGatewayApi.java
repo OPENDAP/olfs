@@ -34,6 +34,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap4.Dap4Error;
+import opendap.dap4.QueryParameters;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.Header;
@@ -173,6 +174,84 @@ public class BesGatewayApi extends BesApi {
         return new Document(request);
 
     }
+
+
+
+
+    @Override
+    public  Document getDap4RequestDocument(String type,
+                                            String remoteDataSourceUrl,
+                                            QueryParameters qp,
+                                            int maxResponseSize,
+                                            String xmlBase,
+                                            String formURL,
+                                            String returnAs,
+                                            String errorContext)
+            throws BadConfigurationException {
+
+
+        log.debug("getDap4RequestDocument() - Building request for BES gateway_module request. remoteDataSourceUrl: {}",remoteDataSourceUrl);
+        Element e, request = new Element("request", BES.BES_NS);
+
+        //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
+
+
+
+
+        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
+
+
+        request.setAttribute("reqID",reqID);
+
+
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+
+        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
+
+        if(xmlBase!=null)
+            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
+
+        if(maxResponseSize>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+
+
+        request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
+
+        Element def = defineElement("d1","default");
+        e = (containerElement("gatewayContainer"));
+
+        if(qp.getCe()!=null && !qp.getCe().equals(""))
+            e.addContent(dap4ConstraintElement(qp.getCe()));
+
+        if(qp.getFunc()!=null && !qp.getFunc().equals(""))
+            e.addContent(dap4FunctionElement(qp.getFunc()));
+
+        def.addContent(e);
+
+        request.addContent(def);
+
+        e = getElement(type,"d1",formURL,returnAs,qp.getAsync(),qp.getStoreResultRequestServiceUrl());
+
+        request.addContent(e);
+
+        log.debug("getDap4RequestDocument() - Built request for BES gateway_module.");
+
+        return new Document(request);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
 
