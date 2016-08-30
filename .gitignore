@@ -31,7 +31,6 @@ Makefile.in
 atlocal
 atconfig
 aclocal.m4
-conf
 config.log
 config.status
 configure
