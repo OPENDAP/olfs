@@ -257,7 +257,7 @@ public class SimpleRepositoryUploader {
                 }
                 else {
                     // Recursive index generation
-                    s3Ingest(child,myPath, level++);
+                    s3Ingest(child,myPath, level+1);
                 }
             }
         }
