@@ -621,13 +621,14 @@
 
 
 
+
     <target  name="s3up" depends="compile">
 
         <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
-                >
+        >
             <classpath refid="compile.classpath" />
 
             <arg line="--verbose" />
@@ -638,6 +639,35 @@
 
             <arg line="--awsId=${AWS_KEY_ID}" />
             <arg line="--awsKey=${AWS_SECRET_KEY}" />
+        </java>
+
+    </target>
+
+
+
+
+    <property name="DRY_RUN"              value="--dry-run"/>
+    <property name="REPO_ORIGIN_DIR"      value="/tmp"/>
+
+
+    <target  name="pushRepo" depends="compile">
+
+        <java classname="opendap.aws.s3.SimpleRepositoryUploader"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+        >
+            <classpath refid="compile.classpath" />
+
+            <arg line="--verbose" />
+            <arg line="${DRY_RUN}" />
+            <arg line="--s3-bucket-name=${S3_BUCKET}" />
+
+
+            <arg line="--awsId=${AWS_KEY_ID}" />
+            <arg line="--awsKey=${AWS_SECRET_KEY}" />
+            <arg line="--directory=${REPO_ORIGIN_DIR}" />
+
         </java>
 
     </target>

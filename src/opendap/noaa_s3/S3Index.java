@@ -67,9 +67,6 @@ public class S3Index extends S3Object {
 
 
 
-
-
-
     public S3Index(HttpServletRequest req, String bucketContext, String bucketName) {
         super();
         log = LoggerFactory.getLogger(getClass());

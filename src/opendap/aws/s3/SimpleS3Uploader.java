@@ -45,15 +45,29 @@ public class SimpleS3Uploader {
     private boolean verbose;
 
     //private String s3LocalCacheRoot;
-    private String s3BucketName;
+    private String _s3BucketName;
 
 
-    private String awsAccessKeyId;
-    private String awsSecretKey;
+    private String _awsAccessKeyId;
+    private String _awsSecretKey;
 
-    private String targetUploadFile;
-    private String uploadFileKey;
+    private String _targetUploadFile;
+    private String _uploadFileKey;
 
+    public SimpleS3Uploader(String bucket, String keyId, String key){
+        _s3BucketName = bucket;
+        _awsAccessKeyId = keyId;
+        _awsSecretKey = key;
+        initS3();
+    }
+
+    private  SimpleS3Uploader(){
+        _s3BucketName     = null;
+        _awsAccessKeyId   = null;
+        _awsSecretKey     = null;
+        _targetUploadFile = null;
+        _uploadFileKey    = null;
+    }
 
     private  boolean processCommandline(String[] args) throws Exception {
 
@@ -102,27 +116,27 @@ public class SimpleS3Uploader {
         }
         */
 
-        s3BucketName = line.getOptionValue("s3-bucket-name");
-        if(s3BucketName==null){
+        _s3BucketName = line.getOptionValue("s3-bucket-name");
+        if(_s3BucketName ==null){
             errorMessage.append("Missing Parameter - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
         }
 
 
 
-        awsAccessKeyId =  line.getOptionValue("awsId");
-        if(awsAccessKeyId == null){
+        _awsAccessKeyId =  line.getOptionValue("awsId");
+        if(_awsAccessKeyId == null){
             errorMessage.append("Missing Parameter - You must provide an AWS access key ID (to access the S3 service) with the --awsId option.\n");
         }
 
-        awsSecretKey = line.getOptionValue("awsKey");
-        if(awsSecretKey == null){
+        _awsSecretKey = line.getOptionValue("awsKey");
+        if(_awsSecretKey == null){
             errorMessage.append("Missing Parameter - You must provide an AWS secret key (to access the S3 service) with the --awsKey option.\n");
         }
 
-        targetUploadFile = line.getOptionValue("uploadFile");
-        if (targetUploadFile!=null) {
-            uploadFileKey = line.getOptionValue("uploadKey");
-            if (uploadFileKey ==null) {
+        _targetUploadFile = line.getOptionValue("uploadFile");
+        if (_targetUploadFile !=null) {
+            _uploadFileKey = line.getOptionValue("uploadKey");
+            if (_uploadFileKey ==null) {
                 errorMessage.append("Bad Parameter - You must provide an upload Key in conjunction with an upload file.\n");
             }
         }
@@ -166,12 +180,11 @@ public class SimpleS3Uploader {
      * @see com.amazonaws.auth.PropertiesCredentials
      * @see com.amazonaws.ClientConfiguration
      */
-    private void initS3() throws Exception {
-
-
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId,awsSecretKey);
-
+    private void initS3()  {
+        System.out.println("initS3() - BEGIN");
+        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretKey);
         s3  = new AmazonS3Client(basicAWSCredentials);
+        System.out.println("initS3() - END");
     }
 
     public static void main(String[] args) throws Exception {
@@ -229,7 +242,7 @@ public class SimpleS3Uploader {
 
     public void listBucket() {
         System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
-        System.out.println("S3 Bucket: "+s3BucketName);
+        System.out.println("S3 Bucket: "+ _s3BucketName);
         System.out.println("Listing: ");
 
 
@@ -239,7 +252,7 @@ public class SimpleS3Uploader {
 
 
 
-        ObjectListing objects = s3.listObjects(s3BucketName);
+        ObjectListing objects = s3.listObjects(_s3BucketName);
         do {
             for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
                 System.out.println("   " + objectSummary.getKey() + " " + objectSummary.getSize()+" bytes");
@@ -249,15 +262,15 @@ public class SimpleS3Uploader {
             objects = s3.listNextBatchOfObjects(objects);
         } while (objects.isTruncated());
 
-        System.out.println("The  Amazon S3 bucket '" + s3BucketName + "'" +
+        System.out.println("The  Amazon S3 bucket '" + _s3BucketName + "'" +
                 "contains " + totalItems + " objects with a total size of " + totalSize + " bytes.");
 
 
     }
 
     public void uploadFile(){
-        if(targetUploadFile!=null){
-            uploadFile(targetUploadFile, uploadFileKey);
+        if(_targetUploadFile !=null){
+            uploadFile(_targetUploadFile, _uploadFileKey);
         }
     }
 
@@ -273,15 +286,12 @@ public class SimpleS3Uploader {
     public void uploadFile( File f, String key){
         System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
         System.out.println("S3 File Uploader");
-        System.out.println("    S3 Bucket:      "+s3BucketName);
+        System.out.println("    S3 Bucket:      "+ _s3BucketName);
         System.out.println("    Uploading file: "+ f.getAbsolutePath());
         System.out.println("    S3 Key:         "+ key);
 
-        s3.putObject(s3BucketName, key, f);
-
-
+        s3.putObject(_s3BucketName, key, f);
     }
-
 
 
 }
