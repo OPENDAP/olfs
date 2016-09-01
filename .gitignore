@@ -30,6 +30,7 @@ Makefile
 Makefile.in
 atlocal
 atconfig
+conf
 aclocal.m4
 config.log
 config.status
