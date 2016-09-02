@@ -611,63 +611,39 @@
 
     -->
 
-    <property name="S3_BUCKET"            value="opendap.test"/>
-
-    <property name="UPLOAD_FILE"          value="resources/experiments/AWS/s3/index.xml"/>
-    <property name="UPLOAD_KEY"           value="/index.xml"/>
-
-    <property name="AWS_KEY_ID"           value="anonymous" />
-    <property name="AWS_SECRET_KEY"       value="YouShouldKnowBetterThanThat" />
-
-
-
-
-    <target  name="s3up" depends="compile">
-
+    <property name="S3_UPLOAD"       value="-h" />
+    <target  name="s3up"
+             description="Loads files into an S3 bucket under the supplied upload key. Use -DS3_UPLOAD='' to specify the command line options."
+             depends="compile">
         <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
         >
             <classpath refid="compile.classpath" />
-
-            <arg line="--verbose" />
-            <arg line="--s3-bucket-name=${S3_BUCKET}" />
-
-            <arg line="--uploadFile=${UPLOAD_FILE}" />
-            <arg line="--uploadKey=${UPLOAD_KEY}" />
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
+            <arg line="--s3-bucket-name=${S3_UPLOAD}" />
         </java>
 
     </target>
 
 
+    <!-- *******************************************************
 
 
-    <property name="DRY_RUN"              value="--dry-run"/>
-    <property name="REPO_ORIGIN_DIR"      value="/tmp"/>
 
+   -->
 
-    <target  name="pushRepo" depends="compile">
-
+    <property name="REPO_BUILDER"     value="-h"/>
+    <target  name="RepositoryBuilder"
+             description="RepositoryBuilder: Starting at some point the file system (identified on the command line) this code will build a simple XML index of the tree and transmit the index files and the regular files to the identified S3 bucket. The resulting index.xml files in S3 will prvide the same logical view of the regular files as was manifested by the file system. Use -DREPO_BUILDER='' to specify the command line options."
+             depends="compile ">
         <java classname="opendap.aws.s3.SimpleRepositoryUploader"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
         >
             <classpath refid="compile.classpath" />
-
-            <arg line="--verbose" />
-            <arg line="${DRY_RUN}" />
-            <arg line="--s3-bucket-name=${S3_BUCKET}" />
-
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
-            <arg line="--directory=${REPO_ORIGIN_DIR}" />
-
+            <arg line="${REPO_BUILDER}" />
         </java>
 
     </target>
