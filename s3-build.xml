@@ -333,8 +333,8 @@
 
     <target  name="PreProcessSourceCode"
              depends="clean,init"
-             description="Moves selected source code from the development tree into
-             the build/src directory. The code text is filtered to update version numbers.">
+description="Moves selected source code from the development tree into
+the build/src directory. The code text is filtered to update version numbers.">
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
@@ -613,7 +613,8 @@
 
     <property name="S3_UPLOAD"       value="-h" />
     <target  name="s3up"
-             description="Loads files into an S3 bucket under the supplied upload key. Use -DS3_UPLOAD='' to specify the command line options."
+description="Loads files into an S3 bucket under the supplied upload key.
+Use -DS3_UPLOAD=&quot;...&quot; to specify the command line options."
              depends="compile">
         <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
@@ -635,7 +636,15 @@
 
     <property name="REPO_BUILDER"     value="-h"/>
     <target  name="RepositoryBuilder"
-             description="RepositoryBuilder: Starting at some point the file system (identified on the command line) this code will build a simple XML index of the tree and transmit the index files and the regular files to the identified S3 bucket. The resulting index.xml files in S3 will prvide the same logical view of the regular files as was manifested by the file system. Use -DREPO_BUILDER='' to specify the command line options."
+description="RepositoryBuilder:
+Starting at the supplied point the file system
+this code will build a simple XML index of the tree
+and transmit the index files and the regular files
+to the identified S3 bucket. The resulting index.xml
+files in S3 will provide the same logical view of the
+regular files as was manifested by the file system.
+Use -DREPO_BUILDER=&quot;...&quot; to specify the
+command line options."
              depends="compile ">
         <java classname="opendap.aws.s3.SimpleRepositoryUploader"
               fork="true"
