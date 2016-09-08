@@ -256,28 +256,30 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
 
-        String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
+        try {
+            String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
 
 
-        // This Transformer class is an attempt at making the use of the saxon-9 API
-        // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-        // See the source code for opendap.xml.Transformer for more.
-        Transformer transformer = new Transformer(xsltDocName);
+            // This Transformer class is an attempt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
 
 
-        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-        transformer.setParameter("HyraxVersion",Version.getHyraxVersionString());
+            transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
+            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
-        // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform( new JDOMSource(ddx),os);
-
-
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform(new JDOMSource(ddx), os);
 
 
-        os.flush();
-        log.info("Sent Rubric version of DDX.");
-        log.debug("Restoring working directory to "+ currentDir);
-        System.setProperty("user.dir",currentDir);
+            os.flush();
+            log.info("Sent Rubric version of DDX.");
+        }
+        finally {
+            log.debug("Restoring working directory to "+ currentDir);
+            System.setProperty("user.dir",currentDir);
+        }
 
 
 

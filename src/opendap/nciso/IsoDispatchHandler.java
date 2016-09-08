@@ -249,25 +249,27 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
 
-        String xsltDocName = "ddx2iso.xsl";
+        try {
+            String xsltDocName = "ddx2iso.xsl";
 
 
-        // This Transformer class is an attempt at making the use of the saxon-9 API
-        // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-        // See the source code for opendap.xml.Transformer for more.
-        Transformer transformer = new Transformer(xsltDocName);
+            // This Transformer class is an attempt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
 
-        // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform( new JDOMSource(ddx),os);
-
-
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform(new JDOMSource(ddx), os);
 
 
-        os.flush();
-        os.close();
-        log.info("Sent RDF version of DDX.");
-        log.debug("Restoring working directory to "+ currentDir);
-        System.setProperty("user.dir",currentDir);
+            os.flush();
+            os.close();
+            log.info("Sent RDF version of DDX.");
+        }
+        finally {
+            log.debug("Restoring working directory to " + currentDir);
+            System.setProperty("user.dir", currentDir);
+        }
 
 
 
