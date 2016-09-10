@@ -175,19 +175,19 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Document wcsResponse;
         switch (getRequestType(wcsRequest)) {
 
-            case WCS.GET_CAPABILITIES:
+            case GET_CAPABILITIES:
                 GetCapabilitiesRequest getCapabilitiesRequest = new  GetCapabilitiesRequest(wcsRequest);
                 wcsResponse = getCapabilities(getCapabilitiesRequest, serviceUrl);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
-            case WCS.DESCRIBE_COVERAGE:
+            case DESCRIBE_COVERAGE:
                 DescribeCoverageRequest wcsDCR = new DescribeCoverageRequest(wcsRequest);
                 wcsResponse = describeCoverage(wcsDCR);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
-            case WCS.GET_COVERAGE:
+            case GET_COVERAGE:
 
                 GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
 
@@ -338,7 +338,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
 
 
-    public static int getRequestType(Element req) throws WcsException{
+    public static WCS.REQUEST getRequestType(Element req) throws WcsException{
         if(req == null){
             throw new WcsException("Poorly formatted WCS request. Missing " +
                     "root element of document.",
@@ -347,14 +347,14 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
         String name = req.getName();
 
-        if(name.equals("GetCapabilities")){
-            return WCS.GET_CAPABILITIES;
+        if(name.equals(WCS.REQUEST.GET_CAPABILITIES.toString())){
+            return WCS.REQUEST.GET_CAPABILITIES;
         }
-        else if(name.equals("DescribeCoverage")){
-            return WCS.DESCRIBE_COVERAGE;
+        else if(name.equals(WCS.REQUEST.DESCRIBE_COVERAGE.toString())){
+            return WCS.REQUEST.DESCRIBE_COVERAGE;
         }
-        else if(name.equals("GetCoverage")){
-            return WCS.GET_COVERAGE;
+        else if(name.equals(WCS.REQUEST.GET_COVERAGE.toString())){
+            return WCS.REQUEST.GET_COVERAGE;
         }
         else {
             throw new WcsException("The request document  was  invalid. " +

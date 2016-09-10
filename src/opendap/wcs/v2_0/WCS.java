@@ -100,9 +100,24 @@ public class WCS {
     public static final Namespace XLINK_NS = Namespace.getNamespace("xlink",XLINK_NAMESPACE_STRING);
     public static final String    XLINK_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/xlink/1.0.0/";
 
-    public static final int GET_CAPABILITIES   = 0;
-    public static final int DESCRIBE_COVERAGE  = 1;
-    public static final int GET_COVERAGE       = 2;
+
+    public enum REQUEST {
+        GET_CAPABILITIES("GetCapabilities"),
+        DESCRIBE_COVERAGE("DescribeCoverage"),
+        GET_COVERAGE("GetCoverage"),
+        DESCRIBE_EO_COVERAGE_SET("DescribeEOCoverageSet");
+
+        private final String name;
+
+        REQUEST(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString(){
+            return name;
+        }
+    }
 
 
 

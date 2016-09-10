@@ -286,4 +286,12 @@ public interface WcsCatalog {
 
 
 
-}
+    public  EOCoverageDescription getEOCoverageDescription(String id) throws WcsException;
+
+
+    public   EODatasetSeries getEODatasetSeries(String id) throws WcsException;
+
+    public boolean hasEoCoverage(String id);
+
+
+    }

@@ -117,7 +117,7 @@ public class DimensionSubset {
     /**
      * Accepts the KVP encoding of a subset parameter for WCS 2.0
      * @param kvpSubsetString  the KVP encoding of a subset parameter value.
-     * @throws WcsException When it's funky like an old sock.
+     * @throws WcsException When it's funky, like an old sock.
      */
     public DimensionSubset(String kvpSubsetString) throws WcsException {
         int leftParen = kvpSubsetString.indexOf("(");

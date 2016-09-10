@@ -68,6 +68,10 @@ public class EODatasetSeries {
     }
 
 
+    Vector<EOCoverageDescription> getMembers(){
+        return new Vector<>(members);
+    }
+
 
 
 
@@ -81,47 +85,98 @@ public class EODatasetSeries {
     }
 
 
-    public Element getDatasetSeriesSummary() throws WcsException {
 
+    public BoundingBox getBoundingBox() throws WcsException {
+        BoundingBox seriesBoundingBox = null;
+
+        for (EOCoverageDescription cd : members) {
+            BoundingBox bb = cd.getBoundingBox();
+            if (seriesBoundingBox == null) {
+                try {
+                    seriesBoundingBox = new BoundingBox(bb);
+                }
+                catch (URISyntaxException e) {
+                    log.error("Failed to get new BoundingBox from copy constructor. Caught URISyntaxException. Message: {}",e.getMessage());
+                }
+
+            } else {
+                seriesBoundingBox = seriesBoundingBox.union(bb);
+            }
+
+        }
+        return seriesBoundingBox;
+
+    }
+
+
+    public Element getDatasetSeriesSummaryElement() throws WcsException {
         Element datasetSeriesSummary = new Element("DatasetSeriesSummary",WCS.WCSEO_NS);
+        addDatasetSeriesContent(datasetSeriesSummary);
+        return datasetSeriesSummary;
+
+    }
+
+    public void addDatasetSeriesContent(Element e) throws WcsException {
+
 
         //         <wcseo:DatasetSeriesId>someDatasetSeries1</wcseo:DatasetSeriesId>
         Element dsId = new Element("DatasetSeriesId",WCS.WCSEO_NS);
         dsId.setText(getCoverageId());
 
-        datasetSeriesSummary.addContent(dsId);
+        e.addContent(dsId);
 
-        BoundingBox seriesBoundingBox = null;
-
-        try {
-            for (EOCoverageDescription cd : members) {
-                BoundingBox bb = cd.getBoundingBox();
-                if (seriesBoundingBox == null) {
-                    seriesBoundingBox = new BoundingBox(bb);
-                } else {
-                    seriesBoundingBox = seriesBoundingBox.union(bb);
-                }
-
-            }
-        }
-        catch (URISyntaxException e) {
-            log.error("Failed to get new BoundingBox from copy constructor. Caught URISyntaxException. Message: {}",e.getMessage());
-        }
+        BoundingBox seriesBoundingBox = getBoundingBox();
 
         if(seriesBoundingBox!=null){
             Element wgs84BB = seriesBoundingBox.getWgs84BoundingBoxElement();
-            datasetSeriesSummary.addContent(wgs84BB);
+            e.addContent(wgs84BB);
             if(seriesBoundingBox.hasTimePeriod()){
                 Element timePeriod = seriesBoundingBox.getGmlTimePeriod(getCoverageId()+"_timePeriod");
                 if(timePeriod!=null)
-                    datasetSeriesSummary.addContent(timePeriod);
+                    e.addContent(timePeriod);
             }
         }
-
-        return datasetSeriesSummary;
     }
 
 
+
+
+    /*
+
+    <wcseo:DatasetSeriesDescription gml:id="ds2">
+        <gml:boundedBy>
+            <gml:Envelope
+                axisLabels="lat long"
+                srsDimension="2"
+                srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+                uomLabels="deg deg"
+                >
+                <gml:lowerCorner>46 16</gml:lowerCorner>
+                <gml:upperCorner>48 18</gml:upperCorner>
+            </gml:Envelope>
+        </gml:boundedBy>
+        <wcseo:DatasetSeriesId>ds2</wcseo:DatasetSeriesId>
+        <gml:TimePeriod gml:id="ds2_timeperiod">
+            <gml:beginPosition>2010-01-01T00:00:00.000</gml:beginPosition>
+            <gml:endPosition>2010-12-31T23:59:59.999</gml:endPosition>
+        </gml:TimePeriod>
+    </wcseo:DatasetSeriesDescription>
+
+
+
+     */
+
+    public Element getDatasetSeriesDescriptionElement() throws WcsException {
+
+        Element datasetSeriesDescription = new Element("DatasetSeriesDescription",WCS.WCSEO_NS);
+
+
+        addDatasetSeriesContent(datasetSeriesDescription);
+
+
+        return datasetSeriesDescription;
+
+    }
 
 
 

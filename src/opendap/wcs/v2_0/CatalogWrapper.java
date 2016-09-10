@@ -353,6 +353,18 @@ public class CatalogWrapper {
     }
 
 
+    public static EOCoverageDescription getEOCoverageDescription(String id) throws WcsException {
+        return _catalogImpl.getEOCoverageDescription(id);
+    }
+
+
+   public static  EODatasetSeries getEODatasetSeries(String id) throws WcsException {
+        return _catalogImpl.getEODatasetSeries(id);
+    }
+
+    public boolean hasEoCoverage(String id){
+        return _catalogImpl.hasEoCoverage(id);
+    }
 
 
 

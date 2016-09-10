@@ -74,6 +74,7 @@ public class LocalFileCatalog implements WcsCatalog {
     private  boolean  intitialized = false;
 
     private  ConcurrentHashMap<String,CoverageDescription> coveragesMap = new  ConcurrentHashMap<>();
+    private  ConcurrentHashMap<String,EOCoverageDescription> eoCoveragesMap = new  ConcurrentHashMap<>();
     private  ConcurrentHashMap<String,EODatasetSeries> datasetSeriesMap = new  ConcurrentHashMap<>();
 
 
@@ -81,6 +82,7 @@ public class LocalFileCatalog implements WcsCatalog {
     private  ReentrantReadWriteLock _catalogLock;
 
 
+    @Override
     public String getDataAccessUrl(String coverageID) {
 
         CoverageDescription cd = coveragesMap.get(coverageID);
@@ -113,6 +115,7 @@ public class LocalFileCatalog implements WcsCatalog {
      * @throws Exception
      */
 
+    @Override
     public void init(Element config, String persistentContentPath, String contextPath) throws Exception{
 
         if(intitialized)
@@ -290,6 +293,9 @@ public class LocalFileCatalog implements WcsCatalog {
         if(eoDatasetSeries!=null){
             String coverageId = eoDatasetSeries.getCoverageId();
             datasetSeriesMap.put(coverageId,eoDatasetSeries);
+            for(EOCoverageDescription eocd:eoDatasetSeries.getMembers())
+                eoCoveragesMap.put(eocd.getCoverageId(),eocd);
+
         }
 
     }
@@ -356,7 +362,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         if(eoCoverageDescription!=null){
             String coverageId = eoCoverageDescription.getCoverageId();
-            coveragesMap.put(coverageId,eoCoverageDescription);
+            eoCoveragesMap.put(coverageId,eoCoverageDescription);
         }
 
     }
@@ -364,6 +370,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
 
+    @Override
     public boolean hasCoverage(String id){
 
         log.debug("Looking for a coverage with ID: "+id);
@@ -371,7 +378,16 @@ public class LocalFileCatalog implements WcsCatalog {
         return coveragesMap.containsKey(id);
     }
 
+    @Override
+    public boolean hasEoCoverage(String id){
 
+        log.debug("Looking for a coverage with ID: "+id);
+
+        return eoCoveragesMap.containsKey(id);
+    }
+
+
+    @Override
     public  Element getCoverageDescriptionElement(String id) throws WcsException{
 
         CoverageDescription coverage = coveragesMap.get(id);
@@ -386,6 +402,7 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
+    @Override
     public  CoverageDescription getCoverageDescription(String id) throws WcsException {
 
         CoverageDescription cd = coveragesMap.get(id);
@@ -401,6 +418,7 @@ public class LocalFileCatalog implements WcsCatalog {
         return coveragesMap.get(id).getCoverageSummary();
     }
 
+    @Override
     public  Collection<Element> getCoverageSummaryElements() throws WcsException {
 
 
@@ -420,6 +438,25 @@ public class LocalFileCatalog implements WcsCatalog {
         return coverageSummaries.values();
     }
 
+    public  Collection<Element> getEOCoverageSummaryElements() throws WcsException {
+
+
+        TreeMap<String, Element> eoCoverageSummaries = new TreeMap<>();
+
+        Enumeration e = eoCoveragesMap.elements();
+
+        EOCoverageDescription eoCoverageDescription;
+
+        while(e.hasMoreElements()){
+            eoCoverageDescription = (EOCoverageDescription)e.nextElement();
+
+            eoCoverageSummaries.put(eoCoverageDescription.getCoverageId(),eoCoverageDescription.getCoverageSummary());
+
+        }
+
+        return eoCoverageSummaries.values();
+    }
+
     @Override
     public Collection<Element> getDatasetSeriesSummaryElements() throws InterruptedException, WcsException {
 
@@ -433,7 +470,7 @@ public class LocalFileCatalog implements WcsCatalog {
             dss = (EODatasetSeries) e.nextElement();
 
             String id = dss.getCoverageId();
-            Element e3 = dss.getDatasetSeriesSummary();
+            Element e3 = dss.getDatasetSeriesSummaryElement();
             datasetSeriesElements.put(id,e3);
 
         }
@@ -442,17 +479,32 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
+    @Override
     public long getLastModified(){
         return _lastModified;
     }
 
 
 
+    @Override
     public void destroy(){}
 
 
+    @Override
     public void update(){
     }
+
+
+    @Override
+    public  EOCoverageDescription getEOCoverageDescription(String id){
+        return eoCoveragesMap.get(id);
+    }
+
+    @Override
+    public   EODatasetSeries getEODatasetSeries(String id){
+        return datasetSeriesMap.get(id);
+    }
+
 
 
 }
