@@ -290,15 +290,59 @@ public class LocalFileCatalog implements WcsCatalog {
             log.error(msg);
         }
 
-        if(eoDatasetSeries!=null){
-            String coverageId = eoDatasetSeries.getCoverageId();
-            datasetSeriesMap.put(coverageId,eoDatasetSeries);
-            for(EOCoverageDescription eocd:eoDatasetSeries.getMembers())
-                eoCoveragesMap.put(eocd.getCoverageId(),eocd);
 
+
+        Vector<EOCoverageDescription> processed = new Vector<>();
+
+
+        if(eoDatasetSeries!=null){
+            String datasetSeriesId = eoDatasetSeries.getId();
+            boolean conflict = false;
+
+            for(EOCoverageDescription eocd:eoDatasetSeries.getMembers()) {
+
+                String coverageId = eocd.getCoverageId();
+
+                CoverageDescription cd = coveragesMap.get(coverageId)==null?eoCoveragesMap.get(coverageId):coveragesMap.get(coverageId);
+                if(cd!=null) {
+                    StringBuilder sb = new StringBuilder("ingestDatasetSeries() -");
+                    sb.append(" SKIPPING new coverage with duplicate coverageID '").append(coverageId);
+                    sb.append("' and dataset URL: ").append(eocd.getDapDatasetUrl());
+                    sb.append(" The coverageId is already in use and associated with dataset URL: ").append(cd.getDapDatasetUrl());
+                    log.error(sb.toString());
+                    conflict = true;
+
+                }
+                else {
+                    coveragesMap.put(coverageId, eocd);
+                    eoCoveragesMap.put(coverageId, eocd);
+                    processed.add(eocd);
+                }
+            }
+
+            if(conflict) {
+
+                for(EOCoverageDescription eocd : processed){
+                    coveragesMap.remove(eocd);
+                    eoCoveragesMap.remove(eocd);
+
+                }
+
+
+                StringBuilder sb = new StringBuilder("ingestDatasetSeries() - ");
+                sb.append("CoverageId conflicts were found in the DatasetSeries '").append(datasetSeriesId).append("' ");
+                sb.append(" !!SKIPPING!");
+                log.error(sb.toString());
+
+            }
+            else {
+                datasetSeriesMap.put(datasetSeriesId, eoDatasetSeries);
+                log.info("ingestDatasetSeries() - Ingested EODatasetSeries '{}'",datasetSeriesId);
+            }
         }
 
     }
+
 
 
 
@@ -329,8 +373,24 @@ public class LocalFileCatalog implements WcsCatalog {
 
         if(coverageDescription!=null){
             String coverageId = coverageDescription.getCoverageId();
-            coveragesMap.put(coverageId,coverageDescription);
+
+            CoverageDescription cd = coveragesMap.get(coverageId);
+            if(cd!=null){
+                StringBuilder sb = new StringBuilder("ingestCoverageDescription() -");
+                sb.append(" SKIPPING new coverage with duplicate coverageID '").append(coverageId);
+                sb.append("' and dataset URL: ").append(coverageDescription.getDapDatasetUrl());
+                sb.append(" The coverageId is already in use and associated with dataset URL: ").append(cd.getDapDatasetUrl());
+                log.error(sb.toString());
+
+            }
+            else {
+                coveragesMap.put(coverageId, coverageDescription);
+            }
         }
+
+
+
+
 
     }
 
@@ -343,26 +403,39 @@ public class LocalFileCatalog implements WcsCatalog {
         try {
             eoCoverageDescription = new EOCoverageDescription(wcsCoverageConfig, _catalogDir, validateContent);
         } catch (JDOMException e) {
-            msg = "ingestCoverageDescription(): CoverageDescription file either did not parse or did not validate. Msg: " +
+            msg = "ingestEOCoverageDescription(): CoverageDescription file either did not parse or did not validate. Msg: " +
                     e.getMessage()+"  SKIPPING";
             log.error(msg);
         } catch (IOException e) {
-            msg = "ingestCoverageDescription(): Attempting to access CoverageDescription file  generated an IOException. Msg: " +
+            msg = "ingestEOCoverageDescription(): Attempting to access CoverageDescription file  generated an IOException. Msg: " +
                     e.getMessage()+"  SKIPPING";
             log.error(msg);
         } catch (ConfigurationException e) {
-            msg = "ingestCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
+            msg = "ingestEOCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
                     e.getMessage()+"  SKIPPING";
             log.error(msg);
         } catch (WcsException e) {
-            msg = "ingestCoverageDescription(): When ingesting the CoverageDescription it failed a validation test. Msg: " +
+            msg = "ingestEOCoverageDescription(): When ingesting the CoverageDescription it failed a validation test. Msg: " +
                     e.getMessage()+"  SKIPPING";
             log.error(msg);
         }
 
         if(eoCoverageDescription!=null){
             String coverageId = eoCoverageDescription.getCoverageId();
-            eoCoveragesMap.put(coverageId,eoCoverageDescription);
+
+            CoverageDescription cd = coveragesMap.get(coverageId)==null?eoCoveragesMap.get(coverageId):coveragesMap.get(coverageId);
+            if(cd!=null){
+                StringBuilder sb = new StringBuilder("ingestEOCoverageDescription() -");
+                sb.append(" SKIPPING new coverage with duplicate coverageID '").append(coverageId);
+                sb.append("' and dataset URL: ").append(eoCoverageDescription.getDapDatasetUrl());
+                sb.append(" The coverageId is already in use and associated with dataset URL: ").append(cd.getDapDatasetUrl());
+                log.error(sb.toString());
+
+            }
+            else {
+                eoCoveragesMap.put(coverageId, eoCoverageDescription);
+                coveragesMap.put(coverageId, eoCoverageDescription);
+            }
         }
 
     }
@@ -469,7 +542,7 @@ public class LocalFileCatalog implements WcsCatalog {
         while(e.hasMoreElements()){
             dss = (EODatasetSeries) e.nextElement();
 
-            String id = dss.getCoverageId();
+            String id = dss.getId();
             Element e3 = dss.getDatasetSeriesSummaryElement();
             datasetSeriesElements.put(id,e3);
 

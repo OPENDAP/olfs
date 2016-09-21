@@ -215,7 +215,7 @@ public class DescribeEOCoverageSetRequest {
         }
 
         _eoIds = null;
-        vals = kvp.get("eoId");
+        vals = kvp.get("eoid");
         if (vals == null) {
             throw new WcsException("The 'eoId' query parameter is required for a  " + KVP_REQUEST + " request.", WcsException.MISSING_PARAMETER_VALUE, "eoId");
         }

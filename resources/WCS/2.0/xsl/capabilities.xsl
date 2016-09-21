@@ -31,6 +31,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:wcs="http://www.opengis.net/wcs/2.0"
                 xmlns:ows="http://www.opengis.net/ows/2.0"
+                xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0"
+                xmlns:gml="http://www.opengis.net/gml/3.2"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
@@ -47,10 +49,6 @@
     <xsl:template match="/wcs:Capabilities">
         <html>
             <head>
-
-
-
-
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
@@ -241,11 +239,6 @@
     <xsl:template match="wcs:Contents">
         <h3>Available Coverages</h3>
         <table border="0" width="100%" style="font-size: 14px; font-family: courier;" >
-            <tr>
-                <th align="left">Identifier</th>
-                <!-- <th align="center">Description</th> -->
-                <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLat,&#160;&#160;lwrLon]&#160;[&#160;uprLat,&#160;&#160;uprLon]</th>
-            </tr>
             <xsl:choose>
                 <xsl:when test="wcs:CoverageSummary">
                     <xsl:apply-templates select="wcs:CoverageSummary"/>
@@ -259,6 +252,34 @@
                 </xsl:otherwise>
             </xsl:choose>
         </table>
+
+
+
+        <h3>Available EO DatasetSeries</h3>
+        <table border="0" width="100%" style="font-size: 14px; font-family: courier;" >
+            <xsl:choose>
+                <xsl:when test="wcs:Extension/wcseo:DatasetSeriesSummary">
+                    <xsl:apply-templates select="wcs:Extension/wcseo:DatasetSeriesSummary"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tr>
+                        <td align="left"><span class="bold_italic">No EO DatasetSeries Found</span></td>
+                        <!-- <th align="center">Description</th> -->
+                        <td align="center">[----.--, ----.--] [----.--, ----.--]</td>
+                    </tr>
+                </xsl:otherwise>
+            </xsl:choose>
+        </table>
+
+
+
+
+
+
+
+
+
+
         <hr size="1" noshade="noshade"/>
         <!-- xsl:call-template name="ServerIDs"/ -->
         <xsl:if test="wcs:SupportedCRS">
@@ -323,7 +344,65 @@
 
 
 
-    <xsl:template match="ows:BoundingBox">
+
+    <!--
+    <wcseo:DatasetSeriesSummary>
+      <wcseo:DatasetSeriesId>MODIS_L3_chl-a</wcseo:DatasetSeriesId>
+      <ows:WGS84BoundingBox>
+        <ows:LowerCorner>-90.0  -180.0</ows:LowerCorner>
+        <ows:UpperCorner>90.0  180.0</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <gml:TimePeriod xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="MODIS_L3_chl-a_timePeriod">
+        <gml:beginPosition>2002-07-02T17:00:00.0 -0700</gml:beginPosition>
+        <gml:endPosition>2002-07-06T16:59:59.0 -0700</gml:endPosition>
+      </gml:TimePeriod>
+    </wcseo:DatasetSeriesSummary>
+
+-->
+    <xsl:template match="wcseo:DatasetSeriesSummary">
+
+        <tr>
+            <td align="left">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <!-- xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcseo:DatasetSeriesId"/ -->
+                        <xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;version=2.0.1&amp;request=DescribeEOCoverageSet&amp;eoId=<xsl:value-of select="wcseo:DatasetSeriesId"/>
+
+                        <!--
+                        http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002_nc4_min_eo
+                         -->
+
+                    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="ows:Title">
+                            <xsl:value-of select="ows:Title"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <b><xsl:value-of select="wcseo:DatasetSeriesId"/></b>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:element>
+                <span class="small"> <xsl:apply-templates select="ows:Abstract"/> </span>
+
+            </td>
+            <td align="center">
+                <xsl:apply-templates select="ows:WGS84BoundingBox"/>
+                <br/>
+                <xsl:apply-templates select="gml:TimePeriod"/>
+            </td>
+        </tr>
+
+    </xsl:template>
+
+    <xsl:template match="gml:TimePeriod">
+        begin: [<xsl:value-of select="gml:beginPosition"/>]
+        <br />
+        end: [<xsl:value-of select="gml:endPosition"/>]
+    </xsl:template>
+
+
+
+    <xsl:template match="ows:BoundingBox | ows:WGS84BoundingBox">
 
         <xsl:variable name="numberFormat">+000.00;-000.00</xsl:variable>
         <xsl:variable name="lowerLon">
@@ -342,7 +421,10 @@
             <xsl:value-of select="format-number(number(substring-after(ows:UpperCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
         </xsl:variable>
 
-        <div class="small">crs=<xsl:value-of select="@crs"/></div>
+        <xsl:if test="@crs">
+            <div class="small">crs=<xsl:value-of select="@crs"/></div>
+        </xsl:if>
+
         [<xsl:value-of select="concat($lowerLat,', ',$lowerLon)"/>] [<xsl:value-of select="concat($upperLat,', ',$upperLon)"/>]
 
     </xsl:template>
@@ -425,6 +507,17 @@
     </xsl:template>
 
 
+    <xsl:template match="ows:Constraint" mode="operMetadata">
+        <li><xsl:value-of select="@name"/>:
+
+            <xsl:for-each select="ows:DefaultValue">
+                [<xsl:value-of select="."/>],
+            </xsl:for-each>
+        </li>
+    </xsl:template>
+
+
+
     <xsl:template match="ows:HTTP" mode="operMetadata">
         <xsl:for-each select="*">
             <li>
@@ -471,7 +564,7 @@
             </xsl:element>
         </li>
     </xsl:template>
-    
+
     
     <xsl:template match="*" mode="providerDetail"> 
         <li>

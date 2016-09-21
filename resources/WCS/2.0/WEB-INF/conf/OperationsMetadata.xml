@@ -107,7 +107,7 @@
             </ows:AllowedValues>
         </ows:Parameter>
     </ows:Operation>
-    <ows:Constraint>
+    <ows:Constraint name="CountDefault">
         <ows:NoValues />
         <ows:DefaultValue>1000</ows:DefaultValue>
     </ows:Constraint>

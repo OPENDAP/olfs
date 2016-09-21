@@ -80,7 +80,7 @@ public class WCS {
 
 
     public static final String    WCSEO_NAMESPACE_STRING = "http://www.opengis.net/wcs/wcseo/1.0";
-    public static final Namespace WCSEO_NS = Namespace.getNamespace("wcs",WCSEO_NAMESPACE_STRING);
+    public static final Namespace WCSEO_NS = Namespace.getNamespace("wcseo",WCSEO_NAMESPACE_STRING);
     public static final String    WCSEO_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcseo/1.0/";
 
     public static final String    EOP_NAMESPACE_STRING = "http://www.opengis.net/eop/2.0";

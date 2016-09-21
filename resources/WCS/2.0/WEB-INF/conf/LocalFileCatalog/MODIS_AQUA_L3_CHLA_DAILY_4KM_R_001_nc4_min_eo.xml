@@ -35,7 +35,7 @@
     xmlns:eop="http://www.opengis.net/eop/2.0" 
     xmlns:om="http://www.opengis.net/om/2.0" 
     xmlns:xlink="http://www.w3.org/1999/xlink" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo" 
     xsi:schemaLocation="http://www.opengis.net/wcs/wcseo/1.0 http://schemas.opengis.net/wcs/wcseo/1.0/wcsEOAll.xsd"
 >
     <gml:boundedBy>
@@ -44,25 +44,25 @@
             <gml:upperCorner>90.0 180.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <wcs:CoverageId>MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4</wcs:CoverageId>
+    <wcs:CoverageId>MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo</wcs:CoverageId>
     <gmlcov:metadata>
         <gmlcov:Extension>
             <!-- Minimal (based on spec and schema) EO Content-->
             <wcseo:EOMetadata>
                 <eop:EarthObservation>
                     <om:phenomenonTime>
-                        <gml:TimePeriod gml:id="tp_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                        <gml:TimePeriod gml:id="tp_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo">
                             <gml:beginPosition>2002-07-04T00:00:00Z</gml:beginPosition>
                             <gml:endPosition>2002-07-04T23:59:59Z</gml:endPosition>
                         </gml:TimePeriod>
                     </om:phenomenonTime>
                     <om:resultTime>
-                        <gml:TimeInstant gml:id="archiving_date_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                        <gml:TimeInstant gml:id="archiving_date_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo">
                             <gml:timePosition>2002-08-05T00:00:00Z</gml:timePosition>
                         </gml:TimeInstant>
                     </om:resultTime>
                     <om:procedure>
-                        <eop:EarthObservationEquipment gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4_eoe">
+                        <eop:EarthObservationEquipment gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo_eoe">
                             <eop:platform> <!-- 0..1 -->
                                 <shortName>MODIS</shortName>
                             </eop:platform>
@@ -95,11 +95,11 @@
 
                     -->
                     <om:featureOfInterest> <!-- 0..1 -->
-                        <eop:Footprint gml:id="footprint_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                        <eop:Footprint gml:id="footprint_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo">
                             <eop:multiExtentOf>
-                                <gml:MultiSurface gml:id="multisurface_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4" srsName="EPSG:4326">
+                                <gml:MultiSurface gml:id="multisurface_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo" srsName="EPSG:4326">
                                     <gml:surfaceMember>
-                                        <gml:Polygon gml:id="polygon_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                                        <gml:Polygon gml:id="polygon_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo">
                                             <gml:exterior>
                                                 <gml:LinearRing>
                                                     <gml:posList>-90 -180 90 -180 90 180 -90 180 -90 -180</gml:posList>
@@ -110,7 +110,7 @@
                                 </gml:MultiSurface>
                             </eop:multiExtentOf>
                             <eop:centerOf>
-                                <gml:Point gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4_p" srsName="EPSG:4326">
+                                <gml:Point gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo_p" srsName="EPSG:4326">
                                     <gml:pos>0 0</gml:pos>
                                 </gml:Point>
                             </eop:centerOf>
@@ -143,7 +143,7 @@
                     
                     <eop:metaDataProperty>
                         <eop:EarthObservationMetaData>
-                            <eop:identifier>MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4</eop:identifier>
+                            <eop:identifier>MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo</eop:identifier>
                             <!--
                             acquisitionType
                             Used to distinguish at a high level the
@@ -169,7 +169,7 @@
         </gmlcov:Extension>
     </gmlcov:metadata>
     <gml:domainSet>
-        <gml:RectifiedGrid dimension="2" gml:id="grid_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+        <gml:RectifiedGrid dimension="2" gml:id="grid_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo">
             <gml:limits>
                 <gml:GridEnvelope>
                     <gml:low>0 0</gml:low>
@@ -178,7 +178,7 @@
             </gml:limits>
             <gml:axisLabels>latitude longitude</gml:axisLabels>
             <gml:origin>
-                <gml:Point gml:id="grid_origin_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                <gml:Point gml:id="grid_origin_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
                     <gml:pos>90.0 -180.0</gml:pos>
                 </gml:Point>
             </gml:origin>

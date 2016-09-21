@@ -14,6 +14,7 @@ public class DescribeEOCoverageSetRequestProcessor {
         e.addNamespaceDeclaration(WCS.SWE_NS);
         e.addNamespaceDeclaration(WCS.GMLCOV_NS);
         e.addNamespaceDeclaration(WCS.XSI_NS);
+        e.addNamespaceDeclaration(WCS.WCSEO_NS);
 
         StringBuilder schemaLocationValue = new StringBuilder();
 

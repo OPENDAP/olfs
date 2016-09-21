@@ -98,6 +98,7 @@ public class CapabilitiesRequestProcessor {
         capabilities.addNamespaceDeclaration(WCS.WCS_NS);
         capabilities.addNamespaceDeclaration(WCS.OWS_NS);
         capabilities.addNamespaceDeclaration(WCS.XSI_NS);
+        capabilities.addNamespaceDeclaration(WCS.WCSEO_NS);
 
         StringBuilder schemaLocation = new StringBuilder();
 
@@ -214,13 +215,15 @@ public class CapabilitiesRequestProcessor {
         if(count<maxContentsSectionsCount && (allContent | dataset_series_summary)) {
             Iterator i = CatalogWrapper.getDatasetSeriesSummaryElements().iterator();
             if(i.hasNext()){
+                Element wcsExtensionElement = new Element("Extension",WCS.WCS_NS);
                 Element dss;
                 while(i.hasNext()){
                     dss = (Element) i.next();
                     count++;
                     if(count<maxContentsSectionsCount)
-                        contentsElement.addContent(dss);
+                        wcsExtensionElement.addContent(dss);
                 }
+                contentsElement.addContent(wcsExtensionElement);
             }
         }
 

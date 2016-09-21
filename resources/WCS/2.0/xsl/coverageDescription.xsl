@@ -208,12 +208,6 @@
         <br/>
     </xsl:template>
 
-    <xsl:template match="gmlcov:metadata">
-        <em>gml:coverageMetadata - </em>
-        <xsl:apply-templates/>
-        <br/>
-    </xsl:template>
-
     <xsl:template match="gml:domainSet">
         <h2>Domain Set <span class="small">(gml:domainSet)</span></h2>
 

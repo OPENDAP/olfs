@@ -15,7 +15,7 @@ import java.util.Vector;
  */
 public class EODatasetSeries {
 
-    private String myCoverageId;
+    private String _id;
 
     private Vector<EOCoverageDescription> members;
 
@@ -54,10 +54,10 @@ public class EODatasetSeries {
 
         String s;
 
-        myCoverageId=null;
+        _id =null;
         s = eodsElement.getAttributeValue("id");
         if(s!=null)
-            myCoverageId = s;
+            _id = s;
 
         Iterator cvrgList = eodsElement.getChildren(EOCoverageDescription.CONFIG_ELEMENT_NAME,LocalFileCatalog.NS).iterator();
 
@@ -80,8 +80,8 @@ public class EODatasetSeries {
      *
      * @return Returns the value of the unique wcs:CoverageId associated with this CoverageDescription.
      */
-    public String getCoverageId(){
-        return myCoverageId;
+    public String getId(){
+        return _id;
     }
 
 
@@ -121,7 +121,7 @@ public class EODatasetSeries {
 
         //         <wcseo:DatasetSeriesId>someDatasetSeries1</wcseo:DatasetSeriesId>
         Element dsId = new Element("DatasetSeriesId",WCS.WCSEO_NS);
-        dsId.setText(getCoverageId());
+        dsId.setText(getId());
 
         e.addContent(dsId);
 
@@ -131,7 +131,7 @@ public class EODatasetSeries {
             Element wgs84BB = seriesBoundingBox.getWgs84BoundingBoxElement();
             e.addContent(wgs84BB);
             if(seriesBoundingBox.hasTimePeriod()){
-                Element timePeriod = seriesBoundingBox.getGmlTimePeriod(getCoverageId()+"_timePeriod");
+                Element timePeriod = seriesBoundingBox.getGmlTimePeriod(getId()+"_timePeriod");
                 if(timePeriod!=null)
                     e.addContent(timePeriod);
             }
