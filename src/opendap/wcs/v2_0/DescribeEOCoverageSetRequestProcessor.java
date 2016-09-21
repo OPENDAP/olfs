@@ -105,6 +105,10 @@ public class DescribeEOCoverageSetRequestProcessor {
                             if (resultCDs == null) {
                                 resultCDs = new HashMap<>();
                             }
+
+                            //@TODO Evaluate subset here!!
+
+                            numberMatched++;
                             if (numberReturned < req.getMaxItemCount()) {
                                 resultCDs.put(eoCoverageDescription.getCoverageId(), eoCoverageDescription);
                                 numberReturned++;
