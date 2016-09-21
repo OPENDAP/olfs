@@ -3,6 +3,9 @@ package opendap.wcs.v2_0;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import java.util.HashMap;
+import java.util.Vector;
+
 /**
  * Created by ndp on 9/8/16.
  */
@@ -42,64 +45,125 @@ public class DescribeEOCoverageSetRequestProcessor {
 
         addEoWcsNameSpaces(eoCoverageSetDescription);
 
-        int numberReturned = 0;
         int numberMatched = 0;
+        int numberReturned = 0;
+
+        Vector<String> unprocessedIds = new Vector<>();
+
+        HashMap<String,EOCoverageDescription> resultCDs = null;
+        HashMap<String,EODatasetSeries > resultDSs = null;
 
         if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
-
-            Element eoCoverageDescriptions = null;
-
-            for(String id: req.getEoIds()){
+            for (String id : req.getEoIds()) {
                 EOCoverageDescription eoCoverageDescription = CatalogWrapper.getEOCoverageDescription(id);
-
-                if(eoCoverageDescription!=null) {
+                if (eoCoverageDescription != null) {
 
                     //@TODO Evaluate subset here!!
 
                     numberMatched++;
-
-                    if(eoCoverageDescriptions==null) {
-                        eoCoverageDescriptions = new Element("CoverageDescriptions", WCS.WCS_NS);
-                        eoCoverageSetDescription.addContent(eoCoverageDescriptions);
+                    if (resultCDs == null) {
+                        resultCDs = new HashMap<>();
                     }
-
-
-                    if(numberReturned < req.getMaxItemCount()) {
-                        eoCoverageDescriptions.addContent(eoCoverageDescription.getCoverageDescriptionElement());
+                    if (numberReturned < req.getMaxItemCount()) {
+                        resultCDs.put(id,eoCoverageDescription);
                         numberReturned++;
                     }
+                } else {
+                    unprocessedIds.add(id);
                 }
             }
         }
+
+        Vector<String> remaingIds = unprocessedIds;
+        unprocessedIds = new Vector<>();
 
 
         if(req.hasSection(DescribeEOCoverageSetRequest.Sections.DatasetSeriesDescriptions) |
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
 
-            Element eoDatasetSeriesDescriptions = null;
+            resultDSs  = new HashMap<>();
 
-            for(String id: req.getEoIds()){
-                EODatasetSeries eoDatasetSeries = CatalogWrapper.getEODatasetSeries(id);
+            for(String eoId: remaingIds){
+                EODatasetSeries eoDatasetSeries = CatalogWrapper.getEODatasetSeries(eoId);
                 if(eoDatasetSeries!=null ) {
 
                     //@TODO Evaluate subset here!!
 
+
+
                     numberMatched++;
-                    if(eoDatasetSeriesDescriptions==null) {
-                        eoDatasetSeriesDescriptions = new Element("DatasetSeriesDescriptions", WCS.WCSEO_NS);
-                        eoCoverageSetDescription.addContent(eoDatasetSeriesDescriptions);
-                    }
 
                     if( numberReturned < req.getMaxItemCount()) {
-                        eoDatasetSeriesDescriptions.addContent(eoDatasetSeries.getDatasetSeriesDescriptionElement());
+                        resultDSs.put(eoId,eoDatasetSeries);
                         numberReturned++;
                     }
+
+                    for(EOCoverageDescription eoCoverageDescription: eoDatasetSeries.getMembers()){
+                        if (resultCDs == null) {
+                            resultCDs = new HashMap<>();
+                        }
+
+                        if( numberReturned < req.getMaxItemCount()) {
+                            resultCDs.put(eoCoverageDescription.getCoverageId(),eoCoverageDescription);
+                            numberReturned++;
+                        }
+
+                    }
+
+
+
+
+                }
+                else {
+                    unprocessedIds.add(eoId);
                 }
 
             }
 
         }
+
+        if(!unprocessedIds.isEmpty()){
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("Only IDs associated with EOCoverages or DatasetSeries may be submitted to ");
+            sb.append("DescribeEOCoverageSet request. The the submitted coverage identifiers '");
+            for(String id:unprocessedIds){
+                sb.append(unprocessedIds.indexOf(id)>0?",":"").append(id);
+            }
+            sb.append("' is/are not associated with a recognized EOCoverage or DatsetSeries.");
+
+            throw new WcsException(sb.toString(),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcseo:DescribeEOCoverageSetRequest");
+
+        }
+
+
+
+
+
+        if(resultCDs!=null) {
+            Element eoCoverageDescriptions = new Element("CoverageDescriptions", WCS.WCS_NS);
+            eoCoverageSetDescription.addContent(eoCoverageDescriptions);
+            for (String eoId : resultCDs.keySet()) {
+                EOCoverageDescription eoCoverageDescription = resultCDs.get(eoId);
+                eoCoverageDescriptions.addContent(eoCoverageDescription.getCoverageDescriptionElement());
+
+            }
+        }
+
+        if(resultDSs!=null) {
+            Element eoDatasetSeriesDescriptions = new Element("DatasetSeriesDescriptions", WCS.WCSEO_NS);
+            eoCoverageSetDescription.addContent(eoDatasetSeriesDescriptions);
+            for (String eoId : resultDSs.keySet()) {
+                EODatasetSeries eoDatasetSeries = resultDSs.get(eoId);
+                eoDatasetSeriesDescriptions.addContent(eoDatasetSeries.getDatasetSeriesDescriptionElement());
+            }
+        }
+
+
+
         eoCoverageSetDescription.setAttribute("numberMatched",Integer.toString(numberMatched));
 
         eoCoverageSetDescription.setAttribute("numberReturned",Integer.toString(numberReturned));
