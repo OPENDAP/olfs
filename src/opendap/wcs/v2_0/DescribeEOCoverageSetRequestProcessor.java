@@ -99,16 +99,18 @@ public class DescribeEOCoverageSetRequestProcessor {
                         numberReturned++;
                     }
 
-                    for(EOCoverageDescription eoCoverageDescription: eoDatasetSeries.getMembers()){
-                        if (resultCDs == null) {
-                            resultCDs = new HashMap<>();
-                        }
+                    if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
+                            req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
+                        for (EOCoverageDescription eoCoverageDescription : eoDatasetSeries.getMembers()) {
+                            if (resultCDs == null) {
+                                resultCDs = new HashMap<>();
+                            }
+                            if (numberReturned < req.getMaxItemCount()) {
+                                resultCDs.put(eoCoverageDescription.getCoverageId(), eoCoverageDescription);
+                                numberReturned++;
+                            }
 
-                        if( numberReturned < req.getMaxItemCount()) {
-                            resultCDs.put(eoCoverageDescription.getCoverageId(),eoCoverageDescription);
-                            numberReturned++;
                         }
-
                     }
 
 
