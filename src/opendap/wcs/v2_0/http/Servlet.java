@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by IntelliJ IDEA.

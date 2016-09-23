@@ -25,8 +25,6 @@
  */
 package opendap.wcs.v2_0;
 
-import opendap.coreServlet.Scrub;
-import opendap.wcs.v2_0.http.HttpGetHandler;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

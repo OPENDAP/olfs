@@ -28,7 +28,6 @@ package opendap.wcs.v2_0;
 import org.jdom.Element;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  *

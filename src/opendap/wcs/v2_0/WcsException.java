@@ -25,7 +25,6 @@
  */
 package opendap.wcs.v2_0;
 
-import org.apache.http.HttpResponse;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletResponse;
