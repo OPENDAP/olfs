@@ -471,9 +471,11 @@ public class NewBoundingBox {
         return _dimensions.get(i);
     }
 
+    /*
     public Dimension getDimension(String s){
         return _dimensions.get(s);
     }
+    */
 
 
 
