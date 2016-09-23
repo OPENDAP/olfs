@@ -508,21 +508,7 @@ public class BoundingBox {
 
     public BoundingBox union(BoundingBox bb) throws WcsException {
 
-
-        if(_lowerCorner.length != bb._lowerCorner.length || _upperCorner.length != bb._upperCorner.length)
-            throw new WcsException("The union() operation only woeks on BoundingBoxes with the same number of dimensions." +
-                    "The gml:lowerCorner elements have "+_lowerCorner.length+" and "+bb._lowerCorner+" dimensions. "+
-                    "The gml:upperCorner elements have "+_upperCorner.length+" and "+bb._upperCorner+" dimensions. ",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "gml:boundedBy");
-
-
-        if(_srsName!=null && bb._srsName!=null && _srsName.equals(bb._srsName))
-            throw new WcsException("The SRS names do not match and no transformation is provided ",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "gml:boundedBy");
-
-
+        qcIncomingBB(bb);
 
         double newLowerCorner[] = new double[_lowerCorner.length];
         for(int i=0; i<_lowerCorner.length ; i++){
@@ -544,12 +530,53 @@ public class BoundingBox {
 
     }
 
-    public BoundingBox intersection(BoundingBox bb) throws WcsException {
-        throw new WcsException("BoundingBox.intersection() not yet supported.",
-                WcsException.OPERATION_NOT_SUPPORTED,
-                "ows:BoundingBox/@crs");
+
+
+    private void qcIncomingBB(BoundingBox bb) throws WcsException {
+        if(_lowerCorner.length != bb._lowerCorner.length || _upperCorner.length != bb._upperCorner.length)
+            throw new WcsException("The union() operation only works on BoundingBoxes with the same number of dimensions." +
+                    "The gml:lowerCorner elements have "+_lowerCorner.length+" and "+bb._lowerCorner.length+" dimensions. "+
+                    "The gml:upperCorner elements have "+_upperCorner.length+" and "+bb._upperCorner.length+" dimensions. ",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:boundedBy");
+
+
+        if(_srsName !=null &&
+                bb.getCRSURI()!=null &&
+                !_srsName.equals(bb.getCRSURI())){
+
+            String msg = "Cannot check for BoundingBox intersections since the " +
+                    "passed BoundingBox is expressed in a different CRS. " +
+                    "My CRS: "+ _srsName.toASCIIString()+" " +
+                    "Passed CRS: "+bb.getCRSURI().toASCIIString();
+
+            log.error(msg);
+            throw new WcsException(msg,
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "ows:BoundingBox/@crs");
+        }
 
     }
+
+
+    public boolean contains(BoundingBox bb) throws WcsException {
+        qcIncomingBB(bb);
+
+        boolean contains = true;
+
+        for(int i=0; i<_lowerCorner.length ; i++){
+            contains = contains && ( _lowerCorner[i] <= bb._lowerCorner[i]);
+        }
+        for(int i=0; i<_upperCorner.length ; i++){
+            contains =  contains && (bb._upperCorner[i] >=_upperCorner[i]);
+        }
+        if(hasTimePeriod() && bb.hasTimePeriod()){
+            contains = contains && _startTime.before(bb._startTime);
+            contains = contains && _endTime.after(bb._endTime);
+        }
+        return contains;
+    }
+
 
 
 }
