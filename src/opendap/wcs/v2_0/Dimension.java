@@ -3,7 +3,7 @@ package opendap.wcs.v2_0;
 /**
  * Created by ndp on 9/22/16.
  */
-public class Dimension {
+public class Dimension implements Cloneable {
 
     private double _lowerBound;
     private double _upperBound;
@@ -34,6 +34,13 @@ public class Dimension {
         _coordinate = null;
         _lowerBound = Double.NaN;
         _upperBound = Double.NaN;
+
+    }
+
+    Dimension(Dimension d){
+        _coordinate = d._coordinate;
+        _lowerBound = d._lowerBound;
+        _upperBound = d._upperBound;
 
     }
 
@@ -69,7 +76,7 @@ public class Dimension {
         }
         else {
 
-            throw new WcsException("Unkwown coordinate axis '"+name+"'",WcsException.INVALID_PARAMETER_VALUE,"subset");
+            throw new WcsException("Unknown coordinate axis '"+name+"'",WcsException.INVALID_PARAMETER_VALUE,"subset");
 
         }
 
