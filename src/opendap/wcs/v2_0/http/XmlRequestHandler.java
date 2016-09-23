@@ -218,6 +218,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         try {
             ServletOutputStream os = response.getOutputStream();
+            response.setStatus(er.getHttpStatusCode());
             xmlo.output(er.getReport(),os);
         } catch (IOException e) {
             log.error("FAILED to transmit WcsException to client. Message: ",e.getMessage());

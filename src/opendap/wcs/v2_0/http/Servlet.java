@@ -408,25 +408,31 @@ public class Servlet extends HttpServlet {
         try {
             LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
+            log.info("tetsty");
         }
         catch (Throwable t) {
             try {
-                WcsException myBadThang =  null;
+                WcsException myBadThang;
                 if(t instanceof WcsException){
                     myBadThang = (WcsException) t;
-                    request_status = HttpServletResponse.SC_BAD_REQUEST;
                 }
                 else {
                     myBadThang = new WcsException("The bad things have happened in WCS-2.0. Caught "+
                             t.getClass().getName()+" Message: "+ t.getMessage(),WcsException.NO_APPLICABLE_CODE);
-                    request_status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                    myBadThang.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 }
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                 Document errDoc = new Document( myBadThang.getExceptionElement());
 
-                resp.setStatus(request_status);
+                if(!resp.isCommitted()){
+                    resp.setStatus(myBadThang.getHttpStatusCode());
+                    xmlo.output(errDoc,resp.getOutputStream());
+                }
+                else {
+                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
+                    resp.sendError(myBadThang.getHttpStatusCode(),myBadThang.getMessage());
+                }
 
-                xmlo.output(errDoc,resp.getOutputStream());
 
             }
             catch(Throwable t2) {

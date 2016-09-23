@@ -25,7 +25,10 @@
  */
 package opendap.wcs.v2_0;
 
+import org.apache.http.HttpResponse;
 import org.jdom.Element;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * WCS exceptions 
@@ -84,6 +87,7 @@ import org.jdom.Element;
 public class WcsException extends Exception {
 
 
+    private int _httpStatusCode;
 
     /**
      * OperationNotSupported: Request is for an operation that is not supported
@@ -145,12 +149,14 @@ public class WcsException extends Exception {
 
     public WcsException(String s, int exceptionCode, String locator) {
         super(s);
+        _httpStatusCode =  HttpServletResponse.SC_BAD_REQUEST;
         _exceptionCode = exceptionCode;
         _locator = locator;
     }
 
     public WcsException(String s, int exceptionCode) {
         super(s);
+        _httpStatusCode =  HttpServletResponse.SC_BAD_REQUEST;
         _exceptionCode = exceptionCode;
         _locator = null;
     }
@@ -185,6 +191,15 @@ public class WcsException extends Exception {
 
         return msg;
 
+    }
+
+    public void setHttpStatusCode(int code){
+        _httpStatusCode = code;
+    }
+
+
+    public int getHttpStatusCode(){
+        return _httpStatusCode;
     }
 
 

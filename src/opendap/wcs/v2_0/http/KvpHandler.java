@@ -116,8 +116,10 @@ public class KvpHandler {
             if(os==null)
                 os = response.getOutputStream();
 
-            if(!response.isCommitted())
+            if(!response.isCommitted()) {
                 response.setContentType("text/xml");
+                response.setStatus(er.getHttpStatusCode());
+            }
 
             os.println(er.toString());
         }

@@ -31,6 +31,7 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -46,6 +47,7 @@ public class WcsExceptionReport {
 
 
 
+    private int _httpStatus;
 
     private final Document report;
 
@@ -54,6 +56,7 @@ public class WcsExceptionReport {
         root.addNamespaceDeclaration(WCS.XSI_NS);
         root.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
 
+        _httpStatus = -1;
         report = new Document();
         report.setRootElement(root);
     }
@@ -64,6 +67,8 @@ public class WcsExceptionReport {
     }
 
     public void addException(WcsException exp){
+        if(_httpStatus==-1)
+            _httpStatus = exp.getHttpStatusCode();
         report.getRootElement().addContent(exp.getExceptionElement());
     }
 
@@ -81,5 +86,9 @@ public class WcsExceptionReport {
         return report;
     }
 
+
+    public int getHttpStatusCode(){
+        return _httpStatus;
+    }
 
 }
