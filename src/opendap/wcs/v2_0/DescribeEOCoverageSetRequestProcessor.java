@@ -31,6 +31,32 @@ public class DescribeEOCoverageSetRequestProcessor {
     }
 
 
+    private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, BoundingBox datasetBB) throws WcsException{
+
+
+        BoundingBox requestSubset = req.getSubsetBoundingBox();
+
+        if(requestSubset==null)
+            return true;
+
+        boolean matches;
+        switch(req.getContainment()) {
+            case OVERLAPS:
+                matches = requestSubset.intersects(datasetBB);
+                break;
+            case CONTAINS:
+                matches = requestSubset.contains(datasetBB);
+                break;
+            default:
+                throw new WcsException("Unknown 'containment' type.",
+                        WcsException.INVALID_PARAMETER_VALUE, "wcseo:containment");
+        }
+        return matches;
+    }
+
+
+
+
     /**
      * <wcseo:EOCoverageSetDescription numberMatched="2" numberReturned="2">
      * @param req
@@ -59,16 +85,21 @@ public class DescribeEOCoverageSetRequestProcessor {
                 EOCoverageDescription eoCoverageDescription = CatalogWrapper.getEOCoverageDescription(id);
                 if (eoCoverageDescription != null) {
 
-                    //@TODO Evaluate subset here!!
 
-                    numberMatched++;
-                    if (resultCDs == null) {
-                        resultCDs = new HashMap<>();
+                    boolean matches = evaluate_subset(req,eoCoverageDescription.getBoundingBox());
+
+                    if(matches){
+                        numberMatched++;
+                        if (resultCDs == null) {
+                            resultCDs = new HashMap<>();
+                        }
+                        if (numberReturned < req.getMaxItemCount()) {
+                            resultCDs.put(id,eoCoverageDescription);
+                            numberReturned++;
+                        }
+
                     }
-                    if (numberReturned < req.getMaxItemCount()) {
-                        resultCDs.put(id,eoCoverageDescription);
-                        numberReturned++;
-                    }
+
                 } else {
                     unprocessedIds.add(id);
                 }
@@ -88,16 +119,20 @@ public class DescribeEOCoverageSetRequestProcessor {
                 EODatasetSeries eoDatasetSeries = CatalogWrapper.getEODatasetSeries(eoId);
                 if(eoDatasetSeries!=null ) {
 
+                    boolean matches = evaluate_subset(req,eoDatasetSeries.getBoundingBox());
+
                     //@TODO Evaluate subset here!!
 
+                    if(matches){
+                        numberMatched++;
 
+                        if( numberReturned < req.getMaxItemCount()) {
+                            resultDSs.put(eoId,eoDatasetSeries);
+                            numberReturned++;
+                        }
 
-                    numberMatched++;
-
-                    if( numberReturned < req.getMaxItemCount()) {
-                        resultDSs.put(eoId,eoDatasetSeries);
-                        numberReturned++;
                     }
+
 
                     if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
                             req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
@@ -106,12 +141,15 @@ public class DescribeEOCoverageSetRequestProcessor {
                                 resultCDs = new HashMap<>();
                             }
 
-                            //@TODO Evaluate subset here!!
+                            matches = evaluate_subset(req,eoCoverageDescription.getBoundingBox());
 
-                            numberMatched++;
-                            if (numberReturned < req.getMaxItemCount()) {
-                                resultCDs.put(eoCoverageDescription.getCoverageId(), eoCoverageDescription);
-                                numberReturned++;
+                            if(matches){
+                                numberMatched++;
+                                if (numberReturned < req.getMaxItemCount()) {
+                                    resultCDs.put(eoCoverageDescription.getCoverageId(), eoCoverageDescription);
+                                    numberReturned++;
+                                }
+
                             }
 
                         }

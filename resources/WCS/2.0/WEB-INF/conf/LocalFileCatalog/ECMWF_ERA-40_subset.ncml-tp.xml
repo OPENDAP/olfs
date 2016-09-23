@@ -35,7 +35,7 @@
             xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
             xmlns:swe="http://www.opengis.net/swe/2.0">
         <boundedBy>
-            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
+            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
                 uomLabels="time deg deg" srsDimension="2" >
                 <lowerCorner>-90.000 0.000</lowerCorner>
                 <upperCorner>90.000 360.00</upperCorner>

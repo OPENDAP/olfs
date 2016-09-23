@@ -36,8 +36,8 @@
     xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
     >
     <boundedBy>
-        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
-            uomLabels="time deg deg" srsDimension="2" >
+        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
+            uomLabels="deg deg" srsDimension="2" >
             <lowerCorner>21.73596 82.1161499</lowerCorner>
             <upperCorner>46.4944191 122.768791</upperCorner>
             <beginPosition>2008-03-27T16:00:00.000Z</beginPosition>

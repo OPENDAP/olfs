@@ -64,7 +64,7 @@ public class DescribeEOCoverageSetRequest {
      */
     private Containment _containment;
 
-    private enum Containment {
+    public enum Containment {
         OVERLAPS("overlaps"),
         CONTAINS("contains");
 
@@ -237,7 +237,7 @@ public class DescribeEOCoverageSetRequest {
             }
 
         }
-        _log.debug("DescribeEOCoverageSetRequest() - Containment set to: {}", _containment);
+        _log.debug("DescribeEOCoverageSetRequest() - Containment set to: '{}'", _containment);
 
         _count = DEFAULT_COUNT;
         vals = kvp.get("count");
@@ -314,5 +314,19 @@ public class DescribeEOCoverageSetRequest {
     public int getMaxItemCount(){
         return _count;
     }
+
+    public BoundingBox getSubsetBoundingBox(){
+
+        //BoundingBox bb = new BoundingBox();
+
+        return null;
+
+    }
+
+    public Containment getContainment(){
+        return _containment;
+    }
+
+
 
 }
