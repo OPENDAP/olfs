@@ -458,6 +458,55 @@ public class NewBoundingBox {
         return bbox;
     }
 
+
+    /**
+     *
+     * @param bb
+     * @throws WcsException
+     */
+    private void qcIncomingBB(NewBoundingBox bb) throws WcsException {
+
+        if(_dimensions.size() != bb._dimensions.size())
+            throw new WcsException("The union() operation only works on BoundingBoxes with the same number of dimensions." +
+                    "The base Bounding box has "+_dimensions.size()+" the offered BoudningBox has "+bb._dimensions.size()+
+                    " dimensions.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "gml:boundedBy");
+
+
+        if(_srsName !=null &&
+                bb.getCRSURI()!=null &&
+                !_srsName.equals(bb.getCRSURI())){
+
+            String msg = "Cannot check for BoundingBox intersections since the " +
+                    "passed BoundingBox is expressed in a different CRS. " +
+                    "My CRS: "+ _srsName.toASCIIString()+" " +
+                    "Passed CRS: "+bb.getCRSURI().toASCIIString();
+
+            _log.error(msg);
+            throw new WcsException(msg,
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "ows:BoundingBox/@crs");
+        }
+
+    }
+
+    public LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> getDimensions(){
+
+        LinkedHashMap<CoordinateDimension.Coordinate,CoordinateDimension> dims =  new LinkedHashMap<>();
+
+        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            CoordinateDimension dim = _dimensions.get(coordinate);
+            CoordinateDimension newDim = new CoordinateDimension(dim);
+            dims.put(coordinate, newDim);
+        }
+
+        return dims;
+    }
+
+
+
+
     /**
      *
      * @param bb The BoundingBox we want to compare.
@@ -495,55 +544,12 @@ public class NewBoundingBox {
 
     }
 
-    public LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> getDimensions(){
-
-        LinkedHashMap<CoordinateDimension.Coordinate,CoordinateDimension> dims =  new LinkedHashMap<>();
-
-        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
-            CoordinateDimension dim = _dimensions.get(coordinate);
-            CoordinateDimension newDim = new CoordinateDimension(dim);
-            dims.put(coordinate, newDim);
-        }
-
-        return dims;
-    }
-
-    /*
-    public CoordinateDimension getDimension(String s){
-        return _dimensions.get(s);
-    }
-    */
-
-
-
-
-    private void qcIncomingBB(NewBoundingBox bb) throws WcsException {
-
-        if(_dimensions.size() != bb._dimensions.size())
-            throw new WcsException("The union() operation only works on BoundingBoxes with the same number of dimensions." +
-                    "The base Bounding box has "+_dimensions.size()+" the offered BoudningBox has "+bb._dimensions.size()+
-                    " dimensions.",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "gml:boundedBy");
-
-
-        if(_srsName !=null &&
-                bb.getCRSURI()!=null &&
-                !_srsName.equals(bb.getCRSURI())){
-
-            String msg = "Cannot check for BoundingBox intersections since the " +
-                    "passed BoundingBox is expressed in a different CRS. " +
-                    "My CRS: "+ _srsName.toASCIIString()+" " +
-                    "Passed CRS: "+bb.getCRSURI().toASCIIString();
-
-            _log.error(msg);
-            throw new WcsException(msg,
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "ows:BoundingBox/@crs");
-        }
-
-    }
-
+    /**
+     *
+     * @param bb
+     * @return
+     * @throws WcsException
+     */
     public NewBoundingBox union(NewBoundingBox bb) throws WcsException {
 
         qcIncomingBB(bb);
@@ -571,6 +577,14 @@ public class NewBoundingBox {
 
     }
 
+
+    /**
+     *
+     * @param bb THe bounding box to evaluate
+     * @return True if the passed BB is contained both sptially and temporally
+     * by this BB.
+     * @throws WcsException
+     */
     public boolean contains(NewBoundingBox bb) throws WcsException {
         qcIncomingBB(bb);
 
@@ -581,16 +595,22 @@ public class NewBoundingBox {
             CoordinateDimension bbDim = bb._dimensions.get(coordinate);
 
             // myMin is less than their min
-            contains = contains && ( myDim.getMin()<= bbDim.getMin());
+            contains = contains && ( myDim.getMin() <= bbDim.getMin() );
+
 
             // myMax is bigger than their max
-            contains = contains && ( myDim.getMax()>= bbDim.getMax());
+            contains = contains && ( bbDim.getMax() <= myDim.getMax() );
+
+            _log.debug("contains() - The candidate BoundingBox {} dimension {} me.",bbDim.getCoordinate(),contains?"is contained by":"is NOT contained by");
         }
 
         if(hasTimePeriod() && bb.hasTimePeriod()){
             contains = contains && _startTime.before(bb._startTime);
             contains = contains && _endTime.after(bb._endTime);
         }
+
+        _log.debug("contains() - The candidate BoundingBox {} me.",contains?"is contained by":"is NOT contained by");
+
         return contains;
     }
 
