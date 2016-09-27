@@ -3,7 +3,7 @@ package opendap.wcs.v2_0;
 /**
  * Created by ndp on 9/22/16.
  */
-public class Dimension implements Cloneable {
+public class CoordinateDimension implements Cloneable {
 
     private double _lowerBound;
     private double _upperBound;
@@ -30,47 +30,52 @@ public class Dimension implements Cloneable {
     }
 
 
-    Dimension(){
+    CoordinateDimension(){
         _coordinate = null;
         _lowerBound = Double.NaN;
         _upperBound = Double.NaN;
 
     }
 
-    Dimension(Dimension d){
+    CoordinateDimension(CoordinateDimension d){
         _coordinate = d._coordinate;
         _lowerBound = d._lowerBound;
         _upperBound = d._upperBound;
 
     }
 
-    Dimension(String name, double min, double max) throws WcsException{
-        setCoordinate(name);
-        setMax(min);
+
+    CoordinateDimension(Coordinate c, double min, double max) throws WcsException{
+        setCoordinate(c);
+        setMin(min);
         setMax(max);
     }
-
-    public void setMax(double max){ _upperBound = max; }
-    public double getMax(){ return _upperBound;}
 
     public void setMin(double min){ _lowerBound = min; }
     public double getMin(){ return _lowerBound;}
 
+    public void setMax(double max){ _upperBound = max; }
+    public double getMax(){ return _upperBound;}
+
     public Coordinate getCoordinate() { return _coordinate;}
 
-    public Coordinate setCoordinate(String name) throws WcsException {
+    public void setCoordinate(Coordinate c) throws WcsException {
+        _coordinate = c;
+    }
+
+    public static Coordinate getCoordinateByName(String name) throws WcsException {
 
         Coordinate coordinate;
-        name = name.toLowerCase();
+        String lienient_name = name.toLowerCase();
 
-        if(name.startsWith("lat")) {
+        if(lienient_name.startsWith("lat")) {
             coordinate = Coordinate.LATITUDE;
         }
-        else if(name.startsWith("lon")){
+        else if(lienient_name.startsWith("lon")){
             coordinate = Coordinate.LONGITUDE;
 
         }
-        else if(name.equals("phenomenonTime") || name.startsWith("time")){
+        else if(lienient_name.equals("phenomenontime") || lienient_name.startsWith("time")){
             coordinate = Coordinate.TIME;
 
         }
@@ -80,7 +85,6 @@ public class Dimension implements Cloneable {
 
         }
 
-        _coordinate = coordinate;
 
         return coordinate;
 

@@ -401,10 +401,10 @@ public class CoverageDescription {
      * Returns null if no gml:boundedBy element is found.
      * @throws WcsException When bad things happen.
      */
-    public BoundingBox getBoundingBox() throws WcsException {
+    public NewBoundingBox getBoundingBox() throws WcsException {
         Element boundedBy =  myCD.getChild("boundedBy",WCS.GML_NS);
         if(boundedBy!=null)
-            return new BoundingBox(boundedBy);
+            return new NewBoundingBox(boundedBy);
         return null;
     }
 
@@ -587,7 +587,7 @@ public class CoverageDescription {
         }
 
         if(hasBoundedBy()){
-            BoundingBox boundingBox = getBoundingBox();
+            NewBoundingBox boundingBox = getBoundingBox();
             Element bb = boundingBox.getOwsBoundingBoxElement();
             covSum.addContent(bb);
         }

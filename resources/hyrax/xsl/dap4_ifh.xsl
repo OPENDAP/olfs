@@ -163,7 +163,7 @@
     <!--
     <xsl:template match="dap:Group"> </xsl:template>
 
-    <xsl:template match="dap:Dimension"> </xsl:template>
+    <xsl:template match="dap:CoordinateDimension"> </xsl:template>
 -->
 
     <!--
@@ -365,7 +365,7 @@
 
     <!-- ###################################################################
      -
-     -    Dimension Slicing Controls
+     -    CoordinateDimension Slicing Controls
      -
      -
     -->

@@ -44,8 +44,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -416,14 +415,26 @@ public class Servlet extends HttpServlet {
                     myBadThang = (WcsException) t;
                 }
                 else {
-                    myBadThang = new WcsException("The bad things have happened in WCS-2.0. Caught "+
-                            t.getClass().getName()+" Message: "+ t.getMessage(),WcsException.NO_APPLICABLE_CODE);
+
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("doGet() - The bad things have happened in WCS-2.0. Caught ")
+                            .append(t.getClass().getName()).append("\n");
+                    msg.append("Message: ").append(t.getMessage()).append("\n");
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    t.printStackTrace(new PrintStream(baos));
+                    msg.append("StackTrace: ").append(baos.toString()).append("\n");
+
+                    myBadThang = new WcsException(msg.toString(),WcsException.NO_APPLICABLE_CODE);
                     myBadThang.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+
                 }
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                 Document errDoc = new Document( myBadThang.getExceptionElement());
 
                 if(!resp.isCommitted()){
+                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
                     resp.setStatus(myBadThang.getHttpStatusCode());
                     xmlo.output(errDoc,resp.getOutputStream());
                 }

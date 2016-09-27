@@ -42,7 +42,7 @@
 >
 
     <gml:boundedBy>
-        <gml:Envelope axisLabels="latitude longitude" srsDimension="2" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+        <gml:Envelope axisLabels="latitude longitude" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
                       uomLabels="deg deg">
             <gml:lowerCorner>-90.0 -180.00</gml:lowerCorner>
             <gml:upperCorner>90.0 180.0</gml:upperCorner>
@@ -184,12 +184,12 @@
             </gml:limits>
             <gml:axisLabels>latitude longitude</gml:axisLabels>
             <gml:origin>
-                <gml:Point gml:id="grid_origin_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003_nc4_min_eo" _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                <gml:Point gml:id="grid_origin_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003_nc4_min_eo" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
                     <gml:pos>90.0 -180.0</gml:pos>
                 </gml:Point>
             </gml:origin>
-            <gml:offsetVector _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-0.0417 0.0</gml:offsetVector>
-            <gml:offsetVector _srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0417</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-0.0417 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0417</gml:offsetVector>
         </gml:RectifiedGrid>
     </gml:domainSet>
 

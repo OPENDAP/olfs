@@ -30,7 +30,7 @@ import org.jdom.Element;
 
 
 /**
- * This class embodies a WCS Dimension Subset concept and is able to produce a DAP constraint expression
+ * This class embodies a WCS CoordinateDimension Subset concept and is able to produce a DAP constraint expression
  * that requests the correct subset of the data.
  *
  * Essentially this class acts as a map from WCS 2.0 dimension sub-setting syntax to DAP constraint expression syntax.
@@ -52,7 +52,7 @@ public class DimensionSubset {
 
     public enum Type {TRIM, SLICE_POINT}
 
-    Type myDimensionType;
+    Type mySubsetType;
 
 
     private String dimensionId;
@@ -63,21 +63,21 @@ public class DimensionSubset {
     private boolean isArrayIndexSubset;
 
     public DimensionSubset(DimensionSubset source) {
-        setDimensionType(source.getType());
-        setDimensionId(source.getDimensionId());
-        setTrimLow(source.getTrimLow());
-        setTrimHigh(source.getTrimHigh());
-        setSlicePoint(source.getSlicePoint());
-        setIsArraySubset(source.isArraySubset());
+        mySubsetType = source.mySubsetType;
+        dimensionId = source.dimensionId;
+        trimLow = source.trimLow;
+        trimHigh =  source.trimHigh;
+        slicePoint =  source.slicePoint;
+        isArrayIndexSubset = source.isArrayIndexSubset;
     }
 
 
-    protected void setDimensionId(String s){
+    protected void setDimensionId(String s) throws WcsException {
         dimensionId = s;
     }
 
-    protected void setDimensionType(Type t){
-        myDimensionType = t;
+    protected void setSubsetType(Type t){
+        mySubsetType = t;
     }
 
     protected void setTrimLow(String s){
@@ -138,7 +138,7 @@ public class DimensionSubset {
         if(intervalOrPoint.contains(",")){
             int commaIndex = intervalOrPoint.indexOf(",");
             // It's an interval!
-            setDimensionType(Type.TRIM);
+            setSubsetType(Type.TRIM);
             setTrimLow(intervalOrPoint.substring(0,commaIndex));
             setTrimHigh(intervalOrPoint.substring(commaIndex+1,intervalOrPoint.length()));
 
@@ -164,7 +164,7 @@ public class DimensionSubset {
         }
         else {
             // It's a slicePoint;
-            setDimensionType(Type.SLICE_POINT);
+            setSubsetType(Type.SLICE_POINT);
             setSlicePoint(intervalOrPoint);
             setTrimHigh(null);
             setTrimLow(null);
@@ -201,7 +201,7 @@ public class DimensionSubset {
     }
 
     public Type getType(){
-        return myDimensionType;
+        return mySubsetType;
     }
 
 
@@ -218,17 +218,17 @@ public class DimensionSubset {
         String type = dimensionSubsetType.getName();
 
 
-        Element dimensionElement = dimensionSubsetType.getChild("Dimension",WCS.WCS_NS);
+        Element dimensionElement = dimensionSubsetType.getChild("CoordinateDimension",WCS.WCS_NS);
         if(dimensionElement==null)
-            throw new WcsException("Missing wcs:Dimension element in wcs:DimensionSubsetType.",
+            throw new WcsException("Missing wcs:CoordinateDimension element in wcs:DimensionSubsetType.",
                 WcsException.MISSING_PARAMETER_VALUE,
-                "wcs:Dimension");
+                "wcs:CoordinateDimension");
 
         String id = dimensionElement.getTextTrim();
         if(id==null)
-            throw new WcsException("Missing value for wcs:Dimension element in wcs:DimensionSubsetType.",
+            throw new WcsException("Missing value for wcs:CoordinateDimension element in wcs:DimensionSubsetType.",
                 WcsException.MISSING_PARAMETER_VALUE,
-                "wcs:Dimension");
+                "wcs:CoordinateDimension");
 
         setDimensionId(id);
 
@@ -309,7 +309,7 @@ public class DimensionSubset {
         if(isSliceSubset()){
             ds = new Element("DimensionSlice",WCS.WCS_NS);
 
-            Element e = new Element("Dimension",WCS.WCS_NS);
+            Element e = new Element("CoordinateDimension",WCS.WCS_NS);
             e.setText(dimensionId);
             ds.addContent(e);
 
@@ -322,7 +322,7 @@ public class DimensionSubset {
         if(isTrimSubset()){
             ds = new Element("DimensionTrim",WCS.WCS_NS);
 
-            Element e = new Element("Dimension",WCS.WCS_NS);
+            Element e = new Element("CoordinateDimension",WCS.WCS_NS);
             e.setText(dimensionId);
             ds.addContent(e);
 

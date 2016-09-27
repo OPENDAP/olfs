@@ -43,8 +43,8 @@ public class EOCoverageDescription extends CoverageDescription {
      * @throws WcsException When bad things happen.
      */
     @Override
-    public BoundingBox getBoundingBox() throws WcsException {
-        BoundingBox bb = super.getBoundingBox();
+    public NewBoundingBox getBoundingBox() throws WcsException {
+        NewBoundingBox bb = super.getBoundingBox();
 
         if(!bb.hasTimePeriod()){
             // No time period? Check the  EO metadata section for that...

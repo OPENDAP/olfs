@@ -31,10 +31,10 @@ public class DescribeEOCoverageSetRequestProcessor {
     }
 
 
-    private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, BoundingBox datasetBB) throws WcsException{
+    private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, NewBoundingBox datasetBB) throws WcsException{
 
 
-        BoundingBox requestSubset = req.getSubsetBoundingBox();
+        NewBoundingBox requestSubset = req.getSubsetBoundingBox(datasetBB);
 
         if(requestSubset==null)
             return true;
@@ -120,8 +120,6 @@ public class DescribeEOCoverageSetRequestProcessor {
                 if(eoDatasetSeries!=null ) {
 
                     boolean matches = evaluate_subset(req,eoDatasetSeries.getBoundingBox());
-
-                    //@TODO Evaluate subset here!!
 
                     if(matches){
                         numberMatched++;

@@ -249,7 +249,7 @@ public class WCS {
 
         checkNamespace(e,"SpatialDomain",WCS.WCS_NS);
 
-        new BoundingBox(e.getChild("BoundingBox",WCS.OWS_NS));
+        new NewBoundingBox(e.getChild("BoundingBox",WCS.OWS_NS));
 
 
 

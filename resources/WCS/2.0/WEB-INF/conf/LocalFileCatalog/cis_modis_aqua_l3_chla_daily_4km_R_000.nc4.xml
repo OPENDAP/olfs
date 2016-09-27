@@ -102,7 +102,7 @@
                     <om:featureOfInterest>
                         <eop:Footprint gml:id="footprint_someEOCoverage1">
                             <eop:multiExtentOf>
-                                <gml:MultiSurface gml:id="multisurface_someEOCoverage1" _srsName="EPSG:4326">
+                                <gml:MultiSurface gml:id="multisurface_someEOCoverage1" srsName="EPSG:4326">
                                     <gml:surfaceMember>
                                         <gml:Polygon gml:id="polygon_someEOCoverage1">
                                             <gml:exterior>
@@ -117,7 +117,7 @@
                                 </gml:MultiSurface>
                             </eop:multiExtentOf>
                             <eop:centerOf>
-                                <gml:Point gml:id="someEOCoverage1_p" _srsName="EPSG:4326">
+                                <gml:Point gml:id="someEOCoverage1_p" srsName="EPSG:4326">
                                     <gml:pos>43.190833 2.374167</gml:pos>
                                 </gml:Point>
                             </eop:centerOf>

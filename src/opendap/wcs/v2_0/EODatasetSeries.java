@@ -86,14 +86,14 @@ public class EODatasetSeries {
 
 
 
-    public BoundingBox getBoundingBox() throws WcsException {
-        BoundingBox seriesBoundingBox = null;
+    public NewBoundingBox getBoundingBox() throws WcsException {
+        NewBoundingBox seriesBoundingBox = null;
 
         for (EOCoverageDescription cd : members) {
-            BoundingBox bb = cd.getBoundingBox();
+            NewBoundingBox bb = cd.getBoundingBox();
             if (seriesBoundingBox == null) {
                 try {
-                    seriesBoundingBox = new BoundingBox(bb);
+                    seriesBoundingBox = new NewBoundingBox(bb);
                 }
                 catch (URISyntaxException e) {
                     log.error("Failed to get new BoundingBox from copy constructor. Caught URISyntaxException. Message: {}",e.getMessage());
@@ -125,7 +125,7 @@ public class EODatasetSeries {
 
         e.addContent(dsId);
 
-        BoundingBox seriesBoundingBox = getBoundingBox();
+        NewBoundingBox seriesBoundingBox = getBoundingBox();
 
         if(seriesBoundingBox!=null){
             Element wgs84BB = seriesBoundingBox.getWgs84BoundingBoxElement();

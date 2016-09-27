@@ -4,9 +4,9 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+
+import static java.lang.Float.NaN;
 
 /**
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -122,8 +122,9 @@ public class DescribeEOCoverageSetRequest {
      * high:         point | *
      * point:        number| " token " // " = ASCII 0x42
      */
-    HashMap<Subsets, DimensionSubset> _subsets;
+    HashMap<CoordinateDimension.Coordinate, CoordinateDimensionSubset> _subsets;
 
+    /*
     private enum Subsets {
         LONG("long"),
         LAT("lat"),
@@ -140,7 +141,7 @@ public class DescribeEOCoverageSetRequest {
             return name;
         }
     }
-
+  */
 
     /**
      * request
@@ -278,26 +279,12 @@ public class DescribeEOCoverageSetRequest {
         if (vals != null) {
 
             for (String subset : vals) {
-                DimensionSubset ds = new DimensionSubset(subset);
+                CoordinateDimensionSubset ds = new CoordinateDimensionSubset(subset);
                 if (ds.isSliceSubset()) {
                     throw new WcsException("A 'low' and 'high' values are required ex: " + ds.getDimensionId() + "(-10,10)",
                             WcsException.INVALID_PARAMETER_VALUE, "subset");
                 }
-
-                if (ds.getDimensionId().equalsIgnoreCase(Subsets.LAT.toString())) {
-                    _subsets.put(Subsets.LAT, ds);
-                } else if (ds.getDimensionId().equalsIgnoreCase(Subsets.LONG.toString())) {
-                    _subsets.put(Subsets.LONG, ds);
-                } else if (ds.getDimensionId().equalsIgnoreCase(Subsets.PHENOMENON_TIME.toString())) {
-                    _subsets.put(Subsets.PHENOMENON_TIME, ds);
-                }
-                else {
-                    StringBuilder msg = new StringBuilder();
-                    msg.append("Use of the 'subset' parameter with a ").append(DescribeEOCoverageSetRequest.KVP_REQUEST);
-                    msg.append(" is restricted to the coordinate dimensions ").append(Subsets.LONG);
-                    msg.append(",").append(Subsets.LAT).append(", and ").append(Subsets.PHENOMENON_TIME);
-                    throw new WcsException("msg",WcsException.INVALID_PARAMETER_VALUE, "subset");
-                }
+                _subsets.put(ds.getCoordinate(), ds);
 
             }
         }
@@ -314,11 +301,73 @@ public class DescribeEOCoverageSetRequest {
         return _count;
     }
 
-    public BoundingBox getSubsetBoundingBox(){
 
-        //BoundingBox bb = new BoundingBox();
 
-        return null;
+    public NewBoundingBox getSubsetBoundingBox(NewBoundingBox coverageBoundingBox) throws WcsException {
+
+        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> cvrgDims = coverageBoundingBox.getDimensions();
+
+        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> subsetBBDims = new LinkedHashMap<>();
+        double min, max;
+
+        Date startTime=null, endTime=null;
+        for(CoordinateDimension.Coordinate coordinate : cvrgDims.keySet()) {
+            CoordinateDimension cDim = cvrgDims.get(coordinate);
+            CoordinateDimensionSubset dimSubset = _subsets.get(coordinate);
+            if(dimSubset==null){
+                if(cDim.getCoordinate() == CoordinateDimension.Coordinate.TIME) {
+                    throw  new WcsException("ERROR: Unfortunately, the Coverage defines 'time' as a dimension. " +
+                            "While this makes a lot of sense to scientisits (where time is considered a continuous real " +
+                            "valued function, it is in conflict with the semantic perspective of the GIS and OGC " +
+                            "communities which see 'time' as a special, disctreet valued phenomenen. Bummer, right? " +
+                            "So until this Coverage representation is changed to reflect the OGC semantics of " +
+                            "'phenomenonTime' it will be blocked from subsetting and other activities. Sorry...",
+                            WcsException.INVALID_PARAMETER_VALUE,"gml:boundedBy");
+                }
+                else {
+                    min = cDim.getMin();
+                    max = cDim.getMax();
+                    CoordinateDimension newDim = new CoordinateDimension(coordinate,min,max);
+                    subsetBBDims.put(coordinate,newDim);
+                }
+            }
+            else {
+                if(cDim.getCoordinate() == CoordinateDimension.Coordinate.TIME) {
+                    throw  new WcsException("ERROR: Unfortunately, the Coverage defines 'time' as a dimension. " +
+                            "While this makes a lot of sense to scientisits (where time is considered a continuous real " +
+                            "valued function, it is in conflict with the semantic perspective of the GIS and OGC " +
+                            "communities which see 'time' as a special, disctreet valued phenomenen. Bummer, right? " +
+                            "So until this Coverage representation is changed to reflect the OGC semantics of " +
+                            "'phenomenonTime' it will be blocked from subsetting and other activities. Sorry...",
+                            WcsException.INVALID_PARAMETER_VALUE,"gml:boundedBy");
+                }
+                else {
+                    min = Double.parseDouble(dimSubset.getTrimLow());
+                    max = Double.parseDouble(dimSubset.getTrimHigh());
+                    CoordinateDimension newDim = new CoordinateDimension(coordinate,min,max);
+                    subsetBBDims.put(coordinate,newDim);
+                }
+            }
+
+        }
+
+        CoordinateDimensionSubset cds = _subsets.get(CoordinateDimension.Coordinate.TIME);
+        if(cds!=null){
+            startTime = TimeConversion.parseWCSTimePosition(cds.getTrimLow());
+            endTime   = TimeConversion.parseWCSTimePosition(cds.getTrimHigh());
+        }
+        else if(coverageBoundingBox.hasTimePeriod()){
+            startTime = coverageBoundingBox.getStartTime();
+            endTime = coverageBoundingBox.getEndTime();
+        }
+        else {
+            _log.warn("getSubsetBoundingBox() - Neither the Coverage BoundingBox nor the specified subset contain " +
+                    "information about Time bounds. SKIPPING time stuff...");
+        }
+
+        NewBoundingBox nbb = new NewBoundingBox(subsetBBDims,startTime,endTime,null);
+
+        return nbb;
 
     }
 

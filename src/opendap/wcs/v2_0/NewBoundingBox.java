@@ -27,10 +27,12 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 /**
@@ -43,9 +45,9 @@ import java.util.Vector;
 public class NewBoundingBox {
 
 
-    private Logger log;
+    private Logger _log;
 
-    private Vector<Dimension> _dimensions = new Vector<>();
+    private LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> _dimensions;
 
     private boolean _hasTimePeriod;
     private Date _startTime;
@@ -54,7 +56,8 @@ public class NewBoundingBox {
 
     public NewBoundingBox() throws WcsException {
 
-        _dimensions = new Vector<>();
+        _log = LoggerFactory.getLogger(this.getClass());
+        _dimensions = new LinkedHashMap<>();
         _srsName = null;
 
         _startTime     =  null;
@@ -62,14 +65,19 @@ public class NewBoundingBox {
         _hasTimePeriod = false;
     }
 
-    public NewBoundingBox(Vector<Dimension> dims, Date startTime, Date endTime, URI srsName) throws WcsException{
+    public NewBoundingBox(NewBoundingBox bb) throws WcsException, URISyntaxException {
+        this(bb._dimensions, bb._startTime, bb._endTime, bb._srsName);
+    }
+
+    public NewBoundingBox(LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> dims, Date startTime, Date endTime, URI srsName) throws WcsException {
 
         this();
 
-        _dimensions =  new Vector<>();
-        for(Dimension dim : dims){
-            Dimension newDim = new Dimension(dim);
-            _dimensions.add(newDim);
+        for(CoordinateDimension.Coordinate coordinate : dims.keySet())
+        {
+            CoordinateDimension dim = dims.get(coordinate);
+            CoordinateDimension newDim = new CoordinateDimension(dim);
+            _dimensions.put(coordinate,newDim);
         }
 
         if(startTime!=null && endTime!=null) {
@@ -83,9 +91,18 @@ public class NewBoundingBox {
             _endTime = new Date(endTime.getTime());
         }
 
-        _srsName = srsName;
+        if(srsName!=null) {
+            try {
+                _srsName = new URI(srsName.toString());
+            } catch (URISyntaxException e) {
+                throw new WcsException("The srsName is not a valid URI. Msg: " + e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "gml:boundedBy/gml:Envelope@srsName");
+            }
+        }
 
     }
+
 
 
     /**
@@ -106,8 +123,8 @@ public class NewBoundingBox {
      * @throws WcsException When the ows:BoundingBox has issues.
      */
     public NewBoundingBox(Element bbElement) throws WcsException {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
+        this();
 
         if (bbElement == null)
             throw new WcsException("Missing " +
@@ -154,9 +171,10 @@ public class NewBoundingBox {
 
 
             for(String aLabel: axisLabels){
-                Dimension d = new Dimension();
-                d.setCoordinate(aLabel);
-                _dimensions.add(d);
+                CoordinateDimension.Coordinate coordinate = CoordinateDimension.getCoordinateByName(aLabel);
+                CoordinateDimension d = new CoordinateDimension();
+                d.setCoordinate(coordinate);
+                _dimensions.put(coordinate,d);
             }
             // Process Lower Corner.
             e = envelope.getChild("lowerCorner", WCS.GML_NS);
@@ -176,10 +194,10 @@ public class NewBoundingBox {
                         WcsException.INVALID_PARAMETER_VALUE,
                         "gml:lowerCorner");
 
-            int index;
-            for (index = 0; index < valCount; index++) {
-                double value = Double.parseDouble(tmp[index]);
-                _dimensions.get(index).setMin(value);
+            int index=0;
+            for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+                double value = Double.parseDouble(tmp[index++]);
+                _dimensions.get(coordinate).setMin(value);
             }
 
 
@@ -202,16 +220,18 @@ public class NewBoundingBox {
                         WcsException.INVALID_PARAMETER_VALUE,
                         "gml:upperCorner");
 
-            for (int i = 0; i < valCount; i++) {
-                double value = Double.parseDouble(tmp[i]);
-                _dimensions.get(i).setMax(value);
+            index=0;
+            for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+                double value = Double.parseDouble(tmp[index++]);
+                _dimensions.get(coordinate).setMax(value);
             }
+
 
 
             s = envelope.getAttributeValue("srsName");
             if (s != null) {
                 try {
-                    srsName = new URI(s);
+                    _srsName = new URI(s);
                 } catch (URISyntaxException use) {
                     throw new WcsException(use.getMessage(),
                             WcsException.INVALID_PARAMETER_VALUE,
@@ -229,9 +249,6 @@ public class NewBoundingBox {
                     WcsException.INVALID_PARAMETER_VALUE,
                     "gml:boundedBy");
         }
-
-
-        this._srsName = srsName;
 
 
     }
@@ -319,8 +336,8 @@ public class NewBoundingBox {
     public double[] getLowerCorner() {
         double lowerCorner[] = new double[_dimensions.size()];
         int i = 0;
-        for(Dimension dim: _dimensions){
-            lowerCorner[i] = dim.getMin();
+        for(CoordinateDimension dim: _dimensions.values()){
+            lowerCorner[i++] = dim.getMin();
         }
 
         return lowerCorner;
@@ -333,8 +350,8 @@ public class NewBoundingBox {
     public double[] getUpperCorner() {
         double upperCorner[] = new double[_dimensions.size()];
         int i = 0;
-        for(Dimension dim: _dimensions){
-            upperCorner[i] = dim.getMax();
+        for(CoordinateDimension dim: _dimensions.values()){
+            upperCorner[i++] = dim.getMax();
         }
 
         return upperCorner;
@@ -455,24 +472,44 @@ public class NewBoundingBox {
         qcIncomingBB(bb);
         // @todo transform coordinates of passed BB to those of this one before check intersection
 
-
-        for(int i=0; i<_dimensions.size(); i++){
-            Dimension myDim =  _dimensions.get(i);
-            Dimension bbDim =  bb._dimensions.get(i);
+        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            CoordinateDimension myDim =  _dimensions.get(coordinate);
+            CoordinateDimension bbDim =  bb._dimensions.get(coordinate);
             overlap = myDim.getMin()<bbDim.getMax()  && myDim.getMax()>bbDim.getMin();
+            _log.debug("intersects() - The candidate BoundingBox {} dimension {} me.",bbDim.getCoordinate(),overlap?"overlaps":"do not overlap");
             hasIntersection = overlap && hasIntersection;
 
         }
-         return hasIntersection;
+        _log.debug("intersects() - The candidate BoundingBox  coordinate dimensions {} me!",hasIntersection?"intersects":"is disjoint from");
+
+        if(hasTimePeriod() && bb.hasTimePeriod()) {
+            boolean timePeriodOverlap = (getStartTime().before(bb.getEndTime()) && getEndTime().after(bb.getStartTime()));
+            _log.debug("intersects() - The candidate BoundingBox TimePeriod {} me.",timePeriodOverlap?"overlaps":"do not overlap");
+            hasIntersection = hasIntersection && timePeriodOverlap;
+        }
+
+        _log.debug("intersects() - The candidate BoundingBox {} me!",hasIntersection?"intersects":"is disjoint from");
+
+
+        return hasIntersection;
 
     }
 
-    public Dimension getDimension(int i){
-        return _dimensions.get(i);
+    public LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> getDimensions(){
+
+        LinkedHashMap<CoordinateDimension.Coordinate,CoordinateDimension> dims =  new LinkedHashMap<>();
+
+        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            CoordinateDimension dim = _dimensions.get(coordinate);
+            CoordinateDimension newDim = new CoordinateDimension(dim);
+            dims.put(coordinate, newDim);
+        }
+
+        return dims;
     }
 
     /*
-    public Dimension getDimension(String s){
+    public CoordinateDimension getDimension(String s){
         return _dimensions.get(s);
     }
     */
@@ -499,7 +536,7 @@ public class NewBoundingBox {
                     "My CRS: "+ _srsName.toASCIIString()+" " +
                     "Passed CRS: "+bb.getCRSURI().toASCIIString();
 
-            log.error(msg);
+            _log.error(msg);
             throw new WcsException(msg,
                     WcsException.INVALID_PARAMETER_VALUE,
                     "ows:BoundingBox/@crs");
@@ -511,15 +548,15 @@ public class NewBoundingBox {
 
         qcIncomingBB(bb);
 
-        Vector<Dimension> newDims = new Vector<>();
+        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> newDims = new LinkedHashMap<>();
 
-        for(int i=0; i<_dimensions.size(); i++){
-            Dimension myDim =  _dimensions.get(i);
-            Dimension bbDim =  bb._dimensions.get(i);
+        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            CoordinateDimension myDim =  _dimensions.get(coordinate);
+            CoordinateDimension bbDim =  bb._dimensions.get(coordinate);
             double newMin =    (myDim.getMin() <= bbDim.getMin()) ? myDim.getMin() : bbDim.getMin();
             double newMax =    (myDim.getMax() >= bbDim.getMax()) ? myDim.getMax() : bbDim.getMax();
-            Dimension newDim = new Dimension(myDim.getCoordinate().toString(), newMin, newMax);
-            newDims.add(newDim);
+            CoordinateDimension newDim = new CoordinateDimension(coordinate, newMin, newMax);
+            newDims.put(coordinate,newDim);
         }
 
 
@@ -539,16 +576,15 @@ public class NewBoundingBox {
 
         boolean contains = true;
 
-        for(int i=0; i<_dimensions.size(); i++){
-            Dimension myDim = _dimensions.elementAt(i);
-            Dimension bbDim = bb.getDimension(i);
+        for(CoordinateDimension.Coordinate coordinate :_dimensions.keySet()){
+            CoordinateDimension myDim = _dimensions.get(coordinate);
+            CoordinateDimension bbDim = bb._dimensions.get(coordinate);
 
             // myMin is less than their min
             contains = contains && ( myDim.getMin()<= bbDim.getMin());
 
             // myMax is bigger than their max
             contains = contains && ( myDim.getMax()>= bbDim.getMax());
-
         }
 
         if(hasTimePeriod() && bb.hasTimePeriod()){
