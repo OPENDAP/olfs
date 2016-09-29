@@ -123,6 +123,13 @@ public class DimensionSubset {
         int leftParen = kvpSubsetString.indexOf("(");
         int rghtParen = kvpSubsetString.indexOf(")");
 
+        if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
+            throw new WcsException("Invalid subset expression. The subset expression '"+kvpSubsetString+"' lacks " +
+                    "correctly organized parenthetical content.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "KVP subset");
+        }
+
         setIsArraySubset(false);
 
         String s = kvpSubsetString.substring(0,leftParen);
