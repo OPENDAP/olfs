@@ -32,9 +32,7 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: ndp
@@ -47,81 +45,122 @@ public class GetCoverageRequest {
 
     private static final String _request = "GetCoverage";
 
-    private String coverageID = null;
-    private String format = null;
-    private String mediaType = null;
-    private HashMap<String, DimensionSubset> subsets = null;
+    private String _coverageID;
+    private String _format;
+    private String _mediaType;
+    private HashMap<String, DimensionSubset> _subsets;
 
-    private String _requestUrl = null;
+    private String _requestUrl;
+
+    private String _outputCRS;
+    private String _subsettingCRS;
+
+    /**
+     *  This get setto true if any scaling option is selected.
+     */
+    private boolean _isScalingRequest;
+
+    /**
+     *  Request Parameter
+     *  kvp: ScaleFactor=x
+     */
+    private double _scaleFactor;
+
+    /**
+     *  Request Parameter
+     *  kvp: ScaleAxes=ax1(x1),ax2(x2)
+     */
+    private HashMap<String,Double> _scaleAxisByFactor;
+
+    /**
+     *  Request Parameter
+     *  kvp: ScaleSize=ax1(s1),ax2(s2)
+     */
+    private HashMap<String,Long> _scaleToSize;
+
+    /**
+     *
+     * ScaleExtent (WTF does this even mean? Throw an exception!)
+     *  ...& SCALEEXTENT=i(10:20),j(20:30) &...
+     * @param does
+     */
+    private HashMap<String,long[]> _scaleToExtents;
+
+
+    /**
+     * Request parameter
+     * kvp:
+     *    &RangeSubset=r& selects one range component.
+     *    &RangeSubset=r1,r2,r4& selects three range components
+     *    &RangeSubset=r1:r4,r7& selects 5 range components.
+     */
+    private Vector<String> _rangeSubset;
+
+    // INTERPOLATION
+    //
+    // &interpolation=iMethod&  specifes global interpolation method iMethod for all axes
+    //
+    // &InterpolationPerAxis=axis1,iMethod&  specifes global interpolation method iMethod for axis1
+    //
+    // &InterpolationPerAxis=axis1,iMethod&InterpolationPerAxis=axis2,foo&
+    //    specifes global interpolation method iMethod for all axis1  and foo for axis2
+
+    /**
+     * Request Parameter
+     * kvp:
+     *   &interpolation=iMethod&  specifies global interpolation method iMethod for all axes
+     */
+    private String _interpolationMethod;
+
+
+    /**
+     * Request Parameter
+     * kvp:
+     *    &InterpolationPerAxis=axis1,iMethod&  specifes global interpolation method iMethod for axis1
+     *
+     *    &InterpolationPerAxis=axis1,iMethod&InterpolationPerAxis=axis2,foo&
+     *    specifes global interpolation method iMethod for all axis1  and foo for axis2
+     */
+    private HashMap<String,String> _interpolationByAxis;
 
 
 
+    public GetCoverageRequest(){
+        _coverageID     = null;
+        _format         = null;
+        _mediaType      = null;
+        _subsets        = new HashMap<>();
+        _requestUrl     = null;
+
+        _outputCRS      = null;
+        _subsettingCRS  = null;
+
+        _isScalingRequest  = false;
+        _scaleFactor       = Double.NaN;
+        _scaleAxisByFactor = new HashMap<>();
+        _scaleToSize       = new HashMap<>();
+        _scaleToExtents    = new HashMap<>();    // supported? maybe not...
+
+        _rangeSubset    = new Vector<>();
+
+        _interpolationMethod = null;
+        _interpolationByAxis =  new HashMap<>();  // supported? maybe not...
 
 
-    public void setMediaType(String mType) throws WcsException {
-
-        if(mType!=null && !mType.equalsIgnoreCase("multipart/related")){
-            throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
-                "No other value is allowed. OGC [09-110r4] section 8.4.1",
-                WcsException.INVALID_PARAMETER_VALUE,
-                "mediaType");
-        }
-
-        mediaType = mType;
     }
 
-    public String getMediaType(){
-        return mediaType;
-    }
 
-
-    public String getCoverageID() {
-        return coverageID;
-    }
-
-
-    public void setCoverageID(String coverageID) {
-        this.coverageID = coverageID;
-    }
-
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-
-    public HashMap<String, DimensionSubset> getDimensionSubsets(){
-
-        HashMap<String, DimensionSubset> newDS = new HashMap<>();
-
-
-        for(DimensionSubset ds: subsets.values()){
-
-            if(ds instanceof TemporalDimensionSubset){
-                TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
-                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts,ts.getUnits()));
-            }
-            else {
-                newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
-            }
-
-        }
-        return newDS;
-    }
-
-
-
-
-
-
+    /**
+     * Creates a GetCoverageRequest from the KVP in the request URL's query string.
+     * @param requestUrl
+     * @param kvp
+     * @throws WcsException
+     * @throws InterruptedException
+     */
     public GetCoverageRequest(String requestUrl, Map<String,String[]> kvp)
             throws WcsException, InterruptedException {
 
-        subsets = new HashMap<String, DimensionSubset>();
+        this();
         String s[];
 
         _requestUrl = requestUrl;
@@ -132,7 +171,7 @@ public class GetCoverageRequest {
 
         // Make sure the client can accept a supported WCS version...
         s = kvp.get("version");
-        WCS.checkVersion(s==null? null : s[0]);
+        WCS.checkVersion( s==null ? null : s[0]);
 
 
         // Make sure the client is actually asking for this operation
@@ -160,38 +199,126 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "coverageId");
         }
-        coverageID = s[0];
+        _coverageID = s[0];
 
 
-        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(coverageID);
+        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
-            throw new WcsException("No such coverageID: '"+coverageID+"'",
+            throw new WcsException("No such _coverageID: '"+ _coverageID +"'",
                     WcsException.INVALID_PARAMETER_VALUE,
                     "coverageId");
         }
 
 
 
-        // Get the format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
+        // Get the _format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
         // it was not specified.
         s = kvp.get("format");
-        format = s==null? null : s[0];
+        _format = s==null? null : s[0];
 
-
-
-
-        // Get the mediaType. It's not required and a null is used to indicate that
+        // Get the _mediaType. It's not required and a null is used to indicate that
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
-        // part and the second part must contain whatever response format the user specified in the format parameter.
-        s = kvp.get("mediaType".toLowerCase());
+        // part and the second part must contain whatever response _format the user specified in the _format parameter.
+        s = kvp.get("_mediaType".toLowerCase());
         if(s!=null){
             setMediaType(s[0]);
         }
 
 
+        // Did they specify an output CRS?
+        s = kvp.get("outputCRS".toLowerCase());
+        if(s!=null){
+            setOutputCRS(s[0]);
+        }
 
+
+        // Did they specify a CRS for their subset coordinates?
+        s = kvp.get("subsettingCRS".toLowerCase());
+        if(s!=null){
+            setOutputCRS(s[0]);
+        }
+
+        // Did they submit  a global scale factor?
+        s = kvp.get("scalefactor".toLowerCase());
+        if(s!=null){
+            try {
+                _scaleFactor = Double.parseDouble(s[0]);
+            }
+            catch (NumberFormatException e){
+                throw new WcsException("The value of the SCALEFACTOR parameter failed to parse as a floating " +
+                        "point value. Msg: "+e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleByFactor");
+            }
+        }
+
+
+        // Did the submit per-axis scale factors?
+        s = kvp.get("scaleaxes".toLowerCase());
+        if(s!=null){
+            ingestKvpForScaleAxesParameter(s[0]);
+
+    }
+
+        // Did they submit per-axis scale sizes?
+        s = kvp.get("scalesize".toLowerCase());
+        if(s!=null){
+            ingestKvpForScaleSizeParameter(s[0]);
+        }
+
+
+        // Did they submit a scale to extent parameter?
+        s = kvp.get("scaleextent".toLowerCase());
+        if(s!=null){
+            // too bad because that's something we never understood...
+            throw new WcsException("The SCALEEXTENT operation is not implemented.",
+                    WcsException.OPERATION_NOT_SUPPORTED,
+                    "scal:ScaleToExtent");
+
+        }
+
+        // Did they submit a range subset to extent parameter?
+        s = kvp.get("rangesubset".toLowerCase());
+        if(s!=null){
+            String rangeSubsetString = s[0];
+            String varNames[] = rangeSubsetString.split(",");
+            Collections.addAll(_rangeSubset, varNames);
+        }
+
+        // Did they submit an interpolation method parameter?
+        s = kvp.get("interpolation".toLowerCase());
+        if(s!=null){
+            _interpolationMethod = s[0];
+        }
+
+        // Did they submit one or more  per axis interpolation method parameters?
+        s = kvp.get("interpolationperaxis".toLowerCase());
+        if(s!=null){
+
+            for(String interpolationPerAxisString: s){
+                String parts[] = interpolationPerAxisString.split(",");
+
+                if(parts.length < 2){
+                    throw new WcsException("The INTERPOLATIONPERAXIS parameter '"+interpolationPerAxisString+
+                            "' does not have both an axis and an interpolation method.",
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "int:InterpolationPerAxis");
+                }
+
+                if(parts.length > 2){
+                    throw new WcsException("The INTERPOLATIONPERAXIS parameter '"+interpolationPerAxisString+
+                            "' has too many componets - it should have a single dimension name and a " +
+                            "single interpolation method name.",
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "int:InterpolationPerAxis");
+                }
+                _interpolationByAxis.put(parts[0],parts[1]);
+            }
+        }
+
+        // Get the subset expressions
         s = kvp.get("subset");
         if(s!=null){
             for(String subsetStr:s){
@@ -203,17 +330,23 @@ public class GetCoverageRequest {
                     subset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
                 }
 
-                subsets.put(subset.getDimensionId(), subset);
+                _subsets.put(subset.getDimensionId(), subset);
             }
         }
 
     }
 
-
+    /**
+     * Creates a GetCoverageRequest from the XML submitted in a POST request.
+     * @param requestUrl
+     * @param getCoverageRequestElem
+     * @throws WcsException
+     * @throws InterruptedException
+     */
     public GetCoverageRequest(String requestUrl, Element getCoverageRequestElem)
             throws WcsException, InterruptedException {
 
-        subsets = new HashMap<>();
+        this();
 
         Element e;
         String s;
@@ -238,33 +371,207 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "wcs:CoverageId");
         }
-        coverageID =e.getText();
+        _coverageID =e.getText();
 
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
-        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(coverageID);
+        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(_coverageID);
 
 
         ingestDimensionSubset(getCoverageRequestElem, cvrDsc);
 
 
-        // Get the format for the coverage output.
+        // Get the _format for the coverage output.
         Element formatElement  = getCoverageRequestElem.getChild("format",WCS.WCS_NS);
         if(formatElement!=null){
-            format = formatElement.getTextTrim();
+            _format = formatElement.getTextTrim();
         }
 
 
-        // Get the mediaType. It's not required and a null is used to indicate that
+        // Get the _mediaType. It's not required and a null is used to indicate that
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
-        // part and the second part must contain whatever response format the user specified in the format parameter.
-        Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
+        // part and the second part must contain whatever response _format the user specified in the _format parameter.
+        Element mediaTypeElement = getCoverageRequestElem.getChild("_mediaType",WCS.WCS_NS);
         if(mediaTypeElement!=null){
             s = mediaTypeElement.getTextTrim();
             setMediaType(s);
         }
     }
+
+
+
+    private void ingestKvpForScaleAxesParameter(String kvpScaleAxesString) throws WcsException {
+
+        String axisScaleStrings[] = kvpScaleAxesString.split(",");
+
+        for(String axisScaleString: axisScaleStrings){
+
+            int leftParen = axisScaleString.indexOf("(");
+            int rghtParen = axisScaleString.indexOf(")");
+
+            if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
+                throw new WcsException("Invalid subset expression. The 'SCALEAXES' expression '"+kvpScaleAxesString+"' lacks " +
+                        "correctly organized parenthetical content.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            String dimensionName = axisScaleString.substring(0,leftParen);
+
+            if(dimensionName.length()==0){
+                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must begin with a dimension name.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            String scaleFactorString = axisScaleString.substring(leftParen+1,rghtParen);
+
+            if(scaleFactorString.length()==0){
+                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must contain a scale factor value.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            double scaleFactor;
+            try {
+                scaleFactor = Double.parseDouble(scaleFactorString);
+            }
+            catch (NumberFormatException e){
+                throw new WcsException("The scale factor string for dimension"+dimensionName+
+                        " failed to parse as a floating point value.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            _scaleAxisByFactor.put(dimensionName, scaleFactor);
+        }
+    }
+
+
+    private void ingestKvpForScaleSizeParameter(String kvpScaleSizeString) throws WcsException {
+
+
+        String axisScaleStrings[] = kvpScaleSizeString.split(",");
+
+        for(String axisScaleString: axisScaleStrings){
+
+            int leftParen = axisScaleString.indexOf("(");
+            int rghtParen = axisScaleString.indexOf(")");
+
+            if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
+                throw new WcsException("Invalid subset expression. The 'SCALESIZE' expression '"+kvpScaleSizeString+"' lacks " +
+                        "correctly organized parenthetical content.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            String dimensionName = axisScaleString.substring(0,leftParen);
+
+            if(dimensionName.length()==0){
+                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must begin with a dimension name.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            String scaleSizeString = axisScaleString.substring(leftParen+1,rghtParen);
+
+            if(scaleSizeString.length()==0){
+                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must contain a scale factor value.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            long scaleFactor;
+            try {
+                scaleFactor = Long.parseLong(scaleSizeString);
+            }
+            catch (NumberFormatException e){
+                throw new WcsException("The scale size string for dimension"+dimensionName+
+                        " failed to parse as an integer value.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "scal:ScaleAxesByFactor");
+            }
+
+            _scaleToSize.put(dimensionName, scaleFactor);
+        }
+    }
+
+
+
+
+    public void setMediaType(String mType) throws WcsException {
+
+        if(mType!=null && !mType.equalsIgnoreCase("multipart/related")){
+            throw new WcsException("Optional _mediaType MUST be set to'multipart/related' " +
+                "No other value is allowed. OGC [09-110r4] section 8.4.1",
+                WcsException.INVALID_PARAMETER_VALUE,
+                "_mediaType");
+        }
+
+        _mediaType = mType;
+    }
+
+    public void setOutputCRS(String outputCRS) {
+        _outputCRS = outputCRS;
+    }
+
+    public String getOutputCRS() {
+        return _outputCRS;
+    }
+
+    public void setSubsetCRS(String subsetCRS) {
+        _subsettingCRS = subsetCRS;
+    }
+    public String getSubsetCRS() {
+        return _subsettingCRS;
+    }
+
+
+    public String getMediaType(){
+        return _mediaType;
+    }
+
+
+    public String getCoverageID() {
+        return _coverageID;
+    }
+
+
+    public void setCoverageID(String coverageID) {
+        this._coverageID = coverageID;
+    }
+
+
+    public String getFormat() {
+        return _format;
+    }
+
+    public void setFormat(String format) {
+        this._format = format;
+    }
+
+
+    public HashMap<String, DimensionSubset> getDimensionSubsets(){
+
+        HashMap<String, DimensionSubset> newDS = new HashMap<>();
+
+
+        for(DimensionSubset ds: _subsets.values()){
+
+            if(ds instanceof TemporalDimensionSubset){
+                TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
+                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts,ts.getUnits()));
+            }
+            else {
+                newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
+            }
+
+        }
+        return newDS;
+    }
+
+
 
 
 
@@ -288,7 +595,7 @@ public class GetCoverageRequest {
                 ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
             }
 
-            subsets.put(ds.getDimensionId(), ds);
+            _subsets.put(ds.getDimensionId(), ds);
         }
 
     }
@@ -344,23 +651,23 @@ public class GetCoverageRequest {
         requestElement.setAttribute("version",WCS.CURRENT_VERSION);
 
         Element e = new Element("CoverageId",WCS.WCS_NS);
-        e.setText(coverageID);
+        e.setText(_coverageID);
         requestElement.addContent(e);
 
-        for(DimensionSubset ds: subsets.values()){
+        for(DimensionSubset ds: _subsets.values()){
             requestElement.addContent(ds.getDimensionSubsetElement());
         }
 
-        if(format !=null){
+        if(_format !=null){
             Element formatElement = new Element("format",WCS.WCS_NS);
-            formatElement.setText(format);
+            formatElement.setText(_format);
             requestElement.addContent(formatElement);
         }
 
 
-        if(mediaType!=null){
-            Element mediaTypeElement = new Element("mediaType",WCS.WCS_NS);
-            mediaTypeElement.setText(mediaType);
+        if(_mediaType !=null){
+            Element mediaTypeElement = new Element("_mediaType",WCS.WCS_NS);
+            mediaTypeElement.setText(_mediaType);
             requestElement.addContent(mediaTypeElement);
         }
 
