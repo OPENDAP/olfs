@@ -47,72 +47,39 @@ import org.jdom.Element;
  * values (non integer). In other words: Both values must be in the arrayIndex facet, or both in the byValue facet.
  *
 */
-public class DimensionSubset {
+public class DimensionSubset implements Cloneable {
 
 
     public enum Type {TRIM, SLICE_POINT}
 
-    Type mySubsetType;
+    private Type _mySubsetType;
 
 
-    private String dimensionId;
-    private String trimLow;
-    private String trimHigh;
-    private String slicePoint;
+    private String _dimensionId;
+    private String _trimLow;
+    private String _trimHigh;
+    private String _slicePoint;
 
-    private boolean isArrayIndexSubset;
+    private boolean _isArrayIndexSubset;
+
+
+    private DimensionSubset() {
+        _dimensionId = null;
+        _trimLow = null;
+        _trimHigh = null;
+        _slicePoint = null;
+        _isArrayIndexSubset = false;
+    }
 
     public DimensionSubset(DimensionSubset source) {
-        mySubsetType = source.mySubsetType;
-        dimensionId = source.dimensionId;
-        trimLow = source.trimLow;
-        trimHigh =  source.trimHigh;
-        slicePoint =  source.slicePoint;
-        isArrayIndexSubset = source.isArrayIndexSubset;
+        _mySubsetType = source._mySubsetType;
+        _dimensionId = source._dimensionId;
+        _trimLow = source._trimLow;
+        _trimHigh =  source._trimHigh;
+        _slicePoint =  source._slicePoint;
+        _isArrayIndexSubset = source._isArrayIndexSubset;
     }
 
-
-    protected void setDimensionId(String s) throws WcsException {
-        dimensionId = s;
-    }
-
-    protected void setSubsetType(Type t){
-        mySubsetType = t;
-    }
-
-    protected void setTrimLow(String s){
-
-        trimLow = trimQuotesAndWhiteSpace(s);
-    }
-
-    protected void setTrimHigh(String s){
-        trimHigh = trimQuotesAndWhiteSpace(s);
-    }
-
-    protected void setIsArraySubset(boolean s){
-        isArrayIndexSubset = s;
-    }
-
-    protected void setSlicePoint(String s){
-        slicePoint = trimQuotesAndWhiteSpace(s);
-    }
-
-    private String trimQuotesAndWhiteSpace(String s){
-
-        if(s==null)
-            return null;
-
-        // Trim them from the front.
-        while(s.startsWith(" ") || s.startsWith("\t") || s.startsWith("\"") || s.startsWith("'"))
-            s = s.substring(1,s.length());
-
-
-        // Trim them from the back.
-        while(s.endsWith(" ") || s.endsWith("\t") || s.endsWith("\"") || s.endsWith("'"))
-            s = s.substring(0,s.length()-1);
-
-        return s;
-    }
 
     /**
      * Accepts the KVP encoding of a subset parameter for WCS 2.0
@@ -120,6 +87,8 @@ public class DimensionSubset {
      * @throws WcsException When it's funky, like an old sock.
      */
     public DimensionSubset(String kvpSubsetString) throws WcsException {
+        this();
+
         int leftParen = kvpSubsetString.indexOf("(");
         int rghtParen = kvpSubsetString.indexOf(")");
 
@@ -170,7 +139,7 @@ public class DimensionSubset {
             setSlicePoint(null);
         }
         else {
-            // It's a slicePoint;
+            // It's a _slicePoint;
             setSubsetType(Type.SLICE_POINT);
             setSlicePoint(intervalOrPoint);
             setTrimHigh(null);
@@ -178,6 +147,49 @@ public class DimensionSubset {
 
             setIsArraySubset(isArraySubsetString(getSlicePoint()));
         }
+    }
+
+    protected void setDimensionId(String s) throws WcsException {
+        _dimensionId = s;
+    }
+
+
+    protected void setSubsetType(Type t){
+        _mySubsetType = t;
+    }
+
+    protected void setTrimLow(String s){
+
+        _trimLow = trimQuotesAndWhiteSpace(s);
+    }
+
+    protected void setTrimHigh(String s){
+        _trimHigh = trimQuotesAndWhiteSpace(s);
+    }
+
+    protected void setIsArraySubset(boolean s){
+        _isArrayIndexSubset = s;
+    }
+
+    protected void setSlicePoint(String s){
+        _slicePoint = trimQuotesAndWhiteSpace(s);
+    }
+
+    private String trimQuotesAndWhiteSpace(String s){
+
+        if(s==null)
+            return null;
+
+        // Trim them from the front.
+        while(s.startsWith(" ") || s.startsWith("\t") || s.startsWith("\"") || s.startsWith("'"))
+            s = s.substring(1,s.length());
+
+
+        // Trim them from the back.
+        while(s.endsWith(" ") || s.endsWith("\t") || s.endsWith("\"") || s.endsWith("'"))
+            s = s.substring(0,s.length()-1);
+
+        return s;
     }
 
 
@@ -200,15 +212,15 @@ public class DimensionSubset {
 
 
     public boolean isValueSubset(){
-        return !isArrayIndexSubset;
+        return !_isArrayIndexSubset;
     }
 
     public boolean isArraySubset(){
-        return isArrayIndexSubset;
+        return _isArrayIndexSubset;
     }
 
     public Type getType(){
-        return mySubsetType;
+        return _mySubsetType;
     }
 
 
@@ -317,11 +329,11 @@ public class DimensionSubset {
             ds = new Element("DimensionSlice",WCS.WCS_NS);
 
             Element e = new Element("CoordinateDimension",WCS.WCS_NS);
-            e.setText(dimensionId);
+            e.setText(_dimensionId);
             ds.addContent(e);
 
             e = new Element("SlicePoint",WCS.WCS_NS);
-            e.setText(slicePoint);
+            e.setText(_slicePoint);
             ds.addContent(e);
 
         }
@@ -330,17 +342,17 @@ public class DimensionSubset {
             ds = new Element("DimensionTrim",WCS.WCS_NS);
 
             Element e = new Element("CoordinateDimension",WCS.WCS_NS);
-            e.setText(dimensionId);
+            e.setText(_dimensionId);
             ds.addContent(e);
 
-            if(!trimLow.equals("*")){
+            if(!_trimLow.equals("*")){
                 e = new Element("TrimLow",WCS.WCS_NS);
-                e.setText(trimLow);
+                e.setText(_trimLow);
                 ds.addContent(e);
             }
-            if(!trimHigh.equals("*")){
+            if(!_trimHigh.equals("*")){
                 e = new Element("TrimHigh",WCS.WCS_NS);
-                e.setText(trimHigh);
+                e.setText(_trimHigh);
                 ds.addContent(e);
             }
         }
@@ -461,27 +473,27 @@ public class DimensionSubset {
 
 
     public boolean isSliceSubset(){
-        return slicePoint !=null;
+        return _slicePoint !=null;
     }
 
     public boolean isTrimSubset(){
-        return trimHigh !=null && trimLow !=null;
+        return _trimHigh !=null && _trimLow !=null;
     }
 
     public String getSlicePoint(){
-        return slicePoint;
+        return _slicePoint;
     }
 
     public String getTrimHigh(){
-        return trimHigh;
+        return _trimHigh;
     }
 
     public String getTrimLow(){
-        return trimLow;
+        return _trimLow;
     }
 
     public String getDimensionId(){
-        return dimensionId;
+        return _dimensionId;
     }
 
 }

@@ -33,11 +33,21 @@ import java.util.Date;
  * This class extends DimensionSubset concept to correctly handle time strings.
  *
 */
-public class TemporalDimensionSubset extends DimensionSubset {
+public class TemporalDimensionSubset  extends DimensionSubset implements Cloneable {
 
 
     private String _units;
 
+
+    public TemporalDimensionSubset(DimensionSubset ds) {
+        super(ds);
+        _units = null;
+    }
+
+    public TemporalDimensionSubset(TemporalDimensionSubset tds) {
+        super(tds);
+        _units = tds._units;
+    }
 
     public TemporalDimensionSubset(DimensionSubset ds, String units) {
         super(ds);
@@ -140,5 +150,16 @@ public class TemporalDimensionSubset extends DimensionSubset {
 
 
 
+    public Date getStartTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getTrimLow());
 
-}
+    }
+    public Date getEndTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getTrimHigh());
+    }
+
+    public Date getSlicePointTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getSlicePoint());
+    }
+
+    }

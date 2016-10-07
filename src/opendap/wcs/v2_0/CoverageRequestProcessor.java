@@ -119,6 +119,16 @@ public class CoverageRequestProcessor {
 
         CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
 
+        /**
+         * If this an EO coverage then update it's bounding box to reflect the subset.
+         */
+        if(coverageDescription instanceof EOCoverageDescription){
+            EOCoverageDescription eoCoverageDescription = (EOCoverageDescription)coverageDescription;
+            NewBoundingBox cvrgBB = eoCoverageDescription.getBoundingBox();
+            NewBoundingBox regBB = WCS.getSubsetBoundingBox(req.getDimensionSubsets(),req.getTemporalSubset(),cvrgBB);
+            eoCoverageDescription.setBoundingBox(regBB);
+        }
+
         Coverage coverage = coverageDescription.getCoverage(req.getRequestUrl()); // new Coverage(coverageDescription, req.getRequestUrl());
 
         Element coverageElement = coverage.getCoverageElement(rangePartId, getReturnMimeType(req));
@@ -174,7 +184,7 @@ public class CoverageRequestProcessor {
         } else if (format.equals("image/jp2")) {
             dataAccessURL = getGmlJpeg2000DataAccessURL(req);
         } else if (format.equals("application/octet-stream")) {
-            dataAccessURL = getDapDataAccessURL(req);
+            dataAccessURL = getDap2DataAccessURL(req);
         } else {
             throw new WcsException("Unrecognized response format: '" + Scrub.fileName(format)+"'",
                     WcsException.INVALID_PARAMETER_VALUE, "format");
@@ -230,7 +240,7 @@ public class CoverageRequestProcessor {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        String dapCE = getDapCE(req);
+        String dapCE = getDap2CE(req);
         log.debug("getGmlJpeg2000DataAccessURL() - Dap CE: '{}'",dapCE);
 
         try {
@@ -246,7 +256,7 @@ public class CoverageRequestProcessor {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        String dapCE = getDapCE(req);
+        String dapCE = getDap2CE(req);
         log.debug("getGeoTiffDataAccessURL() - Dap CE: '{}'",dapCE);
 
         try {
@@ -258,11 +268,11 @@ public class CoverageRequestProcessor {
         return requestURL;
     }
 
-    public static String getDapDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
+    public static String getDap2DataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        requestURL += ".dods" + "?" + getDapCE(req);
+        requestURL += ".dods" + "?" + getDap2CE(req);
 
         return requestURL;
     }
@@ -272,7 +282,7 @@ public class CoverageRequestProcessor {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        requestURL += ".nc" + "?" + getDapCE(req);
+        requestURL += ".nc" + "?" + getDap2CE(req);
 
         return requestURL;
     }
@@ -283,13 +293,13 @@ public class CoverageRequestProcessor {
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
         requestURL += ".ddx";
-        //requestURL +=  "/" + req.getCoverageID() + ".ddx"+"?"+getDapCE(req);
+        //requestURL +=  "/" + req.getCoverageID() + ".ddx"+"?"+getDap2CE(req);
 
         return requestURL;
     }
 
 
-    private static String getDapCE(GetCoverageRequest req) throws InterruptedException, WcsException {
+    private static String getDap2CE(GetCoverageRequest req) throws InterruptedException, WcsException {
 
         StringBuilder dapCE = new StringBuilder();
 
@@ -315,13 +325,24 @@ public class CoverageRequestProcessor {
         }
 
 
-        for (Field field : fields) {
+        Vector<String> _rangeSubset =  req.getRangeSubset();
 
+        if(_rangeSubset.isEmpty()) {
+            // if they didn't ask for a subset of the set of fields, then take them all.
+            for (Field field : fields) {
+                _rangeSubset.add(field.getName());
+            }
+        }
+
+
+
+        Vector<String> gridCalls = new Vector<>();
+        Vector<String> arraySubsets =  new Vector<>();
+
+        for(String fieldId: _rangeSubset){
             if(dapCE.length()>0)
                 dapCE.append(",");
 
-
-            String fieldId = field.getName();
             String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
@@ -368,7 +389,7 @@ public class CoverageRequestProcessor {
                     }
                 }
 
-                // So we've processed all the user requested dimension subsets, no we need to build the inditial
+                // So we've processed all the user requested dimension subsets, now we need to build the inditial
                 // array subsetting clause if needed.
 
 
@@ -408,8 +429,8 @@ public class CoverageRequestProcessor {
         try {
             return URLEncoder.encode(dapCE.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("getDapCE() - Unable to URLEncoder.encode() DAP CE: '{}'",dapCE);
-            throw new WcsException("Failed encode DAP CE: "+dapCE+"'",WcsException.NO_APPLICABLE_CODE);
+            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dapCE);
+            throw new WcsException("Failed URL encode DAP2 CE: "+dapCE+"'",WcsException.NO_APPLICABLE_CODE);
         }
 
     }

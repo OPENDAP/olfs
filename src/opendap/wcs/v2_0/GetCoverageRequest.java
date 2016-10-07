@@ -48,7 +48,8 @@ public class GetCoverageRequest {
     private String _coverageID;
     private String _format;
     private String _mediaType;
-    private HashMap<String, DimensionSubset> _subsets;
+    private HashMap<String, DimensionSubset> _dimensionSubsets;
+    private TemporalDimensionSubset _temporalSubset;
 
     private String _requestUrl;
 
@@ -129,7 +130,7 @@ public class GetCoverageRequest {
         _coverageID     = null;
         _format         = null;
         _mediaType      = null;
-        _subsets        = new HashMap<>();
+        _dimensionSubsets = new HashMap<>();
         _requestUrl     = null;
 
         _outputCRS      = null;
@@ -325,12 +326,17 @@ public class GetCoverageRequest {
                 DimensionSubset subset = new DimensionSubset(subsetStr);
 
 
+                /**
+                 * THis is the spot where we treat time the same as any other dimension
+                 * (because that's the way the data is)
+                 * While also handling it specially so the we can make the WCS dance.
+                 */
                 if(subset.getDimensionId().toLowerCase().contains("time")){
                     DomainCoordinate timeDomain = cvrgDscrpt.getDomainCoordinate("time");
-                    subset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
+                    _temporalSubset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
+                    subset = _temporalSubset;
                 }
-
-                _subsets.put(subset.getDimensionId(), subset);
+                _dimensionSubsets.put(subset.getDimensionId(), subset);
             }
         }
 
@@ -498,6 +504,9 @@ public class GetCoverageRequest {
     }
 
 
+    public Vector<String> getRangeSubset(){
+        return new Vector<>(_rangeSubset);
+    }
 
 
     public void setMediaType(String mType) throws WcsException {
@@ -557,11 +566,11 @@ public class GetCoverageRequest {
         HashMap<String, DimensionSubset> newDS = new HashMap<>();
 
 
-        for(DimensionSubset ds: _subsets.values()){
+        for(DimensionSubset ds: _dimensionSubsets.values()){
 
             if(ds instanceof TemporalDimensionSubset){
                 TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
-                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts,ts.getUnits()));
+                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts));
             }
             else {
                 newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
@@ -595,7 +604,7 @@ public class GetCoverageRequest {
                 ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
             }
 
-            _subsets.put(ds.getDimensionId(), ds);
+            _dimensionSubsets.put(ds.getDimensionId(), ds);
         }
 
     }
@@ -654,7 +663,7 @@ public class GetCoverageRequest {
         e.setText(_coverageID);
         requestElement.addContent(e);
 
-        for(DimensionSubset ds: _subsets.values()){
+        for(DimensionSubset ds: _dimensionSubsets.values()){
             requestElement.addContent(ds.getDimensionSubsetElement());
         }
 
@@ -682,6 +691,9 @@ public class GetCoverageRequest {
         return _requestUrl;
     }
 
+    public TemporalDimensionSubset getTemporalSubset(){
+        return new TemporalDimensionSubset(_temporalSubset);
+    }
 
 
 

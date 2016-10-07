@@ -27,6 +27,9 @@
 package opendap.wcs.v2_0;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -135,7 +138,7 @@ public class TimeConversion {
 
 
     */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, WcsException {
 
         GregorianCalendar gc = new GregorianCalendar();
         String timeUnits;
@@ -247,7 +250,7 @@ public class TimeConversion {
     }
 
 
-    public static void testTimeConversion(Date date, String timeUnits){
+    public static void testTimeConversion(Date date, String timeUnits) throws WcsException{
 
         GregorianCalendar gc = new GregorianCalendar();
         Date epoch = getEpoch(timeUnits);
@@ -277,7 +280,15 @@ public class TimeConversion {
      * @return  A string representation of the submitted time after conversion to the supplied time units.
      * @see TimeConversion
      */
-    public static String convertDateToTimeUnits(Date time, String timeUnits){
+    public static String convertDateToTimeUnits(Date time, String timeUnits) throws WcsException {
+
+        Logger log = LoggerFactory.getLogger("TimeConversion");
+        if(timeUnits==null){
+            String msg = "convertDateToTimeUnits() - Supplied time units string was null.";
+            log.error(msg);
+            throw new WcsException(msg,WcsException.NO_APPLICABLE_CODE,
+                    "Dap Dataset As Coverage Configuration");
+        }
 
         // Trim leading whitespace from timeUnits string
         while(timeUnits.startsWith(" ") || timeUnits.startsWith("\t"))

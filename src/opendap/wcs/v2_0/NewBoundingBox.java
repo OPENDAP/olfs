@@ -47,7 +47,7 @@ public class NewBoundingBox {
 
     private Logger _log;
 
-    private LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> _dimensions;
+    private LinkedHashMap<String, CoordinateDimension> _dimensions;
 
     private boolean _hasTimePeriod;
     private Date _startTime;
@@ -69,11 +69,11 @@ public class NewBoundingBox {
         this(bb._dimensions, bb._startTime, bb._endTime, bb._srsName);
     }
 
-    public NewBoundingBox(LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> dims, Date startTime, Date endTime, URI srsName) throws WcsException {
+    public NewBoundingBox(LinkedHashMap<String, CoordinateDimension> dims, Date startTime, Date endTime, URI srsName) throws WcsException {
 
         this();
 
-        for(CoordinateDimension.Coordinate coordinate : dims.keySet())
+        for(String coordinate : dims.keySet())
         {
             CoordinateDimension dim = dims.get(coordinate);
             CoordinateDimension newDim = new CoordinateDimension(dim);
@@ -171,10 +171,9 @@ public class NewBoundingBox {
 
 
             for(String aLabel: axisLabels){
-                CoordinateDimension.Coordinate coordinate = CoordinateDimension.getCoordinateByName(aLabel);
                 CoordinateDimension d = new CoordinateDimension();
-                d.setCoordinate(coordinate);
-                _dimensions.put(coordinate,d);
+                d.setName(aLabel);
+                _dimensions.put(aLabel,d);
             }
             // Process Lower Corner.
             e = envelope.getChild("lowerCorner", WCS.GML_NS);
@@ -195,9 +194,9 @@ public class NewBoundingBox {
                         "gml:lowerCorner");
 
             int index=0;
-            for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            for(String dimName: _dimensions.keySet()){
                 double value = Double.parseDouble(tmp[index++]);
-                _dimensions.get(coordinate).setMin(value);
+                _dimensions.get(dimName).setMin(value);
             }
 
 
@@ -221,9 +220,9 @@ public class NewBoundingBox {
                         "gml:upperCorner");
 
             index=0;
-            for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
+            for(String dimName: _dimensions.keySet()){
                 double value = Double.parseDouble(tmp[index++]);
-                _dimensions.get(coordinate).setMax(value);
+                _dimensions.get(dimName).setMax(value);
             }
 
 
@@ -491,14 +490,14 @@ public class NewBoundingBox {
 
     }
 
-    public LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> getDimensions(){
+    public LinkedHashMap<String, CoordinateDimension> getDimensions(){
 
-        LinkedHashMap<CoordinateDimension.Coordinate,CoordinateDimension> dims =  new LinkedHashMap<>();
+        LinkedHashMap<String,CoordinateDimension> dims =  new LinkedHashMap<>();
 
-        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
-            CoordinateDimension dim = _dimensions.get(coordinate);
+        for(String dimName: _dimensions.keySet()){
+            CoordinateDimension dim = _dimensions.get(dimName);
             CoordinateDimension newDim = new CoordinateDimension(dim);
-            dims.put(coordinate, newDim);
+            dims.put(dimName, newDim);
         }
 
         return dims;
@@ -521,11 +520,11 @@ public class NewBoundingBox {
         qcIncomingBB(bb);
         // @todo transform coordinates of passed BB to those of this one before check intersection
 
-        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
-            CoordinateDimension myDim =  _dimensions.get(coordinate);
-            CoordinateDimension bbDim =  bb._dimensions.get(coordinate);
+        for(String dimName: _dimensions.keySet()){
+            CoordinateDimension myDim =  _dimensions.get(dimName);
+            CoordinateDimension bbDim =  bb._dimensions.get(dimName);
             overlap = myDim.getMin()<bbDim.getMax()  && myDim.getMax()>bbDim.getMin();
-            _log.debug("intersects() - The candidate BoundingBox {} dimension {} me.",bbDim.getCoordinate(),overlap?"overlaps":"do not overlap");
+            _log.debug("intersects() - The candidate BoundingBox {} dimension {} me.",bbDim.getName(),overlap?"overlaps":"do not overlap");
             hasIntersection = overlap && hasIntersection;
 
         }
@@ -554,15 +553,15 @@ public class NewBoundingBox {
 
         qcIncomingBB(bb);
 
-        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> newDims = new LinkedHashMap<>();
+        LinkedHashMap<String, CoordinateDimension> newDims = new LinkedHashMap<>();
 
-        for(CoordinateDimension.Coordinate coordinate: _dimensions.keySet()){
-            CoordinateDimension myDim =  _dimensions.get(coordinate);
-            CoordinateDimension bbDim =  bb._dimensions.get(coordinate);
+        for(String dimName: _dimensions.keySet()){
+            CoordinateDimension myDim =  _dimensions.get(dimName);
+            CoordinateDimension bbDim =  bb._dimensions.get(dimName);
             double newMin =    (myDim.getMin() <= bbDim.getMin()) ? myDim.getMin() : bbDim.getMin();
             double newMax =    (myDim.getMax() >= bbDim.getMax()) ? myDim.getMax() : bbDim.getMax();
-            CoordinateDimension newDim = new CoordinateDimension(coordinate, newMin, newMax);
-            newDims.put(coordinate,newDim);
+            CoordinateDimension newDim = new CoordinateDimension(dimName, newMin, newMax);
+            newDims.put(dimName,newDim);
         }
 
 
@@ -590,9 +589,9 @@ public class NewBoundingBox {
 
         boolean contains = true;
 
-        for(CoordinateDimension.Coordinate coordinate :_dimensions.keySet()){
-            CoordinateDimension myDim = _dimensions.get(coordinate);
-            CoordinateDimension bbDim = bb._dimensions.get(coordinate);
+        for(String dimName :_dimensions.keySet()){
+            CoordinateDimension myDim = _dimensions.get(dimName);
+            CoordinateDimension bbDim = bb._dimensions.get(dimName);
 
             // myMin is less than their min
             contains = contains && ( myDim.getMin() <= bbDim.getMin() );
@@ -601,7 +600,7 @@ public class NewBoundingBox {
             // myMax is bigger than their max
             contains = contains && ( bbDim.getMax() <= myDim.getMax() );
 
-            _log.debug("contains() - The candidate BoundingBox {} dimension {} me.",bbDim.getCoordinate(),contains?"is contained by":"is NOT contained by");
+            _log.debug("contains() - The candidate BoundingBox {} dimension {} me.",bbDim.getName(),contains?"is contained by":"is NOT contained by");
         }
 
         if(hasTimePeriod() && bb.hasTimePeriod()){

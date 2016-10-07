@@ -9,44 +9,27 @@ public class CoordinateDimension implements Cloneable {
     private double _upperBound;
 
 
-    private Coordinate _coordinate;
+    private String _name;
 
-    public enum Coordinate {
-        LATITUDE("lat"),
-        LONGITUDE("long"),
-        TIME("phenomenonTime");
-
-        private final String name;
-
-        Coordinate(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
 
 
     CoordinateDimension(){
-        _coordinate = null;
+        _name = null;
         _lowerBound = Double.NaN;
         _upperBound = Double.NaN;
 
     }
 
     CoordinateDimension(CoordinateDimension d){
-        _coordinate = d._coordinate;
+        _name = d._name;
         _lowerBound = d._lowerBound;
         _upperBound = d._upperBound;
 
     }
 
 
-    CoordinateDimension(Coordinate c, double min, double max) throws WcsException{
-        setCoordinate(c);
+    CoordinateDimension(String name, double min, double max) throws WcsException{
+        setName(name);
         setMin(min);
         setMax(max);
     }
@@ -57,36 +40,10 @@ public class CoordinateDimension implements Cloneable {
     public void setMax(double max){ _upperBound = max; }
     public double getMax(){ return _upperBound;}
 
-    public Coordinate getCoordinate() { return _coordinate;}
+    public String getName() { return _name;}
 
-    public void setCoordinate(Coordinate c) throws WcsException {
-        _coordinate = c;
+    public void setName(String name) throws WcsException {
+        _name = name;
     }
 
-    public static Coordinate getCoordinateByName(String name) throws WcsException {
-
-        Coordinate coordinate;
-        String lienient_name = name.toLowerCase();
-
-        if(lienient_name.startsWith("lat")) {
-            coordinate = Coordinate.LATITUDE;
-        }
-        else if(lienient_name.startsWith("lon")){
-            coordinate = Coordinate.LONGITUDE;
-
-        }
-        else if(lienient_name.equals("phenomenontime") || lienient_name.startsWith("time")){
-            coordinate = Coordinate.TIME;
-
-        }
-        else {
-
-            throw new WcsException("Unknown coordinate axis '"+name+"'",WcsException.INVALID_PARAMETER_VALUE,"subset");
-
-        }
-
-
-        return coordinate;
-
-    }
 }

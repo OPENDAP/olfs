@@ -70,71 +70,75 @@ public class CoverageDescription {
 
 
 
-    /**
-     * Builds the CoverageDescription object from a lfc:WcsCoverage element that is part of the configuration file used
-     * opendap.wcs.v2_0.LocalFileCatalog
-     *
-     <LocalFileCatalog
-         xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
-         xmlns:lfc="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
-        validateCatalog="true">
+    public CoverageDescription(CoverageDescription cd) throws IOException, JDOMException, ConfigurationException, WcsException {
+    }
+
+
+        /**
+         * Builds the CoverageDescription object from a lfc:WcsCoverage element that is part of the configuration file used
+         * opendap.wcs.v2_0.LocalFileCatalog
+         *
+         <LocalFileCatalog
+             xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
+             xmlns:lfc="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
+            validateCatalog="true">
 
 
 
-         <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
+             <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
 
-             <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+                 <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
 
-             <field name="tcw">
-                 <DapIdOfLatitudeCoordinate>tcw.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>tcw.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>tcw.time</DapIdOfTimeCoordinate>
-             </field>
+                 <field name="tcw">
+                     <DapIdOfLatitudeCoordinate>tcw.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>tcw.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>tcw.time</DapIdOfTimeCoordinate>
+                 </field>
 
-             <field name="tcwv">
-                 <DapIdOfLatitudeCoordinate>tcwv.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>tcwv.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>tcwv.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="lsp">
-                 <DapIdOfLatitudeCoordinate>lsp.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>lsp.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>lsp.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="cp">
-                 <DapIdOfLatitudeCoordinate>cp.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>cp.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>cp.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="msl">
-                 <DapIdOfLatitudeCoordinate>msl.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>msl.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>msl.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="blh">
-                 <DapIdOfLatitudeCoordinate>blh.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>blh.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>blh.time</DapIdOfTimeCoordinate>
-             </field>
-         </WcsCoverage>
+                 <field name="tcwv">
+                     <DapIdOfLatitudeCoordinate>tcwv.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>tcwv.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>tcwv.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="lsp">
+                     <DapIdOfLatitudeCoordinate>lsp.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>lsp.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>lsp.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="cp">
+                     <DapIdOfLatitudeCoordinate>cp.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>cp.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>cp.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="msl">
+                     <DapIdOfLatitudeCoordinate>msl.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>msl.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>msl.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="blh">
+                     <DapIdOfLatitudeCoordinate>blh.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>blh.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>blh.time</DapIdOfTimeCoordinate>
+                 </field>
+             </WcsCoverage>
 
 
-     </LocalFileCatalog>
+         </LocalFileCatalog>
 
-     *
-     *
-     *
-     *
-     * @param wcsCoverageConfig The file containing the wcs:CoverageDescription element.
-     * @param catalogDir
-     * @param validateContent  Controls the XML parser document validation. A value of true will cause the parser to
-     * perform document validation. A value of false will cause the parser to simply parse the document which only
-     * checks for that it is well-formed.
-     * @throws IOException When the file cannot be read.
-     * @throws JDOMException When the file cannot be parsed.
-     * @throws ConfigurationException
-     * @throws WcsException
-     */
+         *
+         *
+         *
+         *
+         * @param wcsCoverageConfig The file containing the wcs:CoverageDescription element.
+         * @param catalogDir
+         * @param validateContent  Controls the XML parser document validation. A value of true will cause the parser to
+         * perform document validation. A value of false will cause the parser to simply parse the document which only
+         * checks for that it is well-formed.
+         * @throws IOException When the file cannot be read.
+         * @throws JDOMException When the file cannot be parsed.
+         * @throws ConfigurationException
+         * @throws WcsException
+         */
     public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException, WcsException {
         init();
 
@@ -811,6 +815,13 @@ public class CoverageDescription {
         Coverage coverage = new Coverage(this,requestUrl);
 
         return coverage;
+
+
+    }
+
+
+    public void setBoundingBox(NewBoundingBox newBoundingBox) throws WcsException {
+        throw new WcsException("BoundingBox adjustment not supported.",WcsException.OPERATION_NOT_SUPPORTED,"meh");
 
 
     }

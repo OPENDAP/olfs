@@ -34,7 +34,10 @@ public class DescribeEOCoverageSetRequestProcessor {
     private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, NewBoundingBox datasetBB) throws WcsException{
 
 
-        NewBoundingBox requestSubset = req.getSubsetBoundingBox(datasetBB);
+        NewBoundingBox requestSubset = WCS.getSubsetBoundingBox(
+                                            req.getDimensionSubsets(),
+                                            req.getTemporalSubset(),
+                                            datasetBB);
 
         if(requestSubset==null)
             return true;

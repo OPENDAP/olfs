@@ -28,8 +28,12 @@ package opendap.wcs.v2_0;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * User: ndp
@@ -436,6 +440,75 @@ public class WCS {
 
 
     }
+
+
+    public static NewBoundingBox getSubsetBoundingBox(
+            HashMap<String, DimensionSubset> dimensionSubsets,
+            TemporalDimensionSubset temporalSubset,
+            NewBoundingBox coverageBoundingBox)
+            throws WcsException {
+
+        Logger log = LoggerFactory.getLogger("WCS");
+
+        LinkedHashMap<String, CoordinateDimension> cvrgDims = coverageBoundingBox.getDimensions();
+
+        LinkedHashMap<String, CoordinateDimension> subsetBBDims = new LinkedHashMap<>();
+        double min, max;
+
+        Date startTime=null, endTime=null;
+        for(String dimName : cvrgDims.keySet()) {
+            CoordinateDimension cDim = cvrgDims.get(dimName);
+            DimensionSubset dimSubset = dimensionSubsets.get(dimName);
+
+            if(dimSubset==null){
+                // no subset on this dim? then we take the extents of the dimension in the coverage.
+                min = cDim.getMin();
+                max = cDim.getMax();
+                CoordinateDimension newDim = new CoordinateDimension(dimName,min,max);
+                subsetBBDims.put(dimName,newDim);
+            }
+            else {
+                if(dimSubset instanceof TemporalDimensionSubset){
+                    log.warn("getSubsetBoundingBox() - Found TemporalDimensionSubset in the dimensionsSubsets list.");
+                }
+                else {
+                    if (dimSubset.isTrimSubset()) {
+                        min = Double.parseDouble(dimSubset.getTrimLow());
+                        max = Double.parseDouble(dimSubset.getTrimHigh());
+                    } else {
+                        // looks like a slice
+                        min = Double.parseDouble(dimSubset.getSlicePoint());
+                        max = min;
+
+                    }
+                    CoordinateDimension newDim = new CoordinateDimension(dimName, min, max);
+                    subsetBBDims.put(dimName, newDim);
+                }
+            }
+
+        }
+
+        if(temporalSubset!=null) {
+            startTime = temporalSubset.getStartTime();
+            endTime   = temporalSubset.getEndTime();
+        }
+        else if(coverageBoundingBox.hasTimePeriod()){
+            startTime = coverageBoundingBox.getStartTime();
+            endTime = coverageBoundingBox.getEndTime();
+        }
+        else {
+            log.warn("getSubsetBoundingBox() - Neither the Coverage BoundingBox nor the specified subset contain " +
+                    "information about Time bounds. SKIPPING time stuff...");
+        }
+
+        NewBoundingBox nbb = new NewBoundingBox(subsetBBDims,startTime,endTime,null);
+
+        return nbb;
+
+    }
+
+
+
 
 
 

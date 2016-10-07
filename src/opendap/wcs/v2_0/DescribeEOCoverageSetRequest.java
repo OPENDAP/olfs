@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static java.lang.Float.NaN;
-
 /**
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DescribeEOCoverageSetRequest
@@ -44,26 +42,24 @@ import static java.lang.Float.NaN;
 public class DescribeEOCoverageSetRequest {
 
 
-    private Logger _log;
+    enum Sections {
+        CoverageDescriptions("CoverageDescriptions"),
+        DatasetSeriesDescriptions("DatasetSeriesDescriptions"),
+        All("All");
 
+        private final String name;
 
-    public static final int DEFAULT_COUNT = 100;
-    public static final org.jdom.Namespace NS = WCS.WCSEO_NS;
+        Sections(String name) {
+            this.name = name;
+        }
 
-    public static final String KVP_REQUEST = WCS.REQUEST.DESCRIBE_EO_COVERAGE_SET.toString();
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
-    /**
-     * eoId = v1,..,vn where vi = (EOCovergeId | DatasetSeriesId | StichedMosaicId)
-     */
-    private Vector<String> _eoIds;
-
-
-    /**
-     * containment = overlaps | contains
-     */
-    private Containment _containment;
-
-    public enum Containment {
+    enum Containment {
         OVERLAPS("overlaps"),
         CONTAINS("contains");
 
@@ -81,6 +77,24 @@ public class DescribeEOCoverageSetRequest {
     }
 
 
+    private Logger _log;
+
+    public static final int DEFAULT_COUNT = 100;
+    public static final org.jdom.Namespace NS = WCS.WCSEO_NS;
+
+    public static final String KVP_REQUEST = WCS.REQUEST.DESCRIBE_EO_COVERAGE_SET.toString();
+
+    /**
+     * eoId = v1,..,vn where vi = (EOCovergeId | DatasetSeriesId | StichedMosaicId)
+     */
+    private Vector<String> _eoIds;
+
+
+    /**
+     * containment = overlaps | contains
+     */
+    private Containment _containment;
+
     /**
      * count = max_number_of_CoverageDescriptions to return
      */
@@ -91,38 +105,15 @@ public class DescribeEOCoverageSetRequest {
      */
     Vector<Sections> _sections;
 
-    public enum Sections {
-        CoverageDescriptions("CoverageDescriptions"),
-        DatasetSeriesDescriptions("DatasetSeriesDescriptions"),
-        All("All");
-
-        private final String name;
-
-        Sections(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     boolean hasSection(Sections s){
         return _sections.contains(s);
     }
 
-    /**
-     * subset = long | lat | phenomenonTime (low,high)
-     * <p>
-     * SubsetSpec:  dimension ( interval )
-     * dimension:   long | lat | phenomenonTime
-     * interval:    low, high
-     * low:          point | *
-     * high:         point | *
-     * point:        number| " token " // " = ASCII 0x42
-     */
-    HashMap<CoordinateDimension.Coordinate, CoordinateDimensionSubset> _subsets;
+    private HashMap<String, DimensionSubset> _dimensionSubsets;
+
+    private TemporalDimensionSubset _temporalSubset;
+
 
     /*
     private enum Subsets {
@@ -143,6 +134,16 @@ public class DescribeEOCoverageSetRequest {
     }
   */
 
+    private DescribeEOCoverageSetRequest(){
+        _log = LoggerFactory.getLogger(this.getClass());
+        _eoIds = new Vector<>();
+        _containment = Containment.OVERLAPS;
+        _count = DEFAULT_COUNT;
+        _sections = new Vector<>();
+        _dimensionSubsets =  new HashMap<>();
+        _temporalSubset = null;
+    }
+
     /**
      * request
      * eoId
@@ -154,6 +155,7 @@ public class DescribeEOCoverageSetRequest {
      * @param descrEoCovSetElem
      */
     public DescribeEOCoverageSetRequest(Element descrEoCovSetElem) throws WcsException {
+        this();
         throw new WcsException("XML requests not supported.",
                 WcsException.OPERATION_NOT_SUPPORTED,
                 "EO-WCS XML/SOAP Request Encoding ");
@@ -197,8 +199,8 @@ public class DescribeEOCoverageSetRequest {
     public DescribeEOCoverageSetRequest(Map<String, String[]> kvp)
             throws WcsException {
 
+        this();
 
-        _log = LoggerFactory.getLogger(this.getClass());
 
         String vals[];
         String s;
@@ -214,20 +216,15 @@ public class DescribeEOCoverageSetRequest {
 
         }
 
-        _eoIds = null;
         vals = kvp.get("eoid");
         if (vals == null) {
             throw new WcsException("The 'eoId' query parameter is required for a  " + KVP_REQUEST + " request.", WcsException.MISSING_PARAMETER_VALUE, "eoId");
         }
-        _eoIds = new Vector<>();
         String ids[] = vals[0].split(",");
-        for (String id : ids) {
-            _eoIds.add(id);
-        }
+        Collections.addAll(_eoIds, ids);
         _log.debug("DescribeEOCoverageSetRequest() - Got {} eoId values.", _eoIds.size());
 
 
-        _containment = Containment.OVERLAPS; // Default.
         vals = kvp.get("containment");
         if (vals != null) {
             if (vals[0].equalsIgnoreCase(Containment.OVERLAPS.toString())) {
@@ -239,7 +236,6 @@ public class DescribeEOCoverageSetRequest {
         }
         _log.debug("DescribeEOCoverageSetRequest() - Containment set to: '{}'", _containment);
 
-        _count = DEFAULT_COUNT;
         vals = kvp.get("count");
         if (vals != null) {
             try {
@@ -250,8 +246,6 @@ public class DescribeEOCoverageSetRequest {
         }
         _log.debug("DescribeEOCoverageSetRequest() - Count set to: {} (default: {})", _count, DEFAULT_COUNT);
 
-
-        _sections = new Vector<>();
         vals = kvp.get("sections");
         if (vals != null) {
 
@@ -273,22 +267,62 @@ public class DescribeEOCoverageSetRequest {
         }
         _log.debug("DescribeEOCoverageSetRequest() - sections has {} elements)", _sections.size());
 
-
-        _subsets = new HashMap<>();
         vals = kvp.get("subset");
         if (vals != null) {
 
             for (String subset : vals) {
-                CoordinateDimensionSubset ds = new CoordinateDimensionSubset(subset);
+
+                DimensionSubset ds = new DimensionSubset(subset);
+
+/**
+ * The EOWCS-2.0 spec [OGC 10-140r1] says:
+ * "The GetCoverage request is unchanged over WCS Core [OGC 09-110r4], except that for EO Coverages
+ * slicing is disallowed as it would leave the EO Metadata undefined."
+ *
+ * In short: No Slice subsetting because it breaks the metadata description of the object.
+ *
+ * I think this restriction is a bad choice because it sacrifices data access in order to protect the
+ * metadata integrity of the WCS service. Additionally, in the case of servers that are returning complex
+ * data objects like NetCDF, DAP2, and DAP4 the response comes, in every case, with syntactic metadata that will always
+ * be correct for the returned object, regardless of issues with EO metadata delivered in a CoverageDescription.
+ * The NetCDF and DAP4 responses may also contain additional semantic metadata describing the returned object which
+ * may or may not be correct. So banning slicing in no way protects the various metadata chains from inaccuracy.
+ *
+ * And finally: How is a "SlicePoint" different from a "Trim" in which max=min?
+ *
+ * Therefore, I am not going to enforce the restriction.
+ *
+
+                // The EOWCS-2.0 spec says no Slice subsetting because it breaks the metadata description of the object.
                 if (ds.isSliceSubset()) {
                     throw new WcsException("A 'low' and 'high' values are required ex: " + ds.getDimensionId() + "(-10,10)",
                             WcsException.INVALID_PARAMETER_VALUE, "subset");
                 }
-                _subsets.put(ds.getCoordinate(), ds);
+*/
+
+                // Disallow array subsets for this type of request because the entire point is
+                // to determine geospatial connection based on coordinate values.
+
+                if(ds.isArraySubset()){
+                    String msg = "The submitted subset for dimension '" + ds.getDimensionId() + "' "+
+                            "invokes an array index based subset because it submits integer values for " +
+                            "the subset bounds. Only value based subsetting is allowed for a " +
+                            "DescribeEOCoverageSet request Use floating point values to specify a " +
+                            "value based subset. Thanks.";
+                    throw new WcsException(msg,WcsException.INVALID_PARAMETER_VALUE,"wcs:DimensionSubset") ;
+                }
+
+                if(ds.getDimensionId().toLowerCase().contains("time")){
+                    _temporalSubset = new TemporalDimensionSubset(ds);
+                }
+                else {
+                    _dimensionSubsets.put(ds.getDimensionId(), ds);
+                }
+
 
             }
         }
-        _log.debug("DescribeEOCoverageSetRequest() - subsets has {} elements)", _subsets.size());
+        _log.debug("DescribeEOCoverageSetRequest() - subsets has {} elements)", _dimensionSubsets.size());
     }
 
     public String[] getEoIds(){
@@ -303,78 +337,20 @@ public class DescribeEOCoverageSetRequest {
 
 
 
-    public NewBoundingBox getSubsetBoundingBox(NewBoundingBox coverageBoundingBox) throws WcsException {
-
-        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> cvrgDims = coverageBoundingBox.getDimensions();
-
-        LinkedHashMap<CoordinateDimension.Coordinate, CoordinateDimension> subsetBBDims = new LinkedHashMap<>();
-        double min, max;
-
-        Date startTime=null, endTime=null;
-        for(CoordinateDimension.Coordinate coordinate : cvrgDims.keySet()) {
-            CoordinateDimension cDim = cvrgDims.get(coordinate);
-            CoordinateDimensionSubset dimSubset = _subsets.get(coordinate);
-            if(dimSubset==null){
-                if(cDim.getCoordinate() == CoordinateDimension.Coordinate.TIME) {
-                    throw  new WcsException("ERROR: Unfortunately, the Coverage defines 'time' as a dimension. " +
-                            "While this makes a lot of sense to scientisits (where time is considered a continuous real " +
-                            "valued function, it is in conflict with the semantic perspective of the GIS and OGC " +
-                            "communities which see 'time' as a special, disctreet valued phenomenen. Bummer, right? " +
-                            "So until this Coverage representation is changed to reflect the OGC semantics of " +
-                            "'phenomenonTime' it will be blocked from subsetting and other activities. Sorry...",
-                            WcsException.INVALID_PARAMETER_VALUE,"gml:boundedBy");
-                }
-                else {
-                    min = cDim.getMin();
-                    max = cDim.getMax();
-                    CoordinateDimension newDim = new CoordinateDimension(coordinate,min,max);
-                    subsetBBDims.put(coordinate,newDim);
-                }
-            }
-            else {
-                if(cDim.getCoordinate() == CoordinateDimension.Coordinate.TIME) {
-                    throw  new WcsException("ERROR: Unfortunately, the Coverage defines 'time' as a dimension. " +
-                            "While this makes a lot of sense to scientisits (where time is considered a continuous real " +
-                            "valued function, it is in conflict with the semantic perspective of the GIS and OGC " +
-                            "communities which see 'time' as a special, disctreet valued phenomenen. Bummer, right? " +
-                            "So until this Coverage representation is changed to reflect the OGC semantics of " +
-                            "'phenomenonTime' it will be blocked from subsetting and other activities. Sorry...",
-                            WcsException.INVALID_PARAMETER_VALUE,"gml:boundedBy");
-                }
-                else {
-                    min = Double.parseDouble(dimSubset.getTrimLow());
-                    max = Double.parseDouble(dimSubset.getTrimHigh());
-                    CoordinateDimension newDim = new CoordinateDimension(coordinate,min,max);
-                    subsetBBDims.put(coordinate,newDim);
-                }
-            }
-
-        }
-
-        CoordinateDimensionSubset cds = _subsets.get(CoordinateDimension.Coordinate.TIME);
-        if(cds!=null){
-            startTime = TimeConversion.parseWCSTimePosition(cds.getTrimLow());
-            endTime   = TimeConversion.parseWCSTimePosition(cds.getTrimHigh());
-        }
-        else if(coverageBoundingBox.hasTimePeriod()){
-            startTime = coverageBoundingBox.getStartTime();
-            endTime = coverageBoundingBox.getEndTime();
-        }
-        else {
-            _log.warn("getSubsetBoundingBox() - Neither the Coverage BoundingBox nor the specified subset contain " +
-                    "information about Time bounds. SKIPPING time stuff...");
-        }
-
-        NewBoundingBox nbb = new NewBoundingBox(subsetBBDims,startTime,endTime,null);
-
-        return nbb;
-
-    }
 
     public Containment getContainment(){
         return _containment;
     }
 
+
+    public HashMap<String, DimensionSubset> getDimensionSubsets(){
+        HashMap<String, DimensionSubset> subsets = new HashMap<>(_dimensionSubsets);
+        return subsets;
+    }
+
+    public TemporalDimensionSubset getTemporalSubset(){
+        return new TemporalDimensionSubset(_temporalSubset);
+    }
 
 
 }

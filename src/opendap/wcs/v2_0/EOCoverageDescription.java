@@ -75,6 +75,17 @@ public class EOCoverageDescription extends CoverageDescription {
         return bb;
     }
 
+    public void setBoundingBox(NewBoundingBox newBoundingBox) throws WcsException {
+        super.setBoundingBox(newBoundingBox);
+
+        throw new WcsException("BoundingBox adjustment not supported.",WcsException.OPERATION_NOT_SUPPORTED,"meh");
+
+
+    }
+
+
+
+
     public  Element getEOMetadata(){
 
         Element coverageDescription = myCD;
