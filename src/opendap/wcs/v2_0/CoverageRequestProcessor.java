@@ -301,7 +301,6 @@ public class CoverageRequestProcessor {
 
     private static String getDap2CE(GetCoverageRequest req) throws InterruptedException, WcsException {
 
-        StringBuilder dapCE = new StringBuilder();
 
         String coverageID = req.getCoverageID();
 
@@ -335,18 +334,16 @@ public class CoverageRequestProcessor {
         }
 
 
+        StringBuilder dapCE = new StringBuilder();
 
-        Vector<String> gridCalls = new Vector<>();
-        Vector<String> arraySubsets =  new Vector<>();
+        Vector<String> gridSubsetClauses = new Vector<>();
+        Vector<String> arraySubsetClauses =  new Vector<>();
 
         for(String fieldId: _rangeSubset){
-            if(dapCE.length()>0)
-                dapCE.append(",");
-
             String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
-                dapCE.append(dapGridArrayName);
+                gridSubsetClauses.add(dapGridArrayName);
             }
             else {
 
@@ -354,11 +351,12 @@ public class CoverageRequestProcessor {
                 // So we need to process the value based subsets with a call to grid
                 // and the array index subsets with an appended array index subset for that.
 
+
                 StringBuilder ssfGridSubsetClause = new StringBuilder();
 
                 boolean arraySubset = false;
 
-                // Process each subset term the user submitted
+                // Process each dimension subset term the user has submitted
                 for (DimensionSubset dimSub : dimensionSubsets.values()) {
 
 
@@ -366,11 +364,16 @@ public class CoverageRequestProcessor {
                         // A value subset means that the user supplied values of the domain coordinates that specify
                         // the bounds of the subset that they want
                         if(ssfGridSubsetClause.length()==0){
+                            // the first dimension subset needs the grid ssf function
+                            // declaration and the name of the Grid array and a comma
+                            // separator.
                             ssfGridSubsetClause.append("grid(").append(dapGridArrayName).append(",");
                         }
                         else {
+                            // subsequent dimensions just need the comma separator
                             ssfGridSubsetClause.append(",");
                         }
+                        // Then we tack on the value constraint expression: "low<=dimName<=high"
                         ssfGridSubsetClause.append(dimSub.getDapGridValueConstraint());
                     }
                     else if(dimSub.isArraySubset()) {
@@ -407,23 +410,33 @@ public class CoverageRequestProcessor {
                     }
                 }
 
+
                 if(ssfGridSubsetClause.length()>0){
                     ssfGridSubsetClause.append(")");
-                    if(arraySubsetClause.length()>0){
-                        ssfGridSubsetClause.append(",");
-                    }
+                    //if(arraySubsetClause.length()>0){
+                    //    ssfGridSubsetClause.append(",");
+                    //}
+                    gridSubsetClauses.add(ssfGridSubsetClause.toString());
                 }
+
 
                 if(arraySubsetClause.length()>0){
-                    ssfGridSubsetClause.append(arraySubsetClause);
+                    arraySubsetClauses.add(arraySubsetClause.toString());
+                    //ssfGridSubsetClause.append(arraySubsetClause);
                 }
 
-                dapCE.append(ssfGridSubsetClause);
+                //dapCE.append(ssfGridSubsetClause);
 
-            }
+            } // dimension subsets
+        } // fields
+        for(String gridSubsetClause: gridSubsetClauses){
+            String comma_as_needed = dapCE.length()>0 ? "," : "";
+            dapCE.append(comma_as_needed).append(gridSubsetClause);
+        }
 
-
-
+        for(String arraySubsetClause: arraySubsetClauses){
+            String comma_as_needed = dapCE.length()>0 ? "," : "";
+            dapCE.append(comma_as_needed).append(arraySubsetClause);
         }
 
         try {
