@@ -108,9 +108,7 @@
                                         <gml:Polygon gml:id="polygon_someEOCoverage1">
                                             <gml:exterior>
                                                 <gml:LinearRing>
-                                                    <gml:posList>43.516667 2.1025 43.381667 2.861667 42.862778 2.65
-                                                        42.996389 1.896944 43.516667 2.1025
-                                                    </gml:posList>
+                                                    <gml:posList>-90.0 0.0 90.0 0.0 90.0 360.0 -90.0 360.0 -90.0 0.0</gml:posList>
                                                 </gml:LinearRing>
                                             </gml:exterior>
                                         </gml:Polygon>
