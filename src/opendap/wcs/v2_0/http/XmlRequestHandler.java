@@ -333,7 +333,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      */
     public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 
     }
 

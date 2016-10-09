@@ -122,7 +122,7 @@ public class SoapHandler extends XmlRequestHandler {
     @Override
     public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, true );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, true );
 
     }
 

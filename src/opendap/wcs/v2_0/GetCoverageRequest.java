@@ -222,7 +222,7 @@ public class GetCoverageRequest {
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
         // part and the second part must contain whatever response _format the user specified in the _format parameter.
-        s = kvp.get("_mediaType".toLowerCase());
+        s = kvp.get("mediaType".toLowerCase());
         if(s!=null){
             setMediaType(s[0]);
         }
@@ -675,7 +675,7 @@ public class GetCoverageRequest {
 
 
         if(_mediaType !=null){
-            Element mediaTypeElement = new Element("_mediaType",WCS.WCS_NS);
+            Element mediaTypeElement = new Element("mediaType",WCS.WCS_NS);
             mediaTypeElement.setText(_mediaType);
             requestElement.addContent(mediaTypeElement);
         }

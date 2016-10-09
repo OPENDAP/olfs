@@ -182,7 +182,7 @@ public class KvpHandler {
 
         GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 
     }
 

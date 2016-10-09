@@ -50,10 +50,10 @@ import java.util.Vector;
  * Process GetCoverage requests. Static methods are used to construct a wcs:Coverages
  * response.
  */
-public class CoverageRequestProcessor {
+public class GetCoverageRequestProcessor {
 
 
-    private static Logger log = LoggerFactory.getLogger(CoverageRequestProcessor.class);
+    private static Logger log = LoggerFactory.getLogger(GetCoverageRequestProcessor.class);
 
 
     public static String coveragesContentID = "urn:ogc:wcs:1.1:coverages";
@@ -120,13 +120,21 @@ public class CoverageRequestProcessor {
         CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
 
         /**
-         * If this an EO coverage then update it's bounding box to reflect the subset.
+         * If this an EO coverage then update its bounding box to reflect the subset.
          */
         if(coverageDescription instanceof EOCoverageDescription){
-            EOCoverageDescription eoCoverageDescription = (EOCoverageDescription)coverageDescription;
-            NewBoundingBox cvrgBB = eoCoverageDescription.getBoundingBox();
-            NewBoundingBox regBB = WCS.getSubsetBoundingBox(req.getDimensionSubsets(),req.getTemporalSubset(),cvrgBB);
-            eoCoverageDescription.setBoundingBox(regBB);
+            try {
+                // Mke a copy so we don't bunk up the original.
+                EOCoverageDescription eocd = new EOCoverageDescription((EOCoverageDescription)coverageDescription);
+                // Tweak the foot print
+                eocd.adjustEOMetadataCoverageFootprint(req);
+                // Make it the thing to use...
+                coverageDescription = eocd;
+            } catch (IOException e) {
+                throw new WcsException("sendMultipartGmlResponse() - OUCH!! Failed to create new (malleable) " +
+                        "EOCoverageDescription using the copy constructor.",
+                        WcsException.NO_APPLICABLE_CODE);
+            }
         }
 
         Coverage coverage = coverageDescription.getCoverage(req.getRequestUrl()); // new Coverage(coverageDescription, req.getRequestUrl());
@@ -334,7 +342,7 @@ public class CoverageRequestProcessor {
         }
 
 
-        StringBuilder dapCE = new StringBuilder();
+        StringBuilder dap2CE = new StringBuilder();
 
         Vector<String> gridSubsetClauses = new Vector<>();
         Vector<String> arraySubsetClauses =  new Vector<>();
@@ -425,25 +433,26 @@ public class CoverageRequestProcessor {
                     //ssfGridSubsetClause.append(arraySubsetClause);
                 }
 
-                //dapCE.append(ssfGridSubsetClause);
+                //dap2CE.append(ssfGridSubsetClause);
 
             } // dimension subsets
         } // fields
         for(String gridSubsetClause: gridSubsetClauses){
-            String comma_as_needed = dapCE.length()>0 ? "," : "";
-            dapCE.append(comma_as_needed).append(gridSubsetClause);
+            String comma_as_needed = dap2CE.length()>0 ? "," : "";
+            dap2CE.append(comma_as_needed).append(gridSubsetClause);
         }
 
         for(String arraySubsetClause: arraySubsetClauses){
-            String comma_as_needed = dapCE.length()>0 ? "," : "";
-            dapCE.append(comma_as_needed).append(arraySubsetClause);
+            String comma_as_needed = dap2CE.length()>0 ? "," : "";
+            dap2CE.append(comma_as_needed).append(arraySubsetClause);
         }
 
         try {
-            return URLEncoder.encode(dapCE.toString(), "UTF-8");
+            log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+            return URLEncoder.encode(dap2CE.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dapCE);
-            throw new WcsException("Failed URL encode DAP2 CE: "+dapCE+"'",WcsException.NO_APPLICABLE_CODE);
+            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
+            throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
         }
 
     }

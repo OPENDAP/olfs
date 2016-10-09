@@ -570,7 +570,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         Coverage coverage = new Coverage(coverageDescription,requestUrl);
 
-        Element coverageElement = coverage.getCoverageElement(CoverageRequestProcessor.getDataAccessUrl(gcr),CoverageRequestProcessor.getReturnMimeType(gcr));
+        Element coverageElement = coverage.getCoverageElement(GetCoverageRequestProcessor.getDataAccessUrl(gcr), GetCoverageRequestProcessor.getReturnMimeType(gcr));
 
 
         page.append(xmlo.outputString(coverageElement).replaceAll("<","&lt;").replaceAll(">","&gt;"));

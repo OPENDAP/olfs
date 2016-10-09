@@ -158,10 +158,7 @@ public class DimensionSubset implements Cloneable {
         _mySubsetType = t;
     }
 
-    protected void setTrimLow(String s){
-
-        _trimLow = trimQuotesAndWhiteSpace(s);
-    }
+    protected void setTrimLow(String s){ _trimLow = trimQuotesAndWhiteSpace(s); }
 
     protected void setTrimHigh(String s){
         _trimHigh = trimQuotesAndWhiteSpace(s);
@@ -172,6 +169,7 @@ public class DimensionSubset implements Cloneable {
     }
 
     protected void setSlicePoint(String s){
+
         _slicePoint = trimQuotesAndWhiteSpace(s);
     }
 

@@ -483,6 +483,7 @@ public class LocalFileCatalog implements WcsCatalog {
             throw new WcsException("No such wcs:Coverage: "+ Scrub.fileName(id),
                     WcsException.INVALID_PARAMETER_VALUE,"wcs:CoverageId");
 
+
         return cd;
     }
 

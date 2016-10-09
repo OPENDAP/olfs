@@ -33,7 +33,7 @@ public class EODatasetSeries {
     public static final String CONFIG_ELEMENT_NAME = "EODatasetSeries";
 
 
-    //boolean initialized = false;
+    //boolean _initialized = false;
 
 
     public EODatasetSeries(Element eodsElement, String catalogDir, boolean validateContent)

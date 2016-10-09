@@ -489,8 +489,30 @@ public class WCS {
         }
 
         if(temporalSubset!=null) {
-            startTime = temporalSubset.getStartTime();
-            endTime   = temporalSubset.getEndTime();
+            if (temporalSubset.isTrimSubset()) {
+                if (temporalSubset.isValueSubset()) {
+                    startTime = temporalSubset.getStartTime();
+                    endTime   = temporalSubset.getEndTime();
+                }
+                else { // It's an array index subset - oh. crap.
+                    log.warn("Array subsetting not of time is not fully supported.");
+                    startTime = coverageBoundingBox.getStartTime();
+                    endTime = coverageBoundingBox.getEndTime();
+
+                }
+            }
+            else { // It's a slice point.
+                if (temporalSubset.isValueSubset()) {
+                    startTime = temporalSubset.getSlicePointTime();
+                    endTime = temporalSubset.getSlicePointTime();
+                }
+                else { //it's an array index subset. oh. crap.
+                    log.warn("Array subsetting not of time is not fully supported.");
+                    startTime = coverageBoundingBox.getStartTime();
+                    endTime = coverageBoundingBox.getEndTime();
+
+                }
+            }
         }
         else if(coverageBoundingBox.hasTimePeriod()){
             startTime = coverageBoundingBox.getStartTime();

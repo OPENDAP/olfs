@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.*;
 
 /**
  *
@@ -612,6 +610,59 @@ public class NewBoundingBox {
 
         return contains;
     }
+
+
+    /**
+     * THe EO schema has this to say about the footprint type:
+     *   Acquisition footprint coordinates, described by a closed polygon (last point=first point),
+     *   using CRS:WGS84, Latitude,Longitude pairs (per-WGS84 definition of point ordering, not necessarily
+     *   per all WFS implementations).
+     *
+     *   Expected structure is:
+     *   gml:Polygon/gml:exterior/gml:LinearRing/gml:posList.
+     *
+     *   eop/EOLI : polygon/coordinates (F B b s)
+     *
+     * @return
+     */
+     public String getEOFootprintPositionListValue() throws WcsException {
+
+         StringBuilder footprint = new StringBuilder();
+         Vector<CoordinateDimension> latLonDims = getLatNLonDims();
+         String sep = " ";
+
+         CoordinateDimension dim0 = latLonDims.get(0);
+         CoordinateDimension dim1 = latLonDims.get(1);
+
+         footprint.append(dim0.getMin()).append(sep).append(dim1.getMin()).append(sep);
+         footprint.append(dim0.getMax()).append(sep).append(dim1.getMin()).append(sep);
+         footprint.append(dim0.getMax()).append(sep).append(dim1.getMax()).append(sep);
+         footprint.append(dim0.getMin()).append(sep).append(dim1.getMax()).append(sep);
+         footprint.append(dim0.getMin()).append(sep).append(dim1.getMin());
+
+         return footprint.toString();
+
+
+     }
+
+     private Vector<CoordinateDimension> getLatNLonDims() throws WcsException {
+
+         Vector<CoordinateDimension> latLonDims = new Vector<>();
+         Iterator<String> keys = _dimensions.keySet().iterator();
+
+         while(keys.hasNext() && latLonDims.size()<2){
+             String dimName = keys.next();
+             if(dimName.toLowerCase().startsWith("lat") ||
+                     dimName.toLowerCase().startsWith("lon")) {
+                 latLonDims.add(_dimensions.get(dimName));
+             }
+         }
+         if(latLonDims.size()!=2){
+             throw new WcsException("getLatNLonDims() - OUCH! Unable to locate the latitude and longitude dimensions!",
+                     WcsException.NO_APPLICABLE_CODE,"NewBounndingBox");
+         }
+         return latLonDims;
+     }
 
 
 
