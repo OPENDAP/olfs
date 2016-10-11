@@ -32,7 +32,6 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jdom.Document;
 import org.jdom.output.Format;
