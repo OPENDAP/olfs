@@ -82,7 +82,7 @@ public class DimensionSubset implements Cloneable {
         _trimHigh =  source._trimHigh;
         _slicePoint =  source._slicePoint;
         _isArrayIndexSubset = source._isArrayIndexSubset;
-        _domainCoordinate = new DomainCoordinate(_domainCoordinate);
+        _domainCoordinate = source._domainCoordinate==null ? null : new DomainCoordinate(source._domainCoordinate);
     }
 
 
