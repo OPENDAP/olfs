@@ -178,7 +178,20 @@
 
 
     <xsl:template match="gml:boundedBy">
+            <xsl:apply-templates/>
+    </xsl:template>
+
+    <!--
+    <gml:Envelope axisLabels="lat long" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+                  uomLabels="deg deg">
+    -->
+    <xsl:template match="gml:Envelope | gml:EnvelopeWithTimePeriod">
         <h2>Bounding Box <span class="small">(gml:boundedBy)</span></h2>
+        <dd><span class="medium_bold">SRS: <xsl:value-of select="@srsName" /></span></dd>
+        <dd><span class="medium_bold">SRS Dimensions: <xsl:value-of select="@srsDimensions" /></span></dd>
+        <dd><span class="medium_bold">Axis Labels: <xsl:value-of select="@axisLabels" /></span></dd>
+        <dd><span class="medium_bold">Units Of Measure: <xsl:value-of select="@uomLabels" /></span></dd>
+
         <div class="medium">
             <xsl:apply-templates/>
         </div>

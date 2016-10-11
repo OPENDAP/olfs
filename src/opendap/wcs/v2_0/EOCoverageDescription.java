@@ -2,6 +2,8 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,7 @@ public class EOCoverageDescription extends CoverageDescription {
         if(!bb.hasTimePeriod()){
             // No time period? Check the  EO metadata section for that...
 
-            Element eoMetadata =  getEOMetadata();
+            Element eoMetadata =  getEOMetadata(_myCD);
             if(eoMetadata == null)
                 return bb; // Give up on the time thing...
 
@@ -87,11 +89,16 @@ public class EOCoverageDescription extends CoverageDescription {
         NewBoundingBox regBB = WCS.getSubsetBoundingBox(req.getDimensionSubsets(),req.getTemporalSubset(),cvrgBB);
 
         String newPositionListValue = regBB.getEOFootprintPositionListValue();
-        Element eoFootprintPositionList = getEOFootprintPositionList();
+        Element eoFootprintPositionList = getEOFootprintPositionList(_myCD);
+
         if(eoFootprintPositionList==null)
             throw new WcsException("adjustEOMetadataCoverageFootprint() - Unable to locate EO Footprint content.",WcsException.NO_APPLICABLE_CODE);
 
         eoFootprintPositionList.setText(newPositionListValue);
+
+
+
+
 
     }
 
@@ -105,7 +112,14 @@ public class EOCoverageDescription extends CoverageDescription {
 
     public  Element getEOMetadata(){
 
-        Element metadata =  _myCD.getChild("metadata",WCS.GMLCOV_NS);
+        Element eoMetadata =  getEOMetadata(_myCD);
+
+        return (Element)eoMetadata.clone();
+    }
+
+    protected  Element getEOMetadata(Element coverageDescriptionElement){
+
+        Element metadata =  coverageDescriptionElement.getChild("metadata",WCS.GMLCOV_NS);
         if(metadata == null)
             return null; // Give up on the EO Metadata thing...
 
@@ -118,7 +132,7 @@ public class EOCoverageDescription extends CoverageDescription {
             return null; // Give up on the EO Metadata thing...
 
 
-        return (Element)eoMetadata.clone();
+        return eoMetadata;
     }
     /*
 
@@ -135,9 +149,9 @@ public class EOCoverageDescription extends CoverageDescription {
                                                 <gml:posList>-90 -180 90 -180 90 180 -90 180 -90 -180</gml:posList>
 
     */
-    public Element getEOFootprintPositionList() {
+    public Element getEOFootprintPositionList(Element coverageDescriptionElement) {
 
-        Element eoMetadata = getEOMetadata();
+        Element eoMetadata = getEOMetadata(coverageDescriptionElement);
 
         Element earthObservation =  eoMetadata.getChild("EarthObservation",WCS.EOP_NS);
         if(earthObservation == null)

@@ -32,6 +32,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -118,8 +120,8 @@ public class Util {
         while (!done) {
             bytesRead = is.read(buf);
             if (bytesRead == -1) {
-                if (totalBytesRead == 0)
-                    totalBytesRead = -1;
+             //   if (totalBytesRead == 0)
+              //      totalBytesRead = -1;
                 done = true;
             } else {
                 totalBytesRead += bytesRead;
@@ -238,7 +240,15 @@ public class Util {
             int statusCode = httpClient.executeMethod(request);
 
             if (statusCode != HttpStatus.SC_OK) {
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                is = request.getResponseBodyAsStream();
+                drainInputStream(is, baos, bufferSize);
+
+
                 String msg = "HttpClient failed to executeMethod(). Status: " + request.getStatusLine();
+                msg += " Response Body: " + baos.toString();
+
                 log.error(msg);
                 throw new IOException(msg);
             }

@@ -42,7 +42,7 @@
 >
 
     <gml:boundedBy>
-        <gml:Envelope axisLabels="lat long" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+        <gml:Envelope axisLabels="latitude longitude" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
                       uomLabels="deg deg">
             <gml:lowerCorner>-90.0 0.0</gml:lowerCorner>
             <gml:upperCorner>90.0 359.5</gml:upperCorner>

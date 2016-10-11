@@ -73,7 +73,7 @@ public class TemporalDimensionSubset  extends DimensionSubset implements Cloneab
      * @throws WcsException
      */
     @Override
-    public String getDapGridValueConstraint() throws WcsException {
+    public String getDap2GridValueConstraint() throws WcsException {
         StringBuilder subsetClause = new StringBuilder();
 
         if (isValueSubset()) {

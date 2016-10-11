@@ -62,6 +62,8 @@ public class DimensionSubset implements Cloneable {
 
     private boolean _isArrayIndexSubset;
 
+    private DomainCoordinate _domainCoordinate;
+
 
     private DimensionSubset() {
         _dimensionId = null;
@@ -69,6 +71,7 @@ public class DimensionSubset implements Cloneable {
         _trimHigh = null;
         _slicePoint = null;
         _isArrayIndexSubset = false;
+        _domainCoordinate = null;
     }
 
     public DimensionSubset(DimensionSubset source) {
@@ -147,6 +150,10 @@ public class DimensionSubset implements Cloneable {
 
             setIsArraySubset(isArraySubsetString(getSlicePoint()));
         }
+    }
+
+    public void setDomainCoordinate(DomainCoordinate dc){
+        _domainCoordinate =dc;
     }
 
     protected void setDimensionId(String s) throws WcsException {
@@ -370,7 +377,17 @@ public class DimensionSubset implements Cloneable {
      * is not a value based subset (i.e. as an array index subset) the empty string is returned.
      * @throws WcsException
      */
-    public String getDapGridValueConstraint() throws WcsException {
+    public String getDap2GridValueConstraint() throws WcsException {
+
+        if(_domainCoordinate == null){
+            StringBuilder msg = new StringBuilder("The DimensionSubset '").append(getDimensionId()).append("' ");
+            msg.append("Has not been associated with a DomainCoordinate instance.");
+
+            throw new WcsException(msg.toString(),WcsException.INVALID_PARAMETER_VALUE,"DimensionSubset");
+        }
+
+        String dapVarName = _domainCoordinate.getDapID();
+
         StringBuilder subsetClause = new StringBuilder();
 
         if(isValueSubset()){
@@ -381,7 +398,7 @@ public class DimensionSubset implements Cloneable {
                           .append("\"")
                           .append(getTrimLow())
                           .append("<=")
-                          .append(getDimensionId())
+                          .append(dapVarName)
                           .append("<=")
                           .append(getTrimHigh())
                           .append("\"");
@@ -390,7 +407,7 @@ public class DimensionSubset implements Cloneable {
               case SLICE_POINT:
                   subsetClause
                           .append("\"")
-                          .append(getDimensionId())
+                          .append(dapVarName)
                           .append("=")
                           .append(getSlicePoint())
                           .append("\"");
@@ -422,6 +439,7 @@ public class DimensionSubset implements Cloneable {
      * @throws WcsException
      */
     public String getDapArrayIndexConstraint() throws WcsException {
+
         StringBuilder subsetClause = new StringBuilder();
 
         if (isArraySubset()) {

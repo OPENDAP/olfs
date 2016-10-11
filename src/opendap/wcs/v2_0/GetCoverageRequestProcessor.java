@@ -165,7 +165,10 @@ public class GetCoverageRequestProcessor {
         try {
             mpr.send(response);
         } catch (Exception e) {
-            throw new WcsException("Failed to transmit WCS coverage response.", WcsException.NO_APPLICABLE_CODE);
+            StringBuilder msg = new StringBuilder("sendMultipartGmlResponse() - ");
+            msg.append("Failed to transmit WCS coverage response.");
+            msg.append(" Message: ").append(e.getMessage());
+            throw new WcsException(msg.toString(), WcsException.NO_APPLICABLE_CODE);
         }
 
     }
@@ -313,22 +316,45 @@ public class GetCoverageRequestProcessor {
         String coverageID = req.getCoverageID();
 
 
-        CoverageDescription coverage = CatalogWrapper.getCoverageDescription(coverageID);
-        Vector<Field> fields = coverage.getFields();
+        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(coverageID);
+        Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 
 
         // The user provided domain subsets!
         // Let's first just QC the request - We'll make sure that the user is asking for dimension
         // subsets of coordinate dimensions that this field has.
-        LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverage.getDomainCoordinates();
+        LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverageDescription.getDomainCoordinates();
         for(DimensionSubset ds: dimensionSubsets.values()){
             DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
             if(dc==null){
-                throw new WcsException("Bad subsetting request",
+
+                /**
+                 * It's likely to happen frequently that the user submits a bad dimension name. So
+                 * take the time to give an informative error message.
+                 */
+                StringBuilder msg = new StringBuilder();
+                msg.append("Bad subsetting request.\n");
+                msg.append("A subset was requested for dimension '").append(ds.getDimensionId()).append("'");
+                msg.append(" and there is no coordinate dimension of that name in the Coverage ");
+                msg.append("'").append(coverageDescription.getCoverageId()).append("'\n");
+
+                msg.append("Valid coordinate dimension names for '").append(coverageDescription.getCoverageId()).append("' ");
+                msg.append("are: ");
+                for(String dcName :domainCoordinates.keySet()){
+                    msg.append("\n    ").append(dcName);
+                }
+                msg.append("\n");
+
+                log.debug(msg.toString());
+
+                throw new WcsException(msg.toString(),
                         WcsException.INVALID_PARAMETER_VALUE,
                         "wcs:dimension");
             }
+
+            ds.setDomainCoordinate(dc);
+
         }
 
 
@@ -348,7 +374,7 @@ public class GetCoverageRequestProcessor {
         Vector<String> arraySubsetClauses =  new Vector<>();
 
         for(String fieldId: _rangeSubset){
-            String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
+            String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
                 gridSubsetClauses.add(dapGridArrayName);
@@ -382,7 +408,7 @@ public class GetCoverageRequestProcessor {
                             ssfGridSubsetClause.append(",");
                         }
                         // Then we tack on the value constraint expression: "low<=dimName<=high"
-                        ssfGridSubsetClause.append(dimSub.getDapGridValueConstraint());
+                        ssfGridSubsetClause.append(dimSub.getDap2GridValueConstraint());
                     }
                     else if(dimSub.isArraySubset()) {
                         // An Array subset means that user indicated (through the use of integer values in
