@@ -347,12 +347,20 @@ public class DescribeEOCoverageSetRequest {
 
 
     public HashMap<String, DimensionSubset> getDimensionSubsets(){
-        HashMap<String, DimensionSubset> subsets = new HashMap<>(_dimensionSubsets);
+        HashMap<String, DimensionSubset> subsets = new HashMap<>();
+        for(String id: _dimensionSubsets.keySet()){
+            DimensionSubset ds = _dimensionSubsets.get(id);
+            subsets.put(id,new DimensionSubset(ds));
+        }
         return subsets;
     }
 
     public TemporalDimensionSubset getTemporalSubset(){
-        return new TemporalDimensionSubset(_temporalSubset);
+
+        if(_temporalSubset!=null) {
+            return new TemporalDimensionSubset(_temporalSubset);
+        }
+        return null;
     }
 
 

@@ -75,12 +75,14 @@ public class DimensionSubset implements Cloneable {
     }
 
     public DimensionSubset(DimensionSubset source) {
+        this();
         _mySubsetType = source._mySubsetType;
         _dimensionId = source._dimensionId;
         _trimLow = source._trimLow;
         _trimHigh =  source._trimHigh;
         _slicePoint =  source._slicePoint;
         _isArrayIndexSubset = source._isArrayIndexSubset;
+        _domainCoordinate = new DomainCoordinate(_domainCoordinate);
     }
 
 
