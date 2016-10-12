@@ -377,7 +377,7 @@ public class GetCoverageRequestProcessor {
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
-                gridSubsetClauses.add(dapGridArrayName);
+                arraySubsetClauses.add(dapGridArrayName);
             }
             else {
 

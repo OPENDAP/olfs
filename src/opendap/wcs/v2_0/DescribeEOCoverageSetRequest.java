@@ -356,11 +356,7 @@ public class DescribeEOCoverageSetRequest {
     }
 
     public TemporalDimensionSubset getTemporalSubset(){
-
-        if(_temporalSubset!=null) {
-            return new TemporalDimensionSubset(_temporalSubset);
-        }
-        return null;
+        return _temporalSubset==null ? null : new TemporalDimensionSubset(_temporalSubset);
     }
 
 

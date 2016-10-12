@@ -581,10 +581,6 @@ public class GetCoverageRequest {
     }
 
 
-
-
-
-
     public void ingestDimensionSubset(Element getCoverageRequestElem, CoverageDescription cvrDsc) throws WcsException {
 
 
