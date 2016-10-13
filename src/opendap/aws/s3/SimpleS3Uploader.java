@@ -74,7 +74,7 @@ public class SimpleS3Uploader {
         _makePubliclyReadable = false;
     }
 
-    private boolean processCommandline(String[] args) throws Exception {
+    private boolean processCommandline(String[] args)  {
 
         CommandLineParser parser = new PosixParser();
 
@@ -97,17 +97,22 @@ public class SimpleS3Uploader {
         options.addOption("f", "uploadFile", true, "Local file to upload to bucket.");
         options.addOption("k", "uploadKey", true, "S3 Key to associate with upload file.");
 
-
-        CommandLine line = parser.parse(options, args);
-
-
         String usage = this.getClass().getSimpleName() + " [-h] [-v] [-p] [-B] -i AWSAccessKeyID -s AWSSecretKey -b S3BucketName -f fileToUpLoad -k s3KeyForUploadObject";
-
 
         StringBuilder errorMessage = new StringBuilder();
 
+        CommandLine line = null;
+        boolean parseFail= false;
+        try {
+            line = parser.parse(options, args);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            parseFail = true ;
+        }
 
-        if (line.hasOption("help")) {
+
+        if (parseFail || line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(usage, options);
             return false;
