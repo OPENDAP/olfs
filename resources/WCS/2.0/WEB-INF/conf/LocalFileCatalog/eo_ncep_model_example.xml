@@ -66,40 +66,17 @@
                     </om:resultTime>
                     <om:procedure>
                         <eop:EarthObservationEquipment gml:id="eo_ncep_model_example_eoe">
-                            <eop:platform>
-                                <eop:Platform>
-                                    <eop:shortName>PHR</eop:shortName>
-                                    <eop:serialIdentifier>1A</eop:serialIdentifier>
-                                </eop:Platform>
+                            <eop:platform> <!-- 0..1 -->
+                                <shortName>NCEP</shortName>
                             </eop:platform>
-                            <eop:instrument>
-                                <eop:Instrument>
-                                    <eop:shortName>PHR</eop:shortName>
-                                </eop:Instrument>
-                            </eop:instrument>
-                            <eop:sensor>
-                                <eop:Sensor>
-                                    <eop:sensorType>OPTICAL</eop:sensorType>
-                                    <eop:operationalMode codeSpace="urn:eop:PHR:sensorMode">PX</eop:operationalMode>
-                                    <eop:resolution uom="m">0.7</eop:resolution>
-                                </eop:Sensor>
-                            </eop:sensor>
-                            <eop:acquisitionParameters>
-                                <eop:Acquisition>
-                                    <eop:orbitNumber>12</eop:orbitNumber>
-                                    <eop:lastOrbitNumber>12</eop:lastOrbitNumber>
-                                    <eop:orbitDirection>ASCENDING</eop:orbitDirection>
-                                    <eop:wrsLongitudeGrid codeSpace="EPSG">12</eop:wrsLongitudeGrid>
-                                    <eop:wrsLatitudeGrid codeSpace="EPSG">12</eop:wrsLatitudeGrid>
-                                    <eop:instrumentAzimuthAngle uom="deg">-14.0</eop:instrumentAzimuthAngle>
-                                    <eop:pitch uom="deg">0</eop:pitch>
-                                    <eop:roll uom="deg">0</eop:roll>
-                                    <eop:yaw uom="deg">0</eop:yaw>
-                                </eop:Acquisition>
-                            </eop:acquisitionParameters>
+                            <!-- <eop:instrument /> 0..1 -->
+                            <!-- <eop:sensor /> 0..1 -->
+                            <!-- <eop:acquisitionParameters /> 0..1 -->
                         </eop:EarthObservationEquipment>
                     </om:procedure>
-                    <om:observedProperty xlink:href="#phenom1"/>
+
+                    <om:observedProperty xlink:href="http://cfconventions.org/Data/cf-standard-names/35/src/cf-standard-name-table.xml#wind"/> <!-- 1..n -->
+
                     <om:featureOfInterest>
                         <eop:Footprint gml:id="footprint_someEOCoverage1">
                             <eop:multiExtentOf>
@@ -122,66 +99,54 @@
                             </eop:centerOf>
                         </eop:Footprint>
                     </om:featureOfInterest>
+                    <!--
+                    result
+
+                    This is required to be om:result/eop:EarthObservationResult but there are no required children
+                    of eop:EarthObservationResult. I added one child (eop:parameter) in order to not to nilify
+                    the eop:EarthObservationResult
+                    -->
                     <om:result>
-                        <eop:EarthObservationResult gml:id="someEOCoverage1_eor">
-                            <eop:browse>
-                                <eop:BrowseInformation>
-                                    <eop:type>QUICKLOOK</eop:type>
-                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
-                                    </eop:referenceSystemIdentifier>
-                                    <eop:fileName>
-                                        <ows:ServiceReference xlink:href="http://etc">
-                                            <ows:RequestMessage/>
-                                        </ows:ServiceReference>
-                                    </eop:fileName>
-                                </eop:BrowseInformation>
-                            </eop:browse>
-                            <eop:mask>
-                                <eop:MaskInformation>
-                                    <eop:type>CLOUD</eop:type>
-                                    <eop:format>VECTOR</eop:format>
-                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
-                                    </eop:referenceSystemIdentifier>
-                                    <eop:fileName>
-                                        <ows:ServiceReference xlink:href="http://etc">
-                                            <ows:RequestMessage/>
-                                        </ows:ServiceReference>
-                                    </eop:fileName>
-                                </eop:MaskInformation>
-                            </eop:mask>
-                            <eop:parameter>
-                                <eop:ParameterInformation/>
+                        <eop:EarthObservationResult>
+                            <!-- <eop:browse /> 0..1 -->
+                            <!-- <eop:product /> 0..1 -->
+                            <!-- <eop:mask /> 0..1 -->
+                            <eop:parameter> <!-- 0..1 -->
+                                <eop:ParameterInformation>
+                                    <eop:unitOfMeasure>m/s</eop:unitOfMeasure>
+                                </eop:ParameterInformation>
                             </eop:parameter>
+                            <!-- <eop:coverage /> 0..1 -->
                         </eop:EarthObservationResult>
                     </om:result>
+
                     <eop:metaDataProperty>
                         <eop:EarthObservationMetaData>
-                            <eop:identifier>someEOCoverage1</eop:identifier>
+                            <eop:identifier>eop_eo_ncep_model_example</eop:identifier>
+                            <!--
+                            acquisitionType
+                            Used to distinguish at a high level the
+                            appropriateness of the acquisition for "general" use,
+                            whether the product is a nominal acquisition, special
+                            calibration product or other
+
+                            AllowedValues: NOMINAL | CALIBRATION | OTHER
+                            -->
                             <eop:acquisitionType>NOMINAL</eop:acquisitionType>
-                            <eop:productType>TBD</eop:productType>
+                            <!--
+                            status
+                            Refers to product status.
+
+                            AllowedValues: ARCHIVED | ACQUIRED | CANCELLED | FAILED |
+                            PLANNED | POTENTIAL | REJECTED | QUALITYDEGRADED
+                            -->
                             <eop:status>ARCHIVED</eop:status>
-                            <eop:downlinkedTo>
-                                <eop:DownlinkInformation>
-                                    <eop:acquisitionStation codeSpace="urn:eop:PHR:stationCode">TLS
-                                    </eop:acquisitionStation>
-                                </eop:DownlinkInformation>
-                            </eop:downlinkedTo>
-                            <eop:archivedIn>
-                                <eop:ArchivingInformation>
-                                    <eop:archivingCenter codeSpace="urn:eop:PHR:stationCode">TLS</eop:archivingCenter>
-                                    <eop:archivingDate>2001-08-22T11:02:47.999</eop:archivingDate>
-                                </eop:ArchivingInformation>
-                            </eop:archivedIn>
-                            <eop:processing>
-                                <eop:ProcessingInformation/>
-                            </eop:processing>
                         </eop:EarthObservationMetaData>
                     </eop:metaDataProperty>
                 </eop:EarthObservation>
             </wcseo:EOMetadata>
         </gmlcov:Extension>
     </gmlcov:metadata>
-
 
     <gml:domainSet>
         <gml:RectifiedGrid dimension="3" gml:id="eo_ncep_model_example_grid">
@@ -198,12 +163,11 @@
                 </gml:Point>
             </gml:origin>
             <!-- isobaric is not regular!! Values: 100, 200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000, 85000, 90000, 92500, 95000, 97500, 100000 -->
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">100 0.0 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/IRREGULAR">100 0.0 0.0</gml:offsetVector>
             <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.5 0.0</gml:offsetVector>
             <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 -0.5</gml:offsetVector>
         </gml:RectifiedGrid>
     </gml:domainSet>
-
 
     <gmlcov:rangeType>
         <swe:DataRecord>

@@ -729,6 +729,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public HttpSession getSession() { return r.getSession(); }
 
+        @Override
+        public String changeSessionId() {
+            return r.changeSessionId();
+        }
+
         /**
         @Override
         public String changeSessionId() {
@@ -772,6 +777,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
             return r.getPart(s);
         }
 
+        @Override
+        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+            return null;
+        }
+
         /**
         @Override
         public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
@@ -788,6 +798,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public void setCharacterEncoding(String s) throws UnsupportedEncodingException { r.setCharacterEncoding(s); }
 
         public int getContentLength() { return r.getContentLength(); }
+
+        @Override
+        public long getContentLengthLong() {
+            return 0;
+        }
 
         /**
         @Override
