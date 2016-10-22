@@ -727,16 +727,21 @@ public class S3Index extends S3Object {
      */
 
     private long getTimeFromLMTString(String lmtString){
-        long lmt;
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
-            if(lmtString.endsWith("Z"))
-                lmtString = lmtString.substring(0,lmtString.lastIndexOf('Z')) + "GMT";
-            Date d = format.parse(lmtString);
-            lmt = d.getTime();
-        } catch (Exception e) {
-            log.error("ERROR: Failed to parse last modified time string {}  MESSAGE: {}",lmtString,e.getMessage());
-            lmt = -1;
+        long lmt=-1;
+        if(lmtString!=null) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+                if (lmtString.endsWith("Z"))
+                    lmtString = lmtString.substring(0, lmtString.lastIndexOf('Z')) + "GMT";
+                Date d = format.parse(lmtString);
+                lmt = d.getTime();
+            } catch (Exception e) {
+                log.error("getTimeFromLMTString() - Failed to parse last modified time string {}  MESSAGE: {}", lmtString, e.getMessage());
+            }
+        }
+        else {
+            log.error("getTimeFromLMTString() - The lmtString value is null. Skipping. LMT set to -1");
+
         }
         return lmt;
 
