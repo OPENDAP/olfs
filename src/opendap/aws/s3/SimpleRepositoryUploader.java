@@ -190,7 +190,7 @@ public class SimpleRepositoryUploader {
             indexElement.setAttribute("name",f.getName());
             Date lmt = new Date(f.lastModified());
             SimpleDateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            indexElement.setAttribute("last-modifed",outputFormatter.format(lmt));
+            indexElement.setAttribute("last-modified",outputFormatter.format(lmt));
             indexElement.setAttribute("size",Long.toString(f.length()));
             index.addContent(indexElement);
 
