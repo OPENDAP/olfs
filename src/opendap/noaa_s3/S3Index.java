@@ -740,7 +740,7 @@ public class S3Index extends S3Object {
             }
         }
         else {
-            log.error("getTimeFromLMTString() - The lmtString value is null. Skipping. LMT set to -1");
+            log.warn("getTimeFromLMTString() - The lmtString value is null. Skipping. LMT set to -1");
 
         }
         return lmt;
