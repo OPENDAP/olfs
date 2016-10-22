@@ -700,10 +700,6 @@ public class S3Index extends S3Object {
 
 
             String lmtString = file.getAttributeValue("last-modified");
-
-            if (lmtString==null) // hack to get stuff from index.xml written with crappy code.
-                lmtString = file.getAttributeValue("last-modifed");
-
             long lmt = getTimeFromLMTString(lmtString);
 
             long size;
