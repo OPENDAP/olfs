@@ -736,7 +736,7 @@ public class S3Index extends S3Object {
                 Date d = format.parse(lmtString);
                 lmt = d.getTime();
             } catch (Exception e) {
-                log.error("getTimeFromLMTString() - Failed to parse last modified time string {}  MESSAGE: {}", lmtString, e.getMessage());
+                log.error("getTimeFromLMTString() - Failed to parse last modified time string '{}'  MESSAGE: {}", lmtString, e.getMessage());
             }
         }
         else {
