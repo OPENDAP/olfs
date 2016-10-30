@@ -688,7 +688,9 @@ public class GetCoverageRequest {
     }
 
     public TemporalDimensionSubset getTemporalSubset(){
-        return new TemporalDimensionSubset(_temporalSubset);
+        if(_temporalSubset!=null)
+            return new TemporalDimensionSubset(_temporalSubset);
+        return null;
     }
 
 

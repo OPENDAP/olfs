@@ -57,6 +57,13 @@ DMR: http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.
 
 http:://localhost:8080/opendap/testbed-12/ncep/
 
+
+curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=eo_ncep_model_example"
+
+
+
+
+
 curl "http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dods?grid(u-component_of_wind_isobaric,\"41.9<=lat<=46.3\",\"0.0<=isobaric<=500.0\",\"55.0<=lon<=63.6\"),grid(v-component_of_wind_isobaric,\"41.9<=lat<=46.3\",\"0.0<=isobaric<=500.0\",\"55.0<=lon<=63.6\"),u-component_of_wind_isobaric\[0\]\[*\]\[*\]\[*\],v-component_of_wind_isobaric\[0\]\[*\]\[*\]\[*\]" > foo.nc
 
 
