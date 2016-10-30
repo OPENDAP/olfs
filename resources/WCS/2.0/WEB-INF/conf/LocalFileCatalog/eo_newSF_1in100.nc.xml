@@ -78,11 +78,11 @@
                     <om:observedProperty xlink:href="http://cfconventions.org/Data/cf-standard-names/35/src/cf-standard-name-table.xml#wind"/> <!-- 1..n -->
 
                     <om:featureOfInterest>
-                        <eop:Footprint gml:id="footprint_someEOCoverage1">
+                        <eop:Footprint gml:id="footprint_eo_newSF_1in100.nc">
                             <eop:multiExtentOf>
-                                <gml:MultiSurface gml:id="multisurface_someEOCoverage1" srsName="EPSG:4326">
+                                <gml:MultiSurface gml:id="multisurface_eo_newSF_1in100.nc" srsName="EPSG:4326">
                                     <gml:surfaceMember>
-                                        <gml:Polygon gml:id="polygon_someEOCoverage1">
+                                        <gml:Polygon gml:id="polygon_eo_newSF_1in100.nc">
                                             <gml:exterior>
                                                 <gml:LinearRing>
                                                     <gml:posList>
@@ -99,7 +99,7 @@
                                 </gml:MultiSurface>
                             </eop:multiExtentOf>
                             <eop:centerOf>
-                                <gml:Point gml:id="someEOCoverage1_p" srsName="EPSG:4326">
+                                <gml:Point gml:id="eo_newSF_1in100.nc_p" srsName="EPSG:4326">
                                     <gml:pos>37.9999 121.9999</gml:pos>
                                 </gml:Point>
                             </eop:centerOf>
