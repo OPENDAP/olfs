@@ -100,11 +100,11 @@
                     </om:procedure>
                     <om:observedProperty xlink:href="#phenom1"/>
                     <om:featureOfInterest>
-                        <eop:Footprint gml:id="footprint_someEOCoverage1">
+                        <eop:Footprint gml:id="footprint_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
                             <eop:multiExtentOf>
-                                <gml:MultiSurface gml:id="multisurface_someEOCoverage1" srsName="EPSG:4326">
+                                <gml:MultiSurface gml:id="multisurface_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4" srsName="EPSG:4326">
                                     <gml:surfaceMember>
-                                        <gml:Polygon gml:id="polygon_someEOCoverage1">
+                                        <gml:Polygon gml:id="polygon_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
                                             <gml:exterior>
                                                 <gml:LinearRing>
                                                     <gml:posList>43.516667 2.1025 43.381667 2.861667 42.862778 2.65
@@ -117,14 +117,14 @@
                                 </gml:MultiSurface>
                             </eop:multiExtentOf>
                             <eop:centerOf>
-                                <gml:Point gml:id="someEOCoverage1_p" srsName="EPSG:4326">
+                                <gml:Point gml:id="cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4_p" srsName="EPSG:4326">
                                     <gml:pos>43.190833 2.374167</gml:pos>
                                 </gml:Point>
                             </eop:centerOf>
                         </eop:Footprint>
                     </om:featureOfInterest>
                     <om:result>
-                        <eop:EarthObservationResult gml:id="someEOCoverage1_eor">
+                        <eop:EarthObservationResult gml:id="cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4_eor">
                             <eop:browse>
                                 <eop:BrowseInformation>
                                     <eop:type>QUICKLOOK</eop:type>
@@ -157,7 +157,7 @@
                     </om:result>
                     <eop:metaDataProperty>
                         <eop:EarthObservationMetaData>
-                            <eop:identifier>someEOCoverage1</eop:identifier>
+                            <eop:identifier>cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4</eop:identifier>
                             <eop:acquisitionType>NOMINAL</eop:acquisitionType>
                             <eop:productType>TBD</eop:productType>
                             <eop:status>ARCHIVED</eop:status>
