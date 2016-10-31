@@ -55,7 +55,7 @@
                 <eop:EarthObservation gml:id="eop_eo_ncep_model_example">
                     <om:phenomenonTime>
                         <gml:TimePeriod gml:id="tp_eo_ncep_model_example">
-                            <gml:beginPosition>2016-06-17T00:00:00.000Z</gml:beginPosition> <!-- 108 days -->
+                            <gml:beginPosition>2016-06-17T00:00:00.000Z</gml:beginPosition> <!-- 112 Hours -->
                             <gml:endPosition>2016-07-02T00:00:00.000Z</gml:endPosition>
                         </gml:TimePeriod>
                     </om:phenomenonTime>
