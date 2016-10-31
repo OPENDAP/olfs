@@ -55,7 +55,7 @@
                 <eop:EarthObservation gml:id="eop_eo_ncep_model_example">
                     <om:phenomenonTime>
                         <gml:TimePeriod gml:id="tp_eo_ncep_model_example">
-                            <gml:beginPosition>2016-06-17T00:00:00.000Z</gml:beginPosition> <!-- 108 days -->
+                            <gml:beginPosition>2016-06-17T00:00:00.000Z</gml:beginPosition> <!-- 112 Hours -->
                             <gml:endPosition>2016-07-02T00:00:00.000Z</gml:endPosition>
                         </gml:TimePeriod>
                     </om:phenomenonTime>
@@ -149,23 +149,31 @@
     </gmlcov:metadata>
 
     <gml:domainSet>
-        <gml:RectifiedGrid dimension="3" gml:id="eo_ncep_model_example_grid">
+        <gml:RectifiedGrid dimension="4" gml:id="eo_ncep_model_example_grid">
             <gml:limits>
                 <gml:GridEnvelope>
-                    <gml:low>0 0 0</gml:low>
-                    <gml:high>30 360 719</gml:high>
+                    <gml:low>0 0 0 0</gml:low>
+                    <gml:high>111 30 360 719</gml:high>
                 </gml:GridEnvelope>
             </gml:limits>
-            <gml:axisLabels>isobaric latitude longitude</gml:axisLabels>
+            <gml:axisLabels>time isobaric latitude longitude</gml:axisLabels>
             <gml:origin>
                 <gml:Point gml:id="grid_origin_eo_ncep_model_example" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-                    <gml:pos>100.0 90.0 0.0</gml:pos>
+                    <gml:pos>0.0 100.0 90.0 0.0</gml:pos>
                 </gml:Point>
             </gml:origin>
-            <!-- isobaric is not regular!! Values: 100, 200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000, 85000, 90000, 92500, 95000, 97500, 100000 -->
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/IRREGULAR">100 0.0 0.0</gml:offsetVector>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.5 0.0</gml:offsetVector>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 -0.5</gml:offsetVector>
+            <!-- Time Units: Hour since 2016-06-17T00:00:00Z -->
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/TIME">3.0 0.0 0.0 0.0</gml:offsetVector>
+            <!--
+            isobaric axis is not regular!!
+                    Values: 100, 200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000,
+                            15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000,
+                            60000, 65000, 70000, 75000, 80000, 85000, 90000, 92500, 95000,
+                            97500, 100000
+            -->
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/IRREGULAR">0.0 100 0.0 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 0.0 0.5</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 -0.5 0.0</gml:offsetVector>
         </gml:RectifiedGrid>
     </gml:domainSet>
 
