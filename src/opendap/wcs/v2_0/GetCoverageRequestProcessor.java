@@ -271,7 +271,7 @@ public class GetCoverageRequestProcessor {
         log.debug("getGeoTiffDataAccessURL() - Dap CE: '{}'",dapCE);
 
         try {
-            requestURL += ".geotiff" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
+            requestURL += ".tiff" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new WcsException("Failed to construct DAP data Access URL. Primary Message: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
