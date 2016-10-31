@@ -155,21 +155,22 @@
     </gmlcov:metadata>
 
     <gml:domainSet>
-        <gml:RectifiedGrid dimension="2" gml:id="eo_newSF_1in100.nc_grid">
+        <gml:RectifiedGrid dimension="3" gml:id="eo_newSF_1in100.nc_grid">
             <gml:limits>
                 <gml:GridEnvelope>
-                    <gml:low>0 0</gml:low>
-                    <gml:high>4799 4799</gml:high>
+                    <gml:low>0 0 0</gml:low>
+                    <gml:high>107 4799 4799</gml:high>
                 </gml:GridEnvelope>
             </gml:limits>
-            <gml:axisLabels>latitude longitude</gml:axisLabels>
+            <gml:axisLabels>time longitude latitude</gml:axisLabels>
             <gml:origin>
                 <gml:Point gml:id="grid_origin_eo_newSF_1in100.nc" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-                    <gml:pos>38.6663888522222 -122.666388920222 </gml:pos>
+                    <gml:pos>1465511434 -122.666388920222 38.6663888522222</gml:pos>
                 </gml:Point>
             </gml:origin>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-2.7778E-4 0.0</gml:offsetVector>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 2.7777778E-4</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/TIME">86400.0 0.0 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 -2.7778E-4 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 2.7777778E-4</gml:offsetVector>
         </gml:RectifiedGrid>
     </gml:domainSet>
 
