@@ -444,7 +444,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
         // Add the Hyrax Version
-        cf_history_entry.append(" Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
+        cf_history_entry.append(opendap.bes.Version.getHyraxVersionString());
         cf_history_entry.append(" ");
 
         // Add the complete request URL
