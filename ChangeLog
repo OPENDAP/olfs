@@ -1,7 +1,12 @@
-2016-06-03 ---  hyrax=1.13.2olfs=1.16.1  END 
+2016-11-03 ---  hyrax=1.13.2 olfs=1.16.1  END 
+2016-11-03  Nathan Potter  <ndp@opendap.org>
+
+    Added some release helper scripts.
+
 2016-11-02  Nathan Potter  <ndp@opendap.org>
 
     olfs:   Dropped duplicate server name from fnoc history attribute entry.
+    
 	Updating OLFS baselines to rflect minor changes in BES error message content.
 
 2016-10-31  Nathan Potter  <ndp@opendap.org>
