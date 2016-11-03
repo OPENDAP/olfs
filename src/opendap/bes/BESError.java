@@ -282,7 +282,9 @@ public class BESError extends OPeNDAPException {
                 break;
 
             case BESError.TIME_OUT:
-                httpStatus = 418; // I'm a Teapot!!
+                // Not a great semantic match as it's not a server error per say,
+                // but this what the users wanted.
+                httpStatus = HttpServletResponse.SC_GATEWAY_TIMEOUT;
                 break;
 
             default:
