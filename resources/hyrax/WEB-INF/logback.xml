@@ -51,7 +51,7 @@
         <File>${logdir}/error.log</File>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxErrors.%d{yyyy-MM-dd}.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>3</MaxIndex>
         </rollingPolicy>
@@ -70,7 +70,7 @@
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
@@ -85,7 +85,7 @@
     <appender name="AnonymousAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/AnonymousAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>AnonymousAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxAnonymousAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
@@ -100,7 +100,7 @@
     <appender name="BESCommands" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/BESCommands.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxBESCommands.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
