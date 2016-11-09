@@ -132,7 +132,7 @@
     </WcsCoverage>
 
     <EOWcsCoverage fileName="eo_newSF_1in100.nc.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100.nc</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100_reorder.nc</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="latitude" units="degrees_north" />
         <DomainCoordinate name="longitude" dapID="longitude" units="degrees_east" />
