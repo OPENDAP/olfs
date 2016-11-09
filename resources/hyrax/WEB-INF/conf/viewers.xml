@@ -57,7 +57,7 @@
     <WebServiceHandler className="opendap.viewers.GodivaWebService" serviceId="godiva" >
         <applicationName>Godiva WMS GUI</applicationName>
         <NcWmsService href="http://localhost:8080/ncWMS2/wms" base="/ncWMS2/wms" ncWmsDynamicServiceId="lds"/>
-        <Godiva href="/ncWMS2/godiva3.html" base="/ncWMS2/godiva3.html"/>
+        <Godiva href="/ncWMS2/Godiva3.html" base="/ncWMS2/Godiva3.html"/>
     </WebServiceHandler -->
 
 
