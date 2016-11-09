@@ -10,10 +10,7 @@ import org.jdom.JDOMException;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -471,7 +468,8 @@ public class BesCatalogCache implements Runnable{
     private void update() throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
         lock.lock();
         try {
-            for (String resourceId : catalogTransactionCache.keySet()) {
+            Map<String,CatalogTransaction> map = catalogTransactionCache;
+            for (String resourceId : map.keySet()) {
                 updateCatalogTransaction(resourceId);
                 if(halt.get())
                     return;
