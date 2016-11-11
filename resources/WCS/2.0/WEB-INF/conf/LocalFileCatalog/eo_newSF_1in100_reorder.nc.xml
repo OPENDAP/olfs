@@ -169,8 +169,8 @@
                 </gml:Point>
             </gml:origin>
             <gml:offsetVector srsName="http://www.opengis.net/def/crs/TIME">86400.0 0.0 0.0</gml:offsetVector>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 -2.7778E-4 0.0</gml:offsetVector>
             <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 2.7777778E-4</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 -2.7778E-4 0.0</gml:offsetVector>
         </gml:RectifiedGrid>
     </gml:domainSet>
 
