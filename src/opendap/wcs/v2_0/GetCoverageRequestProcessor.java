@@ -321,9 +321,10 @@ public class GetCoverageRequestProcessor {
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 
 
-        // The user provided domain subsets!
+        // The user may have provided domain subsets.
         // Let's first just QC the request - We'll make sure that the user is asking for dimension
-        // subsets of coordinate dimensions that this field has.
+        // subsets of coordinate dimensions that this field has, and while we do that we will associate
+        // every matching DomainCoordinate with the DimensionSubset that it matched.
         LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverageDescription.getDomainCoordinates();
         for(DimensionSubset ds: dimensionSubsets.values()){
             DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
@@ -358,8 +359,11 @@ public class GetCoverageRequestProcessor {
         }
 
 
+        /**
+         * Determines which fields (variables) will be sent back with the response.
+         * If none are specified, all are sent.
+         */
         Vector<String> _rangeSubset =  req.getRangeSubset();
-
         if(_rangeSubset.isEmpty()) {
             // if they didn't ask for a subset of the set of fields, then take them all.
             for (Field field : fields) {
@@ -367,12 +371,21 @@ public class GetCoverageRequestProcessor {
             }
         }
 
+        /**
+         * Is there a Scale request?
+         */
+        ScaleRequest sr = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
 
+        /**
+         * Here we begin building the DAP2 CE
+         * For every field (variable) to be transmitted we (may) need server side functional expressions,
+         * array subset expressions, ect.
+         *
+         */
         Vector<String> gridSubsetClauses = new Vector<>();
         Vector<String> arraySubsetClauses =  new Vector<>();
-
         for(String fieldId: _rangeSubset){
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
@@ -465,7 +478,10 @@ public class GetCoverageRequestProcessor {
         } // fields
         for(String gridSubsetClause: gridSubsetClauses){
             String comma_as_needed = dap2CE.length()>0 ? "," : "";
-            dap2CE.append(comma_as_needed).append(gridSubsetClause);
+
+            String possiblyScaledGridSubset = sr.getScaleExpression(gridSubsetClause);
+
+            dap2CE.append(comma_as_needed).append(possiblyScaledGridSubset);
         }
 
         for(String arraySubsetClause: arraySubsetClauses){

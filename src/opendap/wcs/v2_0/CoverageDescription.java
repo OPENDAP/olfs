@@ -196,7 +196,7 @@ public class CoverageDescription {
 
 
         /**
-         * Load DAP ID (The Fully Qualified Name) for the variable that holds the Latitude coordinate values
+         * Load DAP ID (The Fully Qualified Name) for the variable that holds the domain coordinate values
          * for this field.
          * This is REQUIRED.
          */

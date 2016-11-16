@@ -53,41 +53,6 @@ public class GetCoverageRequest {
 
     private String _requestUrl;
 
-    private String _outputCRS;
-    private String _subsettingCRS;
-
-    /**
-     *  This get setto true if any scaling option is selected.
-     */
-    private boolean _isScalingRequest;
-
-    /**
-     *  Request Parameter
-     *  kvp: ScaleFactor=x
-     */
-    private double _scaleFactor;
-
-    /**
-     *  Request Parameter
-     *  kvp: ScaleAxes=ax1(x1),ax2(x2)
-     */
-    private HashMap<String,Double> _scaleAxisByFactor;
-
-    /**
-     *  Request Parameter
-     *  kvp: ScaleSize=ax1(s1),ax2(s2)
-     */
-    private HashMap<String,Long> _scaleToSize;
-
-    /**
-     *
-     * ScaleExtent (WTF does this even mean? Throw an exception!)
-     *  ...& SCALEEXTENT=i(10:20),j(20:30) &...
-     * @param does
-     */
-    private HashMap<String,long[]> _scaleToExtents;
-
-
     /**
      * Request parameter
      * kvp:
@@ -97,34 +62,8 @@ public class GetCoverageRequest {
      */
     private Vector<String> _rangeSubset;
 
-    // INTERPOLATION
-    //
-    // &interpolation=iMethod&  specifes global interpolation method iMethod for all axes
-    //
-    // &InterpolationPerAxis=axis1,iMethod&  specifes global interpolation method iMethod for axis1
-    //
-    // &InterpolationPerAxis=axis1,iMethod&InterpolationPerAxis=axis2,foo&
-    //    specifes global interpolation method iMethod for all axis1  and foo for axis2
 
-    /**
-     * Request Parameter
-     * kvp:
-     *   &interpolation=iMethod&  specifies global interpolation method iMethod for all axes
-     */
-    private String _interpolationMethod;
-
-
-    /**
-     * Request Parameter
-     * kvp:
-     *    &InterpolationPerAxis=axis1,iMethod&  specifes global interpolation method iMethod for axis1
-     *
-     *    &InterpolationPerAxis=axis1,iMethod&InterpolationPerAxis=axis2,foo&
-     *    specifes global interpolation method iMethod for all axis1  and foo for axis2
-     */
-    private HashMap<String,String> _interpolationByAxis;
-
-
+    private ScaleRequest _scaleRequest;
 
     public GetCoverageRequest(){
         _coverageID     = null;
@@ -133,19 +72,10 @@ public class GetCoverageRequest {
         _dimensionSubsets = new HashMap<>();
         _requestUrl     = null;
 
-        _outputCRS      = null;
-        _subsettingCRS  = null;
 
-        _isScalingRequest  = false;
-        _scaleFactor       = Double.NaN;
-        _scaleAxisByFactor = new HashMap<>();
-        _scaleToSize       = new HashMap<>();
-        _scaleToExtents    = new HashMap<>();    // supported? maybe not...
-
+        _scaleRequest   = null;
         _rangeSubset    = new Vector<>();
 
-        _interpolationMethod = null;
-        _interpolationByAxis =  new HashMap<>();  // supported? maybe not...
 
 
     }
@@ -227,97 +157,7 @@ public class GetCoverageRequest {
             setMediaType(s[0]);
         }
 
-
-        // Did they specify an output CRS?
-        s = kvp.get("outputCRS".toLowerCase());
-        if(s!=null){
-            setOutputCRS(s[0]);
-        }
-
-
-        // Did they specify a CRS for their subset coordinates?
-        s = kvp.get("subsettingCRS".toLowerCase());
-        if(s!=null){
-            setOutputCRS(s[0]);
-        }
-
-        // Did they submit  a global scale factor?
-        s = kvp.get("scalefactor".toLowerCase());
-        if(s!=null){
-            try {
-                _scaleFactor = Double.parseDouble(s[0]);
-            }
-            catch (NumberFormatException e){
-                throw new WcsException("The value of the SCALEFACTOR parameter failed to parse as a floating " +
-                        "point value. Msg: "+e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleByFactor");
-            }
-        }
-
-
-        // Did the submit per-axis scale factors?
-        s = kvp.get("scaleaxes".toLowerCase());
-        if(s!=null){
-            ingestKvpForScaleAxesParameter(s[0]);
-
-    }
-
-        // Did they submit per-axis scale sizes?
-        s = kvp.get("scalesize".toLowerCase());
-        if(s!=null){
-            ingestKvpForScaleSizeParameter(s[0]);
-        }
-
-
-        // Did they submit a scale to extent parameter?
-        s = kvp.get("scaleextent".toLowerCase());
-        if(s!=null){
-            // too bad because that's something we never understood...
-            throw new WcsException("The SCALEEXTENT operation is not implemented.",
-                    WcsException.OPERATION_NOT_SUPPORTED,
-                    "scal:ScaleToExtent");
-
-        }
-
-        // Did they submit a range subset to extent parameter?
-        s = kvp.get("rangesubset".toLowerCase());
-        if(s!=null){
-            String rangeSubsetString = s[0];
-            String varNames[] = rangeSubsetString.split(",");
-            Collections.addAll(_rangeSubset, varNames);
-        }
-
-        // Did they submit an interpolation method parameter?
-        s = kvp.get("interpolation".toLowerCase());
-        if(s!=null){
-            _interpolationMethod = s[0];
-        }
-
-        // Did they submit one or more  per axis interpolation method parameters?
-        s = kvp.get("interpolationperaxis".toLowerCase());
-        if(s!=null){
-
-            for(String interpolationPerAxisString: s){
-                String parts[] = interpolationPerAxisString.split(",");
-
-                if(parts.length < 2){
-                    throw new WcsException("The INTERPOLATIONPERAXIS parameter '"+interpolationPerAxisString+
-                            "' does not have both an axis and an interpolation method.",
-                            WcsException.INVALID_PARAMETER_VALUE,
-                            "int:InterpolationPerAxis");
-                }
-
-                if(parts.length > 2){
-                    throw new WcsException("The INTERPOLATIONPERAXIS parameter '"+interpolationPerAxisString+
-                            "' has too many componets - it should have a single dimension name and a " +
-                            "single interpolation method name.",
-                            WcsException.INVALID_PARAMETER_VALUE,
-                            "int:InterpolationPerAxis");
-                }
-                _interpolationByAxis.put(parts[0],parts[1]);
-            }
-        }
+        _scaleRequest = new ScaleRequest(kvp,cvrgDscrpt);
 
         // Get the subset expressions
         s = kvp.get("subset");
@@ -406,101 +246,8 @@ public class GetCoverageRequest {
     }
 
 
-
-    private void ingestKvpForScaleAxesParameter(String kvpScaleAxesString) throws WcsException {
-
-        String axisScaleStrings[] = kvpScaleAxesString.split(",");
-
-        for(String axisScaleString: axisScaleStrings){
-
-            int leftParen = axisScaleString.indexOf("(");
-            int rghtParen = axisScaleString.indexOf(")");
-
-            if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
-                throw new WcsException("Invalid subset expression. The 'SCALEAXES' expression '"+kvpScaleAxesString+"' lacks " +
-                        "correctly organized parenthetical content.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            String dimensionName = axisScaleString.substring(0,leftParen);
-
-            if(dimensionName.length()==0){
-                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must begin with a dimension name.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            String scaleFactorString = axisScaleString.substring(leftParen+1,rghtParen);
-
-            if(scaleFactorString.length()==0){
-                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must contain a scale factor value.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            double scaleFactor;
-            try {
-                scaleFactor = Double.parseDouble(scaleFactorString);
-            }
-            catch (NumberFormatException e){
-                throw new WcsException("The scale factor string for dimension"+dimensionName+
-                        " failed to parse as a floating point value.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            _scaleAxisByFactor.put(dimensionName, scaleFactor);
-        }
-    }
-
-
-    private void ingestKvpForScaleSizeParameter(String kvpScaleSizeString) throws WcsException {
-
-
-        String axisScaleStrings[] = kvpScaleSizeString.split(",");
-
-        for(String axisScaleString: axisScaleStrings){
-
-            int leftParen = axisScaleString.indexOf("(");
-            int rghtParen = axisScaleString.indexOf(")");
-
-            if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
-                throw new WcsException("Invalid subset expression. The 'SCALESIZE' expression '"+kvpScaleSizeString+"' lacks " +
-                        "correctly organized parenthetical content.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            String dimensionName = axisScaleString.substring(0,leftParen);
-
-            if(dimensionName.length()==0){
-                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must begin with a dimension name.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            String scaleSizeString = axisScaleString.substring(leftParen+1,rghtParen);
-
-            if(scaleSizeString.length()==0){
-                throw new WcsException("Each subclause of the  'SCALEAXES' parameter must contain a scale factor value.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            long scaleFactor;
-            try {
-                scaleFactor = Long.parseLong(scaleSizeString);
-            }
-            catch (NumberFormatException e){
-                throw new WcsException("The scale size string for dimension"+dimensionName+
-                        " failed to parse as an integer value.",
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "scal:ScaleAxesByFactor");
-            }
-
-            _scaleToSize.put(dimensionName, scaleFactor);
-        }
+    public ScaleRequest getScaleRequest(){
+        return new ScaleRequest(_scaleRequest);
     }
 
 
@@ -519,21 +266,6 @@ public class GetCoverageRequest {
         }
 
         _mediaType = mType;
-    }
-
-    public void setOutputCRS(String outputCRS) {
-        _outputCRS = outputCRS;
-    }
-
-    public String getOutputCRS() {
-        return _outputCRS;
-    }
-
-    public void setSubsetCRS(String subsetCRS) {
-        _subsettingCRS = subsetCRS;
-    }
-    public String getSubsetCRS() {
-        return _subsettingCRS;
     }
 
 

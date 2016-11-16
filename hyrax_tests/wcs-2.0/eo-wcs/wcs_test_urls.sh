@@ -1,7 +1,10 @@
 #!/bin/sh
 
 
-# http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=isobaric(0.0,500.0)&subset=time(0) 
+WCS_SERVICE="http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1"
+
+
+# $WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=isobaric(0.0,500.0)&subset=time(0)
 
 
 
@@ -9,13 +12,13 @@ curl "http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc
 
 
 
- curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=isobaric(0.0,500.0)&subset=time(0)"> foo.nc
+ curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=isobaric(0.0,500.0)&subset=time(0)"> foo.nc
 
 
 
 
 
-curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lat(-20.0,20.0)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lat(-20.0,20.0)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
 
 
 
@@ -37,31 +40,31 @@ curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverag
 
 
 
-curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lat(-20.0,20.0)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lat(-20.0,20.0)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
 
 
-curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lon(-125.0,-116.4)&subset=lat(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=lon(-125.0,-116.4)&subset=lat(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
 
 
-curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
 
 
 curl "http://testbed-12.opendap.org:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&mediaType=multipart/related" > foo.nc
 
 
-EO_NCEP
+########################
+#
+#
+# EO_NCEP   DAP REquests
+#
+#
+# DDS: http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dds
+# DMR: http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dmr
+#
+# http:://localhost:8080/opendap/testbed-12/ncep/
 
 
-DDS: http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dds
-DMR: http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dmr
-
-http:://localhost:8080/opendap/testbed-12/ncep/
-
-
-curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=eo_ncep_model_example"
-
-
-
+curl "$WCS_SERVICE&request=DescribeCoverage&coverageId=eo_ncep_model_example"
 
 
 curl "http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dods?grid(u-component_of_wind_isobaric,\"41.9<=lat<=46.3\",\"0.0<=isobaric<=500.0\",\"55.0<=lon<=63.6\"),grid(v-component_of_wind_isobaric,\"41.9<=lat<=46.3\",\"0.0<=isobaric<=500.0\",\"55.0<=lon<=63.6\"),u-component_of_wind_isobaric\[0\]\[*\]\[*\]\[*\],v-component_of_wind_isobaric\[0\]\[*\]\[*\]\[*\]" > foo.nc
@@ -69,3 +72,38 @@ curl "http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc
 
 
 curl "http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc.dods?grid(u-component_of_wind_isobaric,\"41.9<=lat<=46.3\",\"0.0<=isobaric<=500.0\",\"55.0<=lon<=63.6\"),u-component_of_wind_isobaric\[0\]\[*\]\[*\]\[*\]" > foo.nc
+
+
+
+
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0.0,500.0)&subset=time(0)&scaleFactor=.1" > foo.nc;
+
+
+
+###########################################################################################################################################################################
+###########################################################################################################################################################################
+SF_1in100
+
+WCS_SERVICE="http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1"
+COVERAGE_ID="eo_newSF_1in100_reorder,nc"
+
+http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=$COVERAGE_ID
+
+http://testbed-12:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100_reorder.nc.dds
+
+#        Float64 depth[time = 108][latitude = 4800][longitude = 4800];
+
+latitude     min:   37.3333332966667  max:   38.6663888522222
+longitude    min: -122.666388920222   max: -121.333333364667
+
+
+latSubset="subset=latitude(37.6,38.1)"
+lonSubset="subset=longitude(-122.2,-121.7)"
+
+curl "$WCS_SERVICE&request=GetCoverage&coverageId=$COVERAGE_ID&$latSubset&$lonSubset&subset=time(0)&scaleFactor=.1" > foo.nc;
+
+
+
+
+
+curl "http://localhost:8080/opendap/testbed-12/NETCDF_Flood/2d.nc4.dds?scale_grid(depth,48,48)"
