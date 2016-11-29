@@ -26,8 +26,9 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <LocalFileCatalog xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#" validateCatalog="false">
-    
-    
+
+    <!--
+
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
         <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/ECMWF_ERA-40_subset.nc</DapDatasetUrl>
@@ -52,7 +53,6 @@
         <field name="tp"   dapID="tp" />
     </WcsCoverage>
 
-    <!--
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcw.xml">
         <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/ECMWF_ERA-40_subset.nc</DapDatasetUrl>
         <DomainCoordinate name="time"      dapID="time"      units="hours since 1900-01-01 00:00:0.0" />

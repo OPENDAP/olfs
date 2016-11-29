@@ -374,6 +374,183 @@ public class GetCoverageRequestProcessor {
         /**
          * Is there a Scale request?
          */
+        ScaleRequest scaleRequest = req.getScaleRequest();
+
+        StringBuilder dap2CE = new StringBuilder();
+
+        /**
+         * Here we begin building the DAP2 CE
+         * For every field (variable) to be transmitted we (may) need server side functional expressions,
+         * array subset expressions, etc.
+         *
+         */
+        Vector<String> subsetClauses =  new Vector<>();
+        for(String fieldId: _rangeSubset){
+            String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
+
+            if(dimensionSubsets.isEmpty()){
+                // no dimension subsets means take the whole enchilada
+                subsetClauses.add(dapGridArrayName);
+            }
+            else {
+
+
+                // So we need to process the value based subsets by using a call to the grid() ssf
+                // The array index subsets, if any need to be applied to the variable as it is
+                // passed into the grid() function
+
+
+                StringBuilder valueSubsetClause = new StringBuilder();
+
+                boolean arraySubset = false;
+
+                // Process each dimension subset term the user has submitted
+                for (DimensionSubset dimSub : dimensionSubsets.values()) {
+
+
+                    if(dimSub.isValueSubset()) {
+                        // A value subset means that the user supplied values of the domain coordinates that specify
+                        // the bounds of the subset that they want
+                        if(valueSubsetClause.length()>0){
+                            valueSubsetClause.append(",");
+                        }
+                        // Then we tack on the value constraint expression: "low<=dimName<=high"
+                        valueSubsetClause.append(dimSub.getDap2GridValueConstraint());
+                    }
+                    else if(dimSub.isArraySubset()) {
+                        // An Array subset means that user indicated (through the use of integer values in
+                        // their subset request) that they are wanting to subset by array index.
+                        // Because order of the [] array notation in DAP URL's is important, we collect
+                        // all of the user provided array constraints here and then literally sort them out below
+                        // for inclusion in the response.
+
+                        DomainCoordinate domCoord =  domainCoordinates.get(dimSub.getDimensionId());
+                        domCoord.setArraySubset(dimSub.getDapArrayIndexConstraint());
+                        arraySubset = true;
+                    }
+                    else {
+                        throw new WcsException("Unrecognized dimension subset.",WcsException.NO_APPLICABLE_CODE);
+                    }
+                }
+
+                // So we've processed all the user requested dimension subsets, now we need to build the inditial
+                // array subsetting clause if needed.
+
+
+                StringBuilder fieldSubsetClause = new StringBuilder();
+
+                // If theres value based subsetting to be done we'll need the grid() ssf
+                if(valueSubsetClause.length()>0) {
+                    fieldSubsetClause.append("grid(");
+                }
+                // then the name of the variable
+                fieldSubsetClause.append(dapGridArrayName);
+
+                // Add any inditial array subsets to the variable name
+                if(arraySubset){
+                    // We build the subsetting string using the domain coordinates in the order they
+                    // appear in the DAP dataset, which is how they MUST occur in the configuration
+                    // or this all gets broken.
+                    for(DomainCoordinate dc : domainCoordinates.values()){
+                        String clause = dc.getArraySubset();
+                        clause = clause==null?"[*]":clause;
+                        fieldSubsetClause.append(clause);
+                    }
+                }
+
+                // Add the value subsets (to the grid() syntax)
+                if(valueSubsetClause.length()>0){
+                    fieldSubsetClause.append(",");
+                    fieldSubsetClause.append(valueSubsetClause);
+                    fieldSubsetClause.append(")");
+                }
+
+                // add to the list of clauses.
+                subsetClauses.add(fieldSubsetClause.toString());
+
+
+            } // dimension subsets
+        } // fields
+
+        for(String subsetClause: subsetClauses){
+            String comma_as_needed = dap2CE.length()>0 ? "," : "";
+            dap2CE.append(comma_as_needed).append(subsetClause);
+        }
+
+        try {
+            log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+            return URLEncoder.encode(dap2CE.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
+            throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
+        }
+
+    }
+
+    private static String getDap2CE_OLD(GetCoverageRequest req) throws InterruptedException, WcsException {
+
+
+        String coverageID = req.getCoverageID();
+
+
+        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(coverageID);
+        Vector<Field> fields = coverageDescription.getFields();
+        HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
+
+
+        // The user may have provided domain subsets.
+        // Let's first just QC the request - We'll make sure that the user is asking for dimension
+        // subsets of coordinate dimensions that this field has, and while we do that we will associate
+        // every matching DomainCoordinate with the DimensionSubset that it matched.
+        LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverageDescription.getDomainCoordinates();
+        for(DimensionSubset ds: dimensionSubsets.values()){
+            DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
+            if(dc==null){
+
+                /**
+                 * It's likely to happen frequently that the user submits a bad dimension name. So
+                 * take the time to give an informative error message.
+                 */
+                StringBuilder msg = new StringBuilder();
+                msg.append("Bad subsetting request.\n");
+                msg.append("A subset was requested for dimension '").append(ds.getDimensionId()).append("'");
+                msg.append(" and there is no coordinate dimension of that name in the Coverage ");
+                msg.append("'").append(coverageDescription.getCoverageId()).append("'\n");
+
+                msg.append("Valid coordinate dimension names for '").append(coverageDescription.getCoverageId()).append("' ");
+                msg.append("are: ");
+                for(String dcName :domainCoordinates.keySet()){
+                    msg.append("\n    ").append(dcName);
+                }
+                msg.append("\n");
+
+                log.debug(msg.toString());
+
+                throw new WcsException(msg.toString(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "wcs:dimension");
+            }
+
+            ds.setDomainCoordinate(dc);
+
+        }
+
+
+        /**
+         * Determines which fields (variables) will be sent back with the response.
+         * If none are specified, all are sent.
+         */
+        Vector<String> _rangeSubset =  req.getRangeSubset();
+        if(_rangeSubset.isEmpty()) {
+            // if they didn't ask for a subset of the set of fields, then take them all.
+            for (Field field : fields) {
+                _rangeSubset.add(field.getName());
+            }
+        }
+
+        /**
+         * Is there a Scale request?
+         */
         ScaleRequest sr = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
@@ -390,6 +567,7 @@ public class GetCoverageRequestProcessor {
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
+                // no dimension subsets means take the whole enchilada
                 arraySubsetClauses.add(dapGridArrayName);
             }
             else {
@@ -498,6 +676,5 @@ public class GetCoverageRequestProcessor {
         }
 
     }
-
 
 }
