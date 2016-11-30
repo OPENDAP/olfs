@@ -108,6 +108,15 @@ curl "$WCS_SERVICE&request=DescribeCoverage&coverageId=$COVERAGE_ID";
 curl "$WCS_SERVICE&request=GetCoverage&coverageId=$COVERAGE_ID&$latSubset&$lonSubset&subset=time(0)" > foo.nc;
 curl "$WCS_SERVICE&request=GetCoverage&coverageId=$COVERAGE_ID&$latSubset&$lonSubset&subset=time(0)&scaleFactor=.1" > foo.nc;
 
+curl "http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0,3)&subset=time(0)&format=x-netcdf" > foo.nc
+
+grid(u-component_of_wind_isobaric[0][0:1:3][*][*],"41.9<=lat<=46.3","55.0<=lon<=63.6"),grid(v-component_of_wind_isobaric[0][0:1:3][*][*],"41.9<=lat<=46.3","55.0<=lon<=63.6")
+
+
+curl "http://testbed-12.opendap.org:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=eo_ncep_model_example&subset=longitude(55.0,63.6)&subset=latitude(41.9,46.3)&subset=isobaric(0,3)&subset=time(0)&format=x-netcdf" > foo.nc
+
+grid(u-component_of_wind_isobaric[0][0:1:3][*][*],"41.9<=lat<=46.3","55.0<=lon<=63.6"),grid(v-component_of_wind_isobaric[0][0:1:3][*][*],"41.9<=lat<=46.3","55.0<=lon<=63.6")
+
 
 
 curl "http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100_reorder.nc.dods?grid(depth\[0\]\[*\]\[*\],\"37.9<=latitude<=38.1\",\"-122.0<=longitude<=-121.7\")"
