@@ -1,3 +1,39 @@
+2016-11-03 ---  hyrax=1.13.2 olfs=1.16.1  END 
+2016-11-03  Nathan Potter  <ndp@opendap.org>
+
+    Added some release helper scripts.
+
+2016-11-02  Nathan Potter  <ndp@opendap.org>
+
+    olfs:   Dropped duplicate server name from fnoc history attribute entry.
+    
+	Updating OLFS baselines to rflect minor changes in BES error message content.
+
+2016-10-31  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2016-10-03  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Updated viewers.xml file to reflect changes for ncWMS2 and Godiva3?
+
+2016-08-29  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   Patching a problem with the way the XSL transforms are carried out that could have left the process running in an unexpected directory.
+
+2016-06-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Repaired variable semantics..
+
+	olfs:  Repaired variable semantics..
+
+2016-06-03  Nathan Potter  <ndp@opendap.org>
+
+	Patched issue in test
+
+	Release Candidate 1 Hyrax-1.13.1, OLFS-1.16.0
+
+	helpoer script
 2016-06-03 ---  hyrax=1.13.1 olfs=1.16.0  END 
 2016-01-27  Nathan Potter  <ndp@opendap.org>
 

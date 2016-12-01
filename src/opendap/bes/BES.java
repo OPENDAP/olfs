@@ -40,6 +40,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -694,7 +695,8 @@ public class BES {
             throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
-        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
+        log.debug("besTransaction() request document: \n{}-----------\n",showRequest(request));
+        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
 
 
         boolean trouble = false;
@@ -829,7 +831,7 @@ public class BES {
 
         log.debug("besTransaction() - Started.");
         log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
-
+        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
 
         boolean besTrouble = false;
 

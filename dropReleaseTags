@@ -1,0 +1,14 @@
+#!/bin/sh
+
+hyrax_ver=$1
+olfs_ver=$2
+
+
+# Drop OLFS version tag
+git push --delete origin olfs-$olfs_ver
+git tag --delete olfs-$olfs_ver
+
+
+# Drop Hyrax version tag
+git push --delete origin hyrax-$hyrax_ver
+git tag --delete hyrax-$hyrax_ver
