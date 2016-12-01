@@ -326,7 +326,19 @@ public class ReqInfo {
     }
 
 
-
+    /**
+     * Sucks an InputStream dry and turns the extracted content into a Java String.
+     *
+     * Lifted from Pat Niemeyer's 2004 Stupid Scanner Tricks Article
+     * Orig Source: https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
+     * Archive: http://web.archive.org/web/20140531042945/https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
+     *
+     * @author Pat Niemeyer -  http://pat.net/Pat%20Niemeyer/Welcome.html
+     * @param is InputStream to drain
+     * @return A String formed from the content of InputStream is;
+     * @throws IOException When the bad things happen.
+     *
+     */
     private static String convertStreamToString(java.io.InputStream is) throws IOException {
 
         // Using the scanner with the \A delimiter basically says "from the beginning of the input"
