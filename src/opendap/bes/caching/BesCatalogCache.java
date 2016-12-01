@@ -3,6 +3,7 @@ package opendap.bes.caching;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -85,7 +86,25 @@ public class BesCatalogCache implements Runnable{
 
         public CatalogTransaction(String key, Document request, Object response){
             _key = key;
-            _request = request;
+            _request = (Document)request.clone();
+
+
+            // Dump the timeout context from the request.
+            List list = _request.getRootElement().getChildren("setContext", BES.BES_NS);
+            Vector<Element> dropList = new Vector<>();
+            for(Object o : list){
+                Element setContextElement = (Element) o;
+                String contextName=setContextElement.getAttributeValue("name");
+                if(contextName.equals("bes_timeout")){
+                    dropList.add(setContextElement);
+                }
+            }
+            for(Element dropMe: dropList){
+                dropMe.detach();
+            }
+
+
+
             _response = response;
             _lastAccessedTime = System.nanoTime();
             _lastUpdateTime = _lastAccessedTime;
@@ -97,7 +116,7 @@ public class BesCatalogCache implements Runnable{
         }
 
         public Document getRequest(){
-            return _request;
+            return (Document) _request.clone();
         }
 
         /**
@@ -233,6 +252,7 @@ public class BesCatalogCache implements Runnable{
             return;
 
 
+
         lock.lock();
         try {
             log.debug("putCatalogTransaction() - BEGIN  catalogTransactionCache.size(): {}  " +
@@ -340,7 +360,7 @@ public class BesCatalogCache implements Runnable{
             BesApi besApi = new BesApi();
             try {
                 Document response = new Document();
-                besApi.besTransaction(resourceId, cTransaction._request, response);
+                besApi.besTransaction(resourceId, cTransaction.getRequest(), response);
                 cTransaction._response = response.clone();
             } catch (BESError be) {
                 log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
