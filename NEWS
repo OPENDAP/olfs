@@ -10,8 +10,13 @@ Version 1.16.2 (10 Jan 2017)
 - Issues with the netcdf file response History attribute were fixed,
   once again...
 
-- Changed the XXX error message to YYY from 418 (I'm a teapot). But,
-  we really liked the teapot...
+- Prompted by user requests we have changed the HTTP status returned when 
+  the server encounters a BES timeout error from 418 (I'm a teapot) to 504 
+  (Gateway Timeout) We really liked the teapot because we felt applying the 
+  504 (Gateway Timeout) status to this error strains the formal definition 
+  of the 504 status code and could lead to confusion down the road. 
+  Time will tell...
+
 
 Version 1.16.1  (02 Nov 2016)
 
