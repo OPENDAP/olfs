@@ -3,7 +3,7 @@ Version 1.16.2 (10 Jan 2017)
 - Improved logging, including log rotation.
 
 - Fixed a null pointer exception in the AggregationServlet (the
-  component that performs user-specified aggragtions).
+  component that performs user-specified aggregations).
 
 - Repaired viewers.xml configuration for Godiva3
 
