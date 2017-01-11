@@ -26,6 +26,7 @@
 
 package opendap.bes.dap4Responders.DatasetMetadata;
 
+import opendap.PathBuilder;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
@@ -140,8 +141,7 @@ public class HtmlDMR extends Dap4Responder {
         log.debug("Cached working directory: "+currentDir);
 
 
-        String xslDir = _systemPath + "/xsl";
-
+        String xslDir = new PathBuilder(_systemPath).pathAppend("xsl").toString();
 
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);

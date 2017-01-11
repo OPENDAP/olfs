@@ -25,6 +25,7 @@
  */
 package opendap.gateway;
 
+import opendap.PathBuilder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.HttpResponder;
 import org.slf4j.Logger;
@@ -82,8 +83,8 @@ public class GatewayForm extends HttpResponder {
         String contextPath = request.getContextPath();
 
 
+        String gatewayFormFile = new PathBuilder(_systemPath).pathAppend("gateway").pathAppend("gateway_form.html").toString();
 
-        String gatewayFormFile = _systemPath + "/gateway/gateway_form.html";
         String form = readFileAsString(gatewayFormFile);
 
 
