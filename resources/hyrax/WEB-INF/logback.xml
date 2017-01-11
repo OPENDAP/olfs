@@ -27,14 +27,12 @@
 
 <configuration>
 
-    <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
-    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}]  %-5p - %c - %m%n" />
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
           <pattern>${FORMAT}</pattern>
         </encoder>
-
     </appender>
 
     <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
@@ -42,68 +40,56 @@
     </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/error.log</File>
-
+        <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxErrors.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>3</MaxIndex>
         </rollingPolicy>
-
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
-
-
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
           <pattern>${FORMAT}</pattern>
         </encoder>
-
     </appender>
 
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
-
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
-
     </appender>
 
 
     <appender name="AnonymousAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/AnonymousAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>AnonymousAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxAnonymousAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
-
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
-
     </appender>
 
 
-    <appender name="BESCommands" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="BESCommandLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/BESCommands.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxBESCommands.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
-
-
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}]      %m</pattern>
+            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}] [%X{resourceID}] [%X{query}] %m</pattern>
         </encoder>
-
     </appender>
 
 
@@ -115,18 +101,25 @@
 
     <logger name="opendap" level="error" >
         <appender-ref ref="stdout"/>
+        <appender-ref ref="ErrorLog"/>
     </logger>
 
 
+
     <!-- Access/Performance Logging -->
-    <logger name="HyraxAccess" level="all">
+    <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
 
+    <!-- logger name="BesCommandLog" level="info">
+        <appender-ref ref="BESCommandLogAppender"/>
+    </logger -->
+
+
     <root level="error">
-        <appender-ref ref="ErrorLog"/>
         <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>
+
 
 </configuration>

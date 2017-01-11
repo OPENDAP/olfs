@@ -588,6 +588,8 @@ public class AggregationServlet extends HttpServlet {
 
             String requestKind = request.getParameter("operation");
             _log.debug("Aggregation: The requested operation is: {}", requestKind);
+            if (requestKind == null)
+                requestKind = "nothing - the operation parameter was not supplied.";
 
             switch (requestKind) {
                 case "version":

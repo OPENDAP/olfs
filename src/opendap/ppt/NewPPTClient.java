@@ -300,7 +300,7 @@ public class NewPPTClient {
         */
 
 
-        log.error(msg.toString());
+        log.info(msg.toString());
         try {
             if(informServer && _out != null) {
                 _out.close();

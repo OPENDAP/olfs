@@ -25,6 +25,7 @@
  */
 package opendap.bes.dap2Responders;
 
+import opendap.PathBuilder;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -127,14 +128,17 @@ public class RDF extends Dap4Responder {
         log.debug(xmlo.outputString(ddx));
 
         ServletOutputStream os = response.getOutputStream();
-        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes( HyraxStringEncoding.getCharset())));
+        StreamSource ddxStreamSource  =
+                new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes( HyraxStringEncoding.getCharset())));
 
         /*
          Because we are going to daisy chain the XSLT's we have to be careful here!
          */
 
         // Make the first Transform
-        String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
+        String addRdfId2DapTransformFileName =
+                new PathBuilder(_systemPath).pathAppend("xsl").pathAppend("addRdfId2Dap3.2.xs").toString();
+
         Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
 
         // Grab it's Processor object. All of the XSLT's in the chain must be built

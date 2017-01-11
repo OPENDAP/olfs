@@ -549,7 +549,7 @@
             <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and not(parent::dap:Map)">
                 <xsl:value-of select="$separator"/>
             </xsl:if>
-            <xsl:value-of select="@name"/>
+            <xsl:value-of select="translate(@name,' ','_')"/>
         </xsl:if>
     </xsl:template>
     <!-- ################################################################### -->

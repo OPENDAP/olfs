@@ -441,10 +441,11 @@ public abstract class Dap4Responder extends BesDapResponder  {
         SimpleDateFormat sdf = new SimpleDateFormat(CF_History_Entry_Date_Format);
         sdf.setTimeZone(new SimpleTimeZone(0,"GMT"));
         cf_history_entry.append(sdf.format(now,new StringBuffer(),new FieldPosition(0)));
+        cf_history_entry.append(" ");
 
 
         // Add the Hyrax Version
-        cf_history_entry.append(" Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
+        cf_history_entry.append("Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
         cf_history_entry.append(" ");
 
         // Add the complete request URL
