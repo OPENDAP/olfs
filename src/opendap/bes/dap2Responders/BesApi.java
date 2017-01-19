@@ -110,6 +110,9 @@ public class BesApi {
 
     public static final String EXPLICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
 
+    // Added for cloudydap experiment
+    public static final String CLOUDY_DAP_CONTEXT = "cloudydap";
+
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
 
@@ -2300,6 +2303,14 @@ public class BesApi {
 
         request.setAttribute("reqID",reqID);
 
+        /**----------------------------------------------------------------------
+         * Added this bit for the cloudy dap experiment - ndp 1/19/17
+         */
+        String cloudyDap = qp.getCloudyDap();
+        if(cloudyDap!=null){
+            request.addContent(setContextElement(CLOUDY_DAP_CONTEXT,cloudyDap));
+        }
+        /**----------------------------------------------------------------------*/
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 

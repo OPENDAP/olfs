@@ -195,14 +195,19 @@ public class BesGatewayApi extends BesApi {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-
-
-
         String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
 
 
         request.setAttribute("reqID",reqID);
 
+        /**----------------------------------------------------------------------
+         * Added this bit for the cloudy dap experiment - ndp 1/19/17
+         */
+        String cloudyDap = qp.getCloudyDap();
+        if(cloudyDap!=null){
+            request.addContent(setContextElement(CLOUDY_DAP_CONTEXT,cloudyDap));
+        }
+        /**----------------------------------------------------------------------*/
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
