@@ -105,8 +105,6 @@ public class Chunk {
         for(int i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
             sizestr.append((char) chunkHeader[i]);
         }
-
-
         //log.error("ChunkSizeString: "+sizestr);
 
         int chunkSize;
@@ -198,9 +196,10 @@ public class Chunk {
                     if (totalBytesRead == 0)
                         totalBytesRead = -1;
                     done = true;
-                } else {
+                }
+                else {
                     totalBytesRead += bytesRead;
-                    if (totalBytesRead == bytesToRead) {
+                    if(totalBytesRead == bytesToRead){
                         done = true;
                     } else {
                         len = bytesToRead - totalBytesRead;
