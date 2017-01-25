@@ -25,11 +25,13 @@
  */
 package opendap.io;
 
+import opendap.ppt.NewPPTClient;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * User: ndp
@@ -59,19 +61,20 @@ public class ChunkedInputStream  {
 
     //private ChunkProtocol chunkProtocol;
 
+    private Socket _mySock = null;
 
 
 
-/**
+    /**
      * Wraps an input stream and interprets it as a chunked stream.
      * @param stream to wrap
-     * @param chunkProtocol the chunking protocol
+     * @param s Underlying socket connection
      */
-    public ChunkedInputStream(InputStream stream, ChunkProtocol chunkProtocol){
+    public ChunkedInputStream(InputStream stream, Socket s){
 
         this(stream);
 
-        //this.chunkProtocol = chunkProtocol;
+        _mySock = s;
     }
 
 
@@ -105,17 +108,16 @@ public class ChunkedInputStream  {
     public int readChunkHeader() throws IOException {
         if(isClosed) throw new IOException("Cannot read from a closed stream.");
 
-        int ret;
-
+        log.error(NewPPTClient.showConnectionProperties(_mySock));
 
         // Read the header
-        ret = Chunk.readChunkHeader(is,currentChunkHeader,0);
+        currentChunkDataSize = Chunk.readChunkHeader(is,currentChunkHeader,0);
 
-        if(ret==-1)
-            return ret;
+        if(currentChunkDataSize==-1)
+            return currentChunkDataSize;
 
         // Cache the chunk size the header
-        currentChunkDataSize = Chunk.getDataSize(currentChunkHeader);
+        //currentChunkDataSize = Chunk.getDataSize(currentChunkHeader);
 
         // Cache the Chunk Type.
         currentChunkType = Chunk.getType(currentChunkHeader);

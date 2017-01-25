@@ -192,6 +192,7 @@ public class Chunk {
             int totalBytesRead =0;
             int bytesRead;
 
+            
             while(!done){
                 bytesRead = is.read(buf,off,len);
                 if(bytesRead == -1){
