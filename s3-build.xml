@@ -618,7 +618,7 @@ Use -DS3_UPLOAD=&quot;...&quot; to specify the command line options."
              depends="compile">
         <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
-              maxmemory="1024m"
+              maxmemory="4096m"
               dir="${build.run}"
         >
             <classpath refid="compile.classpath" />
@@ -648,7 +648,7 @@ command line options."
              depends="compile ">
         <java classname="opendap.aws.s3.SimpleRepositoryUploader"
               fork="true"
-              maxmemory="1024m"
+              maxmemory="4096m"
               dir="${build.run}"
         >
             <classpath refid="compile.classpath" />
