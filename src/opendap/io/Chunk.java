@@ -361,21 +361,28 @@ public class Chunk {
 
             StringBuilder sb =  new StringBuilder();
             sb.append("  -  InputStream Dump: \n");
-            boolean done = false;
-            while(!done){
-                byte b[] = new byte[4096];
-                int c = is.read(b);
-                if(c<0) {
-                    done = true;
-                }
-                else {
-                    for (int i = 0; i < c; i++) {
-                        sb.append((char) b[i]);
+            try {
+                boolean done = false;
+                while (!done) {
+                    byte b[] = new byte[4096];
+                    int c = is.read(b);
+                    if (c < 0) {
+                        done = true;
+                    } else {
+                        for (int i = 0; i < c; i++) {
+                            sb.append((char) b[i]);
+                        }
                     }
                 }
             }
+            catch (Exception m){
+                sb.append("OUCH! FAILED TO DRAIN STREAM! Caught ").append(m.getClass().getName());
+                sb.append(" Message: ").append(m.getMessage());
+            }
+            finally {
+                sb.append("\nDUMP END\n");
+            }
 
-            sb.append("\n");
             sb.append("RETHROWING ").append(e.getClass().getName()).append("\n");
             log.error(sb.toString());
 
