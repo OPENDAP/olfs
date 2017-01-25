@@ -108,7 +108,7 @@ public class ChunkedInputStream  {
     public int readChunkHeader() throws IOException {
         if(isClosed) throw new IOException("Cannot read from a closed stream.");
 
-        log.error(NewPPTClient.showConnectionProperties(_mySock));
+        log.debug(NewPPTClient.showConnectionProperties(_mySock));
 
         // Read the header
         currentChunkDataSize = Chunk.readChunkHeader(is,currentChunkHeader,0);
