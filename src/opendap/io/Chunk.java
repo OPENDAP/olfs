@@ -366,7 +366,7 @@ public class Chunk {
                 while (!done) {
                     byte b[] = new byte[4096];
                     int c = is.read(b);
-                    if (c <= 0) {
+                    if (c < 4096) {
                         done = true;
                     } else {
                         for (int i = 0; i < c; i++) {
