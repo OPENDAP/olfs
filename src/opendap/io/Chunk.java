@@ -368,11 +368,11 @@ public class Chunk {
                     int c = is.read(b);
                     if (c < 4096) {
                         done = true;
-                    } else {
-                        for (int i = 0; i < c; i++) {
-                            sb.append((char) b[i]);
-                        }
                     }
+                    for (int i = 0; i < c; i++) {
+                        sb.append((char) b[i]);
+                    }
+
                 }
             }
             catch (Exception m){
