@@ -358,7 +358,9 @@ public class Chunk {
         catch(IOException e)  {
 
             StringBuilder sb =  new StringBuilder();
-            sb.append("  -  InputStream Dump: \n");
+            sb.append("  -  Caught ")
+                    .append(e.getClass().getName())
+                    .append("  InputStream Dump: \n");
             boolean done = false;
             while(!done){
                 byte b[] = new byte[4096];
@@ -374,6 +376,7 @@ public class Chunk {
             }
 
             sb.append("\n");
+            sb.append("RETHROWING ").append(e.getClass().getName()).append("\n");
             log.error(sb.toString());
 
             throw e;
