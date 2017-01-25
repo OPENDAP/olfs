@@ -363,7 +363,7 @@ public class Chunk {
             while(!done){
                 byte b[] = new byte[4096];
                 int c = is.read(b);
-                if(c>0) {
+                if(c<0) {
                     done = true;
                 }
                 else {
