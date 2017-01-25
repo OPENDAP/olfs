@@ -264,7 +264,7 @@ public class NewPPTClient {
 
 
 
-        _in = new ChunkedInputStream(_rawIn, _mySock);
+        _in = new ChunkedInputStream(_rawIn);
 
         log.debug("initConnection() -  END");
 

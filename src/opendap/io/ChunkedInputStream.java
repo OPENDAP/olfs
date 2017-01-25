@@ -61,23 +61,8 @@ public class ChunkedInputStream  {
 
     //private ChunkProtocol chunkProtocol;
 
-    private Socket _mySock = null;
 
-
-
-    /**
-     * Wraps an input stream and interprets it as a chunked stream.
-     * @param stream to wrap
-     * @param s Underlying socket connection
-     */
-    public ChunkedInputStream(InputStream stream, Socket s){
-
-        this(stream);
-
-        _mySock = s;
-    }
-
-
+    
     /**
          * Wraps an input stream and interprets it as a chunked stream.
          * @param stream to wrap

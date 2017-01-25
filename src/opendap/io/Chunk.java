@@ -333,7 +333,7 @@ public class Chunk {
         if(header.length-off<HEADER_SIZE)
             throw new IOException("Header will exceed bounds of passed array.");
 
-        try {
+//        try {
             int ret;
 
             // Read the header
@@ -345,6 +345,7 @@ public class Chunk {
             int size =  getDataSize(header);
 
             return size;
+/*
         }
         catch(IOException e)  {
 
@@ -379,7 +380,7 @@ public class Chunk {
 
             throw e;
         }
-    
+*/
 
     }
 
