@@ -107,11 +107,11 @@ public class Chunk {
         }
 
 
-        //System.out.println("ChunkSizeString: "+sizestr);
+        log.info("ChunkSizeString: "+sizestr);
 
         int chunkSize = Integer.valueOf(sizestr.toString(),16);
 
-        //System.out.println("ChunkSize:       "+chunkSize);
+        log.info("ChunkSize:       "+chunkSize);
 
         if(chunkSize==0){
             return -1;
