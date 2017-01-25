@@ -355,7 +355,7 @@ public class Chunk {
 
             return size;
         }
-        catch(Exception e)  {
+        catch(IOException e)  {
 
             StringBuilder sb =  new StringBuilder();
             sb.append("  -  InputStream Dump: \n");
