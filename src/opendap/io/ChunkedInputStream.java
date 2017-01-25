@@ -25,13 +25,11 @@
  */
 package opendap.io;
 
-import opendap.ppt.NewPPTClient;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 
 /**
  * User: ndp
