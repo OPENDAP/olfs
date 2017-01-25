@@ -107,11 +107,17 @@ public class Chunk {
         }
 
 
-        log.info("ChunkSizeString: "+sizestr);
+        log.error("ChunkSizeString: "+sizestr);
 
-        int chunkSize = Integer.valueOf(sizestr.toString(),16);
+        int chunkSize = 0;
+        try {
+            Integer.valueOf(sizestr.toString(),16);
+        }
+        catch(NumberFormatException e){
+            throw new IOException("Failed to parse Chunk header datasize field. msg:"+e.getMessage());
+        }
 
-        log.info("ChunkSize:       "+chunkSize);
+        log.error("ChunkSize:       "+chunkSize);
 
         if(chunkSize==0){
             return -1;
