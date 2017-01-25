@@ -109,9 +109,9 @@ public class Chunk {
 
         //log.error("ChunkSizeString: "+sizestr);
 
-        int chunkSize = 0;
+        int chunkSize;
         try {
-            Integer.valueOf(sizestr.toString(),16);
+            chunkSize = Integer.valueOf(sizestr.toString(),16);
         }
         catch(NumberFormatException e){
             throw new IOException("Failed to parse Chunk header data size field. msg: "+e.getMessage());
