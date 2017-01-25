@@ -357,7 +357,7 @@ public class Chunk {
         }
         catch(IOException e)  {
 
-            log.error(" - Caught {}",e.getClass().getName());
+            log.error(" - Caught {} Msg: {}",e.getClass().getName(),e.getMessage());
 
             StringBuilder sb =  new StringBuilder();
             sb.append("  -  InputStream Dump: \n");
