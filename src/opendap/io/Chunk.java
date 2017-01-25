@@ -114,7 +114,8 @@ public class Chunk {
             chunkSize = Integer.valueOf(sizestr.toString(),16);
         }
         catch(NumberFormatException e){
-            throw new IOException("Failed to parse Chunk header data size field. msg: "+e.getMessage());
+            throw new IOException("Failed to parse Chunk header data size field. " +
+                    "Caught " + e.getClass().getName() + " msg: "+e.getMessage());
         }
 
         //log.error("ChunkSize:       "+chunkSize);
