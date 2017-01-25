@@ -342,16 +342,42 @@ public class Chunk {
         if(header.length-off<HEADER_SIZE)
             throw new IOException("Header will exceed bounds of passed array.");
 
-        int ret;
+        try {
+            int ret;
 
+            // Read the header
+            ret = Chunk.readFully(is, header,off, HEADER_SIZE);
 
-        // Read the header
-        ret = Chunk.readFully(is, header,off, HEADER_SIZE);
+            if(ret==-1)
+                return ret;
 
-        if(ret==-1)
-            return ret;
+            int size =  getDataSize(header);
 
-        return getDataSize(header);
+            return size;
+        }
+        catch(Exception e)  {
+
+            StringBuilder sb =  new StringBuilder();
+            sb.append("  -  InputStream Dump: \n");
+            boolean done = false;
+            while(!done){
+                byte b[] = new byte[4096];
+                int c = is.read(b);
+                if(c>0) {
+                    done = true;
+                }
+                else {
+                    for (int i = 0; i < c; i++) {
+                        sb.append((char) b[i]);
+                    }
+                }
+            }
+
+            sb.append("\n");
+            log.error(sb.toString());
+
+            throw e;
+        }
 
 
     }
