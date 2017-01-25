@@ -178,7 +178,6 @@ public class Chunk {
 
     static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException {
 
-
         if(     buf!=null &&         // Make sure the buffer is not null
                 len>=0 &&            // Make sure they want a positive number of bytes
                 off>=0 &&            // Make sure the offset is positive
@@ -192,32 +191,24 @@ public class Chunk {
             int totalBytesRead =0;
             int bytesRead;
 
-            try {
 
-                while (!done) {
-                    bytesRead = is.read(buf, off, len);
-                    if (bytesRead == -1) {
-                        if (totalBytesRead == 0)
-                            totalBytesRead = -1;
+            while (!done) {
+                bytesRead = is.read(buf, off, len);
+                if (bytesRead == -1) {
+                    if (totalBytesRead == 0)
+                        totalBytesRead = -1;
+                    done = true;
+                } else {
+                    totalBytesRead += bytesRead;
+                    if (totalBytesRead == bytesToRead) {
                         done = true;
                     } else {
-                        totalBytesRead += bytesRead;
-                        if (totalBytesRead == bytesToRead) {
-                            done = true;
-                        } else {
-                            len = bytesToRead - totalBytesRead;
-                            off += bytesRead;
-                        }
+                        len = bytesToRead - totalBytesRead;
+                        off += bytesRead;
                     }
                 }
             }
-            catch(IOException ioe){
-                log.error("Caught {} Message: {}",ioe.getClass().getName(), ioe.getMessage());
-                throw ioe;
-            }
-
             return totalBytesRead;
-
         }
         else {
             String msg = "Attempted to read "+len+" bytes starting " +
@@ -230,10 +221,6 @@ public class Chunk {
             log.error(msg);
             throw new IOException(msg);
         }
-
-
-
-
     }
 
     /**
