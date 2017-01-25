@@ -201,7 +201,8 @@ public class Chunk {
                     totalBytesRead += bytesRead;
                     if(totalBytesRead == bytesToRead){
                         done = true;
-                    } else {
+                    }
+                    else {
                         len = bytesToRead - totalBytesRead;
                         off += bytesRead;
                     }
