@@ -176,7 +176,7 @@ public class Chunk {
     }
 
 
-    static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException{
+    static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException {
 
 
         if(     buf!=null &&         // Make sure the buffer is not null
@@ -192,24 +192,28 @@ public class Chunk {
             int totalBytesRead =0;
             int bytesRead;
 
-            
-            while(!done){
-                bytesRead = is.read(buf,off,len);
-                if(bytesRead == -1){
-                    if(totalBytesRead==0)
-                        totalBytesRead=-1;
-                    done = true;
-                }
-                else {
-                    totalBytesRead += bytesRead;
-                    if(totalBytesRead == bytesToRead){
+            try {
+
+                while (!done) {
+                    bytesRead = is.read(buf, off, len);
+                    if (bytesRead == -1) {
+                        if (totalBytesRead == 0)
+                            totalBytesRead = -1;
                         done = true;
-                    }
-                    else {
-                        len = bytesToRead - totalBytesRead;
-                        off += bytesRead;
+                    } else {
+                        totalBytesRead += bytesRead;
+                        if (totalBytesRead == bytesToRead) {
+                            done = true;
+                        } else {
+                            len = bytesToRead - totalBytesRead;
+                            off += bytesRead;
+                        }
                     }
                 }
+            }
+            catch(IOException ioe){
+                log.error("Caught {} Message: {}",ioe.getClass().getName(), ioe.getMessage());
+                throw ioe;
             }
 
             return totalBytesRead;
