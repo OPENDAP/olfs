@@ -140,7 +140,7 @@ public class OPeNDAPClient {
 
         int paddedTimeout = (int)(timeOut * 1.5);
 
-        paddedTimeout = 10000;
+        // paddedTimeout = 10000;
         
         _client = new NewPPTClient(hostStr, portVal, paddedTimeout);
         _client.initConnection();
