@@ -234,8 +234,7 @@ public class ChunkedInputStream  {
                 // read the chunk body
                 bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
 
-                log.error("CurrentChunksize: "+ currentChunkDataSize+
-                        " bytesReceived: "+ bytesReceived);
+                log.debug("CurrentChunksize: "+ currentChunkDataSize+ " bytesReceived: "+ bytesReceived);
                 
                 // update the read pointer.
                 chunkReadPosition += bytesReceived;
