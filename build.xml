@@ -377,7 +377,7 @@
                 <exclude name="opendap/noaa_s3/**"/>
 
                 <!-- Exclude async test code -->
-                <!-- exclude name="opendap/async/**"/ -->
+                <exclude name="opendap/async/**"/>
 
 
                 <!-- Exclude the Hyrax Admin Interface code  -->

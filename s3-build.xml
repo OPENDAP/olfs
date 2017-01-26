@@ -353,6 +353,10 @@ the build/src directory. The code text is filtered to update version numbers.">
                 <exclude  name="opendap/aws/glacier/**"/>
                 <exclude  name="opendap/aws/demo.java"/>
                 <exclude  name="opendap/aws/s3/Testy.java"/>
+
+                <!-- Exclude async test code -->
+                <exclude name="opendap/async/**"/>
+
             </fileset>
 
         </copy>

@@ -775,6 +775,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
  * systems, but not older ones.
  * Comment them out or uncomment them as needed
  */
+/*
         @Override
         public String changeSessionId() {
             return r.changeSessionId();
@@ -790,7 +791,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public long getContentLengthLong() {
             return r.getContentLengthLong();
         }
-        
+ */
 /* ********************************************************************************** */
 /* ********************************************************************************** */
 /* ********************************************************************************** */
