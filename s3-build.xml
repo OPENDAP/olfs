@@ -350,6 +350,7 @@ the build/src directory. The code text is filtered to update version numbers.">
                 <exclude  name="opendap/wcs/**"/>
                 <exclude  name="opendap/hai/**"/>
                 <exclude  name="opendap/aws/glacier/**"/>
+                <exclude  name="opendap/aws/glacier/**"/>
                 <exclude  name="opendap/aws/demo.java"/>
                 <exclude  name="opendap/aws/s3/Testy.java"/>
             </fileset>
