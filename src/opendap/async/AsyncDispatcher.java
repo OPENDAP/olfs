@@ -730,11 +730,6 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public HttpSession getSession() { return r.getSession(); }
 
-        //@Override
-        //public String changeSessionId() {
-        //    return r.changeSessionId();
-        //}
-
         public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
 
         public boolean isRequestedSessionIdFromCookie() { return r.isRequestedSessionIdFromCookie(); }
@@ -771,10 +766,36 @@ public class AsyncDispatcher extends BesDapDispatcher {
             return r.getPart(s);
         }
 
-        //@Override
-        //public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
-        //    return r.upgrade(aClass);
-        //}
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* **********************************************************************************
+ * The following methods are part of the Servlet API version 3.1 that is not
+ * yet deployed to CentOS-6.6 yum repos. So - these will compile on more modrern
+ * systems, but not older ones.
+ * Comment them out or uncomment them as needed
+ */
+        @Override
+        public String changeSessionId() {
+            return r.changeSessionId();
+        }
+
+
+        @Override
+        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+            return r.upgrade(aClass);
+        }
+
+        @Override
+        public long getContentLengthLong() {
+            return r.getContentLengthLong();
+        }
+        
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+
 
 
         public Object getAttribute(String s) { return r.getAttribute(s); }
@@ -787,10 +808,6 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public int getContentLength() { return r.getContentLength(); }
 
-        //@Override
-        //public long getContentLengthLong() {
-        //    return r.getContentLengthLong();
-        //}
 
         public String getContentType() { return r.getContentType(); }
 
