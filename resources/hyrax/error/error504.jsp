@@ -52,7 +52,7 @@
                 <img src="<%= contextPath %>/docs/images/watchit.jpg"
                      alt="BES Timeout!"
                      title="BES Timeout!"
-                     width="350" height="300"
+                     width="360" height="480"
                      border="0"/>
             </a>
         </td>
