@@ -323,6 +323,10 @@
         <location>/error/error502.jsp</location>
     </error-page>
     <error-page>
+        <error-code>504</error-code>
+        <location>/error/error504.jsp</location>
+    </error-page>
+    <error-page>
         <exception-type>java.lang.Throwable</exception-type>
         <location>/error/error500.jsp</location>
     </error-page>
