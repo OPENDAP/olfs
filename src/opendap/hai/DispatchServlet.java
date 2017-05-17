@@ -165,6 +165,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
             masterRegex += p.getRequestMatchRegexString();
         }
+        masterRegex =  masterRegex==null?"":masterRegex;
         return Pattern.compile(masterRegex);
     }
 

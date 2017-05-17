@@ -27,7 +27,9 @@
 package opendap.coreServlet;
 
 
+import opendap.threddsHandler.InheritedMetadataManager;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import java.io.*;
@@ -146,7 +148,7 @@ public class PersistentConfigurationHandler {
             if(!toDir.mkdirs()){
                 String msg = "FAILED to create target directory '"+toDir.getAbsolutePath()+
                               "' Unable to copy content from '"+fromDir.getAbsolutePath()+"'";
-                log.error("copyDirTree() - {}",msg);
+                LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - {}",msg);
                 throw new IOException(msg);
             }
         }
