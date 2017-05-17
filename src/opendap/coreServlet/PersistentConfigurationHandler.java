@@ -67,12 +67,12 @@ public class PersistentConfigurationHandler {
             //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
 
             String semaphore = ".INIT";
-
-            log.debug("PersistentContentHandler:");
-            log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
-            log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
-            log.debug("    semaphore:                " + semaphore);
-            log.debug("    ThreadName:               " + Thread.currentThread().getName());
+            Logger my_log = LoggerFactory.getLogger(PersistentConfigurationHandler.class);
+            my_log.debug("PersistentContentHandler:");
+            my_log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
+            my_log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
+            my_log.debug("    semaphore:                " + semaphore);
+            my_log.debug("    ThreadName:               " + Thread.currentThread().getName());
 
 
             // -------------
@@ -83,12 +83,12 @@ public class PersistentConfigurationHandler {
             if (defaultConfigurationFile.exists()) {
                 try {
                     if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphore)) {
-                        log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
+                        my_log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
                     } else {
-                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
+                        my_log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
                     }
                 } catch (IOException ioe) {
-                    log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
+                    my_log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
                 }
             }
             //-------------
@@ -110,7 +110,7 @@ public class PersistentConfigurationHandler {
                 copyDirTree(fromDir, toDir);
                 if (!contentFile.exists()) {
                     String msg = "FAILED to locate semaphore file '" + contentFile.getAbsolutePath() + "' after copy completed.";
-                    log.error("copyDirIfSemaphoreNotPresent() - {}", msg);
+                    LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirIfSemaphoreNotPresent() - {}", msg);
                     throw new IOException(msg);
 
                 }
@@ -155,7 +155,7 @@ public class PersistentConfigurationHandler {
 
         File[] files = fromDir.listFiles();
         if(files==null){
-            log.error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+            LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
             return;
         }
         for (int i=0; i<files.length; i++) {
@@ -185,7 +185,7 @@ public class PersistentConfigurationHandler {
         	    out.close();
              }
              catch(IOException e){
-                 log.error("Failed to close file: "+fileOutName+" Error Message: "+e.getMessage());
+                 LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("Failed to close file: "+fileOutName+" Error Message: "+e.getMessage());
              }
          }
 
@@ -194,7 +194,7 @@ public class PersistentConfigurationHandler {
         	    in.close();
              }
              catch(IOException e){
-                 log.error("Failed to close file: "+fileInName+" Error Message: "+e.getMessage());
+                 LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("Failed to close file: "+fileInName+" Error Message: "+e.getMessage());
              }
          }
       }
