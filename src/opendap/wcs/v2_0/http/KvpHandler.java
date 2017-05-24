@@ -37,11 +37,13 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 8, 2009
- * Time: 12:03:09 AM
- * To change this template use File | Settings | File Templates.
+ *  KvpHandler handles the parsing and procesing of WCS requests received in the
+ *  URL query string as a set of Key Value Pairs;.
+ *
+ *  Supported WCS Versions:
+ *      WCS-2.0.1
+ *      EO-WCS-2.0
+ *
  */
 public class KvpHandler {
 
@@ -62,8 +64,6 @@ public class KvpHandler {
     }
 
     public static void processKvpWcsRequest(String serviceURL, String requestUrl, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
-
-
 
         Document wcsResponse;
         XMLOutputter xmlo;

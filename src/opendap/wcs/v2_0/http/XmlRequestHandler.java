@@ -44,11 +44,9 @@ import java.io.*;
 import java.net.URLDecoder;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 7, 2009
- * Time: 4:50:49 PM
- * To change this template use File | Settings | File Templates.
+ * This class is responsible for processing WCS XML request documents.
+ *
+ * Supports WCS-2.0.1 only
  */
 public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
     protected Logger log;

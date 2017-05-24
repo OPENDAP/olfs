@@ -39,12 +39,9 @@ import java.util.List;
 
 /**
  *
+ *  This class extends the XmlRequestHandler to deal with the
+ *  SOAP wrapper and all that truck.
  *
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 7, 2009
- * Time: 9:00:41 AM
- * To change this template use File | Settings | File Templates.
  */
 public class SoapHandler extends XmlRequestHandler {
 

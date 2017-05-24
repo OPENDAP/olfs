@@ -41,9 +41,8 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * User: ndp
- * Date: Mar 30, 2009
- * Time: 4:05:15 PM
+ * This class is used to wrap an instance of the WcsCatalog class with a set of
+ * static methods, creating a singleton catalog from a non-singleton class.
  */
 public class CatalogWrapper {
 
