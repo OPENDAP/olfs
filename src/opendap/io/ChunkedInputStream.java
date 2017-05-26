@@ -60,21 +60,7 @@ public class ChunkedInputStream  {
     //private ChunkProtocol chunkProtocol;
 
 
-
-
-/**
-     * Wraps an input stream and interprets it as a chunked stream.
-     * @param stream to wrap
-     * @param chunkProtocol the chunking protocol
-     */
-    public ChunkedInputStream(InputStream stream, ChunkProtocol chunkProtocol){
-
-        this(stream);
-
-        //this.chunkProtocol = chunkProtocol;
-    }
-
-
+    
     /**
          * Wraps an input stream and interprets it as a chunked stream.
          * @param stream to wrap
@@ -105,17 +91,16 @@ public class ChunkedInputStream  {
     public int readChunkHeader() throws IOException {
         if(isClosed) throw new IOException("Cannot read from a closed stream.");
 
-        int ret;
-
+        //log.info(NewPPTClient.showConnectionProperties(_mySock));
 
         // Read the header
-        ret = Chunk.readChunkHeader(is,currentChunkHeader,0);
+        currentChunkDataSize = Chunk.readChunkHeader(is,currentChunkHeader,0);
 
-        if(ret==-1)
-            return ret;
+        if(currentChunkDataSize==-1)
+            return currentChunkDataSize;
 
         // Cache the chunk size the header
-        currentChunkDataSize = Chunk.getDataSize(currentChunkHeader);
+        //currentChunkDataSize = Chunk.getDataSize(currentChunkHeader);
 
         // Cache the Chunk Type.
         currentChunkType = Chunk.getType(currentChunkHeader);
@@ -249,6 +234,8 @@ public class ChunkedInputStream  {
                 // read the chunk body
                 bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
 
+                log.debug("CurrentChunksize: "+ currentChunkDataSize+ " bytesReceived: "+ bytesReceived);
+                
                 // update the read pointer.
                 chunkReadPosition += bytesReceived;
 

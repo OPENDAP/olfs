@@ -26,11 +26,13 @@
 
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -126,7 +128,9 @@ public class HtmlDSR extends Dap4Responder {
 
         String currentDir = System.getProperty("user.dir");
         log.debug("Cached working directory: "+currentDir);
-        String xslDir = _systemPath + "xsl";
+
+        String xslDir = new PathBuilder(_systemPath).pathAppend("xsl").toString();
+
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
 

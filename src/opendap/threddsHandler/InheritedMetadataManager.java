@@ -39,6 +39,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
@@ -614,8 +615,6 @@ public class InheritedMetadataManager {
 
                     // Found applicable metadata collection
                     servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
-
-
                     for (Vector<Element> services : servicesForThisRootPath.values()) {
                         for(Element service:  services){
                             String serviceName = service.getAttributeValue("name");
@@ -628,19 +627,14 @@ public class InheritedMetadataManager {
                             }
                         }
                     }
-
-
                 }
             }
-
             inheritedServices.addContent(serviceElements.values());
             return inheritedServices;
         }
         finally {
             readLock.unlock();
         }
-
-
     }
 
 
@@ -648,19 +642,13 @@ public class InheritedMetadataManager {
         Element serviceParent = service.getParentElement();
         if(serviceParent==null){
             String msg = "FAILED to find THREDDS service definition.";
-            log.error("getServiceDefinition() - {}",msg);
+            LoggerFactory.getLogger(InheritedMetadataManager.class).error("getServiceDefinition() - {}",msg);
             throw new MissingServiceDefinitionException();
         }
         if(!serviceParent.getName().equals("service") ||  serviceParent.getNamespacePrefix().equals("thredds")){
-
             return service;
-
         }
-
         return getServiceDefinition(serviceParent);
-
-
-
     }
 
 

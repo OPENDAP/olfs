@@ -28,6 +28,7 @@ package opendap.coreServlet;
 
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import java.io.*;
@@ -41,6 +42,8 @@ public class PersistentConfigurationHandler {
 
     private static Logger log;
 
+    private static String defaultContentLocation="WEB-INF/conf/";
+
     private static final ReentrantLock _installDefaultConfigLock = new ReentrantLock();
 
 
@@ -49,47 +52,42 @@ public class PersistentConfigurationHandler {
         log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
     }
 
-    /**
-     * Checks to see if the local content directory exists, if it doesn't it is created and populated
-     * with initial content from the distribution.
-     * @param servlet
-     */
-    public static void installDefaultConfiguration(HttpServlet servlet, String semaphoreFile) {
+        /**
+         * If the following are true:
+         *  - The local configuration directory exists.
+         *  - The semaphore file does not exist in the configuration directory.
+         *  Then the default configuration will be copied into
+         *  the configuration directory.
+         *  Otherwise, nothing will be done.
+         * @param servlet
+         */
+    public static void installDefaultConfiguration(HttpServlet servlet, String semaphore) {
 
 
         _installDefaultConfigLock.lock();     // Only one thread allowed in at a time.
         try {
-
-            //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
-
-
-            log.info("installDefaultConfiguration() - configPath:               " + ServletUtil.getConfigPath(servlet));
-            log.info("installDefaultConfiguration() - defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
-            log.info("installD`faultConfiguration() - semaphore:                " + semaphoreFile);
-            log.info("installDefaultConfiguration() - ThreadName:               " + Thread.currentThread().getName());
-
-
+            Logger my_log = LoggerFactory.getLogger(PersistentConfigurationHandler.class);
+            my_log.debug("PersistentContentHandler:");
+            my_log.debug("    configPath:               {}",ServletUtil.getConfigPath(servlet));
+            my_log.debug("    defaultConfigurationPath: {}",getDefaultConfigurationPath(servlet));
+            my_log.debug("    semaphore:                {}",semaphore);
+            my_log.debug("    ThreadName:               {}",Thread.currentThread().getName());
+            
             // -------------
             // first time, create content directory
             String defaultConfigurationPath = getDefaultConfigurationPath(servlet);
-            File defaultConfigurationDir = new File(defaultConfigurationPath);
+            File defaultConfigurationFile = new File(defaultConfigurationPath);
 
-            log.info("installDefaultConfiguration() - Checking for default configuration: {}",defaultConfigurationDir.getAbsolutePath());
-
-            if (defaultConfigurationDir.exists()) {
-                log.info("installDefaultConfiguration() - Located default configuration {}",defaultConfigurationDir.getAbsolutePath());
+            if (defaultConfigurationFile.exists()) {
                 try {
-                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphoreFile)) {
-                        log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
+                    if (copyDirIfSemaphoreNotPresent(defaultConfigurationPath, ServletUtil.getConfigPath(servlet), semaphore)) {
+                        my_log.info("Copied default configuration from " + defaultConfigurationPath + " to directory " + ServletUtil.getConfigPath(servlet));
                     } else {
-                        log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphoreFile, ServletUtil.getConfigPath(servlet));
+                        my_log.info("Located configuration directory semaphore ('{}') in directory '{}'", semaphore, ServletUtil.getConfigPath(servlet));
                     }
                 } catch (IOException ioe) {
-                    log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
+                    my_log.error("Failed to copy default content directory " + defaultConfigurationPath + " to " + ServletUtil.getConfigPath(servlet), ioe);
                 }
-            }
-            else {
-                log.error("installDefaultConfiguration() - FAILED TO LOCATE {}",defaultConfigurationDir.getAbsolutePath());
             }
             //-------------
         } finally {
@@ -110,7 +108,7 @@ public class PersistentConfigurationHandler {
                 copyDirTree(fromDir, toDir);
                 if (!contentFile.exists()) {
                     String msg = "FAILED to locate semaphore file '" + contentFile.getAbsolutePath() + "' after copy completed.";
-                    log.error("copyDirIfSemaphoreNotPresent() - {}", msg);
+                    LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirIfSemaphoreNotPresent() - {}", msg);
                     throw new IOException(msg);
 
                 }
@@ -128,8 +126,7 @@ public class PersistentConfigurationHandler {
   */
 
     private static String getDefaultConfigurationPath(HttpServlet servlet) {
-        String defaultConfigurationPath = "WEB-INF/conf/";
-        return ServletUtil.getRootPath(servlet) + defaultConfigurationPath;
+      return ServletUtil.getRootPath(servlet) + defaultContentLocation;
     }
 
 
@@ -149,14 +146,14 @@ public class PersistentConfigurationHandler {
             if(!toDir.mkdirs()){
                 String msg = "FAILED to create target directory '"+toDir.getAbsolutePath()+
                               "' Unable to copy content from '"+fromDir.getAbsolutePath()+"'";
-                log.error("copyDirTree() - {}",msg);
+                LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - {}",msg);
                 throw new IOException(msg);
             }
         }
 
         File[] files = fromDir.listFiles();
         if(files==null){
-            log.error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+            LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
             return;
         }
         for (int i=0; i<files.length; i++) {
@@ -186,7 +183,7 @@ public class PersistentConfigurationHandler {
         	    out.close();
              }
              catch(IOException e){
-                 log.error("Failed to close file: "+fileOutName+" Error Message: "+e.getMessage());
+                 LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("Failed to close file: "+fileOutName+" Error Message: "+e.getMessage());
              }
          }
 
@@ -195,7 +192,7 @@ public class PersistentConfigurationHandler {
         	    in.close();
              }
              catch(IOException e){
-                 log.error("Failed to close file: "+fileInName+" Error Message: "+e.getMessage());
+                 LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("Failed to close file: "+fileInName+" Error Message: "+e.getMessage());
              }
          }
       }

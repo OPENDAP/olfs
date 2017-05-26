@@ -70,10 +70,10 @@
     </AuthenticationControls -->
 
 
-    <CatalogCache>
+    <!-- CatalogCache>
         <maxEntries>10000</maxEntries>
         <updateIntervalSeconds>10000</updateIntervalSeconds>
-    </CatalogCache>
+    </CatalogCache -->
 
     <DispatchHandlers>
 

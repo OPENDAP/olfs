@@ -101,45 +101,47 @@ public class NewPPTClient {
         }
 
     }
-
-
     public String showConnectionProperties() {
+        return showConnectionProperties(_mySock);
+    }
+
+    public static String showConnectionProperties(Socket socket) {
 
         StringBuilder msg = new StringBuilder();
 
         msg.append("\nshowConnectionProperties():\n");
-        msg.append("    Socket isBound():          ").append(_mySock.isBound()).append("\n");
-        msg.append("    Socket isClosed():         ").append(_mySock.isClosed()).append("\n");
-        msg.append("    Socket isConnected():      ").append(_mySock.isConnected()).append("\n");
-        msg.append("    Socket isInputShutdown():  ").append(_mySock.isInputShutdown()).append("\n");
-        msg.append("    Socket isOutputShutdown(): ").append(_mySock.isOutputShutdown()).append("\n");
+        msg.append("    Socket isBound():          ").append(socket.isBound()).append("\n");
+        msg.append("    Socket isClosed():         ").append(socket.isClosed()).append("\n");
+        msg.append("    Socket isConnected():      ").append(socket.isConnected()).append("\n");
+        msg.append("    Socket isInputShutdown():  ").append(socket.isInputShutdown()).append("\n");
+        msg.append("    Socket isOutputShutdown(): ").append(socket.isOutputShutdown()).append("\n");
 
         try {
-            msg.append("    Socket getKeepAlive():     ").append(_mySock.getKeepAlive()).append("\n");
+            msg.append("    Socket getKeepAlive():     ").append(socket.getKeepAlive()).append("\n");
         } catch (SocketException e) {
             msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
         }
 
         try {
-            msg.append("    Socket getOOBInline():     ").append(_mySock.getOOBInline()).append("\n");
+            msg.append("    Socket getOOBInline():     ").append(socket.getOOBInline()).append("\n");
         } catch (SocketException e) {
             msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
         }
 
         try {
-            msg.append("    Socket getReuseAddress():  ").append(_mySock.getReuseAddress()).append("\n");
+            msg.append("    Socket getReuseAddress():  ").append(socket.getReuseAddress()).append("\n");
         } catch (SocketException e) {
             msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
         }
 
         try {
-            msg.append("    Socket getSoLinger():      ").append(_mySock.getSoLinger()).append("\n");
+            msg.append("    Socket getSoLinger():      ").append(socket.getSoLinger()).append("\n");
         } catch (SocketException e) {
             msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
         }
 
         try {
-            msg.append("    Socket getSoTimeout():     ").append(_mySock.getSoTimeout()).append("\n");
+            msg.append("    Socket getSoTimeout():     ").append(socket.getSoTimeout()).append("\n");
         } catch (SocketException e) {
             msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
         }
@@ -261,7 +263,8 @@ public class NewPPTClient {
         _out = new BESChunkedOutputStream(_rawOut);
 
 
-        _in = new ChunkedInputStream(_rawIn, new PPTSessionProtocol());
+
+        _in = new ChunkedInputStream(_rawIn);
 
         log.debug("initConnection() -  END");
 

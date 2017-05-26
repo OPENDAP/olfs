@@ -149,7 +149,7 @@
         </init-param>
 
         <init-param>
-            <param-name>OLFSConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>olfs.xml</param-value>
         </init-param>
 

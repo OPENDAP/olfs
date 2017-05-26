@@ -105,13 +105,18 @@ public class Chunk {
         for(int i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
             sizestr.append((char) chunkHeader[i]);
         }
+        //log.error("ChunkSizeString: "+sizestr);
 
+        int chunkSize;
+        try {
+            chunkSize = Integer.valueOf(sizestr.toString(),16);
+        }
+        catch(NumberFormatException e){
+            throw new IOException("Failed to parse Chunk header data size field. " +
+                    "Caught " + e.getClass().getName() + " msg: "+e.getMessage());
+        }
 
-        //System.out.println("ChunkSizeString: "+sizestr);
-
-        int chunkSize = Integer.valueOf(sizestr.toString(),16);
-
-        //System.out.println("ChunkSize:       "+chunkSize);
+        //log.error("ChunkSize:       "+chunkSize);
 
         if(chunkSize==0){
             return -1;
@@ -169,8 +174,7 @@ public class Chunk {
     }
 
 
-    static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException{
-
+    static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException {
 
         if(     buf!=null &&         // Make sure the buffer is not null
                 len>=0 &&            // Make sure they want a positive number of bytes
@@ -185,11 +189,12 @@ public class Chunk {
             int totalBytesRead =0;
             int bytesRead;
 
-            while(!done){
-                bytesRead = is.read(buf,off,len);
-                if(bytesRead == -1){
-                    if(totalBytesRead==0)
-                        totalBytesRead=-1;
+
+            while (!done) {
+                bytesRead = is.read(buf, off, len);
+                if (bytesRead == -1) {
+                    if (totalBytesRead == 0)
+                        totalBytesRead = -1;
                     done = true;
                 }
                 else {
@@ -203,9 +208,7 @@ public class Chunk {
                     }
                 }
             }
-
             return totalBytesRead;
-
         }
         else {
             String msg = "Attempted to read "+len+" bytes starting " +
@@ -218,10 +221,6 @@ public class Chunk {
             log.error(msg);
             throw new IOException(msg);
         }
-
-
-
-
     }
 
     /**
@@ -334,17 +333,54 @@ public class Chunk {
         if(header.length-off<HEADER_SIZE)
             throw new IOException("Header will exceed bounds of passed array.");
 
-        int ret;
+//        try {
+            int ret;
 
+            // Read the header
+            ret = readFully(is, header,off, HEADER_SIZE);
 
-        // Read the header
-        ret = Chunk.readFully(is, header,off, HEADER_SIZE);
+            if(ret==-1)
+                return ret;
 
-        if(ret==-1)
-            return ret;
+            int size =  getDataSize(header);
 
-        return getDataSize(header);
+            return size;
+/*
+        }
+        catch(IOException e)  {
 
+            log.error(" - Caught {} Msg: {}",e.getClass().getName(),e.getMessage());
+
+            StringBuilder sb =  new StringBuilder();
+            sb.append("  -  InputStream Dump: \n");
+            try {
+                boolean done = false;
+                while (!done) {
+                    byte b[] = new byte[4096];
+                    int c = is.read(b);
+                    if (c < 4096) {
+                        done = true;
+                    }
+                    for (int i = 0; i < c; i++) {
+                        sb.append((char) b[i]);
+                    }
+
+                }
+            }
+            catch (Exception m){
+                sb.append("OUCH! FAILED TO DRAIN STREAM! Caught ").append(m.getClass().getName());
+                sb.append(" Message: ").append(m.getMessage());
+            }
+            finally {
+                sb.append("\nDUMP END\n");
+            }
+
+            sb.append("RETHROWING ").append(e.getClass().getName()).append("\n");
+            log.error(sb.toString());
+
+            throw e;
+        }
+*/
 
     }
 

@@ -48,7 +48,7 @@
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${logdir}/HyraxErrors.%i{yyyy-MM-dd}.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxErrors.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>3</MaxIndex>
         </rollingPolicy>

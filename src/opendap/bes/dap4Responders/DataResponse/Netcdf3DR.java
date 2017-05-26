@@ -94,10 +94,12 @@ public class Netcdf3DR extends Dap4Responder{
     public String getDownloadFileName(String resourceID){
 
         String downloadFileName = super.getDownloadFileName(resourceID);
+        /*
+        // Turned this off at Fan's request - ndp 03/31/2017
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
-
+        */
         return downloadFileName;
     }
 

@@ -52,58 +52,33 @@
         <Attribute name="string_length" type="Int32">
             <Value>3</Value>
         </Attribute>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </String>
     <Int16 name="order">
         <Dim name="/i"/>
         <Dim name="/j"/>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </Int16>
     <Int32 name="shot">
         <Dim name="/i"/>
         <Dim name="/j"/>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </Int32>
     <Float32 name="aloan">
         <Dim name="/i"/>
         <Dim name="/j"/>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </Float32>
     <Float64 name="cross">
         <Dim name="/i"/>
         <Dim name="/j"/>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </Float64>
-    <Int32 name="i">
-        <Dim name="/i"/>
-        <Attribute name="attr1" type="String">
-            <Value>1</Value>
-        </Attribute>
-        <Attribute name="attr2" type="String">
-            <Value>1</Value>
-            <Value>2</Value>
-            <Value>3</Value>
-            <Value>4</Value>
-        </Attribute>
-        <Attribute name="i_1" type="Container">
-            <Attribute name="attr3_1" type="String">
-                <Value>17</Value>
-            </Attribute>
-            <Attribute name="attr3_2" type="Float64">
-                <Value>19</Value>
-                <Value>23</Value>
-                <Value>27</Value>
-            </Attribute>
-        </Attribute>
-    </Int32>
-    <Float32 name="j">
-        <Dim name="/j"/>
-    </Float32>
     <Int16 name="l">
         <Dim name="/l"/>
     </Int16>

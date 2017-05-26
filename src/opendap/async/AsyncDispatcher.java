@@ -729,19 +729,10 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public HttpSession getSession() { return r.getSession(); }
 
-
-        /**
-
-         @Override
-        public String changeSessionId() {
-            return r.changeSessionId();
-        }
-
         @Override
         public String changeSessionId() {
             return r.changeSessionId();
         }
-        */
 
         public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
 
@@ -778,18 +769,11 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public Part getPart(String s) throws IOException, ServletException {
             return r.getPart(s);
         }
-        /**
-
-         @Override
-        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
-            return null;
-        }
 
         @Override
         public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
             return r.upgrade(aClass);
         }
-        **/
 
         public Object getAttribute(String s) { return r.getAttribute(s); }
 
@@ -801,18 +785,10 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public int getContentLength() { return r.getContentLength(); }
 
-        /**
-
-        @Override
-        public long getContentLengthLong() {
-            return 0;
-        }
-
         @Override
         public long getContentLengthLong() {
             return r.getContentLengthLong();
         }
-        **/
 
         public String getContentType() { return r.getContentType(); }
 

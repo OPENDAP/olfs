@@ -42,9 +42,9 @@
     </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/error.log</File>
+        <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${logdir}/HyraxErrors.%d{yyyy-MM-dd}.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/HyraxErrors.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>3</MaxIndex>
         </rollingPolicy>
@@ -93,6 +93,7 @@
             <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}] [%X{resourceID}] [%X{query}] %m</pattern>
         </encoder>
     </appender>
+
 
 
 
@@ -151,63 +152,63 @@
 
     <logger name="opendap.w10n" level="all" />
 
-    <logger name="opendap.wcs.v2_0" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.wcs.v2_0.http" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
 
 
 
 
     <!--
+    <logger name="opendap.ppt.NewPPTClient" level="all" />
 
 
-        <logger name="opendap.WcsCatalog" level="all"/>
+    <logger name="opendap.wcs.v2_0.http" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="opendap.WcsCatalog" level="all"/>
 
-        <logger name="opendap.wcs" level="all">
-            <appender-ref ref="stdout"/>
-        </logger>
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
 
-        <logger name="opendap.wcs.gatewayClient" level="all"/>
-        <logger name="opendap.wcs.v1_1_2" level="all"/>
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
+    <logger name="opendap.WcsCatalog" level="all"/>
+
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
+
+    <logger name="opendap.semantics" level="debug">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="org.openrdf" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
 
 
 
+    <logger name="opendap.semantics">
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
 
+    <logger name="org.openrdf">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
 
-
-        <logger name="opendap.semantics" level="debug">
-            <appender-ref ref="stdout"/>
-            <appender-ref ref="DebugLog"/>
-        </logger>
-
-        <logger name="org.openrdf" level="info">
-            <appender-ref ref="stdout"/>
-        </logger>
-
-        <logger name="org.xml" level="info">
-            <appender-ref ref="stdout"/>
-        </logger>
-
-
-
-        <logger name="opendap.semantics">
-            <level value="DEBUG"/>
-            <appender-ref ref="stdout"/>
-        </logger>
-
-        <logger name="org.openrdf">
-            <level value="INFO"/>
-            <appender-ref ref="stdout"/>
-        </logger>
-
-        <logger name="org.xml">
-            <level value="INFO"/>
-            <appender-ref ref="stdout"/>
-        </logger>
+    <logger name="org.xml">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
     -->
 
 

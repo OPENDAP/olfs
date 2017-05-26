@@ -97,19 +97,15 @@ public class ViewersServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-
-        String viewersConfigFileName = getInitParameter("ViewersConfigFileName");
-        if (viewersConfigFileName == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the Dataset Viewers configuration!\n";
+        String configFile = getInitParameter("ConfigFileName");
+        if (configFile == null) {
+            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
+                    "is the name of the OLFS configuration file!\n";
             System.err.println(msg);
             throw new ServletException(msg);
         }
 
-
-
-
-        PersistentConfigurationHandler.installDefaultConfiguration(this, viewersConfigFileName);
+        PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
 
 
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -158,7 +154,7 @@ public class ViewersServlet extends HttpServlet {
 
         }
 
-        _configDoc = loadConfig(viewersConfigFileName);
+        _configDoc = loadConfig();
 
         buildJwsHandlers(_webStartResourcesDirectory,_configDoc.getRootElement());
         buildWebServiceHandlers(_webStartResourcesDirectory, _configDoc.getRootElement());
@@ -172,14 +168,22 @@ public class ViewersServlet extends HttpServlet {
 
     /**
      * Loads the configuration file specified in the servlet parameter
-     * OLFSConfigFileName.
+     * ViewersConfigFileName.
      *
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
      */
-    private Document loadConfig(String filename) throws ServletException {
+    private Document loadConfig() throws ServletException {
 
         Document doc;
+
+        String filename = getInitParameter("ViewersConfigFileName");
+        if (filename == null) {
+            String msg = "Servlet configuration must include a file name for " +
+                    "the Dataset Viewers configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
 
         filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 

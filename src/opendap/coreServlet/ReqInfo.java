@@ -735,18 +735,21 @@ public class ReqInfo {
         String servletPath = req.getServletPath();
 
 
+        //String preq = ServletUtil.probeRequest(null,req);
 
+        //System.out.println(preq);
         String reqURI = req.getRequestURI();
 
         String serviceName = contextPath + servletPath;
 
+        boolean stringsMatch =  reqURI.equals(serviceName);
 
-        if (reqURI.equals(serviceName) && !reqURI.endsWith("/")) {
+        if (stringsMatch && !reqURI.endsWith("/")) {
             return true;
         }
         return false;
 
     }
-}
+}                                                          
 
 

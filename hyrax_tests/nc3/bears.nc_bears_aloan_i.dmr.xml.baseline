@@ -48,14 +48,14 @@
         <Attribute name="string_length" type="Int32">
             <Value>3</Value>
         </Attribute>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </String>
     <Float32 name="aloan">
         <Dim name="/i"/>
         <Dim name="/j"/>
-        <Map name="i"/>
-        <Map name="j"/>
+        <Map name="/i"/>
+        <Map name="/j"/>
     </Float32>
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="history" type="String">
