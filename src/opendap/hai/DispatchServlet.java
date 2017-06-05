@@ -101,7 +101,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     /**
      * Loads the configuration file specified in the servlet parameter
-     * OLFSConfigFileName.
+     * ConfigFileName.
      *
      * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
      *                                        to parse (as an XML document).

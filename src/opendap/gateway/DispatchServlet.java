@@ -100,7 +100,7 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * Loads the configuration file specified in the servlet parameter
-     * OLFSConfigFileName.
+     * GatewayConfigFileName.
      *
      * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
      *                                        to parse (as an XML document).

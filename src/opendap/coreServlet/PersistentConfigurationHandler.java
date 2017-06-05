@@ -27,7 +27,6 @@
 package opendap.coreServlet;
 
 
-import opendap.threddsHandler.InheritedMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,28 +52,27 @@ public class PersistentConfigurationHandler {
         log = org.slf4j.LoggerFactory.getLogger(PersistentConfigurationHandler.class);
     }
 
-    /**
-     * Checks to see if the local content directory exists, if it doesn't it is created and populated
-     * with initial content from the distribution.
-     * @param servlet
-     */
-    public static void installDefaultConfiguration(HttpServlet servlet) {
+        /**
+         * If the following are true:
+         *  - The local configuration directory exists.
+         *  - The semaphore file does not exist in the configuration directory.
+         *  Then the default configuration will be copied into
+         *  the configuration directory.
+         *  Otherwise, nothing will be done.
+         * @param servlet
+         */
+    public static void installDefaultConfiguration(HttpServlet servlet, String semaphore) {
 
 
         _installDefaultConfigLock.lock();     // Only one thread allowed in at a time.
         try {
-
-            //String semaphore = servlet.getInitParameter("OLFSConfigFileName");
-
-            String semaphore = ".INIT";
             Logger my_log = LoggerFactory.getLogger(PersistentConfigurationHandler.class);
             my_log.debug("PersistentContentHandler:");
-            my_log.debug("    configPath:               " + ServletUtil.getConfigPath(servlet));
-            my_log.debug("    defaultConfigurationPath: " + getDefaultConfigurationPath(servlet));
-            my_log.debug("    semaphore:                " + semaphore);
-            my_log.debug("    ThreadName:               " + Thread.currentThread().getName());
-
-
+            my_log.debug("    configPath:               {}",ServletUtil.getConfigPath(servlet));
+            my_log.debug("    defaultConfigurationPath: {}",getDefaultConfigurationPath(servlet));
+            my_log.debug("    semaphore:                {}",semaphore);
+            my_log.debug("    ThreadName:               {}",Thread.currentThread().getName());
+            
             // -------------
             // first time, create content directory
             String defaultConfigurationPath = getDefaultConfigurationPath(servlet);

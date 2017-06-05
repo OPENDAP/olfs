@@ -1,0 +1,2 @@
+url = http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ncep_model_example&format=application/x-netcdf-cf1.0&subset=time("1")
+-s

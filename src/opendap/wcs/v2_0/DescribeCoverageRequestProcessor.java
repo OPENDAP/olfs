@@ -60,7 +60,7 @@ public class DescribeCoverageRequestProcessor {
 
         for(String id: req.getIds()){
             cd = CatalogWrapper.getCoverageDescription(id);
-            coverageDescriptions.addContent(cd.getElement());
+            coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
         }
 
         return new Document(coverageDescriptions);

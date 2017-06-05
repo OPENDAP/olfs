@@ -26,7 +26,6 @@
 
 package opendap.wcs.v2_0.http;
 
-import opendap.coreServlet.ReqInfo;
 import opendap.dap.Request;
 import opendap.wcs.v2_0.WcsException;
 import org.apache.commons.httpclient.Header;
@@ -115,18 +114,18 @@ public class Util {
         int totalBytesWritten = 0;
         int bytesRead;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         while (!done) {
             bytesRead = is.read(buf);
             if (bytesRead == -1) {
-                if (totalBytesRead == 0)
-                    totalBytesRead = -1;
+             //   if (totalBytesRead == 0)
+              //      totalBytesRead = -1;
                 done = true;
             } else {
                 totalBytesRead += bytesRead;
                 os.write(buf, 0, bytesRead);
-                baos.write(buf,0,bytesRead);
+                // baos.write(buf,0,bytesRead);
                 totalBytesWritten += bytesRead;
             }
         }
@@ -136,9 +135,9 @@ public class Util {
                     "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
 
 
-        System.out.println("################################################################");
-        System.out.write(baos.toByteArray());
-        System.out.println("################################################################");
+        //System.out.println("################################################################");
+        //System.out.write(baos.toByteArray());
+        //System.out.println("################################################################");
 
 
         return totalBytesRead;
@@ -164,7 +163,6 @@ public class Util {
             throws URISyntaxException, IOException, WcsException {
 
         log.debug("Retrieving URL: "+url);
-
 
         GetMethod contentRequest = new GetMethod(url);
         InputStream is = null;
@@ -241,7 +239,15 @@ public class Util {
             int statusCode = httpClient.executeMethod(request);
 
             if (statusCode != HttpStatus.SC_OK) {
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                is = request.getResponseBodyAsStream();
+                drainInputStream(is, baos, bufferSize);
+
+
                 String msg = "HttpClient failed to executeMethod(). Status: " + request.getStatusLine();
+                msg += " Response Body: " + baos.toString();
+
                 log.error(msg);
                 throw new IOException(msg);
             }

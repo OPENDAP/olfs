@@ -70,7 +70,7 @@ public class CapabilitiesRequestProcessor {
 
         //log.debug(xmlo.outputString(capabilities));
 
-        capabilities.addContent(getContents());
+        capabilities.addContent(getContents(true,true,true,GetCapabilitiesRequest.DEFAULT_MAX_CONTENTS_SECTIONS_COUNT));
 
         return new Document(capabilities);
 
@@ -98,6 +98,7 @@ public class CapabilitiesRequestProcessor {
         capabilities.addNamespaceDeclaration(WCS.WCS_NS);
         capabilities.addNamespaceDeclaration(WCS.OWS_NS);
         capabilities.addNamespaceDeclaration(WCS.XSI_NS);
+        capabilities.addNamespaceDeclaration(WCS.WCSEO_NS);
 
         StringBuilder schemaLocation = new StringBuilder();
 
@@ -152,14 +153,19 @@ public class CapabilitiesRequestProcessor {
                 capabilities.addContent(getServiceMetadata());
             }
 
-            if(all  ||  req.hasSection(GetCapabilitiesRequest.CONTENTS)){
-                capabilities.addContent(getContents());
+            if(all  ||
+                    req.hasSection(GetCapabilitiesRequest.CONTENTS) ||
+                    req.hasSection(GetCapabilitiesRequest.DATASET_SERIES_SUMMARY) ||
+                    req.hasSection(GetCapabilitiesRequest.COVERAGE_SUMMARY)){
+
+                capabilities.addContent(getContents(
+                        all || req.hasSection(GetCapabilitiesRequest.CONTENTS),
+                        req.hasSection(GetCapabilitiesRequest.DATASET_SERIES_SUMMARY),
+                        req.hasSection(GetCapabilitiesRequest.COVERAGE_SUMMARY),
+                        req.getCount()));
             }
 
-
-
-
-            return new Document(capabilities);
+         return new Document(capabilities);
 
 
 
@@ -186,28 +192,49 @@ public class CapabilitiesRequestProcessor {
      * @throws WcsException   When bad things happen.
      * @throws InterruptedException
      */
-    public static Element getContents()  throws InterruptedException, WcsException {
+    public static Element getContents(boolean allContent, boolean dataset_series_summary, boolean coverage_summary, long maxContentsSectionsCount)  throws InterruptedException, WcsException {
 
-        Element contents = new Element("Contents",WCS.WCS_NS);
-        Element cs;
-        Iterator i = CatalogWrapper.getCoverageSummaryElements().iterator();
+        Element contentsElement = new Element("Contents",WCS.WCS_NS);
 
-        if(i.hasNext()){
+        long count = 0;
 
-            while(i.hasNext()){
-                cs = (Element) i.next();
-                contents.addContent(cs);
+
+        if(allContent  | coverage_summary){
+            Iterator i = CatalogWrapper.getCoverageSummaryElements().iterator();
+            if(i.hasNext()){
+                Element cs;
+                while(i.hasNext()){
+                    cs = (Element) i.next();
+                    count++;
+                    if(count<maxContentsSectionsCount)
+                        contentsElement.addContent(cs);
+                }
             }
-
-        }else {
-            cs = new Element("OtherSource",WCS.WCS_NS);
-            XLink xlink = new XLink(XLink.Type.SIMPLE,"http://www.google.com",null,null,"No Coverages found. You could try Google...",null,null,null,null,null);
-            cs.setAttributes(xlink.getAttributes());
         }
 
-        return contents;
+        if(count<maxContentsSectionsCount && (allContent | dataset_series_summary)) {
+            Iterator i = CatalogWrapper.getDatasetSeriesSummaryElements().iterator();
+            if(i.hasNext()){
+                Element wcsExtensionElement = new Element("Extension",WCS.WCS_NS);
+                Element dss;
+                while(i.hasNext()){
+                    dss = (Element) i.next();
+                    count++;
+                    if(count<maxContentsSectionsCount)
+                        wcsExtensionElement.addContent(dss);
+                }
+                contentsElement.addContent(wcsExtensionElement);
+            }
+        }
 
+        if(contentsElement.getChildren().isEmpty()){
+            Element os;
+            os = new Element("OtherSource",WCS.WCS_NS);
+            XLink xlink = new XLink(XLink.Type.SIMPLE,"http://www.google.com",null,null,"No Coverages found. You could try Google...",null,null,null,null,null);
+            os.setAttributes(xlink.getAttributes());
+        }
 
+        return contentsElement;
     }
 
 
@@ -224,7 +251,7 @@ public class CapabilitiesRequestProcessor {
         Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
 
         Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("application/x-netcdf-cf1.0");
+        formatSupported.setText("application/x-netcdf");
         serviceMetadata.addContent(formatSupported);
 
         formatSupported = new Element("formatSupported",WCS.WCS_NS);

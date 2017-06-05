@@ -30,7 +30,7 @@ import org.jdom.Element;
 
 
 /**
- * This class embodies a WCS Dimension Subset concept and is able to produce a DAP constraint expression
+ * This class embodies a WCS CoordinateDimension Subset concept and is able to produce a DAP constraint expression
  * that requests the correct subset of the data.
  *
  * Essentially this class acts as a map from WCS 2.0 dimension sub-setting syntax to DAP constraint expression syntax.
@@ -47,81 +47,62 @@ import org.jdom.Element;
  * values (non integer). In other words: Both values must be in the arrayIndex facet, or both in the byValue facet.
  *
 */
-public class DimensionSubset {
+public class DimensionSubset implements Cloneable {
 
 
     public enum Type {TRIM, SLICE_POINT}
 
-    Type myDimensionType;
+    private Type _mySubsetType;
 
 
-    private String dimensionId;
-    private String trimLow;
-    private String trimHigh;
-    private String slicePoint;
+    private String _dimensionId;
+    private String _trimLow;
+    private String _trimHigh;
+    private String _slicePoint;
 
-    private boolean isArrayIndexSubset;
+    private boolean _isArrayIndexSubset;
+
+    private DomainCoordinate _domainCoordinate;
+
+
+    private DimensionSubset() {
+        _dimensionId = null;
+        _trimLow = null;
+        _trimHigh = null;
+        _slicePoint = null;
+        _isArrayIndexSubset = false;
+        _domainCoordinate = null;
+    }
 
     public DimensionSubset(DimensionSubset source) {
-        setDimensionType(source.getType());
-        setDimensionId(source.getDimensionId());
-        setTrimLow(source.getTrimLow());
-        setTrimHigh(source.getTrimHigh());
-        setSlicePoint(source.getSlicePoint());
-        setIsArraySubset(source.isArraySubset());
+        this();
+        _mySubsetType = source._mySubsetType;
+        _dimensionId = source._dimensionId;
+        _trimLow = source._trimLow;
+        _trimHigh =  source._trimHigh;
+        _slicePoint =  source._slicePoint;
+        _isArrayIndexSubset = source._isArrayIndexSubset;
+        _domainCoordinate = source._domainCoordinate==null ? null : new DomainCoordinate(source._domainCoordinate);
     }
 
-
-    protected void setDimensionId(String s){
-        dimensionId = s;
-    }
-
-    protected void setDimensionType(Type t){
-        myDimensionType = t;
-    }
-
-    protected void setTrimLow(String s){
-
-        trimLow = trimQuotesAndWhiteSpace(s);
-    }
-
-    protected void setTrimHigh(String s){
-        trimHigh = trimQuotesAndWhiteSpace(s);
-    }
-
-    protected void setIsArraySubset(boolean s){
-        isArrayIndexSubset = s;
-    }
-
-    protected void setSlicePoint(String s){
-        slicePoint = trimQuotesAndWhiteSpace(s);
-    }
-
-    private String trimQuotesAndWhiteSpace(String s){
-
-        if(s==null)
-            return null;
-
-        // Trim them from the front.
-        while(s.startsWith(" ") || s.startsWith("\t") || s.startsWith("\"") || s.startsWith("'"))
-            s = s.substring(1,s.length());
-
-
-        // Trim them from the back.
-        while(s.endsWith(" ") || s.endsWith("\t") || s.endsWith("\"") || s.endsWith("'"))
-            s = s.substring(0,s.length()-1);
-
-        return s;
-    }
 
     /**
      * Accepts the KVP encoding of a subset parameter for WCS 2.0
      * @param kvpSubsetString  the KVP encoding of a subset parameter value.
-     * @throws WcsException When it's funky like an old sock.
+     * @throws WcsException When it's funky, like an old sock.
      */
     public DimensionSubset(String kvpSubsetString) throws WcsException {
+        this();
+
         int leftParen = kvpSubsetString.indexOf("(");
         int rghtParen = kvpSubsetString.indexOf(")");
+
+        if(leftParen<0 || rghtParen<0 || leftParen > rghtParen){
+            throw new WcsException("Invalid subset expression. The subset expression '"+kvpSubsetString+"' lacks " +
+                    "correctly organized parenthetical content.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "KVP subset");
+        }
 
         setIsArraySubset(false);
 
@@ -138,7 +119,7 @@ public class DimensionSubset {
         if(intervalOrPoint.contains(",")){
             int commaIndex = intervalOrPoint.indexOf(",");
             // It's an interval!
-            setDimensionType(Type.TRIM);
+            setSubsetType(Type.TRIM);
             setTrimLow(intervalOrPoint.substring(0,commaIndex));
             setTrimHigh(intervalOrPoint.substring(commaIndex+1,intervalOrPoint.length()));
 
@@ -163,14 +144,59 @@ public class DimensionSubset {
             setSlicePoint(null);
         }
         else {
-            // It's a slicePoint;
-            setDimensionType(Type.SLICE_POINT);
+            // It's a _slicePoint;
+            setSubsetType(Type.SLICE_POINT);
             setSlicePoint(intervalOrPoint);
             setTrimHigh(null);
             setTrimLow(null);
 
             setIsArraySubset(isArraySubsetString(getSlicePoint()));
         }
+    }
+
+    public void setDomainCoordinate(DomainCoordinate dc){
+        _domainCoordinate =dc;
+    }
+
+    protected void setDimensionId(String s) throws WcsException {
+        _dimensionId = s;
+    }
+
+
+    protected void setSubsetType(Type t){
+        _mySubsetType = t;
+    }
+
+    protected void setTrimLow(String s){ _trimLow = trimQuotesAndWhiteSpace(s); }
+
+    protected void setTrimHigh(String s){
+        _trimHigh = trimQuotesAndWhiteSpace(s);
+    }
+
+    protected void setIsArraySubset(boolean s){
+        _isArrayIndexSubset = s;
+    }
+
+    protected void setSlicePoint(String s){
+
+        _slicePoint = trimQuotesAndWhiteSpace(s);
+    }
+
+    private String trimQuotesAndWhiteSpace(String s){
+
+        if(s==null)
+            return null;
+
+        // Trim them from the front.
+        while(s.startsWith(" ") || s.startsWith("\t") || s.startsWith("\"") || s.startsWith("'"))
+            s = s.substring(1,s.length());
+
+
+        // Trim them from the back.
+        while(s.endsWith(" ") || s.endsWith("\t") || s.endsWith("\"") || s.endsWith("'"))
+            s = s.substring(0,s.length()-1);
+
+        return s;
     }
 
 
@@ -193,15 +219,15 @@ public class DimensionSubset {
 
 
     public boolean isValueSubset(){
-        return !isArrayIndexSubset;
+        return !_isArrayIndexSubset;
     }
 
     public boolean isArraySubset(){
-        return isArrayIndexSubset;
+        return _isArrayIndexSubset;
     }
 
     public Type getType(){
-        return myDimensionType;
+        return _mySubsetType;
     }
 
 
@@ -218,17 +244,17 @@ public class DimensionSubset {
         String type = dimensionSubsetType.getName();
 
 
-        Element dimensionElement = dimensionSubsetType.getChild("Dimension",WCS.WCS_NS);
+        Element dimensionElement = dimensionSubsetType.getChild("CoordinateDimension",WCS.WCS_NS);
         if(dimensionElement==null)
-            throw new WcsException("Missing wcs:Dimension element in wcs:DimensionSubsetType.",
+            throw new WcsException("Missing wcs:CoordinateDimension element in wcs:DimensionSubsetType.",
                 WcsException.MISSING_PARAMETER_VALUE,
-                "wcs:Dimension");
+                "wcs:CoordinateDimension");
 
         String id = dimensionElement.getTextTrim();
         if(id==null)
-            throw new WcsException("Missing value for wcs:Dimension element in wcs:DimensionSubsetType.",
+            throw new WcsException("Missing value for wcs:CoordinateDimension element in wcs:DimensionSubsetType.",
                 WcsException.MISSING_PARAMETER_VALUE,
-                "wcs:Dimension");
+                "wcs:CoordinateDimension");
 
         setDimensionId(id);
 
@@ -309,12 +335,12 @@ public class DimensionSubset {
         if(isSliceSubset()){
             ds = new Element("DimensionSlice",WCS.WCS_NS);
 
-            Element e = new Element("Dimension",WCS.WCS_NS);
-            e.setText(dimensionId);
+            Element e = new Element("CoordinateDimension",WCS.WCS_NS);
+            e.setText(_dimensionId);
             ds.addContent(e);
 
             e = new Element("SlicePoint",WCS.WCS_NS);
-            e.setText(slicePoint);
+            e.setText(_slicePoint);
             ds.addContent(e);
 
         }
@@ -322,18 +348,18 @@ public class DimensionSubset {
         if(isTrimSubset()){
             ds = new Element("DimensionTrim",WCS.WCS_NS);
 
-            Element e = new Element("Dimension",WCS.WCS_NS);
-            e.setText(dimensionId);
+            Element e = new Element("CoordinateDimension",WCS.WCS_NS);
+            e.setText(_dimensionId);
             ds.addContent(e);
 
-            if(!trimLow.equals("*")){
+            if(!_trimLow.equals("*")){
                 e = new Element("TrimLow",WCS.WCS_NS);
-                e.setText(trimLow);
+                e.setText(_trimLow);
                 ds.addContent(e);
             }
-            if(!trimHigh.equals("*")){
+            if(!_trimHigh.equals("*")){
                 e = new Element("TrimHigh",WCS.WCS_NS);
-                e.setText(trimHigh);
+                e.setText(_trimHigh);
                 ds.addContent(e);
             }
         }
@@ -353,7 +379,17 @@ public class DimensionSubset {
      * is not a value based subset (i.e. as an array index subset) the empty string is returned.
      * @throws WcsException
      */
-    public String getDapGridValueConstraint() throws WcsException {
+    public String getDap2GridValueConstraint() throws WcsException {
+
+        if(_domainCoordinate == null){
+            StringBuilder msg = new StringBuilder("The DimensionSubset '").append(getDimensionId()).append("' ");
+            msg.append("Has not been associated with a DomainCoordinate instance.");
+
+            throw new WcsException(msg.toString(),WcsException.INVALID_PARAMETER_VALUE,"DimensionSubset");
+        }
+
+        String dapVarName = _domainCoordinate.getDapID();
+
         StringBuilder subsetClause = new StringBuilder();
 
         if(isValueSubset()){
@@ -364,7 +400,7 @@ public class DimensionSubset {
                           .append("\"")
                           .append(getTrimLow())
                           .append("<=")
-                          .append(getDimensionId())
+                          .append(dapVarName)
                           .append("<=")
                           .append(getTrimHigh())
                           .append("\"");
@@ -373,7 +409,7 @@ public class DimensionSubset {
               case SLICE_POINT:
                   subsetClause
                           .append("\"")
-                          .append(getDimensionId())
+                          .append(dapVarName)
                           .append("=")
                           .append(getSlicePoint())
                           .append("\"");
@@ -405,6 +441,7 @@ public class DimensionSubset {
      * @throws WcsException
      */
     public String getDapArrayIndexConstraint() throws WcsException {
+
         StringBuilder subsetClause = new StringBuilder();
 
         if (isArraySubset()) {
@@ -454,27 +491,27 @@ public class DimensionSubset {
 
 
     public boolean isSliceSubset(){
-        return slicePoint !=null;
+        return _slicePoint !=null;
     }
 
     public boolean isTrimSubset(){
-        return trimHigh !=null && trimLow !=null;
+        return _trimHigh !=null && _trimLow !=null;
     }
 
     public String getSlicePoint(){
-        return slicePoint;
+        return _slicePoint;
     }
 
     public String getTrimHigh(){
-        return trimHigh;
+        return _trimHigh;
     }
 
     public String getTrimLow(){
-        return trimLow;
+        return _trimLow;
     }
 
     public String getDimensionId(){
-        return dimensionId;
+        return _dimensionId;
     }
 
 }

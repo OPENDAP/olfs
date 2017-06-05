@@ -54,6 +54,10 @@ public class GetCapabilitiesRequest {
     private HashSet<String> Sections = new HashSet<String>();
     private boolean hasSectionsElement;
 
+    private boolean _hasCountElement;
+    private long    _maxContentsSectionsCount;
+    public static final long DEFAULT_MAX_CONTENTS_SECTIONS_COUNT = 1000;
+
     private String[]        AcceptFormats = null;
     private String[]        AcceptLanguages = null;
 
@@ -65,6 +69,9 @@ public class GetCapabilitiesRequest {
     public static String CONTENTS = "Contents";
     public static String ALL = "All";
 
+    // Earth Observation Profile sections
+    public static String DATASET_SERIES_SUMMARY = "DatasetSeriesSummary";
+    public static String COVERAGE_SUMMARY = "CoverageSummary";
 
     public static final HashSet<String> sectionNames = new HashSet<String>();
     static {
@@ -111,6 +118,14 @@ public class GetCapabilitiesRequest {
         return hasSectionsElement;
     }
 
+    public boolean hasCountElement() {
+        return _hasCountElement;
+    }
+
+    public long getCount(){
+        return _maxContentsSectionsCount;
+    }
+
 
     public String[] getAcceptFormats() {
         return AcceptFormats;
@@ -127,6 +142,7 @@ public class GetCapabilitiesRequest {
         Iterator i;
         int index;
 
+        _maxContentsSectionsCount = DEFAULT_MAX_CONTENTS_SECTIONS_COUNT;
 
         // Make sure we got the correct request object.
         WCS.checkNamespace(getCRElem,_request,WCS.WCS_NS);
@@ -173,6 +189,7 @@ public class GetCapabilitiesRequest {
         }
 
         // Get the sections the client wants.
+        hasSectionsElement = false;
         e = getCRElem.getChild("Sections",WCS.WCS_NS);
         if(e!=null ){
 
@@ -181,7 +198,6 @@ public class GetCapabilitiesRequest {
             List vlist = e.getChildren("Section",WCS.WCS_NS);
 
             i = vlist.iterator();
-            index = 0;
             while(i.hasNext()){
                 e = (Element) i.next();
                 s = e.getTextNormalize();
@@ -291,6 +307,24 @@ public class GetCapabilitiesRequest {
             AcceptVersions = tmp;
         }
 
+        // Get the list of section the client has requested. Returning
+        // individual sections may not be supported, but we'll keep track of
+        // that partof the request regardless.
+        _hasCountElement = false;
+        _maxContentsSectionsCount = DEFAULT_MAX_CONTENTS_SECTIONS_COUNT;
+        s = kvp.get("count".toLowerCase());
+        if(s!=null){
+            _hasCountElement = true;
+
+            try {
+                _maxContentsSectionsCount = Long.parseLong(s[0]);
+            }
+            catch (NumberFormatException e){
+                // Nobody cares...
+            }
+
+        }
+
 
 
 
@@ -298,6 +332,7 @@ public class GetCapabilitiesRequest {
         // Get the list of section the client has requested. Returning
         // individual sections may not be supported, but we'll keep track of
         // that partof the request regardless.
+        hasSectionsElement = false;
         s = kvp.get("Sections".toLowerCase());
         if(s!=null){
             hasSectionsElement = true;

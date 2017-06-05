@@ -97,7 +97,15 @@ public class ViewersServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this);
+        String configFile = getInitParameter("ConfigFileName");
+        if (configFile == null) {
+            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
+                    "is the name of the OLFS configuration file!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+        PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
 
 
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -160,7 +168,7 @@ public class ViewersServlet extends HttpServlet {
 
     /**
      * Loads the configuration file specified in the servlet parameter
-     * OLFSConfigFileName.
+     * ViewersConfigFileName.
      *
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
