@@ -1,3 +1,122 @@
+2017-05-31  ndp-opendap  <ndp@opendap.org>
+
+	Repaired minor but crippling problem with the ToolsUI.jnlp template file.
+
+2017-05-17  ndp-opendap  <ndp@opendap.org>
+
+	More concurrency patching
+
+	Fixed concurrency issues with log access and various null reference issues.
+
+2017-05-16  ndp-opendap  <ndp@opendap.org>
+
+	Updated REqInfo internal implmentation
+
+	Updating baselines to reflect changes to libdap4
+
+2017-03-31  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added  JSP error page and image for 504 (server timeout) error.
+
+	olfs: Disabled the code that adds the prefix "nc_" to the names of FONc response files.
+
+	olfs: Added  JSP error page and image for 504 (server timeout) error."
+
+2017-01-25  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #7 from OPENDAP/timeout_hack
+	Timeout hack
+
+2017-01-25  ndp-opendap  <ndp@opendap.org>
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1
+
+2017-01-24  ndp-opendap  <ndp@opendap.org>
+
+	hack 1
+
+	hack 1
+
+	hack 1
+
+	Debugging
+
+2017-01-11  ndp-opendap  <ndp@opendap.org>
+
+	Added code to replace spaces with _ in javascript variables names built by the dap4_ifh.xsl
+
+	Patched a string handling error in path construction.
+
+2017-01-10  ndp-opendap  <ndp@opendap.org>
+
+	Updated news
+
+2017-01-10  James Gallagher  <jgallagher@opendap.org>
+
+	Spellin' in the NEWS file...
+
+	Added info about our replacing the 418 message (I'm a teapot)
+	We replaced it with something more formal
+
+	Updated NEWS and ChangeLog for the OLFS 1.16.2 (Hyrax 1.13.3) release.
 2016-12-03	---  hyrax=1.13.3 olfs=1.16.2 END
 2016-12-03  ndp-opendap  <ndp@opendap.org>
 

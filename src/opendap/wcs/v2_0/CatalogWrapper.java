@@ -41,9 +41,8 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * User: ndp
- * Date: Mar 30, 2009
- * Time: 4:05:15 PM
+ * This class is used to wrap an instance of the WcsCatalog class with a set of
+ * static methods, creating a singleton catalog from a non-singleton class.
  */
 public class CatalogWrapper {
 
@@ -115,6 +114,11 @@ public class CatalogWrapper {
 
     public static Collection<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();
+    }
+
+
+    public static Collection<Element> getDatasetSeriesSummaryElements()  throws InterruptedException, WcsException{
+        return _catalogImpl.getDatasetSeriesSummaryElements();
     }
 
 
@@ -348,6 +352,18 @@ public class CatalogWrapper {
     }
 
 
+    public static EOCoverageDescription getEOCoverageDescription(String id) throws WcsException {
+        return _catalogImpl.getEOCoverageDescription(id);
+    }
+
+
+   public static  EODatasetSeries getEODatasetSeries(String id) throws WcsException {
+        return _catalogImpl.getEODatasetSeries(id);
+    }
+
+    public boolean hasEoCoverage(String id){
+        return _catalogImpl.hasEoCoverage(id);
+    }
 
 
 

@@ -31,6 +31,7 @@ import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,98 +48,113 @@ import java.util.*;
  */
 public class CoverageDescription {
 
-    private Element myCD;
+    protected Element _myCD;
 
-    private Logger log;
-
-
-    private long lastModified;
-
-    private File myFile;
-
-    private boolean validateContent = false;
+    private Logger _log;
 
 
-    private URL dapDatasetUrl;
+    private long _lastModified;
+
+    private File _myFile;
+
+    private boolean _validateContent = false;
+
+
+    private URL _dapDatasetUrl;
     private HashMap<String,String> _dapGridId;
 
+    public static final String CONFIG_ELEMENT_NAME = "WcsCoverage";
 
     private LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
 
-    boolean initialized = false;
+    boolean _initialized = false;
+
+    public CoverageDescription(CoverageDescription cd) throws IOException {
+        _myCD = (Element)cd._myCD.clone();
+        _log = LoggerFactory.getLogger(this.getClass());
+        _lastModified = cd._lastModified;
+        _myFile = cd._myFile.getCanonicalFile();
+        _validateContent = cd._validateContent;
+        _dapDatasetUrl = new URL(cd._dapDatasetUrl.toString());
+        _dapGridId = new HashMap<>();
+        _dapGridId.putAll(cd._dapGridId);
+        _domainCoordinates = new LinkedHashMap<>();
+        _domainCoordinates.putAll(cd._domainCoordinates);
+        _initialized = cd._initialized;
+    }
 
 
 
-    /**
-     * Builds the CoverageDescription object from a lfc:WcsCoverage element that is part of the configuration file used
-     * opendap.wcs.v2_0.LocalFileCatalog
-     *
-     <LocalFileCatalog
-         xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
-         xmlns:lfc="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
-        validateCatalog="true">
+        /**
+         * Builds the CoverageDescription object from a lfc:WcsCoverage element that is part of the configuration file used
+         * opendap.wcs.v2_0.LocalFileCatalog
+         *
+         <LocalFileCatalog
+             xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
+             xmlns:lfc="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#"
+            validateCatalog="true">
 
 
 
-         <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
+             <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
 
-             <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+                 <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
 
-             <field name="tcw">
-                 <DapIdOfLatitudeCoordinate>tcw.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>tcw.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>tcw.time</DapIdOfTimeCoordinate>
-             </field>
+                 <field name="tcw">
+                     <DapIdOfLatitudeCoordinate>tcw.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>tcw.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>tcw.time</DapIdOfTimeCoordinate>
+                 </field>
 
-             <field name="tcwv">
-                 <DapIdOfLatitudeCoordinate>tcwv.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>tcwv.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>tcwv.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="lsp">
-                 <DapIdOfLatitudeCoordinate>lsp.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>lsp.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>lsp.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="cp">
-                 <DapIdOfLatitudeCoordinate>cp.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>cp.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>cp.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="msl">
-                 <DapIdOfLatitudeCoordinate>msl.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>msl.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>msl.time</DapIdOfTimeCoordinate>
-             </field>
-             <field name="blh">
-                 <DapIdOfLatitudeCoordinate>blh.longitude</DapIdOfLatitudeCoordinate>
-                 <DapIdOfLongitudeCoordinate>blh.latitude</DapIdOfLongitudeCoordinate>
-                 <DapIdOfTimeCoordinate>blh.time</DapIdOfTimeCoordinate>
-             </field>
-         </WcsCoverage>
+                 <field name="tcwv">
+                     <DapIdOfLatitudeCoordinate>tcwv.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>tcwv.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>tcwv.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="lsp">
+                     <DapIdOfLatitudeCoordinate>lsp.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>lsp.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>lsp.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="cp">
+                     <DapIdOfLatitudeCoordinate>cp.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>cp.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>cp.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="msl">
+                     <DapIdOfLatitudeCoordinate>msl.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>msl.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>msl.time</DapIdOfTimeCoordinate>
+                 </field>
+                 <field name="blh">
+                     <DapIdOfLatitudeCoordinate>blh.longitude</DapIdOfLatitudeCoordinate>
+                     <DapIdOfLongitudeCoordinate>blh.latitude</DapIdOfLongitudeCoordinate>
+                     <DapIdOfTimeCoordinate>blh.time</DapIdOfTimeCoordinate>
+                 </field>
+             </WcsCoverage>
 
 
-     </LocalFileCatalog>
+         </LocalFileCatalog>
 
-     *
-     *
-     *
-     *
-     * @param wcsCoverageConfig The file containing the wcs:CoverageDescription element.
-     * @param catalogDir
-     * @param validateContent  Controls the XML parser document validation. A value of true will cause the parser to
-     * perform document validation. A value of false will cause the parser to simply parse the document which only
-     * checks for that it is well-formed.
-     * @throws IOException When the file cannot be read.
-     * @throws JDOMException When the file cannot be parsed.
-     * @throws ConfigurationException
-     * @throws WcsException
-     */
+         *
+         *
+         *
+         *
+         * @param wcsCoverageConfig The file containing the wcs:CoverageDescription element.
+         * @param catalogDir
+         * @param validateContent  Controls the XML parser document validation. A value of true will cause the parser to
+         * perform document validation. A value of false will cause the parser to simply parse the document which only
+         * checks for that it is well-formed.
+         * @throws IOException When the file cannot be read.
+         * @throws JDOMException When the file cannot be parsed.
+         * @throws ConfigurationException
+         * @throws WcsException
+         */
     public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException, WcsException {
         init();
 
 
-        this.validateContent = validateContent;
+        this._validateContent = validateContent;
 
         String coverageDescriptionFileName =  wcsCoverageConfig.getAttributeValue("fileName");
 
@@ -146,7 +162,7 @@ public class CoverageDescription {
 
         if(coverageDescriptionFileName==null){
             msg = "ingestCatalog(): In the catalog file ("+coverageDescriptionFileName+" a lfc:WcsCoverage element is missing the 'fileName' attribute.";
-            log.error(msg);
+            _log.error(msg);
             throw new ConfigurationException(msg);
         }
 
@@ -154,14 +170,14 @@ public class CoverageDescription {
         File coverageDescriptionFile = new File(fileName);
 
         // Ingest the CoverageDescription File
-        log.debug("ingestCatalog(): Loading coverage description '{}'",coverageDescriptionFile);
+        _log.debug("ingestCatalog(): Loading coverage description '{}'",coverageDescriptionFile);
 
-        myCD = ingestCoverageDescription(coverageDescriptionFile);
-        myFile = coverageDescriptionFile;
+        _myCD = ingestCoverageDescription(coverageDescriptionFile);
+        _myFile = coverageDescriptionFile;
 
         qcCoverageDescriptionContent();
 
-        lastModified = coverageDescriptionFile.lastModified();
+        _lastModified = coverageDescriptionFile.lastModified();
 
 
         /**
@@ -171,7 +187,7 @@ public class CoverageDescription {
         Element e = wcsCoverageConfig.getChild("DapDatasetUrl",LocalFileCatalog.NS);
         if(e==null){
             msg = "ingestCatalog(): In the catalog file ("+coverageDescriptionFileName+" a lfc:WcsCoverage element is missing the 'lfc:DapDatasetUrl' element.";
-            log.error(msg);
+            _log.error(msg);
             throw new ConfigurationException(msg);
         }
         URL datasetUrl = new URL(e.getTextTrim());
@@ -180,7 +196,7 @@ public class CoverageDescription {
 
 
         /**
-         * Load DAP ID (The Fully Qualified Name) for the variable that holds the Latitude coordinate values
+         * Load DAP ID (The Fully Qualified Name) for the variable that holds the domain coordinate values
          * for this field.
          * This is REQUIRED.
          */
@@ -188,7 +204,7 @@ public class CoverageDescription {
         if(coordList.isEmpty()){
             msg = "ingestCatalog(): The configuration element is missing the required " +
                     "child element(s) 'DomainCoordinate'.";
-            log.error(msg);
+            _log.error(msg);
             throw new ConfigurationException(msg);
         }
         Iterator coordIt = coordList.iterator();
@@ -218,7 +234,7 @@ public class CoverageDescription {
             if(fieldName==null){
                 msg = "ingestCatalog(): In the catalog file "+coverageDescriptionFileName+" a lfc:field element is " +
                         "missing the required attribute 'name' .";
-                log.error(msg);
+                _log.error(msg);
                 throw new ConfigurationException(msg);
             }
 
@@ -233,7 +249,7 @@ public class CoverageDescription {
                 msg = "CoverageDescription(): In in the Catalog Configuration file, the field element"  +
                         "named "+fieldName+" is missing the required" +
                         "attribute  'dapID'.";
-                log.error(msg);
+                _log.error(msg);
                 throw new ConfigurationException(msg);
             }
             setDapGridArrayId(fieldName,dapID);
@@ -251,12 +267,12 @@ public class CoverageDescription {
 
     private void init(){
 
-        if(initialized) return;
+        if(_initialized) return;
 
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _log = org.slf4j.LoggerFactory.getLogger(getClass());
         _dapGridId = new HashMap<String,String>();
         _domainCoordinates = new LinkedHashMap<String, DomainCoordinate>();
-        initialized = true;
+        _initialized = true;
     }
 
 
@@ -282,17 +298,17 @@ public class CoverageDescription {
 
         if(!Util.isReadableFile(cdFile)){
             msg = "Problem with file: "+ cdFile.getName();
-            log.error(msg);
+            _log.error(msg);
             throw new IOException(msg);
         }
 
-        log.info("Ingesting wcs:CoverageDescription from '{}'. XML Validation is {}.",cdFile,validateContent?"ON":"OFF");
+        _log.info("Ingesting wcs:CoverageDescription from '{}'. XML Validation is {}.",cdFile, _validateContent ?"ON":"OFF");
 
-        Element cd = parseXmlDoc(new FileInputStream(cdFile),validateContent);
+        Element cd = parseXmlDoc(new FileInputStream(cdFile), _validateContent);
 
-        myFile = cdFile;
+        _myFile = cdFile;
 
-        lastModified = cdFile.lastModified();
+        _lastModified = cdFile.lastModified();
 
         return cd;
 
@@ -321,21 +337,21 @@ public class CoverageDescription {
     public long lastModified() {
 
         try {
-            if (myFile != null && lastModified < myFile.lastModified()) {
-                myCD = ingestCoverageDescription(myFile);
+            if (_myFile != null && _lastModified < _myFile.lastModified()) {
+                _myCD = ingestCoverageDescription(_myFile);
             }
         }
         catch (Exception e) {
 
             String msg ="Failed to update CoverageDescription from file ";
 
-            if(myFile != null){
-                msg += myFile.getAbsoluteFile();
+            if(_myFile != null){
+                msg += _myFile.getAbsoluteFile();
             }
-            log.error(msg);
+            _log.error(msg);
         }
 
-        return lastModified;
+        return _lastModified;
 
     }
 
@@ -348,11 +364,11 @@ public class CoverageDescription {
     public boolean hasField(String fieldID){
         boolean foundIt = false;
 
-        Element range =  myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        Element range =  _myCD.getChild("rangeType",WCS.GMLCOV_NS);
 
         if(range == null) return foundIt;
 
-        Element dataRecord =  myCD.getChild("DataRecord",WCS.SWE_NS);
+        Element dataRecord =  _myCD.getChild("DataRecord",WCS.SWE_NS);
 
         if(dataRecord==null)  return foundIt;
 
@@ -382,7 +398,7 @@ public class CoverageDescription {
      * @return Returns the value of the unique wcs:CoverageId associated with this CoverageDescription.
      */
     public String getCoverageId(){
-        Element coverageId =  myCD.getChild("CoverageId",WCS.WCS_NS);
+        Element coverageId =  _myCD.getChild("CoverageId",WCS.WCS_NS);
         return coverageId.getText();
     }
 
@@ -391,7 +407,7 @@ public class CoverageDescription {
      * @return Returns the unique wcs:Identifier associated with this CoverageDescription.
      */
     public Element getCoverageIdElement(){
-        return (Element) myCD.getChild("CoverageId",WCS.WCS_NS).clone();
+        return (Element) _myCD.getChild("CoverageId",WCS.WCS_NS).clone();
     }
 
     /**
@@ -400,16 +416,16 @@ public class CoverageDescription {
      * Returns null if no gml:boundedBy element is found.
      * @throws WcsException When bad things happen.
      */
-    public BoundingBox getBoundingBox() throws WcsException {
-        Element boundedBy =  myCD.getChild("boundedBy",WCS.GML_NS);
+    public NewBoundingBox getBoundingBox() throws WcsException {
+        Element boundedBy =  _myCD.getChild("boundedBy",WCS.GML_NS);
         if(boundedBy!=null)
-            return new BoundingBox(boundedBy);
+            return new NewBoundingBox(boundedBy);
         return null;
     }
 
 
     public boolean hasBoundedBy(){
-        Element boundedBy =  myCD.getChild("boundedBy",WCS.GML_NS);
+        Element boundedBy =  _myCD.getChild("boundedBy",WCS.GML_NS);
         if(boundedBy!=null)
             return true;
         return false;
@@ -423,7 +439,7 @@ public class CoverageDescription {
      * @throws WcsException When bad things happen.
      */
     public Element getBoundedByElement() throws WcsException {
-        Element boundedBy =  myCD.getChild("boundedBy",WCS.GML_NS);
+        Element boundedBy =  _myCD.getChild("boundedBy",WCS.GML_NS);
         if(boundedBy!=null)
             return  (Element) boundedBy.clone();
         return null;
@@ -437,7 +453,7 @@ public class CoverageDescription {
      * @return Returns the wcs:SupportedCRS elements associated with this CoverageDescription.
      */
     public List getSupportedCrsElements(){
-        return  cloneElementList(myCD.getChildren("SupportedCRS",WCS.WCS_NS));
+        return  cloneElementList(_myCD.getChildren("SupportedCRS",WCS.WCS_NS));
     }
 
 
@@ -448,7 +464,7 @@ public class CoverageDescription {
      */
     public Element getNativeFormatElement(){
 
-        Element serviceParameters = myCD.getChild("ServiceParameters",WCS.WCS_NS);
+        Element serviceParameters = _myCD.getChild("ServiceParameters",WCS.WCS_NS);
         if(serviceParameters==null)
             return null;
 
@@ -471,7 +487,7 @@ public class CoverageDescription {
 
 
     public String getCoverageSubtype(){
-        Element serviceParameters = myCD.getChild("ServiceParameters",WCS.WCS_NS);
+        Element serviceParameters = _myCD.getChild("ServiceParameters",WCS.WCS_NS);
         if(serviceParameters==null)
             return null;
 
@@ -485,7 +501,7 @@ public class CoverageDescription {
 
 
     public Element getCoverageSubtypeElement(){
-        Element serviceParameters = myCD.getChild("ServiceParameters",WCS.WCS_NS);
+        Element serviceParameters = _myCD.getChild("ServiceParameters",WCS.WCS_NS);
         if(serviceParameters==null)
             return null;
 
@@ -497,7 +513,7 @@ public class CoverageDescription {
     }
 
     public Element getCoverageSubtypeFamilyTree(){
-        Element serviceParameters = myCD.getChild("ServiceParameters",WCS.WCS_NS);
+        Element serviceParameters = _myCD.getChild("ServiceParameters",WCS.WCS_NS);
         if(serviceParameters==null)
             return null;
 
@@ -511,7 +527,7 @@ public class CoverageDescription {
 
 
     public boolean hasCoverageSubtypeFamilyTree(){
-        Element serviceParameters = myCD.getChild("ServiceParameters",WCS.WCS_NS);
+        Element serviceParameters = _myCD.getChild("ServiceParameters",WCS.WCS_NS);
         if(serviceParameters==null)
             return false;
 
@@ -586,7 +602,7 @@ public class CoverageDescription {
         }
 
         if(hasBoundedBy()){
-            BoundingBox boundingBox = getBoundingBox();
+            NewBoundingBox boundingBox = getBoundingBox();
             Element bb = boundingBox.getOwsBoundingBoxElement();
             covSum.addContent(bb);
         }
@@ -602,9 +618,29 @@ public class CoverageDescription {
      *
      * @return Returns the wcs:CoverageDescription element that represents this CoverageDescription.
      */
-    public Element getElement(){
-        return (Element) myCD.clone();
+    public Element getCoverageDescriptionElement(){
+       return (Element) _myCD.clone();
     }
+
+    /**
+     * @param requestURL The request URL for the current request to be used in constructing lineage content.
+     * @return Returns the wcs:CoverageDescription element that represents this CoverageDescription.
+     */
+   // public Element getCoverageDescriptionElement(String requestURL){
+   //     Element cdElement = (Element) _myCD.clone();
+   //     addLineage(cdElement, requestURL);
+   //     return cdElement;
+   // }
+
+    /**
+     * Regular WCS-2.0 doesn't know about lineage, but EO WCS does. So this is a do nothing call in the
+     * general case and it adds the lineage to the EO case. Woot...
+     *
+     * @param requestURL
+     */
+    public void addLineage(Element coverageDescription, String requestURL){}
+
+
 
 
     /**
@@ -669,18 +705,18 @@ public class CoverageDescription {
 
     public void setDapDatasetUrl(URL datasetUrl) throws MalformedURLException {
 
-        dapDatasetUrl = new URL(datasetUrl.toExternalForm());
+        _dapDatasetUrl = new URL(datasetUrl.toExternalForm());
     }
 
     public URL getDapDatasetUrl()  {
 
-        return dapDatasetUrl;
+        return _dapDatasetUrl;
     }
 
 
     public String getGmlId(){
 
-        return myCD.getAttributeValue("id",WCS.GML_NS);
+        return _myCD.getAttributeValue("id",WCS.GML_NS);
 
     }
 
@@ -689,26 +725,26 @@ public class CoverageDescription {
         Element e;
         Vector<Element> abstractGmlTypeContent = new Vector<Element>();
 
-        for (Object o : myCD.getChildren("metaDataProperty", WCS.GML_NS)) {
+        for (Object o : _myCD.getChildren("metaDataProperty", WCS.GML_NS)) {
             e = (Element) o;
             abstractGmlTypeContent.add((Element) e.clone());
         }
 
-        e = myCD.getChild("description",WCS.GML_NS);
+        e = _myCD.getChild("description",WCS.GML_NS);
         if(e!=null)
             abstractGmlTypeContent.add((Element) e.clone());
 
-        e = myCD.getChild("descriptionReference",WCS.GML_NS);
-        if(e!=null)
-            abstractGmlTypeContent.add((Element) e.clone());
-
-
-        e = myCD.getChild("identifier",WCS.GML_NS);
+        e = _myCD.getChild("descriptionReference",WCS.GML_NS);
         if(e!=null)
             abstractGmlTypeContent.add((Element) e.clone());
 
 
-        for (Object o : myCD.getChildren("name", WCS.GML_NS)) {
+        e = _myCD.getChild("identifier",WCS.GML_NS);
+        if(e!=null)
+            abstractGmlTypeContent.add((Element) e.clone());
+
+
+        for (Object o : _myCD.getChildren("name", WCS.GML_NS)) {
             e = (Element) o;
             abstractGmlTypeContent.add((Element) e.clone());
         }
@@ -723,11 +759,11 @@ public class CoverageDescription {
         Element e;
         Vector<Element> abstractFeatureTypeContent = getAbstractGmlTypeContent();
 
-        e = myCD.getChild("boundedBy",WCS.GML_NS);
+        e = _myCD.getChild("boundedBy",WCS.GML_NS);
         if(e!=null)
             abstractFeatureTypeContent.add((Element) e.clone());
 
-        e = myCD.getChild("location",WCS.GML_NS);
+        e = _myCD.getChild("location",WCS.GML_NS);
         if(e!=null)
             abstractFeatureTypeContent.add((Element) e.clone());
 
@@ -739,7 +775,7 @@ public class CoverageDescription {
 
         Element domainSet;
 
-        domainSet = myCD.getChild("domainSet",WCS.GML_NS);
+        domainSet = _myCD.getChild("domainSet",WCS.GML_NS);
         if(domainSet!=null)
             return (Element) domainSet.clone();
 
@@ -751,7 +787,7 @@ public class CoverageDescription {
 
         Element rangeType;
 
-        rangeType = myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        rangeType = _myCD.getChild("rangeType",WCS.GMLCOV_NS);
         if(rangeType!=null)
             return (Element) rangeType.clone();
 
@@ -764,7 +800,7 @@ public class CoverageDescription {
 
         Element rangeType;
 
-        rangeType = myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        rangeType = _myCD.getChild("rangeType",WCS.GMLCOV_NS);
         if(rangeType==null)
             throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
                 WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
@@ -785,5 +821,13 @@ public class CoverageDescription {
     }
 
 
+    public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
+
+        Coverage coverage = new Coverage(this,requestUrl);
+
+        return coverage;
+
+
+    }
 
 }

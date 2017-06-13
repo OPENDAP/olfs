@@ -38,29 +38,44 @@ import org.jdom.Element;
 public class DomainCoordinate {
 
 
-    private String name;
-    private String dapID;
-    private String units;
+    private String _name;
+    private String _dapID;
+    private String _units;
     private String _arraySubset;
+    private long _size;
 
     DomainCoordinate(Element dc) throws ConfigurationException {
 
-        name   = dc.getAttributeValue("name");
-        if(name==null){
+        _name = dc.getAttributeValue("name");
+        if(_name ==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'name'.");
         }
 
-        dapID  = dc.getAttributeValue("dapID");
-        if(dapID==null){
+        _dapID = dc.getAttributeValue("dapID");
+        if(_dapID ==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'dapID'.");
         }
 
-        units  = dc.getAttributeValue("units");
-        if(units==null){
+        _units = dc.getAttributeValue("units");
+        if(_units ==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'units'.");
+        }
+
+
+        String s = dc.getAttributeValue("size");
+        if(s ==null){
+            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+                    "missing the required attribute 'size'.");
+        }
+        try {
+            _size = Long.parseLong(s);
+        }
+        catch (NumberFormatException e){
+            throw new ConfigurationException("Unable to parse the value of the " +
+                    "size attribute: '"+s+"' as a long integer. msg: "+e.getMessage());
         }
 
 
@@ -68,9 +83,11 @@ public class DomainCoordinate {
 
     DomainCoordinate(DomainCoordinate dc){
 
-        name   = dc.getName();
-        dapID  = dc.getDapID();
-        units  = dc.getUnits();
+        _name = dc._name;
+        _dapID = dc._dapID;
+        _units = dc._units;
+        _arraySubset = dc._arraySubset;
+        _size = dc._size;
 
     }
     @Override
@@ -89,10 +106,11 @@ public class DomainCoordinate {
             // Deep clone member fields here
 
 
-            name   = dc.getName();
-            dapID  = dc.getDapID();
-            units  = dc.getUnits();
-            _arraySubset = null;
+            _name = dc._name;
+            _dapID = dc._dapID;
+            _units = dc._units;
+            _arraySubset = dc._arraySubset;
+            _size = dc._size;
 
 
 
@@ -101,17 +119,17 @@ public class DomainCoordinate {
 
 
     public String getDapID(){
-        return dapID;
+        return _dapID;
     }
 
 
     public String getName(){
-        return name;
+        return _name;
     }
 
 
     public String getUnits(){
-        return units;
+        return _units;
     }
 
     public void setArraySubset(String arraySubset){
@@ -121,6 +139,10 @@ public class DomainCoordinate {
 
     public String getArraySubset(){
         return _arraySubset;
+    }
+
+    public long getSize(){
+        return _size;
     }
 
 

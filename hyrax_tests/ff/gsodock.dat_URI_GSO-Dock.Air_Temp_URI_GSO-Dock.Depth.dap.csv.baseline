@@ -1,5 +1,5 @@
 Dataset: gsodock.dat
-/URI_GSO-Dock.Time, /URI_GSO-Dock.Depth, /URI_GSO-Dock.Sea_Temp, /URI_GSO-Dock.Salinity, /URI_GSO-Dock.DO_percent, /URI_GSO-Dock.pH, /URI_GSO-Dock.Turbidity, /URI_GSO-Dock.Air_Temp, /URI_GSO-Dock.Wind_Speed, /URI_GSO-Dock.Wind_Direction, /URI_GSO-Dock.Barometric_Pres, /URI_GSO-Dock.Solar_Radiation
+/URI_GSO-Dock.Depth, /URI_GSO-Dock.Air_Temp
 1.95, 21.4
 1.89, 21.4
 1.84, 21.2

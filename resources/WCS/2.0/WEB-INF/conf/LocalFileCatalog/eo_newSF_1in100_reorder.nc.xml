@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<wcs:CoverageDescription
+        gml:id="eo_newSF_1in100_reorder.nc"
+        xmlns="http://www.opengis.net/gml/3.2"
+        xmlns:ows="http://www.opengis.net/ows/2.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+        xmlns:swe="http://www.opengis.net/swe/2.0"
+        xmlns:wcs="http://www.opengis.net/wcs/2.0"
+        xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0"
+        xmlns:eop="http://www.opengis.net/eop/2.0"
+        xmlns:om="http://www.opengis.net/om/2.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/wcs/wcseo/1.0 http://schemas.opengis.net/wcs/wcseo/1.0/wcsEOAll.xsd"
+>
+
+    <gml:boundedBy>
+        <gml:Envelope axisLabels="latitude longitude" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+                      uomLabels="deg deg">
+            <gml:lowerCorner>37.3333332966667  -122.666666698</gml:lowerCorner>
+            <gml:upperCorner>38.66666663 -121.333333364667</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <wcs:CoverageId>eo_newSF_1in100_reorder.nc</wcs:CoverageId>
+    <gmlcov:metadata>
+        <gmlcov:Extension>
+            <wcseo:EOMetadata>
+                <eop:EarthObservation gml:id="eop_eo_newSF_1in100_reorder.nc">
+                    <om:phenomenonTime>
+                        <gml:TimePeriod gml:id="tp_eo_newSF_1in100_reorder.nc">
+                            <gml:beginPosition>2016-06-09T10:30:34.000Z</gml:beginPosition> <!-- 108 days -->
+                            <gml:endPosition>2016-09-24T10:30:34.000Z</gml:endPosition>
+                        </gml:TimePeriod>
+                    </om:phenomenonTime>
+                    <om:resultTime>
+                        <gml:TimeInstant gml:id="archiving_date_eo_newSF_1in100_reorder.nc">
+                            <gml:timePosition>2016-09-26T10:30:34.000Z</gml:timePosition>
+                        </gml:TimeInstant>
+                    </om:resultTime>
+                    <om:procedure>
+                        <eop:EarthObservationEquipment gml:id="eo_newSF_1in100_reorder.nc_eoe">
+                            <eop:platform> <!-- 0..1 -->
+                                <shortName>SF-1:100</shortName>
+                            </eop:platform>
+                            <!-- <eop:instrument /> 0..1 -->
+                            <!-- <eop:sensor /> 0..1 -->
+                            <!-- <eop:acquisitionParameters /> 0..1 -->
+                        </eop:EarthObservationEquipment>
+                    </om:procedure>
+
+                    <om:observedProperty xlink:href="http://cfconventions.org/Data/cf-standard-names/35/src/cf-standard-name-table.xml#wind"/> <!-- 1..n -->
+
+                    <om:featureOfInterest>
+                        <eop:Footprint gml:id="footprint_eo_newSF_1in100_reorder.nc">
+                            <eop:multiExtentOf>
+                                <gml:MultiSurface gml:id="multisurface_eo_newSF_1in100_reorder.nc" srsName="EPSG:4326">
+                                    <gml:surfaceMember>
+                                        <gml:Polygon gml:id="polygon_eo_newSF_1in100_reorder.nc">
+                                            <gml:exterior>
+                                                <gml:LinearRing>
+                                                    <gml:posList>
+                                                        37.3333332966667  -122.666666698
+                                                        38.66666663 -122.666666698
+                                                        38.66666663 -121.333333364667
+                                                        37.3333332966667.0 -121.333333364667
+                                                        37.3333332966667  -122.666666698
+                                                    </gml:posList>
+                                                </gml:LinearRing>
+                                            </gml:exterior>
+                                        </gml:Polygon>
+                                    </gml:surfaceMember>
+                                </gml:MultiSurface>
+                            </eop:multiExtentOf>
+                            <eop:centerOf>
+                                <gml:Point gml:id="eo_newSF_1in100_reorder.nc_p" srsName="EPSG:4326">
+                                    <gml:pos>37.9999 121.9999</gml:pos>
+                                </gml:Point>
+                            </eop:centerOf>
+                        </eop:Footprint>
+                    </om:featureOfInterest>
+                    <!--
+                    result
+
+                    This is required to be om:result/eop:EarthObservationResult but there are no required children
+                    of eop:EarthObservationResult. I added one child (eop:parameter) in order to not to nilify
+                    the eop:EarthObservationResult
+                    -->
+                    <om:result>
+                        <eop:EarthObservationResult>
+                            <!-- <eop:browse /> 0..1 -->
+                            <!-- <eop:product /> 0..1 -->
+                            <!-- <eop:mask /> 0..1 -->
+                            <eop:parameter> <!-- 0..1 -->
+                                <eop:ParameterInformation>
+                                    <eop:unitOfMeasure>m/s</eop:unitOfMeasure>
+                                </eop:ParameterInformation>
+                            </eop:parameter>
+                            <!-- <eop:coverage /> 0..1 -->
+                        </eop:EarthObservationResult>
+                    </om:result>
+
+                    <eop:metaDataProperty>
+                        <eop:EarthObservationMetaData>
+                            <eop:identifier>eop_eo_newSF_1in100_reorder.nc</eop:identifier>
+                            <!--
+                            acquisitionType
+                            Used to distinguish at a high level the
+                            appropriateness of the acquisition for "general" use,
+                            whether the product is a nominal acquisition, special
+                            calibration product or other
+
+                            AllowedValues: NOMINAL | CALIBRATION | OTHER
+                            -->
+                            <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+                            <!--
+                            status
+                            Refers to product status.
+
+                            AllowedValues: ARCHIVED | ACQUIRED | CANCELLED | FAILED |
+                            PLANNED | POTENTIAL | REJECTED | QUALITYDEGRADED
+                            -->
+                            <eop:status>ARCHIVED</eop:status>
+                        </eop:EarthObservationMetaData>
+                    </eop:metaDataProperty>
+                </eop:EarthObservation>
+            </wcseo:EOMetadata>
+        </gmlcov:Extension>
+    </gmlcov:metadata>
+
+    <gml:domainSet>
+        <gml:RectifiedGrid dimension="3" gml:id="eo_newSF_1in100_reorder.nc_grid">
+            <gml:limits>
+                <gml:GridEnvelope>
+                    <gml:low>0 0 0</gml:low>
+                    <gml:high>107 4799 4799</gml:high>
+                </gml:GridEnvelope>
+            </gml:limits>
+            <gml:axisLabels>time latitude longitude</gml:axisLabels>
+            <gml:origin>
+                <gml:Point gml:id="grid_origin_eo_newSF_1in100_reorder.nc" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                    <gml:pos>1465511434 38.6663888522222 -122.666388920222 </gml:pos>
+                </gml:Point>
+            </gml:origin>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/TIME">86400.0 0.0 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 2.7777778E-4</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 -2.7778E-4 0.0</gml:offsetVector>
+        </gml:RectifiedGrid>
+    </gml:domainSet>
+
+    <gmlcov:rangeType>
+        <swe:DataRecord>
+            <swe:field name="depth">
+                <swe:Quantity definition="urn:ncep:def:independantVariable:u_component_of_wind_isobaric">
+                    <swe:description>Depth of Innudation Above Sea Level</swe:description>
+                    <swe:uom code="m"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-10.0 110.0</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </gmlcov:rangeType>
+    <wcs:ServiceParameters>
+        <wcs:CoverageSubtype>RectifiedDataset</wcs:CoverageSubtype>
+        <wcs:CoverageSubtypeParent>
+            <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
+        </wcs:CoverageSubtypeParent>
+        <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+    </wcs:ServiceParameters>
+</wcs:CoverageDescription>
+

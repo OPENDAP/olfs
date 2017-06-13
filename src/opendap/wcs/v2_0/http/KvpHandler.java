@@ -37,11 +37,13 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 8, 2009
- * Time: 12:03:09 AM
- * To change this template use File | Settings | File Templates.
+ *  KvpHandler handles the parsing and procesing of WCS requests received in the
+ *  URL query string as a set of Key Value Pairs;.
+ *
+ *  Supported WCS Versions:
+ *      WCS-2.0.1
+ *      EO-WCS-2.0
+ *
  */
 public class KvpHandler {
 
@@ -49,54 +51,54 @@ public class KvpHandler {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(KvpHandler.class);
 
 
-    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
+    private static void transmitXML(Document doc, ServletOutputStream sos) throws WcsException {
+        try {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            xmlo.output(doc,sos);
+        } catch (IOException e) {
+            throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
+        }
 
 
+
+    }
+
+    public static void processKvpWcsRequest(String serviceURL, String requestUrl, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
 
         Document wcsResponse;
         XMLOutputter xmlo;
 
-        ServletOutputStream os = null;
+        ServletOutputStream os  = null;
 
 
         try {
+            os  = response.getOutputStream();
 
-            int wcsRequestType = getRequestType(keyValuePairs);
-
-
-
+            WCS.REQUEST wcsRequestType = getRequestType(keyValuePairs);
 
             switch(wcsRequestType){
 
-                case  WCS.GET_CAPABILITIES:
+                case GET_CAPABILITIES:
                     wcsResponse = getCapabilities(keyValuePairs, serviceURL);
-                    xmlo = new XMLOutputter(Format.getPrettyFormat());
-                    try {
-                        response.setContentType("text/xml");
-                        os = response.getOutputStream();
-                        xmlo.output(wcsResponse,os);
-                    } catch (IOException e) {
-                        throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
-                    }
-
+                    response.setContentType("text/xml");
+                    transmitXML(wcsResponse,os);
                     break;
 
-                case  WCS.DESCRIBE_COVERAGE:
+                case DESCRIBE_COVERAGE:
                     wcsResponse = describeCoverage(keyValuePairs);
-                    xmlo = new XMLOutputter(Format.getPrettyFormat());
-                    try {
-                        response.setContentType("text/xml");
-                        os = response.getOutputStream();
-                        xmlo.output(wcsResponse,os);
-                    } catch (IOException e) {
-                        throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
-                    }
-
+                    response.setContentType("text/xml");
+                    transmitXML(wcsResponse,os);
                     break;
 
-                case WCS.GET_COVERAGE:
+                case DESCRIBE_EO_COVERAGE_SET:
+                    wcsResponse = describeEOCoverageSet(keyValuePairs);
+                    response.setContentType("text/xml");
+                    transmitXML(wcsResponse,os);
+                    break;
 
-                    getCoverage(keyValuePairs,response);
+                case GET_COVERAGE:
+
+                    getCoverage(requestUrl, keyValuePairs,response);
 
                     break;
 
@@ -111,9 +113,13 @@ public class KvpHandler {
         catch(WcsException e){
             log.error(e.getMessage());
             WcsExceptionReport er = new WcsExceptionReport(e);
-
             if(os==null)
                 os = response.getOutputStream();
+
+            if(!response.isCommitted()) {
+                response.setContentType("text/xml");
+                response.setStatus(er.getHttpStatusCode());
+            }
 
             os.println(er.toString());
         }
@@ -151,6 +157,19 @@ public class KvpHandler {
     }
 
 
+    /**
+     *
+     * @param keyValuePairs     Key Value Pairs from WCS URL
+     * @throws WcsException  When bad things happen.
+     */
+    public static Document describeEOCoverageSet(Map<String,String[]> keyValuePairs )  throws InterruptedException, WcsException {
+
+        DescribeEOCoverageSetRequest wcsRequest = new DescribeEOCoverageSetRequest(keyValuePairs);
+
+        return DescribeEOCoverageSetRequestProcessor.processDescribeEOCoverageSetRequest(wcsRequest);
+    }
+
+
 
     /**
      *
@@ -159,24 +178,11 @@ public class KvpHandler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public static void getCoverage(Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public static void getCoverage(String requestUrl, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
-        GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
+        GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
-
-    }
-
-
-    /**
-     *
-     * @param req    A GetCoverageREquest object.
-     * @throws WcsException  When bad things happen.
-     */
-    public static void getCoverage(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
-
-
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 
     }
 
@@ -185,7 +191,7 @@ public class KvpHandler {
 
 
 
-    public static int getRequestType(Map<String,String[]> keyValuePairs) throws WcsException{
+    public static WCS.REQUEST getRequestType(Map<String,String[]> keyValuePairs) throws WcsException{
 
 
         if(keyValuePairs.isEmpty())
@@ -206,14 +212,17 @@ public class KvpHandler {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(s[0].equalsIgnoreCase("GetCapabilities")){
-            return WCS.GET_CAPABILITIES;
+        else if(s[0].equalsIgnoreCase(WCS.REQUEST.GET_CAPABILITIES.toString())){
+            return WCS.REQUEST.GET_CAPABILITIES;
         }
-        else if(s[0].equalsIgnoreCase("DescribeCoverage")){
-            return WCS.DESCRIBE_COVERAGE;
+        else if(s[0].equalsIgnoreCase(WCS.REQUEST.DESCRIBE_COVERAGE.toString())){
+            return WCS.REQUEST.DESCRIBE_COVERAGE;
         }
-        else if(s[0].equalsIgnoreCase("GetCoverage")){
-            return WCS.GET_COVERAGE;
+        else if(s[0].equalsIgnoreCase(WCS.REQUEST.DESCRIBE_EO_COVERAGE_SET.toString())){
+            return WCS.REQUEST.DESCRIBE_EO_COVERAGE_SET;
+        }
+        else if(s[0].equalsIgnoreCase(WCS.REQUEST.GET_COVERAGE.toString())){
+            return WCS.REQUEST.GET_COVERAGE;
         }
         else {
             throw new WcsException("The parameter 'request' has an invalid " +

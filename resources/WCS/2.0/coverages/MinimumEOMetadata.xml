@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<eop:EarthObservation>
+    <om:phenomenonTime>
+        <gml:TimePeriod gml:id="tp_someEOCoverage1">
+            <gml:beginPosition>2008-03-13T10:00:06.000</gml:beginPosition>
+            <gml:endPosition>2008-03-13T10:20:26.000</gml:endPosition>
+        </gml:TimePeriod>
+    </om:phenomenonTime>
+    <om:resultTime>
+        <gml:TimeInstant gml:id="archivingdate_someEOCoverage1">
+            <gml:timePosition>2008-03-13T11:02:47.999</gml:timePosition>
+        </gml:TimeInstant>
+    </om:resultTime>
+    <om:procedure>
+        <eop:EarthObservationEquipment gml:id="someEOCoverage1_eoe">
+            <!-- <eop:platform /> 0..1 -->
+            <!-- <eop:instrument /> 0..1 -->
+            <!-- <eop:sensor /> 0..1 -->
+            <!-- <eop:acquisitionParameters /> 0..1 -->
+        </eop:EarthObservationEquipment>
+    </om:procedure>
+    <!--
+    xlink reference to 
+    eop:EarthObservationResult/eop:parameter/eop:ParameterInformation/eop:phenomenon/swe:Phenomenon if provided 
+    or CF Standard Name code list entry
+    -->
+    <om:observedProperty xlink:href="#phenom1"/>
+    <!-- 1..n -->
+    <!-- om:featureOfInterest is required but nilable according to the schema -->
+    <om:featureOfInterest/>
+    <!-- om:featureOfInterest/eop:Footprint 0..1 -->
+    <om:result>
+        <eop:EarthObservationResult>
+            <!-- <eop:browse /> 0..1 -->
+            <!-- <eop:product /> 0..1 -->
+            <!-- <eop:mask /> 0..1 -->
+            <!-- <eop:parameter /> 0..1 -->
+            <!-- <eop:coverage /> 0..1 -->
+        </eop:EarthObservationResult>
+    </om:result>
+    <eop:metaDataProperty>
+        <eop:EarthObservationMetaData>
+            <eop:identifier>someEOCoverage1</eop:identifier>
+            <!-- <creationDate /> 0..1 -->
+            <!-- <Doi /> 0..1 -->
+            <!-- <parentIdentifier /> 0..1 -->
+            <!-- 
+            acquisitionType
+            Used to distinguish at a high level the 
+            appropriateness of the acquisition for "general" use,
+            whether the product is a nominal acquisition, special 
+            calibration product or other
+            
+            Values: NOMINAL | CALIBRATION | OTHER 
+            -->
+            <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+            <!-- <acquisitionSubType /> 0..1 -->
+            <!-- <productType /> 0..1 -->
+            <!--
+            status
+            Refers to product status.
+            
+            Values: ARCHIVED | ACQUIRED | CANCELLED | FAILED |
+            PLANNED | POTENTIAL | REJECTED | QUALITYDEGRADED
+            -->
+            <eop:status>ARCHIVED</eop:status>
+            <!-- <statusDetail /> 0..1 -->
+            <!-- <eop:downlinkedTo> 0..1 -->
+            <!-- <eop:archivedIn> 0..1 -->
+            <!-- <eop:imageQualityDegradation /> 0..1 -->
+            <!-- <eop:imageQualityDegradationQuotationMode /> 0..1 -->
+            <!-- <eop:histograms /> 0..1 -->
+            <!-- <eop:composedOf /> 0..1 -->
+            <!-- <eop:subsetOf /> 0..1 -->
+            <!-- <eop:linkedWith /> 0..1 -->
+            <!-- <eop:processing /> 0..1 -->
+            <!-- <eop:vendorSpecific /> 0..1 -->
+        </eop:EarthObservationMetaData>
+    </eop:metaDataProperty>
+</eop:EarthObservation>

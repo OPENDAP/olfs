@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cis:coverageDescription
+        gml:id="cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4"
+        xmlns:wcs="http://www.opengis.net/wcs/2.0"
+        xmlns:ows="http://www.opengis.net/ows/2.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+        xmlns:swe="http://www.opengis.net/swe/2.0"
+        xmlns:cis='http://www.opengis.net/cis/1.1'
+        xmlns:gml='http://www.opengis.net/gml/3.2'
+        xmlns:swe='http://www.opengis.net/swe/2.0'
+        xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0"
+        xmlns:eop="http://www.opengis.net/eop/2.0"
+        xmlns:om="http://www.opengis.net/om/2.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+
+
+    <cis:envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="lat lon" srsDimension="2">
+        <cis:axisExtent axisLabel="lat" uomLabel="deg" lowerBound="-90.0"    upperBound="90.0" />
+        <cis:axisExtent axisLabel="lon" uomLabel="deg" lowerBound="-180.0"   upperBound="180.0" />
+    </cis:envelope>
+
+    <cis:domainSet>
+        <cis:generalGrid srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="lat lon">
+            <cis:regularAxis axisLabel="lat"  lowerBound="-90.0" upperBound="90.0" uomLabel="deg" resolution="0.0417"/>
+            <cis:regularAxis axisLabel="lon" lowerBound="-180.0"   upperBound="180.0"  uomLabel="deg" resolution="0.0417"/>
+            <cis:gridLimits srsName="http://www.opengis.net/def/crs/OGC/0/Index2D" axisLabels="lat lon">
+                <cis:indexAxis axisLabel="lat" lowerBound="0" upperBound="4319"/>
+                <cis:indexAxis axisLabel="lon" lowerBound="0" upperBound="8639"/>
+            </cis:gridLimits>
+        </cis:generalGrid>
+    </cis:domainSet>
+
+    <cis:rangeType>
+        <swe:DataRecord>
+            <swe:field name="chlorophyll-a">
+                <swe:Quantity definition="urn:nasa:modis:def:independentVariable:chlorophyll-a">
+                    <swe:description>Optically measured chlorophyll-a at or near the ocean's surface</swe:description>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>0.0 100.0</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </cis:rangeType>
+
+    <cis:metadata>
+        <gmlcov:Extension>
+            <wcseo:EOMetadata>
+                <eop:EarthObservation gml:id="eop_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                    <om:phenomenonTime>
+                        <gml:TimePeriod gml:id="tp_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                            <gml:beginPosition>2002-07-03T00:00:00Z</gml:beginPosition>
+                            <gml:endPosition>2002-07-03T23:59:59Z</gml:endPosition>
+                        </gml:TimePeriod>
+                    </om:phenomenonTime>
+                    <om:resultTime>
+                        <gml:TimeInstant gml:id="archiving_date_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                            <gml:timePosition>2002-08-03T00:00:00Z</gml:timePosition>
+                        </gml:TimeInstant>
+                    </om:resultTime>
+                    <om:procedure>
+                        <eop:EarthObservationEquipment gml:id="eoe_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                            <eop:platform>
+                                <eop:Platform>
+                                    <eop:shortName>PHR</eop:shortName>
+                                    <eop:serialIdentifier>1A</eop:serialIdentifier>
+                                </eop:Platform>
+                            </eop:platform>
+                            <eop:instrument>
+                                <eop:Instrument>
+                                    <eop:shortName>PHR</eop:shortName>
+                                </eop:Instrument>
+                            </eop:instrument>
+                            <eop:sensor>
+                                <eop:Sensor>
+                                    <eop:sensorType>OPTICAL</eop:sensorType>
+                                    <eop:operationalMode codeSpace="urn:eop:PHR:sensorMode">PX</eop:operationalMode>
+                                    <eop:resolution uom="m">0.7</eop:resolution>
+                                </eop:Sensor>
+                            </eop:sensor>
+                            <eop:acquisitionParameters>
+                                <eop:Acquisition>
+                                    <eop:orbitNumber>12</eop:orbitNumber>
+                                    <eop:lastOrbitNumber>12</eop:lastOrbitNumber>
+                                    <eop:orbitDirection>ASCENDING</eop:orbitDirection>
+                                    <eop:wrsLongitudeGrid codeSpace="EPSG">12</eop:wrsLongitudeGrid>
+                                    <eop:wrsLatitudeGrid codeSpace="EPSG">12</eop:wrsLatitudeGrid>
+                                    <eop:instrumentAzimuthAngle uom="deg">-14.0</eop:instrumentAzimuthAngle>
+                                    <eop:pitch uom="deg">0</eop:pitch>
+                                    <eop:roll uom="deg">0</eop:roll>
+                                    <eop:yaw uom="deg">0</eop:yaw>
+                                </eop:Acquisition>
+                            </eop:acquisitionParameters>
+                        </eop:EarthObservationEquipment>
+                    </om:procedure>
+                    <om:observedProperty xlink:href="#phenom1"/>
+                    <om:featureOfInterest>
+                        <eop:Footprint gml:id="footprint_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                            <eop:multiExtentOf>
+                                <gml:MultiSurface gml:id="multisurface_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4" srsName="EPSG:4326">
+                                    <gml:surfaceMember>
+                                        <gml:Polygon gml:id="polygon_cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4">
+                                            <gml:exterior>
+                                                <gml:LinearRing>
+                                                    <gml:posList>43.516667 2.1025 43.381667 2.861667 42.862778 2.65
+                                                        42.996389 1.896944 43.516667 2.1025
+                                                    </gml:posList>
+                                                </gml:LinearRing>
+                                            </gml:exterior>
+                                        </gml:Polygon>
+                                    </gml:surfaceMember>
+                                </gml:MultiSurface>
+                            </eop:multiExtentOf>
+                            <eop:centerOf>
+                                <gml:Point gml:id="cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4_p" srsName="EPSG:4326">
+                                    <gml:pos>43.190833 2.374167</gml:pos>
+                                </gml:Point>
+                            </eop:centerOf>
+                        </eop:Footprint>
+                    </om:featureOfInterest>
+                    <om:result>
+                        <eop:EarthObservationResult gml:id="cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4_eor">
+                            <eop:browse>
+                                <eop:BrowseInformation>
+                                    <eop:type>QUICKLOOK</eop:type>
+                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
+                                    </eop:referenceSystemIdentifier>
+                                    <eop:fileName>
+                                        <ows:ServiceReference xlink:href="http://etc">
+                                            <ows:RequestMessage/>
+                                        </ows:ServiceReference>
+                                    </eop:fileName>
+                                </eop:BrowseInformation>
+                            </eop:browse>
+                            <eop:mask>
+                                <eop:MaskInformation>
+                                    <eop:type>CLOUD</eop:type>
+                                    <eop:format>VECTOR</eop:format>
+                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
+                                    </eop:referenceSystemIdentifier>
+                                    <eop:fileName>
+                                        <ows:ServiceReference xlink:href="http://etc">
+                                            <ows:RequestMessage/>
+                                        </ows:ServiceReference>
+                                    </eop:fileName>
+                                </eop:MaskInformation>
+                            </eop:mask>
+                            <eop:parameter>
+                                <eop:ParameterInformation/>
+                            </eop:parameter>
+                        </eop:EarthObservationResult>
+                    </om:result>
+                    <eop:metaDataProperty>
+                        <eop:EarthObservationMetaData>
+                            <eop:identifier>cis:MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4</eop:identifier>
+                            <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+                            <eop:productType>TBD</eop:productType>
+                            <eop:status>ARCHIVED</eop:status>
+                            <eop:downlinkedTo>
+                                <eop:DownlinkInformation>
+                                    <eop:acquisitionStation codeSpace="urn:eop:PHR:stationCode">TLS
+                                    </eop:acquisitionStation>
+                                </eop:DownlinkInformation>
+                            </eop:downlinkedTo>
+                            <eop:archivedIn>
+                                <eop:ArchivingInformation>
+                                    <eop:archivingCenter codeSpace="urn:eop:PHR:stationCode">TLS</eop:archivingCenter>
+                                    <eop:archivingDate>2001-08-22T11:02:47.999</eop:archivingDate>
+                                </eop:ArchivingInformation>
+                            </eop:archivedIn>
+                            <eop:processing>
+                                <eop:ProcessingInformation/>
+                            </eop:processing>
+                        </eop:EarthObservationMetaData>
+                    </eop:metaDataProperty>
+                </eop:EarthObservation>
+            </wcseo:EOMetadata>
+        </gmlcov:Extension>
+    </cis:metadata>
+
+
+    <wcs:ServiceParameters>
+        <wcs:CoverageSubtype>GeneralGridCoverage</wcs:CoverageSubtype>
+        <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+    </wcs:ServiceParameters>
+
+</cis:coverageDescription>
+

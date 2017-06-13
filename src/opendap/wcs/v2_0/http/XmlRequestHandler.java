@@ -33,23 +33,20 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 7, 2009
- * Time: 4:50:49 PM
- * To change this template use File | Settings | File Templates.
+ * This class is responsible for processing WCS XML request documents.
+ *
+ * Supports WCS-2.0.1 only
  */
 public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
     protected Logger log;
@@ -163,32 +160,34 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Element wcsRequest = wcsRequestDoc.getRootElement();
         String serviceUrl = Util.getServiceUrlString(request, _prefix);
 
-        handleWcsRequest(wcsRequest,serviceUrl,response);
+        String requestUrl=HttpGetHandler.getRequestUrl(request);
+
+        handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
 
 
 
     }
 
-    public void handleWcsRequest(Element wcsRequest, String serviceUrl, HttpServletResponse response) throws WcsException, InterruptedException {
+    public void handleWcsRequest(Element wcsRequest, String serviceUrl, String requestUrl, HttpServletResponse response) throws WcsException, InterruptedException {
 
         Document wcsResponse;
         switch (getRequestType(wcsRequest)) {
 
-            case WCS.GET_CAPABILITIES:
+            case GET_CAPABILITIES:
                 GetCapabilitiesRequest getCapabilitiesRequest = new  GetCapabilitiesRequest(wcsRequest);
                 wcsResponse = getCapabilities(getCapabilitiesRequest, serviceUrl);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
-            case WCS.DESCRIBE_COVERAGE:
+            case DESCRIBE_COVERAGE:
                 DescribeCoverageRequest wcsDCR = new DescribeCoverageRequest(wcsRequest);
                 wcsResponse = describeCoverage(wcsDCR);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
-            case WCS.GET_COVERAGE:
+            case GET_COVERAGE:
 
-                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(wcsRequest);
+                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
 
                 /*
                 if (getCoverageRequest.isStore()) {
@@ -217,6 +216,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         try {
             ServletOutputStream os = response.getOutputStream();
+            response.setStatus(er.getHttpStatusCode());
             xmlo.output(er.getReport(),os);
         } catch (IOException e) {
             log.error("FAILED to transmit WcsException to client. Message: ",e.getMessage());
@@ -239,6 +239,14 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         }
 
     }
+
+
+    public class NoOpEntityResolver implements EntityResolver {
+        public InputSource resolveEntity(String publicId, String systemId) {
+            return new InputSource(new StringReader(""));
+        }
+    }
+
 
 
     public Document parseWcsRequest(BufferedReader sis, String encoding) throws WcsException {
@@ -282,6 +290,11 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
             // Parse the XML doc into a Document object.
             SAXBuilder saxBuilder = new SAXBuilder();
 
+            // I added these next two bits to stop ENTITY resolution,
+            // which is important for security reasons - ndp
+            saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            saxBuilder.setEntityResolver(new NoOpEntityResolver());
+
             ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
             requestDoc = saxBuilder.build(baos);
             return requestDoc;
@@ -318,13 +331,13 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      */
     public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 
     }
 
 
 
-    public static int getRequestType(Element req) throws WcsException{
+    public static WCS.REQUEST getRequestType(Element req) throws WcsException{
         if(req == null){
             throw new WcsException("Poorly formatted WCS request. Missing " +
                     "root element of document.",
@@ -333,14 +346,14 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
         String name = req.getName();
 
-        if(name.equals("GetCapabilities")){
-            return WCS.GET_CAPABILITIES;
+        if(name.equals(WCS.REQUEST.GET_CAPABILITIES.toString())){
+            return WCS.REQUEST.GET_CAPABILITIES;
         }
-        else if(name.equals("DescribeCoverage")){
-            return WCS.DESCRIBE_COVERAGE;
+        else if(name.equals(WCS.REQUEST.DESCRIBE_COVERAGE.toString())){
+            return WCS.REQUEST.DESCRIBE_COVERAGE;
         }
-        else if(name.equals("GetCoverage")){
-            return WCS.GET_COVERAGE;
+        else if(name.equals(WCS.REQUEST.GET_COVERAGE.toString())){
+            return WCS.REQUEST.GET_COVERAGE;
         }
         else {
             throw new WcsException("The request document  was  invalid. " +

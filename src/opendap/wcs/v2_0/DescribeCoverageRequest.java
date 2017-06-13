@@ -57,6 +57,7 @@ public class DescribeCoverageRequest {
 
     private final String   _request = "DescribeCoverage";
 
+
     private String[] ids;
 
     public String[] getIds() {
@@ -72,6 +73,7 @@ public class DescribeCoverageRequest {
         Element e;
         Iterator i;
         int index;
+
 
         // Make sure we got the correct request object.
         WCS.checkNamespace(descrCovElem,_request,WCS.WCS_NS);
@@ -105,6 +107,7 @@ public class DescribeCoverageRequest {
 
     public DescribeCoverageRequest(Map<String,String[]> kvp)
             throws WcsException {
+
 
 
         String tmp[], s[];
@@ -150,19 +153,7 @@ public class DescribeCoverageRequest {
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
     }
-
 
     /**
      * <pre>
