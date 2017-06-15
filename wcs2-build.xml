@@ -603,13 +603,6 @@
     	
         <property name="lfc.build.dir" value="${build.dir}/wcs"/>
     	
-    	<!-- 
-    	     generalize source and destination directory for the copy command 
-    	     from the "meaningful" property names templates.dir and lfc.build.dir
-    	-->
-    	<property name="src.dir" value="${templates.dir}" />
-    	<property name="dst.dir" value="${lfc.build.dir}" />
-
     	<!-- filenames (TOKEN replacement values in the 00 file) -->
     	<property name="dataset.name" value="MERRA2_400.tavgM_2d_int_Nx.2016" />
     	<property name="file.00.name"   value="${dataset.name}00.nc4"/><!-- This is the file 00 with tokens -->
@@ -623,28 +616,28 @@
         
     
 	    <!-- first delete, then create the destination LFC folder -->	
-	    <delete dir="${dst.dir}"/>
-    	<mkdir  dir="${dst.dir}"/>
+	    <delete dir="${lfc.build.dir}"/>
+    	<mkdir  dir="${lfc.build.dir}"/>
     	
-    	<copy file="${src.dir}/LFC.xml" todir="${dst.dir}" />
+    	<copy file="${templates.dir}/LFC.xml" todir="${lfc.build.dir}" />
 	    
 	    <!-- copy file 00 from src into the respective seven files in the actual LFC -->
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.01.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.02.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.03.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.04.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.05.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.06.name}.xml" />
-	    <copy file="${src.dir}/${file.00.name}.xml" tofile="${dst.dir}/${file.07.name}.xml" />   
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.01.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.02.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.03.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.04.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.05.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.06.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.07.name}.xml" />   
 	    
 	    <!-- now replace tokens -->
-	    <replace file="${dst.dir}/${file.01.name}.xml" token="@MERRA2DATASET@" value="${file.01.name}" />
-	    <replace file="${dst.dir}/${file.02.name}.xml" token="@MERRA2DATASET@" value="${file.02.name}" />
-	    <replace file="${dst.dir}/${file.03.name}.xml" token="@MERRA2DATASET@" value="${file.03.name}" />
-	    <replace file="${dst.dir}/${file.04.name}.xml" token="@MERRA2DATASET@" value="${file.04.name}" />
-	    <replace file="${dst.dir}/${file.05.name}.xml" token="@MERRA2DATASET@" value="${file.05.name}" />
-	    <replace file="${dst.dir}/${file.06.name}.xml" token="@MERRA2DATASET@" value="${file.06.name}" />
-	    <replace file="${dst.dir}/${file.07.name}.xml" token="@MERRA2DATASET@" value="${file.07.name}" />
+	    <replace file="${lfc.build.dir}/${file.01.name}.xml" token="@MERRA2DATASET@" value="${file.01.name}" />
+	    <replace file="${lfc.build.dir}/${file.02.name}.xml" token="@MERRA2DATASET@" value="${file.02.name}" />
+	    <replace file="${lfc.build.dir}/${file.03.name}.xml" token="@MERRA2DATASET@" value="${file.03.name}" />
+	    <replace file="${lfc.build.dir}/${file.04.name}.xml" token="@MERRA2DATASET@" value="${file.04.name}" />
+	    <replace file="${lfc.build.dir}/${file.05.name}.xml" token="@MERRA2DATASET@" value="${file.05.name}" />
+	    <replace file="${lfc.build.dir}/${file.06.name}.xml" token="@MERRA2DATASET@" value="${file.06.name}" />
+	    <replace file="${lfc.build.dir}/${file.07.name}.xml" token="@MERRA2DATASET@" value="${file.07.name}" />
     	
     </target>
 
