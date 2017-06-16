@@ -130,7 +130,7 @@ public class LocalFileCatalog implements WcsCatalog {
         e1 = config.getChild("CatalogDirectory");
         if(e1==null){
 
-            String defaultCatalogDirectory = persistentContentPath + "/"+ this.getClass().getSimpleName();
+            String defaultCatalogDirectory = persistentContentPath + this.getClass().getSimpleName();
 
             File defaultCatDir = new File(defaultCatalogDirectory);
 
