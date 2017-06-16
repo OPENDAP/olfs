@@ -52,7 +52,7 @@
       <swe:DataRecord>
         <swe:field name="PRECLS">
           <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
-            <swe:description>convective_rainfall</swe:description>
+            <swe:description>large_scale_rainfall</swe:description>
             <swe:uom code="kg m-2 s-1" />
             <swe:constraint>
               <swe:AllowedValues>
@@ -65,7 +65,7 @@
       <swe:DataRecord>
         <swe:field name="PRECSN">
           <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
-            <swe:description>convective_rainfall</swe:description>
+            <swe:description>snowfall</swe:description>
             <swe:uom code="kg m-2 s-1" />
             <swe:constraint>
               <swe:AllowedValues>
