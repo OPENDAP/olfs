@@ -78,6 +78,7 @@
     </gmlcov:rangeType>
     <wcs:ServiceParameters>
       <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
-      <wcs:nativeFormat>application/vnd.opendap.dap4.data</wcs:nativeFormat>
+      <!-- wcs:nativeFormat>application/vnd.opendap.dap4.data</wcs:nativeFormat -->
+      <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
     </wcs:ServiceParameters>
   </wcs:CoverageDescription>
