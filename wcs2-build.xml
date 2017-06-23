@@ -578,6 +578,73 @@
         </java>
 
     </target>
+    
+    
+    
+    
+    <target name="merra2wcs" depends="clean,init">
+    	
+    	<!-- 
+    	      templates.dir is the where we keep the complete WCS coverage description 
+    	      for MERRA2 with replacment tokens for where file specific information 
+    	      (such as filename) should be
+    	      
+    	      IMPORTANT: The File 00 and LFC.xml should be in this directory BEFORE 
+    	      running this target
+
+    	 -->
+        <property name="templates.dir"       value="resources/WCS/2.0/templates"/>
+        
+ 
+    	<!-- 
+    	     lfc.build.dir is directory WITHIN olfs.dir for the Local File Catalog (LFC) to 
+    	     which we will copying the 00 file seven times and also the LFC.xml 
+    	-->
+    	
+        <property name="lfc.build.dir" value="${build.dir}/wcs"/>
+    	
+    	<!-- filenames (TOKEN replacement values in the 00 file) -->
+    	<property name="dataset.name" value="MERRA2_400.tavgM_2d_int_Nx.2016" />
+    	<property name="file.00.name"   value="${dataset.name}00.nc4"/><!-- This is the file 00 with tokens -->
+        <property name="file.01.name"   value="${dataset.name}01.nc4"/>
+        <property name="file.02.name"   value="${dataset.name}02.nc4"/>    
+        <property name="file.03.name"   value="${dataset.name}03.nc4"/>    
+        <property name="file.04.name"   value="${dataset.name}04.nc4"/>
+        <property name="file.05.name"   value="${dataset.name}05.nc4"/>    
+        <property name="file.06.name"   value="${dataset.name}06.nc4"/>    
+        <property name="file.07.name"   value="${dataset.name}07.nc4"/>         
+        
+    
+	    <!-- first delete, then create the destination LFC folder -->	
+	    <delete dir="${lfc.build.dir}"/>
+    	<mkdir  dir="${lfc.build.dir}"/>
+    	
+    	<copy file="${templates.dir}/LFC.xml" todir="${lfc.build.dir}" />
+	    
+	    <!-- copy file 00 from src into the respective seven files in the actual LFC -->
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.01.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.02.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.03.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.04.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.05.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.06.name}.xml" />
+	    <copy file="${templates.dir}/${file.00.name}.xml" tofile="${lfc.build.dir}/${file.07.name}.xml" />   
+	    
+	    <!-- now replace tokens -->
+	    <replace file="${lfc.build.dir}/${file.01.name}.xml" token="@MERRA2DATASET@" value="${file.01.name}" />
+	    <replace file="${lfc.build.dir}/${file.02.name}.xml" token="@MERRA2DATASET@" value="${file.02.name}" />
+	    <replace file="${lfc.build.dir}/${file.03.name}.xml" token="@MERRA2DATASET@" value="${file.03.name}" />
+	    <replace file="${lfc.build.dir}/${file.04.name}.xml" token="@MERRA2DATASET@" value="${file.04.name}" />
+	    <replace file="${lfc.build.dir}/${file.05.name}.xml" token="@MERRA2DATASET@" value="${file.05.name}" />
+	    <replace file="${lfc.build.dir}/${file.06.name}.xml" token="@MERRA2DATASET@" value="${file.06.name}" />
+	    <replace file="${lfc.build.dir}/${file.07.name}.xml" token="@MERRA2DATASET@" value="${file.07.name}" />
+    	
+    </target>
+
+
+
+
+
 
     <!-- *******************************************************  -->
 

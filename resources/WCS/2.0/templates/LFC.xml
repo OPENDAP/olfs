@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<LocalFileCatalog xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#" validateCatalog="false">
+
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201601.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201601.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-01-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201602.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201602.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-02-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201603.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201603.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-03-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+ <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201604.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201604.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-04-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201605.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201605.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-05-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201606.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201606.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-06-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>
+  
+  
+  <WcsCoverage fileName="MERRA2_400.tavgM_2d_int_Nx.201607.nc4.xml">
+    <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201607.nc4</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="1" units="minutes since 2016-07-01 00:30:00" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+  </WcsCoverage>  
+  
+</LocalFileCatalog>
+
