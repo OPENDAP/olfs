@@ -12,8 +12,8 @@
       <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude" uomLabels="time deg deg" srsDimension="2">
         <lowerCorner>-90.00 -180.00</lowerCorner>
         <upperCorner>90.00 179.375</upperCorner>
-        <beginPosition>2016-01-01T00:30:00.000Z</beginPosition>
-        <endPosition>2016-02-01T00:00:00.000Z</endPosition>
+        <beginPosition>@START_DATE@T00:30:00.000Z</beginPosition>
+        <endPosition>@END_DATE@T00:00:00.000Z</endPosition>
       </EnvelopeWithTimePeriod>
     </boundedBy>
     <wcs:CoverageId>@MERRA2DATASET@</wcs:CoverageId>
