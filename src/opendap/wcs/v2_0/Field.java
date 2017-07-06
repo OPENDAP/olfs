@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
+import javax.xml.bind.annotation.XmlAttribute;
 /**
  *
  *
@@ -52,7 +53,13 @@ public class Field {
     Element mySweElement;
 
     String name;
+    String dapId;
 
+    public Field ()
+    {
+    	
+    }
+    
     public Field(Element swe) throws WcsException {
 
         if(swe.getName().equals("field") && swe.getNamespace().equals(WCS.SWE_NS)){
@@ -65,10 +72,29 @@ public class Field {
     }
 
 
-
+    @XmlAttribute
     public String getName(){
+    	if (mySweElement == null) return this.name;
         return mySweElement.getAttributeValue("name");
     }
+
+
+    @XmlAttribute
+	public String getDapId() {
+		return dapId;
+	}
+
+
+
+	public void setDapId(String dapId) {
+		this.dapId = dapId;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 
 }

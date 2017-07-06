@@ -26,6 +26,8 @@
 
 package opendap.wcs.v2_0;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
 import org.jdom.Element;
 
 /**
@@ -37,45 +39,39 @@ import org.jdom.Element;
  */
 public class DomainCoordinate {
 
-
-    private String _name;
-    private String _dapID;
-    private String _units;
+	
+    private String name;
+    private String dapID;
+    private String units;
+	private String size;
     private String _arraySubset;
-    private long _size;
+    
+    public DomainCoordinate(String name, String dapID, String size, String units)
+    {
+    	this.name = name;
+    	this.dapID = dapID;
+    	this.units = units;
+    	this.size = size;
+    }
 
     DomainCoordinate(Element dc) throws ConfigurationException {
 
-        _name = dc.getAttributeValue("name");
-        if(_name ==null){
+        name   = dc.getAttributeValue("name");
+        if(name==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'name'.");
         }
 
-        _dapID = dc.getAttributeValue("dapID");
-        if(_dapID ==null){
+        dapID  = dc.getAttributeValue("dapID");
+        if(dapID==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'dapID'.");
         }
 
-        _units = dc.getAttributeValue("units");
-        if(_units ==null){
+        units  = dc.getAttributeValue("units");
+        if(units==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'units'.");
-        }
-
-
-        String s = dc.getAttributeValue("size");
-        if(s ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
-                    "missing the required attribute 'size'.");
-        }
-        try {
-            _size = Long.parseLong(s);
-        }
-        catch (NumberFormatException e){
-            throw new ConfigurationException("Unable to parse the value of the " +
-                    "size attribute: '"+s+"' as a long integer. msg: "+e.getMessage());
         }
 
 
@@ -83,11 +79,10 @@ public class DomainCoordinate {
 
     DomainCoordinate(DomainCoordinate dc){
 
-        _name = dc._name;
-        _dapID = dc._dapID;
-        _units = dc._units;
-        _arraySubset = dc._arraySubset;
-        _size = dc._size;
+        name   = dc.getName();
+        dapID  = dc.getDapID();
+        units  = dc.getUnits();
+        size   = dc.getSize();
 
     }
     @Override
@@ -106,32 +101,56 @@ public class DomainCoordinate {
             // Deep clone member fields here
 
 
-            _name = dc._name;
-            _dapID = dc._dapID;
-            _units = dc._units;
-            _arraySubset = dc._arraySubset;
-            _size = dc._size;
+            name   = dc.getName();
+            dapID  = dc.getDapID();
+            units  = dc.getUnits();
+            size   = dc.getSize();
+            _arraySubset = null;
 
 
 
             return dc;
         }
 
-
+    @XmlAttribute
     public String getDapID(){
-        return _dapID;
+        return dapID;
     }
 
-
+    @XmlAttribute
     public String getName(){
-        return _name;
+        return name;
     }
 
+    @XmlAttribute
+    public String getSize() {
+		return this.size;
+	}
 
+    @XmlAttribute
     public String getUnits(){
-        return _units;
+        return units;
     }
 
+
+	public void setUnits(String u){
+        this.units=u;
+    }
+
+    
+
+    public void setDapID(String d){
+        this.dapID = d;
+    }
+
+
+    public void setName(String n){
+        this.name=n;
+    }
+
+
+
+    
     public void setArraySubset(String arraySubset){
         _arraySubset = arraySubset;
 
@@ -139,10 +158,6 @@ public class DomainCoordinate {
 
     public String getArraySubset(){
         return _arraySubset;
-    }
-
-    public long getSize(){
-        return _size;
     }
 
 
