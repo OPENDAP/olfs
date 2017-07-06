@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 import org.jdom.Element;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -123,7 +124,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    //public List<Element> getCoverageDescriptionElements() throws InterruptedException, WcsException;
+    public List<CoverageDescription> getCoverageDescriptionElements() throws InterruptedException, WcsException;
 
 
 
@@ -147,7 +148,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     // public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
+    public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -167,31 +168,8 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
+    public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
 
-
-
-
-
-
-
-
-    /**
-     * Queries the catalog and returns all wcs:CoverageOfferingBrief elements
-     * found therin.
-     *
-     * <p><b>
-     * Since the wcs:CoverageOfferingBrief is derivable from the
-     * conent of wcs:CoverageDecription it may be that we want to migrate this
-     * method out of the interface.
-     * </b></p>
-     *
-     * @return A List containing all of the wcs:CoverageOfferingBrief Elements
-     * found in the catalog. The list may be empty.
-     * @throws WcsException When the bad things happen.
-     * @throws InterruptedException
-     */
-    public Collection<Element> getDatasetSeriesSummaryElements() throws InterruptedException, WcsException;
 
 
 
@@ -285,12 +263,4 @@ public interface WcsCatalog {
 
 
 
-    public  EOCoverageDescription getEOCoverageDescription(String id) throws WcsException;
-
-
-    public   EODatasetSeries getEODatasetSeries(String id) throws WcsException;
-
-    public boolean hasEoCoverage(String id);
-
-
-    }
+}
