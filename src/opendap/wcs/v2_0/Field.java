@@ -27,6 +27,7 @@
 package opendap.wcs.v2_0;
 
 import org.jdom.Element;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  *
@@ -65,10 +66,14 @@ public class Field {
     }
 
 
-
+    @XmlAttribute
     public String getName(){
         return mySweElement.getAttributeValue("name");
     }
 
+    @XmlAttribute
+    public String getDapId(){
+      return getName();	
+    }
 
 }

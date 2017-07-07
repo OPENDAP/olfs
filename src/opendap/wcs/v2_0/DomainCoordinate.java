@@ -27,6 +27,7 @@
 package opendap.wcs.v2_0;
 
 import org.jdom.Element;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * Created by IntelliJ IDEA.
@@ -117,17 +118,17 @@ public class DomainCoordinate {
             return dc;
         }
 
-
+    @XmlAttribute(name="dapId")
     public String getDapID(){
         return _dapID;
     }
 
-
+    @XmlAttribute    
     public String getName(){
         return _name;
     }
 
-
+    @XmlAttribute 
     public String getUnits(){
         return _units;
     }
@@ -140,7 +141,8 @@ public class DomainCoordinate {
     public String getArraySubset(){
         return _arraySubset;
     }
-
+    
+    @XmlAttribute
     public long getSize(){
         return _size;
     }
