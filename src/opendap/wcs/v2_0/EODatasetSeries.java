@@ -7,12 +7,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+
+
+import javax.xml.bind.annotation.*;
+
 
 /**
  * Created by ndp on 7/26/16.
  */
+@XmlRootElement(name = "EODatasetSeries")
 public class EODatasetSeries {
 
     private String _id;
@@ -35,6 +43,7 @@ public class EODatasetSeries {
 
     //boolean _initialized = false;
 
+    public EODatasetSeries(){}
 
     public EODatasetSeries(Element eodsElement, String catalogDir, boolean validateContent)
             throws WcsException, JDOMException, ConfigurationException, IOException {
@@ -80,11 +89,14 @@ public class EODatasetSeries {
      *
      * @return Returns the value of the unique wcs:CoverageId associated with this CoverageDescription.
      */
+    @XmlAttribute
     public String getId(){
         return _id;
     }
 
-
+    public void setId(String myId){
+    	this._id = myId;
+    }
 
     public NewBoundingBox getBoundingBox() throws WcsException {
         NewBoundingBox seriesBoundingBox = null;
@@ -178,6 +190,16 @@ public class EODatasetSeries {
 
     }
 
-
+    
+    @XmlElement(name = "EOWcsCoverage")
+    public List<EOCoverageDescription> getEoCoverageDescriptionElements() {
+    	if (members == null || members.isEmpty()) return Collections.<EOCoverageDescription>emptyList();
+    	return Collections.list(members.elements());
+    }
+  
+    public void setEoCoverageDescriptionElements(Vector<EOCoverageDescription> ecovs)
+    {
+      this.members = ecovs;	
+    }
 
 }

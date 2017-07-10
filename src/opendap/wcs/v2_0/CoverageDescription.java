@@ -41,6 +41,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * An implementation of a wcs:CoverageDescription object. This implementation includes methods that assist in the
  * creation of DAP constraint expressions to retrieve coverage data as NetCDF.
@@ -68,7 +72,13 @@ public class CoverageDescription {
     private LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
 
     boolean _initialized = false;
+    
+    private List<Field> fields;
 
+    public CoverageDescription() {
+    	
+    }
+    
     public CoverageDescription(CoverageDescription cd) throws IOException {
         _myCD = (Element)cd._myCD.clone();
         _log = LoggerFactory.getLogger(this.getClass());
@@ -820,7 +830,25 @@ public class CoverageDescription {
         return fields;
     }
 
-
+    
+    @XmlElement(name="field")
+    public List<Field> getFieldsList()
+    {
+    	if (this.fields == null || this.fields.isEmpty()) 
+    	{
+    		try
+    		{
+    			fields.addAll(getFields());
+    		}
+    		catch  (Exception e)
+    		{
+    			
+    		}
+    	}
+    	
+    	return this.fields;
+    }
+    
     public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
 
         Coverage coverage = new Coverage(this,requestUrl);
@@ -828,6 +856,32 @@ public class CoverageDescription {
         return coverage;
 
 
+    }
+    
+    public void setFields(List<Field> fields) {
+		this.fields = fields;
+	}
+
+    
+    @XmlAttribute(name = "fileName")
+	public File getMyFile() {
+		return _myFile;
+	}
+
+
+	public void setMyFile(File myFile) {
+		this._myFile = myFile;
+	}
+	
+    @XmlElement(name="DomainCoordinate")
+    public List<DomainCoordinate> getDomainCoordinatesAsList()
+    {
+    	return new ArrayList(getDomainCoordinates().values());
+    }
+
+    public void setDomainCoordinatesLinkedHashMap(LinkedHashMap<String, DomainCoordinate> dc)
+    {
+      this._domainCoordinates = dc;	
     }
 
 }

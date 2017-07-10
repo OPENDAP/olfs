@@ -41,6 +41,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.xml.bind.annotation.*;
+
+
 /**
  *
  *
@@ -50,6 +53,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 9:06:40 AM
  * To change this template use File | Settings | File Templates.
  */
+@XmlRootElement(name="LocalFileCatalog")
 public class LocalFileCatalog implements WcsCatalog {
 
 
@@ -61,6 +65,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
     private  Logger log;
 
+    @XmlAttribute(name = "validateCatalog")
     private boolean validateContent = false;
 
     private  String _catalogDir;
@@ -579,6 +584,34 @@ public class LocalFileCatalog implements WcsCatalog {
         return datasetSeriesMap.get(id);
     }
 
+    @XmlElement(name = "WcsCoverage")
+    public List<CoverageDescription> getCoverageDescriptionElements() {
+    	return Collections.list(coveragesMap.elements());
+    }
+  
+    public void setCoverageDescriptionElements(ConcurrentHashMap<String,CoverageDescription> covs)
+    {
+      this.coveragesMap = covs;	
+    }
 
+    @XmlElement(name = "EOWcsCoverage")
+    public List<EOCoverageDescription> getEoCoverageDescriptionElements() {
+    	return Collections.list(eoCoveragesMap.elements());
+    }
+  
+    public void setEoCoverageDescriptionElements(ConcurrentHashMap<String,EOCoverageDescription> ecovs)
+    {
+      this.eoCoveragesMap = ecovs;	
+    }
+    
+    @XmlElement(name = "EODatasetSeries")
+    public List<EODatasetSeries> getEoDataSeriesElements() {
+    	return Collections.list(datasetSeriesMap.elements());
+    }
+  
+    public void setEoDataSeriesElements(ConcurrentHashMap<String,EODatasetSeries> dataSeries)
+    {
+      this.datasetSeriesMap = dataSeries;	
+    }
 
 }
