@@ -17,7 +17,9 @@ public class EOCoverageDescription extends CoverageDescription {
 
     public static final String CONFIG_ELEMENT_NAME = "EOWcsCoverage";
 
-
+   public EOCoverageDescription() {
+    	
+    }
 
     public EOCoverageDescription(EOCoverageDescription eocd) throws IOException {
         super(eocd);

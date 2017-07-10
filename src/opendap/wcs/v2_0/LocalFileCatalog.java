@@ -41,9 +41,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
+
 
 /**
  *
@@ -589,10 +588,30 @@ public class LocalFileCatalog implements WcsCatalog {
     public List<CoverageDescription> getCoverageDescriptionElements() {
     	return Collections.list(coveragesMap.elements());
     }
-
-    
-    public void setCoverageDescriptionElements(ConcurrentHashMap<String,CoverageDescription> covs) {
+  
+    public void setCoverageDescriptionElements(ConcurrentHashMap<String,CoverageDescription> covs)
+    {
       this.coveragesMap = covs;	
+    }
+
+    @XmlElement(name = "EOWcsCoverage")
+    public List<EOCoverageDescription> getEoCoverageDescriptionElements() {
+    	return Collections.list(eoCoveragesMap.elements());
+    }
+  
+    public void setEoCoverageDescriptionElements(ConcurrentHashMap<String,EOCoverageDescription> ecovs)
+    {
+      this.eoCoveragesMap = ecovs;	
+    }
+    
+    @XmlElement(name = "EODatasetSeries")
+    public List<EODatasetSeries> getEoDataSeriesElements() {
+    	return Collections.list(datasetSeriesMap.elements());
+    }
+  
+    public void setEoDataSeriesElements(ConcurrentHashMap<String,EODatasetSeries> dataSeries)
+    {
+      this.datasetSeriesMap = dataSeries;	
     }
 
 }

@@ -43,6 +43,7 @@ import java.util.*;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * An implementation of a wcs:CoverageDescription object. This implementation includes methods that assist in the

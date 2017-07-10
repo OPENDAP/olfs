@@ -5,10 +5,8 @@ import org.jdom.Element;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.*;
+
 
 /**
  * This is a test class - leave it out of production build
@@ -23,7 +21,7 @@ public class LfcMarshaller {
 
 
 		
-		ConcurrentHashMap<String,CoverageDescription> covs = 
+		ConcurrentHashMap<String,CoverageDescription> coveragesMap = 
 				new ConcurrentHashMap<String,CoverageDescription>();
 		
 		CoverageDescription cd = new CoverageDescription();
@@ -36,7 +34,7 @@ public class LfcMarshaller {
 		  System.out.println(e);
 		}
 		cd.setMyFile(new java.io.File("MERRA2_400.tavgM_2d_int_Nx.201601.nc4.xml"));
-		covs.put("1", cd);
+		coveragesMap.put("1", cd);
 		
 		
 		// domain coordinates
@@ -96,16 +94,16 @@ public class LfcMarshaller {
 		
 		
 		
-		lfc.setCoverageDescriptionElements(covs);
+		lfc.setCoverageDescriptionElements(coveragesMap);
 		
-		/*
 		
-		// EO Coverages
 		
-		ConcurrentHashMap<String,CoverageDescription> ecovs = 
-				new ConcurrentHashMap<String,CoverageDescription>();
+		// EO WCS Coverages
 		
-		CoverageDescription ecd = new CoverageDescription();
+		ConcurrentHashMap<String,EOCoverageDescription> eoCoveragesMap = 
+				new ConcurrentHashMap<String,EOCoverageDescription>();
+		
+		EOCoverageDescription ecd = new EOCoverageDescription();
 		try
 		{
 		 ecd.setDapDatasetUrl(new java.net.URL("http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc"));
@@ -115,57 +113,87 @@ public class LfcMarshaller {
 		  System.out.println(e);
 		}
 		ecd.setMyFile(new java.io.File("eo_ncep_model_example.xml"));
-		ecovs.put("1", ecd);
-		
+		eoCoveragesMap.put("1", ecd);
 		
 		// domain coordinates
 		LinkedHashMap elhm = new LinkedHashMap();
 		
-		DomainCoordinate ed1  = new DomainCoordinate("time", "time", "112", "Hours since 2016-06-17T00:00:00.000Z");
-		DomainCoordinate ed2  = new DomainCoordinate("latitude", "latitude", "361", "degrees_north");
-		DomainCoordinate ed3  = new DomainCoordinate("longitude", "longitude", "720", "degrees_east");
-		DomainCoordinate ed4  = new DomainCoordinate("isobaric", "isobaric", "31", "Pa");
+		try
+		{
+			Element e6 = new Element("DomainCoordinate"); 
+			e6.setAttribute("name", "time"); e6.setAttribute("dapID", "time");e6.setAttribute("size", "112"); 
+			e6.setAttribute("units", "Hours since 2016-06-17T00:00:00.000Z");
+			DomainCoordinate d1  = new DomainCoordinate(e6);
+			
+			Element e7 = new Element("DomainCoordinate"); 
+			e7.setAttribute("name", "latitude"); e7.setAttribute("dapID", "latitude");e7.setAttribute("size", "361"); 
+			e7.setAttribute("units", "degrees_north");
+			DomainCoordinate d2  = new DomainCoordinate(e7);
+			
+			Element e8 = new Element("DomainCoordinate"); 
+			e8.setAttribute("name", "longitude"); e8.setAttribute("dapID", "longitude");e8.setAttribute("size", "720"); 
+			e8.setAttribute("units", "degrees_east");
+			DomainCoordinate d3  = new DomainCoordinate(e8);
+				
+			Element e9 = new Element("DomainCoordinate"); 
+			e9.setAttribute("name", "isobaric"); e9.setAttribute("dapID", "isobaric");e9.setAttribute("size", "31"); 
+			e9.setAttribute("units", "Pa");
+			DomainCoordinate d4  = new DomainCoordinate(e9);
+				
+			elhm.put("time", d1); elhm.put("isobaric", d4); elhm.put("latitude", d2); elhm.put("longitude", d3);
+		}
+		catch (Exception e)
+		{
+			
+		}
 		
-		elhm.put("time", ed1); elhm.put("isobaric", ed4); elhm.put("latitude", ed2); elhm.put("longitude", ed3);
-		
+
 		ecd.setDomainCoordinatesLinkedHashMap(elhm);
+		
+		
+		try
+		{
+			Element e10 = new Element("field"); e10.setNamespace(WCS.SWE_NS);
+			e10.setAttribute("name", "u_component_of_wind_isobaric");
+			Field f3  = new Field(e10);
+			
+			Element e11 = new Element("field"); e11.setNamespace(WCS.SWE_NS);
+			e11.setAttribute("name", "v_component_of_wind_isobaric");
+			Field f4  = new Field(e11);
+			
+			
+			ArrayList<Field> efields = new ArrayList<Field>(); 
+			efields.add(f3); efields.add(f4);
+			
+			ecd.setFields(efields);
+			
+		}
+		catch (Exception e)
+		{
+			
+		}
 	
-		Field ef1 = new Field(); ef1.setDapId("u_component_of_wind_isobaric"); ef1.setName("u_component_of_wind_isobaric");
-		Field ef2 = new Field(); ef2.setDapId("v_component_of_wind_isobaric"); ef2.setName("v_component_of_wind_isobaric");
-		
-		ArrayList<Field> efields = new ArrayList<Field>(); efields.add(ef1); efields.add(ef2);
-		ecd.setFields(efields);
-		
-		
-		
-		
-		
-		
-		lfc.setEoCoverageDescriptionElements(ecovs);
+
+		lfc.setEoCoverageDescriptionElements(eoCoveragesMap);
 		
 		
 		
 		// DataSeries
-		DataSetSeries dss = new DataSetSeries();
-		dss.name = "MODIS_L3_chl-a";
-		dss.coverages = new Vector<CoverageDescription>();
-		dss.coverages.add(cd); dss.coverages.add(ecd);
+		
+		ConcurrentHashMap<String,EODatasetSeries> datasetSeriesMap = 
+				new ConcurrentHashMap<String,EODatasetSeries>();
 		
 		
-		lfc.setEoDataSetSeries(dss);
+		EODatasetSeries dss = new EODatasetSeries();
+		dss.setId("MODIS_L3_chl-a");
 		
+		Vector<EOCoverageDescription> members = new Vector();
+		members.add(ecd);
+        dss.setEoCoverageDescriptionElements(members);
 		
-		// create coverage element(s)
-		//WcsCoverage wcsc = new WcsCoverage();
-		//wcsc.fileName="MERRA2_400.tavgM_2d_int_Nx.201601.nc4.xml";
+		datasetSeriesMap.put("1", dss);
+		lfc.setEoDataSeriesElements(datasetSeriesMap);
 		
-		// add them to LFC root 
-		//List<WcsCoverage> wcsCoverageList = new ArrayList<WcsCoverage>();
-		//wcsCoverageList.add(wcsc);
-		//lfc.wcs = wcsCoverageList;
-		 * 
-		 * 
-		 */
 		
 		//Marshall the LFC
 		 try 
