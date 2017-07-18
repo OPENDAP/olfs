@@ -62,7 +62,8 @@ public class ThreddsCatalogUtil {
 
 	private CredentialsProvider credsProvider;
 	/**
-	 * Constructor.
+	 * Constructor. It will look in ~/.netrc for authentication credentials.
+	 *  If another source is needed use the other constructor.
 	 * 
 	 */
     public ThreddsCatalogUtil() {
@@ -73,12 +74,19 @@ public class ThreddsCatalogUtil {
         try {
             credsProvider = opendap.http.Util.getCredentials();
         } catch (IOException e) {
-            String msg = "Unable to load authentication crednetials from defult location. " +
+            String msg = "Unable to load authentication credentials from defult location. " +
                     "Try specifying the credentials location if credentials are required.";
             log.warn(msg);
         }
     }
-    public ThreddsCatalogUtil(String credentialsFilename) {
+
+	/**
+	 *
+	 * @param credentialsFilename Name of a .netrc formatted file with authentication credentials
+	 *                            for various servers.
+	 *
+	 */
+	public ThreddsCatalogUtil(String credentialsFilename) {
         log = LoggerFactory.getLogger(this.getClass());
 
         xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -86,9 +94,10 @@ public class ThreddsCatalogUtil {
         try {
             credsProvider = opendap.http.Util.getCredentials(credentialsFilename, true);
         } catch (IOException e) {
-            String msg = "Unable to load authentication crednetials from defult location. " +
-                    "Try specifying the credentials location if credentials are required.";
-            log.warn(msg);
+            String msg = "Unable to load authentication credentials from  " +
+					credentialsFilename +
+					" Message: " +e.getMessage();
+			log.warn(msg);
         }
     }
 
@@ -255,9 +264,28 @@ public class ThreddsCatalogUtil {
     public static void main(String[] args) throws Exception {
         
 		try {
-            Vector<String> urls=null;
 
-            //Options options = createCmdLineOptions();
+			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+
+			// Get one DMR document and print it.
+			Document dmr = tcc.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml");
+			tcc.log.debug(tcc.xmlo.outputString(dmr));
+
+			// Get all the DMR URLs in the collection
+			Vector<String> urls =tcc.getDMRUrls("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/catalog.xml",true);
+
+			// Print the URLS
+			if(urls!=null) {
+				for (String url : urls) {
+					tcc.log.debug(url);
+				}
+			}
+
+			// Print all the DMR docs in the sub-collection (one month)
+			tcc.printDMRDocuments(System.out,"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml",false);
+
+
+			//Options options = createCmdLineOptions();
 
 			//CommandLineParser parser = new PosixParser();
 			// CommandLine cmd = parser.parse(options, args);
@@ -280,14 +308,12 @@ public class ThreddsCatalogUtil {
 			// tcc.getDataAccessURLs("http://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml",datasetURLs);
 
 
-			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
 
             // Vector<String> urls =tcc.getDataAccessURLs("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/catalog.xml",SERVICE.OPeNDAP,true);
 
             // Vector<String> urls =tcc.getDMRUrls("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml",true);
 
 
-            tcc.printDMRDocuments(System.out,"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml",false);
 
 
             //Vector<String> urls = tcc.getDDXUrls("http://localhost:8080/opendap/catalog.xml",true);
@@ -305,7 +331,6 @@ public class ThreddsCatalogUtil {
             // tcc.test_apache_client("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml");
 
 
-            tcc.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml");
 
 
             // tcc.crawlTest(System.out,"http://localhost:8080/opendap/catalog.xml",cmd.hasOption("r"));
