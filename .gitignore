@@ -41,3 +41,4 @@ autom4te.cache
 # Random temp files
 foo
 foo.*
+/bin/

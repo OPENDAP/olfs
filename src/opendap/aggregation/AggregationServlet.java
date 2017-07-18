@@ -310,8 +310,7 @@ public class AggregationServlet extends HttpServlet {
      */
     private void writeSinglePlainGranule(String granule, OutputStream os)
             throws IOException, BadConfigurationException {
-
-
+    	
         try {
             _besApi.writeFile(granule, os);
         }
@@ -320,7 +319,6 @@ public class AggregationServlet extends HttpServlet {
             os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
             _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
         }
-
     }
 
     /**
