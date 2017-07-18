@@ -72,7 +72,7 @@ public class ThreddsCatalogUtil {
         xmlo = new XMLOutputter(Format.getPrettyFormat());
         credsProvider = null;
         try {
-            credsProvider = opendap.http.Util.getCredentials();
+            credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
         } catch (IOException e) {
             String msg = "Unable to load authentication credentials from defult location. " +
                     "Try specifying the credentials location if credentials are required.";
@@ -92,7 +92,7 @@ public class ThreddsCatalogUtil {
         xmlo = new XMLOutputter(Format.getPrettyFormat());
         credsProvider = null;
         try {
-            credsProvider = opendap.http.Util.getCredentials(credentialsFilename, true);
+            credsProvider = opendap.http.Util.getNetRCCredentialsProvider(credentialsFilename, true);
         } catch (IOException e) {
             String msg = "Unable to load authentication credentials from  " +
 					credentialsFilename +

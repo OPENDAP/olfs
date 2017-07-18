@@ -11,19 +11,18 @@ import java.io.IOException;
 
 public class Util {
 
-    static public CredentialsProvider  getCredentials() throws IOException{
+    static public CredentialsProvider  getNetRCCredentialsProvider() throws IOException{
         String default_file=".netrc";
         String home = System.getProperty("user.home");
 
         if(home!=null)
             default_file = home + "/" +default_file;
 
-        return getCredentials(default_file, true);
+        return getNetRCCredentialsProvider(default_file, true);
 
     }
 
-    static public CredentialsProvider  getCredentials(String filename, boolean secure_transport) throws IOException {
-
+    static public CredentialsProvider  getNetRCCredentialsProvider(String filename, boolean secure_transport) throws IOException {
 
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         NetRC netRC = new NetRC(filename);
