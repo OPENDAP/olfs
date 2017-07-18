@@ -65,21 +65,35 @@ public class ThreddsCatalogUtil {
 	 * Constructor.
 	 * 
 	 */
-	public ThreddsCatalogUtil() {
+    public ThreddsCatalogUtil() {
         log = LoggerFactory.getLogger(this.getClass());
 
-	    xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo = new XMLOutputter(Format.getPrettyFormat());
         credsProvider = null;
-	    try {
+        try {
             credsProvider = opendap.http.Util.getCredentials();
         } catch (IOException e) {
-	        String msg = "Unable to load authentication crednetials from defult location. " +
-                    "Try specifying the location if credentials are required.";
-	        log.warn(msg);
+            String msg = "Unable to load authentication crednetials from defult location. " +
+                    "Try specifying the credentials location if credentials are required.";
+            log.warn(msg);
         }
     }
-	
-	/**
+    public ThreddsCatalogUtil(String credentialsFilename) {
+        log = LoggerFactory.getLogger(this.getClass());
+
+        xmlo = new XMLOutputter(Format.getPrettyFormat());
+        credsProvider = null;
+        try {
+            credsProvider = opendap.http.Util.getCredentials(credentialsFilename, true);
+        } catch (IOException e) {
+            String msg = "Unable to load authentication crednetials from defult location. " +
+                    "Try specifying the credentials location if credentials are required.";
+            log.warn(msg);
+        }
+    }
+
+
+    /**
 	 * Implements a modified depth-first traversal of a thredds catalog. The
 	 * catalog is treated as a tree-like structure, but since it is really a
 	 * directed graph, catalog URLs are cached and the same URL is neither
