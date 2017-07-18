@@ -318,13 +318,6 @@ public class ThreddsCatalogUtil {
 
             //Vector<String> urls = tcc.getDDXUrls("http://localhost:8080/opendap/catalog.xml",true);
 
-            if(urls!=null) {
-                for (String url : urls) {
-                    System.out.println(url);
-                }
-            }
-            //https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/hyrax/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml
-
 
 
 
