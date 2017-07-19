@@ -340,16 +340,17 @@ public class ThreddsCatalogUtil {
 
 		Options options = new Options();
         options.addOption(
-		        "u",  "user",
+		        "t",
+				"thredds-catalog-url",
 				true,
-                "");
+                ""
+		);
 		options.addOption(
 		        "d",
+				"debug",
 				false,
-				"decode the command line arguments, cannot be used in conjunction with -e (encode).");
-		options.addOption("t", false,
-				"runs internal tests and produces output on stdout.");
-
+				"Enable debugging output."
+		);
 		options.addOption("r", false,
 				"recursively descend nested THREDDS catalogs.");
 
