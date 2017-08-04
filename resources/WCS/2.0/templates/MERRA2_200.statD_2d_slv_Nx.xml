@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:CoverageDescription 
+       xmlns="http://www.opengis.net/gml/3.2" 
+	   xmlns:wcs="http://www.opengis.net/wcs/2.0"
+       xmlns:gml="http://www.opengis.net/gml/3.2" 
+       xmlns:swe="http://www.opengis.net/swe/2.0" 
+       xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       gml:id="@MERRA2DATASET@" 
+       xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd">
+    <boundedBy>
+      <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude" uomLabels="time deg deg" srsDimension="2">
+        <lowerCorner>-90.00 -180.00</lowerCorner>
+        <upperCorner>90.00 179.375</upperCorner>
+        <beginPosition>@START_DATE@T@START_TIME@Z</beginPosition>
+        <endPosition>@END_DATE@T@END_TIME@Z</endPosition>
+      </EnvelopeWithTimePeriod>
+    </boundedBy>
+    <wcs:CoverageId>@MERRA2DATASET@</wcs:CoverageId>
+    <domainSet>
+      <RectifiedGrid dimension="2" gml:id="Grid-@MERRA2DATASET@">
+        <limits>
+          <GridEnvelope>
+            <low>0 0</low>
+            <high>361 576</high>
+          </GridEnvelope>
+        </limits>
+        <axisLabels>latitude longitude</axisLabels>
+        <gml:origin>
+          <gml:Point gml:id="GridOrigin-@MERRA2DATASET@" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+            <gml:pos>-90 -180</gml:pos>
+          </gml:Point>
+        </gml:origin>
+        <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.5 0.0</gml:offsetVector>
+        <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.625</gml:offsetVector>
+      </RectifiedGrid>
+    </domainSet>
+    <gmlcov:rangeType>
+      <swe:DataRecord>
+        <swe:field name="HOURNORAIN">
+          <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
+            <swe:description>time-during_an_hour_with_no_precipitation</swe:description>
+            <swe:uom code="s" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999987e+14 9.99999987e+14</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:Quantity>
+        </swe:field>
+      </swe:DataRecord>
+      <swe:DataRecord>
+        <swe:field name="T2MMAX">
+          <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
+            <swe:description>2-meter_air_temperature</swe:description>
+            <swe:uom code="K" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999987e+14 9.99999987e+14</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:Quantity>
+        </swe:field>
+      </swe:DataRecord>
+      <swe:DataRecord>
+        <swe:field name="T2MMEAN">
+          <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
+            <swe:description>2-meter_air_temperature</swe:description>
+            <swe:uom code="K" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999987e+14 9.99999987e+14</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:Quantity>
+        </swe:field>
+      </swe:DataRecord>
+      <swe:DataRecord>
+        <swe:field name="T2MMIN">
+          <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
+            <swe:description>2-meter_air_temperature</swe:description>
+            <swe:uom code="K" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999987e+14 9.99999987e+14</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:Quantity>
+        </swe:field>
+      </swe:DataRecord>
+      <swe:DataRecord>
+        <swe:field name="TPRECMAX">
+          <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:measure">
+            <swe:description>total_precipitation</swe:description>
+            <swe:uom code="kg m-2 s-1" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999987e+14 9.99999987e+14</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:Quantity>
+        </swe:field>
+      </swe:DataRecord>
+    </gmlcov:rangeType>
+    <wcs:ServiceParameters>
+      <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
+      <!-- wcs:nativeFormat>application/vnd.opendap.dap4.data</wcs:nativeFormat -->
+      <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+    </wcs:ServiceParameters>
+  </wcs:CoverageDescription>

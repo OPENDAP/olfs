@@ -1,10 +1,6 @@
 #!/bin/bash
 
-
-# For example invoke like this:
-# ./buildMerra2.sh MERRA2_400.tavgM_2d_int_Nx
-
-collection=$1
+collection="MERRA2_400.tavgM_2d_int_Nx"
 echo "COLLECTION: $collection";
 
 files=`curl -s https://s3.amazonaws.com/testbed-13/merra2//index.xml | grep $collection | awk '{split($2,f,"\"");print f[2];}'`;
