@@ -1,10 +1,10 @@
 #!/bin/bash
 
+# This collection contains daily precipitation data at 0.1 deg spatial resolution
+server="https://gpm1.gesdisc.eosdis.nasa.gov"
+collection="opendap/GPM_L3/GPM_3IMERGDF.04"
 
-
-server="https://goldsmr4.gesdisc.eosdis.nasa.gov"
-
-template="MERRA2_200.statD_2d_slv_Nx.xml"
+template="MERRA2_GPM_3IMERGDF.xml"
 echo "TEMPLATE: $template";
 
 # make sure we drop this stuff in a non-destructive spot...
@@ -13,35 +13,40 @@ mkdir -p -v tmp
 # Start LFC.xml
 cat LFC_OPEN.xml > tmp/LFC.xml;
 
-# The data start at 1980, but I'm just doing getting 5 years (~5GB) to save space
-for year in {2012..2017}; do
+# The data start in 2014
+for year in {2014..2017}; do
     echo "Processing year $year"
     for month in 01 02 03 04 05 06 07 08 09 10 11 12 ; do
-        echo "Processing Mnth: $month"
+        echo "Processing Month: $month"
         #mkdir -p $year/$month
-        files=`curl -s "$server/opendap/MERRA2/M2SDNXSLV.5.12.4/$year/$month/catalog.xml" | grep ID | grep nc4 | sed -e "s/ID=\"//g" -e "s/\">//g"`
+        files=`curl -s "$server/$collection/$year/$month/catalog.xml" | grep ID | grep nc4 | sed -e "s/ID=\"//g" -e "s/\">//g"`
         for file in $files; do
             echo "FILE: $file"
             target=`basename $file`
-            #echo "TARGET: $target"  
+            echo "TARGET: $target"  
             dataset_url="$server/$file" # We add .nc4 to invoke returnAs since direct file downloads are disabled.
-            #echo "DATASET_URL: $dataset_url"
+            echo "DATASET_URL: $dataset_url"
             
             # parse TARGET for day of month ex: MERRA2_400.statD_2d_slv_Nx.20120223.nc4
             
-            day=`echo $target | awk '{split($0,s,".");print s[3];}' | sed -e "s/$year$month//g"`
+            day=`echo $target | awk '{split($0,s,".");split(s[5],f,"-");print f[1];}' | sed -e "s/$year$month//g"`
             echo "DAY: $day"
             
-            # I inspected the time values and they are all "690" or 11:30 AM
-            # So I construct a time period limited to the individual date, begining with the 
-            # the start time in the dataset metadata            
+            # Metadat inspection revealed that each file represents a single day.
+            # From the DAS response, HDF5_GLOBAL container:
+            # String BeginDate "2014-05-01";
+            # String BeginTime "00:00:00.000Z";
+            # String EndDate "2014-05-01";
+            # String EndTime "23:59:59.999Z";
+            # So I construct a time period limited to the individual date, utilizing
+            # the start end end times from the metadata.            
             start_date="$year-$month-$day";
-            start_time="00:30:00" 
+            start_time="00:00:00" 
             echo "START_DATE: $start_date  START_TIME: $start_time"
             
             # the end time is a bit of a "punt"
             end_date=$start_date
-            end_time="23:30:00"
+            end_time="23:59:59.999"
             echo "END_DATE: $end_date  END_TIME: $end_time"
 
             # add coverage to LFC.xml
