@@ -19,7 +19,7 @@ cat LFC_OPEN.xml > tmp/LFC_$template;
 for year in {2014..2017}; do
     echo "Processing year $year"
     for month in 01 02 03 04 05 06 07 08 09 10 11 12 ; do
-        echo "Processing Mnth: $month"
+        echo "Processing Month: $month"
         #mkdir -p $year/$month
         files=`curl -s "$server/$collection/$year/$month/catalog.xml" | grep ID | grep nc4 | sed -e "s/ID=\"//g" -e "s/\">//g"`
         for file in $files; do
