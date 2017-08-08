@@ -12,7 +12,7 @@ echo "TEMPLATE: $template";
 mkdir -p -v tmp
 
 # Start LFC.xml
-cat LFC_OPEN.xml > tmp/LFC.xml;
+cat LFC_OPEN.xml > tmp/LFC_$template;
 
 # The data start at 1980, but I'm just getting from 2014 on because the 
 # daily precipitation data on extends that far into the past
@@ -47,7 +47,7 @@ for year in {2014..2017}; do
             echo "END_DATE: $end_date  END_TIME: $end_time"
 
             # add coverage to LFC.xml
-            cat LFC_$template | sed -e "s/@COVERAGE_NAME@/$target/g" -e "s/@DATE@/$start_date/g" >> tmp/LFC.xml
+            cat LFC_$template | sed -e "s/@COVERAGE_NAME@/$target/g" -e "s/@DATE@/$start_date/g" >> tmp/LFC_$template
             
             # Make CoverageDescription file.
             cat $template  |  sed \
@@ -61,4 +61,4 @@ for year in {2014..2017}; do
     done
 done
 # finish up LFC.xml
-cat LFC_CLOSE.xml >> tmp/LFC.xml;
+cat LFC_CLOSE.xml >> tmp/LFC_$template;
