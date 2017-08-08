@@ -9,7 +9,11 @@
        gml:id="@MERRA2DATASET@" 
        xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd">
     <boundedBy>
-      <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude" uomLabels="time deg deg" srsDimension="2">
+      <EnvelopeWithTimePeriod
+              srsName="urn:ogc:def:crs:EPSG::4326"
+              axisLabels="latitude longitude"
+              uomLabels="deg deg"
+              srsDimension="2">
         <lowerCorner>-89.95 -179.95</lowerCorner>
         <upperCorner>89.85 179.95</upperCorner>
         <beginPosition>@START_DATE@T@START_TIME@Z</beginPosition>
