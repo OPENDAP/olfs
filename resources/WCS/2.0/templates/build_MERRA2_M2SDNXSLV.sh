@@ -5,7 +5,7 @@
 server="https://goldsmr4.gesdisc.eosdis.nasa.gov"
 collection="opendap/MERRA2/M2SDNXSLV.5.12.4"
 
-template="MERRA2_200.statD_2d_slv_Nx.xml"
+template="MERRA2_M2SDNXSLV.xml"
 echo "TEMPLATE: $template";
 
 # make sure we drop this stuff in a non-destructive spot...
