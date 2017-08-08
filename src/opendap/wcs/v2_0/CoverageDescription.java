@@ -171,7 +171,7 @@ public class CoverageDescription {
         String msg;
 
         if(coverageDescriptionFileName==null){
-            msg = "ingestCatalog(): In the catalog file ("+coverageDescriptionFileName+" a lfc:WcsCoverage element is missing the 'fileName' attribute.";
+            msg = "In the catalog file ("+coverageDescriptionFileName+" a lfc:WcsCoverage element is missing the 'fileName' attribute.";
             _log.error(msg);
             throw new ConfigurationException(msg);
         }
@@ -180,7 +180,7 @@ public class CoverageDescription {
         File coverageDescriptionFile = new File(fileName);
 
         // Ingest the CoverageDescription File
-        _log.debug("ingestCatalog(): Loading coverage description '{}'",coverageDescriptionFile);
+        _log.debug("Loading coverage description '{}'",coverageDescriptionFile);
 
         _myCD = ingestCoverageDescription(coverageDescriptionFile);
         _myFile = coverageDescriptionFile;

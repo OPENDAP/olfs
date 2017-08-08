@@ -249,18 +249,22 @@ public class LocalFileCatalog implements WcsCatalog {
 
         validateContent = validate;
 
+        int i=0;
         for (Object o : lfcConfig.getChildren(CoverageDescription.CONFIG_ELEMENT_NAME, NS)) {
             Element wcsCoverageConfig = (Element) o;
+            log.debug("Processing {}[{}]",CoverageDescription.CONFIG_ELEMENT_NAME,i++);
             ingestCoverageDescription(wcsCoverageConfig,  validateContent);
         }
-
+        i=0;
         for (Object o : lfcConfig.getChildren(EOCoverageDescription.CONFIG_ELEMENT_NAME, NS)) {
             Element eoWcsCoverageConfig = (Element) o;
+            log.debug("Processing {}[{}]",EOCoverageDescription.CONFIG_ELEMENT_NAME,i++);
             ingestEOCoverageDescription(eoWcsCoverageConfig,  validateContent);
         }
-
+        i=0;
         for (Object o : lfcConfig.getChildren(EODatasetSeries.CONFIG_ELEMENT_NAME, NS)) {
             Element eoDatasetSeries = (Element) o;
+            log.debug("Processing {}[{}]",EODatasetSeries.CONFIG_ELEMENT_NAME,i++);
             ingestDatasetSeries(eoDatasetSeries,  validateContent);
         }
 

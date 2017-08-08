@@ -56,7 +56,7 @@ public class GetCapabilitiesRequest {
 
     private boolean _hasCountElement;
     private long    _maxContentsSectionsCount;
-    public static final long DEFAULT_MAX_CONTENTS_SECTIONS_COUNT = 1000;
+    public static final long DEFAULT_MAX_CONTENTS_SECTIONS_COUNT = 10000;
 
     private String[]        AcceptFormats = null;
     private String[]        AcceptLanguages = null;
