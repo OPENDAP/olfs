@@ -1,3 +1,33 @@
+2017-07-25  ndp-opendap  <ndp@opendap.org>
+
+	Repaired a typo (or maybe a random deletion) that corrupted the name of a crucila XSL file.
+
+2017-07-18  ndp-opendap  <ndp@opendap.org>
+
+	Updating code
+
+	library updates
+
+	Updating apache componetes client
+
+	more changes
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Updated ThreddsCatalogUtil to authenicate against NASA servers.
+
+2017-07-11  James Gallagher  <jgallagher@opendap.org>
+
+	Formatting for the AggregationServlet
+
+2017-06-13  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2017-06-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #9 from OPENDAP/eo-wcs-2.0
+	Eo wcs 2.0
 2017-05-31  ndp-opendap  <ndp@opendap.org>
 
 	Repaired minor but crippling problem with the ToolsUI.jnlp template file.
