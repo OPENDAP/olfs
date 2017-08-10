@@ -50,6 +50,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -88,7 +89,9 @@ public class ViewersServlet extends HttpServlet {
     }
 
 
-
+    public ViewersServlet(){
+        _log = LoggerFactory.getLogger(getClass());
+    }
 
     //private Document configDoc;
     private AtomicInteger reqNumber;
@@ -97,18 +100,18 @@ public class ViewersServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        String configFile = getInitParameter("ConfigFileName");
-        if (configFile == null) {
-            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
-                    "is the name of the OLFS configuration file!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
+        String configFile = "viewers.xml";
+        String s = getInitParameter("ConfigFileName");
+
+        if (s != null) {
+            configFile = s;
+            String msg = "Servlet configuration included a parameter called 'ConfigFileName' whose value is '" +
+                    configFile + "'\n";
+            _log.warn(msg);
         }
 
         PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
 
-
-        _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         _serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();
 
