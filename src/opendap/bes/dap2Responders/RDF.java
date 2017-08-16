@@ -137,7 +137,7 @@ public class RDF extends Dap4Responder {
 
         // Make the first Transform
         String addRdfId2DapTransformFileName =
-                new PathBuilder(_systemPath).pathAppend("xsl").pathAppend("addRdfId2Dap3.2.xs").toString();
+                new PathBuilder(_systemPath).pathAppend("xsl").pathAppend("addRdfId2Dap3.2.xsl").toString();
 
         Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
 
