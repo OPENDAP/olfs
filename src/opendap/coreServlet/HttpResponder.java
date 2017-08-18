@@ -25,6 +25,7 @@
  */
 package opendap.coreServlet;
 
+import opendap.PathBuilder;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
@@ -104,7 +105,8 @@ public abstract class HttpResponder {
 
 
     public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
-        String errorPageTemplate = _systemPath + "/error/error.html.proto";
+        String errorPageTemplate = new PathBuilder(_systemPath).pathAppend("error").pathAppend("error.html.proto").toString();
+
         sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
     }
 

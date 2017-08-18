@@ -1,0 +1,2 @@
+url = http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ECMWF_ERA-40_subset.ncml&format=application/x-netcdf-cf1.0
+-s

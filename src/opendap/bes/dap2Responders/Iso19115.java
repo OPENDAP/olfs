@@ -26,6 +26,7 @@
 
 package opendap.bes.dap2Responders;
 
+import opendap.PathBuilder;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -129,7 +130,7 @@ public class Iso19115 extends Dap4Responder {
         log.debug("Cached working directory: "+currentDir);
 
 
-        String xslDir = _systemPath + "/nciso/xsl";
+        String xslDir = new PathBuilder(_systemPath).pathAppend("nciso").pathAppend("xsl").toString();
 
 
         log.debug("Changing working directory to "+ xslDir);

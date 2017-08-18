@@ -35,4 +35,11 @@
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>classes</name>
+			<type>2</type>
+			<location>/Users/jimg/src/opendap/hyrax_git/olfs/build/classes</location>
+		</link>
+	</linkedResources>
 </projectDescription>

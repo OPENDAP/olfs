@@ -39,18 +39,18 @@ public class PathBuilder  {
     private StringBuilder _sb;
 
     public PathBuilder(){
-
         _log = LoggerFactory.getLogger(this.getClass());
-
         _sb = new StringBuilder();
     }
 
     public PathBuilder(String s){
-        _sb = new StringBuilder(s);
+        this();
+        _sb.append(s);
     }
 
     public PathBuilder(CharSequence cs){
-        _sb = new StringBuilder(cs);
+        this();
+        _sb.append(cs);
     }
 
     public PathBuilder pathAppend(String s){

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<generalGridCoverage xmlns="http://www.opengis.net/cis/1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:cis="http://www.opengis.net/cis/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cis/1.1 ../cisAll.xsd" gml:id="cis_eo_ncep_model_example">
+    <domainSet>
+        <generalGrid srsName="http://www.opengis.net/def/crs/EPSG/0/4979" axisLabels="Lat Long h">
+            <cis:regularAxis axisLabel="Lat" lowerBound="-90.0" upperBound="90.0" uomLabel="deg" resolution="0.0417"/>
+            <cis:regularAxis axisLabel="Lon" lowerBound="0.0" upperBound="360.0" uomLabel="deg" resolution="0.0417"/>
+            <irregularAxis axisLabel="isobaric" uomLabel="Pa">
+                <c>100</c><c>200</c><c>300</c><c>500</c><c>700</c><c>1000</c><c>2000</c>
+                <c>3000</c><c>5000</c><c>7000</c><c>10000</c><c>15000</c><c>20000</c>
+                <c>25000</c><c>30000</c><c>35000</c><c>40000</c><c>45000</c><c>50000</c>
+                <c>55000</c><c>60000</c><c>65000</c><c>70000</c><c>75000</c><c>80000</c>
+                <c>85000</c><c>90000</c><c>92500</c><c>95000</c><c>97500</c><c>100000</c>
+            </irregularAxis>
+            <cis:regularAxis axisLabel="time" lowerBound="0" upperBound="360" uomLabel="Hour since 2016-06-17T00:00:00Z" resolution="3"/>
+            <gridLimits srsName="http://www.opengis.net/def/crs/OGC/0/Index4D" axisLabels="time isobaric lat lon">
+                <indexAxis axisLabel="time" lowerBound="0" upperBound="111"/>
+                <indexAxis axisLabel="isobaric" lowerBound="0" upperBound="30"/>
+                <indexAxis axisLabel="lat" lowerBound="0" upperBound="360"/>
+                <indexAxis axisLabel="lon" lowerBound="0" upperBound="719"/>
+            </gridLimits>
+        </generalGrid>
+    </domainSet>
+    <rangeSet>
+        <gml:File>
+            <gml:rangeParameters xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="cid:eo_ncep_model_example" xlink:role="http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/dap2" xlink:arcrole="fileReference"/>
+            <gml:fileReference>cid:eo_ncep_model_example</gml:fileReference>
+            <gml:fileStructure/>
+        </gml:File>
+    </rangeSet>
+    <rangeType>
+        <swe:DataRecord xmlns:swe="http://www.opengis.net/swe/2.0">
+            <swe:field name="u_component_of_wind_isobaric">
+                <swe:Quantity definition="urn:ncep:def:independantVariable:u_component_of_wind_isobaric">
+                    <swe:description>u-component of wind @ Isobaric surface</swe:description>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-60.0 161.0</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+            <swe:field name="v_component_of_wind_isobaric">
+                <swe:Quantity definition="urn:ncep:def:independantVariable:vu_component_of_wind_isobaric">
+                    <swe:description>v-component of wind @ Isobaric surface</swe:description>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-71.0 79.0</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </rangeType>
+</generalGridCoverage>

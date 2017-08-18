@@ -222,9 +222,8 @@
     <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
 
 
-    <property name="http-components-httpclient.lib"       value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpclient-cache.lib" value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="apache-http-components-httpcore-4.3.jar"/>
+    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
 
@@ -264,7 +263,6 @@
             <include name="${commons-lang.lib}"/>
 
             <include name="${http-components-httpclient.lib}"/>
-            <include name="${http-components-httpclient-cache.lib}"/>
             <include name="${http-components-httpcore.lib}"/>
 
             <include name="${commons-io.lib}"/>
@@ -735,7 +733,6 @@
                 <include name="${commons-codec.lib}"/>
 
                 <include name="${http-components-httpclient.lib}"/>
-                <include name="${http-components-httpclient-cache.lib}"/>
                 <include name="${http-components-httpcore.lib}"/>
 
                 <include name="${commons-io.lib}"/>
@@ -778,46 +775,6 @@
 
     </target>
 
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >   
-        </sourceanalyzer>
-    </target>
 
 
     <!-- OS-X stuff -->

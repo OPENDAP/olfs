@@ -100,37 +100,6 @@
         <Map name="/i"/>
         <Map name="/j"/>
     </Float64>
-    <Int32 name="i">
-        <Dim name="/i"/>
-        <Attribute name="attr1" type="String">
-            <Value>1</Value>
-        </Attribute>
-        <Attribute name="attr2" type="String">
-            <Value>1</Value>
-            <Value>2</Value>
-            <Value>3</Value>
-            <Value>4</Value>
-        </Attribute>
-        <Attribute name="i_1" type="Container">
-            <Attribute name="attr3_1" type="String">
-                <Value>17</Value>
-            </Attribute>
-            <Attribute name="attr3_2" type="Float64">
-                <Value>19</Value>
-                <Value>23</Value>
-                <Value>27</Value>
-            </Attribute>
-        </Attribute>
-        <Attribute name="DAP4_Checksum_CRC32" type="String">
-            <Value>2b990369</Value>
-        </Attribute>
-    </Int32>
-    <Float32 name="j">
-        <Dim name="/j"/>
-        <Attribute name="DAP4_Checksum_CRC32" type="String">
-            <Value>5e221f27</Value>
-        </Attribute>
-    </Float32>
     <Int16 name="l">
         <Dim name="/l"/>
         <Attribute name="DAP4_Checksum_CRC32" type="String">
@@ -157,7 +126,5 @@ Int16 order[i = 2][j = 3] = {{1, 2, 3},{4, 5, 6}};
 Int32 shot[i = 2][j = 3] = {{2, 3, 4},{5, 6, 7}};
 Float32 aloan[i = 2][j = 3] = {{3, 4, 5},{6, 7, 1e+12}};
 Float64 cross[i = 2][j = 3] = {{4, 5, 0.000244140625},{7, 8, 10000000000}};
-Int32 i[i = 2] = {10, 20};
-Float32 j[j = 3] = {2, 4, 6};
 Int16 l[l = 3] = {10, 9, 8};
 

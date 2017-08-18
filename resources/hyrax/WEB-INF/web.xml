@@ -168,7 +168,7 @@
         </init-param>
 
         <init-param>
-            <param-name>OLFSConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>olfs.xml</param-value>
         </init-param>
 
@@ -199,7 +199,7 @@
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
 
         <init-param>
-            <param-name>ViewersConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>viewers.xml</param-value>
         </init-param>
 
@@ -321,6 +321,10 @@
     <error-page>
         <error-code>502</error-code>
         <location>/error/error502.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>504</error-code>
+        <location>/error/error504.jsp</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>

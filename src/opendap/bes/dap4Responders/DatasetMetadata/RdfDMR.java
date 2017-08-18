@@ -26,6 +26,7 @@
 
 package opendap.bes.dap4Responders.DatasetMetadata;
 
+import opendap.PathBuilder;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
@@ -144,7 +145,8 @@ public class RdfDMR extends Dap4Responder {
          */
 
         // Make the first Transform
-        String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
+        String addRdfId2DapTransformFileName =
+                new PathBuilder(_systemPath).pathAppend("xsl").pathAppend("addRdfId2Dap3.2.xsl").toString();
         Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
 
         // Grab it's Processor object. All of the XSLT's in the chain must be built
@@ -152,7 +154,9 @@ public class RdfDMR extends Dap4Responder {
         net.sf.saxon.s9api.Processor proc = addRdfId2DdxTransform.getProcessor();
 
         // Make the 2nd Transform using the Processor from the first.
-        String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
+        String xml2rdfFileName =
+                new PathBuilder(_systemPath).pathAppend("xsl").pathAppend("anyXml2Rdf.xsl").toString();
+
         Transformer xml2rdf = new Transformer(proc, xml2rdfFileName);
 
 

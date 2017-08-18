@@ -31,7 +31,7 @@ Makefile.in
 atlocal
 atconfig
 aclocal.m4
-conf
+hyrax_tests/conf
 config.log
 config.status
 configure
@@ -41,5 +41,7 @@ autom4te.cache
 # Random temp files
 foo
 foo.*
+
 /.externalToolBuilders/
 /.settings/
+/bin/

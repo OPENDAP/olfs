@@ -1,0 +1,4 @@
+url = http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=ncep_model_example
+-s
+
+

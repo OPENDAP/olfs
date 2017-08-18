@@ -119,9 +119,9 @@ public class Util {
         log.debug("Retrieving XML Document: "+docUrlString);
 
         if(docUrlString.startsWith("http://")){
-            URL catalogURL = new URL(docUrlString);
-            log.debug("Document URL INFO: \n"+getUrlInfo(catalogURL));
-            doc = sb.build(catalogURL);
+            URL docUrl = new URL(docUrlString);
+            log.debug("Document URL INFO: \n"+getUrlInfo(docUrl));
+            doc = sb.build(docUrl);
 
         }
         else {
