@@ -41,3 +41,5 @@ autom4te.cache
 # Random temp files
 foo
 foo.*
+/.externalToolBuilders/
+/.settings/
