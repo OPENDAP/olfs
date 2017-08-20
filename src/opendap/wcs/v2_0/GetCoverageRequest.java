@@ -50,6 +50,7 @@ public class GetCoverageRequest {
     private String _mediaType;
     private HashMap<String, DimensionSubset> _dimensionSubsets;
     private TemporalDimensionSubset _temporalSubset;
+    private RangeSubset _rangeSubset;
 
     private String _requestUrl;
 
@@ -60,7 +61,6 @@ public class GetCoverageRequest {
      *    &RangeSubset=r1,r2,r4& selects three range components
      *    &RangeSubset=r1:r4,r7& selects 5 range components.
      */
-    private Vector<String> _rangeSubset;
 
 
     private ScaleRequest _scaleRequest;
@@ -74,7 +74,7 @@ public class GetCoverageRequest {
 
 
         _scaleRequest   = null;
-        _rangeSubset    = new Vector<>();
+        _rangeSubset    = null;
 
 
 
@@ -180,6 +180,14 @@ public class GetCoverageRequest {
             }
         }
 
+        // Get the range subset expressions
+        s = kvp.get("RangeSubset".toLowerCase());
+        if(s!=null) {
+            for (String rangeSubsetString : s) {
+                if(!rangeSubsetString.isEmpty())
+                    _rangeSubset = new RangeSubset(rangeSubsetString,cvrgDscrpt.getFields());
+            }
+        }
     }
 
     /**
@@ -251,8 +259,8 @@ public class GetCoverageRequest {
     }
 
 
-    public Vector<String> getRangeSubset(){
-        return new Vector<>(_rangeSubset);
+    public RangeSubset getRangeSubset(){
+        return _rangeSubset;
     }
 
 
