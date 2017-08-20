@@ -363,12 +363,19 @@ public class GetCoverageRequestProcessor {
          * Determines which fields (variables) will be sent back with the response.
          * If none are specified, all are sent.
          */
-        Vector<String> _rangeSubset =  req.getRangeSubset();
-        if(_rangeSubset.isEmpty()) {
-            // if they didn't ask for a subset of the set of fields, then take them all.
-            for (Field field : fields) {
-                _rangeSubset.add(field.getName());
+        Vector<String> requestedFields;
+        RangeSubset rangeSubset =  req.getRangeSubset();
+        if(rangeSubset!=null) {
+            requestedFields = rangeSubset.getRequestedFields();
+            if (requestedFields.isEmpty()) {
+                // if they didn't ask for a subset of the set of fields, then take them all.
+                for (Field field : fields) {
+                    requestedFields.add(field.getName());
+                }
             }
+        }
+        else {
+            requestedFields = new Vector<>();
         }
 
         /**
@@ -385,7 +392,7 @@ public class GetCoverageRequestProcessor {
          *
          */
         Vector<String> subsetClauses =  new Vector<>();
-        for(String fieldId: _rangeSubset){
+        for(String fieldId: requestedFields){
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
@@ -540,12 +547,19 @@ public class GetCoverageRequestProcessor {
          * Determines which fields (variables) will be sent back with the response.
          * If none are specified, all are sent.
          */
-        Vector<String> _rangeSubset =  req.getRangeSubset();
-        if(_rangeSubset.isEmpty()) {
-            // if they didn't ask for a subset of the set of fields, then take them all.
-            for (Field field : fields) {
-                _rangeSubset.add(field.getName());
+        Vector<String> requestedFields;
+        RangeSubset rangeSubset =  req.getRangeSubset();
+        if(rangeSubset!=null) {
+            requestedFields = rangeSubset.getRequestedFields();
+            if (requestedFields.isEmpty()) {
+                // if they didn't ask for a subset of the set of fields, then take them all.
+                for (Field field : fields) {
+                    requestedFields.add(field.getName());
+                }
             }
+        }
+        else {
+            requestedFields = new Vector<>();
         }
 
         /**
@@ -563,7 +577,7 @@ public class GetCoverageRequestProcessor {
          */
         Vector<String> gridSubsetClauses = new Vector<>();
         Vector<String> arraySubsetClauses =  new Vector<>();
-        for(String fieldId: _rangeSubset){
+        for(String fieldId: requestedFields){
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
             if(dimensionSubsets.isEmpty()){
