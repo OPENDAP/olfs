@@ -162,14 +162,10 @@ public class Servlet extends HttpServlet {
 
         if (_initialized) return;
 
-
-
         Element e1, e2;
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
-
-
         SAXBuilder sb = new SAXBuilder();
         Document configDoc = null;
 
@@ -194,7 +190,6 @@ public class Servlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-
         Element catalogConfig = configFileRoot.getChild("WcsCatalog");
         if(catalogConfig==null) {
             msg = "The WCS 2.0 servlet is unable to locate the configuration Directory <WcsCatalog> element " +
@@ -202,7 +197,6 @@ public class Servlet extends HttpServlet {
             log.error(msg);
             throw new ServletException(msg);
         }
-
 
         String className =  catalogConfig.getAttributeValue("className");
         if(className==null) {
@@ -212,36 +206,17 @@ public class Servlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-
         WcsCatalog wcsCatalog = null;
         try {
-
-            log.debug("Building Handler: " + className);
+            log.debug("Building WcsCatalog implementation: " + className);
             Class classDefinition = Class.forName(className);
             wcsCatalog = (WcsCatalog) classDefinition.newInstance();
-
-
-        } catch (ClassNotFoundException e) {
-            msg = "Cannot find class: " + className;
+        }
+        catch ( Exception e){
+            msg = "Failed to build WcsCatalog implementation: "+className+
+                    " Caught an exception of type "+e.getClass().getName() + " Message: "+ e.getMessage();
             log.error(msg);
             throw new ServletException(msg, e);
-        } catch (InstantiationException e) {
-            msg = "Cannot instantiate class: " + className;
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (IllegalAccessException e) {
-            msg = "Cannot access class: " + className;
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (ClassCastException e) {
-            msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (Exception e) {
-            msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            log.error(msg);
-            throw new ServletException(msg, e);
-
         }
 
         try {
@@ -251,17 +226,14 @@ public class Servlet extends HttpServlet {
             throw new ServletException(e);
         }
 
-
         try {
             CatalogWrapper.init(serviceContentPath, wcsCatalog);
         } catch (Exception e) {
             log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
-
         _initialized = true;
         log.info("Initialized. ");
-
     }
 
 
@@ -409,7 +381,6 @@ public class Servlet extends HttpServlet {
         try {
             LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
-            log.info("tetsty");
         }
         catch (Throwable t) {
             try {

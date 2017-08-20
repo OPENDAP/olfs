@@ -331,11 +331,7 @@
 
                 <include name="opendap/dap4/QueryParameters.java"/>
                 <include name="opendap/dap4/Dap4Error.java"/>
-
-
-
-
-
+                
                 <include name="opendap/coreServlet/DocServlet.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
                 <include name="opendap/coreServlet/Scrub.java"/>

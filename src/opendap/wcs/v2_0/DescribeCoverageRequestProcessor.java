@@ -58,11 +58,13 @@ public class DescribeCoverageRequestProcessor {
 
         CoverageDescription cd;
 
-        for(String id: req.getIds()){
-            cd = CatalogWrapper.getCoverageDescription(id);
-            coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
+        String ids[] = req.getIds();
+        if(ids!=null && ids.length>0){
+            for(String id: ids){
+                cd = CatalogWrapper.getCoverageDescription(id);
+                coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
+            }
         }
-
         return new Document(coverageDescriptions);
 
     }

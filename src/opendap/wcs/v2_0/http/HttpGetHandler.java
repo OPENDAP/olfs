@@ -162,7 +162,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     private Map<String, String[]> getKVP(HttpServletRequest request){
-        Map<String,String[]> requestParameters = new HashMap<String, String[]>();
+        Map<String,String[]> requestParameters = new HashMap<>();
         Map pmap =  request.getParameterMap();
 
         for(Object o: pmap.keySet()){
@@ -171,6 +171,26 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
             key = key.toLowerCase(); // Make the key set case insensitive;
             requestParameters.put(key,value);
         }
+
+
+        String localUrl = ReqInfo.getLocalUrl(request);
+        while(localUrl.startsWith("/") && !localUrl.isEmpty()){
+            localUrl = localUrl.substring(1,localUrl.length());
+        }
+        while(localUrl.endsWith("/") && !localUrl.isEmpty()){
+            localUrl = localUrl.substring(0,localUrl.length()-1);
+        }
+        if( localUrl!=null &&
+                !localUrl.isEmpty() &&
+                !requestParameters.containsKey("coverageId".toLowerCase())){
+
+            String[] vals;
+            vals = new String[1];
+            vals[0] = localUrl;
+            requestParameters.put("coverageId".toLowerCase(), vals);
+        }
+
+
         return requestParameters;
 
     }
@@ -195,48 +215,54 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         if (relativeURL != null) {
 
-                isWcsEndPoint = true;
+            isWcsEndPoint = true;
 
-                if (sendResponse) {
+            if (sendResponse) {
 
-                    if (relativeURL.equals("/")) {
-                        response.sendRedirect(_contextPath+"/");
-                        log.debug("Sent redirect from / to "+_contextPath+"/");
+                if (relativeURL.equals("/")) {
+                    response.sendRedirect(_contextPath+"/");
+                    log.debug("Sent redirect from / to "+_contextPath+"/");
+                }
+                else if(relativeURL.equals("") && query!=null){
+                    KvpHandler.processKvpWcsRequest(serviceURL, requestUrl ,getKVP(request),response);
+                    log.info("Sent WCS Response");
+                }
+                else if(relativeURL.startsWith(_testPath)){
+                    testWcsRequest(request, response);
+                    log.info("Sent WCS Test Page");
+                }
+                else if(relativeURL.startsWith(_xmlEchoPath)){
+                    echoWcsRequest(request, response);
+                    log.info("Returned WCS KVP request as an WCS XML request document.");
+                }
+                else if(relativeURL.startsWith(_describeCoveragePath)){
+                    sendDescribeCoveragePage(request, response);
+                    log.info("Returned WCS Describe Coverage Presentation Page.");
+                }
+                else if(_enableUpdateUrl && relativeURL.equals("update()")){
+                    log.info("Updating catalog.");
+                    update(request, response);
+                    log.info("Catalog update complete.");
+                }
+                else if(query==null){
+                    sendCapabilitesPresentationPage(request, response);
+                    log.info("Sent WCS Capabilities Response Presentation Page.");
+                }
+                else {
+                    log.info("Trying extra path as coverageId: {}",relativeURL);
+                    Map<String, String[]> kvp = getKVP(request);
+                    try {
+                        KvpHandler.processKvpWcsRequest(serviceURL, requestUrl, kvp, response);
                     }
-                    else if(relativeURL.equals("") && query!=null){
-                        KvpHandler.processKvpWcsRequest(serviceURL, requestUrl ,getKVP(request),response);
-                        log.info("Sent WCS Response");
-                    }
-                    else if(relativeURL.startsWith(_testPath)){
-                        testWcsRequest(request, response);
-                        log.info("Sent WCS Test Page");
-                    }
-                    else if(relativeURL.startsWith(_xmlEchoPath)){
-                        echoWcsRequest(request, response);
-                        log.info("Returned WCS KVP request as an WCS XML request document.");
-                    }
-                    else if(relativeURL.startsWith(_describeCoveragePath)){
-                        sendDescribeCoveragePage(request, response);
-                        log.info("Returned WCS Describe Coverage Presentation Page.");
-                    }
-                    else if(_enableUpdateUrl && relativeURL.equals("update()")){
-                        log.info("Updating catalog.");
-                        update(request, response);
-                        log.info("Catalog update complete.");
-                    }
-                    else if(query==null){
-                        sendCapabilitesPresentationPage(request, response);
-                        log.info("Sent WCS Capabilities Response Presentation Page.");
-                    }
-                    else {
-                        String msg = "The request does not resolve to a WCS service operation that this server supports.";
+                    catch(Exception e){
+                        String msg = "The request was a failure. Caught "+e.getClass().getName()+
+                        "  Message: "+e.getMessage();
                         log.error("wcsRequestDispatch() - {}",msg);
                         throw new BadRequest(msg);
                     }
-
                 }
+            }
         }
-
         return isWcsEndPoint;
 
     }
@@ -335,7 +361,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String serviceUrl = Util.getServiceUrl(request);
         log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
 
-        Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
+        Map<String, String[]> kvp = getKVP(request);
+        String[] cids= kvp.get("coverageId".toLowerCase());
+        Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl,cids);
 
 
         log.debug(xmlo.outputString(capabilitiesDoc));

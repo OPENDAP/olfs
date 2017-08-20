@@ -52,7 +52,7 @@ public class CapabilitiesRequestProcessor {
      * @return The complete wcs:Capabilities document, suitable for serialization to a requesting client.
      * @throws WcsException When bad things happen.
      */
-    public static Document getFullCapabilitiesDocument(String serviceUrl)  throws InterruptedException, WcsException {
+    public static Document getFullCapabilitiesDocument(String serviceUrl, String[] cids)  throws InterruptedException, WcsException {
 
         Element capabilities = new Element("Capabilities", WCS.WCS_NS);
 
@@ -70,7 +70,7 @@ public class CapabilitiesRequestProcessor {
 
         //log.debug(xmlo.outputString(capabilities));
 
-        capabilities.addContent(getContents(true,true,true,GetCapabilitiesRequest.DEFAULT_MAX_CONTENTS_SECTIONS_COUNT));
+        capabilities.addContent(getContents(true,true,true,GetCapabilitiesRequest.DEFAULT_MAX_CONTENTS_SECTIONS_COUNT,cids));
 
         return new Document(capabilities);
 
@@ -162,7 +162,7 @@ public class CapabilitiesRequestProcessor {
                         all || req.hasSection(GetCapabilitiesRequest.CONTENTS),
                         req.hasSection(GetCapabilitiesRequest.DATASET_SERIES_SUMMARY),
                         req.hasSection(GetCapabilitiesRequest.COVERAGE_SUMMARY),
-                        req.getCount()));
+                        req.getCount(),req.getRequestedCoverageIds()));
             }
 
          return new Document(capabilities);
@@ -192,7 +192,7 @@ public class CapabilitiesRequestProcessor {
      * @throws WcsException   When bad things happen.
      * @throws InterruptedException
      */
-    public static Element getContents(boolean allContent, boolean dataset_series_summary, boolean coverage_summary, long maxContentsSectionsCount)  throws InterruptedException, WcsException {
+    public static Element getContents(boolean allContent, boolean dataset_series_summary, boolean coverage_summary, long maxContentsSectionsCount, String[] coverageIds)  throws InterruptedException, WcsException {
 
         Element contentsElement = new Element("Contents",WCS.WCS_NS);
 
@@ -200,14 +200,29 @@ public class CapabilitiesRequestProcessor {
 
 
         if(allContent  | coverage_summary){
-            Iterator i = CatalogWrapper.getCoverageSummaryElements().iterator();
-            if(i.hasNext()){
-                Element cs;
-                while(i.hasNext()){
-                    cs = (Element) i.next();
-                    count++;
-                    if(count<maxContentsSectionsCount)
-                        contentsElement.addContent(cs);
+            if(coverageIds!=null && coverageIds.length>0){
+                log.info("getContents() Building contents from supplied list of coverageIds");
+                for(String coverageId:coverageIds) {
+                    Element coverageSummaryElement = CatalogWrapper.getCoverageSummaryElement(coverageId);
+                    log.debug("coverageId: {} coverageSummaryElement: {}",coverageId, coverageSummaryElement);
+                    if(coverageSummaryElement!=null){
+                        contentsElement.addContent(coverageSummaryElement);
+                    }
+                    if( maxContentsSectionsCount < count++)
+                        break;
+                }
+            }
+            else {
+                log.info("getContents() Building contents from WcsCatalog API");
+                Iterator i = CatalogWrapper.getCoverageSummaryElements().iterator();
+                if (i.hasNext()) {
+                    Element cs;
+                    while (i.hasNext()) {
+                        cs = (Element) i.next();
+                        count++;
+                        if (count < maxContentsSectionsCount)
+                            contentsElement.addContent(cs);
+                    }
                 }
             }
         }

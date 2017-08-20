@@ -175,9 +175,9 @@ public class GetCoverageRequestProcessor {
 
 
     public static String getReturnFormat(GetCoverageRequest req) throws WcsException, InterruptedException {
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
         String format = req.getFormat();
         if (format == null) {
+            CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
             format = coverageDescription.getNativeFormat();
         }
         return format;
