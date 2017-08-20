@@ -19,7 +19,9 @@ public class RangeSubset {
         for(String id:ids){
             if(!id.isEmpty()){
 
+                // Ranges of fields are expressed with a ":"
                 if(id.contains(":")){
+                    // Looks like a range expression - evaluate it.
                     String[] ss = id.split(":");
                     if(ss.length!=2)
                         throw new WcsException("Unable to process field list range expression.",
