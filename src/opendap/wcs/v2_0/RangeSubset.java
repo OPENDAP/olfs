@@ -10,7 +10,7 @@ public class RangeSubset {
     private String _kvpSubsetString;
     private Vector<String> _requestedFields;
 
-    RangeSubset(String kvpSubsetString){
+    RangeSubset(String kvpSubsetString, Vector<Field> fields) throws WcsException {
         _log = LoggerFactory.getLogger(getClass());
         _kvpSubsetString = kvpSubsetString;
         _requestedFields = new Vector<>();
@@ -18,7 +18,29 @@ public class RangeSubset {
         String[] ids = _kvpSubsetString.split(",");
         for(String id:ids){
             if(!id.isEmpty()){
-                _requestedFields.add(id);
+
+                if(id.contains(":")){
+                    String[] ss = id.split(":");
+                    if(ss.length!=2)
+                        throw new WcsException("Unable to process field list range expression.",
+                                WcsException.INVALID_PARAMETER_VALUE);
+                    String start = ss[0];
+                    String stop = ss[1];
+
+                    boolean gitit = false;
+                    for(Field field : fields){
+                        if(field.getName().equals(start)) gitit=true;
+
+                        if(gitit) _requestedFields.add(field.getName());
+
+                        if(field.getName().equals(stop))  gitit=false;
+                    }
+                }
+                else {
+                    _requestedFields.add(id);
+                }
+
+
             }
         }
     }

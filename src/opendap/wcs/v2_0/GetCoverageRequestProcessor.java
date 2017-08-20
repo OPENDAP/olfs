@@ -367,15 +367,15 @@ public class GetCoverageRequestProcessor {
         RangeSubset rangeSubset =  req.getRangeSubset();
         if(rangeSubset!=null) {
             requestedFields = rangeSubset.getRequestedFields();
-            if (requestedFields.isEmpty()) {
-                // if they didn't ask for a subset of the set of fields, then take them all.
-                for (Field field : fields) {
-                    requestedFields.add(field.getName());
-                }
-            }
         }
         else {
             requestedFields = new Vector<>();
+        }
+        if (requestedFields.isEmpty()) {
+            // if they didn't ask for a subset of the set of fields, then take them all.
+            for (Field field : fields) {
+                requestedFields.add(field.getName());
+            }
         }
 
         /**

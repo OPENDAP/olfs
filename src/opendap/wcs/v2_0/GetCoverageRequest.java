@@ -185,7 +185,7 @@ public class GetCoverageRequest {
         if(s!=null) {
             for (String rangeSubsetString : s) {
                 if(!rangeSubsetString.isEmpty())
-                    _rangeSubset = new RangeSubset(rangeSubsetString);
+                    _rangeSubset = new RangeSubset(rangeSubsetString,cvrgDscrpt.getFields());
             }
         }
     }
