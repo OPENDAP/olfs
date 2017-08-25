@@ -53,13 +53,13 @@ public class WcsService implements WebServiceHandler {
 
     private Element _config;
 
-    private String _ncWcsServiceUrl;
+    private String _wcsServiceUrl;
 
     public WcsService() {
 
         _serviceId = ID;
         _applicationName = ID + " Service";
-        _ncWcsServiceUrl = "http://localhost:8080/"+ID+"/";
+        _wcsServiceUrl = "http://localhost:8080/"+ID+"/";
         _base = "/" + ID;
         _wcsDynamicServiceId = "lds";
 
@@ -94,7 +94,7 @@ public class WcsService implements WebServiceHandler {
 
             s = e.getAttributeValue("href");
             if (s != null && s.length() != 0)
-                _ncWcsServiceUrl = s;
+                _wcsServiceUrl = s;
 
             s = e.getAttributeValue("base");
             if (s != null && s.length() != 0)
@@ -128,14 +128,33 @@ public class WcsService implements WebServiceHandler {
 
     @Override
     public String getServiceLink(String datasetUrl) {
-
         PathBuilder pb = new PathBuilder();
-        pb.append(_ncWcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
+
+
+        pb.append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities");
+
+        /*
+
+        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
+        pb.pathAppend(datasetUrl).append("\">");
+        pb.append(_applicationName).append("</a>");
+
+        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
+        pb.pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities\">");
+        pb.append("GetCapabilities").append("</a>");
+
+        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
+        pb.pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=DescribeCoverage");
+        pb.append("&coverageId=").append(_wcsDynamicServiceId).pathAppend(datasetUrl).append("\">");
+        pb.append("DescribeCoverage").append("</a>");
+
+        */
+
+//        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
+  //      pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
+
+
         return pb.toString();
-
-
-        // return _ncWcsServiceUrl + "/" + _wcsDynamicServiceId + datasetUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
-
     }
 
 
@@ -158,7 +177,7 @@ public class WcsService implements WebServiceHandler {
         sb.append("    base: ").append(_base).append("\n");
         sb.append("    dynamicServiceId: ").append(_wcsDynamicServiceId).append("\n");
         sb.append("    applicationName: ").append(_applicationName).append("\n");
-        sb.append("    WcsService: ").append(_ncWcsServiceUrl).append("\n");
+        sb.append("    WcsService: ").append(_wcsServiceUrl).append("\n");
 
         return sb.toString();
     }

@@ -1,6 +1,5 @@
 package opendap.wcs.v2_0;
 
-import opendap.namespaces.XML;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -8,7 +7,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
@@ -20,7 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,9 +26,7 @@ import org.apache.commons.codec.binary.Hex;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class DynamicServicesCatalog implements WcsCatalog{
@@ -135,9 +130,9 @@ public class DynamicServicesCatalog implements WcsCatalog{
         }
     }
 
-    private void cacheRemoteContent(String url, OutputStream os) throws IOException, JDOMException {
+    private void writeRemoteContent(String url, OutputStream os) throws IOException, JDOMException {
 
-        _log.debug("cacheRemoteContent() - URL: {}",url);
+        _log.debug("writeRemoteContent() - URL: {}",url);
 
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(_credsProvider)
@@ -146,7 +141,7 @@ public class DynamicServicesCatalog implements WcsCatalog{
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse resp = httpclient.execute(httpGet);
         try {
-            _log.debug("cacheRemoteContent() - HTTP STATUS: {}",resp.getStatusLine());
+            _log.debug("writeRemoteContent() - HTTP STATUS: {}",resp.getStatusLine());
             HttpEntity entity1 = resp.getEntity();
             entity1.writeTo(os);
             EntityUtils.consume(entity1);
@@ -190,7 +185,7 @@ public class DynamicServicesCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(cacheFile);
-                cacheRemoteContent(dmrUrl,fos);
+                writeRemoteContent(dmrUrl,fos);
                 fos.close();
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
                 dmrElement.setAttribute("name",coverageId);
@@ -224,7 +219,7 @@ public class DynamicServicesCatalog implements WcsCatalog{
             Element dmr = getCachedDMR(coverageId);
             if(dmr==null)
                 return null;
-            CoverageDescription coverageDescription = new CoverageDescription(dmr,getDmrUrl(coverageId));
+            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,getDmrUrl(coverageId));
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {

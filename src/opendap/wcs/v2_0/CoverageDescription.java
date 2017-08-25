@@ -76,22 +76,9 @@ public class CoverageDescription {
     private List<Field> fields;
 
     public CoverageDescription() {
-
-    }
-    public CoverageDescription(Element dmr, String datasetUrl) throws IOException {
-        _myCD = dmr;
         _log = LoggerFactory.getLogger(this.getClass());
         _lastModified = 0;
-        _dapDatasetUrl = new URL(datasetUrl);
         _dapGridId = new HashMap<>();
-
-        String name = dmr.getAttributeValue("name");
-        Element coverageId =  new Element("CoverageId",WCS.WCS_NS);
-
-        coverageId.setText(name);
-        dmr.addContent(1,coverageId);
-
-
     }
 
     public CoverageDescription(CoverageDescription cd) throws IOException {
@@ -565,14 +552,14 @@ public class CoverageDescription {
 
 
 
-    private List<Element> cloneElementList(List<Element> list){
-        ArrayList<Element> newList = new ArrayList<>();
+    private List<Element> cloneElementList(List list){
+        ArrayList<Element> newList = new ArrayList<Element>();
 
-        Iterator<Element> i = list.iterator();
+        Iterator i = list.iterator();
         Element e;
 
         while(i.hasNext()){
-            e = i.next();
+            e = (Element)i.next();
             newList.add((Element)e.clone());
         }
 
