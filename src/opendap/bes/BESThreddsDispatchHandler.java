@@ -35,6 +35,7 @@ import opendap.services.Service;
 import opendap.services.ServicesRegistry;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.viewers.NcWmsService;
+import opendap.viewers.WcsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -203,10 +204,18 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
             showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
         }
-        _log.debug("ncWMS service base:"+base);
+        _log.debug("ncWMS service base: {}",base);
 
 
-
+        s = ServicesRegistry.getWebServiceById(WcsService.ID);
+        if(s!=null && s instanceof WcsService){
+            WcsService wcs = (WcsService) s;
+            base  = wcs.getBase();
+            dsId = wcs.getDynamicServiceId();
+            showCatalogToThreddsCatalog.setParameter("WcsServiceBase",base);
+            showCatalogToThreddsCatalog.setParameter("WcsDynamicServiceId",dsId);
+        }
+        _log.debug("WCS service base: {}",base);
 
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
@@ -258,17 +267,13 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             }
 
             if(!inheritedServices.isEmpty()){
-
-
-
                 _log.debug("Collecting existing services.");
                 i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
                 HashMap<String, Element> existingServices = new HashMap<String, Element>();
-                while(i.hasNext()){
-                    service = (Element)i.next();
-                    existingServices.put(service.getAttributeValue("name"),service);
+                while(i.hasNext()) {
+                    service = (Element) i.next();
+                    existingServices.put(service.getAttributeValue("name"), service);
                 }
-
 
                 String iServiceName;
 
