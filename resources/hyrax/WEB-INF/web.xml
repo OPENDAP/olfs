@@ -199,7 +199,7 @@
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
 
         <init-param>
-            <param-name>ViewersConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>viewers.xml</param-value>
         </init-param>
 

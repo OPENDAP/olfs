@@ -1,3 +1,13 @@
+Version 1.16.4  (09 August 2017)
+
+- Repaired broken RDF responses.
+
+- Updated dependecy Jars.
+
+- Enabled ThreddsCatalogUtil to authenticate against Earthdata Login
+
+- Merged eo-wcs features into master
+
 Version 1.16.3 (05 Jun 2017)
 
 - Server timeout conditions now return HTTP status 504 (and not 418).

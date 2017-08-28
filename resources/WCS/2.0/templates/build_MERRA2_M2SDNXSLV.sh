@@ -16,7 +16,7 @@ cat LFC_OPEN.xml > tmp/LFC_$template;
 
 # The data start at 1980, but I'm just getting from 2014 on because the 
 # daily precipitation data on extends that far into the past
-for year in {2014..2017}; do
+for year in {1980..1981}; do
     echo "Processing year $year"
     for month in 01 02 03 04 05 06 07 08 09 10 11 12 ; do
         echo "Processing Month: $month"
@@ -25,7 +25,11 @@ for year in {2014..2017}; do
         for file in $files; do
             echo "FILE: $file"
             target=`basename $file`
-            #echo "TARGET: $target"  
+            target=`echo $target | sed -e "s/.nc4$/.SUB.nc4/g" `
+            echo "TARGET: $target"  
+            
+
+            
             dataset_url="$server/$file" # We add .nc4 to invoke returnAs since direct file downloads are disabled.
             #echo "DATASET_URL: $dataset_url"
             
@@ -62,3 +66,10 @@ for year in {2014..2017}; do
 done
 # finish up LFC.xml
 cat LFC_CLOSE.xml >> tmp/LFC_$template;
+
+
+
+# URL:  MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.html
+
+# FILE: MERRA2_100.statD_2d_slv_Nx.19800131.nc4
+

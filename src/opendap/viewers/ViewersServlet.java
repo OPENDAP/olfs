@@ -50,6 +50,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -81,6 +82,8 @@ public class ViewersServlet extends HttpServlet {
 
     private BesApi _besApi;
 
+    private String _configFilename;
+
     private static String _serviceId ="/viewers";
 
     public static String getServiceId(){
@@ -88,7 +91,10 @@ public class ViewersServlet extends HttpServlet {
     }
 
 
-
+    public ViewersServlet(){
+        _log = LoggerFactory.getLogger(getClass());
+        _configFilename = "viewers.xml"; // Default value
+    }
 
     //private Document configDoc;
     private AtomicInteger reqNumber;
@@ -97,18 +103,16 @@ public class ViewersServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        String configFile = getInitParameter("ConfigFileName");
-        if (configFile == null) {
-            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
-                    "is the name of the OLFS configuration file!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
+        String s = getInitParameter("ConfigFileName");
+        if (s != null) {
+            _configFilename = s;
+            String msg = "Servlet configuration included a parameter called 'ConfigFileName' whose value is '" +
+                    _configFilename + "'\n";
+            _log.warn(msg);
         }
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
+        PersistentConfigurationHandler.installDefaultConfiguration(this, _configFilename);
 
-
-        _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         _serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();
 
@@ -154,7 +158,7 @@ public class ViewersServlet extends HttpServlet {
 
         }
 
-        _configDoc = loadConfig();
+        _configDoc = loadConfig(_configFilename);
 
         buildJwsHandlers(_webStartResourcesDirectory,_configDoc.getRootElement());
         buildWebServiceHandlers(_webStartResourcesDirectory, _configDoc.getRootElement());
@@ -173,26 +177,14 @@ public class ViewersServlet extends HttpServlet {
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
      */
-    private Document loadConfig() throws ServletException {
+    private Document loadConfig(String configFileName) throws ServletException {
 
         Document doc;
-
-        String filename = getInitParameter("ViewersConfigFileName");
-        if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the Dataset Viewers configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
-
-        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
-
-        _log.debug("Loading Dataset Viewers Configuration File: " + filename);
-
-
+        configFileName = Scrub.fileName(ServletUtil.getConfigPath(this) + configFileName);
+        _log.debug("Loading Dataset Viewers Configuration File: " + configFileName);
         try {
 
-            File confFile = new File(filename);
+            File confFile = new File(configFileName);
             FileInputStream fis = new FileInputStream(confFile);
 
             try {
@@ -205,15 +197,15 @@ public class ViewersServlet extends HttpServlet {
             }
 
         } catch (FileNotFoundException e) {
-            String msg = "Dataset Viewers Configuration File \"" + filename + "\" cannot be found.";
+            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" cannot be found.";
             _log.error(msg);
             throw new ServletException(msg, e);
         } catch (IOException e) {
-            String msg = "Dataset Viewers Configuration File \"" + filename + "\" is not readable.";
+            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" is not readable.";
             _log.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
-            String msg = "Dataset Viewers Configuration File \"" + filename + "\" cannot be parsed.";
+            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" cannot be parsed.";
             _log.error(msg);
             throw new ServletException(msg, e);
         }
