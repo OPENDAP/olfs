@@ -53,49 +53,39 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
     private Logger log;
-
-
     private Document _config;
-
-
     private AtomicInteger reqNumber;
-
     private String systemPath;
-
     private boolean isInitialized;
-
-
     private Vector<HttpResponder> responders;
+    private boolean _devMode;
 
+
+    public DispatchServlet(){
+        super();
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        isInitialized = false;
+        _devMode = false;
+        responders = new Vector<>();
+        reqNumber = new AtomicInteger(0);
+    }
 
     public void init() {
 
         if (isInitialized)
             return;
 
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
-        isInitialized = false;
-        reqNumber = new AtomicInteger(0);
         systemPath = ServletUtil.getSystemPath(this, "");
-
-        responders = new Vector<HttpResponder>();
-
-
-        // dapResponders.add(new DDX(getMethod(,HttpServletRequest.class,HttpServletResponse.class)));
-
-
-
-
         responders.add(new OlfsControlApi(systemPath));
         responders.add(new BesControlApi(systemPath));
-
-
         log.info("masterDispatchRegex=\"" + getDispatchRegex() + "\"");
-        log.info("Initialized.");
-
-
+        
+        String devMode = getInitParameter("DeveloperMode");
+        if (devMode != null && devMode.equalsIgnoreCase("true")) {
+            _devMode=true;
+        }
         isInitialized = true;
+        log.info("Initialized.");
     }
 
 
@@ -346,12 +336,17 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             throws javax.servlet.ServletException, java.io.IOException {
 
         if (!req.isSecure()) {
-            String msg = "Connection is NOT secure. Protocol: "+req.getProtocol();
-            log.error(msg);
-            resp.sendError(403);
+            if(!_devMode) {
+                String msg = "service() - Connection is NOT secure. Protocol: " + req.getProtocol();
+                log.error(msg);
+                resp.sendError(403);
+            }
+            else {
+                log.warn("service() - Allowing non-secure access to HAI! protocol: {}  _devMode: {}",req.getProtocol(),_devMode);
+            }
         }
         else {
-            log.debug("Connection is secure. Protocol: "+req.getProtocol());
+            log.debug("service() - Connection is secure. protocol: "+req.getProtocol());
         }
 
         super.service(req,resp);
