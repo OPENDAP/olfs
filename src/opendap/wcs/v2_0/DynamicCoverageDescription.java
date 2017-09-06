@@ -44,7 +44,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
-        //TODO: All this stuff neess reviewed?
+        //TODO: All this stuff needs reviewed?
         ////////////////////////////////////
         //  use DOM to directly set member variables
 
@@ -60,7 +60,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      *  Abandon this version for the version that takes the DMR as a JDOM element (see above)
-      * @param datasetUrl
+     *
+     *  From dap4dmr branch version of CoverageDescription
+     *
+     * @param datasetUrl
      * @throws IOException
      */
     @Deprecated
