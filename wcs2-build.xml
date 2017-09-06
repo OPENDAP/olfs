@@ -191,6 +191,7 @@
     <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
     <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
+
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
     <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
 
@@ -207,6 +208,16 @@
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
     <property name="catalina.lib"       value="catalina-6.0.14.jar"/>
+
+    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>	
+    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
 
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
@@ -229,6 +240,7 @@
             <include name="${commons-codec.lib}"/>
             <include name="${commons-lang.lib}"/>
 
+
             <include name="${http-components-httpclient.lib}"/>
             <include name="${http-components-httpcore.lib}"/>
 
@@ -241,8 +253,20 @@
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
 
-	        <include name="${owlim.lib}"/>
+	    <include name="${owlim.lib}"/>
             <include name="${openrdf-sesame.lib}"/>
+
+            <include name="${ogc-wcs.lib}" />
+            <include name="${ogc-gml.lib}" />
+            <include name="${ogc-swe.lib}" />
+            <include name="${ogc-gmlcov.lib}" />
+            <include name="${ogc-ows.lib}" />
+            <include name="${ogc-jaxb.lib}" />
+        	
+        	<include name="${jaxb-core.lib}" />
+        	<include name="${jaxb-impl.lib}" />
+        	<include name="${xlink.lib}" />
+
 
         </fileset>
     </path>
@@ -292,8 +316,11 @@
 
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
-                <!-- include all the java files -->
+                <!-- include all the WCS 2.0 java files -->
                 <include name="opendap/wcs/v2_0/**/*.java"/>
+                
+   
+                
                 <!-- include name="opendap/semantics/**/*.java"/ -->
                 
                 <include name="opendap/bes/BESManager.java"/>
@@ -331,7 +358,11 @@
 
                 <include name="opendap/dap4/QueryParameters.java"/>
                 <include name="opendap/dap4/Dap4Error.java"/>
-                
+                <exclude name="opendap/dap4/Dap4Service.java"/>
+
+                <!-- include DAP4 stuff -->
+                <include name="opendap/dap4/**/*.java" />
+
                 <include name="opendap/coreServlet/DocServlet.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
                 <include name="opendap/coreServlet/Scrub.java"/>

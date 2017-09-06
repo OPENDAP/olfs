@@ -219,7 +219,7 @@ public class DynamicServicesCatalog implements WcsCatalog{
             Element dmr = getCachedDMR(coverageId);
             if(dmr==null)
                 return null;
-            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,getDmrUrl(coverageId));
+            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr);
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {

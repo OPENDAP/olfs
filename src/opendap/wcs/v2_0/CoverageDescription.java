@@ -25,7 +25,18 @@
  */
 package opendap.wcs.v2_0;
 
-import org.jdom.Document;
+
+import java.io.*;
+
+import javax.xml.bind.*;
+import javax.xml.stream.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+
+//import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
@@ -33,10 +44,6 @@ import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -45,11 +52,15 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+
 /**
  * An implementation of a wcs:CoverageDescription object. This implementation includes methods that assist in the
  * creation of DAP constraint expressions to retrieve coverage data as NetCDF.
  *
+ *
  */
+@XmlRootElement(name="CoverageDescription")
 public class CoverageDescription {
 
     protected Element _myCD;
@@ -77,9 +88,12 @@ public class CoverageDescription {
 
     public CoverageDescription() {
         _log = LoggerFactory.getLogger(this.getClass());
-        _lastModified = 0;
+        _lastModified = System.currentTimeMillis();
         _dapGridId = new HashMap<>();
+        _domainCoordinates = new LinkedHashMap<>();
     }
+
+    
 
     public CoverageDescription(CoverageDescription cd) throws IOException {
         _myCD = (Element)cd._myCD.clone();
@@ -294,7 +308,7 @@ public class CoverageDescription {
         SAXBuilder validatingParser = new SAXBuilder("org.apache.xerces.parsers.SAXParser",validateContent);
         validatingParser.setFeature("http://apache.org/xml/features/validation/schema",validateContent);
 
-        Document cdDoc = validatingParser.build(is);
+        org.jdom.Document cdDoc = validatingParser.build(is);
 
         Element cd = cdDoc.getRootElement();
 
@@ -885,5 +899,12 @@ public class CoverageDescription {
     {
       this._domainCoordinates = dc;	
     }
+    
+    
+ 
 
+
+
+    
+    
 }
