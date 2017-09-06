@@ -28,13 +28,6 @@ package opendap.wcs.v2_0;
 
 import java.io.*;
 
-import javax.xml.bind.*;
-import javax.xml.stream.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 
 //import org.jdom.Document;
 import org.jdom.Element;
@@ -84,7 +77,7 @@ public class CoverageDescription {
 
     boolean _initialized = false;
     
-    private List<Field> fields;
+    private List<Field> _fields;
 
     public CoverageDescription() {
         _log = LoggerFactory.getLogger(this.getClass());
@@ -850,11 +843,11 @@ public class CoverageDescription {
     @XmlElement(name="field")
     public List<Field> getFieldsList()
     {
-    	if (this.fields == null || this.fields.isEmpty()) 
+    	if (this._fields == null || this._fields.isEmpty())
     	{
     		try
     		{
-    			fields.addAll(getFields());
+    			_fields.addAll(getFields());
     		}
     		catch  (Exception e)
     		{
@@ -862,7 +855,7 @@ public class CoverageDescription {
     		}
     	}
     	
-    	return this.fields;
+    	return this._fields;
     }
     
     public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
@@ -875,7 +868,7 @@ public class CoverageDescription {
     }
     
     public void setFields(List<Field> fields) {
-		this.fields = fields;
+		this._fields = fields;
 	}
 
     

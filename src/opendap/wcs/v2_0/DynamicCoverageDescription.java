@@ -55,6 +55,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //this.fields = dataset.getVars32bitFloats();
         //_initialized = cd._initialized;
 
+        /**
+         * TODO: Populate the parent class's (CoverageDescription) internal objects including: _myCD, _gridIds, _domainCoordinates, and _fields.
+         * The parent class may need additional setter/getters or protected variables
+         * in order to fufill this.
+         */
+
 
     }
 
