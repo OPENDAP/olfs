@@ -112,6 +112,10 @@ public class CatalogWrapper {
 
 
 
+    public static Element getCoverageSummaryElement(String coverageId)  throws InterruptedException, WcsException{
+        return _catalogImpl.getCoverageSummaryElement(coverageId);
+    }
+
     public static Collection<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();
     }

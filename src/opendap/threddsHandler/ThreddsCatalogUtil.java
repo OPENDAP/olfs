@@ -340,17 +340,16 @@ public class ThreddsCatalogUtil {
 
 		Options options = new Options();
         options.addOption(
-		        "t",
-				"thredds-catalog-url",
+		        "u",  "user",
 				true,
-                ""
-		);
+                "");
 		options.addOption(
 		        "d",
-				"debug",
 				false,
-				"Enable debugging output."
-		);
+				"decode the command line arguments, cannot be used in conjunction with -e (encode).");
+		options.addOption("t", false,
+				"runs internal tests and produces output on stdout.");
+
 		options.addOption("r", false,
 				"recursively descend nested THREDDS catalogs.");
 
@@ -867,7 +866,7 @@ public class ThreddsCatalogUtil {
 	 *            The URL of the document to retrieve.
 	 * @return The Document
 	 */
-    Document  getDocument(String docUrlString) throws IOException, JDOMException {
+    public Document  getDocument(String docUrlString) throws IOException, JDOMException {
 
 
         log.debug("getDocument() - URL: {}",docUrlString);
@@ -1113,6 +1112,14 @@ public class ThreddsCatalogUtil {
 		return accessURLs;
 	}
 
+	public XMLOutputter getXmlo() {
+		return xmlo;
+	}
 
+	public void setXmlo(XMLOutputter xmlo) {
+		this.xmlo = xmlo;
+	}
+
+   
 
 }

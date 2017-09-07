@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -143,7 +144,16 @@ public class DescribeCoverageRequest {
         s = kvp.get("coverageId".toLowerCase());
         if(s!=null){
             tmp = s[0].split(",");
-            ids = tmp;
+            Vector<String> cids = new Vector<>();
+            for(String t:tmp){
+                if(!t.isEmpty()){
+                    cids.add(t);
+                }
+            }
+            if(cids.size()>0){
+                ids = new String[cids.size()];
+                cids.toArray(ids);
+            }
         }
         else {
             throw new WcsException("Request is missing required list of " +

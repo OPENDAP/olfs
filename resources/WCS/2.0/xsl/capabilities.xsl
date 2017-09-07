@@ -95,17 +95,20 @@
                     </table>
 
                 </xsl:if>
-                
-                <xsl:choose>
-                    <xsl:when test="ows:ServiceIdentification/ows:Title">
-                        <h1>
-                            <xsl:value-of select="ows:ServiceIdentification/ows:Title"/>
-                        </h1>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <h1>WCS Capabilities</h1>
-                    </xsl:otherwise>
-                </xsl:choose>
+
+                <h1>
+                    <xsl:choose>
+                        <xsl:when test="ows:ServiceIdentification/ows:Title">
+                                <xsl:value-of select="ows:ServiceIdentification/ows:Title"/>
+                        </xsl:when>
+                        <xsl:otherwise>WCS Capabilities</xsl:otherwise>
+                    </xsl:choose>
+                       - <xsl:element name="a">
+                            <xsl:attribute name="style">font-family:Tahoma,Arial,sans-serif; color:white; background-color:#527CC1; font-size:16px; padding-left: 5px;</xsl:attribute >
+                            <xsl:attribute name="href">?service=WCS&amp;request=GetCapabilities</xsl:attribute >
+                            GetCapabilities
+                        </xsl:element>
+                </h1>
                 <xsl:apply-templates select="ows:ServiceIdentification"/>
 
 
@@ -141,16 +144,6 @@
                     <br/>
                 </ul>
                 <hr/>
-                <ul>
-                    <li>
-                        <xsl:element name="a">
-                            <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;request=GetCapabilities</xsl:attribute >
-                            Capabilities
-                        </xsl:element>
-                        - The GetCapabilities response.
-                    </li>
-                    <br/>
-                </ul>
                 </div>
                 <h2>WCS Request Form</h2>
 

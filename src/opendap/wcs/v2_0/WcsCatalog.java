@@ -147,7 +147,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     // public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
+     public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
 
 

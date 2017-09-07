@@ -33,10 +33,7 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: ndp
@@ -61,6 +58,7 @@ public class GetCapabilitiesRequest {
     private String[]        AcceptFormats = null;
     private String[]        AcceptLanguages = null;
 
+    private String[] _coverageIds;
 
     public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
     public static String SERVICE_PROVIDER = "ServiceProvider";
@@ -135,8 +133,13 @@ public class GetCapabilitiesRequest {
         AcceptFormats = acceptFormats;
     }
 
+    public GetCapabilitiesRequest() {
+        _coverageIds = null;
+    }
+
     public GetCapabilitiesRequest(Element getCRElem) throws WcsException{
 
+        this();
         Element e;
         String s;
         Iterator i;
@@ -265,6 +268,7 @@ public class GetCapabilitiesRequest {
 
     public GetCapabilitiesRequest(Map<String,String[]> kvp)
             throws WcsException {
+        this();
 
         String tmp[], s[];
 
@@ -375,7 +379,17 @@ public class GetCapabilitiesRequest {
 
         }
 
+        // Get the list of identifiers for the coverage to describe in the contents section.
+        s = kvp.get("coverageId".toLowerCase());
+        if(s!=null){
+            tmp = s[0].split(",");
+            _coverageIds = tmp;
+        }
 
+    }
+
+    public String[] getRequestedCoverageIds(){
+        return _coverageIds;
     }
 
     public Element getRequestElement(){

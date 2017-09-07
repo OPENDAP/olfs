@@ -64,13 +64,8 @@ public class KvpHandler {
     }
 
     public static void processKvpWcsRequest(String serviceURL, String requestUrl, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
-
         Document wcsResponse;
-        XMLOutputter xmlo;
-
         ServletOutputStream os  = null;
-
-
         try {
             os  = response.getOutputStream();
 
@@ -201,7 +196,7 @@ public class KvpHandler {
         // Make sure the client is looking for a WCS service....
         String[] s = keyValuePairs.get("service");
         if(s==null || !s[0].equals(WCS.SERVICE))
-            throw new WcsException("Only the WCS service (version "+
+            throw new WcsException("Only the "+WCS.SERVICE+ " service (version "+
                     WCS.CURRENT_VERSION+") is supported.",
                     WcsException.OPERATION_NOT_SUPPORTED,"service");
 
