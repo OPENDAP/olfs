@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-public class DynamicServicesCatalog implements WcsCatalog{
+public class DynamicServiceCatalog implements WcsCatalog{
     private Logger _log;
     private boolean _intiialized;
 
@@ -40,7 +40,7 @@ public class DynamicServicesCatalog implements WcsCatalog{
     private CredentialsProvider _credsProvider;
 
 
-    public DynamicServicesCatalog(){
+    public DynamicServiceCatalog(){
         _intiialized = false;
         _log = LoggerFactory.getLogger(getClass());
         _dynamicServicesMap = new ConcurrentHashMap<>();
