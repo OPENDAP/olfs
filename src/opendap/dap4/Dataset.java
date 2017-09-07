@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement (name="Dataset")
 public class Dataset {
 
-	// FIXME: chanage the name from "coverageId" to "name" and modify setter and getter accodingly.
+	// FIXME: change the name from "coverageId" to "name" and modify setter and getter accodingly. ndp 9/7/17
 	private String coverageId = "";
 	private String url = "";
 	
@@ -132,11 +132,8 @@ public class Dataset {
 		return vars64bitIntegers;
 	}
 
-
 	public void setVars64bitIntegers(List<Int64> vars64bitIntegers) {
 		this.vars64bitIntegers = vars64bitIntegers;
 	}
-
-	
 
 }
