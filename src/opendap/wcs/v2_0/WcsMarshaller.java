@@ -595,14 +595,19 @@ public class WcsMarshaller {
 
             TimePositionType beginTimePosition = new TimePositionType();
             // attribute called frame seems like right place to put ISO-8601 timestamp
-            beginTimePosition.setFrame("2016-01-01T00:30:00.000Z");
+            String beginTimeStr = "2016-01-01T00:30:00.000Z";
+            beginTimePosition.setFrame(beginTimeStr);
             // However, it can also be specified as below.
-            List<String> timeStrings = Arrays.asList("2016-01-01T00:30:00.000Z");
+            List<String> timeStrings = Arrays.asList(beginTimeStr);
             beginTimePosition.setValue(timeStrings);
             envelope.setBeginPosition(beginTimePosition);
 
             TimePositionType endTimePosition = new TimePositionType();
-            endTimePosition.setFrame("2016-02-01T00:00:00.000Z");
+            String endTimeStr = "2016-02-01T00:00:00.000Z";
+            endTimePosition.setFrame(endTimeStr);
+            // However, it can also be specified as below.
+            timeStrings = Arrays.asList(beginTimeStr);
+            endTimePosition.setValue(timeStrings);
             envelope.setEndPosition(endTimePosition);
 
             // it is obvious from method signature of setBoundedBy in
