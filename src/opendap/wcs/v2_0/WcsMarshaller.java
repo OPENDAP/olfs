@@ -79,7 +79,6 @@ public class WcsMarshaller {
     protected List<Field> fields;
     
     // FIXME Add a logger to this class. jhrg 9/6/17
-	
     public WcsMarshaller(Element dmr) {
 
         try {
@@ -154,11 +153,13 @@ public class WcsMarshaller {
                 // runtime dependence on saxon9-jdom.jar library
                 // OK...since this is just sanity check
                 // all we really need is the DOM which has already been marshaled above
+                /* FIXME: The code in comment block doesn't work but should. It complains that saxon9-dom.jar is not available
                 TransformerFactory tf = TransformerFactory.newInstance();
                 Transformer t = tf.newTransformer();
                 DOMSource source = new DOMSource(document0);
                 StreamResult result = new StreamResult(System.out);
                 t.transform(source, result);
+                */
                 // End Sanity Test
 
                 ////////////////////////////
