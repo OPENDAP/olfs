@@ -62,6 +62,8 @@ import opendap.dap4.XMLReaderWithNamespaceInMyPackageDotInfo;
 import opendap.threddsHandler.*;
 
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 
 /**
@@ -101,10 +103,8 @@ public class WcsMarshaller {
             JAXBContext jc = JAXBContext.newInstance(Dataset.class);
             Unmarshaller um = jc.createUnmarshaller();
             try {
-                ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
-
-                // org.jdom.Document dmr = tcc.getDocument(dmrUrl);
-                String dmrXml = tcc.getXmlo().outputString(dmr);
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                String dmrXml = xmlo.outputString(dmr);
                 InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
                 XMLInputFactory factory = XMLInputFactory.newInstance();
                 XMLStreamReader xsr = factory.createXMLStreamReader(is);
@@ -931,9 +931,12 @@ public class WcsMarshaller {
         try {
             String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
 
-            Element dmr = opendap.xml.Util.getDocumentRoot(testDmrUrl);
+            ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
+            Element dmrElement = dmrDoc.getRootElement();
+            dmrElement.detach();
 
-            WcsMarshaller wcs = new WcsMarshaller(dmr);
+            WcsMarshaller wcsMarshy = new WcsMarshaller(dmrElement);
         }
         catch (Throwable t) {
             t.printStackTrace();
