@@ -555,7 +555,7 @@ public class WcsMarshaller {
             List<String> axisLabelsAsList = Arrays.asList("latitude longitude");
             envelope.setAxisLabels(axisLabelsAsList);
 
-            List<String> uomLabelsAsList = Arrays.asList("time deg deg");
+            List<String> uomLabelsAsList = Arrays.asList("deg deg");
             envelope.setUomLabels(uomLabelsAsList);
 
             envelope.setSrsDimension(new BigInteger("2"));
