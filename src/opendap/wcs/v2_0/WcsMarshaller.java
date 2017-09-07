@@ -902,6 +902,7 @@ public class WcsMarshaller {
     public static void main(String[] args) {
         try {
             String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
+            testDmrUrl="http://test.opendap.org/opendap/testbed-13/MERRA2_100.tavgM_2d_int_Nx.198001.nc4.dmr.xml";
 
             ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
             org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
