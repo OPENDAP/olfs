@@ -113,6 +113,7 @@ public class WcsMarshaller {
                 dataset = (Dataset) um.unmarshal(xr);
             }
             catch (Exception e) {
+            	// FIXME Write this to a log, not stderr or stdout. jhrg 9/7/17
                 System.err.println(e);
                 // System.err.println("URL : " + dmrUrl);
                 System.err.println("could not be resolved into a Dataset, please check access");
