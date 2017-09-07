@@ -1,6 +1,7 @@
 package opendap.wcs.v2_0;
 
 import opendap.namespaces.XML;
+import opendap.threddsHandler.ThreddsCatalogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -109,9 +110,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
     // Sanity Check
     public static void main(String[] args) {
 
-        String testDatasetUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4";
+        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
+
         try {
-            CoverageDescription cd = new DynamicCoverageDescription(testDatasetUrl);
+            ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
+            Element dmrElement = dmrDoc.getRootElement();
+            dmrElement.detach();
+            CoverageDescription cd = new DynamicCoverageDescription(dmrElement);
+
+            System.out.println(cd.toString());
         }
         catch (Throwable t){
             t.printStackTrace();
