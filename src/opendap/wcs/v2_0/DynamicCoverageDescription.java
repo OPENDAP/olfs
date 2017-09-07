@@ -4,6 +4,8 @@ import opendap.namespaces.XML;
 import opendap.threddsHandler.ThreddsCatalogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +111,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     // Sanity Check
     public static void main(String[] args) {
-
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
 
         try {
@@ -119,7 +121,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
             dmrElement.detach();
             CoverageDescription cd = new DynamicCoverageDescription(dmrElement);
 
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.println(cd.toString());
+            xmlo.output(cd.getCoverageDescriptionElement(),System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+            xmlo.output(cd.getCoverageSummary(),System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
         }
         catch (Throwable t){
             t.printStackTrace();

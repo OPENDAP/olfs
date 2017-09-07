@@ -602,32 +602,32 @@
 
 
 
-    <!-- *******************************************************
+    <target  name="WcsMarshaller" depends="compile">
 
-            Semantic Web targets
-
-    -->
-
-    <target  name="test" depends="compile">
-
-        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
-        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${build.resources}/WEB-INF/logback-test.xml"  tofile="${build.run}/logback-test.xml"/>
-
-        <java classname="opendap.semantics.wcs.StaticRdfCatalog"
+        <java classname="opendap.wcs.v2_0.WcsMarshaller"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
-                >
-            <classpath refid="compile.classpath"/>
-            <arg value="${CONFIG_FILE}"/>
+        >
+            <classpath refid="compile.classpath" />
         </java>
 
     </target>
-    
-    
-    
-    
+
+
+    <target  name="DynamicCoverageDescription" depends="compile">
+
+        <java classname="opendap.wcs.v2_0.DynamicCoverageDescription"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+        >
+            <classpath refid="compile.classpath" />
+        </java>
+
+    </target>
+
+
     <target name="merra2wcs" depends="clean,init">
     	
     	<!-- 
@@ -690,17 +690,6 @@
 
 
 
-    <target  name="WcsMarshaller" depends="compile">
-
-        <java classname="opendap.wcs.v2_0.WcsMarshaller"
-              fork="true"
-              maxmemory="1024m"
-              dir="${build.run}"
-        >
-            <classpath refid="compile.classpath" />
-        </java>
-
-    </target>
 
 
 
