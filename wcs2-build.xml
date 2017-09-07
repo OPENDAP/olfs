@@ -319,8 +319,6 @@
                 <!-- include all the WCS 2.0 java files -->
                 <include name="opendap/wcs/v2_0/**/*.java"/>
                 
-   
-                
                 <!-- include name="opendap/semantics/**/*.java"/ -->
                 
                 <include name="opendap/bes/BESManager.java"/>
@@ -356,11 +354,8 @@
                 <include name="opendap/ppt/PPTSessionProtocol.java"/>
                 <include name="opendap/ppt/PPTEndOfStreamException.java"/>
 
-                <include name="opendap/dap4/QueryParameters.java"/>
-                <include name="opendap/dap4/Dap4Error.java"/>
-                <exclude name="opendap/dap4/Dap4Service.java"/>
-
                 <!-- include DAP4 stuff -->
+                <exclude name="opendap/dap4/Dap4Service.java"/>
                 <include name="opendap/dap4/**/*.java" />
 
                 <include name="opendap/coreServlet/DocServlet.java"/>
@@ -542,6 +537,17 @@
 
 	            <include name="${owlim.lib}"/>
                 <include name="${openrdf-sesame.lib}"/>
+
+
+                <include name="${ogc-wcs.lib}"/>
+                <include name="${ogc-gml.lib}"/>
+                <include name="${ogc-swe.lib}"/>
+                <include name="${ogc-gmlcov.lib}"/>
+                <include name="${ogc-ows.lib}"/>
+                <include name="${ogc-jaxb.lib}"/>
+                <include name="${jaxb-core.lib}"/>
+                <include name="${jaxb-impl.lib}"/>
+                <include name="${xlink.lib}"/>
 
             </lib>
             <classes dir="${build.classes}"/>
