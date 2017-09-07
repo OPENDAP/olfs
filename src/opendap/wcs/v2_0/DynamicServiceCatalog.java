@@ -235,10 +235,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
         return getCoverageDescription(coverageId).getCoverageDescriptionElement();
     }
 
+
     @Override
     public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException {
         CoverageDescription cDesc = getCoverageDescription(coverageId);
         if(cDesc!=null){
+
+            return cDesc.getCoverageSummary();
+            /*
             Element covSum = new Element("CoverageSummary",WCS.WCS_NS);
             Element coverageID = cDesc.getCoverageIdElement();
             covSum.addContent(coverageID);
@@ -246,6 +250,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             covSum.addContent(coverageSubtype);
             coverageSubtype.addContent(cDesc.getCoverageDescriptionElement());
             return covSum;
+            */
         }
         return null;
     }

@@ -118,7 +118,7 @@ public class Util {
 
         log.debug("Retrieving XML Document: "+docUrlString);
 
-        if(docUrlString.startsWith("http://")){
+        if(docUrlString.startsWith("http://") || docUrlString.startsWith("https://")){
             URL docUrl = new URL(docUrlString);
             log.debug("Document URL INFO: \n"+getUrlInfo(docUrl));
             doc = sb.build(docUrl);
