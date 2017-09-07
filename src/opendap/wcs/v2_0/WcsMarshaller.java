@@ -918,7 +918,8 @@ public class WcsMarshaller {
             // or off at run-time. jhrg 9/6/17
             System.out.println(jdoc.getRootElement());
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Unable to marshal field " + e);
         }
 
@@ -933,7 +934,8 @@ public class WcsMarshaller {
             Element dmr = opendap.xml.Util.getDocumentRoot(testDmrUrl);
 
             WcsMarshaller wcs = new WcsMarshaller(dmr);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             t.printStackTrace();
         }
     }
