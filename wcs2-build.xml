@@ -690,6 +690,18 @@
 
 
 
+    <target  name="WcsMarshaller" depends="compile">
+
+        <java classname="opendap.wcs.v2_0.WcsMarshaller"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+        >
+            <classpath refid="compile.classpath" />
+        </java>
+
+    </target>
+
 
 
     <!-- *******************************************************  -->
