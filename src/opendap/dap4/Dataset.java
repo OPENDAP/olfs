@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.*;
  */
 @XmlRootElement (name="Dataset")
 public class Dataset {
-	
+
+	// FIXME: chanage the name from "coverageId" to "name" and modify setter and getter accodingly.
 	private String coverageId = "";
 	private String url = "";
 	

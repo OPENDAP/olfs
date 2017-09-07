@@ -32,14 +32,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
         setDapDatasetUrl(new URL(datasetUrl));
 
 
+
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
          *  TODO:  Replace this stuff with the output of WcsMarchaller
          */
+        /*
         _myCD =  new Element("CoverageDescription",WCS.WCS_NS);
         Element coverageId =  new Element("CoverageId",WCS.WCS_NS);
         String name = _myDMR.getAttributeValue("name");
         coverageId.setText(name);
         _myCD.addContent(coverageId);
+        */
+
+        WcsMarshaller wcs = new WcsMarshaller(dmr);
+        _myCD = wcs._myCD;
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
