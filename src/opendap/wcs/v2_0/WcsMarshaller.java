@@ -67,18 +67,19 @@ import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 
 /**
- * Marshalling WCS coverage description per OGC 
+ * Marshalling WCS coverage description per OGC
  * for sample MERRA
- * @author ukari
  *
+ * @author ukari
  */
 public class WcsMarshaller {
 
     protected Element _myCD;
     protected LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
     protected List<Field> fields;
-    
+
     // FIXME Add a logger to this class. jhrg 9/6/17
+
     public WcsMarshaller(Element dmr) {
 
         try {
@@ -110,9 +111,8 @@ public class WcsMarshaller {
                 XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
 
                 dataset = (Dataset) um.unmarshal(xr);
-            }
-            catch (Exception e) {
-            	// FIXME Write this to a log, not stderr or stdout. jhrg 9/7/17
+            } catch (Exception e) {
+                // FIXME Write this to a log, not stderr or stdout. jhrg 9/7/17
                 System.err.println(e);
                 // System.err.println("URL : " + dmrUrl);
                 System.err.println("could not be resolved into a Dataset, please check access");
@@ -125,15 +125,20 @@ public class WcsMarshaller {
 
             // First Loop through the variables to glean "knowledge"
 
+            // FIXME Test the null condition above in the try/catch block and exit there
+            // with an exception the WCS service code can catch and process. Doing that
+            // will also reduce one level of nesting down here. jhrg 9/7/17
             if (dataset == null) {
                 System.out.println("DMR dataset....NULL; bye-bye");
                 System.exit(0);
-            }
-            else {
+            } else {
                 //////////////////////////////////////////////////////////
                 // this else block extends all the way to almost
                 // end of program with brace commented with }
                 // end if (dataset==null)
+
+                // FIXME If you need this, put it in a method and call it when the logger is
+                // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
 
                 System.out.println("Marshalling WCS from DMR at Url: ");
                 System.out.println(dataset.getUrl());
@@ -169,18 +174,15 @@ public class WcsMarshaller {
 
                 if (dimensions == null) {
                     System.out.println("Dimensions List NULL");
-                }
-                else
-                    if (dimensions.size() == 0) {
-                        System.out.println("Dimensions list EMPTY");
+                } else if (dimensions.size() == 0) {
+                    System.out.println("Dimensions list EMPTY");
+                } else {
+                    ListIterator dimIter = dimensions.listIterator();
+                    // we know it is non-null and non-empty, so safe to do this right away
+                    while (dimIter.hasNext()) {
+                        System.out.println(dimIter.nextIndex() + ". " + dimIter.next());
                     }
-                    else {
-                        ListIterator dimIter = dimensions.listIterator();
-                        // we know it is non-null and non-empty, so safe to do this right away
-                        while (dimIter.hasNext()) {
-                            System.out.println(dimIter.nextIndex() + ". " + dimIter.next());
-                        }
-                    } // close if then else (dimensions list is non-null and has elements)
+                } // close if then else (dimensions list is non-null and has elements)
 
                 ////////////
                 // Echo Floats, Ints, just for testing
@@ -193,8 +195,7 @@ public class WcsMarshaller {
 
                 if (float32s == null || float32s.isEmpty()) {
                     // do nothing
-                }
-                else {
+                } else {
                     ListIterator<Float32> it = float32s.listIterator();
                     while (it.hasNext()) {
                         int ind = it.nextIndex();
@@ -207,8 +208,7 @@ public class WcsMarshaller {
 
                         if (dims == null || dims.isEmpty()) {
                             // do nothing
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Dim> dit = dims.listIterator();
                             while (dit.hasNext()) {
@@ -226,8 +226,7 @@ public class WcsMarshaller {
 
                         if (attrs == null || attrs.isEmpty()) {
                             System.out.println("Float 32 has not attributes..??");
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Attribute> atit = attrs.listIterator();
                             while (atit.hasNext()) {
@@ -242,13 +241,12 @@ public class WcsMarshaller {
 
                     } // end while floats32 iterator has more elements
                 } // if elseif else (Float32 is not NULL or empty)
-       	
+
                 // float 64
 
                 if (float64s == null || float64s.isEmpty()) {
                     // do nothing
-                }
-                else {
+                } else {
                     ListIterator<Float64> it = float64s.listIterator();
                     while (it.hasNext()) {
                         int ind = it.nextIndex();
@@ -261,8 +259,7 @@ public class WcsMarshaller {
 
                         if (dims == null || dims.isEmpty()) {
                             // do nothing
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Dim> dit = dims.listIterator();
                             while (dit.hasNext()) {
@@ -280,8 +277,7 @@ public class WcsMarshaller {
 
                         if (attrs == null || attrs.isEmpty()) {
                             System.out.println("Float 64 has not attributes..??");
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Attribute> atit = attrs.listIterator();
                             while (atit.hasNext()) {
@@ -301,8 +297,7 @@ public class WcsMarshaller {
 
                 if (int32s == null || int32s.isEmpty()) {
                     // do nothing
-                }
-                else {
+                } else {
                     ListIterator<Int32> it = int32s.listIterator();
                     while (it.hasNext()) {
                         int ind = it.nextIndex();
@@ -315,8 +310,7 @@ public class WcsMarshaller {
 
                         if (dims == null || dims.isEmpty()) {
                             // do nothing
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Dim> dit = dims.listIterator();
                             while (dit.hasNext()) {
@@ -334,8 +328,7 @@ public class WcsMarshaller {
 
                         if (attrs == null || attrs.isEmpty()) {
                             System.out.println("Int 32 has not attributes..??");
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Attribute> atit = attrs.listIterator();
                             while (atit.hasNext()) {
@@ -355,8 +348,7 @@ public class WcsMarshaller {
 
                 if (int64s == null || int64s.isEmpty()) {
                     // do nothing
-                }
-                else {
+                } else {
                     ListIterator<Int64> it = int64s.listIterator();
                     while (it.hasNext()) {
                         int ind = it.nextIndex();
@@ -369,8 +361,7 @@ public class WcsMarshaller {
 
                         if (dims == null || dims.isEmpty()) {
                             // do nothing
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Dim> dit = dims.listIterator();
                             while (dit.hasNext()) {
@@ -388,8 +379,7 @@ public class WcsMarshaller {
 
                         if (attrs == null || attrs.isEmpty()) {
                             System.out.println("Int 64 has not attributes..??");
-                        }
-                        else {
+                        } else {
 
                             ListIterator<Attribute> atit = attrs.listIterator();
                             while (atit.hasNext()) {
@@ -415,113 +405,100 @@ public class WcsMarshaller {
 
                 if (containerAttributes == null) {
                     System.out.println("Container Attribute List NULL");
-                }
-                else
-                    if (containerAttributes.size() == 0) {
-                        System.out.println("Container Attribute list EMPTY");
-                    }
-                    else {
-                        ListIterator<ContainerAttribute> it = containerAttributes.listIterator();
-                        // test for conventions
-                        boolean foundConvention = false;
-                        boolean cfCompliant = false;
-                        while (it.hasNext()) {
+                } else if (containerAttributes.size() == 0) {
+                    System.out.println("Container Attribute list EMPTY");
+                } else {
+                    ListIterator<ContainerAttribute> it = containerAttributes.listIterator();
+                    // test for conventions
+                    boolean foundConvention = false;
+                    boolean cfCompliant = false;
+                    while (it.hasNext()) {
 
-                            boolean foundGlobal = false;
+                        boolean foundGlobal = false;
 
-                            int index = it.nextIndex();
-                            ContainerAttribute containerAttribute = it.next();
+                        int index = it.nextIndex();
+                        ContainerAttribute containerAttribute = it.next();
 
-                            System.out.println(index + " " + containerAttribute);
+                        System.out.println(index + " " + containerAttribute);
 
-                            String ca_name = containerAttribute.getName();
-                            if (ca_name == null || ca_name.trim().length() == 0) {
-                                // do nothing
-                                System.out.println("Container attribute name NULL or empty");
-                            }
-                            else
-                                if (ca_name.contains("convention")) {
-                                    System.out.println("Found container attribute named convention(s)");
-                                    foundConvention = true;
-                                } // this will find plural conventions
-                                else
-                                    if (ca_name.endsWith("_GLOBAL") || ca_name.equals("DODS_EXTRA")) {
+                        String ca_name = containerAttribute.getName();
+                        if (ca_name == null || ca_name.trim().length() == 0) {
+                            // do nothing
+                            System.out.println("Container attribute name NULL or empty");
+                        } else if (ca_name.contains("convention")) {
+                            System.out.println("Found container attribute named convention(s)");
+                            foundConvention = true;
+                        } // this will find plural conventions
+                        else if (ca_name.endsWith("_GLOBAL") || ca_name.equals("DODS_EXTRA")) {
+                            System.out.println(
+                                    "Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+                            System.out.println("Looking for conventions...attribute");
+
+                            foundGlobal = true;
+                        }
+
+                        // now enumerate all attributes of the "container" attribute
+
+                        List<Attribute> attributes = containerAttribute.getAttributes();
+
+                        if (attributes == null) {
+                            System.out.println(">> Attribute List NULL");
+                        } else if (attributes.size() == 0) {
+                            System.out.println(">> Attribute list EMPTY");
+                        } else {
+                            ListIterator<Attribute> attr_iterator = attributes.listIterator();
+
+                            while (attr_iterator.hasNext()) {
+
+                                Attribute a = attr_iterator.next();
+                                int ai = attr_iterator.nextIndex();
+                                System.out.println(index + "." + ai + " " + a);
+
+                                if (foundGlobal) {
+                                    // test for conventions
+
+                                    String a_name = a.getName();
+
+                                    if (a_name == null || a_name.trim().length() == 0) {
+                                        // no action
+                                        System.out.println("Attribute has no name??");
+                                    } else if (a_name.toLowerCase().contains("convention")) {
+                                        foundConvention = true;
+
+                                        String a_value = a.getValue();
+
                                         System.out.println(
-                                                "Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-                                        System.out.println("Looking for conventions...attribute");
+                                                "Found attribute named convention(s), value = " + a_value);
 
-                                        foundGlobal = true;
+                                        if (a_value.contains("CF-")) {
+                                            cfCompliant = true;
+                                            System.out.println("Dataset is CF Compliant!!");
+                                        }
+
                                     }
 
-                            // now enumerate all attributes of the "container" attribute
+                                } // end Found Global, now look at its attributes
 
-                            List<Attribute> attributes = containerAttribute.getAttributes();
+                            } // end while attribute iterator has next
 
-                            if (attributes == null) {
-                                System.out.println(">> Attribute List NULL");
-                            }
-                            else
-                                if (attributes.size() == 0) {
-                                    System.out.println(">> Attribute list EMPTY");
-                                }
-                                else {
-                                    ListIterator<Attribute> attr_iterator = attributes.listIterator();
+                        } // end if - else if - else (attributes List is NOT NULL or EMPTY)
 
-                                    while (attr_iterator.hasNext()) {
+                    } // end while (containerAttributes has elements) LOOP
 
-                                        Attribute a = attr_iterator.next();
-                                        int ai = attr_iterator.nextIndex();
-                                        System.out.println(index + "." + ai + " " + a);
-
-                                        if (foundGlobal) {
-                                            // test for conventions
-
-                                            String a_name = a.getName();
-
-                                            if (a_name == null || a_name.trim().length() == 0) {
-                                                // no action
-                                                System.out.println("Attribute has no name??");
-                                            }
-                                            else
-                                                if (a_name.toLowerCase().contains("convention")) {
-                                                    foundConvention = true;
-
-                                                    String a_value = a.getValue();
-
-                                                    System.out.println(
-                                                            "Found attribute named convention(s), value = " + a_value);
-
-                                                    if (a_value.contains("CF-")) {
-                                                        cfCompliant = true;
-                                                        System.out.println("Dataset is CF Compliant!!");
-                                                    }
-
-                                                }
-
-                                        } // end Found Global, now look at its attributes
-
-                                    } // end while attribute iterator has next
-
-                                } // end if - else if - else (attributes List is NOT NULL or EMPTY)
-
-                        } // end while (containerAttributes has elements) LOOP
-
-                        if (foundConvention) {
-                            if (cfCompliant) {
-                                // already announced success
-                            }
-                            else {
-                                System.out.println("Found GLOBAL Convention but may not be CF compliant...ERROR");
-                            }
+                    if (foundConvention) {
+                        if (cfCompliant) {
+                            // already announced success
+                        } else {
+                            System.out.println("Found GLOBAL Convention but may not be CF compliant...ERROR");
                         }
-                        else {
-                            System.out.println("No conventions found...ERROR");
-                        }
+                    } else {
+                        System.out.println("No conventions found...ERROR");
+                    }
 
-                    } // end if - else if - else (CONTAINER attributes List is NOT NULL or EMPTY)
+                } // end if - else if - else (CONTAINER attributes List is NOT NULL or EMPTY)
 
             } // end if (dataset == null) else { // do everything 	    
-  	    
+
             //////////////////////////////////////////////////
             // Start WCS CoverageDescription..
             // the OLFS functions from a JDOM wrapper to this
@@ -534,40 +511,40 @@ public class WcsMarshaller {
             cd.setId(dataset.getCoverageId());
 
             ////////////////////////////////////////////////////////////////////////////////////
-	    // Envelope with Time Period:  
-	    // lowerCorner, UpperCorner and Time Position
-	    // The ability to reflect time period is most important difference between WCS and other mapping services like WFS
-	    // May or may not find these in the attributes in DMR
-	    // look for camelCase NorthernMostLatitude, SouthernMostLatitude etc - in global attribute in the bottom of the file
-	    // not CF- names (Nathan: too bad we do not have the range function rolled out yet, but when we do will be helpful)
-	    // look at netCDF attribute convention for dataset discovery page (out-of-date and/or may be subsumed into CF-16)
-	    // while "SouthernMostLatitude" doed not exist in any standard..."SouthernMost [space] Latitude" does ... in some form
-	    // Also: instead of lookingt at the attributes (metadata), can perhaps derive from dataset values themselves...may be too complicated
-	    // so...for version #1: we will NOT look at anywhere other than attributes to get...this spatial temporal envelope
-	    // also punt on the SRS - use the entire global if nothing else specified.
-	    // Build up a list of candidate attribute names, look for this in particular variable and also the global attributes
-	    // Variables have shared dimensions specified, but defined typically at the top of the dataset, but could be referencing somewhere else
-	    // Absolutely can trust what is in the DMR, but instead of repeating - they shove them at the end as global attributes
-	    // There are other reasons for being global as well. For instance everyone of these variables have the same longitude and latitude 
-	    // so instead of repeating, they just put them down with global specs.  
-	    // Hence the RULE: look into local variable for lat/long of envelope, and barring that look in the global attributes, and if not even there skip envelope definition
-	    // Look for any attribute whose name contains "Southern", "Southern Most" - pretty hokey!
-	    // Look at container - NC_GLOBAL.  Value of conventions is CF-1.  For all practical - standard.
-	    // 
-	    // For time - compute timestamp using minutes value since 1980. Hard to suss out but doable.  Formulate a DAP URL and request that. 
-	    // WHOLE LOT MORE RELIABLE than parsing attributes (which could just be wrong): reading data from the file DAP style for lat, long of envelope as well. 
-	    // Can write quick test for monotonic increasing, rectified grid etc.
-	    // should we make new server function - rather than doing java.  Range along will be a huge improvement.
-	    // RULE for "what is the envelope?" would be to use does-not-quite exist yet RANGE function and possibly other server functions
-	    // so...very little point in doing this in java - since this too far from the data itself.
-	    // There is a range function in server - in master branch.  "function_result_fnoc1.nc" - totally works. Not in testbest13 yet. produces illegal output, buggy(?)
-	    // For range (will not fix now), BOTTOM LINE, do multiple invocations, get values back ... and do stuff
-	    //  get them back as data, or ASCII and parse it
-	    // James: You can EITHER formulate a URL that calls this range function to return a DAP dataset, extract value of DAP dataset and work with them, OR 
-	    // OR get ASCII (advantage being no need for importing DAP classes to construct DAP Data Response object...this is the way to go since not big)
-	    // For time, need to know it is one-dimensional, get a Float 64 number - minutes since - ISO string - need to further process
-	    // 
-        
+            // Envelope with Time Period:
+            // lowerCorner, UpperCorner and Time Position
+            // The ability to reflect time period is most important difference between WCS and other mapping services like WFS
+            // May or may not find these in the attributes in DMR
+            // look for camelCase NorthernMostLatitude, SouthernMostLatitude etc - in global attribute in the bottom of the file
+            // not CF- names (Nathan: too bad we do not have the range function rolled out yet, but when we do will be helpful)
+            // look at netCDF attribute convention for dataset discovery page (out-of-date and/or may be subsumed into CF-16)
+            // while "SouthernMostLatitude" doed not exist in any standard..."SouthernMost [space] Latitude" does ... in some form
+            // Also: instead of lookingt at the attributes (metadata), can perhaps derive from dataset values themselves...may be too complicated
+            // so...for version #1: we will NOT look at anywhere other than attributes to get...this spatial temporal envelope
+            // also punt on the SRS - use the entire global if nothing else specified.
+            // Build up a list of candidate attribute names, look for this in particular variable and also the global attributes
+            // Variables have shared dimensions specified, but defined typically at the top of the dataset, but could be referencing somewhere else
+            // Absolutely can trust what is in the DMR, but instead of repeating - they shove them at the end as global attributes
+            // There are other reasons for being global as well. For instance everyone of these variables have the same longitude and latitude
+            // so instead of repeating, they just put them down with global specs.
+            // Hence the RULE: look into local variable for lat/long of envelope, and barring that look in the global attributes, and if not even there skip envelope definition
+            // Look for any attribute whose name contains "Southern", "Southern Most" - pretty hokey!
+            // Look at container - NC_GLOBAL.  Value of conventions is CF-1.  For all practical - standard.
+            //
+            // For time - compute timestamp using minutes value since 1980. Hard to suss out but doable.  Formulate a DAP URL and request that.
+            // WHOLE LOT MORE RELIABLE than parsing attributes (which could just be wrong): reading data from the file DAP style for lat, long of envelope as well.
+            // Can write quick test for monotonic increasing, rectified grid etc.
+            // should we make new server function - rather than doing java.  Range along will be a huge improvement.
+            // RULE for "what is the envelope?" would be to use does-not-quite exist yet RANGE function and possibly other server functions
+            // so...very little point in doing this in java - since this too far from the data itself.
+            // There is a range function in server - in master branch.  "function_result_fnoc1.nc" - totally works. Not in testbest13 yet. produces illegal output, buggy(?)
+            // For range (will not fix now), BOTTOM LINE, do multiple invocations, get values back ... and do stuff
+            //  get them back as data, or ASCII and parse it
+            // James: You can EITHER formulate a URL that calls this range function to return a DAP dataset, extract value of DAP dataset and work with them, OR
+            // OR get ASCII (advantage being no need for importing DAP classes to construct DAP Data Response object...this is the way to go since not big)
+            // For time, need to know it is one-dimensional, get a Float 64 number - minutes since - ISO string - need to further process
+            //
+
             // EnvelopeWithTimePeriodType is part of GML
             net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -698,7 +675,7 @@ public class WcsMarshaller {
 
             net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
             net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-        
+
             // NASA guys - Plus or Minus Fill values. Vmin, Vmax. Reasonable gambit - to ask
             // variable for max and min. Say - give me range for hour, no rain?
             // get actual max and min.
@@ -751,123 +728,114 @@ public class WcsMarshaller {
             serviceParameters.setNativeFormat("application/vnd.opendap.dap4.data");
 
             cd.setServiceParameters(serviceParameters);
-        
-	    //////////////////////////////
-	    // OK - push this on stack (edge cases)
-	    // difference between field and coverages
-	    // without field - coverage meaningless
-	    // Data set could have Multiple arrays - not same coverage
-	    // All MERRA - single coverage inside individual dataset
-	    // Not Testbed-13 anymore
-	    // Need then to characterize them with shared dimensions
-	    
-	    // 
-	    // if have multiple fields.
-	    // Simpler set of conditions. Ignore cases where there are multiple shared dimensions or even no shared dimensions. DAP dataset could be a field in a coverage
-	    // but since they have different envelopes, different (separate coverages)
-	    // For now - assume same envelope.  But look for and detect when fields may not be and in those cases 
-	    // say we will not support this dataset right now. 
-	    
-	    // Make a list to come back to later - Punt on 
-	    // Multiple fields can be automated - not multiple coverages. 
-	    // Datasets that are not WGS 84
-	    // 
-	    // Need to have a loop written to generate different coverage descriptions for different DMRs 
-	    
-	    // first set coverageID = get from DMR name attribute of root element
-	    // for every variable in DMR. 
-        
-	    try {
-	        // Boiler plate JAXB marshaling of Coverage Description object into JDOM
-		    
-		    ////////////////////////////////////////////////////////
-		    // Since this was generated from third-party XML schema 
-		    // need to bootstrap the JAXBContext 
-		    // from the package name of the generated model 
-		    // or the ObjectFactory class
-		    // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
-		    
-		    // Required: First, bootstrap context with known WCS package name
-		    JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
-		    Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-		    
-		    // optional:  output "pretty printed"
-		    jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		    
-		    // optional: this is a list of the schema definitions. 
-		    jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-					       "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
-					       "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
-					       "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd "+
-					       "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
-		    
-		    // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
-		    try 
-			{
-			    //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
-			    jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
-			    
-			} 
-		    catch(PropertyException e) 
-			{
-			    System.out.println("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used");
-			    System.out.println("...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc : " + e);
-			}
-		    
-		    
-		    //////////////////////////////////////////////////////////////////////////////////////
-		    // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
-		    // method#1:  need to wrap CoverageDescription as JAXB element
-		    // marshal coverage description into console (more specifically, System.out)
-		    jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0","wcs"), 
-                    CoverageDescriptionType.class, cd),  System.out);
-		    
-		    // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly 
-		    
-		    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		    dbf.setNamespaceAware(true);
-		    DocumentBuilder db = dbf.newDocumentBuilder();
-		    Document doc = db.newDocument(); 
-		    
-		    
-		    //////////////////////////////////////////////////////////////////////////////////////////
-		    // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
-		    // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
-		    // marshal coverage description into a org.w3c.dom.Document...first 
-		    
-		    // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on 
-		    // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
-		    net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-		    jaxbMarshaller.marshal( wcsObjFactory.createCoverageDescription(cd), doc ); 
-		    org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-		    org.jdom.Document jdoc = jdb.build(doc);
-		    
-		    // gotcha!  This is what integrates into OLFS (mostly).  
-		    // The rest of CoverageDescription object can be derive from whatever has been captured so far
-		    // or from _myCD (TODO).
-		    
-		    _myCD = jdoc.getRootElement();
-		    
-		    
-		    // couple of quick sanity checks
-		    System.out.println(_myCD);
-		    Element coverageId =  _myCD.getChild("CoverageId",WCS.WCS_NS);
-		    System.out.println( coverageId.getText());
-		} 
-	    catch (JAXBException e) 
-		{
-		    e.printStackTrace();
-		}
-	    
-	}
-	catch (Exception e)  {
-		System.out.println("WcsMarshaller Constructor Fail: " + e);
-	}
-	
+
+            //////////////////////////////
+            // OK - push this on stack (edge cases)
+            // difference between field and coverages
+            // without field - coverage meaningless
+            // Data set could have Multiple arrays - not same coverage
+            // All MERRA - single coverage inside individual dataset
+            // Not Testbed-13 anymore
+            // Need then to characterize them with shared dimensions
+
+            //
+            // if have multiple fields.
+            // Simpler set of conditions. Ignore cases where there are multiple shared dimensions or even no shared dimensions. DAP dataset could be a field in a coverage
+            // but since they have different envelopes, different (separate coverages)
+            // For now - assume same envelope.  But look for and detect when fields may not be and in those cases
+            // say we will not support this dataset right now.
+
+            // Make a list to come back to later - Punt on
+            // Multiple fields can be automated - not multiple coverages.
+            // Datasets that are not WGS 84
+            //
+            // Need to have a loop written to generate different coverage descriptions for different DMRs
+
+            // first set coverageID = get from DMR name attribute of root element
+            // for every variable in DMR.
+
+            try {
+                // Boiler plate JAXB marshaling of Coverage Description object into JDOM
+
+                ////////////////////////////////////////////////////////
+                // Since this was generated from third-party XML schema
+                // need to bootstrap the JAXBContext
+                // from the package name of the generated model
+                // or the ObjectFactory class
+                // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
+
+                // Required: First, bootstrap context with known WCS package name
+                JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
+                Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+                // optional:  output "pretty printed"
+                jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+                // optional: this is a list of the schema definitions.
+                jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                        "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
+                                "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
+                                "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd " +
+                                "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
+
+                // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
+                try {
+                    //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
+                    jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
+
+                } catch (PropertyException e) {
+                    System.out.println("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used");
+                    System.out.println("...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc : " + e);
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////
+                // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
+                // method#1:  need to wrap CoverageDescription as JAXB element
+                // marshal coverage description into console (more specifically, System.out)
+                jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0", "wcs"),
+                        CoverageDescriptionType.class, cd), System.out);
+
+                // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
+
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setNamespaceAware(true);
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                Document doc = db.newDocument();
+
+                //////////////////////////////////////////////////////////////////////////////////////////
+                // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
+                // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
+                // marshal coverage description into a org.w3c.dom.Document...first
+
+                // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on
+                // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
+                net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
+                jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
+                org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
+                org.jdom.Document jdoc = jdb.build(doc);
+
+                // gotcha!  This is what integrates into OLFS (mostly).
+                // The rest of CoverageDescription object can be derive from whatever has been captured so far
+                // or from _myCD (TODO).
+
+                _myCD = jdoc.getRootElement();
+
+                // couple of quick sanity checks
+                System.out.println(_myCD);
+                Element coverageId = _myCD.getChild("CoverageId", WCS.WCS_NS);
+                System.out.println(coverageId.getText());
+            } catch (JAXBException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            System.out.println("WcsMarshaller Constructor Fail: " + e);
+        }
+
     }
-    
+
     private Field getField(opendap.dap4.Variable var) {
-	
+
         String name = var.getName();
         List<opendap.dap4.Attribute> attributes = var.getAttributes();
         Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
@@ -924,15 +892,13 @@ public class WcsMarshaller {
             // or off at run-time. jhrg 9/6/17
             System.out.println(jdoc.getRootElement());
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Unable to marshal field " + e);
         }
 
         return field;
-    }   
-  
-  
+    }
+
     public static void main(String[] args) {
         try {
             String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
