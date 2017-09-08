@@ -36,6 +36,7 @@ import java.util.*;
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
+    private SimpleSrs _defaultSrs;
 
     public DynamicCoverageDescription() {
         super();
@@ -49,9 +50,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param dmr
      * @throws IOException
      */
-    public DynamicCoverageDescription(Element dmr) throws IOException, WcsException {
+    public DynamicCoverageDescription(Element dmr, SimpleSrs defaultSrs) throws IOException, WcsException {
         this();
         _myDMR = dmr;
+
+        if(defaultSrs==null)
+            throw new WcsException("There must be a default SRS for the coverage!",WcsException.NO_APPLICABLE_CODE);
+        _defaultSrs = defaultSrs;
+
         // TODO: Get the dataset URL from the DMR top level attribute "xml:base"
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
         setDapDatasetUrl(new URL(datasetUrl));
@@ -514,7 +520,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
             Element dmrElement = dmrDoc.getRootElement();
             dmrElement.detach();
-            CoverageDescription cd = new DynamicCoverageDescription(dmrElement);
+
+            SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326","latitude longitude","deg deg",2);
+            CoverageDescription cd = new DynamicCoverageDescription(dmrElement,defaultSrs);
 
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.println("RESULT: " + cd.toString());
@@ -598,15 +606,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
         // both are equivalent spatial reference systems for the ENTIRE globe
-        envelope.setSrsName("urn:ogc:def:crs:EPSG::4326");
 
-        List<String> axisLabelsAsList = Arrays.asList("latitude longitude");
+        envelope.setSrsName(_defaultSrs.getName());
+        List<String> axisLabelsAsList = _defaultSrs.getAxisLabelsList();
         envelope.setAxisLabels(axisLabelsAsList);
-
-        List<String> uomLabelsAsList = Arrays.asList("deg deg");
+        List<String> uomLabelsAsList = _defaultSrs.getUomLabelsList();
         envelope.setUomLabels(uomLabelsAsList);
-
-        envelope.setSrsDimension(new BigInteger("2"));
+        envelope.setSrsDimension(BigInteger.valueOf(_defaultSrs.getSrsDimension()));
 
         DomainCoordinate lat, lon;
         try {

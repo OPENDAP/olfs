@@ -37,13 +37,17 @@ public class DynamicServiceCatalog implements WcsCatalog{
     private ReentrantReadWriteLock _cacheLock;
     private ConcurrentHashMap<String,String> _dynamicServicesMap;
 
+    private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
+
     private CredentialsProvider _credsProvider;
+
 
 
     public DynamicServiceCatalog(){
         _intiialized = false;
         _log = LoggerFactory.getLogger(getClass());
         _dynamicServicesMap = new ConcurrentHashMap<>();
+        _defaultSRS = new ConcurrentHashMap<>();
         _cacheLock = new ReentrantReadWriteLock();
     }
 
@@ -99,10 +103,19 @@ public class DynamicServiceCatalog implements WcsCatalog{
         for(Element dservice:dynamicServices) {
             String name = dservice.getAttributeValue("name");
             String href = dservice.getAttributeValue("href");
-            if (name != null && href != null) {
-                _dynamicServicesMap.put(name, href);
-                _log.info("WCS-2.0 DynamicService Loaded! name: {} href: {} ",name,href);
-            }
+
+            if(name==null || href==null)
+                throw new BadParameterException("The Dynamic service MUST have both a name and an href attribute.");
+
+            _dynamicServicesMap.put(name, href);
+            _log.info("WCS-2.0 DynamicService Loaded! name: {} href: {} ",name,href);
+
+            Element defaultSrsElement =  dservice.getChild("DefaultSRS");
+            if(defaultSrsElement==null)
+                throw new IOException("Failed to locate required DefaultSRS configuration for DynamicService '"+name+"'");
+            SimpleSrs defaultSrs = new SimpleSrs(defaultSrsElement);
+            _defaultSRS.put(name,defaultSrs);
+            _log.info("WCS-2.0 DynamicService {} has default SRS of {}",name, defaultSrs.getName());
         }
 
         _credsProvider = null;
@@ -113,6 +126,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
                     "Try specifying the credentials location if credentials are required.";
             _log.warn(msg);
         }
+
+
+
+
+
         _intiialized = true;
     }
 
@@ -217,9 +235,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
         try {
             Element dmr = getCachedDMR(coverageId);
+
             if(dmr==null)
                 return null;
-            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr);
+            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,getDefaultSrs(coverageId));
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {
@@ -272,8 +291,8 @@ public class DynamicServiceCatalog implements WcsCatalog{
         return datasetUrl + ".dmr.xml";
     }
 
-    @Override
-    public String getDataAccessUrl(String coverageId) throws InterruptedException {
+
+    public String getLongestMatchingDynamicServiceName(String coverageId){
         String longestMatchingDynamicServiceName=null;
         for(String dsName:_dynamicServicesMap.keySet()){
             if(coverageId.startsWith(dsName)){
@@ -287,6 +306,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
                 }
             }
         }
+        return longestMatchingDynamicServiceName;
+    }
+
+
+    @Override
+    public String getDataAccessUrl(String coverageId) throws InterruptedException {
+        String longestMatchingDynamicServiceName= getLongestMatchingDynamicServiceName(coverageId);
         if(longestMatchingDynamicServiceName==null)
             return null;
         String dapServer = _dynamicServicesMap.get(longestMatchingDynamicServiceName);
@@ -322,5 +348,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
     @Override
     public boolean hasEoCoverage(String id) {
         return false;
+    }
+
+
+    public SimpleSrs getDefaultSrs(String coverageId){
+        String dsName = getLongestMatchingDynamicServiceName(coverageId);
+        if(dsName==null)
+            return null;
+        return _defaultSRS.get(dsName);
     }
 }
