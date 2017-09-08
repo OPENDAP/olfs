@@ -629,6 +629,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             lat = new DomainCoordinate("latitude","latitude","degrees_north","",361);
             lon = new DomainCoordinate("longitude","longitude","degrees_east","",576);
         } catch (BadParameterException e) {
+            // This shouldn't happen based on the stuff above...
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
         ////////////////////////////////////////////////////////////
