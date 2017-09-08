@@ -52,7 +52,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
         setDapDatasetUrl(new URL(datasetUrl));
 
-
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
          *  TODO:  Replace this stuff with the output of WcsMarchaller
          */
@@ -67,9 +66,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _myCD.addContent(coverageId);
         }
 
-
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 
         //TODO: All this stuff needs reviewed?
         ////////////////////////////////////
@@ -87,7 +84,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
          * The parent class may need additional setter/getters or protected variables
          * in order to fufill this.
          */
-
 
     }
 
@@ -119,12 +115,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //this.fields = dataset.getVars32bitFloats();
         //_initialized = cd._initialized;
 
-
     }
 
-
     private void ingestDmr(Element dmr) throws WcsException {
-
 
         /////////////////////////////////////////////////
         // Use OLFS method to fetch the DMR
@@ -164,7 +157,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
 
-
         /////////////////////////////////////////////////////////////////////////
         // interpret contents of the dataset (DMR) to generate WCS per OGC below.
 
@@ -185,7 +177,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // FIXME If you need this, put it in a method and call it when the logger is
         // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
 
-        _log.debug("Marshalling WCS from DMR at Url: {}",dataset.getUrl());
+        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
         ////////////////////////////////////////////////
         // Sanity Test
@@ -237,26 +229,25 @@ public class DynamicCoverageDescription extends CoverageDescription {
         */
 
         // Simpler iteration over content.
-        for(Dimension dim : dataset.getDimensions()){
+        for (Dimension dim : dataset.getDimensions()) {
             _log.debug(dim.toString());
 
         }
 
         /////////////////////////////////////////////////////////
         // Echo Floats, Ints, just for testing
-        for(Float32 var : dataset.getVars32bitFloats()){
+        for (Float32 var : dataset.getVars32bitFloats()) {
             ingestDapVar(var);
         }
-        for(Float64 var : dataset.getVars64bitFloats()){
+        for (Float64 var : dataset.getVars64bitFloats()) {
             ingestDapVar(var);
         }
-        for(Int32 var : dataset.getVars32bitIntegers()){
+        for (Int32 var : dataset.getVars32bitIntegers()) {
             ingestDapVar(var);
         }
-        for(Int64 var : dataset.getVars64bitIntegers()){
+        for (Int64 var : dataset.getVars64bitIntegers()) {
             ingestDapVar(var);
         }
-
 
         /////////////////////////////////////////////////////////////////
         // echo "container" attributes and, yes, attributes of attributes
@@ -266,7 +257,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         boolean foundConvention = false;
         boolean cfCompliant = false;
-        for(ContainerAttribute containerAttribute:dataset.getAttributes() ){
+        for (ContainerAttribute containerAttribute : dataset.getAttributes()) {
             boolean foundGlobal = false;
             _log.debug(containerAttribute.toString());
 
@@ -283,7 +274,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             // now enumerate all attributes of the "container" attribute
 
-            for(Attribute a : containerAttribute.getAttributes()) {
+            for (Attribute a : containerAttribute.getAttributes()) {
                 _log.debug(a.toString());
 
                 if (foundGlobal) {
@@ -598,7 +589,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
         }
 
-
         try {
 
             // optional:  output "pretty printed"
@@ -669,22 +659,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
         Element coverageId = _myCD.getChild("CoverageId", WCS.WCS_NS);
         _log.debug(coverageId.getText());
 
-
     }
 
-    private void ingestDapVar(Variable v){
+    private void ingestDapVar(Variable v) {
 
         // list all dims of this Float32
-        for(Dim dim : v.getDims()){
+        for (Dim dim : v.getDims()) {
             _log.debug(dim.toString());
         }
-        for(Attribute attr:v.getAttributes()){
+        for (Attribute attr : v.getAttributes()) {
             _log.debug(attr.toString());
         }
 
     }
-
-
 
     private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
 
@@ -758,7 +745,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
         return field;
     }
-
 
     // Sanity Check
     public static void main(String[] args) {
