@@ -771,6 +771,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return field;
     }
 
+    public void hardwired_CD
+
 
     // Sanity Check
     public static void main(String[] args) {
