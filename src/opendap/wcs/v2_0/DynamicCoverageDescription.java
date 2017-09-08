@@ -243,7 +243,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         /////////////////////////////////////////////////////////
-        // Echo Floats, Ints, just for testing
+        // Process the DAP variables found in the DMR.
+        // This means determine if the DAP var is a field, and then
+        // make the appropriate associates in the member variables.
         for(Float32 var : dataset.getVars32bitFloats()){
             ingestDapVar(var);
         }
@@ -672,6 +674,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
+    /**
+     * We examine a DAP variable and determine if we can produce
+     * a Field from it?
+     *
+     * For now it just dumps the variables Dim and Attribute content.
+     * I created this method simply coalesce a bunch of repetitive code into
+     * a single place.
+     * 
+     * @param v
+     */
     private void ingestDapVar(Variable v){
 
         // list all dims of this Float32
