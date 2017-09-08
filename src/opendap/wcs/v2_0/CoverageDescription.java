@@ -66,13 +66,13 @@ public class CoverageDescription {
     private boolean _validateContent = false;
 
     /**
-     * Use getDapDatsetUrl() and setDapDatasetUrl()
+     * Use getDapDatsetUrl() and setDapDatasetUrl() for access
      */
     private URL _dapDatasetUrl;
 
     /**
-     * use setDapGridArrayId(String, String) add and getDapGridArrayId(String) to access.
-     * The keys in this Map are the wcs:Field names, and the eassociated entry is the name of the
+     * Use addFieldToDapVarIdAssociation(String, String) add and getDapGridArrayId(String fieldName) to access.
+     * The keys in this Map are the wcs:Field names, and the associated entry is the name of the
      * DAP variable that contains the data.
      */
     private HashMap<String, String> _dapGridId;
@@ -238,8 +238,6 @@ public class CoverageDescription {
             Element field = (Element) o;
 
             String fieldName;
-            String dapGridId;
-
             /**
              * Load the field ID for this field in the coverage's range. This is REQUIRED.
              */
@@ -263,7 +261,7 @@ public class CoverageDescription {
                 throw new ConfigurationException(msg);
             }
             
-            setDapGridArrayId(fieldName, dapID);
+            addFieldToDapVarIdAssociation(fieldName, dapID);
         }
     }
 
@@ -638,9 +636,10 @@ public class CoverageDescription {
      *            associated with the wcs:Field's wcs:Identifier represented by
      *            filedID.
      */
-    public void setDapGridArrayId(String fieldID, String dapGridId) {
+    public void addFieldToDapVarIdAssociation(String fieldID, String dapGridId) {
         _dapGridId.put(fieldID, dapGridId);
     }
+
 
     /**
      * Gets the DAP local ID for the Latitude coordinate map array that is
@@ -686,9 +685,13 @@ public class CoverageDescription {
         return new DomainCoordinate(dc);
     }
 
-    public void setDapDatasetUrl(URL datasetUrl) throws MalformedURLException {
+    public void setDapDatasetUrl(URL datasetUrl) throws WcsException {
 
-        _dapDatasetUrl = new URL(datasetUrl.toExternalForm());
+        try {
+            _dapDatasetUrl = new URL(datasetUrl.toExternalForm());
+        } catch (MalformedURLException e) {
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
     }
 
     public URL getDapDatasetUrl() {

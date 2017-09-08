@@ -112,7 +112,7 @@ public class DomainCoordinate {
         if (_units == null) {
             throw new BadParameterException("In DomainCoordinate the 'units' parameter may not have a null value.");
         }
-        if (_size > 0) {
+        if (_size < 0) {
             throw new BadParameterException("In DomainCoordinate the 'size' parameter may not less than zero.");
         }
     }

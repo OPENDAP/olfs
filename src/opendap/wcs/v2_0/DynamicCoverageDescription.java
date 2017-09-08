@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -289,10 +290,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         CoverageDescriptionType cd = new CoverageDescriptionType();
-
-        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(),cd);
-
-
+        URL datasetUrl = null;
+        try {
+            datasetUrl = new URL(dmr.getAttributeValue("base", XML.NS));
+        } catch (MalformedURLException e) {
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
     }
 
 
@@ -501,7 +505,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
 
-        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.tavgM_2d_int_Nx.198001.nc4.dmr.xml";
+        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
         try {
             ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
             org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
@@ -536,7 +540,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
-    private void hardwireTheCdAndDcdForTesting( String id, CoverageDescriptionType cd) throws WcsException {
+    private void hardwireTheCdAndDcdForTesting( String id, URL datasetURl, CoverageDescriptionType cd) throws WcsException {
         //////////////////////////////////////////////////
         // Start WCS CoverageDescription..
         // the OLFS functions from a JDOM wrapper to this
@@ -545,6 +549,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         cd.setCoverageId(id);
         // this will create id as attribute
         cd.setId(id);
+
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        setDapDatasetUrl(datasetURl);
+        ////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////////////////
         // Envelope with Time Period:
@@ -596,6 +605,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         envelope.setSrsDimension(new BigInteger("2"));
 
+        DomainCoordinate lat, lon;
+        try {
+            lat = new DomainCoordinate("latitude","latitude","degrees_north","",361);
+            lon = new DomainCoordinate("longitude","longitude","degrees_east","",576);
+        } catch (BadParameterException e) {
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        addDomainCoordinate(lat);
+        addDomainCoordinate(lon);
+        /////////////////////////////////////////////////////////////
+
         net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
         List<Double> lowerCorner = Arrays.asList(new Double("-90.00"), new Double("-180.00"));
         envelopeLowerCorner.setValue(lowerCorner);
@@ -608,7 +630,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         TimePositionType beginTimePosition = new TimePositionType();
         // attribute called frame seems like right place to put ISO-8601 timestamp
-        String beginTimeStr = "2016-01-01T00:30:00.000Z";
+        String beginTimeStr = "1980-01-01T00:30:00.000Z";
         beginTimePosition.setFrame(beginTimeStr);
         // However, it can also be specified as below.
         List<String> timeStrings = Arrays.asList(beginTimeStr);
@@ -616,7 +638,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         envelope.setBeginPosition(beginTimePosition);
 
         TimePositionType endTimePosition = new TimePositionType();
-        String endTimeStr = "2016-02-01T00:00:00.000Z";
+        String endTimeStr = "1980-02-01T00:00:00.000Z";
         endTimePosition.setFrame(endTimeStr);
         // However, it can also be specified as below.
         timeStrings = Arrays.asList(beginTimeStr);
@@ -648,15 +670,23 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Create the grid envelope for the limits
         GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
-        List<BigInteger> lowerRight = Arrays.asList(BigInteger.valueOf(361), BigInteger.valueOf(576));
-        List<BigInteger> upperLeft = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
-        gridEnvelope.withHigh(lowerRight).withLow(upperLeft);
+
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+
+        // Note: The index values for the arrays are 0 based and so the upper index is
+        // one less than the size.
+        List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
+        List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
+        gridEnvelope.withHigh(upper).withLow(lower);
+        ////////////////////////////////////////////////////////////
+
         // Create the limits, set the envelope on them.
         GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
         gridLimits.withGridEnvelope(gridEnvelope);
         rectifiedGrid.setLimits(gridLimits);
 
-        List<String> axisLabels = Arrays.asList("time latitude longitude");
+        List<String> axisLabels = Arrays.asList("latitude longitude");
         rectifiedGrid.setAxisLabels(axisLabels);
 
         // Create the Origin.
@@ -703,8 +733,15 @@ public class DynamicCoverageDescription extends CoverageDescription {
         net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
 
         dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        dataRecord1FieldQuantity.setDescription("large_scale_rainfall");
-        // dataRecord1FieldQuantity.setId("large_scale_rainfall");
+        dataRecord1FieldQuantity.setDescription("total_precipitation");
+        dataRecord1FieldQuantity.setIdentifier("TPRECMAX");
+        dataRecord1FieldQuantity.withId("withId");
+        /////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
+        /////////////////////////////////////////////////////////////
+
+
 
         net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
         dataRecord1FieldQuantityUom.setCode("kg m-2 s-1");
@@ -726,7 +763,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // look for what the allowed interval means in SWE schema. Walk it into DAP.
         // In this case - use Attribute (not range function).
 
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf("1.368420E-14"), Double.valueOf("7.8325e-14"));
+        List<Double> allowed1Interval = Arrays.asList(Double.valueOf("-9.99999987e+14"), Double.valueOf("9.99999987e+14"));
 
         // good-grief...fix someday...works for now
         List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
@@ -762,7 +799,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // There is cheesy way:compute the differences and say are they the same or not
         serviceParameters
                 .setCoverageSubtype(new QName("http://www.opengis.net/wcs/2.0", "RectifiedGridCoverage", "wcs"));
-        serviceParameters.setNativeFormat("application/vnd.opendap.dap4.data");
+        serviceParameters.setNativeFormat("application/octet-stream");
 
         cd.setServiceParameters(serviceParameters);
 
@@ -791,7 +828,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // first set coverageID = get from DMR name attribute of root element
         // for every variable in DMR.
 
-        
         _myCD = coverageDescriptionType2JDOM(cd);
 
     }
