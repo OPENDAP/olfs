@@ -30,7 +30,13 @@
         <!-- CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile -->
     <!-- /WcsCatalog -->
     <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog" >
-        <DynamicService name="lds" href="http://localhost:8080/opendap/" />
+        <DynamicService name="lds" href="http://localhost:8080/opendap/">
+            <DefaultSRS name="urn:ogc:def:crs:EPSG::4326">
+                <axisLabels>latitude longitude</axisLabels>;
+                <uomLabels>deg deg</uomLabels>;
+                <srsDimension>2</srsDimension>
+            </DefaultSRS>
+        </DynamicService>
     </WcsCatalog>
 </WcsService>
 <!--
