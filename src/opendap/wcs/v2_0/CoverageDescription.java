@@ -65,15 +65,32 @@ public class CoverageDescription {
 
     private boolean _validateContent = false;
 
+    /**
+     * Use getDapDatsetUrl() and setDapDatasetUrl()
+     */
     private URL _dapDatasetUrl;
+
+    /**
+     * use setDapGridArrayId(String, String) add and getDapGridArrayId(String) to access.
+     * The keys in this Map are the wcs:Field names, and the eassociated entry is the name of the
+     * DAP variable that contains the data.
+     */
     private HashMap<String, String> _dapGridId;
 
     public static final String CONFIG_ELEMENT_NAME = "WcsCoverage";
 
+    /**
+     * Use addDomainCoordinate(String, DomainCoordinate) and getDomainCoordinate(String)
+     */
     private LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
+
+
 
     boolean _initialized = false;
 
+    /**
+     * FIXME: The use of the member variable _fields is broken. There is no default assignment. And it violates the idea tha the list of fields get generated from the document. If it was added for just LfcMarshaller then can we drop it and the API changes - setFields() and getFieldsList() ??
+     */
     private List<Field> _fields;
 
     public CoverageDescription() {
@@ -84,15 +101,13 @@ public class CoverageDescription {
     }
 
     public CoverageDescription(CoverageDescription cd) throws IOException {
+        super();
         _myCD = (Element) cd._myCD.clone();
-        _log = LoggerFactory.getLogger(this.getClass());
         _lastModified = cd._lastModified;
         _myFile = cd._myFile.getCanonicalFile();
         _validateContent = cd._validateContent;
         _dapDatasetUrl = new URL(cd._dapDatasetUrl.toString());
-        _dapGridId = new HashMap<>();
         _dapGridId.putAll(cd._dapGridId);
-        _domainCoordinates = new LinkedHashMap<>();
         _domainCoordinates.putAll(cd._domainCoordinates);
         _initialized = cd._initialized;
     }
@@ -213,7 +228,7 @@ public class CoverageDescription {
         while (coordIt.hasNext()) {
             Element domainCoordinateElem = (Element) coordIt.next();
             DomainCoordinate dc = new DomainCoordinate(domainCoordinateElem);
-            _domainCoordinates.put(dc.getName(), dc);
+            addDomainCoordinate(dc);
         }
 
         /**
@@ -256,9 +271,6 @@ public class CoverageDescription {
         if (_initialized)
             return;
 
-        _log = org.slf4j.LoggerFactory.getLogger(getClass());
-        _dapGridId = new HashMap<String, String>();
-        _domainCoordinates = new LinkedHashMap<String, DomainCoordinate>();
         _initialized = true;
     }
 
@@ -647,6 +659,17 @@ public class CoverageDescription {
 
     }
 
+
+    /**
+     * Adds a named DomainCoordinate to the Coverage.
+     * NOTE: The order that coordinates are added is preserved and MATTERS.
+     * 
+     * @param dc
+     */
+    public void addDomainCoordinate(DomainCoordinate dc){
+        _domainCoordinates.put(dc.getName(),dc);
+    }
+
     /**
      * Gets the DAP local ID for the Latitude coordinate map array that is
      * associated by the wcs:Identifier for the wcs:Field
@@ -752,18 +775,17 @@ public class CoverageDescription {
 
         Element rangeType;
 
-        rangeType = _myCD.getChild("rangeType", WCS.GMLCOV_NS);
-        if (rangeType == null)
+        rangeType = _myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        if(rangeType==null)
             throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
-                    WcsException.MISSING_PARAMETER_VALUE, "gmlcov:rangeType");
+                WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
 
-        Vector<Field> fields = new Vector<Field>();
+        Vector<Field> fields = new Vector<>();
 
-        ElementFilter filter = new ElementFilter("field", WCS.SWE_NS);
+        ElementFilter filter = new ElementFilter("field",WCS.SWE_NS);
         Iterator i = rangeType.getDescendants(filter);
-        while (i.hasNext()) {
+        while(i.hasNext()){
             Element fieldElement = (Element) i.next();
-
             Field field = new Field(fieldElement);
             fields.add(field);
         }
@@ -771,6 +793,18 @@ public class CoverageDescription {
         return fields;
     }
 
+
+    /**
+     * FIXME: Can we dispose of this aparently unused method?
+     * Why is this here? Because of the exception handling?
+     * I am certain that this is never called because it cannot work -
+     * the member variable _fields is never assigned so will always be null.
+     * the method getFields() returns a Vector, which is an implmentation
+     * of List so this seem redundant.
+     * If this is about JAXB then why not annotate  the getFields() method?
+     *
+     * @return
+     */
     @XmlElement(name = "field")
     public List<Field> getFieldsList() {
         if (this._fields == null || this._fields.isEmpty()) {
@@ -807,10 +841,6 @@ public class CoverageDescription {
     @XmlElement(name = "DomainCoordinate")
     public List<DomainCoordinate> getDomainCoordinatesAsList() {
         return new ArrayList(getDomainCoordinates().values());
-    }
-
-    public void setDomainCoordinatesLinkedHashMap(LinkedHashMap<String, DomainCoordinate> dc) {
-        this._domainCoordinates = dc;
     }
 
 }

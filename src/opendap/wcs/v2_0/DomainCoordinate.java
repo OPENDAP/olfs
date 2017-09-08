@@ -40,12 +40,12 @@ public class DomainCoordinate {
 
 
     private String _name;
-    private String _dapID;
+    private String _dapId;
     private String _units;
     private String _arraySubset;
     private long _size;
 
-    DomainCoordinate(Element dc) throws ConfigurationException {
+    public DomainCoordinate(Element dc) throws ConfigurationException {
 
         _name = dc.getAttributeValue("name");
         if(_name ==null){
@@ -53,8 +53,8 @@ public class DomainCoordinate {
                     "missing the required attribute 'name'.");
         }
 
-        _dapID = dc.getAttributeValue("dapID");
-        if(_dapID ==null){
+        _dapId = dc.getAttributeValue("dapID");
+        if(_dapId ==null){
             throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'dapID'.");
         }
@@ -82,15 +82,45 @@ public class DomainCoordinate {
 
     }
 
-    DomainCoordinate(DomainCoordinate dc){
+    public DomainCoordinate(DomainCoordinate dc){
 
         _name = dc._name;
-        _dapID = dc._dapID;
+        _dapId = dc._dapId;
         _units = dc._units;
         _arraySubset = dc._arraySubset;
         _size = dc._size;
 
     }
+    public DomainCoordinate(String name,
+                            String dapId,
+                            String units,
+                            String arraySubset,
+                            long size)
+            throws BadParameterException {
+        _name = name;
+        _dapId = dapId;
+        _units = units;
+        _arraySubset = arraySubset;
+        _size = size;
+
+        if (_name == null) {
+            throw new BadParameterException("In DomainCoordinate the 'name' parameter may not have a null value.");
+        }
+        if (_dapId == null) {
+            throw new BadParameterException("In DomainCoordinate the 'dapId' parameter may not have a null value.");
+        }
+        if (_units == null) {
+            throw new BadParameterException("In DomainCoordinate the 'units' parameter may not have a null value.");
+        }
+        if (_size > 0) {
+            throw new BadParameterException("In DomainCoordinate the 'size' parameter may not less than zero.");
+        }
+    }
+
+
+
+
+
     @Override
         public DomainCoordinate clone()
         {
@@ -108,7 +138,7 @@ public class DomainCoordinate {
 
 
             _name = dc._name;
-            _dapID = dc._dapID;
+            _dapId = dc._dapId;
             _units = dc._units;
             _arraySubset = dc._arraySubset;
             _size = dc._size;
@@ -120,7 +150,7 @@ public class DomainCoordinate {
 
     @XmlAttribute(name="dapId")
     public String getDapID(){
-        return _dapID;
+        return _dapId;
     }
 
     @XmlAttribute    
