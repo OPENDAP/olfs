@@ -1,6 +1,9 @@
 package opendap.wcs.v2_0;
 
 import net.opengis.gml.v_3_2_1.*;
+import net.opengis.swecommon.v_2_0.DataRecordType;
+import net.opengis.swecommon.v_2_0.QuantityType;
+import net.opengis.swecommon.v_2_0.UnitReference;
 import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
 import opendap.namespaces.XML;
@@ -728,14 +731,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new net.opengis.swecommon.v_2_0.DataRecordPropertyType();
 
         // first data record
-        net.opengis.swecommon.v_2_0.DataRecordType dataRecord1 = new net.opengis.swecommon.v_2_0.DataRecordType();
-        net.opengis.swecommon.v_2_0.DataRecordType.Field dataRecord1Field = new net.opengis.swecommon.v_2_0.DataRecordType.Field();
-        net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
+        DataRecordType dataRecord1 = new DataRecordType();
+        DataRecordType.Field field = new DataRecordType.Field();
+        QuantityType fieldQuantity = new QuantityType();
 
-        dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        dataRecord1FieldQuantity.setDescription("total_precipitation");
-        dataRecord1FieldQuantity.setIdentifier("TPRECMAX");
-        dataRecord1FieldQuantity.withId("withId");
+        field.setName("TPRECMAX");
+        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
+        fieldQuantity.setDescription("total_precipitation");
         /////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
         addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
@@ -745,7 +747,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
         dataRecord1FieldQuantityUom.setCode("kg m-2 s-1");
-        dataRecord1FieldQuantity.setUom(dataRecord1FieldQuantityUom);
+        fieldQuantity.setUom(dataRecord1FieldQuantityUom);
 
         net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
         net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
@@ -770,14 +772,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
         coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
         allowed1.setInterval(coordinates1);
         dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        dataRecord1FieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
+        fieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
 
-        dataRecord1Field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(dataRecord1FieldQuantity));
+        field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(fieldQuantity));
         // dataRecord1Field.setAbstractDataComponent(new JAXBElement(new
         // QName("http://www.opengis.net/swe/2.0", "Quantity"),
         // dataRecord1FieldQuantity.getClass(),dataRecord1FieldQuantity));
         List<net.opengis.swecommon.v_2_0.DataRecordType.Field> dataRecord1FieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
-        dataRecord1FieldList.add(dataRecord1Field);
+        dataRecord1FieldList.add(field);
         dataRecord1.setField(dataRecord1FieldList);
 
         rangeType.setDataRecord(dataRecord1);
