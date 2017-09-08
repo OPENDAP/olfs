@@ -500,6 +500,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.debug(attr.toString());
         }
 
+        /*   THis is what should happen in here...
+        field.setName("TPRECMAX");
+        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
+        fieldQuantity.setDescription("total_precipitation");
+        /////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
+        /////////////////////////////////////////////////////////////
+
+         */
     }
 
 
