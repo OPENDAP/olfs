@@ -52,7 +52,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
         setDapDatasetUrl(new URL(datasetUrl));
 
-
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
          *  TODO:  Replace this stuff with the output of WcsMarchaller
          */
@@ -67,9 +66,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _myCD.addContent(coverageId);
         }
 
-
         /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 
         //TODO: All this stuff needs reviewed?
         ////////////////////////////////////
@@ -87,7 +84,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
          * The parent class may need additional setter/getters or protected variables
          * in order to fufill this.
          */
-
 
     }
 
@@ -119,12 +115,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //this.fields = dataset.getVars32bitFloats();
         //_initialized = cd._initialized;
 
-
     }
 
-
     private void ingestDmr(Element dmr) throws WcsException {
-
 
         /////////////////////////////////////////////////
         // Use OLFS method to fetch the DMR
@@ -164,7 +157,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
 
-
         /////////////////////////////////////////////////////////////////////////
         // interpret contents of the dataset (DMR) to generate WCS per OGC below.
 
@@ -185,36 +177,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // FIXME If you need this, put it in a method and call it when the logger is
         // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
 
-        _log.debug("Marshalling WCS from DMR at Url: {}",dataset.getUrl());
+        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
-        ////////////////////////////////////////////////
-        // Sanity Test
-        // Create the Document
-                /* FIXME: The code in comment block doesn't work but should. It complains that saxon9-dom.jar is not available. Fix or eliminate.
-                DocumentBuilderFactory dbf0 = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db0 = dbf0.newDocumentBuilder();
-                Document document0 = db0.newDocument();
-
-                // Marshal the Object to a Document
-                Marshaller m0 = jc.createMarshaller();
-                m0.marshal(dataset, document0);
-
-                // Output the Document:
-                // runtime dependence on saxon9-jdom.jar library
-                // OK...since this is just sanity check
-                // all we really need is the DOM which has already been marshaled above
-                TransformerFactory tf = TransformerFactory.newInstance();
-                Transformer t = tf.newTransformer();
-                DOMSource source = new DOMSource(document0);
-                StreamResult result = new StreamResult(System.out);
-                t.transform(source, result);
-                */
-        // End Sanity Test
 
         ////////////////////////////
         // echo data set Dimensions - distinct from variable dimension
-
-
         /* NOTE: This is the old loop iterator pattern which I have replaced
            with the for() loop below. By creating default contrsutors in all the
            related classes we can ensure that none of the getter methods return null.
@@ -233,11 +200,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     _log.debug(dimIter.nextIndex() + ". " + dimIter.next());
                 }
             } // close if then else (dimensions list is non-null and has elements)
-
         */
-
-        // Simpler iteration over content.
-        for(Dimension dim : dataset.getDimensions()){
+        /////////////////////////////////////////////////////////
+        // Simpler iteration over content
+        //
+        for (Dimension dim : dataset.getDimensions()) {
             _log.debug(dim.toString());
 
         }
@@ -246,19 +213,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Process the DAP variables found in the DMR.
         // This means determine if the DAP var is a field, and then
         // make the appropriate associates in the member variables.
+
         for(Float32 var : dataset.getVars32bitFloats()){
             ingestDapVar(var);
         }
-        for(Float64 var : dataset.getVars64bitFloats()){
+        for (Float64 var : dataset.getVars64bitFloats()) {
             ingestDapVar(var);
         }
-        for(Int32 var : dataset.getVars32bitIntegers()){
+        for (Int32 var : dataset.getVars32bitIntegers()) {
             ingestDapVar(var);
         }
-        for(Int64 var : dataset.getVars64bitIntegers()){
+        for (Int64 var : dataset.getVars64bitIntegers()) {
             ingestDapVar(var);
         }
-
 
         /////////////////////////////////////////////////////////////////
         // echo "container" attributes and, yes, attributes of attributes
@@ -268,7 +235,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         boolean foundConvention = false;
         boolean cfCompliant = false;
-        for(ContainerAttribute containerAttribute:dataset.getAttributes() ){
+        for (ContainerAttribute containerAttribute : dataset.getAttributes()) {
             boolean foundGlobal = false;
             _log.debug(containerAttribute.toString());
 
@@ -285,7 +252,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             // now enumerate all attributes of the "container" attribute
 
-            for(Attribute a : containerAttribute.getAttributes()) {
+            for (Attribute a : containerAttribute.getAttributes()) {
                 _log.debug(a.toString());
 
                 if (foundGlobal) {
@@ -319,19 +286,265 @@ public class DynamicCoverageDescription extends CoverageDescription {
             } else {
                 _log.debug("No conventions found...ERROR");
             }
+        }
 
-        } // end if (dataset == null) else { // do everything
+        CoverageDescriptionType cd = new CoverageDescriptionType();
 
+        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(),cd);
+
+
+    }
+
+
+    private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
+
+        String name = var.getName();
+        List<opendap.dap4.Attribute> attributes = var.getAttributes();
+        Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
+        Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
+        while (iter.hasNext()) {
+            opendap.dap4.Attribute attribute = iter.next();
+            attributesHash.put(attribute.getName(), attribute);
+        }
+
+        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
+        net.opengis.swecommon.v_2_0.DataRecordType.Field dataRecord1Field = new net.opengis.swecommon.v_2_0.DataRecordType.Field();
+        net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
+
+        dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
+        dataRecord1FieldQuantity.setDescription(attributesHash.get("long_name").getValue());
+        // dataRecord1FieldQuantity.setId(var.getName());
+
+        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
+        dataRecord1FieldQuantityUom.setCode(attributesHash.get("units").getValue());
+        dataRecord1FieldQuantity.setUom(dataRecord1FieldQuantityUom);
+
+        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
+        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
+
+        List<Double> allowed1Interval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
+                Double.valueOf(attributesHash.get("vmax").getValue()));
+
+        // TODO good-grief...fix someday...works for now
+        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
+        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
+        allowed1.setInterval(coordinates1);
+        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
+        dataRecord1FieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
+
+        dataRecord1Field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(dataRecord1FieldQuantity));
+        Field field;
+        try {
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.newDocument();
+
+            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.swecommon.v_2_0");
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.marshal(dataRecord1Field, doc);
+            org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
+            org.jdom.Document jdoc = jdb.build(doc);
+
+            field = new Field(jdoc.getRootElement());
+
+            // couple of quick sanity checks
+
+            // FIXME Make this use the logging system's DEBUG setting so we can switch it off
+            // or off at run-time. jhrg 9/6/17
+            _log.debug(jdoc.getRootElement().toString());
+
+        } catch (JAXBException |
+                WcsException |
+                ParserConfigurationException e) {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Unable to build Field instance.");
+            sb.append(" Caught ").append(e.getClass().getName());
+            sb.append(" Message  ").append(e.getMessage());
+            _log.error(sb.toString());
+            throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
+        }
+        return field;
+    }
+
+
+
+    public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
+
+        // Boiler plate JAXB marshaling of Coverage Description object into JDOM
+
+        ////////////////////////////////////////////////////////
+        // Since this was generated from third-party XML schema
+        // need to bootstrap the JAXBContext
+        // from the package name of the generated model
+        // or the ObjectFactory class
+        // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
+
+        // Required: First, bootstrap context with known WCS package name
+
+        Marshaller jaxbMarshaller;
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
+            jaxbMarshaller = jaxbContext.createMarshaller();
+        } catch (JAXBException e) {
+            String msg = "Failed to get JAXB Marshaller! JAXBException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+
+        try {
+
+            // optional:  output "pretty printed"
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            // optional: this is a list of the schema definitions.
+            jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                    "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
+                            "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
+                            "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd " +
+                            "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
+
+            // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
+            //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
+            jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
+
+        } catch (PropertyException e) {
+            _log.warn("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used" +
+                    "...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc. Message" + e.getMessage());
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
+        // method#1:  need to wrap CoverageDescription as JAXB element
+        // marshal coverage description into console (more specifically, System.out)
+        //jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0", "wcs"), CoverageDescriptionType.class, cd), System.out);
+
+        // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            String msg = "Failed to get DocumentBuilder! ParserConfigurationException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+        Document doc = db.newDocument();
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
+        // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
+        // marshal coverage description into a org.w3c.dom.Document...first
+
+        // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on
+        // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
+        net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
+        try {
+            jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
+        } catch (JAXBException e) {
+            String msg = "Failed to get marshall COverageDescription! JAXBException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+        org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
+        org.jdom.Document jdoc = jdb.build(doc);
+
+        // gotcha!  This is what integrates into OLFS (mostly).
+        // The rest of CoverageDescription object can be derive from whatever has been captured so far
+        // or from _myCD (TODO).
+
+        Element cdElement = jdoc.getRootElement();
+        cdElement.detach();
+
+        // couple of quick sanity checks
+        _log.debug(cdElement.toString());
+        Element coverageId = cdElement.getChild("CoverageId", WCS.WCS_NS);
+        _log.debug(coverageId.getText());
+        return  cdElement;
+    }
+
+    /**
+     * We examine a DAP variable and determine if we can produce
+     * a Field from it?
+     *
+     * For now it just dumps the variables Dim and Attribute content.
+     * I created this method simply coalesce a bunch of repetitive code into
+     * a single place.
+     * 
+     * @param v
+     */
+    private void ingestDapVar(Variable v) {
+        // list all dims of this Float32
+        for (Dim dim : v.getDims()) {
+            _log.debug(dim.toString());
+        }
+        for (Attribute attr : v.getAttributes()) {
+            _log.debug(attr.toString());
+        }
+
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Out friend main() runs a sanity check using a DMR obtained from test.opendap.org
+     * @param args Ignored...
+     */
+    public static void main(String[] args) {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
+
+        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.tavgM_2d_int_Nx.198001.nc4.dmr.xml";
+        try {
+            ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
+            Element dmrElement = dmrDoc.getRootElement();
+            dmrElement.detach();
+            CoverageDescription cd = new DynamicCoverageDescription(dmrElement);
+
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+            System.out.println("RESULT: " + cd.toString());
+            xmlo.output(cd.getCoverageDescriptionElement(), System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+            xmlo.output(cd.getCoverageSummary(), System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    
+
+
+
+
+    
+
+
+
+    private void hardwireTheCdAndDcdForTesting( String id, CoverageDescriptionType cd) throws WcsException {
         //////////////////////////////////////////////////
         // Start WCS CoverageDescription..
         // the OLFS functions from a JDOM wrapper to this
 
-        net.opengis.wcs.v_2_0.CoverageDescriptionType cd = new net.opengis.wcs.v_2_0.CoverageDescriptionType();
-
         // this will create id as element
-        cd.setCoverageId(dataset.getCoverageId());
+        cd.setCoverageId(id);
         // this will create id as attribute
-        cd.setId(dataset.getCoverageId());
+        cd.setId(id);
 
         ////////////////////////////////////////////////////////////////////////////////////
         // Envelope with Time Period:
@@ -578,226 +791,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // first set coverageID = get from DMR name attribute of root element
         // for every variable in DMR.
 
-        // Boiler plate JAXB marshaling of Coverage Description object into JDOM
-
-        ////////////////////////////////////////////////////////
-        // Since this was generated from third-party XML schema
-        // need to bootstrap the JAXBContext
-        // from the package name of the generated model
-        // or the ObjectFactory class
-        // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
-
-        // Required: First, bootstrap context with known WCS package name
-
-        Marshaller jaxbMarshaller;
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
-            jaxbMarshaller = jaxbContext.createMarshaller();
-        } catch (JAXBException e) {
-            String msg = "Failed to get JAXB Marshaller! JAXBException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-
-
-        try {
-
-            // optional:  output "pretty printed"
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            // optional: this is a list of the schema definitions.
-            jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-                    "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
-                            "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
-                            "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd " +
-                            "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
-
-            // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
-            //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
-            jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
-
-        } catch (PropertyException e) {
-            _log.warn("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used" +
-                    "...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc. Message" + e.getMessage());
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
-        // method#1:  need to wrap CoverageDescription as JAXB element
-        // marshal coverage description into console (more specifically, System.out)
-        //jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0", "wcs"), CoverageDescriptionType.class, cd), System.out);
-
-        // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            String msg = "Failed to get DocumentBuilder! ParserConfigurationException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-        Document doc = db.newDocument();
-
-        //////////////////////////////////////////////////////////////////////////////////////////
-        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
-        // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
-        // marshal coverage description into a org.w3c.dom.Document...first
-
-        // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on
-        // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
-        net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-        try {
-            jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
-        } catch (JAXBException e) {
-            String msg = "Failed to get marshall COverageDescription! JAXBException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-        org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-        org.jdom.Document jdoc = jdb.build(doc);
-
-        // gotcha!  This is what integrates into OLFS (mostly).
-        // The rest of CoverageDescription object can be derive from whatever has been captured so far
-        // or from _myCD (TODO).
-
-        _myCD = jdoc.getRootElement();
-
-        // couple of quick sanity checks
-        _log.debug(_myCD.toString());
-        Element coverageId = _myCD.getChild("CoverageId", WCS.WCS_NS);
-        _log.debug(coverageId.getText());
-
-
-    }
-
-    /**
-     * We examine a DAP variable and determine if we can produce
-     * a Field from it?
-     *
-     * For now it just dumps the variables Dim and Attribute content.
-     * I created this method simply coalesce a bunch of repetitive code into
-     * a single place.
-     * 
-     * @param v
-     */
-    private void ingestDapVar(Variable v){
-
-        // list all dims of this Float32
-        for(Dim dim : v.getDims()){
-            _log.debug(dim.toString());
-        }
-        for(Attribute attr:v.getAttributes()){
-            _log.debug(attr.toString());
-        }
-
-    }
-
-
-
-    private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
-
-        String name = var.getName();
-        List<opendap.dap4.Attribute> attributes = var.getAttributes();
-        Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
-        Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
-        while (iter.hasNext()) {
-            opendap.dap4.Attribute attribute = iter.next();
-            attributesHash.put(attribute.getName(), attribute);
-        }
-
-        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
-        net.opengis.swecommon.v_2_0.DataRecordType.Field dataRecord1Field = new net.opengis.swecommon.v_2_0.DataRecordType.Field();
-        net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
-
-        dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        dataRecord1FieldQuantity.setDescription(attributesHash.get("long_name").getValue());
-        // dataRecord1FieldQuantity.setId(var.getName());
-
-        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
-        dataRecord1FieldQuantityUom.setCode(attributesHash.get("units").getValue());
-        dataRecord1FieldQuantity.setUom(dataRecord1FieldQuantityUom);
-
-        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
-        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
-                Double.valueOf(attributesHash.get("vmax").getValue()));
-
-        // TODO good-grief...fix someday...works for now
-        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
-        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
-        allowed1.setInterval(coordinates1);
-        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        dataRecord1FieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
-
-        dataRecord1Field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(dataRecord1FieldQuantity));
-        Field field;
-        try {
-
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
-
-            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.swecommon.v_2_0");
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.marshal(dataRecord1Field, doc);
-            org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-            org.jdom.Document jdoc = jdb.build(doc);
-
-            field = new Field(jdoc.getRootElement());
-
-            // couple of quick sanity checks
-
-            // FIXME Make this use the logging system's DEBUG setting so we can switch it off
-            // or off at run-time. jhrg 9/6/17
-            _log.debug(jdoc.getRootElement().toString());
-
-        } catch (JAXBException |
-                WcsException |
-                ParserConfigurationException e) {
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Unable to build Field instance.");
-            sb.append(" Caught ").append(e.getClass().getName());
-            sb.append(" Message  ").append(e.getMessage());
-            _log.error(sb.toString());
-            throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
-        }
-        return field;
-    }
-
-    public void hardwired_CD
-
-
-    // Sanity Check
-    public static void main(String[] args) {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
-
-        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.tavgM_2d_int_Nx.198001.nc4.dmr.xml";
-        try {
-            ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
-            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
-            Element dmrElement = dmrDoc.getRootElement();
-            dmrElement.detach();
-            CoverageDescription cd = new DynamicCoverageDescription(dmrElement);
-
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            System.out.println("RESULT: " + cd.toString());
-            xmlo.output(cd.getCoverageDescriptionElement(), System.out);
-            System.out.println("");
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            xmlo.output(cd.getCoverageSummary(), System.out);
-            System.out.println("");
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        
+        _myCD = coverageDescriptionType2JDOM(cd);
 
     }
 
