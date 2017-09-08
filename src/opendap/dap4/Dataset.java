@@ -38,8 +38,8 @@ import javax.xml.bind.annotation.*;
 public class Dataset {
 
 	// FIXME: change the name from "coverageId" to "name" and modify setter and getter accodingly. ndp 9/7/17
-	private String coverageId = "";
-	private String url = "";
+	private String coverageId;
+	private String url;
 	
 	private List<Dimension> dimensions; 
 	private List<ContainerAttribute> attributes;
@@ -48,11 +48,20 @@ public class Dataset {
 	private List<Float32> vars32bitFloats;
 	private List<Int64>   vars64bitIntegers;
 	private List<Int32>   vars32bitIntegers;
-	
-	
-	
+
+
+	/**
+	 * This default constructor intializes all of the stuff so things can never be null.
+	 */
 	public Dataset() {
-		
+		coverageId = "";
+		url = "";
+		dimensions = new Vector<>();
+		attributes = new Vector<>();
+		vars64bitFloats = new Vector<>();
+		vars32bitFloats = new Vector<>();
+		vars64bitIntegers = new Vector<>();
+		vars32bitIntegers = new Vector<>();
 	}
 	
 	

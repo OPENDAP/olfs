@@ -36,10 +36,15 @@ import javax.xml.bind.annotation.*;
  */
 public class Variable {
 	
-	private String name = "";
+	private String name;
 	private List<Dim> dims;
 	private List<Attribute> attributes;
 	
+	Variable(){
+		name="";
+		dims = new Vector<>();
+		attributes = new Vector<>();
+	}
 
 	@XmlAttribute
 	public String getName() {

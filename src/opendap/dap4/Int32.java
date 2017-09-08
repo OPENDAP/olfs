@@ -27,6 +27,9 @@
 package opendap.dap4;
 
 public class Int32 extends Variable {
+	public Int32() {
+		super();
+	}
 	public String toString()
 	{
 		return "Variable Type INT 32, name = " + this.getName();

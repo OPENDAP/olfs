@@ -129,8 +129,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         /////////////////////////////////////////////////
         // Use OLFS method to fetch the DMR
         //
-        // For this to work, will need to have valid
-        // earth data login into local filesystem like so:
+        // For this to work, against a NASA server
+        // then you will need to have valid
+        // Earthdata Login credentials available in the
+        // local filesystem like so:
         // In Unix ~/.netrc should have
         // machine urs.earthdata.nasa.gov
         // login userName
@@ -174,22 +176,21 @@ public class DynamicCoverageDescription extends CoverageDescription {
         if (dataset == null) {
             _log.debug("DMR dataset....NULL; bye-bye");
             throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
-        } else {
-            //////////////////////////////////////////////////////////
-            // this else block extends all the way to almost
-            // end of program with brace commented with }
-            // end if (dataset==null)
+        }
+        //////////////////////////////////////////////////////////
+        // this else block extends all the way to almost
+        // end of program with brace commented with }
+        // end if (dataset==null)
 
-            // FIXME If you need this, put it in a method and call it when the logger is
-            // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
+        // FIXME If you need this, put it in a method and call it when the logger is
+        // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
 
-            _log.debug("Marshalling WCS from DMR at Url: ");
-            _log.debug(dataset.getUrl());
+        _log.debug("Marshalling WCS from DMR at Url: {}",dataset.getUrl());
 
-            ////////////////////////////////////////////////
-            // Sanity Test
-            // Create the Document
-                /* FIXME: The code in comment block doesn't work but should. It complains that saxon9-dom.jar is not available
+        ////////////////////////////////////////////////
+        // Sanity Test
+        // Create the Document
+                /* FIXME: The code in comment block doesn't work but should. It complains that saxon9-dom.jar is not available. Fix or eliminate.
                 DocumentBuilderFactory dbf0 = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db0 = dbf0.newDocumentBuilder();
                 Document document0 = db0.newDocument();
@@ -208,10 +209,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 StreamResult result = new StreamResult(System.out);
                 t.transform(source, result);
                 */
-            // End Sanity Test
+        // End Sanity Test
 
-            ////////////////////////////
-            // echo data set Dimensions - distinct from variable dimension
+        ////////////////////////////
+        // echo data set Dimensions - distinct from variable dimension
+
+
+        /* NOTE: This is the old loop iterator pattern which I have replaced
+           with the for() loop below. By creating default contrsutors in all the
+           related classes we can ensure that none of the getter methods return null.
+           And this frees us to use simpler code. See below
 
             List<Dimension> dimensions = dataset.getDimensions();
 
@@ -227,318 +234,89 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 }
             } // close if then else (dimensions list is non-null and has elements)
 
-            ////////////
-            // Echo Floats, Ints, just for testing
-
-            List<Float32> float32s = dataset.getVars32bitFloats();
-            List<Float64> float64s = dataset.getVars64bitFloats();
-
-            List<Int32> int32s = dataset.getVars32bitIntegers();
-            List<Int64> int64s = dataset.getVars64bitIntegers();
-
-            if (float32s == null || float32s.isEmpty()) {
-                // do nothing
-            } else {
-                ListIterator<Float32> it = float32s.listIterator();
-                while (it.hasNext()) {
-                    int ind = it.nextIndex();
-                    Float32 var = it.next();
-
-                    _log.debug(ind + ". " + var);
-
-                    // list all dims of this Float32
-                    List<Dim> dims = var.getDims();
-
-                    if (dims == null || dims.isEmpty()) {
-                        // do nothing
-                    } else {
-
-                        ListIterator<Dim> dit = dims.listIterator();
-                        while (dit.hasNext()) {
-                            int j = dit.nextIndex();
-                            Dim d = dit.next();
-
-                            _log.debug(j + ". " + d);
-
-                        } // end while dim iterator has more elements
-
-                    } // end if else dims is not NULL or EMPTY
-
-                    // list atrributes of this Float32 element
-                    List<Attribute> attrs = var.getAttributes();
-
-                    if (attrs == null || attrs.isEmpty()) {
-                        _log.debug("Float 32 has not attributes..??");
-                    } else {
-
-                        ListIterator<Attribute> atit = attrs.listIterator();
-                        while (atit.hasNext()) {
-                            int k = atit.nextIndex();
-                            Attribute a = atit.next();
-
-                            _log.debug(k + ". " + a);
-
-                        } // end while attributes iterator has more elements
-
-                    } // end if else attributes List is not NULL or EMPTY
-
-                } // end while floats32 iterator has more elements
-            } // if elseif else (Float32 is not NULL or empty)
-
-            // float 64
-
-            if (float64s == null || float64s.isEmpty()) {
-                // do nothing
-            } else {
-                ListIterator<Float64> it = float64s.listIterator();
-                while (it.hasNext()) {
-                    int ind = it.nextIndex();
-                    Float64 var = it.next();
-
-                    _log.debug(ind + ". " + var);
-
-                    // list all dims of this Float64
-                    List<Dim> dims = var.getDims();
-
-                    if (dims == null || dims.isEmpty()) {
-                        // do nothing
-                    } else {
-
-                        ListIterator<Dim> dit = dims.listIterator();
-                        while (dit.hasNext()) {
-                            int j = dit.nextIndex();
-                            Dim d = dit.next();
-
-                            _log.debug(j + ". " + d);
-
-                        } // end while dim iterator has more elements
-
-                    } // end if else dims is not NULL or EMPTY
-
-                    // list atrributes of this Float32 element
-                    List<Attribute> attrs = var.getAttributes();
-
-                    if (attrs == null || attrs.isEmpty()) {
-                        _log.debug("Float 64 has not attributes..??");
-                    } else {
-
-                        ListIterator<Attribute> atit = attrs.listIterator();
-                        while (atit.hasNext()) {
-                            int k = atit.nextIndex();
-                            Attribute a = atit.next();
-
-                            _log.debug(k + ". " + a);
-
-                        } // end while attributes iterator has more elements
-
-                    } // end if else attributes List is not NULL or EMPTY
-
-                } // end while floats64 iterator has more elements
-            } // if elseif else (Float64 is not NULL or empty)
-
-            // Int32
-
-            if (int32s == null || int32s.isEmpty()) {
-                // do nothing
-            } else {
-                ListIterator<Int32> it = int32s.listIterator();
-                while (it.hasNext()) {
-                    int ind = it.nextIndex();
-                    Int32 var = it.next();
-
-                    _log.debug(ind + ". " + var);
-
-                    // list all dims of this int32
-                    List<Dim> dims = var.getDims();
-
-                    if (dims == null || dims.isEmpty()) {
-                        // do nothing
-                    } else {
-
-                        ListIterator<Dim> dit = dims.listIterator();
-                        while (dit.hasNext()) {
-                            int j = dit.nextIndex();
-                            Dim d = dit.next();
-
-                            _log.debug(j + ". " + d);
-
-                        } // end while dim iterator has more elements
-
-                    } // end if else dims is not NULL or EMPTY
-
-                    // list atrributes of this Int32 element
-                    List<Attribute> attrs = var.getAttributes();
-
-                    if (attrs == null || attrs.isEmpty()) {
-                        _log.debug("Int 32 has not attributes..??");
-                    } else {
-
-                        ListIterator<Attribute> atit = attrs.listIterator();
-                        while (atit.hasNext()) {
-                            int k = atit.nextIndex();
-                            Attribute a = atit.next();
-
-                            _log.debug(k + ". " + a);
-
-                        } // end while attributes iterator has more elements
-
-                    } // end if else attributes List is not NULL or EMPTY
-
-                } // end while ints32 iterator has more elements
-            } // if elseif else (Int32 is not NULL or empty)
-
-            // Int64
-
-            if (int64s == null || int64s.isEmpty()) {
-                // do nothing
-            } else {
-                ListIterator<Int64> it = int64s.listIterator();
-                while (it.hasNext()) {
-                    int ind = it.nextIndex();
-                    Int64 var = it.next();
-
-                    _log.debug(ind + ". " + var);
-
-                    // list all dims of this int32
-                    List<Dim> dims = var.getDims();
-
-                    if (dims == null || dims.isEmpty()) {
-                        // do nothing
-                    } else {
-
-                        ListIterator<Dim> dit = dims.listIterator();
-                        while (dit.hasNext()) {
-                            int j = dit.nextIndex();
-                            Dim d = dit.next();
-
-                            _log.debug(j + ". " + d);
-
-                        } // end while dim iterator has more elements
-
-                    } // end if else dims is not NULL or EMPTY
-
-                    // list atrributes of this Int64 element
-                    List<Attribute> attrs = var.getAttributes();
-
-                    if (attrs == null || attrs.isEmpty()) {
-                        _log.debug("Int 64 has not attributes..??");
-                    } else {
-
-                        ListIterator<Attribute> atit = attrs.listIterator();
-                        while (atit.hasNext()) {
-                            int k = atit.nextIndex();
-                            Attribute a = atit.next();
-
-                            _log.debug(k + ". " + a);
-
-                        } // end while attributes iterator has more elements
-
-                    } // end if else attributes List is not NULL or EMPTY
-
-                } // end while ints64 iterator has more elements
-            } // if else-if else (Int64 is not NULL or empty)
-
-            /////////////////////////////////////////////////////////////////
-            // echo "container" attributes and, yes, attributes of attributes
-            // these attributes and *their* inner attributes (yes they are nested)
-            // will later need to be sniffed for exceptions before marshalling WCS
-            // per Nathan's heauristic
-
-            List<ContainerAttribute> containerAttributes = dataset.getAttributes();
-
-            if (containerAttributes == null) {
-                _log.debug("Container Attribute List NULL");
-            } else if (containerAttributes.size() == 0) {
-                _log.debug("Container Attribute list EMPTY");
-            } else {
-                ListIterator<ContainerAttribute> it = containerAttributes.listIterator();
-                // test for conventions
-                boolean foundConvention = false;
-                boolean cfCompliant = false;
-                while (it.hasNext()) {
-
-                    boolean foundGlobal = false;
-
-                    int index = it.nextIndex();
-                    ContainerAttribute containerAttribute = it.next();
-
-                    _log.debug(index + " " + containerAttribute);
-
-                    String ca_name = containerAttribute.getName();
-                    if (ca_name == null || ca_name.trim().length() == 0) {
-                        // do nothing
-                        _log.debug("Container attribute name NULL or empty");
-                    } else if (ca_name.contains("convention")) {
-                        _log.debug("Found container attribute named convention(s)");
+        */
+
+        // Simpler iteration over content.
+        for(Dimension dim : dataset.getDimensions()){
+            _log.debug(dim.toString());
+
+        }
+
+        /////////////////////////////////////////////////////////
+        // Echo Floats, Ints, just for testing
+        for(Float32 var : dataset.getVars32bitFloats()){
+            ingestDapVar(var);
+        }
+        for(Float64 var : dataset.getVars64bitFloats()){
+            ingestDapVar(var);
+        }
+        for(Int32 var : dataset.getVars32bitIntegers()){
+            ingestDapVar(var);
+        }
+        for(Int64 var : dataset.getVars64bitIntegers()){
+            ingestDapVar(var);
+        }
+
+
+        /////////////////////////////////////////////////////////////////
+        // echo "container" attributes and, yes, attributes of attributes
+        // these attributes and *their* inner attributes (yes they are nested)
+        // will later need to be sniffed for exceptions before marshalling WCS
+        // per Nathan's heauristic
+
+        boolean foundConvention = false;
+        boolean cfCompliant = false;
+        for(ContainerAttribute containerAttribute:dataset.getAttributes() ){
+            boolean foundGlobal = false;
+            _log.debug(containerAttribute.toString());
+
+            String ca_name = containerAttribute.getName();
+            if (ca_name.toLowerCase().contains("convention")) {
+                _log.debug("Found container attribute named convention(s)");
+                foundConvention = true;
+            } // this will find plural conventions
+            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
+                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+                _log.debug("Looking for conventions...attribute");
+                foundGlobal = true;
+            }
+
+            // now enumerate all attributes of the "container" attribute
+
+            for(Attribute a : containerAttribute.getAttributes()) {
+                _log.debug(a.toString());
+
+                if (foundGlobal) {
+                    // test for conventions
+                    String a_name = a.getName();
+
+                    if (a_name == null || a_name.trim().length() == 0) {
+                        // no action
+                        _log.debug("Attribute has no name??");
+                    } else if (a_name.toLowerCase().contains("convention")) {
                         foundConvention = true;
-                    } // this will find plural conventions
-                    else if (ca_name.endsWith("_GLOBAL") || ca_name.equals("DODS_EXTRA")) {
+                        String a_value = a.getValue();
                         _log.debug(
-                                "Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-                        _log.debug("Looking for conventions...attribute");
+                                "Found attribute named convention(s), value = " + a_value);
 
-                        foundGlobal = true;
+                        if (a_value.toLowerCase().contains("cf-")) {
+                            cfCompliant = true;
+                            _log.debug("Dataset is CF Compliant!!");
+                        }
+
                     }
+                } // end Found Global, now look at its attributes
+            }
 
-                    // now enumerate all attributes of the "container" attribute
-
-                    List<Attribute> attributes = containerAttribute.getAttributes();
-
-                    if (attributes == null) {
-                        _log.debug(">> Attribute List NULL");
-                    } else if (attributes.size() == 0) {
-                        _log.debug(">> Attribute list EMPTY");
-                    } else {
-                        ListIterator<Attribute> attr_iterator = attributes.listIterator();
-
-                        while (attr_iterator.hasNext()) {
-
-                            Attribute a = attr_iterator.next();
-                            int ai = attr_iterator.nextIndex();
-                            _log.debug(index + "." + ai + " " + a);
-
-                            if (foundGlobal) {
-                                // test for conventions
-
-                                String a_name = a.getName();
-
-                                if (a_name == null || a_name.trim().length() == 0) {
-                                    // no action
-                                    _log.debug("Attribute has no name??");
-                                } else if (a_name.toLowerCase().contains("convention")) {
-                                    foundConvention = true;
-
-                                    String a_value = a.getValue();
-
-                                    _log.debug(
-                                            "Found attribute named convention(s), value = " + a_value);
-
-                                    if (a_value.contains("CF-")) {
-                                        cfCompliant = true;
-                                        _log.debug("Dataset is CF Compliant!!");
-                                    }
-
-                                }
-
-                            } // end Found Global, now look at its attributes
-
-                        } // end while attribute iterator has next
-
-                    } // end if - else if - else (attributes List is NOT NULL or EMPTY)
-
-                } // end while (containerAttributes has elements) LOOP
-
-                if (foundConvention) {
-                    if (cfCompliant) {
-                        // already announced success
-                    } else {
-                        _log.debug("Found GLOBAL Convention but may not be CF compliant...ERROR");
-                    }
+            if (foundConvention) {
+                if (cfCompliant) {
+                    // already announced success
                 } else {
-                    _log.debug("No conventions found...ERROR");
+                    _log.debug("Found GLOBAL Convention but may not be CF compliant...ERROR");
                 }
-
-            } // end if - else if - else (CONTAINER attributes List is NOT NULL or EMPTY)
+            } else {
+                _log.debug("No conventions found...ERROR");
+            }
 
         } // end if (dataset == null) else { // do everything
 
@@ -893,6 +671,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     }
+
+    private void ingestDapVar(Variable v){
+
+        // list all dims of this Float32
+        for(Dim dim : v.getDims()){
+            _log.debug(dim.toString());
+        }
+        for(Attribute attr:v.getAttributes()){
+            _log.debug(attr.toString());
+        }
+
+    }
+
+
 
     private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
 

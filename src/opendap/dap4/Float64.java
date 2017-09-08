@@ -27,7 +27,11 @@
 package opendap.dap4;
 
 public class Float64 extends Variable {
-	
+
+	public Float64(){
+		super();
+	}
+
 	public String toString()
 	{
 		return "Variable Type Float 64, name = " + this.getName();
