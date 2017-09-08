@@ -563,7 +563,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
-        setDapDatasetUrl(datasetURl);
+        this.setDapDatasetUrl(datasetURl);
         ////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////////////////
@@ -623,8 +623,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
-        addDomainCoordinate(lat);
-        addDomainCoordinate(lon);
+        this.addDomainCoordinate(lat);
+        this.addDomainCoordinate(lon);
         /////////////////////////////////////////////////////////////
 
         net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
@@ -682,7 +682,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
-
         // Note: The index values for the arrays are 0 based and so the upper index is
         // one less than the size.
         List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
@@ -746,9 +745,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         fieldQuantity.setDescription("total_precipitation");
         /////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
-        addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
+        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
         /////////////////////////////////////////////////////////////
-
 
 
         net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
