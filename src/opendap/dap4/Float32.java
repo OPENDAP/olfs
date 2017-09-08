@@ -28,6 +28,10 @@ package opendap.dap4;
 
 public class Float32 extends Variable {
 
+	public Float32(){
+		super();
+	}
+
 	public String toString()
 	{
 		return "Variable Type Float 32, name = " + this.getName();

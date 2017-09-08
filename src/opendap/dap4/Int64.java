@@ -27,6 +27,9 @@
 package opendap.dap4;
 
 public class Int64 extends Variable {
+	public Int64() {
+		super();
+	}
 	public String toString()
 	{
 		return "Variable Type INT 64, name = " + this.getName();

@@ -26,7 +26,10 @@
 
 package opendap.dap4;
 
+import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.*;
 
 /**
@@ -39,9 +42,14 @@ import javax.xml.bind.annotation.*;
  */
 public class ContainerAttribute {
 	
-	private String name = "";
+	private String name;
 	private String type = "Container";
 	private List<Attribute> attributes;
+
+	public ContainerAttribute(){
+		name="";
+		attributes = new Vector<>();
+	}
 	
 	@XmlAttribute
 	public String getName() {
