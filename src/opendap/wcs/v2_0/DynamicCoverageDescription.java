@@ -346,7 +346,17 @@ public class DynamicCoverageDescription extends CoverageDescription {
         } catch (MalformedURLException e) {
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
-        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd, envelopeWithTimePeriod);
+
+        _log.debug("Envelope Southern most latitude is " + envelopeWithTimePeriod.getSouthernmostLatitude());
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
+        net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
+        net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
+        bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
+        cd.setBoundedBy(bs);
+
+
+
+        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
     }
 
     
@@ -644,8 +654,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     private void hardwireTheCdAndDcdForTesting( String id, 
     		                                    URL datasetURl, 
-    		                                    CoverageDescriptionType cd,
-    		                                    EnvelopeWithTimePeriod envelopeWithTimePeriod) throws WcsException {
+    		                                    CoverageDescriptionType cd) throws WcsException {
         //////////////////////////////////////////////////
         // Start WCS CoverageDescription..
         // the OLFS functions from a JDOM wrapper to this
@@ -710,9 +719,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         this.addDomainCoordinate(lon);
         /////////////////////////////////////////////////////////////
 
-        // EnvelopeWithTimePeriodType 
-        _log.debug("Envelope Southern most latitude is " + envelopeWithTimePeriod.getSouthernmostLatitude());
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
         
         // it is obvious from method signature of setBoundedBy in
         // CoverageDescription(cd) that BoundingShapeType is
@@ -722,12 +728,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // this is GENIUS!!...Object factory...could possibly be used for others
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
-        bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
-        // the factory takes care of this...
-        // bs.setEnvelope(new JAXBElement(new QName("http://www.opengis.net/gml/3.2",
-        // "EnvelopeWithTimePeriod"), envelope.getClass(),envelope));
-
-        cd.setBoundedBy(bs);
 
         ///////////////
         // domain set
