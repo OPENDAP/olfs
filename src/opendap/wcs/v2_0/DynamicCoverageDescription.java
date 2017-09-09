@@ -191,6 +191,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
 
+        CoverageDescriptionType cd = new CoverageDescriptionType();
+        URL datasetUrl = null;
+        try {
+            datasetUrl = new URL(dmr.getAttributeValue("base", XML.NS));
+        } catch (MalformedURLException e) {
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+
+
+
         ////////////////////////////
         // echo data set Dimensions - distinct from variable dimension
         /* NOTE: This is the old loop iterator pattern which I have replaced
@@ -222,23 +232,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         }
 
-        /////////////////////////////////////////////////////////
-        // Process the DAP variables found in the DMR.
-        // This means determine if the DAP var is a field, and then
-        // make the appropriate associates in the member variables.
-
-        for(Float32 var : dataset.getVars32bitFloats()){
-            ingestDapVar(var);
-        }
-        for (Float64 var : dataset.getVars64bitFloats()) {
-            ingestDapVar(var);
-        }
-        for (Int32 var : dataset.getVars32bitIntegers()) {
-            ingestDapVar(var);
-        }
-        for (Int64 var : dataset.getVars64bitIntegers()) {
-            ingestDapVar(var);
-        }
 
         /////////////////////////////////////////////////////////////////
         // echo "container" attributes and, yes, attributes of attributes
@@ -339,13 +332,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             }
         }
 
-        CoverageDescriptionType cd = new CoverageDescriptionType();
-        URL datasetUrl = null;
-        try {
-            datasetUrl = new URL(dmr.getAttributeValue("base", XML.NS));
-        } catch (MalformedURLException e) {
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
 
         _log.debug("Envelope Southern most latitude is " + envelopeWithTimePeriod.getSouthernmostLatitude());
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
@@ -354,6 +340,23 @@ public class DynamicCoverageDescription extends CoverageDescription {
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
         cd.setBoundedBy(bs);
 
+        /////////////////////////////////////////////////////////
+        // Process the DAP variables found in the DMR.
+        // This means determine if the DAP var is a field, and then
+        // make the appropriate associates in the member variables.
+
+        for(Float32 var : dataset.getVars32bitFloats()){
+            ingestDapVar(var);
+        }
+        for (Float64 var : dataset.getVars64bitFloats()) {
+            ingestDapVar(var);
+        }
+        for (Int32 var : dataset.getVars32bitIntegers()) {
+            ingestDapVar(var);
+        }
+        for (Int64 var : dataset.getVars64bitIntegers()) {
+            ingestDapVar(var);
+        }
 
 
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
