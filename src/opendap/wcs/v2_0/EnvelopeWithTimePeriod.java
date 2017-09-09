@@ -26,82 +26,153 @@
 
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
+import net.opengis.gml.v_3_2_1.*;
+
+
+/**
+ * Thin wrapper of net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType
+ * facilitates setting of its parameters while iterating over 
+ * the container attributes in DMR Dataset
+ * @author Uday Kari
+ *
+ */
 public class EnvelopeWithTimePeriod {
 
-	private String srsName = "";
-	private String axisLabels = "";
-	private String uomLabels = "";
-	private String srsDimension = "";
+	private String southernmostLatitude = "";
+	private String northernmostLatitude = "";
+	private String westernmostLongitude = "";
+	private String easternmostLongitude = "";
 	
-	private String lowerCorner = "";
-	private String upperCorner = "";
-	private String beginPosition = "";
-	private String endPosition = "";
+	private String rangeBeginningDate = "";
+	private String rangeBeginningTime = "";
+	private String rangeEndingDate = "";
+	private String rangeEndingTime = "";
     
-	@XmlAttribute
-	public String getSrsName() {
-		return srsName;
+	/**
+	 * Provides the OGC GML EnvelopeWithTimePeriodType object using 
+	 * member variables that were captured while iterating 
+	 * over container attributes of a DMR
+	 */
+	public EnvelopeWithTimePeriodType getEnvelope(SimpleSrs srs)
+	{
+        // EnvelopeWithTimePeriodType is part of GML
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
+        
+        
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
+        // both are equivalent spatial reference systems for the ENTIRE globe
+
+        envelope.setSrsName(srs.getName());
+        List<String> axisLabelsAsList = srs.getAxisLabelsList();
+        envelope.setAxisLabels(axisLabelsAsList);
+        List<String> uomLabelsAsList = srs.getUomLabelsList();
+        envelope.setUomLabels(uomLabelsAsList);
+        envelope.setSrsDimension(BigInteger.valueOf(srs.getSrsDimension()));
+
+        net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
+        List<Double> lowerCorner = Arrays.asList(new Double(southernmostLatitude), new Double(westernmostLongitude));
+        envelopeLowerCorner.setValue(lowerCorner);
+        envelope.setLowerCorner(envelopeLowerCorner);
+
+        DirectPositionType envelopeUpperCorner = new DirectPositionType();
+        List<Double> upperCorner = Arrays.asList(new Double(northernmostLatitude), new Double(easternmostLongitude));
+        envelopeUpperCorner.setValue(upperCorner);
+        envelope.setUpperCorner(envelopeUpperCorner);
+
+        TimePositionType beginTimePosition = new TimePositionType();
+        // attribute called frame seems like right place to put ISO-8601 timestamp
+        String beginTimeStr = rangeBeginningDate + "T" + rangeBeginningTime + "Z"; 
+        beginTimePosition.setFrame(beginTimeStr);
+        // However, it can also be specified as below.
+        List<String> timeStrings = Arrays.asList(beginTimeStr);
+        beginTimePosition.setValue(timeStrings);
+        envelope.setBeginPosition(beginTimePosition);
+
+        TimePositionType endTimePosition = new TimePositionType();
+        String endTimeStr = rangeEndingDate + "T" + rangeEndingTime + "Z";
+        endTimePosition.setFrame(endTimeStr);
+        // However, it can also be specified as below.
+        timeStrings = Arrays.asList(beginTimeStr);
+        endTimePosition.setValue(timeStrings);
+        envelope.setEndPosition(endTimePosition);
+        
+        return envelope;
+
 	}
-	public void setSrsName(String srsName) {
-		this.srsName = srsName;
+
+	
+	///////////////////////
+	// getters and setters
+	
+	public String getSouthernmostLatitude() {
+		return southernmostLatitude;
+	}
+
+	public void setSouthernmostLatitude(String southernmostLatitude) {
+		this.southernmostLatitude = southernmostLatitude;
+	}
+
+	public String getNorthernmostLatitude() {
+		return northernmostLatitude;
+	}
+
+	public void setNorthernmostLatitude(String northernmostLatitude) {
+		this.northernmostLatitude = northernmostLatitude;
+	}
+
+	public String getWesternmostLongitude() {
+		return westernmostLongitude;
+	}
+
+	public void setWesternmostLongitude(String westernmostLongitude) {
+		this.westernmostLongitude = westernmostLongitude;
+	}
+
+	public String getEasternmostLongitude() {
+		return easternmostLongitude;
+	}
+
+	public void setEasternmostLongitude(String easternmostLongitude) {
+		this.easternmostLongitude = easternmostLongitude;
+	}
+
+	public String getRangeBeginningDate() {
+		return rangeBeginningDate;
+	}
+
+	public void setRangeBeginningDate(String rangeBeginningDate) {
+		this.rangeBeginningDate = rangeBeginningDate;
+	}
+
+	public String getRangeBeginningTime() {
+		return rangeBeginningTime;
+	}
+
+	public void setRangeBeginningTime(String rangeBeginningTime) {
+		this.rangeBeginningTime = rangeBeginningTime;
+	}
+
+	public String getRangeEndingDate() {
+		return rangeEndingDate;
+	}
+
+	public void setRangeEndingDate(String rangeEndingDate) {
+		this.rangeEndingDate = rangeEndingDate;
+	}
+
+	public String getRangeEndingTime() {
+		return rangeEndingTime;
+	}
+
+	public void setRangeEndingTime(String rangeEndingTime) {
+		this.rangeEndingTime = rangeEndingTime;
 	}
 	
-	@XmlAttribute
-	public String getAxisLabels() {
-		return axisLabels;
-	}
-	public void setAxisLabels(String axisLabels) {
-		this.axisLabels = axisLabels;
-	}
 	
-	@XmlAttribute
-	public String getUomLabels() {
-		return uomLabels;
-	}
-	public void setUomLabels(String uomLabels) {
-		this.uomLabels = uomLabels;
-	}
 	
-	@XmlAttribute
-	public String getSrsDimension() {
-		return srsDimension;
-	}
-	public void setSrsDimension(String srsDimension) {
-		this.srsDimension = srsDimension;
-	}
-	
-	@XmlElement
-	public String getLowerCorner() {
-		return lowerCorner;
-	}
-	public void setLowerCorner(String lowerCorner) {
-		this.lowerCorner = lowerCorner;
-	}
-	
-	@XmlElement
-	public String getUpperCorner() {
-		return upperCorner;
-	}
-	public void setUpperCorner(String upperCorner) {
-		this.upperCorner = upperCorner;
-	}
-	
-	@XmlElement
-	public String getBeginPosition() {
-		return beginPosition;
-	}
-	public void setBeginPosition(String beginPosition) {
-		this.beginPosition = beginPosition;
-	}
-	
-	@XmlElement
-	public String getEndPosition() {
-		return endPosition;
-	}
-	public void setEndPosition(String endPosition) {
-		this.endPosition = endPosition;
-	}
 }

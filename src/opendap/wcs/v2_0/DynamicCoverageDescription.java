@@ -37,7 +37,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
     private SimpleSrs _defaultSrs;
-
+    
+    
     public DynamicCoverageDescription() {
         super();
         _log = LoggerFactory.getLogger(getClass());
@@ -211,9 +212,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 }
             } // close if then else (dimensions list is non-null and has elements)
         */
+        
         /////////////////////////////////////////////////////////
         // Simpler iteration over content
         //
+        
         for (Dimension dim : dataset.getDimensions()) {
             _log.debug(dim.toString());
 
@@ -240,11 +243,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
         /////////////////////////////////////////////////////////////////
         // echo "container" attributes and, yes, attributes of attributes
         // these attributes and *their* inner attributes (yes they are nested)
-        // will later need to be sniffed for exceptions before marshalling WCS
-        // per Nathan's heauristic
+        // will later need to be sniffed for exceptions before marshaling WCS
+        // per Nathan's heuristic
 
         boolean foundConvention = false;
         boolean cfCompliant = false;
+        
+        EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
+        
         for (ContainerAttribute containerAttribute : dataset.getAttributes()) {
             boolean foundGlobal = false;
             _log.debug(containerAttribute.toString());
@@ -260,32 +266,67 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 foundGlobal = true;
             }
 
-            // now enumerate all attributes of the "container" attribute
-
+            
             for (Attribute a : containerAttribute.getAttributes()) {
                 _log.debug(a.toString());
 
+                String a_name = nullProof(a.getName());
+                String a_value = nullProof(a.getValue());
+                
+                
                 if (foundGlobal) {
                     // test for conventions
-                    String a_name = a.getName();
-
-                    if (a_name == null || a_name.trim().length() == 0) {
-                        // no action
-                        _log.debug("Attribute has no name??");
-                    } else if (a_name.toLowerCase().contains("convention")) {
-                        foundConvention = true;
-                        String a_value = a.getValue();
-                        _log.debug(
-                                "Found attribute named convention(s), value = " + a_value);
-
-                        if (a_value.toLowerCase().contains("cf-")) {
-                            cfCompliant = true;
-                            _log.debug("Dataset is CF Compliant!!");
-                        }
-
-                    }
+                	if (stringContains(a_name, "convention")) {
+                		foundConvention = true;
+                		
+                		 _log.debug(
+                                 "Found attribute named convention(s), value = " + a_value);
+                		if (stringContains(a_value, "cf-")) {
+                			cfCompliant = true;	
+                			_log.debug("Dataset is CF Compliant!!");
+                		}
+                	}
                 } // end Found Global, now look at its attributes
-            }
+                
+                
+               // envelope variables
+                
+               
+               if (stringContains(a_name, "NorthernmostLatitude")) {
+            	   envelopeWithTimePeriod.setNorthernmostLatitude(a_value);
+               }
+                
+               if (stringContains(a_name, "WesternmostLongitude")) {
+            	   envelopeWithTimePeriod.setWesternmostLongitude(a_value);
+               }
+
+               if (stringContains(a_name, "EasternmostLongitude")) {
+            	   envelopeWithTimePeriod.setEasternmostLongitude(a_value);
+               }
+
+               if (stringContains(a_name, "SouthernmostLatitude")) {
+            	   envelopeWithTimePeriod.setSouthernmostLatitude(a_value);
+            	   _log.debug("Set southern most latitude to " + a_value);
+               }
+ 
+               if (stringContains(a_name, "RangeBeginningDate")) {
+            	   envelopeWithTimePeriod.setRangeBeginningDate(a_value);
+               }
+
+               if (stringContains(a_name, "RangeBeginningTime")) {
+            	   envelopeWithTimePeriod.setRangeBeginningTime(a_value);
+               }
+
+               if (stringContains(a_name, "RangeEndingDate")) {
+            	   envelopeWithTimePeriod.setRangeEndingDate(a_value);
+               }
+
+               if (stringContains(a_name, "RangeEndingTime")) {
+            	   envelopeWithTimePeriod.setRangeEndingTime(a_value);
+               }
+ 
+                
+            } // end for loop on all container attributes
 
             if (foundConvention) {
                 if (cfCompliant) {
@@ -305,10 +346,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         } catch (MalformedURLException e) {
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
-        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
+        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd, envelopeWithTimePeriod);
     }
 
-
+    
     private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
 
         String name = var.getName();
@@ -512,6 +553,46 @@ public class DynamicCoverageDescription extends CoverageDescription {
          */
     }
 
+    
+    /**
+     * null proof string contains test
+     * @param str the String 
+     * @param sub the test/candiate Sub-string 
+     * @return true only if str contains sub
+     */
+    private boolean stringContains(String str, String sub) {
+    	boolean flag = false;
+    	
+    	if (str == null) 
+    	{
+    		// no action
+    	}
+    	else if (str.trim().length() == 0)
+    	{
+    		// no action 
+    	}
+    	else if (sub == null)
+    	{
+    		// no action
+    	}
+    	else if (sub.trim().length() == 0)
+    	{
+    		// no action
+    	}
+    	else if (str.trim().toLowerCase().contains(sub.trim().toLowerCase()))
+    	{
+    	  flag = true;	
+    	}
+    	
+    	return flag;
+    }
+    
+    private String nullProof(String str) {
+    	if (str == null) return "";
+    	else if (str.trim().length() == 0) return "";
+    	else return str.trim();
+    }
+    
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -561,7 +642,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
-    private void hardwireTheCdAndDcdForTesting( String id, URL datasetURl, CoverageDescriptionType cd) throws WcsException {
+    private void hardwireTheCdAndDcdForTesting( String id, 
+    		                                    URL datasetURl, 
+    		                                    CoverageDescriptionType cd,
+    		                                    EnvelopeWithTimePeriod envelopeWithTimePeriod) throws WcsException {
         //////////////////////////////////////////////////
         // Start WCS CoverageDescription..
         // the OLFS functions from a JDOM wrapper to this
@@ -611,19 +695,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // For time, need to know it is one-dimensional, get a Float 64 number - minutes since - ISO string - need to further process
         //
 
-        // EnvelopeWithTimePeriodType is part of GML
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
-        // both are equivalent spatial reference systems for the ENTIRE globe
-
-        envelope.setSrsName(_defaultSrs.getName());
-        List<String> axisLabelsAsList = _defaultSrs.getAxisLabelsList();
-        envelope.setAxisLabels(axisLabelsAsList);
-        List<String> uomLabelsAsList = _defaultSrs.getUomLabelsList();
-        envelope.setUomLabels(uomLabelsAsList);
-        envelope.setSrsDimension(BigInteger.valueOf(_defaultSrs.getSrsDimension()));
-
+        
         DomainCoordinate lat, lon;
         try {
             lat = new DomainCoordinate("latitude","latitude","degrees_north","",361);
@@ -638,33 +710,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         this.addDomainCoordinate(lon);
         /////////////////////////////////////////////////////////////
 
-        net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
-        List<Double> lowerCorner = Arrays.asList(new Double("-90.00"), new Double("-180.00"));
-        envelopeLowerCorner.setValue(lowerCorner);
-        envelope.setLowerCorner(envelopeLowerCorner);
-
-        DirectPositionType envelopeUpperCorner = new DirectPositionType();
-        List<Double> upperCorner = Arrays.asList(new Double("+90.00"), new Double("+179.375"));
-        envelopeUpperCorner.setValue(upperCorner);
-        envelope.setUpperCorner(envelopeUpperCorner);
-
-        TimePositionType beginTimePosition = new TimePositionType();
-        // attribute called frame seems like right place to put ISO-8601 timestamp
-        String beginTimeStr = "1980-01-01T00:30:00.000Z";
-        beginTimePosition.setFrame(beginTimeStr);
-        // However, it can also be specified as below.
-        List<String> timeStrings = Arrays.asList(beginTimeStr);
-        beginTimePosition.setValue(timeStrings);
-        envelope.setBeginPosition(beginTimePosition);
-
-        TimePositionType endTimePosition = new TimePositionType();
-        String endTimeStr = "1980-02-01T00:00:00.000Z";
-        endTimePosition.setFrame(endTimeStr);
-        // However, it can also be specified as below.
-        timeStrings = Arrays.asList(beginTimeStr);
-        endTimePosition.setValue(timeStrings);
-        envelope.setEndPosition(endTimePosition);
-
+        // EnvelopeWithTimePeriodType 
+        _log.debug("Envelope Southern most latitude is " + envelopeWithTimePeriod.getSouthernmostLatitude());
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
+        
         // it is obvious from method signature of setBoundedBy in
         // CoverageDescription(cd) that BoundingShapeType is
         // needed as argument. It is just an thin-wrapper to the
