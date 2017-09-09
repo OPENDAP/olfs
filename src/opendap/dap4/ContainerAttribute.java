@@ -81,7 +81,7 @@ public class ContainerAttribute {
 			   ",  type = " + type;
     }
 
-    public String getValue(String name, boolean ignoreCase, boolean nullProof){
+    public String getAttributeValue(String name, boolean ignoreCase, boolean nullProof){
 		for(Attribute attribute:attributes){
 			if(ignoreCase)
 				if(name.equalsIgnoreCase(attribute.getName())){
