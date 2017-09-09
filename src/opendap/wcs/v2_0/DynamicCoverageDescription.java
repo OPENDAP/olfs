@@ -345,20 +345,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // This means determine if the DAP var is a field, and then
         // make the appropriate associates in the member variables.
 
-        for(Float32 var : dataset.getVars32bitFloats()){
-            ingestDapVar(var);
-        }
-        for (Float64 var : dataset.getVars64bitFloats()) {
-            ingestDapVar(var);
-        }
-        for (Int32 var : dataset.getVars32bitIntegers()) {
-            ingestDapVar(var);
-        }
-        for (Int64 var : dataset.getVars64bitIntegers()) {
+        for(Variable var : dataset.getVariables()){
             ingestDapVar(var);
         }
 
-
+        
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
     }
 
