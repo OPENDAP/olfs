@@ -72,6 +72,7 @@ import org.w3c.dom.Document;
  *
  * @author ukari
  */
+@Deprecated
 public class WcsMarshaller {
 
     protected Element _myCD;
