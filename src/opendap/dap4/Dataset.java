@@ -175,15 +175,14 @@ public class Dataset {
                 foundGlobal = true;
             }
             if (foundGlobal) {
-
                 for (Attribute a : containerAttribute.getAttributes()) {
-                _log.debug(a.toString());
+                    _log.debug(a.toString());
 
-                String a_name = a.getName();
-                a_name = a_name==null?"":a_name;
+                    String a_name = a.getName();
+                    a_name = a_name==null?"":a_name;
 
-                String a_value = a.getValue();
-                a_value = a_value==null?"":a_value;
+                    String a_value = a.getValue();
+                    a_value = a_value==null?"":a_value;
 
                     // test for conventions
                     if (a_name.toLowerCase().contains("convention")) {
