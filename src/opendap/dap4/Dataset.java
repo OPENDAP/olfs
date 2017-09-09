@@ -100,7 +100,8 @@ public class Dataset {
 
 
 	public void setAttributes(List<ContainerAttribute> attributes) {
-		this.attributes = attributes;
+
+	    this.attributes = attributes;
 	}
 
 	@XmlElement(name="Dimension")
@@ -173,7 +174,9 @@ public class Dataset {
                 _log.debug("Looking for conventions...attribute");
                 foundGlobal = true;
             }
-            for (Attribute a : containerAttribute.getAttributes()) {
+            if (foundGlobal) {
+
+                for (Attribute a : containerAttribute.getAttributes()) {
                 _log.debug(a.toString());
 
                 String a_name = a.getName();
@@ -182,7 +185,6 @@ public class Dataset {
                 String a_value = a.getValue();
                 a_value = a_value==null?"":a_value;
 
-                if (foundGlobal) {
                     // test for conventions
                     if (a_name.toLowerCase().contains("convention")) {
 
