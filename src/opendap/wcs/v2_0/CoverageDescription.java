@@ -88,11 +88,6 @@ public class CoverageDescription {
 
     boolean _initialized = false;
 
-    /**
-     * FIXME: The use of the member variable _fields is broken. There is no default assignment. And it violates the idea tha the list of fields get generated from the document. If it was added for just LfcMarshaller then can we drop it and the API changes - setFields() and getFieldsList() ??
-     */
-    private List<Field> _fields;
-
     public CoverageDescription() {
         _log = LoggerFactory.getLogger(this.getClass());
         _lastModified = System.currentTimeMillis();
@@ -797,39 +792,12 @@ public class CoverageDescription {
     }
 
 
-    /**
-     * FIXME: Can we dispose of this aparently unused method?
-     * Why is this here? Because of the exception handling?
-     * I am certain that this is never called because it cannot work -
-     * the member variable _fields is never assigned so will always be null.
-     * the method getFields() returns a Vector, which is an implmentation
-     * of List so this seem redundant.
-     * If this is about JAXB then why not annotate  the getFields() method?
-     *
-     * @return
-     */
-    @XmlElement(name = "field")
-    public List<Field> getFieldsList() {
-        if (this._fields == null || this._fields.isEmpty()) {
-            try {
-                _fields.addAll(getFields());
-            } catch (Exception e) {
-
-            }
-        }
-
-        return this._fields;
-    }
 
     public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
 
         Coverage coverage = new Coverage(this, requestUrl);
 
         return coverage;
-    }
-
-    public void setFields(List<Field> fields) {
-        this._fields = fields;
     }
 
     @XmlAttribute(name = "fileName")

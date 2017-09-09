@@ -81,6 +81,14 @@ public class ContainerAttribute {
 			   ",  type = " + type;
     }
 
+    /**
+     * Returns the value of the requested attribute, ignore the case of the name as directed, and returning null
+     * or empty string as directed.
+     * @param name Name of Attribute whose value to return
+     * @param ignoreCase Ignore case in the name search
+     * @param nullProof If true return empty string instead of null.
+     * @return
+     */
     public String getAttributeValue(String name, boolean ignoreCase, boolean nullProof){
         String value;
 		for(Attribute attribute:attributes){
