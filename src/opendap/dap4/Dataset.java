@@ -26,6 +26,9 @@
 
 package opendap.dap4;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import javax.xml.bind.annotation.*;
 
@@ -37,6 +40,7 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement (name="Dataset")
 public class Dataset {
 
+    Logger _log;
 	// FIXME: change the name from "coverageId" to "name" and modify setter and getter accordingly. ndp 9/7/17
 	private String coverageId;
 	private String url;
@@ -55,6 +59,7 @@ public class Dataset {
 	 * This default constructor intializes all of the stuff so things can never be null.
 	 */
 	public Dataset() {
+	    _log = LoggerFactory.getLogger(this.getClass());
 		coverageId = "";
 		url = "";
 		dimensions = new Vector<>();
@@ -154,5 +159,45 @@ public class Dataset {
 	public Vector<Variable> getVariables(){
 	    return _myVars;
     }
+
+    public boolean usesCfConventions(){
+        for (ContainerAttribute containerAttribute : attributes) {
+            boolean foundGlobal = false;
+
+            String ca_name = containerAttribute.getName();
+            if (ca_name.toLowerCase().contains("convention")) {
+                _log.debug("Found container attribute named convention(s)");
+            } // this will find plural conventions
+            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
+                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+                _log.debug("Looking for conventions...attribute");
+                foundGlobal = true;
+            }
+            for (Attribute a : containerAttribute.getAttributes()) {
+                _log.debug(a.toString());
+
+                String a_name = a.getName();
+                a_name = a_name==null?"":a_name;
+
+                String a_value = a.getValue();
+                a_value = a_value==null?"":a_value;
+
+                if (foundGlobal) {
+                    // test for conventions
+                    if (a_name.toLowerCase().contains("convention")) {
+
+                        _log.debug(
+                                "Found attribute named convention(s), value = " + a_value);
+                        if (a_value.toLowerCase().contains("cf-")) {
+                            _log.debug("Dataset is CF Compliant!!");
+                            return true;
+                        }
+                    }
+                }
+            } // end for loop on all container attributes
+        }
+        return false;
+    }
+
 
 }
