@@ -264,7 +264,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(-90.0, -180.0);
+        position.withValue(Double.valueOf(envelopeWithTimePeriod.getSouthernmostLatitude()), 
+                           Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
         point.setId("GridOrigin-" + dataset.getCoverageId());
