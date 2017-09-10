@@ -173,6 +173,17 @@ public class EnvelopeWithTimePeriod {
 		this.rangeEndingTime = rangeEndingTime;
 	}
 	
-	
+	public String toString()
+	{
+		return "Envelope with Time Period " +
+	           ", southernmostLatitude = "  + southernmostLatitude +
+	           ", northernmostLatitude = "  + northernmostLatitude +
+	           ", easternmostLongitude = "  + easternmostLongitude +
+	           ", westernmostLongitude = "  + westernmostLongitude +
+	           ", time from " + 
+	           rangeBeginningDate + "T" + rangeBeginningTime + "Z" + 
+	           " to " + 
+	           rangeEndingDate + "T" + rangeEndingTime + "Z";
+	}
 	
 }

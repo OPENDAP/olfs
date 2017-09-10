@@ -29,6 +29,8 @@ package opendap.dap4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import opendap.wcs.v2_0.Util;
+
 import java.util.*;
 import javax.xml.bind.annotation.*;
 
@@ -100,8 +102,7 @@ public class Dataset {
 
 
 	public void setAttributes(List<ContainerAttribute> attributes) {
-
-	    this.attributes = attributes;
+		this.attributes = attributes;
 	}
 
 	@XmlElement(name="Dimension")
@@ -174,16 +175,16 @@ public class Dataset {
                 _log.debug("Looking for conventions...attribute");
                 foundGlobal = true;
             }
-            if (foundGlobal) {
-                for (Attribute a : containerAttribute.getAttributes()) {
-                    _log.debug(a.toString());
+            for (Attribute a : containerAttribute.getAttributes()) {
+                _log.debug(a.toString());
 
-                    String a_name = a.getName();
-                    a_name = a_name==null?"":a_name;
+                String a_name = a.getName();
+                a_name = a_name==null?"":a_name;
 
-                    String a_value = a.getValue();
-                    a_value = a_value==null?"":a_value;
+                String a_value = a.getValue();
+                a_value = a_value==null?"":a_value;
 
+                if (foundGlobal) {
                     // test for conventions
                     if (a_name.toLowerCase().contains("convention")) {
 
@@ -199,6 +200,23 @@ public class Dataset {
         }
         return false;
     }
+        
+   public String getValueOfAttributeWithNameLike(String name) {
+	 
+     String value = "";
+	   
+     for (ContainerAttribute containerAttribute : attributes) {
+       	for (Attribute a : containerAttribute.getAttributes()) {
+
+          String a_name = Util.nullProof(a.getName());
+          String a_value = Util.nullProof(a.getValue());
+          // FIX ME the very first match - make more sophisticated later - gather all matches, rank them etc.
+          if (Util.stringContains(a_name, name)) value = a_value;
+        }
+      }
+     
+     return value;
+   }
 
 
 }

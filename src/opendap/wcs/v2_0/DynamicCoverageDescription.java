@@ -201,30 +201,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
-        ////////////////////////////
-        // echo data set Dimensions - distinct from variable dimension
-        /* NOTE: This is the old loop iterator pattern which I have replaced
-           with the for() loop below. By creating default contrsutors in all the
-           related classes we can ensure that none of the getter methods return null.
-           And this frees us to use simpler code. See below
-
-            List<Dimension> dimensions = dataset.getDimensions();
-
-            if (dimensions == null) {
-                _log.debug("Dimensions List NULL");
-            } else if (dimensions.size() == 0) {
-                _log.debug("Dimensions list EMPTY");
-            } else {
-                ListIterator dimIter = dimensions.listIterator();
-                // we know it is non-null and non-empty, so safe to do this right away
-                while (dimIter.hasNext()) {
-                    _log.debug(dimIter.nextIndex() + ". " + dimIter.next());
-                }
-            } // close if then else (dimensions list is non-null and has elements)
-        */
         
         /////////////////////////////////////////////////////////
-        // Simpler iteration over content
+        // iteration over dimenions 
         //
         
         for (Dimension dim : dataset.getDimensions()) {
@@ -232,108 +211,21 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         }
 
-
-        /////////////////////////////////////////////////////////////////
-        // echo "container" attributes and, yes, attributes of attributes
-        // these attributes and *their* inner attributes (yes they are nested)
-        // will later need to be sniffed for exceptions before marshaling WCS
-        // per Nathan's heuristic
-
-        boolean foundConvention = false;
-        boolean cfCompliant = false;
-        
+        // compute the envelope from dataset
         EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
+      
+        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfAttributeWithNameLike("NorthernmostLatitude"));
+        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfAttributeWithNameLike("SouthernmostLatitude"));
+        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfAttributeWithNameLike("EasternmostLongitude"));
+        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfAttributeWithNameLike("WesternmostLongitude"));
         
-        for (ContainerAttribute containerAttribute : dataset.getAttributes()) {
-            boolean foundGlobal = false;
-            _log.debug(containerAttribute.toString());
-
-            String ca_name = containerAttribute.getName();
-            if (ca_name.toLowerCase().contains("convention")) {
-                _log.debug("Found container attribute named convention(s)");
-                foundConvention = true;
-            } // this will find plural conventions
-            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
-                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-                _log.debug("Looking for conventions...attribute");
-                foundGlobal = true;
-            }
-
-            
-            for (Attribute a : containerAttribute.getAttributes()) {
-                _log.debug(a.toString());
-
-                String a_name = nullProof(a.getName());
-                String a_value = nullProof(a.getValue());
-                
-                
-                if (foundGlobal) {
-                    // test for conventions
-                	if (stringContains(a_name, "convention")) {
-                		foundConvention = true;
-                		
-                		 _log.debug(
-                                 "Found attribute named convention(s), value = " + a_value);
-                		if (stringContains(a_value, "cf-")) {
-                			cfCompliant = true;	
-                			_log.debug("Dataset is CF Compliant!!");
-                		}
-                	}
-                } // end Found Global, now look at its attributes
-                
-                
-               // envelope variables
-                
-               
-               if (stringContains(a_name, "NorthernmostLatitude")) {
-            	   envelopeWithTimePeriod.setNorthernmostLatitude(a_value);
-               }
-                
-               if (stringContains(a_name, "WesternmostLongitude")) {
-            	   envelopeWithTimePeriod.setWesternmostLongitude(a_value);
-               }
-
-               if (stringContains(a_name, "EasternmostLongitude")) {
-            	   envelopeWithTimePeriod.setEasternmostLongitude(a_value);
-               }
-
-               if (stringContains(a_name, "SouthernmostLatitude")) {
-            	   envelopeWithTimePeriod.setSouthernmostLatitude(a_value);
-            	   _log.debug("Set southern most latitude to " + a_value);
-               }
- 
-               if (stringContains(a_name, "RangeBeginningDate")) {
-            	   envelopeWithTimePeriod.setRangeBeginningDate(a_value);
-               }
-
-               if (stringContains(a_name, "RangeBeginningTime")) {
-            	   envelopeWithTimePeriod.setRangeBeginningTime(a_value);
-               }
-
-               if (stringContains(a_name, "RangeEndingDate")) {
-            	   envelopeWithTimePeriod.setRangeEndingDate(a_value);
-               }
-
-               if (stringContains(a_name, "RangeEndingTime")) {
-            	   envelopeWithTimePeriod.setRangeEndingTime(a_value);
-               }
- 
-                
-            } // end for loop on all container attributes
-
-            if (foundConvention) {
-                if (cfCompliant) {
-                    // already announced success
-                } else {
-                    _log.debug("Found GLOBAL Convention but may not be CF compliant...ERROR");
-                }
-            } else {
-                _log.debug("No conventions found...ERROR");
-            }
-        }
-
-
-        _log.debug("Envelope Southern most latitude is " + envelopeWithTimePeriod.getSouthernmostLatitude());
+        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfAttributeWithNameLike("RangeBeginningDate"));
+        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfAttributeWithNameLike("RangeBeginningTime"));
+        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfAttributeWithNameLike("RangeEndingDate"));
+        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfAttributeWithNameLike("RangeEndingTime"));
+        
+        _log.debug(envelopeWithTimePeriod.toString());
+        
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
@@ -558,45 +450,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     
-    /**
-     * null proof string contains test
-     * @param str the String 
-     * @param sub the test/candiate Sub-string 
-     * @return true only if str contains sub
-     */
-    private boolean stringContains(String str, String sub) {
-    	boolean flag = false;
-    	
-    	if (str == null) 
-    	{
-    		// no action
-    	}
-    	else if (str.trim().length() == 0)
-    	{
-    		// no action 
-    	}
-    	else if (sub == null)
-    	{
-    		// no action
-    	}
-    	else if (sub.trim().length() == 0)
-    	{
-    		// no action
-    	}
-    	else if (str.trim().toLowerCase().contains(sub.trim().toLowerCase()))
-    	{
-    	  flag = true;	
-    	}
-    	
-    	return flag;
-    }
-    
-    private String nullProof(String str) {
-    	if (str == null) return "";
-    	else if (str.trim().length() == 0) return "";
-    	else return str.trim();
-    }
-    
+     
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
