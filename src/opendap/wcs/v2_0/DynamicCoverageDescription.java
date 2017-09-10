@@ -200,36 +200,93 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
 
-
-        
-        /////////////////////////////////////////////////////////
-        // iteration over dimenions 
-        //
-        
-        for (Dimension dim : dataset.getDimensions()) {
-            _log.debug(dim.toString());
-
+        DomainCoordinate lat, lon;
+        try {
+            lat = new DomainCoordinate("latitude","latitude","degrees_north","",dataset.getSizeOfDimensionWithNameLike("lat"));
+            lon = new DomainCoordinate("longitude","longitude","degrees_east","",dataset.getSizeOfDimensionWithNameLike("lon"));
+        } catch (BadParameterException e) {
+            // This shouldn't happen based on the stuff above...
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
-
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        this.addDomainCoordinate(lat);
+        this.addDomainCoordinate(lon);
+        /////////////////////////////////////////////////////////////
+        
         // compute the envelope from dataset
         EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
       
-        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfAttributeWithNameLike("NorthernmostLatitude"));
-        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfAttributeWithNameLike("SouthernmostLatitude"));
-        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfAttributeWithNameLike("EasternmostLongitude"));
-        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfAttributeWithNameLike("WesternmostLongitude"));
+        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("NorthernmostLatitude"));
+        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("SouthernmostLatitude"));
+        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("EasternmostLongitude"));
+        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("WesternmostLongitude"));
         
-        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfAttributeWithNameLike("RangeBeginningDate"));
-        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfAttributeWithNameLike("RangeBeginningTime"));
-        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfAttributeWithNameLike("RangeEndingDate"));
-        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfAttributeWithNameLike("RangeEndingTime"));
+        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningDate"));
+        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningTime"));
+        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingDate"));
+        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingTime"));
         
         _log.debug(envelopeWithTimePeriod.toString());
         
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
+
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
+
+        // Grid Envelope
+        net.opengis.gml.v_3_2_1.GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
+
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        // Note: The index values for the arrays are 0 based and so the upper index is
+        // one less than the size.
+        List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
+        List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
+        gridEnvelope.withHigh(upper).withLow(lower);
+        ////////////////////////////////////////////////////////////
+
+        // Create the limits, set the envelope on them.
+        GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
+        gridLimits.withGridEnvelope(gridEnvelope);
+
+        net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
+        net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
+        rectifiedGrid.setDimension(new BigInteger(this.getDomainCoordinates().size()+""));
+        rectifiedGrid.setId(dataset.getCoverageId());
+
+        //Create the grid envelope for the limits
+        rectifiedGrid.setLimits(gridLimits);
+
+        List<String> axisLabels = Arrays.asList(_defaultSrs.getAxisLabels());
+        rectifiedGrid.setAxisLabels(axisLabels);
+
+        // Create the Origin.
+        DirectPositionType position = gmlFactory.createDirectPositionType();
+        position.withValue(-90.0, -180.0);
+        PointType point = gmlFactory.createPointType();
+        point.withPos(position);
+        point.setId("GridOrigin-" + dataset.getCoverageId());
+        point.setSrsName(_defaultSrs.getName());
+        PointPropertyType origin = gmlFactory.createPointPropertyType();
+        origin.withPoint(point);
+        rectifiedGrid.setOrigin(origin);
+
+        // Create the offset vector.
+        List<VectorType> offsetList = new ArrayList<VectorType>();
+        VectorType offset1 = gmlFactory.createVectorType();
+        offset1.withValue(dataset.getLatitudeResolution(), 0.0);
+        offset1.setSrsName(_defaultSrs.getName());
+        offsetList.add(offset1);
+        VectorType offset2 = gmlFactory.createVectorType();
+        offset2.withValue(0.0, dataset.getLongitudeResolution());
+        offset2.setSrsName(_defaultSrs.getName());
+        offsetList.add(offset2);
+        rectifiedGrid.setOffsetVector(offsetList);
+
+        domainSet.setAbstractGeometry(gmlFactory.createRectifiedGrid(rectifiedGrid));
+        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
         cd.setBoundedBy(bs);
 
         /////////////////////////////////////////////////////////
@@ -516,126 +573,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Crucial member variable state setting...
         this.setDapDatasetUrl(datasetURl);
         ////////////////////////////////////////////////////////////
-
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Envelope with Time Period:
-        // lowerCorner, UpperCorner and Time Position
-        // The ability to reflect time period is most important difference between WCS and other mapping services like WFS
-        // May or may not find these in the attributes in DMR
-        // look for camelCase NorthernMostLatitude, SouthernMostLatitude etc - in global attribute in the bottom of the file
-        // not CF- names (Nathan: too bad we do not have the range function rolled out yet, but when we do will be helpful)
-        // look at netCDF attribute convention for dataset discovery page (out-of-date and/or may be subsumed into CF-16)
-        // while "SouthernMostLatitude" doed not exist in any standard..."SouthernMost [space] Latitude" does ... in some form
-        // Also: instead of lookingt at the attributes (metadata), can perhaps derive from dataset values themselves...may be too complicated
-        // so...for version #1: we will NOT look at anywhere other than attributes to get...this spatial temporal envelope
-        // also punt on the SRS - use the entire global if nothing else specified.
-        // Build up a list of candidate attribute names, look for this in particular variable and also the global attributes
-        // Variables have shared dimensions specified, but defined typically at the top of the dataset, but could be referencing somewhere else
-        // Absolutely can trust what is in the DMR, but instead of repeating - they shove them at the end as global attributes
-        // There are other reasons for being global as well. For instance everyone of these variables have the same longitude and latitude
-        // so instead of repeating, they just put them down with global specs.
-        // Hence the RULE: look into local variable for lat/long of envelope, and barring that look in the global attributes, and if not even there skip envelope definition
-        // Look for any attribute whose name contains "Southern", "Southern Most" - pretty hokey!
-        // Look at container - NC_GLOBAL.  Value of conventions is CF-1.  For all practical - standard.
-        //
-        // For time - compute timestamp using minutes value since 1980. Hard to suss out but doable.  Formulate a DAP URL and request that.
-        // WHOLE LOT MORE RELIABLE than parsing attributes (which could just be wrong): reading data from the file DAP style for lat, long of envelope as well.
-        // Can write quick test for monotonic increasing, rectified grid etc.
-        // should we make new server function - rather than doing java.  Range along will be a huge improvement.
-        // RULE for "what is the envelope?" would be to use does-not-quite exist yet RANGE function and possibly other server functions
-        // so...very little point in doing this in java - since this too far from the data itself.
-        // There is a range function in server - in master branch.  "function_result_fnoc1.nc" - totally works. Not in testbest13 yet. produces illegal output, buggy(?)
-        // For range (will not fix now), BOTTOM LINE, do multiple invocations, get values back ... and do stuff
-        //  get them back as data, or ASCII and parse it
-        // James: You can EITHER formulate a URL that calls this range function to return a DAP dataset, extract value of DAP dataset and work with them, OR
-        // OR get ASCII (advantage being no need for importing DAP classes to construct DAP Data Response object...this is the way to go since not big)
-        // For time, need to know it is one-dimensional, get a Float 64 number - minutes since - ISO string - need to further process
-        //
-
-        
-        DomainCoordinate lat, lon;
-        try {
-            lat = new DomainCoordinate("latitude","latitude","degrees_north","",361);
-            lon = new DomainCoordinate("longitude","longitude","degrees_east","",576);
-        } catch (BadParameterException e) {
-            // This shouldn't happen based on the stuff above...
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addDomainCoordinate(lat);
-        this.addDomainCoordinate(lon);
-        /////////////////////////////////////////////////////////////
-
-        
-        // it is obvious from method signature of setBoundedBy in
-        // CoverageDescription(cd) that BoundingShapeType is
-        // needed as argument. It is just an thin-wrapper to the
-        // more substantial EnvelopwithTimePeriod object
-        net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
-
-        // this is GENIUS!!...Object factory...could possibly be used for others
-        net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
-
-        ///////////////
-        // domain set
-
-        net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
-        net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-        rectifiedGrid.setDimension(new BigInteger("2"));
-        rectifiedGrid.setId("Grid-MERRA2_200.inst1_2d_asm_Nx.19920123.nc4");
-
-        // Create the grid envelope for the limits
-        GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
-
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        // Note: The index values for the arrays are 0 based and so the upper index is
-        // one less than the size.
-        List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
-        List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
-        gridEnvelope.withHigh(upper).withLow(lower);
-        ////////////////////////////////////////////////////////////
-
-        // Create the limits, set the envelope on them.
-        GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
-        gridLimits.withGridEnvelope(gridEnvelope);
-        rectifiedGrid.setLimits(gridLimits);
-
-        List<String> axisLabels = Arrays.asList("latitude longitude");
-        rectifiedGrid.setAxisLabels(axisLabels);
-
-        // Create the Origin.
-        DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(-90.0, -180.0);
-        PointType point = gmlFactory.createPointType();
-        point.withPos(position);
-        point.setId("GridOrigin-MERRA2_200.inst1_2d_asm_Nx.19920123.nc4");
-        point.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        PointPropertyType origin = gmlFactory.createPointPropertyType();
-        origin.withPoint(point);
-        rectifiedGrid.setOrigin(origin);
-
-        // Create the offset vector.
-        List<VectorType> offsetList = new ArrayList<VectorType>();
-        VectorType offset1 = gmlFactory.createVectorType();
-        offset1.withValue(0.5, 0.0);
-        offset1.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        offsetList.add(offset1);
-        VectorType offset2 = gmlFactory.createVectorType();
-        offset2.withValue(0.0, 0.625);
-        offset2.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        offsetList.add(offset2);
-        rectifiedGrid.setOffsetVector(offsetList);
-
-        domainSet.setAbstractGeometry(gmlFactory.createRectifiedGrid(rectifiedGrid));
-        // equivalent to: domainSet.setAbstractGeometry(new JAXBElement(new
-        // QName("http://www.opengis.net/gml/3.2", "RectifiedGrid"),
-        // rectifiedGrid.getClass(),rectifiedGrid));
-        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-        // equivalent to: cd.setDomainSet(new JAXBElement(new
-        // QName("http://www.opengis.net/gml/3.2", "domainSet"),
-        // domainSet.getClass(),domainSet));
 
         ///////////////
         // Range Type

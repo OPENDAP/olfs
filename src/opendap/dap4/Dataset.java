@@ -29,6 +29,8 @@ package opendap.dap4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.util.Utils;
+
 import opendap.wcs.v2_0.Util;
 
 import java.util.*;
@@ -201,7 +203,7 @@ public class Dataset {
         return false;
     }
         
-   public String getValueOfAttributeWithNameLike(String name) {
+   public String getValueOfContainerAttributeWithNameLike(String name) {
 	 
      String value = "";
 	   
@@ -218,5 +220,63 @@ public class Dataset {
      return value;
    }
 
+   
+   public int getSizeOfDimensionWithNameLike(String name)
+   {
+     int value = 0;
+     
+     for (Dimension dim : dimensions) {
+       if (Utils.contains(dim.getName(), name)) {
+        
+         try
+         {
+           value = Integer.parseInt(dim.getSize());
+         }
+         catch (java.lang.NumberFormatException e)
+         {
+           _log.debug("could not parse size of dimension" + dim.getName() + ": " + dim.getSize() );  
+           _log.debug(e.toString());
+           _log.debug("returning ZERO");
+         }
+       }  
+     }
+     
+     return value;
+   }
+   
+   public double getLatitudeResolution()
+   {
+     double lat = 0.0;
+     
+     try
+     {
+       lat = Double.parseDouble(this.getValueOfContainerAttributeWithNameLike("LatitudeResolution"));
+     }
+     catch (Exception e)
+     {
+       _log.debug("could not get LATITUDE resolution ");  
+       _log.debug(e.toString());
+       _log.debug("returning ZERO");
+     }
+     
+     return lat;
+   }
 
+   public double getLongitudeResolution()
+   {
+     double lat = 0.0;
+     
+     try
+     {
+       lat = Double.parseDouble(this.getValueOfContainerAttributeWithNameLike("LongitudeResolution"));
+     }
+     catch (Exception e)
+     {
+       _log.debug("could not get LONGITUDE resolution ");  
+       _log.debug(e.toString());
+       _log.debug("returning ZERO");
+     }
+     
+     return lat;
+   }
 }
