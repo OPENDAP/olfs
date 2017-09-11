@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 import java.io.*;
 
 //import org.jdom.Document;
+import opendap.dap4.Util;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;

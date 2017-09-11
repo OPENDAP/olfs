@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.wcs.v2_0;
+package opendap.dap4;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
