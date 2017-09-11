@@ -645,7 +645,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         cd.setServiceParameters(serviceParameters);
 
-
         _myCD = coverageDescriptionType2JDOM(cd);
 
     }
