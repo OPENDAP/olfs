@@ -29,8 +29,6 @@ package opendap.dap4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.javafx.util.Utils;
-
 import opendap.wcs.v2_0.Util;
 
 import java.util.*;
@@ -239,7 +237,7 @@ public class Dataset {
      int value = 0;
      
      for (Dimension dim : dimensions) {
-       if (Utils.contains(dim.getName(), name)) {
+       if (Util.stringContains(dim.getName(), name)) {
         
          try
          {
