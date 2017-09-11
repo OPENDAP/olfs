@@ -290,6 +290,46 @@ public class DynamicCoverageDescription extends CoverageDescription {
         cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
         cd.setBoundedBy(bs);
 
+
+        net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new  net.opengis.swecommon.v_2_0.DataRecordPropertyType();
+        net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
+        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
+
+        // FIX ME:  this would be elegant but not functional...yet
+        // we are not understanding - how exactly does JAXB do its magic
+        for(Variable var : dataset.getVariables()){
+        	fieldList.add(getField(var));
+        }
+        _log.debug("added " + dataset.getVariables().size() + " fields to data record");
+
+        // since the dataset does not seem to setting variabes as expected through setter
+        // just brute force it for now...have to know each and every datatype beforehand
+        
+        for(Variable var : dataset.getVars32bitFloats()){
+        	fieldList.add(getField(var));
+        }
+        _log.debug("added " + dataset.getVars32bitFloats().size() + " 32-bit Floats data record");
+
+        for(Variable var : dataset.getVars64bitFloats()){
+        	fieldList.add(getField(var));
+        }
+        _log.debug("added " + dataset.getVars64bitFloats().size() + " 64-bit Floats data record");
+        
+        for(Variable var : dataset.getVars32bitIntegers()){
+        	fieldList.add(getField(var));
+        }
+        _log.debug("added " + dataset.getVars32bitIntegers().size() + " 32-bit Ints data record");
+        
+        for(Variable var : dataset.getVars64bitIntegers()){
+        	fieldList.add(getField(var));
+        }
+        _log.debug("added " + dataset.getVars64bitIntegers().size() + " 64-bit Ints data record");
+        
+        dataRecord.setField(fieldList);
+        rangeType.setDataRecord(dataRecord);
+        cd.setRangeType(rangeType);
+        
+        
         /////////////////////////////////////////////////////////
         // Process the DAP variables found in the DMR.
         // This means determine if the DAP var is a field, and then
@@ -508,8 +548,35 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     
-     
+   /**
+    * generates a DataRecord from Dap4 variable
+    */
+    private net.opengis.swecommon.v_2_0.DataRecordType.Field getField(Variable var)
+    {
+    	net.opengis.swecommon.v_2_0.DataRecordType.Field field = 
+    			new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
+        field.setName(var.getName());
+
+        for (Attribute attr : var.getAttributes()) {
+            //_log.debug(attr.toString());
+
+         // other goodies (besides name) like long name, UOM etc
+         // later lets get the loop right first
+            
+        }
+        
+        
+        /////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        this.addFieldToDapVarIdAssociation(var.getName(),var.getName());
+        /////////////////////////////////////////////////////////////
+
+        
+    	return field;
+    }
+    
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -561,13 +628,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     private void hardwireTheCdAndDcdForTesting( String id, 
     		                                    URL datasetURl, 
     		                                    CoverageDescriptionType cd) throws WcsException {
-        //////////////////////////////////////////////////
-        // Start WCS CoverageDescription..
-        // the OLFS functions from a JDOM wrapper to this
-
-        // this will create id as element
         cd.setCoverageId(id);
-        // this will create id as attribute
         cd.setId(id);
 
         ////////////////////////////////////////////////////////////
@@ -575,110 +636,15 @@ public class DynamicCoverageDescription extends CoverageDescription {
         this.setDapDatasetUrl(datasetURl);
         ////////////////////////////////////////////////////////////
 
-        ///////////////
-        // Range Type
-        //
-        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
-        net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new net.opengis.swecommon.v_2_0.DataRecordPropertyType();
-
-        // first data record
-        DataRecordType dataRecord1 = new DataRecordType();
-        DataRecordType.Field field = new DataRecordType.Field();
-        QuantityType fieldQuantity = new QuantityType();
-
-        field.setName("TPRECMAX");
-        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        fieldQuantity.setDescription("total_precipitation");
-        /////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
-        /////////////////////////////////////////////////////////////
-
-
-        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
-        dataRecord1FieldQuantityUom.setCode("kg m-2 s-1");
-        fieldQuantity.setUom(dataRecord1FieldQuantityUom);
-
-        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
-        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-
-        // NASA guys - Plus or Minus Fill values. Vmin, Vmax. Reasonable gambit - to ask
-        // variable for max and min. Say - give me range for hour, no rain?
-        // get actual max and min.
-        // http://testbed-13.opendap.org:8080/opendap/testbed-13/M2SDNXSLV.5.12.4/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.ascii?range(HOURNORAIN)
-        // Dataset: function_result_MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4
-        // min, 0
-        // max, 37800
-        // is_monotonic, 0
-        // there is no Vmax, what about Fill (NUG NetCDF USers Guide conventions for
-        // missing data...valid min, max, range)
-        // look for what the allowed interval means in SWE schema. Walk it into DAP.
-        // In this case - use Attribute (not range function).
-
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf("-9.99999987e+14"), Double.valueOf("9.99999987e+14"));
-
-        // good-grief...fix someday...works for now
-        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
-        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
-        allowed1.setInterval(coordinates1);
-        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        fieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
-
-        field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(fieldQuantity));
-        // dataRecord1Field.setAbstractDataComponent(new JAXBElement(new
-        // QName("http://www.opengis.net/swe/2.0", "Quantity"),
-        // dataRecord1FieldQuantity.getClass(),dataRecord1FieldQuantity));
-        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> dataRecord1FieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
-        dataRecord1FieldList.add(field);
-        dataRecord1.setField(dataRecord1FieldList);
-
-        rangeType.setDataRecord(dataRecord1);
-
-        // and so on for other dataRecords (#2 and #3)
-
-        cd.setRangeType(rangeType);
 
         net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
         net.opengis.wcs.v_2_0.ObjectFactory wcsFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-        // Loop over all variables, ask two questions of rightmost two dimensions and
-        // the size of those left of the rightmost two dimensions
-        // and if some criteria are true that particular variable can be a field in a
-        // coverage
-        // Default: Rectified Grid - modulo one thing - lat long dimensions be monotonic
-        // and be evenly spaced...
-        // Lets punt...??..could be added to the Range Function...to tell us whether it
-        // is a rectified grid.
-        // There is cheesy way:compute the differences and say are they the same or not
         serviceParameters
                 .setCoverageSubtype(new QName("http://www.opengis.net/wcs/2.0", "RectifiedGridCoverage", "wcs"));
         serviceParameters.setNativeFormat("application/octet-stream");
 
         cd.setServiceParameters(serviceParameters);
 
-        //////////////////////////////
-        // OK - push this on stack (edge cases)
-        // difference between field and coverages
-        // without field - coverage meaningless
-        // Data set could have Multiple arrays - not same coverage
-        // All MERRA - single coverage inside individual dataset
-        // Not Testbed-13 anymore
-        // Need then to characterize them with shared dimensions
-
-        //
-        // if have multiple fields.
-        // Simpler set of conditions. Ignore cases where there are multiple shared dimensions or even no shared dimensions. DAP dataset could be a field in a coverage
-        // but since they have different envelopes, different (separate coverages)
-        // For now - assume same envelope.  But look for and detect when fields may not be and in those cases
-        // say we will not support this dataset right now.
-
-        // Make a list to come back to later - Punt on
-        // Multiple fields can be automated - not multiple coverages.
-        // Datasets that are not WGS 84
-        //
-        // Need to have a loop written to generate different coverage descriptions for different DMRs
-
-        // first set coverageID = get from DMR name attribute of root element
-        // for every variable in DMR.
 
         _myCD = coverageDescriptionType2JDOM(cd);
 
