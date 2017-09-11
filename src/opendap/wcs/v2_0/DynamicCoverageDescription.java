@@ -37,8 +37,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
     private SimpleSrs _defaultSrs;
-    
-    
+
+
     public DynamicCoverageDescription() {
         super();
         _log = LoggerFactory.getLogger(getClass());
@@ -213,22 +213,22 @@ public class DynamicCoverageDescription extends CoverageDescription {
         this.addDomainCoordinate(lat);
         this.addDomainCoordinate(lon);
         /////////////////////////////////////////////////////////////
-        
+
         // compute the envelope from dataset
         EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
-      
+
         envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("NorthernmostLatitude"));
         envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("SouthernmostLatitude"));
         envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("EasternmostLongitude"));
         envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("WesternmostLongitude"));
-        
+
         envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningDate"));
         envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningTime"));
         envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingDate"));
         envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingTime"));
-        
+
         _log.debug(envelopeWithTimePeriod.toString());
-        
+
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
 
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
@@ -264,7 +264,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(Double.valueOf(envelopeWithTimePeriod.getSouthernmostLatitude()), 
+        position.withValue(Double.valueOf(envelopeWithTimePeriod.getSouthernmostLatitude()),
                            Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
@@ -302,34 +302,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
         _log.debug("added " + dataset.getVariables().size() + " fields to data record");
 
-        // since the dataset does not seem to setting variabes as expected through setter
-        // just brute force it for now...have to know each and every datatype beforehand
-        
-        for(Variable var : dataset.getVars32bitFloats()){
-        	fieldList.add(getField(var));
-        }
-        _log.debug("added " + dataset.getVars32bitFloats().size() + " 32-bit Floats data record");
-
-        for(Variable var : dataset.getVars64bitFloats()){
-        	fieldList.add(getField(var));
-        }
-        _log.debug("added " + dataset.getVars64bitFloats().size() + " 64-bit Floats data record");
-        
-        for(Variable var : dataset.getVars32bitIntegers()){
-        	fieldList.add(getField(var));
-        }
-        _log.debug("added " + dataset.getVars32bitIntegers().size() + " 32-bit Ints data record");
-        
-        for(Variable var : dataset.getVars64bitIntegers()){
-        	fieldList.add(getField(var));
-        }
-        _log.debug("added " + dataset.getVars64bitIntegers().size() + " 64-bit Ints data record");
-        
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
         cd.setRangeType(rangeType);
-        
-        
+
+
         /////////////////////////////////////////////////////////
         // Process the DAP variables found in the DMR.
         // This means determine if the DAP var is a field, and then
@@ -339,11 +316,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
             ingestDapVar(var);
         }
 
-        
+
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
     }
 
-    
+
     private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
 
         String name = var.getName();
@@ -523,7 +500,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * For now it just dumps the variables Dim and Attribute content.
      * I created this method simply coalesce a bunch of repetitive code into
      * a single place.
-     * 
+     *
      * @param v
      */
     private void ingestDapVar(Variable v) {
@@ -547,13 +524,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
          */
     }
 
-    
+
    /**
     * generates a DataRecord from Dap4 variable
     */
     private net.opengis.swecommon.v_2_0.DataRecordType.Field getField(Variable var)
     {
-    	net.opengis.swecommon.v_2_0.DataRecordType.Field field = 
+    	net.opengis.swecommon.v_2_0.DataRecordType.Field field =
     			new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
         field.setName(var.getName());
@@ -563,20 +540,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
          // other goodies (besides name) like long name, UOM etc
          // later lets get the loop right first
-            
+
         }
-        
-        
+
+
         /////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
         this.addFieldToDapVarIdAssociation(var.getName(),var.getName());
         /////////////////////////////////////////////////////////////
 
-        
+
     	return field;
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -616,17 +593,17 @@ public class DynamicCoverageDescription extends CoverageDescription {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    
 
 
 
 
-    
 
 
 
-    private void hardwireTheCdAndDcdForTesting( String id, 
-    		                                    URL datasetURl, 
+
+
+    private void hardwireTheCdAndDcdForTesting( String id,
+    		                                    URL datasetURl,
     		                                    CoverageDescriptionType cd) throws WcsException {
         cd.setCoverageId(id);
         cd.setId(id);

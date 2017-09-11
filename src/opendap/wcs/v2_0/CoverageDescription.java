@@ -54,15 +54,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "CoverageDescription")
 public class CoverageDescription {
-
+    public static final String CONFIG_ELEMENT_NAME = "WcsCoverage";
     protected Element _myCD;
+    boolean _initialized = false;
 
     private Logger _log;
-
     private long _lastModified;
-
     private File _myFile;
-
     private boolean _validateContent = false;
 
     /**
@@ -77,7 +75,6 @@ public class CoverageDescription {
      */
     private HashMap<String, String> _dapGridId;
 
-    public static final String CONFIG_ELEMENT_NAME = "WcsCoverage";
 
     /**
      * Use addDomainCoordinate(String, DomainCoordinate) and getDomainCoordinate(String)
@@ -86,7 +83,6 @@ public class CoverageDescription {
 
 
 
-    boolean _initialized = false;
 
     public CoverageDescription() {
         _log = LoggerFactory.getLogger(this.getClass());

@@ -161,7 +161,26 @@ public class Dataset {
 	}
 
 	public Vector<Variable> getVariables(){
-	    return _myVars;
+
+	    Vector<Variable> vars = new Vector<>();
+
+        // since the dataset does not seem to setting variabes as expected through setter
+        // just brute force it for now...have to know each and every datatype beforehand
+
+        for(Variable var : getVars32bitFloats()){
+            vars.add(var);
+        }
+        for(Variable var : getVars64bitFloats()){
+            vars.add(var);
+        }
+        for(Variable var : getVars32bitIntegers()){
+            vars.add(var);
+        }
+        for(Variable var : getVars64bitIntegers()){
+            vars.add(var);
+        }
+
+        return vars;
     }
 
     public boolean usesCfConventions(){
