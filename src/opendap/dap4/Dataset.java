@@ -57,7 +57,6 @@ public class Dataset {
 	private List<Int64>   vars64bitIntegers;
 	private List<Int32>   vars32bitIntegers;
 
-	private Vector<Variable> _myVars;
 
 	/**
 	 * This default constructor intializes all of the stuff so things can never be null.
@@ -72,7 +71,6 @@ public class Dataset {
 		vars32bitFloats = new Vector<>();
 		vars64bitIntegers = new Vector<>();
 		vars32bitIntegers = new Vector<>();
-		_myVars = new Vector<>();
 	}
 	
 	
@@ -124,7 +122,6 @@ public class Dataset {
 
 
 	public void setVars64bitFloats(List<Float64> vars64bitFloats) {
-		_myVars.addAll(vars64bitFloats);
 		this.vars64bitFloats = vars64bitFloats;
 	}
 
@@ -135,7 +132,6 @@ public class Dataset {
 
 
 	public void setVars32bitFloats(List<Float32> vars32bitFloats) {
-		_myVars.addAll(vars32bitFloats);
 		this.vars32bitFloats = vars32bitFloats;
 	}
 
@@ -146,7 +142,6 @@ public class Dataset {
 
 
 	public void setVars32bitIntegers(List<Int32> vars32bitIntegers) {
-		_myVars.addAll(vars32bitIntegers);
 		this.vars32bitIntegers = vars32bitIntegers;
 	}
 	
@@ -156,7 +151,6 @@ public class Dataset {
 	}
 
 	public void setVars64bitIntegers(List<Int64> vars64bitIntegers) {
-		_myVars.addAll(vars64bitIntegers);
 		this.vars64bitIntegers = vars64bitIntegers;
 	}
 
