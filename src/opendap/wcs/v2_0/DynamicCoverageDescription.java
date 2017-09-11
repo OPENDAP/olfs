@@ -1,9 +1,6 @@
 package opendap.wcs.v2_0;
 
 import net.opengis.gml.v_3_2_1.*;
-import net.opengis.swecommon.v_2_0.DataRecordType;
-import net.opengis.swecommon.v_2_0.QuantityType;
-import net.opengis.swecommon.v_2_0.UnitReference;
 import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
 import opendap.namespaces.XML;
@@ -200,6 +197,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
 
+        //FIXME: Fix dapVariable ID!!!
         DomainCoordinate lat, lon;
         try {
             lat = new DomainCoordinate("latitude","latitude","degrees_north","",dataset.getSizeOfDimensionWithNameLike("lat"));
@@ -217,15 +215,15 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // compute the envelope from dataset
         EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
 
-        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("NorthernmostLatitude"));
-        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfContainerAttributeWithNameLike("SouthernmostLatitude"));
-        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("EasternmostLongitude"));
-        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfContainerAttributeWithNameLike("WesternmostLongitude"));
+        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude"));
+        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude"));
+        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude"));
+        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfGlobalAttributeWithNameLike("WesternmostLongitude"));
 
-        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningDate"));
-        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfContainerAttributeWithNameLike("RangeBeginningTime"));
-        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingDate"));
-        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfContainerAttributeWithNameLike("RangeEndingTime"));
+        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate"));
+        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime"));
+        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate"));
+        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime"));
 
         _log.debug(envelopeWithTimePeriod.toString());
 
@@ -298,23 +296,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // FIX ME:  this would be elegant but not functional...yet
         // we are not understanding - how exactly does JAXB do its magic
         for(Variable var : dataset.getVariables()){
-        	fieldList.add(getField(var));
+            ingestDapVar(var);
         }
         _log.debug("added " + dataset.getVariables().size() + " fields to data record");
 
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
         cd.setRangeType(rangeType);
-
-
-        /////////////////////////////////////////////////////////
-        // Process the DAP variables found in the DMR.
-        // This means determine if the DAP var is a field, and then
-        // make the appropriate associates in the member variables.
-
-        for(Variable var : dataset.getVariables()){
-            ingestDapVar(var);
-        }
 
 
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
@@ -504,6 +492,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param v
      */
     private void ingestDapVar(Variable v) {
+
+        
         // list all dims of this Float32
         for (Dim dim : v.getDims()) {
             _log.debug(dim.toString());

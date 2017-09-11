@@ -222,7 +222,7 @@ public class Dataset {
         return false;
     }
         
-   public String getValueOfContainerAttributeWithNameLike(String name) {
+   public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
      String value = "";
 	   
@@ -269,7 +269,7 @@ public class Dataset {
      
      try
      {
-       lat = Double.parseDouble(this.getValueOfContainerAttributeWithNameLike("LatitudeResolution"));
+       lat = Double.parseDouble(this.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
      }
      catch (Exception e)
      {
@@ -287,7 +287,7 @@ public class Dataset {
      
      try
      {
-       lat = Double.parseDouble(this.getValueOfContainerAttributeWithNameLike("LongitudeResolution"));
+       lat = Double.parseDouble(this.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
      }
      catch (Exception e)
      {
