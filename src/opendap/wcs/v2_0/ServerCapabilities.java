@@ -63,7 +63,7 @@ public class ServerCapabilities {
 
 
     /**
-     *
+     * Returns teh names of the supported formats as the appear in the OperationsMetadata for GetCoverage.
      * @return
      * @param dapServer
      */
@@ -114,6 +114,8 @@ public class ServerCapabilities {
 
     /**
      * Returns the wcs:ServiceMetadata section of the wcs:Capabilities response.
+     * This section itemizes the return formats and we return the MIME types because
+     * that makes sense, right?
      *
      * @return Returns the wcs:Contents section of the wcs:Capabilities response.
      * @throws WcsException   When bad things happen.
@@ -129,10 +131,6 @@ public class ServerCapabilities {
         return serviceMetadata;
     }
 
-
-
-
-
     /**
      *
      * @param coverageID
@@ -142,13 +140,9 @@ public class ServerCapabilities {
     static String[] getInterpolationMethods(String coverageID, String fieldID){
         String[] im = {"nearest"};
         return im;
-        
     }
 
-
-
     public static void main(String[] args) throws Exception{
-
 
         Vector<String> sf = getSupportedFormatNames(null);
         for(String s : sf)
