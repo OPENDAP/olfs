@@ -25,7 +25,11 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.wcs.v2_0.formats.*;
+
 import java.net.URL;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +40,25 @@ import java.net.URL;
  */
 public class ServerCapabilities {
 
-    private static String[] sf = {"netcdf-cf","dap-2.0","geotiff","gmljp2"};
+    private static ConcurrentHashMap<String, WcsResponseFormat> _responseFormats;
+    static {
+        _responseFormats = new ConcurrentHashMap<>();
+
+        WcsResponseFormat rf;
+
+        rf = new NetCdfFormat();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new GeotiffFormat();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new Jpeg200Format();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new Dap2DataFormat();
+        _responseFormats.put(rf.name(),rf);
+    }
+
 
 
 
@@ -45,10 +67,15 @@ public class ServerCapabilities {
      * @return
      * @param dapServer
      */
-    public static String[] getSupportedFormatStrings(URL dapServer){
-        return sf;
+    public static Vector<String> getSupportedFormatNames(URL dapServer){
+        Vector<String> supportedFormatNames = new Vector<>();
+        supportedFormatNames.addAll(_responseFormats.keySet());
+        return supportedFormatNames;
     }
 
+    public static WcsResponseFormat getFormat(String name){
+        return _responseFormats.get(name);
+    }
 
 
     /**
@@ -64,10 +91,11 @@ public class ServerCapabilities {
     }
 
 
+
     public static void main(String[] args) throws Exception{
 
 
-        String[] sf = getSupportedFormatStrings(null);
+        Vector<String> sf = getSupportedFormatNames(null);
         for(String s : sf)
             System.out.println("Supported Format: "+s);
 

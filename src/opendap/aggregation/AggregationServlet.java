@@ -230,7 +230,7 @@ public class AggregationServlet extends HttpServlet {
                     granule =  granule + ".txt";
                     break;
                 case plain:
-                    // No change to the name in this case - this ResponseFormat is
+                    // No change to the name in this case - this WcsResponseFormat is
                     // used by the /file service that simply reads files and dumps
                     // them into the zip output stream.
                     break;

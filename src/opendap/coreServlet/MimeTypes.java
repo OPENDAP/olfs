@@ -70,6 +70,7 @@ public class MimeTypes {
         typeMap.put("jpg",   new String[] {"image", "jpeg"});
         typeMap.put("jfif",  new String[] {"image", "jpeg"});
         typeMap.put("jpe",   new String[] {"image", "jpeg"});
+        typeMap.put("jp2",   new String[] {"image", "jp2"});
 
         typeMap.put("gif",   new String[] {"image", "gif"});
 

@@ -297,7 +297,7 @@ public class CatalogWrapper {
                             parameter.addContent(allowedValues);
                         }
 
-                        allowedValues.addContent(getSupportedFormatsForGetCoverageOperation());
+                        allowedValues.addContent(getSupportedFormatNames());
 
 
                     }
@@ -318,10 +318,10 @@ public class CatalogWrapper {
 
 
 
-    private static Vector<Element> getSupportedFormatsForGetCoverageOperation(){
+    private static Vector<Element> getSupportedFormatNames(){
 
         Vector<Element> sfEs = new Vector<Element>();
-        String[] formats = ServerCapabilities.getSupportedFormatStrings(null);
+        Vector<String> formats = ServerCapabilities.getSupportedFormatNames(null);
         Element sf;
 
         for(String format: formats){
