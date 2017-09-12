@@ -265,6 +265,8 @@ public class CapabilitiesRequestProcessor {
 
         Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
 
+
+
         Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
         formatSupported.setText("application/x-netcdf");
         serviceMetadata.addContent(formatSupported);

@@ -26,6 +26,7 @@
 package opendap.wcs.v2_0;
 
 import opendap.wcs.v2_0.formats.*;
+import org.jdom.Element;
 
 import java.net.URL;
 import java.util.Vector;
@@ -110,6 +111,26 @@ public class ServerCapabilities {
         // can't reach it...
         return null;
     }
+
+    /**
+     * Returns the wcs:ServiceMetadata section of the wcs:Capabilities response.
+     *
+     * @return Returns the wcs:Contents section of the wcs:Capabilities response.
+     * @throws WcsException   When bad things happen.
+     * @throws InterruptedException
+     */
+    public static Element getServiceMetadata()  throws InterruptedException, WcsException {
+        Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
+        for(WcsResponseFormat wrf: _responseFormats.values()){
+            Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
+            formatSupported.setText(wrf.mimeType());
+            serviceMetadata.addContent(formatSupported);
+        }
+        return serviceMetadata;
+    }
+
+
+
 
 
     /**
