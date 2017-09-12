@@ -9,7 +9,7 @@ public class WcsResponseFormat {
         _mimeType = null;
         _dapSuffix = null;
     }
-    public String dapDataResponseSuffix(){ return _dapSuffix;};
-    public String name(){ return _name; }
-    public String mimeType(){return _mimeType;}
+    public String dapDataResponseSuffix(){ return _dapSuffix.toLowerCase();};
+    public String name(){ return _name.toLowerCase(); }
+    public String mimeType(){return _mimeType.toLowerCase();}
 }

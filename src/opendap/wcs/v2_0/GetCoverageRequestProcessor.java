@@ -186,10 +186,6 @@ public class GetCoverageRequestProcessor {
 
 
     /**
-     * This method expects the user to have requested the name of a format from the list
-     * supplied in the GetCapabilities Operations metadata, specifically the Parameter
-     * element in the the GetCoverage section a name attribute "Format". If it cannot
-     * resolve the format to one of the supported response types an exception os thrown
      * @param req
      * @return
      * @throws WcsException

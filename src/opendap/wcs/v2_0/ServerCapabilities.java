@@ -43,7 +43,6 @@ public class ServerCapabilities {
     private static ConcurrentHashMap<String, WcsResponseFormat> _responseFormats;
     static {
         _responseFormats = new ConcurrentHashMap<>();
-
         WcsResponseFormat rf;
 
         rf = new NetCdfFormat();
@@ -73,8 +72,43 @@ public class ServerCapabilities {
         return supportedFormatNames;
     }
 
+    /**
+     * Makes a lenient attempt to locate the requested format. If it can't be
+     * worked out a null is returned.
+     *
+     *
+     * @param name
+     * @return
+     */
     public static WcsResponseFormat getFormat(String name){
-        return _responseFormats.get(name);
+
+        name = name.toLowerCase();
+
+        // If it's a slam dunk the woot.
+        if(_responseFormats.containsKey(name))
+            return _responseFormats.get(name);
+
+        // Otherwise we try to be lenient about it first
+        for(WcsResponseFormat wrf: _responseFormats.values()){
+
+            // Case insensitive name match?
+            if(wrf.name().equalsIgnoreCase(name))
+                return wrf;
+
+            // Case insensitive mime-type match because people might request using mime-type
+            if(wrf.mimeType().equalsIgnoreCase(name))
+                return wrf;
+
+            // Hail Mary #1
+            if(wrf.name().contains(name))
+                return wrf;
+
+            // Hail Mary #2
+            if(wrf.mimeType().contains(name))
+                return wrf;
+        }
+        // can't reach it...
+        return null;
     }
 
 
