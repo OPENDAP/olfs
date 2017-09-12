@@ -197,17 +197,37 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
 
-        //FIXME: Fix dapVariable ID!!!
-        DomainCoordinate lat, lon;
+        Variable time = dataset.getVariable("time");
+        Variable latitude  = dataset.getVariable("lat");
+        Variable longitude  = dataset.getVariable("lon");
+        
+        DomainCoordinate lat, lon, tim;
         try {
-            lat = new DomainCoordinate("latitude","latitude","degrees_north","",dataset.getSizeOfDimensionWithNameLike("lat"));
-            lon = new DomainCoordinate("longitude","longitude","degrees_east","",dataset.getSizeOfDimensionWithNameLike("lon"));
+          
+            tim = new DomainCoordinate(time.getAttributeValue("long_name"),
+                                       time.getAttributeValue("standard_name"),
+                                       time.getAttributeValue("units"),
+                                       "",
+                                       dataset.getSizeOfDimensionWithNameLike("time"));
+
+            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
+                                       latitude.getAttributeValue("standard_name"),
+                                       latitude.getAttributeValue("units"),
+                                       "",
+                                       dataset.getSizeOfDimensionWithNameLike("lat"));
+            
+            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
+                                       longitude.getAttributeValue("standard_name"),
+                                       longitude.getAttributeValue("units"),
+                                       "",
+                                       dataset.getSizeOfDimensionWithNameLike("lon"));
         } catch (BadParameterException e) {
             // This shouldn't happen based on the stuff above...
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
+        this.addDomainCoordinate(tim);
         this.addDomainCoordinate(lat);
         this.addDomainCoordinate(lon);
         /////////////////////////////////////////////////////////////
@@ -468,26 +488,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
     			new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
       field.setName(var.getName());
-      List<opendap.dap4.Attribute> attributes = var.getAttributes();
-      Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
-      Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
-      while (iter.hasNext()) {
-          opendap.dap4.Attribute attribute = iter.next();
-          attributesHash.put(attribute.getName(), attribute);
-      }
       
       net.opengis.swecommon.v_2_0.QuantityType quantity = new net.opengis.swecommon.v_2_0.QuantityType();
       quantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-      quantity.setDescription(attributesHash.get("long_name").getValue());
+      quantity.setDescription(var.getAttributeValue("long_name"));
 
       net.opengis.swecommon.v_2_0.UnitReference uom = new net.opengis.swecommon.v_2_0.UnitReference();
-      uom.setCode(attributesHash.get("units").getValue());
+      uom.setCode(var.getAttributeValue("units"));
       quantity.setUom(uom);
 
       net.opengis.swecommon.v_2_0.AllowedValuesPropertyType allowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
       net.opengis.swecommon.v_2_0.AllowedValuesType allowed = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-      List<Double> allowedInterval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
-              Double.valueOf(attributesHash.get("vmax").getValue()));
+      List<Double> allowedInterval = Arrays.asList(Double.valueOf(var.getAttributeValue("vmin")),
+              Double.valueOf(var.getAttributeValue("vmax")));
       List<JAXBElement<List<Double>>> coordinates = new Vector<JAXBElement<List<Double>>>();
       net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
       coordinates.add(sweFactory.createAllowedValuesTypeInterval(allowedInterval));

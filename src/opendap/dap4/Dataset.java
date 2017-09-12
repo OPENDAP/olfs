@@ -154,9 +154,6 @@ public class Dataset {
 
 	    Vector<Variable> vars = new Vector<>();
 
-        // since the dataset does not seem to setting variabes as expected through setter
-        // just brute force it for now...have to know each and every datatype beforehand
-
         for(Variable var : getVars32bitFloats()){
             vars.add(var);
         }
@@ -288,4 +285,17 @@ public class Dataset {
      
      return lat;
    }
+   
+   public Variable getVariable (String name)
+   {
+     List<opendap.dap4.Variable> variables = this.getVariables();
+     Hashtable<String, opendap.dap4.Variable> variablesHash = new Hashtable();
+     Iterator<opendap.dap4.Variable> iter = variables.iterator();
+     while (iter.hasNext()) {
+         opendap.dap4.Variable variable = iter.next();
+         variablesHash.put(variable.getName(), variable);
+     }
+     return variablesHash.get(name);
+   }
+   
 }
