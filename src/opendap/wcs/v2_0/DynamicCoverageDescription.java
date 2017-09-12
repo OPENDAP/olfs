@@ -309,81 +309,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
-    private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
-
-        String name = var.getName();
-        List<opendap.dap4.Attribute> attributes = var.getAttributes();
-        Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
-        Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
-        while (iter.hasNext()) {
-            opendap.dap4.Attribute attribute = iter.next();
-            attributesHash.put(attribute.getName(), attribute);
-        }
-
-        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
-        net.opengis.swecommon.v_2_0.DataRecordType.Field dataRecord1Field = new net.opengis.swecommon.v_2_0.DataRecordType.Field();
-        net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
-
-        dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        dataRecord1FieldQuantity.setDescription(attributesHash.get("long_name").getValue());
-        // dataRecord1FieldQuantity.setId(var.getName());
-
-        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
-        dataRecord1FieldQuantityUom.setCode(attributesHash.get("units").getValue());
-        dataRecord1FieldQuantity.setUom(dataRecord1FieldQuantityUom);
-
-        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
-        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
-                Double.valueOf(attributesHash.get("vmax").getValue()));
-
-        // TODO good-grief...fix someday...works for now
-        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
-        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
-        allowed1.setInterval(coordinates1);
-        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        dataRecord1FieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
-
-        dataRecord1Field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(dataRecord1FieldQuantity));
-        Field field;
-        try {
-
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
-
-            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.swecommon.v_2_0");
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.marshal(dataRecord1Field, doc);
-            org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-            org.jdom.Document jdoc = jdb.build(doc);
-
-            field = new Field(jdoc.getRootElement());
-
-            // couple of quick sanity checks
-
-            // FIXME Make this use the logging system's DEBUG setting so we can switch it off
-            // or off at run-time. jhrg 9/6/17
-            _log.debug(jdoc.getRootElement().toString());
-
-        } catch (JAXBException |
-                WcsException |
-                ParserConfigurationException e) {
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Unable to build Field instance.");
-            sb.append(" Caught ").append(e.getClass().getName());
-            sb.append(" Message  ").append(e.getMessage());
-            _log.error(sb.toString());
-            throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
-        }
-        return field;
-    }
-
-
-
     public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
 
         // Boiler plate JAXB marshaling of Coverage Description object into JDOM
@@ -481,38 +406,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return  cdElement;
     }
 
-    /**
-     * We examine a DAP variable and determine if we can produce
-     * a Field from it?
-     *
-     * For now it just dumps the variables Dim and Attribute content.
-     * I created this method simply coalesce a bunch of repetitive code into
-     * a single place.
-     *
-     * @param v
-     */
-    private void ingestDapVar(Variable v) {
-
-        
-        // list all dims of this Float32
-        for (Dim dim : v.getDims()) {
-            _log.debug(dim.toString());
-        }
-        for (Attribute attr : v.getAttributes()) {
-            _log.debug(attr.toString());
-        }
-
-        /*   THis is what should happen in here...
-        field.setName("TPRECMAX");
-        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        fieldQuantity.setDescription("total_precipitation");
-        /////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
-        /////////////////////////////////////////////////////////////
-
-         */
-    }
+ 
 
     private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset)
     {
@@ -566,28 +460,47 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
    /**
-    * generates a DataRecord from Dap4 variable
+    * generates a DataRecord.Field from Dap4 variable
     */
     private net.opengis.swecommon.v_2_0.DataRecordType.Field getField(Variable var)
     {
     	net.opengis.swecommon.v_2_0.DataRecordType.Field field =
     			new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
-        field.setName(var.getName());
+      field.setName(var.getName());
+      List<opendap.dap4.Attribute> attributes = var.getAttributes();
+      Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
+      Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
+      while (iter.hasNext()) {
+          opendap.dap4.Attribute attribute = iter.next();
+          attributesHash.put(attribute.getName(), attribute);
+      }
+      
+      net.opengis.swecommon.v_2_0.QuantityType quantity = new net.opengis.swecommon.v_2_0.QuantityType();
+      quantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
+      quantity.setDescription(attributesHash.get("long_name").getValue());
 
-        for (Attribute attr : var.getAttributes()) {
-            //_log.debug(attr.toString());
+      net.opengis.swecommon.v_2_0.UnitReference uom = new net.opengis.swecommon.v_2_0.UnitReference();
+      uom.setCode(attributesHash.get("units").getValue());
+      quantity.setUom(uom);
 
-         // other goodies (besides name) like long name, UOM etc
-         // later lets get the loop right first
+      net.opengis.swecommon.v_2_0.AllowedValuesPropertyType allowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
+      net.opengis.swecommon.v_2_0.AllowedValuesType allowed = new net.opengis.swecommon.v_2_0.AllowedValuesType();
+      List<Double> allowedInterval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
+              Double.valueOf(attributesHash.get("vmax").getValue()));
+      List<JAXBElement<List<Double>>> coordinates = new Vector<JAXBElement<List<Double>>>();
+      net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
+      coordinates.add(sweFactory.createAllowedValuesTypeInterval(allowedInterval));
+      allowed.setInterval(coordinates);
+      allowedValues.setAllowedValues(allowed);
+      quantity.setConstraint(allowedValues);
 
-        }
-
-
-        /////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation(var.getName(),var.getName());
-        /////////////////////////////////////////////////////////////
+      field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(quantity)); 
+      
+      /////////////////////////////////////////////////////////////
+      // Crucial member variable state setting...
+      this.addFieldToDapVarIdAssociation(var.getName(),var.getName());
+      /////////////////////////////////////////////////////////////
 
 
     	return field;
@@ -632,16 +545,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-
-
-
+    
     private void hardwireTheCdAndDcdForTesting( String id,
     		                                    URL datasetURl,
     		                                    CoverageDescriptionType cd) throws WcsException {
