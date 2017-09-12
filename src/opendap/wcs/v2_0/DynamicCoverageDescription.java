@@ -293,12 +293,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
         List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
 
-        // FIX ME:  this would be elegant but not functional...yet
-        // we are not understanding - how exactly does JAXB do its magic
+
         for(Variable var : dataset.getVariables()){
-            ingestDapVar(var);
+          if (compareVariableDimensionsWithDataSet(var, dataset)) {
+            fieldList.add(getField(var));
+          }
         }
-        _log.debug("added " + dataset.getVariables().size() + " fields to data record");
 
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
@@ -514,6 +514,52 @@ public class DynamicCoverageDescription extends CoverageDescription {
          */
     }
 
+    private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset)
+    {
+    	boolean flag = true;
+    	
+    	List<Dim> vdims = var.getDims();
+    	List<Dimension> dimensions = dataset.getDimensions();
+    	
+    	if (vdims.size() == dimensions.size())
+    	{
+    	  _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
+    	  for (Dim dim : var.getDims()) {
+          boolean found = false;
+          String dimName = dim.getName();
+          if (dimName.charAt(0) == '/') dimName = dimName.substring(1);
+          _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
+    	    for (Dimension dimension : dataset.getDimensions()) {
+    	      _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName() );
+
+    	      // probably need a better test
+    	      if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
+    	      
+    	     
+    	     if (found) {
+    	       _log.debug("Dimension " + dimName + " found in Dataset");
+    	       break;
+    	     }
+    	   }
+        }
+    	}
+    	else
+    	{
+    	  flag = false;
+    	  _log.debug("Variable " + var.getName() + " has " + vdims.size() + " dimensions, while Dataset has " + dimensions.size());
+    	}
+    	
+    	if (flag)
+    	{
+    	  _log.debug("All dimensions in Variable " + var.getName() + " match DataSet, so it will be included in WCS coverage ");
+    	}
+    	else
+    	{
+    	  _log.debug("All dimensions in Variable " + var.getName() + " did NOT match DataSet, so it will be NOT included in WCS coverage ");
+    	}
+    	
+    	return flag;
+    }
 
    /**
     * generates a DataRecord from Dap4 variable
