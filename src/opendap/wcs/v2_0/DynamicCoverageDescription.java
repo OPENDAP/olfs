@@ -521,7 +521,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     	List<Dim> vdims = var.getDims();
     	List<Dimension> dimensions = dataset.getDimensions();
     	
-    	if (vdims.size() == dimensions.size())
+    	if (vdims == null || dimensions == null || vdims.isEmpty() || dimensions.isEmpty())
+    	{
+    	  return false;
+    	}
+    	else if (vdims.size() == dimensions.size())
     	{
     	  _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
     	  for (Dim dim : var.getDims()) {
