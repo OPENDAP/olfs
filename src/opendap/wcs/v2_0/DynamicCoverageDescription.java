@@ -1,9 +1,6 @@
 package opendap.wcs.v2_0;
 
 import net.opengis.gml.v_3_2_1.*;
-import net.opengis.swecommon.v_2_0.DataRecordType;
-import net.opengis.swecommon.v_2_0.QuantityType;
-import net.opengis.swecommon.v_2_0.UnitReference;
 import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
 import opendap.namespaces.XML;
@@ -37,6 +34,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
     private SimpleSrs _defaultSrs;
+
 
     public DynamicCoverageDescription() {
         super();
@@ -190,114 +188,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
 
-        ////////////////////////////
-        // echo data set Dimensions - distinct from variable dimension
-        /* NOTE: This is the old loop iterator pattern which I have replaced
-           with the for() loop below. By creating default contrsutors in all the
-           related classes we can ensure that none of the getter methods return null.
-           And this frees us to use simpler code. See below
-
-            List<Dimension> dimensions = dataset.getDimensions();
-
-            if (dimensions == null) {
-                _log.debug("Dimensions List NULL");
-            } else if (dimensions.size() == 0) {
-                _log.debug("Dimensions list EMPTY");
-            } else {
-                ListIterator dimIter = dimensions.listIterator();
-                // we know it is non-null and non-empty, so safe to do this right away
-                while (dimIter.hasNext()) {
-                    _log.debug(dimIter.nextIndex() + ". " + dimIter.next());
-                }
-            } // close if then else (dimensions list is non-null and has elements)
-        */
-        /////////////////////////////////////////////////////////
-        // Simpler iteration over content
-        //
-        for (Dimension dim : dataset.getDimensions()) {
-            _log.debug(dim.toString());
-
-        }
-
-        /////////////////////////////////////////////////////////
-        // Process the DAP variables found in the DMR.
-        // This means determine if the DAP var is a field, and then
-        // make the appropriate associates in the member variables.
-
-        for(Float32 var : dataset.getVars32bitFloats()){
-            ingestDapVar(var);
-        }
-        for (Float64 var : dataset.getVars64bitFloats()) {
-            ingestDapVar(var);
-        }
-        for (Int32 var : dataset.getVars32bitIntegers()) {
-            ingestDapVar(var);
-        }
-        for (Int64 var : dataset.getVars64bitIntegers()) {
-            ingestDapVar(var);
-        }
-
-        /////////////////////////////////////////////////////////////////
-        // echo "container" attributes and, yes, attributes of attributes
-        // these attributes and *their* inner attributes (yes they are nested)
-        // will later need to be sniffed for exceptions before marshalling WCS
-        // per Nathan's heauristic
-
-        boolean foundConvention = false;
-        boolean cfCompliant = false;
-        for (ContainerAttribute containerAttribute : dataset.getAttributes()) {
-            boolean foundGlobal = false;
-            _log.debug(containerAttribute.toString());
-
-            String ca_name = containerAttribute.getName();
-            if (ca_name.toLowerCase().contains("convention")) {
-                _log.debug("Found container attribute named convention(s)");
-                foundConvention = true;
-            } // this will find plural conventions
-            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
-                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-                _log.debug("Looking for conventions...attribute");
-                foundGlobal = true;
-            }
-
-            // now enumerate all attributes of the "container" attribute
-
-            for (Attribute a : containerAttribute.getAttributes()) {
-                _log.debug(a.toString());
-
-                if (foundGlobal) {
-                    // test for conventions
-                    String a_name = a.getName();
-
-                    if (a_name == null || a_name.trim().length() == 0) {
-                        // no action
-                        _log.debug("Attribute has no name??");
-                    } else if (a_name.toLowerCase().contains("convention")) {
-                        foundConvention = true;
-                        String a_value = a.getValue();
-                        _log.debug(
-                                "Found attribute named convention(s), value = " + a_value);
-
-                        if (a_value.toLowerCase().contains("cf-")) {
-                            cfCompliant = true;
-                            _log.debug("Dataset is CF Compliant!!");
-                        }
-
-                    }
-                } // end Found Global, now look at its attributes
-            }
-
-            if (foundConvention) {
-                if (cfCompliant) {
-                    // already announced success
-                } else {
-                    _log.debug("Found GLOBAL Convention but may not be CF compliant...ERROR");
-                }
-            } else {
-                _log.debug("No conventions found...ERROR");
-            }
-        }
-
         CoverageDescriptionType cd = new CoverageDescriptionType();
         URL datasetUrl = null;
         try {
@@ -305,83 +195,163 @@ public class DynamicCoverageDescription extends CoverageDescription {
         } catch (MalformedURLException e) {
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
+
+        ingestDomainCoordinates(dataset);
+
+        DomainCoordinate lat = getDomainCoordinate("latitude");
+        DomainCoordinate lon = getDomainCoordinate("longitude");
+
+        // compute the envelope from dataset
+        EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
+
+        envelopeWithTimePeriod.setNorthernmostLatitude(dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude"));
+        envelopeWithTimePeriod.setSouthernmostLatitude(dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude"));
+        envelopeWithTimePeriod.setEasternmostLongitude(dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude"));
+        envelopeWithTimePeriod.setWesternmostLongitude(dataset.getValueOfGlobalAttributeWithNameLike("WesternmostLongitude"));
+
+        envelopeWithTimePeriod.setRangeBeginningDate(dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate"));
+        envelopeWithTimePeriod.setRangeBeginningTime(dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime"));
+        envelopeWithTimePeriod.setRangeEndingDate(dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate"));
+        envelopeWithTimePeriod.setRangeEndingTime(dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime"));
+
+        _log.debug(envelopeWithTimePeriod.toString());
+
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
+
+        net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
+        net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
+        bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
+
+        // Grid Envelope
+        net.opengis.gml.v_3_2_1.GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
+
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        // Note: The index values for the arrays are 0 based and so the upper index is
+        // one less than the size.
+        List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
+        List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
+        gridEnvelope.withHigh(upper).withLow(lower);
+        ////////////////////////////////////////////////////////////
+
+        // Create the limits, set the envelope on them.
+        GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
+        gridLimits.withGridEnvelope(gridEnvelope);
+
+        net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
+        net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
+        rectifiedGrid.setDimension(new BigInteger(this.getDomainCoordinates().size()+""));
+        rectifiedGrid.setId(dataset.getCoverageId());
+
+        //Create the grid envelope for the limits
+        rectifiedGrid.setLimits(gridLimits);
+
+        List<String> axisLabels = _defaultSrs.getAxisLabelsList();
+        rectifiedGrid.setAxisLabels(axisLabels);
+
+        // Create the Origin.
+        DirectPositionType position = gmlFactory.createDirectPositionType();
+        position.withValue(Double.valueOf(envelopeWithTimePeriod.getSouthernmostLatitude()),
+                           Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
+        PointType point = gmlFactory.createPointType();
+        point.withPos(position);
+        point.setId("GridOrigin-" + dataset.getCoverageId());
+        point.setSrsName(_defaultSrs.getName());
+        PointPropertyType origin = gmlFactory.createPointPropertyType();
+        origin.withPoint(point);
+        rectifiedGrid.setOrigin(origin);
+
+        // Create the offset vector.
+        List<VectorType> offsetList = new ArrayList<VectorType>();
+        VectorType offset1 = gmlFactory.createVectorType();
+        offset1.withValue(dataset.getLatitudeResolution(), 0.0);
+        offset1.setSrsName(_defaultSrs.getName());
+        offsetList.add(offset1);
+        VectorType offset2 = gmlFactory.createVectorType();
+        offset2.withValue(0.0, dataset.getLongitudeResolution());
+        offset2.setSrsName(_defaultSrs.getName());
+        offsetList.add(offset2);
+        rectifiedGrid.setOffsetVector(offsetList);
+
+        domainSet.setAbstractGeometry(gmlFactory.createRectifiedGrid(rectifiedGrid));
+        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
+        cd.setBoundedBy(bs);
+
+
+        net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new  net.opengis.swecommon.v_2_0.DataRecordPropertyType();
+        net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
+        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
+
+
+        for(Variable var : dataset.getVariables()){
+          if (compareVariableDimensionsWithDataSet(var, dataset)) {
+            fieldList.add(getField(var));
+          }
+        }
+
+        dataRecord.setField(fieldList);
+        rangeType.setDataRecord(dataRecord);
+        cd.setRangeType(rangeType);
+
+
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
     }
 
 
-    private Field getFieldInstance(opendap.dap4.Variable var) throws WcsException {
 
-        String name = var.getName();
-        List<opendap.dap4.Attribute> attributes = var.getAttributes();
-        Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
-        Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
-        while (iter.hasNext()) {
-            opendap.dap4.Attribute attribute = iter.next();
-            attributesHash.put(attribute.getName(), attribute);
+    //FIXME The contents of this loop should be refactored to use a loop similar but not exactly like the psudo-code one in the comment below.
+    void ingestDomainCoordinates(Dataset dataset) throws WcsException {
+        /*
+        for(String dimName:_defaultSrs.getAxisLabelsList()){
+            Variable coord = dataset.getVariable(dimName);
+            List<Dim> dims = coord.getDims();
+            if(dims.size()>1)
+                throw new WcsException("",WcsException.NO_APPLICABLE_CODE);
+            // Figure out dimension size
+
+            DomainCoordinate dc = new DomainCoordinate(dimName,coord.getName(),coord.getAttributeValue("units"),"",)
+
         }
+        */
 
-        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
-        net.opengis.swecommon.v_2_0.DataRecordType.Field dataRecord1Field = new net.opengis.swecommon.v_2_0.DataRecordType.Field();
-        net.opengis.swecommon.v_2_0.QuantityType dataRecord1FieldQuantity = new net.opengis.swecommon.v_2_0.QuantityType();
 
-        dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        dataRecord1FieldQuantity.setDescription(attributesHash.get("long_name").getValue());
-        // dataRecord1FieldQuantity.setId(var.getName());
+        Variable time = dataset.getVariable("time");
+        Variable latitude  = dataset.getVariable("lat");
+        Variable longitude  = dataset.getVariable("lon");
 
-        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
-        dataRecord1FieldQuantityUom.setCode(attributesHash.get("units").getValue());
-        dataRecord1FieldQuantity.setUom(dataRecord1FieldQuantityUom);
-
-        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
-        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf(attributesHash.get("vmin").getValue()),
-                Double.valueOf(attributesHash.get("vmax").getValue()));
-
-        // TODO good-grief...fix someday...works for now
-        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
-        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
-        allowed1.setInterval(coordinates1);
-        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        dataRecord1FieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
-
-        dataRecord1Field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(dataRecord1FieldQuantity));
-        Field field;
+        DomainCoordinate lat, lon, tim;
         try {
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
+            tim = new DomainCoordinate(time.getAttributeValue("long_name"),
+                    time.getAttributeValue("standard_name"),
+                    time.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("time"));
 
-            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.swecommon.v_2_0");
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.marshal(dataRecord1Field, doc);
-            org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-            org.jdom.Document jdoc = jdb.build(doc);
+            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
+                    latitude.getAttributeValue("standard_name"),
+                    latitude.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("lat"));
 
-            field = new Field(jdoc.getRootElement());
-
-            // couple of quick sanity checks
-
-            // FIXME Make this use the logging system's DEBUG setting so we can switch it off
-            // or off at run-time. jhrg 9/6/17
-            _log.debug(jdoc.getRootElement().toString());
-
-        } catch (JAXBException |
-                WcsException |
-                ParserConfigurationException e) {
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Unable to build Field instance.");
-            sb.append(" Caught ").append(e.getClass().getName());
-            sb.append(" Message  ").append(e.getMessage());
-            _log.error(sb.toString());
-            throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
+            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
+                    longitude.getAttributeValue("standard_name"),
+                    longitude.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("lon"));
+        } catch (BadParameterException e) {
+            // This shouldn't happen based on the stuff above...
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
-        return field;
-    }
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        this.addDomainCoordinate(tim);
+        this.addDomainCoordinate(lat);
+        this.addDomainCoordinate(lon);
+        /////////////////////////////////////////////////////////////
 
+
+    }
 
 
     public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
@@ -481,35 +451,97 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return  cdElement;
     }
 
-    /**
-     * We examine a DAP variable and determine if we can produce
-     * a Field from it?
-     *
-     * For now it just dumps the variables Dim and Attribute content.
-     * I created this method simply coalesce a bunch of repetitive code into
-     * a single place.
-     * 
-     * @param v
-     */
-    private void ingestDapVar(Variable v) {
-        // list all dims of this Float32
-        for (Dim dim : v.getDims()) {
-            _log.debug(dim.toString());
-        }
-        for (Attribute attr : v.getAttributes()) {
-            _log.debug(attr.toString());
-        }
+ 
 
-        /*   THis is what should happen in here...
-        field.setName("TPRECMAX");
-        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        fieldQuantity.setDescription("total_precipitation");
-        /////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
-        /////////////////////////////////////////////////////////////
+    private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset)
+    {
+    	boolean flag = true;
+    	
+    	List<Dim> vdims = var.getDims();
+    	List<Dimension> dimensions = dataset.getDimensions();
+    	
+    	if (vdims == null || dimensions == null || vdims.isEmpty() || dimensions.isEmpty())
+    	{
+    	  return false;
+    	}
+    	else if (vdims.size() == dimensions.size())
+    	{
+    	  _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
+    	  for (Dim dim : var.getDims()) {
+          boolean found = false;
+          String dimName = dim.getName();
+          if (dimName.charAt(0) == '/') dimName = dimName.substring(1);
+          _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
+    	    for (Dimension dimension : dataset.getDimensions()) {
+    	      _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName() );
 
-         */
+    	      // probably need a better test
+    	      if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
+    	      
+    	     
+    	     if (found) {
+    	       _log.debug("Dimension " + dimName + " found in Dataset");
+    	       break;
+    	     }
+    	   }
+        }
+    	}
+    	else
+    	{
+    	  flag = false;
+    	  _log.debug("Variable " + var.getName() + " has " + vdims.size() + " dimensions, while Dataset has " + dimensions.size());
+    	}
+    	
+    	if (flag)
+    	{
+    	  _log.debug("All dimensions in Variable " + var.getName() + " match DataSet, so it will be included in WCS coverage ");
+    	}
+    	else
+    	{
+    	  _log.debug("All dimensions in Variable " + var.getName() + " did NOT match DataSet, so it will be NOT included in WCS coverage ");
+    	}
+    	
+    	return flag;
+    }
+
+   /**
+    * generates a DataRecord.Field from Dap4 variable
+    */
+    private net.opengis.swecommon.v_2_0.DataRecordType.Field getField(Variable var)
+    {
+    	net.opengis.swecommon.v_2_0.DataRecordType.Field field =
+    			new net.opengis.swecommon.v_2_0.DataRecordType.Field();
+
+      field.setName(var.getName());
+      
+      net.opengis.swecommon.v_2_0.QuantityType quantity = new net.opengis.swecommon.v_2_0.QuantityType();
+      quantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
+      quantity.setDescription(var.getAttributeValue("long_name"));
+
+      net.opengis.swecommon.v_2_0.UnitReference uom = new net.opengis.swecommon.v_2_0.UnitReference();
+      uom.setCode(var.getAttributeValue("units"));
+      quantity.setUom(uom);
+
+      net.opengis.swecommon.v_2_0.AllowedValuesPropertyType allowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
+      net.opengis.swecommon.v_2_0.AllowedValuesType allowed = new net.opengis.swecommon.v_2_0.AllowedValuesType();
+      List<Double> allowedInterval = Arrays.asList(Double.valueOf(var.getAttributeValue("vmin")),
+              Double.valueOf(var.getAttributeValue("vmax")));
+      List<JAXBElement<List<Double>>> coordinates = new Vector<JAXBElement<List<Double>>>();
+      net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
+      coordinates.add(sweFactory.createAllowedValuesTypeInterval(allowedInterval));
+      allowed.setInterval(coordinates);
+      allowedValues.setAllowedValues(allowed);
+      quantity.setConstraint(allowedValues);
+
+      field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(quantity)); 
+      
+      /////////////////////////////////////////////////////////////
+      // Crucial member variable state setting...
+      this.addFieldToDapVarIdAssociation(var.getName(),var.getName());
+      /////////////////////////////////////////////////////////////
+
+
+    	return field;
     }
 
 
@@ -551,24 +583,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
     
-
-
-
-
-    
-
-
-
-    private void hardwireTheCdAndDcdForTesting( String id, URL datasetURl, CoverageDescriptionType cd) throws WcsException {
-        //////////////////////////////////////////////////
-        // Start WCS CoverageDescription..
-        // the OLFS functions from a JDOM wrapper to this
-
-        // this will create id as element
+    private void hardwireTheCdAndDcdForTesting( String id,
+    		                                    URL datasetURl,
+    		                                    CoverageDescriptionType cd) throws WcsException {
         cd.setCoverageId(id);
-        // this will create id as attribute
         cd.setId(id);
 
         ////////////////////////////////////////////////////////////
@@ -576,274 +595,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
         this.setDapDatasetUrl(datasetURl);
         ////////////////////////////////////////////////////////////
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Envelope with Time Period:
-        // lowerCorner, UpperCorner and Time Position
-        // The ability to reflect time period is most important difference between WCS and other mapping services like WFS
-        // May or may not find these in the attributes in DMR
-        // look for camelCase NorthernMostLatitude, SouthernMostLatitude etc - in global attribute in the bottom of the file
-        // not CF- names (Nathan: too bad we do not have the range function rolled out yet, but when we do will be helpful)
-        // look at netCDF attribute convention for dataset discovery page (out-of-date and/or may be subsumed into CF-16)
-        // while "SouthernMostLatitude" doed not exist in any standard..."SouthernMost [space] Latitude" does ... in some form
-        // Also: instead of lookingt at the attributes (metadata), can perhaps derive from dataset values themselves...may be too complicated
-        // so...for version #1: we will NOT look at anywhere other than attributes to get...this spatial temporal envelope
-        // also punt on the SRS - use the entire global if nothing else specified.
-        // Build up a list of candidate attribute names, look for this in particular variable and also the global attributes
-        // Variables have shared dimensions specified, but defined typically at the top of the dataset, but could be referencing somewhere else
-        // Absolutely can trust what is in the DMR, but instead of repeating - they shove them at the end as global attributes
-        // There are other reasons for being global as well. For instance everyone of these variables have the same longitude and latitude
-        // so instead of repeating, they just put them down with global specs.
-        // Hence the RULE: look into local variable for lat/long of envelope, and barring that look in the global attributes, and if not even there skip envelope definition
-        // Look for any attribute whose name contains "Southern", "Southern Most" - pretty hokey!
-        // Look at container - NC_GLOBAL.  Value of conventions is CF-1.  For all practical - standard.
-        //
-        // For time - compute timestamp using minutes value since 1980. Hard to suss out but doable.  Formulate a DAP URL and request that.
-        // WHOLE LOT MORE RELIABLE than parsing attributes (which could just be wrong): reading data from the file DAP style for lat, long of envelope as well.
-        // Can write quick test for monotonic increasing, rectified grid etc.
-        // should we make new server function - rather than doing java.  Range along will be a huge improvement.
-        // RULE for "what is the envelope?" would be to use does-not-quite exist yet RANGE function and possibly other server functions
-        // so...very little point in doing this in java - since this too far from the data itself.
-        // There is a range function in server - in master branch.  "function_result_fnoc1.nc" - totally works. Not in testbest13 yet. produces illegal output, buggy(?)
-        // For range (will not fix now), BOTTOM LINE, do multiple invocations, get values back ... and do stuff
-        //  get them back as data, or ASCII and parse it
-        // James: You can EITHER formulate a URL that calls this range function to return a DAP dataset, extract value of DAP dataset and work with them, OR
-        // OR get ASCII (advantage being no need for importing DAP classes to construct DAP Data Response object...this is the way to go since not big)
-        // For time, need to know it is one-dimensional, get a Float 64 number - minutes since - ISO string - need to further process
-        //
-
-        // EnvelopeWithTimePeriodType is part of GML
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
-        // both are equivalent spatial reference systems for the ENTIRE globe
-
-        envelope.setSrsName(_defaultSrs.getName());
-        List<String> axisLabelsAsList = _defaultSrs.getAxisLabelsList();
-        envelope.setAxisLabels(axisLabelsAsList);
-        List<String> uomLabelsAsList = _defaultSrs.getUomLabelsList();
-        envelope.setUomLabels(uomLabelsAsList);
-        envelope.setSrsDimension(BigInteger.valueOf(_defaultSrs.getSrsDimension()));
-
-        DomainCoordinate lat, lon;
-        try {
-            lat = new DomainCoordinate("latitude","latitude","degrees_north","",361);
-            lon = new DomainCoordinate("longitude","longitude","degrees_east","",576);
-        } catch (BadParameterException e) {
-            // This shouldn't happen based on the stuff above...
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addDomainCoordinate(lat);
-        this.addDomainCoordinate(lon);
-        /////////////////////////////////////////////////////////////
-
-        net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
-        List<Double> lowerCorner = Arrays.asList(new Double("-90.00"), new Double("-180.00"));
-        envelopeLowerCorner.setValue(lowerCorner);
-        envelope.setLowerCorner(envelopeLowerCorner);
-
-        DirectPositionType envelopeUpperCorner = new DirectPositionType();
-        List<Double> upperCorner = Arrays.asList(new Double("+90.00"), new Double("+179.375"));
-        envelopeUpperCorner.setValue(upperCorner);
-        envelope.setUpperCorner(envelopeUpperCorner);
-
-        TimePositionType beginTimePosition = new TimePositionType();
-        // attribute called frame seems like right place to put ISO-8601 timestamp
-        String beginTimeStr = "1980-01-01T00:30:00.000Z";
-        beginTimePosition.setFrame(beginTimeStr);
-        // However, it can also be specified as below.
-        List<String> timeStrings = Arrays.asList(beginTimeStr);
-        beginTimePosition.setValue(timeStrings);
-        envelope.setBeginPosition(beginTimePosition);
-
-        TimePositionType endTimePosition = new TimePositionType();
-        String endTimeStr = "1980-02-01T00:00:00.000Z";
-        endTimePosition.setFrame(endTimeStr);
-        // However, it can also be specified as below.
-        timeStrings = Arrays.asList(beginTimeStr);
-        endTimePosition.setValue(timeStrings);
-        envelope.setEndPosition(endTimePosition);
-
-        // it is obvious from method signature of setBoundedBy in
-        // CoverageDescription(cd) that BoundingShapeType is
-        // needed as argument. It is just an thin-wrapper to the
-        // more substantial EnvelopwithTimePeriod object
-        net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
-
-        // this is GENIUS!!...Object factory...could possibly be used for others
-        net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
-        bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
-        // the factory takes care of this...
-        // bs.setEnvelope(new JAXBElement(new QName("http://www.opengis.net/gml/3.2",
-        // "EnvelopeWithTimePeriod"), envelope.getClass(),envelope));
-
-        cd.setBoundedBy(bs);
-
-        ///////////////
-        // domain set
-
-        net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
-        net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-        rectifiedGrid.setDimension(new BigInteger("2"));
-        rectifiedGrid.setId("Grid-MERRA2_200.inst1_2d_asm_Nx.19920123.nc4");
-
-        // Create the grid envelope for the limits
-        GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
-
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        // Note: The index values for the arrays are 0 based and so the upper index is
-        // one less than the size.
-        List<BigInteger> upper = Arrays.asList(BigInteger.valueOf(lat.getSize()-1), BigInteger.valueOf(lon.getSize()-1));
-        List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
-        gridEnvelope.withHigh(upper).withLow(lower);
-        ////////////////////////////////////////////////////////////
-
-        // Create the limits, set the envelope on them.
-        GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
-        gridLimits.withGridEnvelope(gridEnvelope);
-        rectifiedGrid.setLimits(gridLimits);
-
-        List<String> axisLabels = Arrays.asList("latitude longitude");
-        rectifiedGrid.setAxisLabels(axisLabels);
-
-        // Create the Origin.
-        DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(-90.0, -180.0);
-        PointType point = gmlFactory.createPointType();
-        point.withPos(position);
-        point.setId("GridOrigin-MERRA2_200.inst1_2d_asm_Nx.19920123.nc4");
-        point.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        PointPropertyType origin = gmlFactory.createPointPropertyType();
-        origin.withPoint(point);
-        rectifiedGrid.setOrigin(origin);
-
-        // Create the offset vector.
-        List<VectorType> offsetList = new ArrayList<VectorType>();
-        VectorType offset1 = gmlFactory.createVectorType();
-        offset1.withValue(0.5, 0.0);
-        offset1.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        offsetList.add(offset1);
-        VectorType offset2 = gmlFactory.createVectorType();
-        offset2.withValue(0.0, 0.625);
-        offset2.setSrsName("http://www.opengis.net/def/crs/EPSG/0/4326");
-        offsetList.add(offset2);
-        rectifiedGrid.setOffsetVector(offsetList);
-
-        domainSet.setAbstractGeometry(gmlFactory.createRectifiedGrid(rectifiedGrid));
-        // equivalent to: domainSet.setAbstractGeometry(new JAXBElement(new
-        // QName("http://www.opengis.net/gml/3.2", "RectifiedGrid"),
-        // rectifiedGrid.getClass(),rectifiedGrid));
-        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-        // equivalent to: cd.setDomainSet(new JAXBElement(new
-        // QName("http://www.opengis.net/gml/3.2", "domainSet"),
-        // domainSet.getClass(),domainSet));
-
-        ///////////////
-        // Range Type
-        //
-        net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
-        net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new net.opengis.swecommon.v_2_0.DataRecordPropertyType();
-
-        // first data record
-        DataRecordType dataRecord1 = new DataRecordType();
-        DataRecordType.Field field = new DataRecordType.Field();
-        QuantityType fieldQuantity = new QuantityType();
-
-        field.setName("TPRECMAX");
-        fieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        fieldQuantity.setDescription("total_precipitation");
-        /////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation("TPRECMAX","TPRECMAX");
-        /////////////////////////////////////////////////////////////
-
-
-        net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
-        dataRecord1FieldQuantityUom.setCode("kg m-2 s-1");
-        fieldQuantity.setUom(dataRecord1FieldQuantityUom);
-
-        net.opengis.swecommon.v_2_0.AllowedValuesPropertyType dataRecord1FieldQuantityAllowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
-        net.opengis.swecommon.v_2_0.AllowedValuesType allowed1 = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-
-        // NASA guys - Plus or Minus Fill values. Vmin, Vmax. Reasonable gambit - to ask
-        // variable for max and min. Say - give me range for hour, no rain?
-        // get actual max and min.
-        // http://testbed-13.opendap.org:8080/opendap/testbed-13/M2SDNXSLV.5.12.4/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.ascii?range(HOURNORAIN)
-        // Dataset: function_result_MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4
-        // min, 0
-        // max, 37800
-        // is_monotonic, 0
-        // there is no Vmax, what about Fill (NUG NetCDF USers Guide conventions for
-        // missing data...valid min, max, range)
-        // look for what the allowed interval means in SWE schema. Walk it into DAP.
-        // In this case - use Attribute (not range function).
-
-        List<Double> allowed1Interval = Arrays.asList(Double.valueOf("-9.99999987e+14"), Double.valueOf("9.99999987e+14"));
-
-        // good-grief...fix someday...works for now
-        List<JAXBElement<List<Double>>> coordinates1 = new Vector<JAXBElement<List<Double>>>();
-        coordinates1.add(sweFactory.createAllowedValuesTypeInterval(allowed1Interval));
-        allowed1.setInterval(coordinates1);
-        dataRecord1FieldQuantityAllowedValues.setAllowedValues(allowed1);
-        fieldQuantity.setConstraint(dataRecord1FieldQuantityAllowedValues);
-
-        field.setAbstractDataComponent(sweFactory.createAbstractDataComponent(fieldQuantity));
-        // dataRecord1Field.setAbstractDataComponent(new JAXBElement(new
-        // QName("http://www.opengis.net/swe/2.0", "Quantity"),
-        // dataRecord1FieldQuantity.getClass(),dataRecord1FieldQuantity));
-        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> dataRecord1FieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
-        dataRecord1FieldList.add(field);
-        dataRecord1.setField(dataRecord1FieldList);
-
-        rangeType.setDataRecord(dataRecord1);
-
-        // and so on for other dataRecords (#2 and #3)
-
-        cd.setRangeType(rangeType);
 
         net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
         net.opengis.wcs.v_2_0.ObjectFactory wcsFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-        // Loop over all variables, ask two questions of rightmost two dimensions and
-        // the size of those left of the rightmost two dimensions
-        // and if some criteria are true that particular variable can be a field in a
-        // coverage
-        // Default: Rectified Grid - modulo one thing - lat long dimensions be monotonic
-        // and be evenly spaced...
-        // Lets punt...??..could be added to the Range Function...to tell us whether it
-        // is a rectified grid.
-        // There is cheesy way:compute the differences and say are they the same or not
         serviceParameters
                 .setCoverageSubtype(new QName("http://www.opengis.net/wcs/2.0", "RectifiedGridCoverage", "wcs"));
         serviceParameters.setNativeFormat("application/octet-stream");
 
         cd.setServiceParameters(serviceParameters);
-
-        //////////////////////////////
-        // OK - push this on stack (edge cases)
-        // difference between field and coverages
-        // without field - coverage meaningless
-        // Data set could have Multiple arrays - not same coverage
-        // All MERRA - single coverage inside individual dataset
-        // Not Testbed-13 anymore
-        // Need then to characterize them with shared dimensions
-
-        //
-        // if have multiple fields.
-        // Simpler set of conditions. Ignore cases where there are multiple shared dimensions or even no shared dimensions. DAP dataset could be a field in a coverage
-        // but since they have different envelopes, different (separate coverages)
-        // For now - assume same envelope.  But look for and detect when fields may not be and in those cases
-        // say we will not support this dataset right now.
-
-        // Make a list to come back to later - Punt on
-        // Multiple fields can be automated - not multiple coverages.
-        // Datasets that are not WGS 84
-        //
-        // Need to have a loop written to generate different coverage descriptions for different DMRs
-
-        // first set coverageID = get from DMR name attribute of root element
-        // for every variable in DMR.
 
         _myCD = coverageDescriptionType2JDOM(cd);
 

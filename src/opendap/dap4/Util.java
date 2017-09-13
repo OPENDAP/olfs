@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.wcs.v2_0;
+package opendap.dap4;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +100,44 @@ public class Util {
     }
 
 
+    /**
+     * null proof string contains test
+     * @param str the String 
+     * @param sub the test/candiate Sub-string 
+     * @return true only if str contains sub
+     */
+    public static boolean stringContains(String str, String sub) {
+    	boolean flag = false;
+    	
+    	if (str == null) {
+    		// no action
+    	}
+    	else if (str.trim().length() == 0) {
+    		// no action 
+    	}
+    	else if (sub == null) {
+    		// no action
+    	}
+    	else if (sub.trim().length() == 0) {
+    		// no action
+    	}
+    	else if (str.trim().toLowerCase().contains(sub.trim().toLowerCase())) {
+    	  flag = true;	
+    	}
+    	
+    	return flag;
+    }
+    
+    /**
+     * return string of zero length for nulls and blanks, trimmed otherwise
+     * @param str
+     * @return
+     */
+    public static String nullProof(String str) {
+    	if (str == null) return "";
+    	else if (str.trim().length() == 0) return "";
+    	else return str.trim();
+    }
 
 
 }

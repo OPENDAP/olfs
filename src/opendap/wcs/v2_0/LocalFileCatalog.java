@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
+import opendap.dap4.Util;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -224,7 +225,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         // QC the Catalog directory.
         File catalogDir = new File(_catalogDir);
-        if(!opendap.wcs.v2_0.Util.isReadableDir(catalogDir)){
+        if(!Util.isReadableDir(catalogDir)){
             msg = "ingestCatalog(): Catalog directory "+ catalogDir +" is not accessible.";
             log.error(msg);
             throw new IOException(msg);
@@ -232,7 +233,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         // QC the Catalog file.
         File catalogFile = new File(_catalogConfigFile);
-        if(!opendap.wcs.v2_0.Util.isReadableFile(catalogFile)) {
+        if(!Util.isReadableFile(catalogFile)) {
             msg = "ingestCatalog(): Catalog File "+ _catalogConfigFile +" is not accessible.";
             log.error(msg);
             throw new IOException(msg);
