@@ -196,41 +196,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
 
+        ingestDomainCoordinates(dataset);
 
-        Variable time = dataset.getVariable("time");
-        Variable latitude  = dataset.getVariable("lat");
-        Variable longitude  = dataset.getVariable("lon");
-        
-        DomainCoordinate lat, lon, tim;
-        try {
-          
-            tim = new DomainCoordinate(time.getAttributeValue("long_name"),
-                                       time.getAttributeValue("standard_name"),
-                                       time.getAttributeValue("units"),
-                                       "",
-                                       dataset.getSizeOfDimensionWithNameLike("time"));
-
-            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
-                                       latitude.getAttributeValue("standard_name"),
-                                       latitude.getAttributeValue("units"),
-                                       "",
-                                       dataset.getSizeOfDimensionWithNameLike("lat"));
-            
-            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
-                                       longitude.getAttributeValue("standard_name"),
-                                       longitude.getAttributeValue("units"),
-                                       "",
-                                       dataset.getSizeOfDimensionWithNameLike("lon"));
-        } catch (BadParameterException e) {
-            // This shouldn't happen based on the stuff above...
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.addDomainCoordinate(tim);
-        this.addDomainCoordinate(lat);
-        this.addDomainCoordinate(lon);
-        /////////////////////////////////////////////////////////////
+        DomainCoordinate lat = getDomainCoordinate("latitude");
+        DomainCoordinate lon = getDomainCoordinate("longitude");
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod envelopeWithTimePeriod = new EnvelopeWithTimePeriod();
@@ -277,7 +246,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
 
-        List<String> axisLabels = Arrays.asList(_defaultSrs.getAxisLabels());
+        List<String> axisLabels = _defaultSrs.getAxisLabelsList();
         rectifiedGrid.setAxisLabels(axisLabels);
 
         // Create the Origin.
@@ -326,6 +295,62 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
         hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
+    }
+
+
+
+    //FIXME The contents of this loop should be refactored to use a loop similar but not exactly like the psudo-code one in the comment below.
+    void ingestDomainCoordinates(Dataset dataset) throws WcsException {
+        /*
+        for(String dimName:_defaultSrs.getAxisLabelsList()){
+            Variable coord = dataset.getVariable(dimName);
+            List<Dim> dims = coord.getDims();
+            if(dims.size()>1)
+                throw new WcsException("",WcsException.NO_APPLICABLE_CODE);
+            // Figure out dimension size
+
+            DomainCoordinate dc = new DomainCoordinate(dimName,coord.getName(),coord.getAttributeValue("units"),"",)
+
+        }
+        */
+
+
+        Variable time = dataset.getVariable("time");
+        Variable latitude  = dataset.getVariable("lat");
+        Variable longitude  = dataset.getVariable("lon");
+
+        DomainCoordinate lat, lon, tim;
+        try {
+
+            tim = new DomainCoordinate(time.getAttributeValue("long_name"),
+                    time.getAttributeValue("standard_name"),
+                    time.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("time"));
+
+            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
+                    latitude.getAttributeValue("standard_name"),
+                    latitude.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("lat"));
+
+            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
+                    longitude.getAttributeValue("standard_name"),
+                    longitude.getAttributeValue("units"),
+                    "",
+                    dataset.getSizeOfDimensionWithNameLike("lon"));
+        } catch (BadParameterException e) {
+            // This shouldn't happen based on the stuff above...
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+        ////////////////////////////////////////////////////////////
+        // Crucial member variable state setting...
+        this.addDomainCoordinate(tim);
+        this.addDomainCoordinate(lat);
+        this.addDomainCoordinate(lon);
+        /////////////////////////////////////////////////////////////
+
+
     }
 
 
