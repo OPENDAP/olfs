@@ -64,7 +64,7 @@ public class CapabilitiesRequestProcessor {
         capabilities.addContent(CatalogWrapper.getServiceIdentificationElement());
         capabilities.addContent(CatalogWrapper.getServiceProviderElement());
         capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
-        capabilities.addContent(getServiceMetadata());
+        capabilities.addContent(ServerCapabilities.getServiceMetadata());
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -150,7 +150,7 @@ public class CapabilitiesRequestProcessor {
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_METADATA)){
-                capabilities.addContent(getServiceMetadata());
+                capabilities.addContent(ServerCapabilities.getServiceMetadata());
             }
 
             if(all  ||
@@ -252,41 +252,6 @@ public class CapabilitiesRequestProcessor {
         return contentsElement;
     }
 
-
-
-    /**
-     * Returns the wcs:Contents section of the wcs:Capabilities response.
-     *
-     * @return Returns the wcs:Contents section of the wcs:Capabilities response.
-     * @throws WcsException   When bad things happen.
-     * @throws InterruptedException
-     */
-    public static Element getServiceMetadata()  throws InterruptedException, WcsException {
-
-        Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
-
-        Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("application/x-netcdf");
-        serviceMetadata.addContent(formatSupported);
-
-        formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("image/tiff");
-        serviceMetadata.addContent(formatSupported);
-
-        formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("image/jp2");
-        serviceMetadata.addContent(formatSupported);
-
-        formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("application/octet-stream");
-        serviceMetadata.addContent(formatSupported);
-
-
-
-        return serviceMetadata;
-
-
-    }
 
 
 

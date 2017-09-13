@@ -25,7 +25,12 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.wcs.v2_0.formats.*;
+import org.jdom.Element;
+
 import java.net.URL;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,20 +41,95 @@ import java.net.URL;
  */
 public class ServerCapabilities {
 
-    private static String[] sf = {"netcdf-cf","dap-2.0","geotiff","gmljp2"};
+    private static ConcurrentHashMap<String, WcsResponseFormat> _responseFormats;
+    static {
+        _responseFormats = new ConcurrentHashMap<>();
+        WcsResponseFormat rf;
+
+        rf = new NetCdfFormat();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new GeotiffFormat();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new Jpeg200Format();
+        _responseFormats.put(rf.name(),rf);
+
+        rf = new Dap2DataFormat();
+        _responseFormats.put(rf.name(),rf);
+    }
+
 
 
 
     /**
-     *
+     * Returns teh names of the supported formats as the appear in the OperationsMetadata for GetCoverage.
      * @return
      * @param dapServer
      */
-    public static String[] getSupportedFormatStrings(URL dapServer){
-        return sf;
+    public static Vector<String> getSupportedFormatNames(URL dapServer){
+        Vector<String> supportedFormatNames = new Vector<>();
+        supportedFormatNames.addAll(_responseFormats.keySet());
+        return supportedFormatNames;
     }
 
+    /**
+     * Makes a lenient attempt to locate the requested format. If it can't be
+     * worked out a null is returned.
+     *
+     *
+     * @param name
+     * @return
+     */
+    public static WcsResponseFormat getFormat(String name){
 
+        name = name.toLowerCase();
+
+        // If it's a slam dunk the woot.
+        if(_responseFormats.containsKey(name))
+            return _responseFormats.get(name);
+
+        // Otherwise we try to be lenient about it first
+        for(WcsResponseFormat wrf: _responseFormats.values()){
+
+            // Case insensitive name match?
+            if(wrf.name().equalsIgnoreCase(name))
+                return wrf;
+
+            // Case insensitive mime-type match because people might request using mime-type
+            if(wrf.mimeType().equalsIgnoreCase(name))
+                return wrf;
+
+            // Hail Mary #1
+            if(wrf.name().contains(name))
+                return wrf;
+
+            // Hail Mary #2
+            if(wrf.mimeType().contains(name))
+                return wrf;
+        }
+        // can't reach it...
+        return null;
+    }
+
+    /**
+     * Returns the wcs:ServiceMetadata section of the wcs:Capabilities response.
+     * This section itemizes the return formats and we return the MIME types because
+     * that makes sense, right?
+     *
+     * @return Returns the wcs:Contents section of the wcs:Capabilities response.
+     * @throws WcsException   When bad things happen.
+     * @throws InterruptedException
+     */
+    public static Element getServiceMetadata()  throws InterruptedException, WcsException {
+        Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
+        for(WcsResponseFormat wrf: _responseFormats.values()){
+            Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
+            formatSupported.setText(wrf.mimeType());
+            serviceMetadata.addContent(formatSupported);
+        }
+        return serviceMetadata;
+    }
 
     /**
      *
@@ -60,14 +140,11 @@ public class ServerCapabilities {
     static String[] getInterpolationMethods(String coverageID, String fieldID){
         String[] im = {"nearest"};
         return im;
-        
     }
-
 
     public static void main(String[] args) throws Exception{
 
-
-        String[] sf = getSupportedFormatStrings(null);
+        Vector<String> sf = getSupportedFormatNames(null);
         for(String s : sf)
             System.out.println("Supported Format: "+s);
 

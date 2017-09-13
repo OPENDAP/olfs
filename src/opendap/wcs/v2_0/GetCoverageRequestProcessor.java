@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
+import opendap.wcs.v2_0.formats.WcsResponseFormat;
 import opendap.wcs.v2_0.http.Attachment;
 import opendap.wcs.v2_0.http.MultipartResponse;
 import opendap.wcs.v2_0.http.SoapHandler;
@@ -184,130 +185,54 @@ public class GetCoverageRequestProcessor {
     }
 
 
+    /**
+     * @param req
+     * @return
+     * @throws WcsException
+     * @throws InterruptedException
+     */
     public static String getDataAccessUrl(GetCoverageRequest req) throws WcsException, InterruptedException {
-        String dataAccessURL;
 
         String format = getReturnFormat(req);
-        if (format.contains("netcdf")) {
-            dataAccessURL = getNetcdfDataAccessURL(req);
-        } else if (format.equals("image/tiff")) {
-            dataAccessURL = getGeoTiffDataAccessURL(req);
-        } else if (format.equals("image/jp2")) {
-            dataAccessURL = getGmlJpeg2000DataAccessURL(req);
-        } else if (format.equals("application/octet-stream")) {
-            dataAccessURL = getDap2DataAccessURL(req);
-        } else {
-            throw new WcsException("Unrecognized response format: '" + Scrub.fileName(format)+"'",
+        WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+        if(rFormat ==  null) {
+            throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
-
-        return dataAccessURL;
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
+        StringBuilder dataAccessURL = new StringBuilder(requestURL);
+        dataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
+        return dataAccessURL.toString();
     }
 
 
     public static String getContentDisposition(GetCoverageRequest req) throws WcsException, InterruptedException {
-        String contentDisposition;
-
         String format = getReturnFormat(req);
-        if (format.contains("netcdf")) {
-            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".nc\"";
-        } else if (format.equals("image/tiff")) {
-            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".tiff\"";
-        } else if (format.equals("image/jp2")) {
-            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".jp2\"";
-        } else if (format.equals("application/octet-stream")) {
-            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".dods\"";
-        } else {
+        WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+        if(rFormat ==  null) {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
+        StringBuilder contentDisposition = new StringBuilder();
+        contentDisposition
+                .append(" attachment; filename=\"")
+                .append(req.getCoverageID())
+                .append(rFormat.dapDataResponseSuffix());
 
-        return contentDisposition;
+        return contentDisposition.toString();
     }
 
 
     public static String getReturnMimeType(GetCoverageRequest req) throws WcsException, InterruptedException {
-        String mime_type;
-
         String format = getReturnFormat(req);
-        if (format.contains("netcdf")) {
-            mime_type = "application/x-netcdf";
-        } else if (format.equals("image/tiff")) {
-            mime_type = "image/tiff";
-        } else if (format.equals("image/geotiff")) {
-            mime_type = "image/geotiff";
-        } else if (format.equals("application/octet-stream")) {
-            mime_type = "application/octet-stream";
-        } else {
+        WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+        if(rFormat ==  null)
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
-        }
-
-        return mime_type;
+        return rFormat.mimeType();
     }
 
 
-    public static String getGmlJpeg2000DataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-
-        String dapCE = getDap2CE(req);
-        log.debug("getGmlJpeg2000DataAccessURL() - Dap CE: '{}'",dapCE);
-
-        try {
-            requestURL += ".gmljp2" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new WcsException("Failed to construct DAP data Access URL. Primary Message: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-
-        return requestURL;
-    }
-
-    public static String getGeoTiffDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-
-        String dapCE = getDap2CE(req);
-        log.debug("getGeoTiffDataAccessURL() - Dap CE: '{}'",dapCE);
-
-        try {
-            requestURL += ".tiff" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new WcsException("Failed to construct DAP data Access URL. Primary Message: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-
-        return requestURL;
-    }
-
-    public static String getDap2DataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-
-        requestURL += ".dods" + "?" + getDap2CE(req);
-
-        return requestURL;
-    }
-
-
-    public static String getNetcdfDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-
-        requestURL += ".nc" + "?" + getDap2CE(req);
-
-        return requestURL;
-    }
-
-
-    public static String getMetadataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-
-        requestURL += ".ddx";
-        //requestURL +=  "/" + req.getCoverageID() + ".ddx"+"?"+getDap2CE(req);
-
-        return requestURL;
-    }
 
 
     private static String getDap2CE(GetCoverageRequest req) throws InterruptedException, WcsException {
