@@ -40,9 +40,9 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement (name="Dataset")
 public class Dataset {
 
-    Logger _log;
-	// FIXME: change the name from "coverageId" to "name" and modify setter and getter accordingly. ndp 9/7/17
-	private String coverageId;
+  Logger _log;
+
+	private String name;
 	private String url;
 	
 	private List<Dimension> dimensions; 
@@ -55,11 +55,11 @@ public class Dataset {
 
 
 	/**
-	 * This default constructor intializes all of the stuff so things can never be null.
+	 * This default constructor initializes all of the stuff so things can never be null.
 	 */
 	public Dataset() {
 	    _log = LoggerFactory.getLogger(this.getClass());
-		coverageId = "";
+		name = "";
 		url = "";
 		dimensions = new Vector<>();
 		attributes = new Vector<>();
@@ -70,18 +70,18 @@ public class Dataset {
 	}
 	
 	
-	@XmlAttribute(name="name")
-	public String getCoverageId() {
-		return coverageId;
+	@XmlAttribute
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCoverageId(String coverageId) {
-		this.coverageId = coverageId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	// DMR generate prefixed attribute "xml:base", 
 	// just using base here
-	// the xml prefix is handled in package.info
+	// the respective xml prefix is handled in package.info
 	@XmlAttribute(name="base")
 	public String getUrl() {
 		return url;
@@ -91,7 +91,7 @@ public class Dataset {
 		this.url = url;
 	}
 
-    @XmlElement(name="Attribute")
+  @XmlElement(name="Attribute")
 	public List<ContainerAttribute> getAttributes() {
 		return attributes;
 	}
@@ -150,7 +150,7 @@ public class Dataset {
 		this.vars64bitIntegers = vars64bitIntegers;
 	}
 
-	public Vector<Variable> getVariables(){
+	public Vector<Variable> getVariables() {
 
 	    Vector<Variable> vars = new Vector<>();
 
@@ -211,15 +211,19 @@ public class Dataset {
         
    public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
-     String value = "";
+     String value = null;
 	   
      for (ContainerAttribute containerAttribute : attributes) {
        	for (Attribute a : containerAttribute.getAttributes()) {
 
           String a_name = Util.nullProof(a.getName());
           String a_value = Util.nullProof(a.getValue());
-          // FIX ME the very first match - make more sophisticated later - gather all matches, rank them etc.
-          if (Util.stringContains(a_name, name)) value = a_value;
+          
+          if (Util.stringContains(a_name, name)) 
+          {
+            value = a_value;
+            break;
+          }
         }
       }
      
@@ -250,52 +254,13 @@ public class Dataset {
      return value;
    }
    
-   public double getLatitudeResolution()
-   {
-     double lat = 0.0;
-     
-     try
-     {
-       lat = Double.parseDouble(this.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
-     }
-     catch (Exception e)
-     {
-       _log.debug("could not get LATITUDE resolution ");  
-       _log.debug(e.toString());
-       _log.debug("returning ZERO");
-     }
-     
-     return lat;
-   }
-
-   public double getLongitudeResolution()
-   {
-     double lat = 0.0;
-     
-     try
-     {
-       lat = Double.parseDouble(this.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
-     }
-     catch (Exception e)
-     {
-       _log.debug("could not get LONGITUDE resolution ");  
-       _log.debug(e.toString());
-       _log.debug("returning ZERO");
-     }
-     
-     return lat;
-   }
-   
    public Variable getVariable (String name)
    {
-     List<opendap.dap4.Variable> variables = this.getVariables();
-     Hashtable<String, opendap.dap4.Variable> variablesHash = new Hashtable();
-     Iterator<opendap.dap4.Variable> iter = variables.iterator();
-     while (iter.hasNext()) {
-         opendap.dap4.Variable variable = iter.next();
-         variablesHash.put(variable.getName(), variable);
+     Variable var = null;
+     for (Variable v : this.getVariables())
+     {
+       if (v.getName().equalsIgnoreCase(name)) var = v;
      }
-     return variablesHash.get(name);
-   }
-   
+     return var;
+   }  
 }

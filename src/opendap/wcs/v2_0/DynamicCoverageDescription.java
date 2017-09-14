@@ -156,6 +156,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
             XMLStreamReader xsr = factory.createXMLStreamReader(is);
             XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
             dataset = (Dataset) um.unmarshal(xr);
+            if (dataset == null) {
+              _log.debug("DMR dataset....NULL; bye-bye");
+              throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
+          }
         } catch (JAXBException | UnsupportedEncodingException | XMLStreamException e) {
             StringBuilder sb = new StringBuilder();
             sb.append("Unable to build Dataset instance from JDOM DMR document.");
@@ -164,26 +168,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.error(sb.toString());
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
-
-        /////////////////////////////////////////////////////////////////////////
-        // interpret contents of the dataset (DMR) to generate WCS per OGC below.
-
-        // First Loop through the variables to glean "knowledge"
-
-        // FIXME Test the null condition above in the try/catch block and exit there
-        // with an exception the WCS service code can catch and process. Doing that
-        // will also reduce one level of nesting down here. jhrg 9/7/17
-        if (dataset == null) {
-            _log.debug("DMR dataset....NULL; bye-bye");
-            throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
-        }
-        //////////////////////////////////////////////////////////
-        // this else block extends all the way to almost
-        // end of program with brace commented with }
-        // end if (dataset==null)
-
-        // FIXME If you need this, put it in a method and call it when the logger is
-        // set to the DEBUG level. ... Sanity check, too. jhrg 9/7/17
 
         _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
@@ -241,7 +225,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
         net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
         rectifiedGrid.setDimension(new BigInteger(this.getDomainCoordinates().size()+""));
-        rectifiedGrid.setId(dataset.getCoverageId());
+        rectifiedGrid.setId(dataset.getName());
 
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
@@ -255,7 +239,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                            Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
-        point.setId("GridOrigin-" + dataset.getCoverageId());
+        point.setId("GridOrigin-" + dataset.getName());
         point.setSrsName(_defaultSrs.getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
@@ -264,11 +248,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Create the offset vector.
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
-        offset1.withValue(dataset.getLatitudeResolution(), 0.0);
+        double latitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
+        offset1.withValue(latitudeResolution, 0.0);
         offset1.setSrsName(_defaultSrs.getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
-        offset2.withValue(0.0, dataset.getLongitudeResolution());
+        double longitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
+        offset2.withValue(0.0, longitudeResolution);
         offset2.setSrsName(_defaultSrs.getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
@@ -294,12 +280,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         cd.setRangeType(rangeType);
 
 
-        hardwireTheCdAndDcdForTesting(dataset.getCoverageId(), datasetUrl, cd);
+        hardwireTheCdAndDcdForTesting(dataset.getName(), datasetUrl, cd);
     }
 
 
 
-    //FIXME The contents of this loop should be refactored to use a loop similar but not exactly like the psudo-code one in the comment below.
+    //FIXME The contents of this loop should be refactored to use a loop similar but not exactly 
+    //like the psudo-code one in the comment below.
     void ingestDomainCoordinates(Dataset dataset) throws WcsException {
         /*
         for(String dimName:_defaultSrs.getAxisLabelsList()){
@@ -477,13 +464,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     	      // probably need a better test
     	      if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
-    	      
+    	    } 
     	     
     	     if (found) {
     	       _log.debug("Dimension " + dimName + " found in Dataset");
+    	       continue;
+    	     }
+    	     else
+    	     {
+    	       _log.debug("Dimension " + dimName + " NOT found in DataSet");
+    	       flag = false;
     	       break;
     	     }
-    	   }
+    	   
         }
     	}
     	else
