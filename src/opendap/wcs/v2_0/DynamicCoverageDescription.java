@@ -80,10 +80,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @throws WcsException
      */
     private Dataset buildDataset(Element dmr) throws WcsException {
-        JAXBContext jc = null;
-        Dataset dataset = null;
         try {
-            jc = JAXBContext.newInstance(Dataset.class);
+            JAXBContext jc = JAXBContext.newInstance(Dataset.class);
             Unmarshaller um = jc.createUnmarshaller();
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             String dmrXml = xmlo.outputString(dmr);
@@ -91,11 +89,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLStreamReader xsr = factory.createXMLStreamReader(is);
             XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
-            dataset = (Dataset) um.unmarshal(xr);
+            Dataset dataset = (Dataset) um.unmarshal(xr);
             if (dataset == null) {
-                _log.debug("DMR dataset....NULL; bye-bye");
-                throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
+                String msg = "JAXB failed to produce a Dataset from the DMR.";
+                _log.debug(msg);
+                throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
             }
+            return dataset;
         } catch (JAXBException | UnsupportedEncodingException | XMLStreamException e) {
             StringBuilder sb = new StringBuilder();
             sb.append("Unable to build Dataset instance from JDOM DMR document.");
@@ -104,11 +104,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.error(sb.toString());
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
-        return dataset;
     }
 
 
-    /**\
+    /**
      * Examines the dataset object and builds a gml:EnvelopeWithTimePeriod for the coverage. This may require
      * utilizing the default SRS for the DynamicService, or if a new one is detected, updating the SRS for this
      * coverage and moving forward.
@@ -227,8 +226,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
-    public long getSizeOfDomainCoordinate(Dataset dataset, String dimName) throws WcsException {
-        Variable coordinate = findVariableWithCfStandardName(dataset, dimName);
+    /**
+     * Returns the size of the requested coordinate variable.
+     * @param dataset
+     * @param standard_name The CF standard_name of the coordinate variable;
+     * @return
+     * @throws WcsException
+     */
+    public long getSizeOfDomainCoordinateVariable(Dataset dataset, String standard_name) throws WcsException {
+
+        Variable coordinate = findVariableWithCfStandardName(dataset, standard_name);
 
         List<Dim> dims = coordinate.getDims();
         if(dims.size()>1)
@@ -236,6 +243,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
         
         Dim dim = dims.get(0);
         Dimension dimension = dataset.getDimension(dim.getName());
+        if(dimension==null)
+            throw new WcsException("Unable to locate Dimension '"+dim.getName()+"'",WcsException.NO_APPLICABLE_CODE);
+
         try {
             return Long.parseLong(dimension.getSize());
         }
@@ -294,21 +304,23 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     time.getAttributeValue("standard_name"), // FIXME THis needs to be the DAP Variable name
                     time.getAttributeValue("units"),  // FIXME from the SRS?
                     "",
-                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("time")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
+                    getSizeOfDomainCoordinateVariable(dataset,"time"),
                     "time");
 
-            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"), // FIXME: This should be the name from the SRS
+            lat = new DomainCoordinate(
+                    latitude.getAttributeValue("long_name"), // FIXME: This should be the name from the SRS
                     latitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
                     latitude.getAttributeValue("units"),
                     "",
-                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("latitude")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
+                    getSizeOfDomainCoordinateVariable(dataset,"latitude"),
                     "latitude");
 
-            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),  // FIXME: This should be the name from the SRS
+            lon = new DomainCoordinate(
+                    longitude.getAttributeValue("long_name"),  // FIXME: This should be the name from the SRS
                     longitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
                     longitude.getAttributeValue("units"),
                     "",
-                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("latitude")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
+                    getSizeOfDomainCoordinateVariable(dataset,"longitude"),
                     "longitude");
 
         } catch (BadParameterException e) {
