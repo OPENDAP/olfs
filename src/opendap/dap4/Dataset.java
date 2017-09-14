@@ -110,10 +110,17 @@ public class Dataset {
 		return dimensions;
 	}
 
+    /**
+     * This finds the named imension if it exisits.
+     *
+     * @param name
+     * @return
+     */
 	public Dimension getDimension(String name){
 	    while(name.startsWith("/") && name.length()>1)
             name = name.substring(1);
 
+	    // FIXME This should handle groups and Dimensions declared at places other than the root Group
 	    for(Dimension dim: getDimensions()){
 	        if(dim.getName().equals(name))
 	            return dim;
