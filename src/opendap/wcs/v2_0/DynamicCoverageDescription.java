@@ -313,19 +313,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     time.getAttributeValue("standard_name"),
                     time.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("time"));
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("time")));
 
             lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
                     latitude.getAttributeValue("standard_name"),
                     latitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lat"));
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("lat")));
 
             lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
                     longitude.getAttributeValue("standard_name"),
                     longitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lon"));
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("lon")));
         } catch (BadParameterException e) {
             // This shouldn't happen based on the stuff above...
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);

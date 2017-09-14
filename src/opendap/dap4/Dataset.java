@@ -231,26 +231,15 @@ public class Dataset {
    }
 
    
-   public int getSizeOfDimensionWithNameLike(String name)
+   public String getSizeOfDimensionWithNameLike(String name)
    {
-     int value = 0;
+     String value = null;
      
      for (Dimension dim : dimensions) {
        if (Util.stringContains(dim.getName(), name)) {
-        
-         try
-         {
-           value = Integer.parseInt(dim.getSize());
-         }
-         catch (java.lang.NumberFormatException e)
-         {
-           _log.debug("could not parse size of dimension" + dim.getName() + ": " + dim.getSize() );  
-           _log.debug(e.toString());
-           _log.debug("returning ZERO");
-         }
-       }  
-     }
-     
+           value = dim.getSize();
+       }
+     }     
      return value;
    }
    
