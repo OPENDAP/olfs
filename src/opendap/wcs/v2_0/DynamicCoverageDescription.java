@@ -57,13 +57,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException("There must be a DynamicService associated with the coverage!",WcsException.NO_APPLICABLE_CODE);
         _dynamicService = dynamicService;
 
-        // TODO: Get the dataset URL from the DMR top level attribute "xml:base"
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
         setDapDatasetUrl(new URL(datasetUrl));
-
-        /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         *  TODO:  Replace this stuff with the output of WcsMarchaller
-         */
 
         ingestDmr(dmr);
 
@@ -75,51 +70,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _myCD.addContent(coverageId);
         }
 
-        /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        //TODO: All this stuff needs reviewed?
-        ////////////////////////////////////
-        //  use DOM to directly set member variables
-
-        //_myFile = cd._myFile.getCanonicalFile();
-        //_validateContent = cd._validateContent;
-        //_dapGridId.putAll(cd._dapGridId);
-        //_domainCoordinates.putAll(dataset.getDimensions());
-        //this.fields = dataset.getVars32bitFloats();
-        //_initialized = cd._initialized;
-
-        /**
-         * TODO: Populate the parent class's (CoverageDescription) internal objects including: _myCD, _gridIds, _domainCoordinates, and _fields from WcsMarchaller
-         * The parent class may need additional setter/getters or protected variables
-         * in order to fufill this.
-         */
 
     }
 
     /**
-     * This method uses a DMR to build state into the CoverageDescrption
+     * Uses JAXB to build a Dataset object from the passed DMR.
      * @param dmr
+     * @return
      * @throws WcsException
      */
-    private void ingestDmr(Element dmr) throws WcsException {
-
-        /////////////////////////////////////////////////
-        // Use OLFS method to fetch the DMR
-        //
-        // For this to work, against a NASA server
-        // then you will need to have valid
-        // Earthdata Login credentials available in the
-        // local filesystem like so:
-        // In Unix ~/.netrc should have
-        // machine urs.earthdata.nasa.gov
-        // login userName
-        // password password
-        //
-        // Then login to earthdata and add the respective
-        // dataset to user profile
-
-        // Object wrapper to DMR XML
-
+    private Dataset buildDataset(Element dmr) throws WcsException {
         JAXBContext jc = null;
         Dataset dataset = null;
         try {
@@ -133,9 +93,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
             dataset = (Dataset) um.unmarshal(xr);
             if (dataset == null) {
-              _log.debug("DMR dataset....NULL; bye-bye");
-              throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
-          }
+                _log.debug("DMR dataset....NULL; bye-bye");
+                throw new WcsException("Failed to build Dataset instance from DMR.", WcsException.NO_APPLICABLE_CODE);
+            }
         } catch (JAXBException | UnsupportedEncodingException | XMLStreamException e) {
             StringBuilder sb = new StringBuilder();
             sb.append("Unable to build Dataset instance from JDOM DMR document.");
@@ -144,19 +104,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.error(sb.toString());
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
+        return dataset;
+    }
 
-        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
-
-        CoverageDescriptionType cd = new CoverageDescriptionType();
-        URL datasetUrl = null;
-        try {
-            datasetUrl = new URL(dmr.getAttributeValue("base", XML.NS));
-        } catch (MalformedURLException e) {
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-
-        ingestDomainCoordinates(dataset);
+    /**\
+     * Examines the dataset object and builds a gml:EnvelopeWithTimePeriod for the coverage. This may require
+     * utilizing the default SRS for the DynamicService, or if a new one is detected, updating the SRS for this
+     * coverage and moving forward.
+     * The time period must be determined , as well as the extent of the domain coordinates.
+     *
+     * @param cd
+     * @param dataset
+     */
+    private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset){
 
         DomainCoordinate lat = getDomainCoordinate("latitude");
         DomainCoordinate lon = getDomainCoordinate("longitude");
@@ -212,7 +173,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
         position.withValue(Double.valueOf(envelopeWithTimePeriod.getSouthernmostLatitude()),
-                           Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
+                Double.valueOf(envelopeWithTimePeriod.getWesternmostLongitude()));
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
         point.setId("GridOrigin-" + dataset.getName());
@@ -239,31 +200,48 @@ public class DynamicCoverageDescription extends CoverageDescription {
         cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
         cd.setBoundedBy(bs);
 
+    }
 
+
+    /**
+     * This method examines the variables in the dataset. It determines which variables can be added to the coverage
+     * as fields and then adds them to the CoverageDescription
+     * @param cd
+     * @param dataset
+     */
+    private void addRange(CoverageDescriptionType cd, Dataset dataset){
         net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new  net.opengis.swecommon.v_2_0.DataRecordPropertyType();
         net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
-        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<net.opengis.swecommon.v_2_0.DataRecordType.Field>();
+        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<>();
 
 
         for(Variable var : dataset.getVariables()){
-          if (compareVariableDimensionsWithDataSet(var, dataset)) {
-            fieldList.add(getField(var));
-          }
+            if (compareVariableDimensionsWithDataSet(var, dataset)) {
+                fieldList.add(getField(var));
+            }
         }
 
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
         cd.setRangeType(rangeType);
 
-
-        hardwireTheCdAndDcdForTesting(dataset.getName(), datasetUrl, cd);
     }
 
 
 
-    //FIXME The contents of this loop should be refactored to use a loop similar but not exactly 
-    //like the psudo-code one in the comment below.
+    /**
+     * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
+     * specifically must determine the order of the coordinates, and which DAP variable is associated with each
+     * domain coordinate. The results are added as state to the object and thus set the stage for later
+     * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
+     * to service the  WCS GetCoverage  operation for the coverage.
+     *
+     * @param dataset
+     * @throws WcsException
+     */
     void ingestDomainCoordinates(Dataset dataset) throws WcsException {
+        //FIXME The contents of this method should be refactored to make a susbstantive evaluation of the Dataset's variables before compiling the list of DomainCoordinates.
+        //like the psudo-code one in the comment below.
         /*
         for(String dimName:_defaultSrs.getAxisLabelsList()){
             Variable coord = dataset.getVariable(dimName);
@@ -285,32 +263,40 @@ public class DynamicCoverageDescription extends CoverageDescription {
         DomainCoordinate lat, lon, tim;
         try {
 
-            tim = new DomainCoordinate(time.getAttributeValue("long_name"),
-                    time.getAttributeValue("standard_name"),
-                    time.getAttributeValue("units"),
+
+            //FIXME Checking to see is there is in fact time information in the DMR is needed before adding a time dimension.
+            tim = new DomainCoordinate(
+                    time.getAttributeValue("long_name"),  // FIXME: This should be "time"
+                    time.getAttributeValue("standard_name"), // FIXME THis needs to be the DAP Variable name
+                    time.getAttributeValue("units"),  // FIXME from the SRS?
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("time"),
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("time")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
                     "time");
 
-            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
-                    latitude.getAttributeValue("standard_name"),
+            lat = new DomainCoordinate(latitude.getAttributeValue("long_name"), // FIXME: This should be the name from the SRS
+                    latitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
                     latitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lat"),
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("latitude")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
                     "latitude");
 
-            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
-                    longitude.getAttributeValue("standard_name"),
+            lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),  // FIXME: This should be the name from the SRS
+                    longitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
                     longitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lon"),
+                    Integer.parseInt(dataset.getSizeOfDimensionWithNameLike("latitude")),  // FIXME this will throw an exception the needs to be caught and processed into a WcsException
                     "longitude");
+
         } catch (BadParameterException e) {
             // This shouldn't happen based on the stuff above...
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
         }
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
+        // FIXME - The order that the coordinates are added MUST be the same as they appear in each field.
+        // The order that the Dimension elements appear in the Dataset is not important. What is important
+        // is the number and order of the dimensions in each field. DAP variables with identical Dim lists can be
+        // grouped to form a coverage.
         this.addDomainCoordinate(tim);
         this.addDomainCoordinate(lat);
         this.addDomainCoordinate(lon);
@@ -318,6 +304,24 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     }
+    /**
+     * This method uses a DMR to build state into the CoverageDescrption
+     * @param dmr
+     * @throws WcsException
+     */
+    private void ingestDmr(Element dmr) throws WcsException {
+
+        Dataset dataset =  buildDataset(dmr);
+        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
+
+        CoverageDescriptionType cd = new CoverageDescriptionType();
+        ingestDomainCoordinates(dataset);
+        addEnvelopeWithTimePeriod(cd,dataset);
+        addRange(cd,dataset);
+
+        hardwireTheCdAndDcdForTesting(dataset.getName(), getDapDatasetUrl(), cd);
+    }
+
 
 
     public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {

@@ -26,19 +26,13 @@
 
 package opendap.dap4;
 
-import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.*;
 
 /**
  * JAXB spec for Top Level Container Attribute elements of DMR
  *   <Attribute name="HDF5_GLOBAL" type="container">
- *     No children like <Value>CF-1</Value>
- *     but could contain other attributes...ugh!
  *   </Attribute>
- * 
  */
 public class ContainerAttribute {
 	
