@@ -8,13 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DynamicService {
-    Logger _log;
+    private Logger _log;
     private String _name;
     private URL _dapServiceUrl;
     private SimpleSrs _srs;
@@ -31,15 +30,14 @@ public class DynamicService {
         _time = null;
         _latitude = null;
         _longitude = null;
-        _domainCoordinates =  new Vector<>();
         _srs = null;
+        _domainCoordinates =  new Vector<>();
         _wcsFieldsToDapVar = new ConcurrentHashMap<>();
     }
 
     public DynamicService(Element config) throws ConfigurationException {
 
-        Element e;
-        String s=null;
+        String s;
 
         _name = config.getAttributeValue("name");
         if(_name==null)
@@ -52,19 +50,18 @@ public class DynamicService {
             _dapServiceUrl = new URL(s);
         }
         catch(MalformedURLException mue){
-            throw new ConfigurationException("Failed to build URL from string '"+s+"' ");
+            throw new ConfigurationException("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
         }
 
 
 
-        e = config.getChild("srs");
-        if(e==null)
+        s = config.getAttributeValue("srs");
+        if(s==null)
             throw new ConfigurationException("DynamicService element is missing required 'srs' child element whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
 
-        String srsName = config.getAttributeValue("srs");
-        _srs = SrsFactory.getSrs(srsName);
+        _srs = SrsFactory.getSrs(s);
         if(_srs!=null)
-            throw new ConfigurationException("Failed to locate requested SRS '" + srsName + "' Unable to configure Dynamic service!");
+            throw new ConfigurationException("Failed to locate requested SRS '" + s + "' Unable to configure Dynamic service!");
         _log.info("WCS-2.0 DynamicService {} has default SRS of {}",_name, _srs.getName());
 
         List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");
@@ -98,40 +95,47 @@ public class DynamicService {
         }
     }
 
+    private void orderPreservingCoordinateReplace(DomainCoordinate newCoordinate, DomainCoordinate oldCoordinate){
 
-
-
-
-
-
-
-    public void setTimeCoordinate(DomainCoordinate time){
-        if(_time!=null){
-            _domainCoordinates.remove(_time);
+        if(oldCoordinate==null){
+            _domainCoordinates.add(newCoordinate);
+            return;
         }
-        _time = time;
-        _domainCoordinates.add(time);
+
+        if(_domainCoordinates.contains(oldCoordinate)){
+            int index = _domainCoordinates.indexOf(oldCoordinate);
+            if(index>=0){
+                _domainCoordinates.insertElementAt(newCoordinate,index);
+            }
+            else {
+                _domainCoordinates.add(newCoordinate);
+            }
+            _domainCoordinates.remove(oldCoordinate);
+        }
+        else{
+            _domainCoordinates.add(newCoordinate);
+        }
+
     }
 
+    public void setTimeCoordinate(DomainCoordinate time){
+        orderPreservingCoordinateReplace(time,_time);
+        _time = time;
+    }
     public DomainCoordinate getTimeCoordinate(){ return _time; }
 
     public void setLatitudeCoordinate(DomainCoordinate latitude){
-        if(_latitude!=null){
-            _domainCoordinates.remove(_latitude);
-        }
+        orderPreservingCoordinateReplace(latitude,_latitude);
         _latitude = latitude;
-        _domainCoordinates.add(latitude);
     }
-    public DomainCoordinate getLatitudeCoordinate(){
-        return _latitude; }
+    public DomainCoordinate getLatitudeCoordinate(){ return _latitude; }
 
     public void setLongitudeCoordinate(DomainCoordinate longitude){
-        if(_longitude!=null){
-            _domainCoordinates.remove(_longitude);
-        }
+        orderPreservingCoordinateReplace(longitude,_longitude);
         _longitude = longitude;
-        _domainCoordinates.add(longitude);
     }
+    public DomainCoordinate getLongitudeCoordinate(){ return _longitude; }
+
 
     public void setSrs(SimpleSrs srs){ _srs = srs; }
 

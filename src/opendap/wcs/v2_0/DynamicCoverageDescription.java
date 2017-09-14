@@ -97,35 +97,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Abandon this version for the version that takes the DMR as a JDOM element (see above)
-     * <p>
-     * From dap4dmr branch version of CoverageDescription
-     *
-     * @param datasetUrl
-     * @throws IOException
+     * This method uses a DMR to build state into the CoverageDescrption
+     * @param dmr
+     * @throws WcsException
      */
-    @Deprecated
-    public DynamicCoverageDescription(String datasetUrl) throws IOException, JDOMException, WcsException {
-        super();
-        setDapDatasetUrl(new URL(datasetUrl));
-
-        String dmrUrl = datasetUrl + ".dmr.xml";
-        Element dmr = opendap.xml.Util.getDocumentRoot(dmrUrl);
-
-        ingestDmr(dmr);
-
-        ////////////////////////////////////
-        //  use DOM to directly set member variables
-
-        //_myFile = cd._myFile.getCanonicalFile();
-        //_validateContent = cd._validateContent;
-        //_dapGridId.putAll(cd._dapGridId);
-        //_domainCoordinates.putAll(dataset.getDimensions());
-        //this.fields = dataset.getVars32bitFloats();
-        //_initialized = cd._initialized;
-
-    }
-
     private void ingestDmr(Element dmr) throws WcsException {
 
         /////////////////////////////////////////////////
