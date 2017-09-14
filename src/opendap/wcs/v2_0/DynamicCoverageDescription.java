@@ -351,7 +351,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         try {
             // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
             // it's really not, so we handle it like any other coordinate
-            // It should be in the list from the service if it there is a time coordinate.
+            // It should be in the list from the DynamicService if there is a time coordinate.
             for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
                 DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate,dataset);
                 addDomainCoordinate(domainCoordinate);
