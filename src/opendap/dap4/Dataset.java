@@ -111,7 +111,7 @@ public class Dataset {
 	}
 
     /**
-     * This finds the named imension if it exisits.
+     * This finds the named Dimension if it exists.
      *
      * @param name
      * @return
