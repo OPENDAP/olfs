@@ -11,9 +11,6 @@ public class SrsFactory {
     }
 
     public static SimpleSrs getSrs(String urn){
-        SimpleSrs srs = null;
-        if(urn!=null)
-            srs =  _theList.get(urn);
-        return srs;
+        return  _theList.get(urn);
     }
 }
