@@ -234,27 +234,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @return
      * @throws WcsException
      */
-    public long getSizeOfDomainCoordinateVariable(Dataset dataset, String standard_name) throws WcsException {
 
-        Variable coordinate = findVariableWithCfStandardName(dataset, standard_name);
+    public Dimension getDomainCoordinateVariableDimension(Dataset dataset, String standard_name) throws WcsException {
 
-        List<Dim> dims = coordinate.getDims();
+        Variable coordinateVariable = findVariableWithCfStandardName(dataset, standard_name);
+        if(coordinateVariable==null)
+            return null;
+
+        List<Dim> dims = coordinateVariable.getDims();
         if(dims.size()>1)
             throw new WcsException("Coordinate variable must have a single dimension. dims: {}",dims.size());
         
         Dim dim = dims.get(0);
-        Dimension dimension = dataset.getDimension(dim.getName());
-        if(dimension==null)
-            throw new WcsException("Unable to locate Dimension '"+dim.getName()+"'",WcsException.NO_APPLICABLE_CODE);
-
-        try {
-            return Long.parseLong(dimension.getSize());
-        }
-        catch (NumberFormatException nfe){
-            throw new WcsException("Failed to parse the size of Dimension "+dimension.getName()+
-                    " ,msg: "+nfe.getMessage(),WcsException.NO_APPLICABLE_CODE);
-
-        }
+        return dataset.getDimension(dim.getName());
     }
     
     /**
@@ -282,10 +274,64 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return null;
     }
 
+
+    public SimpleSrs getSRS(Dataset dataset){
+        // TODO Add a bunch of code to evaluate the dataset and figure out the SRS.
+        _log.info("Utilizing default SRS for dataset: {}",dataset.getName());
+        return _dynamicService.getSrs();
+    }
+
+
+    /**
+     * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
+     * be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+     * are used to construct the new DomainCoordinate
+     * @param defaultCoordinate
+     * @param dataset
+     * @return
+     * @throws BadParameterException
+     * @throws WcsException
+     */
+    private DomainCoordinate getDomainCoordinate(DomainCoordinate defaultCoordinate, Dataset dataset) throws BadParameterException, WcsException {
+
+        DomainCoordinate domainCoordinate;
+        String coordinateName = defaultCoordinate.getName();
+        Variable coordinateVariable = findVariableWithCfStandardName(dataset, coordinateName);
+        if(coordinateVariable!=null) {
+            String units = coordinateVariable.getAttributeValue("units");
+            if(units==null)
+                units = defaultCoordinate.getUnits();
+
+            Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset,coordinateName);
+
+            long size = defaultCoordinate.getSize();
+            try {
+                size = Long.parseLong(coordinateDimension.getSize());
+            } catch (NumberFormatException nfe) {
+                _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
+            }
+
+            domainCoordinate = new DomainCoordinate(
+                    coordinateName,
+                    coordinateVariable.getName(),
+                    units,
+                    "",
+                    size,
+                    coordinateName);
+        }
+        else {
+            domainCoordinate = new DomainCoordinate(defaultCoordinate);
+        }
+
+        return domainCoordinate;
+
+    }
+
+
     /**
      * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
-     * specifically must determine the order of the coordinates, and which DAP variable is associated with each
-     * domain coordinate. The results are added as state to the object and thus set the stage for later
+     * utilizes the DynamicService to determine the domain coordinates and their order.
+     * The results are added as state to the object and thus set the stage for later
      * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
      * to service the  WCS GetCoverage  operation for the coverage.
      *
@@ -293,73 +339,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @throws WcsException
      */
     void ingestDomainCoordinates(Dataset dataset) throws WcsException {
-        //FIXME The contents of this method should be refactored to make a susbstantive 
-        // evaluation of the Dataset's variables before compiling the list of DomainCoordinates.
-        //like the psudo-code one in the comment below.
-        /*
-        for(String dimName:_defaultSrs.getAxisLabelsList()){
-            Variable coord = dataset.getVariable(dimName);
-            List<Dim> dims = coord.getDims();
-            if(dims.size()>1)
-                throw new WcsException("",WcsException.NO_APPLICABLE_CODE);
-            // Figure out dimension size
-
-            DomainCoordinate dc = new DomainCoordinate(dimName,coord.getName(),coord.getAttributeValue("units"),"",)
-
-        }
-        */
-
-
-        Variable time = dataset.getVariable("time");
-        Variable latitude  = dataset.getVariable("lat");
-        Variable longitude  = dataset.getVariable("lon");
-
-        DomainCoordinate lat, lon, tim;
         try {
-
-
-            //FIXME Checking to see is there is in fact time information in the DMR is needed before adding a time dimension.
-            tim = new DomainCoordinate(
-                    time.getAttributeValue("long_name"),  // FIXME: This should be "time"
-                    time.getAttributeValue("standard_name"), // FIXME THis needs to be the DAP Variable name
-                    time.getAttributeValue("units"),  // FIXME from the SRS?
-                    "",
-                    getSizeOfDomainCoordinateVariable(dataset,"time"),
-                    "time");
-
-            lat = new DomainCoordinate(
-                    latitude.getAttributeValue("long_name"), // FIXME: This should be the name from the SRS
-                    latitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
-                    latitude.getAttributeValue("units"),
-                    "",
-                    getSizeOfDomainCoordinateVariable(dataset,"latitude"),
-                    "latitude");
-
-            lon = new DomainCoordinate(
-                    longitude.getAttributeValue("long_name"),  // FIXME: This should be the name from the SRS
-                    longitude.getAttributeValue("standard_name"),  // FIXME THis needs to be the DAP Variable name
-                    longitude.getAttributeValue("units"),
-                    "",
-                    getSizeOfDomainCoordinateVariable(dataset,"longitude"),
-                    "longitude");
-
+            // Time is special (Oy, still with that) but it's not, so we handle it like any other coordinate
+            // It should be in the list from the service if it is one.
+            for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
+                DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate,dataset);
+                addDomainCoordinate(domainCoordinate);
+            }
         } catch (BadParameterException e) {
-            // This shouldn't happen based on the stuff above...
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+            throw new WcsException("Failed to create DomainCoordinate ", WcsException.NO_APPLICABLE_CODE);
         }
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        // FIXME - The order that the coordinates are added MUST be the same as they appear in each field.
-        // The order that the Dimension elements appear in the Dataset is not important. What is important
-        // is the number and order of the dimensions in each field. DAP variables with identical Dim lists can be
-        // grouped to form a coverage.
-        this.addDomainCoordinate(tim);
-        this.addDomainCoordinate(lat);
-        this.addDomainCoordinate(lon);
-        /////////////////////////////////////////////////////////////
-
-
     }
+
+
+    
     /**
      * This method uses a DMR to build state into the CoverageDescrption
      * @param dmr
@@ -590,14 +583,42 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
         try {
-            ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
-            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
-            Element dmrElement = dmrDoc.getRootElement();
+            Element dmrElement = opendap.xml.Util.getDocumentRoot(testDmrUrl);
             dmrElement.detach();
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326","latitude longitude","deg deg",2);
             DynamicService ds = new DynamicService();
             ds.setSrs(defaultSrs);
+
+            DomainCoordinate dc = new DomainCoordinate(
+                    "time",
+                    "time",
+                    "minutes since 1980-01-01 00:30:00",
+                    "",
+                    1,
+                    "time");
+
+            ds.setTimeCoordinate(dc);
+
+            dc = new DomainCoordinate(
+                    "latitude",
+                    "lat",
+                    "deg",
+                    "",
+                    361,
+                    "latitude");
+            ds.setLatitudeCoordinate(dc);
+
+
+            dc = new DomainCoordinate(
+                    "longitude",
+                    "lon",
+                    "deg",
+                    "",
+                    576,
+                    "latitude");
+            ds.setLongitudeCoordinate(dc);
+
             CoverageDescription cd = new DynamicCoverageDescription(dmrElement,ds);
 
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");

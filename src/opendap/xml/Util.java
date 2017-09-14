@@ -103,6 +103,7 @@ public class Util {
         Document doc = getDocument(docUrlString);
         if(doc!=null){
             docRoot = doc.getRootElement();
+            docRoot.detach();
         }
         return docRoot;
 
