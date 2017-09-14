@@ -245,19 +245,36 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         }
     }
-
+    
+    /**
+     * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a 
+     * value of an attribute named standard_name.  This method will lookl for this whether or not 
+     * the underlying DMR Dataset is CF compliant
+     * 
+     * @param opendap.dap4.Dataset dataset - a JAXB representation of the DMR response 
+     * @param String standard_name
+     * @return opendap.dap4.Variable 
+     * @throws WcsException throw any exception is handling the dataset
+     */
     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
         if(!dataset.usesCfConventions())
             _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}",this.getDapDatasetUrl());
         
         // proceed to look for it anyway, returning null if not found
-        for (Variable v: dataset.getVariables()) {
-          if (standard_name.equalsIgnoreCase(v.getAttributeValue("standard_name"))) {
-            _log.debug("Found variable with standard name ", standard_name, v.getName());
-            return v;
+        try {
+          for (Variable v: dataset.getVariables()) {
+            if (Objects.equals(standard_name, v.getAttributeValue("standard_name"))) {
+              _log.debug("Found variable with standard name ", standard_name, v.getName());
+              return v;
+            }
           }
         }
-
+        catch (Exception e)
+        {
+          throw new WcsException("Failed to process DMR dataset "+dataset.getName() + ", when looking for standard_name " + standard_name + 
+              " , msg: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+  
         return null;
     }
 
