@@ -184,50 +184,24 @@ public class Dataset {
         return vars;
     }
 
-    // FIXME - I don't think the logic to locate the conventions attribute is correct, verify and fix as needed.
+    
     public boolean usesCfConventions(){
         if(_checkedForCF)
             return _isCFConvention;
 
         _checkedForCF = true;
         for (ContainerAttribute containerAttribute : attributes) {
-            boolean foundGlobal = false;
-
-            String ca_name = containerAttribute.getName();
-            if (ca_name.toLowerCase().contains("convention")) {
-                _log.debug("Found container attribute named convention(s)");
-            } // this will find plural conventions
-            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
+            if (containerAttribute.getName().toLowerCase().endsWith("_global") || 
+                containerAttribute.getName().equalsIgnoreCase("DODS_EXTRA")) {
+              
                 _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
                 _log.debug("Looking for conventions...attribute");
-                foundGlobal = true;
-            }
-            for (Attribute a : containerAttribute.getAttributes()) {
-                _log.debug(a.toString());
-
-                String a_name = a.getName();
-                a_name = a_name == null ? "" : a_name;
-
-                String a_value = a.getValue();
-                a_value = a_value == null ? "" : a_value;
-
-                if (foundGlobal) {
-                    // test for conventions
-                    if (a_name.toLowerCase().contains("convention")) {
-
-                        _log.debug(
-                                "Found attribute named convention(s), value = " + a_value);
-                        if (a_value.toLowerCase().contains("cf-")) {
-                            _log.debug("Dataset is CF Compliant!!");
-                            _isCFConvention = true;
-                            return true;
-                        }
-                    }
-                }
-            } // end for loop on all container attributes
+                
+                if (containerAttribute.getAttributeValue("Conventions").contains("CF")) _isCFConvention = true;
+           } 
         }
 
-		return _isCFConvention;
+		  return _isCFConvention;
     }
 
     

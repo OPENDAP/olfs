@@ -103,4 +103,19 @@ public class ContainerAttribute {
 		}
 		return nullProof?"":null;
 	}
+  
+    
+    /**
+     * return value of attribute given its name 
+     * @param attributeName
+     * @return attributeValue
+     */
+    public String getAttributeValue(String attributeName)
+    {
+      for (Attribute a : this.attributes) {
+        if (a.getName().equalsIgnoreCase(attributeName)) return a.getValue();
+      }
+      
+      return null;
+    }
 }
