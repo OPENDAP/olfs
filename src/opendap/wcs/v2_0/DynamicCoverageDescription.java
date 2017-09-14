@@ -228,7 +228,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Returns the size of the requested coordinate variable.
+     * Returns the size of the requested coordinate variable. Since DomainCoordinate may only have a single
+     * dimension it get's all exceptiony if they have more.
      * @param dataset
      * @param standard_name The CF standard_name of the coordinate variable;
      * @return
@@ -275,6 +276,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
+    /**
+     *
+     * @param dataset
+     * @return The SRS for the coverage represented by the dataset.
+     */
     public SimpleSrs getSRS(Dataset dataset){
         // TODO Add a bunch of code to evaluate the dataset and figure out the SRS.
         _log.info("Utilizing default SRS for dataset: {}",dataset.getName());
@@ -338,10 +344,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param dataset
      * @throws WcsException
      */
-    void ingestDomainCoordinates(Dataset dataset) throws WcsException {
+    private void ingestDomainCoordinates(Dataset dataset) throws WcsException {
         try {
-            // Time is special (Oy, still with that) but it's not, so we handle it like any other coordinate
-            // It should be in the list from the service if it is one.
+            // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
+            // it's really not, so we handle it like any other coordinate
+            // It should be in the list from the service if it there is a time coordinate.
             for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
                 DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate,dataset);
                 addDomainCoordinate(domainCoordinate);
