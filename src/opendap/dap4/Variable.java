@@ -81,15 +81,13 @@ public class Variable {
 	 */
   public String getAttributeValue(String attributeName)
   {
-    List<opendap.dap4.Attribute> attributes = this.getAttributes();
-    Hashtable<String, opendap.dap4.Attribute> attributesHash = new Hashtable();
-    Iterator<opendap.dap4.Attribute> iter = attributes.iterator();
-    while (iter.hasNext()) {
-        opendap.dap4.Attribute attribute = iter.next();
-        attributesHash.put(attribute.getName(), attribute);
+    String value = null;
+    
+    for (Attribute a : this.attributes) {
+      if (a.getName().equalsIgnoreCase(attributeName)) value = a.getValue();
     }
-    Attribute a = attributesHash.get(attributeName);
-    return a.getValue();
+    
+    return value;
   }
 
 }
