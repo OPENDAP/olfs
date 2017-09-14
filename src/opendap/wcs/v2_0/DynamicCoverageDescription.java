@@ -249,6 +249,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
         if(!dataset.usesCfConventions())
             _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}",this.getDapDatasetUrl());
+        
+        // proceed to look for it anyway, returning null if not found
+        for (Variable v: dataset.getVariables()) {
+          if (standard_name.equalsIgnoreCase(v.getAttributeValue("standard_name"))) {
+            _log.debug("Found variable with standard name ", standard_name, v.getName());
+            return v;
+          }
+        }
 
         return null;
     }
@@ -264,7 +272,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @throws WcsException
      */
     void ingestDomainCoordinates(Dataset dataset) throws WcsException {
-        //FIXME The contents of this method should be refactored to make a susbstantive evaluation of the Dataset's variables before compiling the list of DomainCoordinates.
+        //FIXME The contents of this method should be refactored to make a susbstantive 
+        // evaluation of the Dataset's variables before compiling the list of DomainCoordinates.
         //like the psudo-code one in the comment below.
         /*
         for(String dimName:_defaultSrs.getAxisLabelsList()){
