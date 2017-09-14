@@ -197,7 +197,7 @@ public class Dataset {
                 _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
                 _log.debug("Looking for conventions...attribute");
                 
-                if (containerAttribute.getAttributeValue("Conventions").contains("CF")) _isCFConvention = true;
+                if (containerAttribute.getAttributeValue("Conventions", true, true).contains("CF")) _isCFConvention = true;
            } 
         }
 
