@@ -184,47 +184,50 @@ public class Dataset {
         return vars;
     }
 
+    // FIXME - I don't think the logic to locate the conventions attribute is correct, verify and fix as needed.
     public boolean usesCfConventions(){
-		if(!_checkedForCF) {
-			_checkedForCF = true;
-			for (ContainerAttribute containerAttribute : attributes) {
-				boolean foundGlobal = false;
+        if(_checkedForCF)
+            return _isCFConvention;
 
-				String ca_name = containerAttribute.getName();
-				if (ca_name.toLowerCase().contains("convention")) {
-					_log.debug("Found container attribute named convention(s)");
-				} // this will find plural conventions
-				else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
-					_log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-					_log.debug("Looking for conventions...attribute");
-					foundGlobal = true;
-				}
-				for (Attribute a : containerAttribute.getAttributes()) {
-					_log.debug(a.toString());
+        _checkedForCF = true;
+        for (ContainerAttribute containerAttribute : attributes) {
+            boolean foundGlobal = false;
 
-					String a_name = a.getName();
-					a_name = a_name == null ? "" : a_name;
+            String ca_name = containerAttribute.getName();
+            if (ca_name.toLowerCase().contains("convention")) {
+                _log.debug("Found container attribute named convention(s)");
+            } // this will find plural conventions
+            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
+                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+                _log.debug("Looking for conventions...attribute");
+                foundGlobal = true;
+            }
+            for (Attribute a : containerAttribute.getAttributes()) {
+                _log.debug(a.toString());
 
-					String a_value = a.getValue();
-					a_value = a_value == null ? "" : a_value;
+                String a_name = a.getName();
+                a_name = a_name == null ? "" : a_name;
 
-					if (foundGlobal) {
-						// test for conventions
-						if (a_name.toLowerCase().contains("convention")) {
+                String a_value = a.getValue();
+                a_value = a_value == null ? "" : a_value;
 
-							_log.debug(
-									"Found attribute named convention(s), value = " + a_value);
-							if (a_value.toLowerCase().contains("cf-")) {
-								_log.debug("Dataset is CF Compliant!!");
-								_isCFConvention = true;
-								return true;
-							}
-						}
-					}
-				} // end for loop on all container attributes
-			}
-		}
-        return _isCFConvention;
+                if (foundGlobal) {
+                    // test for conventions
+                    if (a_name.toLowerCase().contains("convention")) {
+
+                        _log.debug(
+                                "Found attribute named convention(s), value = " + a_value);
+                        if (a_value.toLowerCase().contains("cf-")) {
+                            _log.debug("Dataset is CF Compliant!!");
+                            _isCFConvention = true;
+                            return true;
+                        }
+                    }
+                }
+            } // end for loop on all container attributes
+        }
+
+		return _isCFConvention;
     }
         
    public String getValueOfGlobalAttributeWithNameLike(String name) {
