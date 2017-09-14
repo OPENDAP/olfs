@@ -1,16 +1,22 @@
-package opendap.wcs.v2_0;
+package opendap.wcs.srs;
 
 import org.jdom.Element;
-
+import opendap.wcs.v2_0.BadParameterException;
 import java.util.Arrays;
 import java.util.List;
 
 public class SimpleSrs {
-    private String _name;
-    private String _axisLabels;
-    private String _uomLabels;
-    private long   _srsDimension;
+    protected String _name;
+    protected String _axisLabels;
+    protected String _uomLabels;
+    protected long   _srsDimension;
 
+    protected SimpleSrs(){
+        _name = null;
+        _axisLabels = null;
+        _uomLabels = null;
+        _srsDimension = 0;
+    }
     /**
      *
      <DefaultSRS name="urn:ogc:def:crs:EPSG::4326">
@@ -21,7 +27,7 @@ public class SimpleSrs {
 
      * @param srs
      */
-    SimpleSrs(Element srs) throws BadParameterException{
+    public SimpleSrs(Element srs) throws BadParameterException {
 
         String s = srs.getAttributeValue("name");
         if(s==null) throw new BadParameterException("A name attribute is required for every SimpleSrs.");
@@ -54,7 +60,7 @@ public class SimpleSrs {
     }
 
 
-    SimpleSrs(String name, String axisLabels, String uomLabels, long  srsDimension) throws BadParameterException{
+    public SimpleSrs(String name, String axisLabels, String uomLabels, long  srsDimension) throws BadParameterException{
 
         if(name==null) throw new BadParameterException("A name attribute is required for every SimpleSrs.");
         _name = name;
@@ -71,13 +77,13 @@ public class SimpleSrs {
     }
 
 
-    String getName(){  return _name;  }
+    public String getName(){  return _name;  }
 
-    String getAxisLabels(){  return _axisLabels;  }
-    List<String> getAxisLabelsList(){  return Arrays.asList(getAxisLabels());  }
+    public String getAxisLabels(){  return _axisLabels;  }
+    public List<String> getAxisLabelsList(){  return Arrays.asList(getAxisLabels());  }
 
-    String getUomLabels(){  return _uomLabels;  }
-    List<String> getUomLabelsList(){  return Arrays.asList(getUomLabels());  }
-    long getSrsDimension(){  return _srsDimension;  }
+    public String getUomLabels(){  return _uomLabels;  }
+    public List<String> getUomLabelsList(){  return Arrays.asList(getUomLabels());  }
+    public long getSrsDimension(){  return _srsDimension;  }
 
 }

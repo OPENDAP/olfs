@@ -1,6 +1,8 @@
 package opendap.wcs.v2_0;
 
-public class BadParameterException extends Exception {
+import java.io.IOException;
+
+public class BadParameterException extends IOException {
     public BadParameterException(){
         super();
     }

@@ -1,5 +1,6 @@
 package opendap.wcs.v2_0;
 
+import opendap.wcs.srs.SimpleSrs;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,20 +36,20 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     private String _cacheDir;
     private ReentrantReadWriteLock _cacheLock;
-    private ConcurrentHashMap<String,String> _dynamicServicesMap;
 
-    private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
+   // private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
 
     private CredentialsProvider _credsProvider;
+
+    private ConcurrentHashMap<String,DynamicService> _dynamicServices;
 
 
 
     public DynamicServiceCatalog(){
         _intiialized = false;
         _log = LoggerFactory.getLogger(getClass());
-        _dynamicServicesMap = new ConcurrentHashMap<>();
-        _defaultSRS = new ConcurrentHashMap<>();
         _cacheLock = new ReentrantReadWriteLock();
+        _dynamicServices = new ConcurrentHashMap<>();
     }
 
     /**
@@ -100,22 +101,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
         List<Element> dynamicServices = config.getChildren("DynamicService");
-        for(Element dservice:dynamicServices) {
-            String name = dservice.getAttributeValue("name");
-            String href = dservice.getAttributeValue("href");
+        for(Element dsElement:dynamicServices) {
 
-            if(name==null || href==null)
-                throw new BadParameterException("The Dynamic service MUST have both a name and an href attribute.");
-
-            _dynamicServicesMap.put(name, href);
-            _log.info("WCS-2.0 DynamicService Loaded! name: {} href: {} ",name,href);
-
-            Element defaultSrsElement =  dservice.getChild("DefaultSRS");
-            if(defaultSrsElement==null)
-                throw new IOException("Failed to locate required DefaultSRS configuration for DynamicService '"+name+"'");
-            SimpleSrs defaultSrs = new SimpleSrs(defaultSrsElement);
-            _defaultSRS.put(name,defaultSrs);
-            _log.info("WCS-2.0 DynamicService {} has default SRS of {}",name, defaultSrs.getName());
+            DynamicService dynamicService = new DynamicService(dsElement);
+            //TODO Check return value to see if an exisiting DynamicService got pushed out when we put
+            DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
+            if(previous!=null){
+                _log.warn("The addtion of the DynamicService called ");
+            }
         }
 
         _credsProvider = null;
@@ -292,31 +285,39 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
-    public String getLongestMatchingDynamicServiceName(String coverageId){
+    public DynamicService getLongestMatchingDynamicService(String coverageId){
         String longestMatchingDynamicServiceName=null;
-        for(String dsName:_dynamicServicesMap.keySet()){
+        DynamicService match = null;
+        for(DynamicService dynamicService:_dynamicServices.values()){
+            String dsName = dynamicService.getName();
+
             if(coverageId.startsWith(dsName)){
                 if(longestMatchingDynamicServiceName==null){
                     longestMatchingDynamicServiceName=dsName;
+                    match = dynamicService;
                 }
                 else {
                     if(longestMatchingDynamicServiceName.length() < dsName.length()) {
                         longestMatchingDynamicServiceName = dsName;
+                        match = dynamicService;
                     }
                 }
             }
         }
-        return longestMatchingDynamicServiceName;
+        return match;
     }
 
 
     @Override
     public String getDataAccessUrl(String coverageId) throws InterruptedException {
-        String longestMatchingDynamicServiceName= getLongestMatchingDynamicServiceName(coverageId);
-        if(longestMatchingDynamicServiceName==null)
+
+        DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+
+        if(dynamicService==null)
             return null;
-        String dapServer = _dynamicServicesMap.get(longestMatchingDynamicServiceName);
-        String datasetUrl = coverageId.replace(longestMatchingDynamicServiceName,dapServer);
+
+        String dapServer = dynamicService.getDapServiceUrl().toString();
+        String datasetUrl = coverageId.replace(dynamicService.getName(),dapServer);
         return datasetUrl;
     }
 
@@ -352,9 +353,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     public SimpleSrs getDefaultSrs(String coverageId){
-        String dsName = getLongestMatchingDynamicServiceName(coverageId);
-        if(dsName==null)
+        DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+
+        if(dynamicService==null)
             return null;
-        return _defaultSRS.get(dsName);
+
+        return dynamicService.getSrs();
     }
 }

@@ -5,6 +5,7 @@ import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
 import opendap.namespaces.XML;
 import opendap.threddsHandler.ThreddsCatalogUtil;
+import opendap.wcs.srs.SimpleSrs;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
