@@ -110,6 +110,17 @@ public class Dataset {
 		return dimensions;
 	}
 
+	public Dimension getDimension(String name){
+	    while(name.startsWith("/") && name.length()>1)
+            name = name.substring(1);
+
+	    for(Dimension dim: getDimensions()){
+	        if(dim.getName().equals(name))
+	            return dim;
+        }
+        return null;
+    }
+
 	
 	public void setDimensions(List<Dimension> dimensions) {
 		this.dimensions = dimensions;
