@@ -341,6 +341,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
      * to service the  WCS GetCoverage  operation for the coverage.
      *
+     * The DAP fields in the coverage will have to have the dimensions in the same order as defined
+     * the DynamicService instance held by this class.
+     *
      * @param dataset
      * @throws WcsException
      */
