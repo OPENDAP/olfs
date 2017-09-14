@@ -229,7 +229,15 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
-    public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name){
+    public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
+        if(!dataset.usesCfConventions())
+            throw new WcsException("Dataset does not appear conform to the CF convention.", WcsException.NO_APPLICABLE_CODE) ;
+
+
+
+
+
+
         return null;
     }
 
