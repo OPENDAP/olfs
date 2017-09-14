@@ -81,13 +81,11 @@ public class Variable {
 	 */
   public String getAttributeValue(String attributeName)
   {
-    String value = null;
-    
     for (Attribute a : this.attributes) {
-      if (a.getName().equalsIgnoreCase(attributeName)) value = a.getValue();
+      if (a.getName().equalsIgnoreCase(attributeName)) return a.getValue();
     }
     
-    return value;
+    return null;
   }
 
 }
