@@ -53,6 +53,8 @@ public class Dataset {
 	private List<Int64>   vars64bitIntegers;
 	private List<Int32>   vars32bitIntegers;
 
+	private boolean _checkedForCF;
+	private boolean _isCFConvention;
 
 	/**
 	 * This default constructor initializes all of the stuff so things can never be null.
@@ -67,6 +69,8 @@ public class Dataset {
 		vars32bitFloats = new Vector<>();
 		vars64bitIntegers = new Vector<>();
 		vars32bitIntegers = new Vector<>();
+		_checkedForCF = false;
+		_isCFConvention = false;
 	}
 	
 	
@@ -154,59 +158,55 @@ public class Dataset {
 
 	    Vector<Variable> vars = new Vector<>();
 
-        for(Variable var : getVars32bitFloats()){
-            vars.add(var);
-        }
-        for(Variable var : getVars64bitFloats()){
-            vars.add(var);
-        }
-        for(Variable var : getVars32bitIntegers()){
-            vars.add(var);
-        }
-        for(Variable var : getVars64bitIntegers()){
-            vars.add(var);
-        }
+		vars.addAll(getVars32bitFloats());
+		vars.addAll(getVars64bitFloats());
+		vars.addAll(getVars32bitIntegers());
+		vars.addAll(getVars64bitIntegers());
 
         return vars;
     }
 
     public boolean usesCfConventions(){
-        for (ContainerAttribute containerAttribute : attributes) {
-            boolean foundGlobal = false;
+		if(!_checkedForCF) {
+			_checkedForCF = true;
+			for (ContainerAttribute containerAttribute : attributes) {
+				boolean foundGlobal = false;
 
-            String ca_name = containerAttribute.getName();
-            if (ca_name.toLowerCase().contains("convention")) {
-                _log.debug("Found container attribute named convention(s)");
-            } // this will find plural conventions
-            else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
-                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
-                _log.debug("Looking for conventions...attribute");
-                foundGlobal = true;
-            }
-            for (Attribute a : containerAttribute.getAttributes()) {
-                _log.debug(a.toString());
+				String ca_name = containerAttribute.getName();
+				if (ca_name.toLowerCase().contains("convention")) {
+					_log.debug("Found container attribute named convention(s)");
+				} // this will find plural conventions
+				else if (ca_name.toLowerCase().endsWith("_global") || ca_name.equalsIgnoreCase("DODS_EXTRA")) {
+					_log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+					_log.debug("Looking for conventions...attribute");
+					foundGlobal = true;
+				}
+				for (Attribute a : containerAttribute.getAttributes()) {
+					_log.debug(a.toString());
 
-                String a_name = a.getName();
-                a_name = a_name==null?"":a_name;
+					String a_name = a.getName();
+					a_name = a_name == null ? "" : a_name;
 
-                String a_value = a.getValue();
-                a_value = a_value==null?"":a_value;
+					String a_value = a.getValue();
+					a_value = a_value == null ? "" : a_value;
 
-                if (foundGlobal) {
-                    // test for conventions
-                    if (a_name.toLowerCase().contains("convention")) {
+					if (foundGlobal) {
+						// test for conventions
+						if (a_name.toLowerCase().contains("convention")) {
 
-                        _log.debug(
-                                "Found attribute named convention(s), value = " + a_value);
-                        if (a_value.toLowerCase().contains("cf-")) {
-                            _log.debug("Dataset is CF Compliant!!");
-                            return true;
-                        }
-                    }
-                }
-            } // end for loop on all container attributes
-        }
-        return false;
+							_log.debug(
+									"Found attribute named convention(s), value = " + a_value);
+							if (a_value.toLowerCase().contains("cf-")) {
+								_log.debug("Dataset is CF Compliant!!");
+								_isCFConvention = true;
+								return true;
+							}
+						}
+					}
+				} // end for loop on all container attributes
+			}
+		}
+        return _isCFConvention;
     }
         
    public String getValueOfGlobalAttributeWithNameLike(String name) {

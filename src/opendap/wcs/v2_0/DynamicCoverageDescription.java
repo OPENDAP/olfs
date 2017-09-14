@@ -229,6 +229,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
 
+    public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name){
+        return null;
+    }
+
     /**
      * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
      * specifically must determine the order of the coordinates, and which DAP variable is associated with each
