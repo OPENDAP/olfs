@@ -597,33 +597,16 @@ public class DynamicCoverageDescription extends CoverageDescription {
             DynamicService ds = new DynamicService();
             ds.setSrs(defaultSrs);
 
-            DomainCoordinate dc = new DomainCoordinate(
-                    "time",
-                    "time",
-                    "minutes since 1980-01-01 00:30:00",
-                    "",
-                    1,
-                    "time");
-
+            String s="time";
+            DomainCoordinate dc = new DomainCoordinate(s,s,"minutes since 1980-01-01 00:30:00", "", 1,s);
             ds.setTimeCoordinate(dc);
 
-            dc = new DomainCoordinate(
-                    "latitude",
-                    "lat",
-                    "deg",
-                    "",
-                    361,
-                    "latitude");
+            s="latitude";
+            dc = new DomainCoordinate(s,s,"deg", "", 361,s);
             ds.setLatitudeCoordinate(dc);
 
-
-            dc = new DomainCoordinate(
-                    "longitude",
-                    "lon",
-                    "deg",
-                    "",
-                    576,
-                    "latitude");
+            s="longitude";
+            dc = new DomainCoordinate(s,s,"deg", "", 576,s);
             ds.setLongitudeCoordinate(dc);
 
             CoverageDescription cd = new DynamicCoverageDescription(dmrElement,ds);
