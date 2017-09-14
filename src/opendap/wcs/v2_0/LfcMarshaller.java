@@ -40,7 +40,8 @@ public class LfcMarshaller {
 		
 		// domain coordinates
 		LinkedHashMap lhm = new LinkedHashMap();
-		
+
+		/*
 		try
 		{
 			DomainCoordinate d1  = new DomainCoordinate("time","time","seconds since 1978-01-01","",108);
@@ -56,7 +57,7 @@ public class LfcMarshaller {
 			
 		}
 
-
+        */
 
 		try
 		{
@@ -98,7 +99,7 @@ public class LfcMarshaller {
 		
 		// domain coordinates
 		LinkedHashMap elhm = new LinkedHashMap();
-		
+		      /*
 		try
 		{
 
@@ -118,7 +119,7 @@ public class LfcMarshaller {
 		{
 			
 		}
-
+        */
 
 		try
 		{

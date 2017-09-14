@@ -34,7 +34,7 @@ import java.util.*;
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
-    private SimpleSrs _defaultSrs;
+    private DynamicService _dynamicService;
 
 
     public DynamicCoverageDescription() {
@@ -49,13 +49,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param dmr
      * @throws IOException
      */
-    public DynamicCoverageDescription(Element dmr, SimpleSrs defaultSrs) throws IOException, WcsException {
+    public DynamicCoverageDescription(Element dmr, DynamicService dynamicService) throws IOException, WcsException {
         this();
         _myDMR = dmr;
 
-        if(defaultSrs==null)
-            throw new WcsException("There must be a default SRS for the coverage!",WcsException.NO_APPLICABLE_CODE);
-        _defaultSrs = defaultSrs;
+        if(dynamicService==null)
+            throw new WcsException("There must be a DynamicService associated with the coverage!",WcsException.NO_APPLICABLE_CODE);
+        _dynamicService = dynamicService;
 
         // TODO: Get the dataset URL from the DMR top level attribute "xml:base"
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
@@ -201,7 +201,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         _log.debug(envelopeWithTimePeriod.toString());
 
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_defaultSrs);
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = envelopeWithTimePeriod.getEnvelope(_dynamicService.getSrs());
 
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
@@ -231,7 +231,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
 
-        List<String> axisLabels = _defaultSrs.getAxisLabelsList();
+        List<String> axisLabels = _dynamicService.getSrs().getAxisLabelsList();
         rectifiedGrid.setAxisLabels(axisLabels);
 
         // Create the Origin.
@@ -241,7 +241,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
         point.setId("GridOrigin-" + dataset.getName());
-        point.setSrsName(_defaultSrs.getName());
+        point.setSrsName(_dynamicService.getSrs().getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
         rectifiedGrid.setOrigin(origin);
@@ -251,12 +251,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         VectorType offset1 = gmlFactory.createVectorType();
         double latitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
         offset1.withValue(latitudeResolution, 0.0);
-        offset1.setSrsName(_defaultSrs.getName());
+        offset1.setSrsName(_dynamicService.getSrs().getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
         double longitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
         offset2.withValue(0.0, longitudeResolution);
-        offset2.setSrsName(_defaultSrs.getName());
+        offset2.setSrsName(_dynamicService.getSrs().getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
 
@@ -314,19 +314,22 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     time.getAttributeValue("standard_name"),
                     time.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("time"));
+                    dataset.getSizeOfDimensionWithNameLike("time"),
+                    "time");
 
             lat = new DomainCoordinate(latitude.getAttributeValue("long_name"),
                     latitude.getAttributeValue("standard_name"),
                     latitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lat"));
+                    dataset.getSizeOfDimensionWithNameLike("lat"),
+                    "latitude");
 
             lon = new DomainCoordinate(longitude.getAttributeValue("long_name"),
                     longitude.getAttributeValue("standard_name"),
                     longitude.getAttributeValue("units"),
                     "",
-                    dataset.getSizeOfDimensionWithNameLike("lon"));
+                    dataset.getSizeOfDimensionWithNameLike("lon"),
+                    "longitude");
         } catch (BadParameterException e) {
             // This shouldn't happen based on the stuff above...
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
@@ -558,7 +561,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             dmrElement.detach();
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326","latitude longitude","deg deg",2);
-            CoverageDescription cd = new DynamicCoverageDescription(dmrElement,defaultSrs);
+            DynamicService ds = new DynamicService();
+            ds.setSrs(defaultSrs);
+            CoverageDescription cd = new DynamicCoverageDescription(dmrElement,ds);
 
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.println("RESULT: " + cd.toString());

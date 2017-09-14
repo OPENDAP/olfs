@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,55 +36,66 @@ public class DynamicService {
         _wcsFieldsToDapVar = new ConcurrentHashMap<>();
     }
 
-    public DynamicService(Element config) throws BadParameterException{
+    public DynamicService(Element config) throws ConfigurationException {
 
         Element e;
         String s=null;
 
         _name = config.getAttributeValue("name");
         if(_name==null)
-            throw new BadParameterException("Failed to locate required attribute 'name' in the DynamicService configuration element!");
+            throw new ConfigurationException("Failed to locate required attribute 'name' in the DynamicService configuration element!");
 
         s = config.getAttributeValue("href");
         if(s==null)
-            throw new BadParameterException("Failed to locate required attribute 'href' in the DynamicService configuration element!");
+            throw new ConfigurationException("Failed to locate required attribute 'href' in the DynamicService configuration element!");
         try {
             _dapServiceUrl = new URL(s);
         }
         catch(MalformedURLException mue){
-            throw new BadParameterException("Failed to build URL from string '"+s+"' ");
+            throw new ConfigurationException("Failed to build URL from string '"+s+"' ");
         }
 
 
 
         e = config.getChild("srs");
         if(e==null)
-            throw new BadParameterException("DynamicService element is missing required 'srs' child element whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
+            throw new ConfigurationException("DynamicService element is missing required 'srs' child element whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
 
         String srsName = config.getAttributeValue("srs");
         _srs = SrsFactory.getSrs(srsName);
         if(_srs!=null)
-            throw new BadParameterException("Failed to locate requested SRS '" + srsName + "' Unable to configure Dynamic service!");
+            throw new ConfigurationException("Failed to locate requested SRS '" + srsName + "' Unable to configure Dynamic service!");
         _log.info("WCS-2.0 DynamicService {} has default SRS of {}",_name, _srs.getName());
 
+        List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");
+        if(domainCoordinateElements.size()<2)
+            _log.warn("The DynamicService '"+_name+"' has "+domainCoordinateElements.size()+" DomainCoordinate elements . This is probably going to break something.");
+        for(Element dcElement: domainCoordinateElements){
+            DomainCoordinate dc = new DomainCoordinate(dcElement);
+            _domainCoordinates.add(dc);
+            String role = dc.getRole();
+            if(role!=null){
+                if(role.equalsIgnoreCase("latitude"))
+                    _latitude = dc;
+                else if(role.equalsIgnoreCase("longitude"))
+                    _longitude = dc;
+                else if(role.equalsIgnoreCase("time"))
+                    _time = dc;
+            }
+        }
 
-        for(Object o : config.getChildren("field")){
-            Element fieldElement =  (Element)o;
+        List<Element> variableMappings = (List<Element>) config.getChildren("field");
+        if(variableMappings.isEmpty()){
+            _log.warn("The configuration fails to associate wcs:Field elements with DAP variables.");
+        }
+        for(Element fieldElement : variableMappings){
             String fieldName = fieldElement.getAttributeValue("name");
             String dapId = fieldElement.getAttributeValue("dapID");
             if(fieldName==null || dapId==null){
-                throw new BadParameterException("Each field element must have both a 'name' and a 'dapID' attribute.");
+                throw new ConfigurationException("Each field element must have both a 'name' and a 'dapID' attribute.");
             }
             _wcsFieldsToDapVar.put(fieldName,dapId);
         }
-
-
-
-
-
-
-
-
     }
 
 
@@ -127,6 +139,11 @@ public class DynamicService {
         return _srs;
     }
 
+    /**
+     * Returns an ordered Vector of the domain coordinates where the last meber is the inner most dimension
+     * of the data
+     * @return
+     */
     public Vector<DomainCoordinate> getDomainCoordinates(){
         return _domainCoordinates;
     }

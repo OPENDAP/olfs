@@ -507,9 +507,9 @@ public class WcsMarshaller {
             net.opengis.wcs.v_2_0.CoverageDescriptionType cd = new net.opengis.wcs.v_2_0.CoverageDescriptionType();
 
             // this will create id as element
-            cd.setCoverageId(dataset.getCoverageId());
+            cd.setCoverageId(dataset.getName());
             // this will create id as attribute
-            cd.setId(dataset.getCoverageId());
+            cd.setId(dataset.getName());
 
             ////////////////////////////////////////////////////////////////////////////////////
             // Envelope with Time Period:

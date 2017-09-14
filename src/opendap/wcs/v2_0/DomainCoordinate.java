@@ -43,6 +43,7 @@ public class DomainCoordinate {
     private String _dapId;
     private String _units;
     private String _arraySubset;
+    private String _role;
     private long _size;
 
     public DomainCoordinate(Element dc) throws ConfigurationException {
@@ -79,6 +80,7 @@ public class DomainCoordinate {
                     "size attribute: '"+s+"' as a long integer. msg: "+e.getMessage());
         }
 
+        _role = dc.getAttributeValue("role");
 
     }
 
@@ -89,19 +91,22 @@ public class DomainCoordinate {
         _units = dc._units;
         _arraySubset = dc._arraySubset;
         _size = dc._size;
+        _role = dc._role;
 
     }
     public DomainCoordinate(String name,
                             String dapId,
                             String units,
                             String arraySubset,
-                            long size)
+                            long size,
+                            String role)
             throws BadParameterException {
         _name = name;
         _dapId = dapId;
         _units = units;
         _arraySubset = arraySubset;
         _size = size;
+        _role = role;
 
         if (_name == null) {
             throw new BadParameterException("In DomainCoordinate the 'name' parameter may not have a null value.");
@@ -177,5 +182,6 @@ public class DomainCoordinate {
         return _size;
     }
 
+    public String getRole(){ return _role; }
 
 }

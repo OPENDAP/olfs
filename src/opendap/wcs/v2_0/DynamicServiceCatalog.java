@@ -231,7 +231,12 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
             if(dmr==null)
                 return null;
-            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,getDefaultSrs(coverageId));
+
+            DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+            if(dynamicService==null)
+                return null;
+
+            DynamicCoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,dynamicService);
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {
