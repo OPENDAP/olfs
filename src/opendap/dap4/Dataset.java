@@ -229,7 +229,8 @@ public class Dataset {
 
 		return _isCFConvention;
     }
-        
+
+    
    public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
      for (ContainerAttribute containerAttribute : attributes) {
