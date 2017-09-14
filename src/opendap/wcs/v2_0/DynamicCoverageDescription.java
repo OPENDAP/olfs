@@ -456,7 +456,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         try {
             jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
         } catch (JAXBException e) {
-            String msg = "Failed to get marshall COverageDescription! JAXBException Message: " + e.getMessage();
+            String msg = "Failed to get marshall CoverageDescription! JAXBException Message: " + e.getMessage();
             _log.error(msg);
             throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
         }
