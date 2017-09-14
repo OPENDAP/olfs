@@ -227,14 +227,28 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
+    public long getSizeOfDomainCoordinate(Dataset dataset, String dimName) throws WcsException {
+        Variable coordinate = findVariableWithCfStandardName(dataset, dimName);
 
-    public 
+        List<Dim> dims = coordinate.getDims();
+        if(dims.size()>1)
+            throw new WcsException("Coordinate variable must have a single dimension. dims: {}",dims.size());
+        
+        Dim dim = dims.get(0);
+        Dimension dimension = dataset.getDimension(dim.getName());
+        try {
+            return Long.parseLong(dimension.getSize());
+        }
+        catch (NumberFormatException nfe){
+            throw new WcsException("Failed to parse the size of Dimension "+dimension.getName()+
+                    " ,msg: "+nfe.getMessage(),WcsException.NO_APPLICABLE_CODE);
 
+        }
+    }
 
     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
         if(!dataset.usesCfConventions())
             _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}",this.getDapDatasetUrl());
-
 
         return null;
     }
