@@ -229,8 +229,6 @@ public class Dataset {
         
    public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
-     String value = null;
-	   
      for (ContainerAttribute containerAttribute : attributes) {
        	for (Attribute a : containerAttribute.getAttributes()) {
 
@@ -239,35 +237,28 @@ public class Dataset {
           
           if (Util.stringContains(a_name, name)) 
           {
-            value = a_value;
-            break;
+            return a_value;
           }
         }
       }
      
-     return value;
+     return null;
    }
 
    
    public String getSizeOfDimensionWithNameLike(String name)
    {
-     String value = null;
-     
-     for (Dimension dim : dimensions) {
-       if (Util.stringContains(dim.getName(), name)) {
-           value = dim.getSize();
-       }
-     }     
-     return value;
+     for (Dimension dim : dimensions)
+       if (Util.stringContains(dim.getName(), name)) return dim.getSize();
+    
+     return null;
    }
    
    public Variable getVariable (String name)
    {
-     Variable var = null;
      for (Variable v : this.getVariables())
-     {
-       if (v.getName().equalsIgnoreCase(name)) var = v;
-     }
-     return var;
+       if (v.getName().equalsIgnoreCase(name)) return v;
+     
+     return null;
    }  
 }
