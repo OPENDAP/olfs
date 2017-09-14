@@ -7,7 +7,7 @@ public class SrsFactory {
     static {
         _theList = new ConcurrentHashMap<>();
         Epsg4326 epsg4326 =  new Epsg4326();
-        _theList.put(epsg4326._name,epsg4326);
+        _theList.put(epsg4326.getName(),epsg4326);
     }
 
     public static SimpleSrs getSrs(String urn){

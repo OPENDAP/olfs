@@ -24,6 +24,7 @@ public class DynamicService {
     private ConcurrentHashMap<String,String> _wcsFieldsToDapVar;
 
     public DynamicService(){
+        super();
         _log = LoggerFactory.getLogger(this.getClass());
         _name = null;
         _dapServiceUrl = null;
@@ -36,9 +37,9 @@ public class DynamicService {
     }
 
     public DynamicService(Element config) throws ConfigurationException {
+        this();
 
         String s;
-
         _name = config.getAttributeValue("name");
         if(_name==null)
             throw new ConfigurationException("Failed to locate required attribute 'name' in the DynamicService configuration element!");
@@ -53,14 +54,13 @@ public class DynamicService {
             throw new ConfigurationException("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
         }
 
-
-
+        
         s = config.getAttributeValue("srs");
         if(s==null)
-            throw new ConfigurationException("DynamicService element is missing required 'srs' child element whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
+            throw new ConfigurationException("DynamicService element is missing required 'srs' attribute whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
 
         _srs = SrsFactory.getSrs(s);
-        if(_srs!=null)
+        if(_srs==null)
             throw new ConfigurationException("Failed to locate requested SRS '" + s + "' Unable to configure Dynamic service!");
         _log.info("WCS-2.0 DynamicService {} has default SRS of {}",_name, _srs.getName());
 
