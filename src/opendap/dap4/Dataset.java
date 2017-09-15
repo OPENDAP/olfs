@@ -179,11 +179,12 @@ public class Dataset {
    * First scans the root of Dataset
    * FIXME: Next it should scan all its variable groups
    *
-   * @param String name attribution of Dimesion tag 
+   * @param name attribution of Dimesion tag
    * @return opendap.dap4.Dimension 
    */
   public Dimension getDimension(String name){
-    if (name.startsWith("/") && name.length()>1)  name = name.substring(1);
+    while(name.startsWith("/") && name.length()>1)
+        name = name.substring(1);
 
     // First, scan the root of Dataset
     for(Dimension dim: getDimensions()){
@@ -216,8 +217,7 @@ public class Dataset {
                 if (containerAttribute.getAttributeValue("Conventions", true, true).contains("CF")) _isCFConvention = true;
            } 
         }
-
-		  return _isCFConvention;
+        return _isCFConvention;
     }
 
    /**
@@ -227,14 +227,12 @@ public class Dataset {
     * @return value of attribute, if found, null otherwise 
     */
    public String getValueOfGlobalAttributeWithNameLike(String name) {
-	 
      for (ContainerAttribute containerAttribute : attributes) {
        	for (Attribute a : containerAttribute.getAttributes()) {
           if (Util.caseInsensitiveStringContains(a.getName(), name))
             return a.getValue();
         }
       }
-     
      return null;
    }
 

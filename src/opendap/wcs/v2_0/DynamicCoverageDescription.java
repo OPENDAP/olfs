@@ -1,13 +1,12 @@
 package opendap.wcs.v2_0;
 
 import net.opengis.gml.v_3_2_1.*;
+import net.opengis.swecommon.v_2_0.DataRecordType;
 import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
 import opendap.namespaces.XML;
-import opendap.threddsHandler.ThreddsCatalogUtil;
 import opendap.wcs.srs.SimpleSrs;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -27,9 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+
+import static java.lang.Double.NaN;
 
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
@@ -122,11 +122,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String beginTime;
         String endDate;
         String endTime;
-        long latitudeSize;
+        long   latitudeSize;
         double latitudeResolution;
-        long longitudeSize;
+        long   longitudeSize;
         double longitudeResolution;
-
     }
 
     /**
@@ -142,7 +141,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         EwtpParameters ewtp = new EwtpParameters();
 
-        // FIXME Everyone of these values in the  EwtpParameters need to be QC'd and moved a default vakue if needed!
+        // FIXME Every one of these values in the EwtpParameters need to be QC'd and set to a default value if needed!
         ewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
         ewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
         ewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
@@ -252,7 +251,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param cd
      * @param dataset
      */
-    private void addRange(CoverageDescriptionType cd, Dataset dataset) {
+    private void addRange(CoverageDescriptionType cd, Dataset dataset) throws WcsException {
         net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new net.opengis.swecommon.v_2_0.DataRecordPropertyType();
         net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
         List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<>();
@@ -260,9 +259,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         for (Variable var : dataset.getVariables()) {
             if (compareVariableDimensionsWithDataSet(var, dataset)) {
-                fieldList.add(getField(var));
+                DynamicService.FieldDef fieldDef = _dynamicService.getFieldDefFromDapId(var.getName());
+
+                if(fieldDef==null)
+                    _log.warn("addRange() - No defaults WCS mapping was located for DAP variable '"+var.getName()+"'");
+
+                DataRecordType.Field sweField = buildSweFieldFromDapVar(var,fieldDef);
+                if(sweField!=null)
+                    fieldList.add(buildSweFieldFromDapVar(var, fieldDef));
+                else
+                    _log.warn("Failed to convert DAP variable '{}' to an swe:Field object. SKIPPING",var.getName());
             }
         }
+        if(fieldList.isEmpty())
+            throw new WcsException("Failed to generate swe:Field elements from DAP variables. There Is No Coverage Here.",WcsException.NO_APPLICABLE_CODE);
 
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
@@ -530,6 +540,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
+    /**
+     * I _think_ the goal here is too decide of the variable has the semantics of a WCS Covergage
+     *
+     * // FIXME this evaluation is flawed because it depends on the dataset having exactly the same top level dimensions as declared in the candidate coverage variable. A different more reliabel test is required.
+     * @param var
+     * @param dataset
+     * @return
+     */
     private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset) {
         boolean flag = true;
 
@@ -551,7 +569,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     // probably need a better test
                     if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
                 }
-
                 if (found) {
                     _log.debug("Dimension " + dimName + " found in Dataset");
                     continue;
@@ -560,7 +577,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     flag = false;
                     break;
                 }
-
             }
         } else {
             flag = false;
@@ -568,9 +584,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         if (flag) {
-            _log.debug("All dimensions in Variable " + var.getName() + " match DataSet, so it will be included in WCS coverage ");
+            _log.debug("All dimensions in DAP variable '" + var.getName() + "' match the Dataset dimensions, so it will be included in WCS coverage ");
         } else {
-            _log.debug("All dimensions in Variable " + var.getName() + " did NOT match DataSet, so it will be NOT included in WCS coverage ");
+            _log.debug("All dimensions in DAP variable '" + var.getName() + "' did NOT match Dataset dimensions, so it will be NOT included in WCS coverage ");
         }
 
         return flag;
@@ -582,26 +598,100 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param var The DAP4 Variable from which to produce a field.
      * @return
      */
-    private net.opengis.swecommon.v_2_0.DataRecordType.Field getField(Variable var) {
+    private net.opengis.swecommon.v_2_0.DataRecordType.Field buildSweFieldFromDapVar(Variable var, DynamicService.FieldDef fieldDef) {
 
         net.opengis.swecommon.v_2_0.DataRecordType.Field field =
                 new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
+        String sweMeasureDefinition = "urn:ogc:def:dataType:OGC:1.1:measure";
+        double min=NaN;
+        double max=NaN;
+        String s;
+        Vector<String> errors = new Vector<>();
+
+
+
+        // FIXME Check for NCNAME issues.
         field.setName(var.getName());
 
+        String description = var.getAttributeValue("long_name");
+        if(description==null){
+            if(fieldDef!=null)
+                description = fieldDef.description;
+            else
+                errors.add("Failed to locate DAP Attribute 'long_name', no default value available.");
+        }
+        String units = var.getAttributeValue("units");
+        if(units==null){
+            if(fieldDef!=null)
+                units = fieldDef.units;
+            else
+                errors.add("Failed to locate DAP Attribute 'units', no default value available.");
+        }
+
+        s = var.getAttributeValue("vmin");
+        if(s!=null){
+            try {
+                min = Double.parseDouble(s);
+            }
+            catch (NumberFormatException nfe){
+               if(fieldDef!=null)
+                   min = fieldDef.min;
+               else
+                   errors.add("Failed to parse the value of DAP Attribute 'vmin' as a Double. msg: "+nfe.getMessage());
+            }
+        }
+        else {
+            if (fieldDef != null)
+                min = fieldDef.min;
+            else
+                errors.add("Failed to locate DAP Attribute 'vmin', no default value available.");
+        }
+
+
+        s = var.getAttributeValue("vmax");
+        if(s!=null){
+            try {
+                max = Double.parseDouble(s);
+            }
+            catch (NumberFormatException nfe){
+                if(fieldDef!=null)
+                    max = fieldDef.max;
+                else
+                    errors.add("Failed to parse the value of DAP Attribute 'vmax' as a Double. msg: "+nfe.getMessage());
+            }
+        }
+        else {
+            if(fieldDef!=null)
+                max = fieldDef.max;
+            else
+                errors.add("Failed to locate DAP Attribute 'vmax', no default value available.");
+
+        }
+
+        if(!errors.isEmpty()){
+            String s1 = "Failed to map DAP variable '"+var.getName()+"' to swe:Field.\n";
+            _log.error(s1);
+            for(String msg: errors){
+                _log.error(msg);
+            }
+            return null;
+        }
+
+
+
         net.opengis.swecommon.v_2_0.QuantityType quantity = new net.opengis.swecommon.v_2_0.QuantityType();
-        quantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
-        quantity.setDescription(var.getAttributeValue("long_name"));
+        quantity.setDefinition(sweMeasureDefinition);
+        quantity.setDescription(description);
 
         net.opengis.swecommon.v_2_0.UnitReference uom = new net.opengis.swecommon.v_2_0.UnitReference();
-        uom.setCode(var.getAttributeValue("units"));
+        uom.setCode(units);
         quantity.setUom(uom);
 
         net.opengis.swecommon.v_2_0.AllowedValuesPropertyType allowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
         net.opengis.swecommon.v_2_0.AllowedValuesType allowed = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-        List<Double> allowedInterval = Arrays.asList(Double.valueOf(var.getAttributeValue("vmin")),
-                Double.valueOf(var.getAttributeValue("vmax")));
-        List<JAXBElement<List<Double>>> coordinates = new Vector<JAXBElement<List<Double>>>();
+        List<Double> allowedInterval = Arrays.asList(min,max);
+        List<JAXBElement<List<Double>>> coordinates = new Vector<>();
         net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
         coordinates.add(sweFactory.createAllowedValuesTypeInterval(allowedInterval));
         allowed.setInterval(coordinates);
@@ -612,9 +702,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         /////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
-        this.addFieldToDapVarIdAssociation(var.getName(), var.getName());
+        this.addFieldToDapVarIdAssociation(field.getName(), var.getName());
         /////////////////////////////////////////////////////////////
-
 
         return field;
     }
