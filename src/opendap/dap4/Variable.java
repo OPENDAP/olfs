@@ -39,11 +39,12 @@ public class Variable {
 	private String name;
 	private List<Dim> dims;
 	private List<Attribute> attributes;
-	
-	Variable(){
+
+  Variable(){
 		name="";
 		dims = new Vector<>();
 		attributes = new Vector<>();
+		dimensions = new Vector<>();
 	}
 
 	@XmlAttribute
