@@ -318,7 +318,8 @@
             <fileset dir="${src.dir}">
                 <!-- include all the WCS 2.0 java files -->
                 <include name="opendap/wcs/v2_0/**/*.java"/>
-                
+                <include name="opendap/wcs/srs/**/*.java"/>
+
                 <!-- include name="opendap/semantics/**/*.java"/ -->
                 
                 <include name="opendap/bes/BESManager.java"/>
@@ -387,6 +388,7 @@
 
 
                 <include name="opendap/io/HyraxStringEncoding.java"/>
+                <include name="opendap/PathBuilder.java"/>
 
 
 
