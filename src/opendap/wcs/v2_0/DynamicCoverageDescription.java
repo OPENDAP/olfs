@@ -142,7 +142,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         EwtpParameters ewtp = new EwtpParameters();
 
-        // FIXME Everyone of these values in the  EwtpParameters need to be QC'd and moved a default vakue if needed!
+        // FIXME Everyone of these values in the  EwtpParameters need to be QC'd and moved a default value if needed!
         ewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
         ewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
         ewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
