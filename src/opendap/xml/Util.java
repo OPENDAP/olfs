@@ -55,12 +55,8 @@ public class Util {
     }
 
     public static Element getDocumentRoot(File f)throws IOException, JDOMException {
-
         Document cdDoc = getDocument(f);
-
         Element root = cdDoc.getRootElement();
-        root.detach();
-
         return root;
     }
     public static Document getDocument(File f)throws IOException, JDOMException{

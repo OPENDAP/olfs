@@ -223,21 +223,15 @@ public class Dataset {
    /**
     * Scans the attributes of all container attributes and returns the FIRST match
     *  
-    * @param String Attribute name being searched for
+    * @param name The Attribute name being searched for
     * @return value of attribute, if found, null otherwise 
     */
    public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
      for (ContainerAttribute containerAttribute : attributes) {
        	for (Attribute a : containerAttribute.getAttributes()) {
-
-          String a_name = Util.nullProof(a.getName());
-          String a_value = Util.nullProof(a.getValue());
-          
-          if (Util.stringContains(a_name, name)) 
-          {
-            return a_value;
-          }
+          if (Util.caseInsensitiveStringContains(a.getName(), name))
+            return a.getValue();
         }
       }
      
@@ -253,7 +247,7 @@ public class Dataset {
    public String getSizeOfDimensionWithNameLike(String name)
    {
      for (Dimension dim : dimensions)
-       if (Util.stringContains(dim.getName(), name)) return dim.getSize();
+       if (Util.caseInsensitiveStringContains(dim.getName(), name)) return dim.getSize();
     
      return null;
    }

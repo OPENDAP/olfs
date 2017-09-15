@@ -19,6 +19,12 @@ public class SimpleSrs {
         _srsDimension = 0;
     }
 
+    public SimpleSrs(SimpleSrs s){
+        _name =s._name;
+        _axisLabels = s._axisLabels;
+        _uomLabels = s._uomLabels;
+        _srsDimension = s._srsDimension;
+    }
 
     public SimpleSrs(String name, String axisLabels, String uomLabels, long  srsDimension) throws BadParameterException{
 

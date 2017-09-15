@@ -1,5 +1,6 @@
 package opendap.wcs.v2_0;
 
+import opendap.PathBuilder;
 import opendap.wcs.srs.SimpleSrs;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CredentialsProvider;
@@ -274,7 +275,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     @Override
     public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException {
-        return new Vector<>();
+
+        Vector<Element> results = new Vector<>();
+        CoverageDescription cDesc = getCoverageDescription("foo");
+        if (cDesc != null) {
+
+
+        }
+        return results;
     }
 
     @Override
@@ -315,15 +323,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     @Override
     public String getDataAccessUrl(String coverageId) throws InterruptedException {
-
         DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
-
         if(dynamicService==null)
             return null;
-
-        String dapServer = dynamicService.getDapServiceUrl().toString();
-        String datasetUrl = coverageId.replace(dynamicService.getName(),dapServer);
-        return datasetUrl;
+        String resourceId = coverageId.replace(dynamicService.getName(),"");
+        PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrl().toString());
+        pb.pathAppend(resourceId);
+        pb.append("");
+        return pb.toString();
     }
 
     @Override

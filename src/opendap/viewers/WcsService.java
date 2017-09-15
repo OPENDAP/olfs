@@ -1,7 +1,6 @@
 package opendap.viewers;
 
 import opendap.PathBuilder;
-import opendap.coreServlet.Util;
 import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -12,10 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.Vector;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -236,8 +232,6 @@ public class WcsService implements WebServiceHandler {
         sb.append("    WcsService: ").append(_serviceEndpoint).append("\n");
         sb.append("    DynamicServiceId: ").append(_dynamicServiceId).append("\n");
         sb.append("    MatchRegex: ").append(_pathMatchRegexString).append("\n");
-
-
         return sb.toString();
     }
 

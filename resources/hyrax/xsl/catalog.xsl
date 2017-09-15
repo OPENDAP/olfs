@@ -40,9 +40,6 @@
     <xsl:param name="ncWmsServiceBase"/>
     <xsl:param name="ncWmsDynamicServiceId"/>
     <xsl:param name="WcsServices"/>
-    <xsl:param name="WcsServiceBase"/>
-    <xsl:param name="WcsDynamicServiceId"/>
-
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -72,10 +69,6 @@
             <xsl:if test="$ncWmsServiceBase">
                 <thredds:service name="wms" serviceType="WMS" base="{$ncWmsServiceBase}" />
             </xsl:if>
-            <xsl:if test="$WcsServiceBase">
-                <thredds:service name="wcs" serviceType="WCS" base="{$WcsServiceBase}" />
-            </xsl:if>
-
             <xsl:if test="$WcsServices">
                 <xsl:apply-templates select="$WcsServices" mode="serviceBase"/>
             </xsl:if>
@@ -198,12 +191,6 @@
                     <thredds:access>
                         <xsl:attribute name="serviceName">wms</xsl:attribute>
                         <xsl:attribute name="urlPath">?DATASET=<xsl:value-of select="$ncWmsDynamicServiceId" /><xsl:value-of select="$urlPath" />&amp;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities</xsl:attribute>
-                    </thredds:access>
-                </xsl:if>
-                <xsl:if test="$WcsServiceBase">
-                    <thredds:access>
-                        <xsl:attribute name="serviceName">wcs</xsl:attribute>
-                        <xsl:attribute name="urlPath">/<xsl:value-of select="$WcsDynamicServiceId" /><xsl:value-of select="$urlPath" />?SERVICE=WCS&amp;REQUEST=GetCapabilities</xsl:attribute>
                     </thredds:access>
                 </xsl:if>
                 <xsl:if test="$WcsServices">

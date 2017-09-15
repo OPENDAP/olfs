@@ -44,7 +44,6 @@ public class Variable {
 		name="";
 		dims = new Vector<>();
 		attributes = new Vector<>();
-		dimensions = new Vector<>();
 	}
 
 	@XmlAttribute
