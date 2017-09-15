@@ -37,13 +37,17 @@ import javax.xml.bind.annotation.*;
 public class Variable {
 	
 	private String name;
+	// dims are mapped back to root dimensions of dataset
 	private List<Dim> dims;
 	private List<Attribute> attributes;
-	
-	Variable(){
+	// dimensions specific to this variable 
+	private List<Dimension> dimensions; 
+
+  Variable(){
 		name="";
 		dims = new Vector<>();
 		attributes = new Vector<>();
+		dimensions = new Vector<>();
 	}
 
 	@XmlAttribute
@@ -73,6 +77,14 @@ public class Variable {
 		this.attributes = attributes;
 	}
 	
+  public List<Dimension> getDimensions() {
+    return dimensions;
+  }
+
+  public void setDimensions(List<Dimension> dimensions) {
+    this.dimensions = dimensions;
+  }
+
 	
 	/**
 	 * return value of attribute given its name 

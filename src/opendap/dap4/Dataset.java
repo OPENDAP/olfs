@@ -33,8 +33,17 @@ import java.util.*;
 import javax.xml.bind.annotation.*;
 
 /**
- * JAXB spec for DMR dataset
- * @author ukari
+ * JAXB for DMR dataset, with some helper, aggregation methods 
+ * 
+ * Supports unmarshaling the DMR XML into Java by reflection
+ * 
+ * This is NOT complete (i.e. supporting yet of all possible DMRs)  
+ * 
+ * Specifically, does not cover all DAP4 variables, and, 
+ * supports nesting of container attributes to one level only.
+ * 
+ * @author Uday Kari
+ * @author Nathan Potter
  *
  */
 @XmlRootElement (name="Dataset")
@@ -83,9 +92,9 @@ public class Dataset {
 		this.name = name;
 	}
 
-	// DMR generate prefixed attribute "xml:base", 
-	// just using base here
-	// the respective xml prefix is handled in package.info
+	// DMR generates prefixed attribute "xml:base", 
+	// just using base here, the respective xml prefix 
+	// being handled in package.info
 	@XmlAttribute(name="base")
 	public String getUrl() {
 		return url;
@@ -110,26 +119,7 @@ public class Dataset {
 		return dimensions;
 	}
 
-    /**
-     * This finds the named Dimension if it exists.
-     *
-     * @param name
-     * @return
-     */
-	public Dimension getDimension(String name){
-	    while(name.startsWith("/") && name.length()>1)
-            name = name.substring(1);
-
-	    // FIXME This should handle groups and Dimensions declared at places other than the root Group
-	    for(Dimension dim: getDimensions()){
-	        if(dim.getName().equals(name))
-	            return dim;
-        }
-        return null;
-    }
-
-	
-	public void setDimensions(List<Dimension> dimensions) {
+ 	public void setDimensions(List<Dimension> dimensions) {
 		this.dimensions = dimensions;
 	}
 
@@ -184,8 +174,39 @@ public class Dataset {
         return vars;
     }
 
+  /**
+   * This finds the named Dimension if it exists.
+   * First scans the root of Dataset
+   * NExt scans all its variables
+   *
+   * @param String name attribution of Dimesion tag 
+   * @return opendap.dap4.Dimension 
+   */
+  public Dimension getDimension(String name){
+    if (name.startsWith("/") && name.length()>1)  name = name.substring(1);
+
+    // First, scan the root of Dataset
+    for(Dimension dim: getDimensions()){
+        if(dim.getName().equals(name))
+            return dim;
+      }
     
-    public boolean usesCfConventions(){
+    // next scan its variables
+    for (Variable var: getVariables()){
+      for (Dimension dim: var.getDimensions()) {
+         if(dim.getName().equals(name))
+           return dim;
+      }
+    }
+      return null;
+  }
+  
+  /**
+   * Searches for global container attributes and looks for conventions tag
+   * if it is found with value CF, then sets the CF compliance flag, returns true
+   * @return true
+   */
+  public boolean usesCfConventions(){
         if(_checkedForCF)
             return _isCFConvention;
 
@@ -204,7 +225,12 @@ public class Dataset {
 		  return _isCFConvention;
     }
 
-    
+   /**
+    * Scans the attributes of all container attributes and returns the FIRST match
+    *  
+    * @param String Attribute name being searched for
+    * @return value of attribute, if found, null otherwise 
+    */
    public String getValueOfGlobalAttributeWithNameLike(String name) {
 	 
      for (ContainerAttribute containerAttribute : attributes) {
@@ -223,6 +249,11 @@ public class Dataset {
      return null;
    }
 
+   /**
+    * Helper method returning the size attribute of Dimension tag
+    * @param name of Dimension
+    * @return size attribute value 
+    */
    
    public String getSizeOfDimensionWithNameLike(String name)
    {
@@ -232,6 +263,11 @@ public class Dataset {
      return null;
    }
    
+   /**
+    * Helper method to scan dataset by variable name 
+    * @param name of variable
+    * @return first instance of opendap.dap4.Variable matching the name, case insensitive
+    */
    public Variable getVariable (String name)
    {
      for (Variable v : this.getVariables())
