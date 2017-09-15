@@ -177,7 +177,7 @@ public class Dataset {
   /**
    * This finds the named Dimension if it exists.
    * First scans the root of Dataset
-   * NExt scans all its variables
+   * FIXME: Next it should scan all its variable groups
    *
    * @param String name attribution of Dimesion tag 
    * @return opendap.dap4.Dimension 
@@ -191,13 +191,8 @@ public class Dataset {
             return dim;
       }
     
-    // next scan its variables
-    for (Variable var: getVariables()){
-      for (Dimension dim: var.getDimensions()) {
-         if(dim.getName().equals(name))
-           return dim;
-      }
-    }
+    // next scan its variable groups
+
       return null;
   }
   
