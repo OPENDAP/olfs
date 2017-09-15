@@ -142,7 +142,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         EwtpParameters ewtp = new EwtpParameters();
 
         // FIXME Every one of these values in the EwtpParameters need to be QC'd and set to a default value if needed!
-
         ewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
         ewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
         ewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
@@ -317,8 +316,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
      */
     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
 
-        if (!dataset.usesCfConventions())
-            _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}", this.getDapDatasetUrl());
+        if(!dataset.usesCfConventions())
+            _log.warn("Dataset does not appear conform to the CF convention. YMMV... Dataset: {}", this.getDapDatasetUrl());
 
         // proceed to look for it anyway, returning null if not found
         for (Variable v : dataset.getVariables()) {
