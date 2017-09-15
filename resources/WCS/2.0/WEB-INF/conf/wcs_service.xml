@@ -30,11 +30,18 @@
         <!-- CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile -->
     <!-- /WcsCatalog -->
     <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog" >
-        <DynamicService name="lds" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
+        <DynamicService name="tb12" href="http://localhost:8080/opendap/testbed-12/" srs="urn:ogc:def:crs:EPSG::4326" >
             <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" role="time"/>
             <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" role="latitude"/>
             <DomainCoordinate name="longitude" dapID="lon" size="8640" units="deg" role="longitude"/>
-            <field name="chl-a" dapID="l3m_data" />
+            <field name="tb12" dapID="l3m_data" />
+        </DynamicService>
+
+        <DynamicService name="tb13" href="http://localhost:8080/opendap/testbed-13/" srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude"/>
+            <field name="tb13" dapID="l3m_data" />
         </DynamicService>
     </WcsCatalog>
 </WcsService>

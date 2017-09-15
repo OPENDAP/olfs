@@ -59,10 +59,20 @@
         <NcWmsService href="http://localhost:8080/ncWMS2/wms" base="/ncWMS2/wms" ncWmsDynamicServiceId="lds"/>
         <Godiva href="/ncWMS2/Godiva3.html" base="/ncWMS2/Godiva3.html"/>
     </WebServiceHandle  -->
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-2.0" >
-        <applicationName>OPeNDAP WCS Service</applicationName>
-        <WcsService href="http://localhost:8080/WCS-2.0/" wcsDynamicServiceId="lds"/>
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-TB12" >
+        <ApplicationName>Testbed-12 WCS Service</ApplicationName>
+        <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
+        <MatchRegex>/testbed-12/.*</MatchRegex>
+        <DynamicServiceId>tb12</DynamicServiceId>
     </WebServiceHandler>
+
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-TB13" >
+        <ApplicationName>Testbed-13 WCS Service</ApplicationName>
+        <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
+        <MatchRegex>/testbed-13/.*</MatchRegex>
+        <DynamicServiceId>tb13</DynamicServiceId>
+    </WebServiceHandler>
+
 
 
 </ViewersConfig>

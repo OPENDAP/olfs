@@ -334,6 +334,16 @@ public class Transformer {
         currentParameters.clear();
 
     }
+    public void setParameter(Element param) throws SaxonApiException {
+        Document doc = new Document();
+        doc.setRootElement(param);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        ByteArrayInputStream reader = new ByteArrayInputStream(xmlo.outputString(doc).getBytes(HyraxStringEncoding.getCharset()));
+        log.debug("Serialized Parameter: \n{}\n",reader.toString());
+        XdmNode valueNode = build(new StreamSource(reader));
+        setParameter(new QName(param.getName()), valueNode);
+    }
+
 
 
     public void setParameter(String name, String value) throws SaxonApiException {

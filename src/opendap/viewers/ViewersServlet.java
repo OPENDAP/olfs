@@ -108,7 +108,7 @@ public class ViewersServlet extends HttpServlet {
             _configFilename = s;
             String msg = "Servlet configuration included a parameter called 'ConfigFileName' whose value is '" +
                     _configFilename + "'\n";
-            _log.warn(msg);
+            _log.info(msg);
         }
 
         PersistentConfigurationHandler.installDefaultConfiguration(this, _configFilename);
@@ -582,7 +582,7 @@ public class ViewersServlet extends HttpServlet {
 
 
 
-        String handlers = getWebStartHandlersParam(ddx);
+        String handlers = getWebStartHandlersParam(datasetID, ddx);
         _log.debug("WebStart Handlers: " + handlers);
         if(handlers!=null){
             ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes(HyraxStringEncoding.getCharset()));
@@ -605,7 +605,7 @@ public class ViewersServlet extends HttpServlet {
 
 
 
-    private Vector<JwsHandler> getWebStartApplicationsForDataset(Document ddx){
+    private Vector<JwsHandler> getWebStartApplicationsForDataset(String datasetId, Document ddx){
         Iterator<JwsHandler> e = ServicesRegistry.getJavaWebStartHandlers().values().iterator();
         JwsHandler jwsHandler;
 
@@ -613,7 +613,7 @@ public class ViewersServlet extends HttpServlet {
 
         while(e.hasNext()){
             jwsHandler = e.next();
-            if(jwsHandler.datasetCanBeViewed(ddx)){
+            if(jwsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.add(jwsHandler);
             }
 
@@ -633,7 +633,7 @@ public class ViewersServlet extends HttpServlet {
 
         while(e.hasNext()){
             wsHandler = e.next();
-            if(wsHandler.datasetCanBeViewed(ddx)){
+            if(wsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.put(wsHandler.getName(), wsHandler);
             }
 
@@ -643,10 +643,10 @@ public class ViewersServlet extends HttpServlet {
 
     }
 
-    private String getWebStartHandlersParam(Document ddx) {
+    private String getWebStartHandlersParam(String datsetId, Document ddx) {
 
 
-        Vector<JwsHandler> jwsHandlers =  getWebStartApplicationsForDataset(ddx);
+        Vector<JwsHandler> jwsHandlers =  getWebStartApplicationsForDataset(datsetId, ddx);
 
         if(jwsHandlers.isEmpty())
             return null;
