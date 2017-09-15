@@ -130,7 +130,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * I added this layer so that we could get a clear idea of all of the searching, QC, and default values
-     * that we will need to have for build the EnvelopeWithTimePeriod. Everyone of these has to be checked and QC's
+     * that we will need to have for build the EnvelopeWithTimePeriod. Every one of these has to be checked and QC's
      * @param cd
      * @param dataset
      */
