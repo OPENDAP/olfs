@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,40 +48,53 @@ public class DomainCoordinate {
     private long _size;
 
     public DomainCoordinate(Element dc) throws ConfigurationException {
+        Vector<String> problems = new Vector<>();
 
         _name = dc.getAttributeValue("name");
-        if(_name ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_name == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'name'.");
         }
 
         _dapId = dc.getAttributeValue("dapID");
-        if(_dapId ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_dapId == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'dapID'.");
         }
 
         _units = dc.getAttributeValue("units");
-        if(_units ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_units == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'units'.");
         }
 
 
         String s = dc.getAttributeValue("size");
         if(s ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'size'.");
         }
-        try {
-            _size = Long.parseLong(s);
-        }
-        catch (NumberFormatException e){
-            throw new ConfigurationException("Unable to parse the value of the " +
-                    "size attribute: '"+s+"' as a long integer. msg: "+e.getMessage());
+        else {
+            try {
+                _size = Long.parseLong(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "size attribute: '" + s + "' as a long integer. msg: " + e.getMessage());
+            }
         }
 
         _role = dc.getAttributeValue("role");
+
+        if(!problems.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Dynamic Configuration Failed To Ingest!\n");
+            for(String msg: problems){
+                sb.append(msg).append("\n");
+                throw new ConfigurationException(sb.toString());
+            }
+
+        }
+
 
     }
 
