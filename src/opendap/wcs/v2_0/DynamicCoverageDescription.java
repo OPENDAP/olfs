@@ -79,6 +79,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @throws WcsException
      */
     private void ingestDmr(Element dmr) throws IOException, WcsException {
+        _log.debug("ingestDMR() - BEGIN");
 
         Dataset dataset = buildDataset(dmr);
         _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
@@ -98,6 +99,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         addRange(cd, dataset);
 
         _myCD = coverageDescriptionType2JDOM(cd);
+
+        if(_log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            _log.debug("ingestDMR() - END  Built CoverageDescription:\n{}",xmlo.outputString(_myCD));
+        }
 
     }
     /**
@@ -327,6 +333,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         EnvelopeWithTimePeriodParams ewtpp = new EnvelopeWithTimePeriodParams();
 
+        ewtpp.coverageID = cd.getCoverageId();
+        
         for (String axisLabel : _srs.getAxisLabelsList()) {
             DomainCoordinate dc = getDomainCoordinate(axisLabel);
             if (dc == null)
@@ -439,19 +447,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
         gridLimits.withGridEnvelope(gridEnvelope);
 
-        // Make the RectifiedGRidType instance
+        // Make the RectifiedGridType instance
         DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
         RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-
-        // Set it's dimensions
+        rectifiedGrid.setId("RectifiedGrid-"+ewtpp.coverageID);
         rectifiedGrid.setDimension(BigInteger.valueOf(_srs.getSrsDimension()));
-
-        // TODO: Check this in out examples but I think we need to add something to make it dcument unique, like: "rgrid-"
-        rectifiedGrid.setId(ewtpp.coverageID);
-
-        //Create the grid envelope for the limits
-        rectifiedGrid.setLimits(gridLimits);
         rectifiedGrid.setAxisLabels(_srs.getAxisLabelsList());
+        rectifiedGrid.setLimits(gridLimits);
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();

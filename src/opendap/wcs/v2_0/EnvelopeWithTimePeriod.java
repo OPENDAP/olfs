@@ -85,9 +85,6 @@ public class EnvelopeWithTimePeriod {
 	{
         // EnvelopeWithTimePeriodType is part of GML
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
-        
-
-
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
