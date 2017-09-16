@@ -236,7 +236,32 @@ public class Dataset {
      return null;
    }
 
-   /**
+    public double getValueOfGlobalAttributeWithNameLikeAsDouble(String attributeName, double defaultValue){
+
+        String valueStr = getValueOfGlobalAttributeWithNameLike(attributeName);
+        double result =defaultValue;
+        if(valueStr != null){
+            try{
+                result = Double.parseDouble(valueStr);;
+            }
+            catch(NumberFormatException nfe){
+                String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                        "Failed to parse value of Dataset global Attribute '"+attributeName+
+                        "' value: "+valueStr+"  Using value: "+result;
+                _log.warn(msg);
+            }
+        }
+        else {
+            String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                    "Failed to locate global Attribute named '"+attributeName+
+                    "'  Using value: "+result;
+            _log.warn(msg);
+        }
+        return result;
+    }
+
+
+    /**
     * Helper method returning the size attribute of Dimension tag
     * @param name of Dimension
     * @return size attribute value 

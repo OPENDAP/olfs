@@ -58,8 +58,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException("There must be a DynamicService associated with the coverage!", WcsException.NO_APPLICABLE_CODE);
         _dynamicService = dynamicService;
 
-        String datasetUrl = dmr.getAttributeValue("base", XML.NS);
-        setDapDatasetUrl(new URL(datasetUrl));
 
         ingestDmr(dmr);
 
@@ -74,24 +72,46 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
+
+    private void addServiceParameters(CoverageDescriptionType cd) throws WcsException {
+        net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
+        serviceParameters.setCoverageSubtype(
+                new QName(
+                        "http://www.opengis.net/wcs/2.0",
+                        "RectifiedGridCoverage",
+                        "wcs")
+        );
+        serviceParameters.setNativeFormat("application/octet-stream");
+        cd.setServiceParameters(serviceParameters);
+    }
+
     /**
      * This method uses a DMR to build state into the CoverageDescrption
      *
      * @param dmr
      * @throws WcsException
      */
-    private void ingestDmr(Element dmr) throws WcsException {
+    private void ingestDmr(Element dmr) throws IOException, WcsException {
 
         Dataset dataset = buildDataset(dmr);
         _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
 
         CoverageDescriptionType cd = new CoverageDescriptionType();
+        cd.setCoverageId(dataset.getName());
+        cd.setId(dataset.getName());
+
+        String datasetUrl = dmr.getAttributeValue("base", XML.NS);
+        setDapDatasetUrl(new URL(datasetUrl));
+
+        addServiceParameters(cd);
+
         ingestSrsFromDataset(dataset, _dynamicService.getSrs());
         ingestDomainCoordinates(dataset);
         addEnvelopeWithTimePeriod(cd, dataset);
         addRange(cd, dataset);
 
-        hardwireTheCdAndDcdForTesting(dataset.getName(), getDapDatasetUrl(), cd);
+        _myCD = coverageDescriptionType2JDOM(cd);
+
     }
     /**
      * Uses JAXB to build a Dataset object from the passed DMR.
@@ -197,6 +217,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
             }
 
+
             domainCoordinate = new DomainCoordinate(
                     coordinateName,
                     coordinateVariable.getName(),
@@ -204,6 +225,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     "",
                     size,
                     coordinateName);
+            
         } else {
             domainCoordinate = new DomainCoordinate(defaultCoordinate);
         }
@@ -267,20 +289,23 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * This class is a C style structure to hold the longthy
      * parameter list required for building the TimePeriodWithEnvelope
      */
-    class CewtpParams {
+    class EnvelopeWithTimePeriodParams {
         String coverageID;
-        String northernMostLat;
-        String southernMostLat;
-        String easternMostLon;
-        String westernMostLon;
         String beginDate;
-        String beginTime;
         String endDate;
-        String endTime;
+        Vector<Double> lowerCorner;
+        Vector<Double> upperCorner;
+        double origin_lat, origin_lon;
         long   latitudeSize;
         double latitudeResolution;
         long   longitudeSize;
         double longitudeResolution;
+
+        // This little constructor ensures the collections are never null;
+        EnvelopeWithTimePeriodParams(){
+            lowerCorner = new Vector<>();
+            upperCorner = new Vector<>();
+        }
     }
 
     /**
@@ -293,49 +318,95 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param cd The CoverageDescription to which to add the EnvelopeWithTimePeriod.
      * @param dataset The DAP dataset to query for the information needed.
      */
-    private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset){
+    private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset) throws WcsException{
 
-        DomainCoordinate lat = getDomainCoordinate("latitude");
-        DomainCoordinate lon = getDomainCoordinate("longitude");
+        EnvelopeWithTimePeriodParams ewtpp = new EnvelopeWithTimePeriodParams();
 
-        CewtpParams cewtp = new CewtpParams();
+        for (String axisLabel : _srs.getAxisLabelsList()) {
+            DomainCoordinate dc = getDomainCoordinate(axisLabel);
+            if (dc == null)
+                throw new WcsException("Failed to locate DomainCoordinate for SRS axis '" +
+                        axisLabel+"'", WcsException.NO_APPLICABLE_CODE);
+            double min = dc.getMin();
+            double max = dc.getMax();
+            if (dc.getName().equalsIgnoreCase("latitude")) {
+                min = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("SouthernmostLatitude", min);
+                max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("NorthernmostLatitude", max);
+                ewtpp.origin_lat = min;
+                ewtpp.latitudeSize = dc.getSize();
+                ewtpp.latitudeResolution = max-min/dc.getSize();
 
-        // FIXME Every one of these values in the CewtpParams need to be QC'd and set to a default value if needed!
-        cewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
-        cewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
-        cewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
-        cewtp.westernMostLon = dataset.getValueOfGlobalAttributeWithNameLike("WesternmostLongitude");
-        cewtp.beginDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
-        cewtp.beginTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
-        cewtp.endDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
-        cewtp.endTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
-        cewtp.latitudeSize = lat.getSize();
-        cewtp.longitudeSize = lon.getSize();
-        cewtp.latitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
-        cewtp.longitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
+            }
+            else if (dc.getName().equalsIgnoreCase("longitude")) {
+                min = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("EasternmostLongitude", min);
+                max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("WesternmostLongitude", max);
+                ewtpp.origin_lon = min;
+                ewtpp.longitudeSize = dc.getSize();
+                ewtpp.longitudeResolution = max-min/dc.getSize();
+            }
+            ewtpp.lowerCorner.add(min);
+            ewtpp.upperCorner.add(max);
+        }
 
-        constructEnvelopeWithTimePeriod(cd, cewtp);
+        // Since time is special in WCS land we have to handle it special
+        // First we attempt assign the default time values from the time coordinate
+        String date,time;
+        DomainCoordinate timeCoordinate = getDomainCoordinate("time");
+        if(timeCoordinate!=null){
+            String timeUnits = timeCoordinate.getUnits();
+            double timeVal = timeCoordinate.getMin();
+            Date beginDate = TimeConversion.getTime(timeVal, timeUnits);
+            ewtpp.beginDate = TimeConversion.formatDateInGmlTimeFormat(beginDate);
+
+            timeVal = timeCoordinate.getMax();
+            Date endDate = TimeConversion.getTime(timeVal, timeUnits);
+            ewtpp.endDate = TimeConversion.formatDateInGmlTimeFormat(endDate);
+        }
+        else {
+            _log.warn("addEnvelopeWithTimePeriod() - No coordinate for 'time' could be located. A default time period will not be utilized.");
+        }
+
+        // Look for obvious start time information in the  Dataset metadata.
+        date = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
+        time = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
+        if(date!=null && time!=null){
+            ewtpp.beginDate = date +"T"+time+"Z";
+        }
+        else {
+            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+        }
+
+        // Look for obvious end time information in the  Dataset metadata.
+        date = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
+        time = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
+        if(date!=null && time!=null){
+            ewtpp.endDate = date +"T"+time+"Z";
+        }
+        else {
+            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+        }
+
+        // FIXME at this point the time bounds for the envelope may be empty We should check and then build an envelope sans time if there's no time info, and print a warning...
+
+
+        constructEnvelopeWithTimePeriod(cd, ewtpp);
     }
 
     /**
      * Build a gml:EnvelopeWithTimePeriod using the passed parameter structure.
      * @param cd
-     * @param cewtp
+     * @param ewtpp
      */
-    private void constructEnvelopeWithTimePeriod(CoverageDescriptionType cd, CewtpParams cewtp) {
+    private void constructEnvelopeWithTimePeriod(CoverageDescriptionType cd, EnvelopeWithTimePeriodParams ewtpp) throws WcsException {
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod etp = new EnvelopeWithTimePeriod();
 
-        etp.setNorthernmostLatitude(cewtp.northernMostLat);
-        etp.setSouthernmostLatitude(cewtp.southernMostLat);
-        etp.setEasternmostLongitude(cewtp.easternMostLon);
-        etp.setWesternmostLongitude(cewtp.westernMostLon);
+        etp.addLowerCornerCoordinateValues(ewtpp.lowerCorner);
+        etp.addUpperCornerCoordinateValues(ewtpp.upperCorner);
 
-        etp.setRangeBeginningDate(cewtp.beginDate);
-        etp.setRangeBeginningTime(cewtp.beginTime);
-        etp.setRangeEndingDate(cewtp.endDate);
-        etp.setRangeEndingTime(cewtp.endTime);
+        etp.setBeginTimePosition(ewtpp.beginDate);
+        etp.setEndTimePosition(ewtpp.endDate);
 
         _log.debug(etp.toString());
 
@@ -353,8 +424,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Note: The index values for the arrays are 0 based and so the upper index is
         // one less than the size.
         List<BigInteger> upper = Arrays.asList(
-                BigInteger.valueOf(cewtp.latitudeSize - 1),
-                BigInteger.valueOf(cewtp.longitudeSize - 1));
+                BigInteger.valueOf(ewtpp.latitudeSize - 1),
+                BigInteger.valueOf(ewtpp.longitudeSize - 1));
         List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
         gridEnvelope.withHigh(upper).withLow(lower);
         ////////////////////////////////////////////////////////////
@@ -365,24 +436,22 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
         net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-        rectifiedGrid.setDimension(new BigInteger(this.getDomainCoordinates().size() + ""));
 
-        rectifiedGrid.setId(cewtp.coverageID);
+        rectifiedGrid.setDimension(BigInteger.valueOf(_srs.getSrsDimension()));
+
+        rectifiedGrid.setId(ewtpp.coverageID);
 
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
 
-        List<String> axisLabels = _srs.getAxisLabelsList();
-        rectifiedGrid.setAxisLabels(axisLabels);
+        rectifiedGrid.setAxisLabels(_srs.getAxisLabelsList());
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(
-                Double.valueOf(etp.getSouthernmostLatitude()),
-                Double.valueOf(etp.getWesternmostLongitude()));
+        position.withValue(ewtpp.origin_lat, ewtpp.origin_lon);
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
-        point.setId("GridOrigin-" + cewtp.coverageID);
+        point.setId("GridOrigin-" + ewtpp.coverageID);
         point.setSrsName(_srs.getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
@@ -392,12 +461,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
 
-        offset1.withValue(cewtp.latitudeResolution, 0.0);
+        offset1.withValue(ewtpp.latitudeResolution, 0.0);
         offset1.setSrsName(_srs.getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
 
-        offset2.withValue(0.0, cewtp.longitudeResolution);
+        offset2.withValue(0.0, ewtpp.longitudeResolution);
         offset2.setSrsName(_srs.getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
@@ -499,7 +568,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Generates a DataRecord.Field from Dap4 variable.
+     * Generates a swe:Field from Dap4 variable.
      *
      * @param var The DAP4 Variable from which to produce a field.
      * @return The DataRecord.Field built from var, or returns null if the process failed.
@@ -574,7 +643,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         if(!errors.isEmpty()){
-            String s1 = "Failed to map DAP variable '"+var.getName()+"' to swe:Field.\n";
+            String s1 = "Failed to map DAP variable '"+var.getName()+"' to swe:Field. SKIPPING!\n";
             _log.error(s1);
             for(String msg: errors){
                 _log.error(msg);
@@ -610,85 +679,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return field;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
-     * Out friend main() runs a sanity check using a DMR obtained from test.opendap.org
-     *
-     * @param args Ignored...
+     * Converts the JAXB generated CoverageDescriptionType to a JDOM representation of the CoverageDescription
+     * @param cd  The CoverageDescriptionType instance to process
+     * @return The JDOM representation of the CoverageDescription
+     * @throws WcsException
      */
-    public static void main(String[] args) {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
-
-        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
-        try {
-            Element dmrElement = opendap.xml.Util.getDocumentRoot(testDmrUrl);
-            dmrElement.detach();
-
-            SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
-            DynamicService ds = new DynamicService();
-            ds.setSrs(defaultSrs);
-
-            String s = "time";
-            DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1, s);
-            ds.setTimeCoordinate(dc);
-
-            s = "latitude";
-            dc = new DomainCoordinate(s, s, "deg", "", 361, s);
-            ds.setLatitudeCoordinate(dc);
-
-            s = "longitude";
-            dc = new DomainCoordinate(s, s, "deg", "", 576, s);
-            ds.setLongitudeCoordinate(dc);
-
-            CoverageDescription cd = new DynamicCoverageDescription(dmrElement, ds);
-
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            System.out.println("RESULT: " + cd.toString());
-            xmlo.output(cd.getCoverageDescriptionElement(), System.out);
-            System.out.println("");
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            xmlo.output(cd.getCoverageSummary(), System.out);
-            System.out.println("");
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    private void hardwireTheCdAndDcdForTesting(String id,
-                                               URL datasetURl,
-                                               CoverageDescriptionType cd) throws WcsException {
-        cd.setCoverageId(id);
-        cd.setId(id);
-
-        ////////////////////////////////////////////////////////////
-        // Crucial member variable state setting...
-        this.setDapDatasetUrl(datasetURl);
-        ////////////////////////////////////////////////////////////
-
-
-        net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
-        net.opengis.wcs.v_2_0.ObjectFactory wcsFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-        serviceParameters
-                .setCoverageSubtype(new QName("http://www.opengis.net/wcs/2.0", "RectifiedGridCoverage", "wcs"));
-        serviceParameters.setNativeFormat("application/octet-stream");
-
-        cd.setServiceParameters(serviceParameters);
-
-        _myCD = coverageDescriptionType2JDOM(cd);
-
-    }
-
     public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
 
         // Boiler plate JAXB marshaling of Coverage Description object into JDOM
@@ -786,5 +782,64 @@ public class DynamicCoverageDescription extends CoverageDescription {
         return cdElement;
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Out friend main() runs a sanity check using a DMR obtained from test.opendap.org
+     *
+     * @param args Ignored...
+     */
+    public static void main(String[] args) {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
+
+        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
+        try {
+            Element dmrElement = opendap.xml.Util.getDocumentRoot(testDmrUrl);
+            dmrElement.detach();
+
+            SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
+            DynamicService ds = new DynamicService();
+            ds.setSrs(defaultSrs);
+
+            String s = "time";
+            DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1, s);
+            dc.setMin(690);
+            dc.setMax(9330);
+            ds.setTimeCoordinate(dc);
+
+            s = "latitude";
+            dc = new DomainCoordinate(s, s, "deg", "", 361, s);
+            dc.setMin(-90.0);
+            dc.setMax( 90.0);
+            ds.setLatitudeCoordinate(dc);
+
+            s = "longitude";
+            dc = new DomainCoordinate(s, s, "deg", "", 576, s);
+            dc.setMin(-180.0);
+            dc.setMax( 179.625);
+            ds.setLongitudeCoordinate(dc);
+
+            CoverageDescription cd = new DynamicCoverageDescription(dmrElement, ds);
+
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+            System.out.println("RESULT: " + cd.toString());
+            xmlo.output(cd.getCoverageDescriptionElement(), System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+            xmlo.output(cd.getCoverageSummary(), System.out);
+            System.out.println("");
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
