@@ -29,9 +29,12 @@ package opendap.wcs.v2_0;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import net.opengis.gml.v_3_2_1.*;
 import opendap.wcs.srs.SimpleSrs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,16 +46,36 @@ import opendap.wcs.srs.SimpleSrs;
  */
 public class EnvelopeWithTimePeriod {
 
-	private String southernmostLatitude = "";
-	private String northernmostLatitude = "";
-	private String westernmostLongitude = "";
-	private String easternmostLongitude = "";
-	
-	private String rangeBeginningDate = "";
-	private String rangeBeginningTime = "";
-	private String rangeEndingDate = "";
-	private String rangeEndingTime = "";
-    
+    private Logger _log;
+
+    private Vector<Double> _lowerCorner;
+    private Vector<Double> _upperCorner;
+
+	private String _beginTimePosition = "";
+	private String _endTimePosition = "";
+
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+
+        sb.append(": lowerCorner: [");
+        for(double value:_lowerCorner)
+            sb.append(" ").append(value);
+        sb.append("]");
+        sb.append(", upperCorner: [");
+        for(double value:_upperCorner)
+            sb.append(" ").append(value);
+        sb.append("]");
+        sb.append(", beginTime: ").append(_beginTimePosition);
+        sb.append(", endTime: ").append(_endTimePosition);
+        return sb.toString();
+    }
+
+    public EnvelopeWithTimePeriod(){
+        _log = LoggerFactory.getLogger(getClass());
+	    _lowerCorner = new Vector<>();
+	    _upperCorner = new Vector<>();
+    }
 	/**
 	 * Provides the OGC GML EnvelopeWithTimePeriodType object using 
 	 * member variables that were captured while iterating 
@@ -62,8 +85,7 @@ public class EnvelopeWithTimePeriod {
 	{
         // EnvelopeWithTimePeriodType is part of GML
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
-        
-        
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
         // both are equivalent spatial reference systems for the ENTIRE globe
@@ -76,29 +98,25 @@ public class EnvelopeWithTimePeriod {
         envelope.setSrsDimension(BigInteger.valueOf(srs.getSrsDimension()));
 
         net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
-        List<Double> lowerCorner = Arrays.asList(new Double(southernmostLatitude), new Double(westernmostLongitude));
-        envelopeLowerCorner.setValue(lowerCorner);
+        envelopeLowerCorner.setValue(_lowerCorner);
         envelope.setLowerCorner(envelopeLowerCorner);
 
         DirectPositionType envelopeUpperCorner = new DirectPositionType();
-        List<Double> upperCorner = Arrays.asList(new Double(northernmostLatitude), new Double(easternmostLongitude));
-        envelopeUpperCorner.setValue(upperCorner);
+        envelopeUpperCorner.setValue(_upperCorner);
         envelope.setUpperCorner(envelopeUpperCorner);
 
         TimePositionType beginTimePosition = new TimePositionType();
         // attribute called frame seems like right place to put ISO-8601 timestamp
-        String beginTimeStr = rangeBeginningDate + "T" + rangeBeginningTime + "Z"; 
-        beginTimePosition.setFrame(beginTimeStr);
+        beginTimePosition.setFrame(_beginTimePosition);
         // However, it can also be specified as below.
-        List<String> timeStrings = Arrays.asList(beginTimeStr);
+        List<String> timeStrings = Arrays.asList(_beginTimePosition);
         beginTimePosition.setValue(timeStrings);
         envelope.setBeginPosition(beginTimePosition);
 
         TimePositionType endTimePosition = new TimePositionType();
-        String endTimeStr = rangeEndingDate + "T" + rangeEndingTime + "Z";
-        endTimePosition.setFrame(endTimeStr);
+        endTimePosition.setFrame(_endTimePosition);
         // However, it can also be specified as below.
-        timeStrings = Arrays.asList(beginTimeStr);
+        timeStrings = Arrays.asList(_endTimePosition);
         endTimePosition.setValue(timeStrings);
         envelope.setEndPosition(endTimePosition);
         
@@ -106,85 +124,35 @@ public class EnvelopeWithTimePeriod {
 
 	}
 
-	
-	///////////////////////
-	// getters and setters
-	
-	public String getSouthernmostLatitude() {
-		return southernmostLatitude;
-	}
+    public void setBeginTimePosition(String beginTime){
+	    _beginTimePosition = beginTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_beginTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse begin time position string '"+_beginTimePosition+"' Error message: {}",e.getMessage());
+        }
+    }
 
-	public void setSouthernmostLatitude(String southernmostLatitude) {
-		this.southernmostLatitude = southernmostLatitude;
-	}
+    public void setEndTimePosition(String endTime){
+        _endTimePosition = endTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_endTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse end time position string '"+_endTimePosition+"' Error message: {}",e.getMessage());
+        }
+    }
 
-	public String getNorthernmostLatitude() {
-		return northernmostLatitude;
-	}
+    public void addLowerCornerCoordinateValues(List<Double> values){
+        _lowerCorner.addAll(values);
 
-	public void setNorthernmostLatitude(String northernmostLatitude) {
-		this.northernmostLatitude = northernmostLatitude;
-	}
+    }
 
-	public String getWesternmostLongitude() {
-		return westernmostLongitude;
-	}
+    public void addUpperCornerCoordinateValues(List<Double> values){
+        _upperCorner.addAll(values);
+    }
 
-	public void setWesternmostLongitude(String westernmostLongitude) {
-		this.westernmostLongitude = westernmostLongitude;
-	}
 
-	public String getEasternmostLongitude() {
-		return easternmostLongitude;
-	}
 
-	public void setEasternmostLongitude(String easternmostLongitude) {
-		this.easternmostLongitude = easternmostLongitude;
-	}
 
-	public String getRangeBeginningDate() {
-		return rangeBeginningDate;
-	}
 
-	public void setRangeBeginningDate(String rangeBeginningDate) {
-		this.rangeBeginningDate = rangeBeginningDate;
-	}
-
-	public String getRangeBeginningTime() {
-		return rangeBeginningTime;
-	}
-
-	public void setRangeBeginningTime(String rangeBeginningTime) {
-		this.rangeBeginningTime = rangeBeginningTime;
-	}
-
-	public String getRangeEndingDate() {
-		return rangeEndingDate;
-	}
-
-	public void setRangeEndingDate(String rangeEndingDate) {
-		this.rangeEndingDate = rangeEndingDate;
-	}
-
-	public String getRangeEndingTime() {
-		return rangeEndingTime;
-	}
-
-	public void setRangeEndingTime(String rangeEndingTime) {
-		this.rangeEndingTime = rangeEndingTime;
-	}
-	
-	public String toString()
-	{
-		return "Envelope with Time Period " +
-	           ", southernmostLatitude = "  + southernmostLatitude +
-	           ", northernmostLatitude = "  + northernmostLatitude +
-	           ", easternmostLongitude = "  + easternmostLongitude +
-	           ", westernmostLongitude = "  + westernmostLongitude +
-	           ", time from " + 
-	           rangeBeginningDate + "T" + rangeBeginningTime + "Z" + 
-	           " to " + 
-	           rangeEndingDate + "T" + rangeEndingTime + "Z";
-	}
-	
 }

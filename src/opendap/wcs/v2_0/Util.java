@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.dap4;
+package opendap.wcs.v2_0;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,16 +119,5 @@ public class Util {
     	return false;
     }
     
-    /**
-     * return string of zero length for nulls and blanks, trimmed otherwise
-     * @param str
-     * @return
-     */
-    public static String nullProof(String str) {
-    	if (str == null) return "";
-    	else if (str.trim().length() == 0) return "";
-    	else return str.trim();
-    }
-
 
 }

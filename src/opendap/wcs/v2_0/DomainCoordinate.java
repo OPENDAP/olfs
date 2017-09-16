@@ -46,6 +46,8 @@ public class DomainCoordinate {
     private String _arraySubset;
     private String _role;
     private long _size;
+    private double _min;
+    private double _max;
 
     public DomainCoordinate(Element dc) throws ConfigurationException {
         Vector<String> problems = new Vector<>();
@@ -79,7 +81,7 @@ public class DomainCoordinate {
                 _size = Long.parseLong(s);
             } catch (NumberFormatException e) {
                 problems.add("Unable to parse the value of the " +
-                        "size attribute: '" + s + "' as a long integer. msg: " + e.getMessage());
+                        "'size' attribute: '" + s + "' as a long integer. msg: " + e.getMessage());
             }
         }
 
@@ -96,18 +98,53 @@ public class DomainCoordinate {
         }
 
 
+        s = dc.getAttributeValue("min");
+        if(s ==null){
+            problems.add("In the configuration a DomainCoordinate element is " +
+                    "missing the required attribute 'min'.");
+        }
+        else {
+            try {
+                _min = Double.parseDouble(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "'min' attribute: '" + s + "' as a double. msg: " + e.getMessage());
+            }
+        }
+        s = dc.getAttributeValue("max");
+        if(s ==null){
+            problems.add("In the configuration a DomainCoordinate element is " +
+                    "missing the required attribute 'max'.");
+        }
+        else {
+            try {
+                _min = Double.parseDouble(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "'max' attribute: '" + s + "' as a double. msg: " + e.getMessage());
+            }
+        }
+
+
+
+
     }
 
+    /**
+     * Copy Constructor
+     * @param dc
+     */
     public DomainCoordinate(DomainCoordinate dc){
-
-        _name = dc._name;
-        _dapId = dc._dapId;
-        _units = dc._units;
+        _name        = dc._name;
+        _dapId       = dc._dapId;
+        _units       = dc._units;
         _arraySubset = dc._arraySubset;
-        _size = dc._size;
-        _role = dc._role;
-
+        _size        = dc._size;
+        _role        = dc._role;
+        _min         = dc._min;
+        _max         = dc._max;
     }
+
     public DomainCoordinate(String name,
                             String dapId,
                             String units,
@@ -197,5 +234,20 @@ public class DomainCoordinate {
     }
 
     public String getRole(){ return _role; }
+
+    public double getMin(){ return _min; }
+    public void setMin(String minStr) {
+        setMin(Double.parseDouble(minStr));
+    }
+    public void setMin(double min) {
+        _min = min;
+    }
+    public double getMax(){ return _max; }
+    public void setMax(String maxStr) {
+        setMax(Double.parseDouble(maxStr));
+    }
+    public void setMax(double max) {
+        _max = max;
+    }
 
 }

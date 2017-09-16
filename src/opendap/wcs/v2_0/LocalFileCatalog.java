@@ -27,7 +27,6 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
-import opendap.dap4.Util;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;

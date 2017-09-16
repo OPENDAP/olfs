@@ -26,6 +26,7 @@
 
 package opendap.dap4;
 
+import opendap.wcs.v2_0.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,20 +237,32 @@ public class Dataset {
      return null;
    }
 
-   /**
-    * Helper method returning the size attribute of Dimension tag
-    * @param name of Dimension
-    * @return size attribute value 
-    */
-   
-   public String getSizeOfDimensionWithNameLike(String name)
-   {
-     for (Dimension dim : dimensions)
-       if (Util.caseInsensitiveStringContains(dim.getName(), name)) return dim.getSize();
-    
-     return null;
-   }
-   
+    public double getValueOfGlobalAttributeWithNameLikeAsDouble(String attributeName, double defaultValue){
+
+        String valueStr = getValueOfGlobalAttributeWithNameLike(attributeName);
+        double result =defaultValue;
+        if(valueStr != null){
+            try{
+                result = Double.parseDouble(valueStr);;
+            }
+            catch(NumberFormatException nfe){
+                String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                        "Failed to parse value of Dataset global Attribute '"+attributeName+
+                        "' value: "+valueStr+"  Using value: "+result;
+                _log.warn(msg);
+            }
+        }
+        else {
+            String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                    "Failed to locate global Attribute named '"+attributeName+
+                    "'  Using value: "+result;
+            _log.warn(msg);
+        }
+        return result;
+    }
+
+
+
    /**
     * Helper method to scan dataset by variable name 
     * @param name of variable
