@@ -75,11 +75,30 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Uses JAXB to build a Dataset object from the passed DMR.
+     * This method uses a DMR to build state into the CoverageDescrption
      *
      * @param dmr
-     * @return
      * @throws WcsException
+     */
+    private void ingestDmr(Element dmr) throws WcsException {
+
+        Dataset dataset = buildDataset(dmr);
+        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
+
+        CoverageDescriptionType cd = new CoverageDescriptionType();
+        ingestSrsFromDataset(dataset, _dynamicService.getSrs());
+        ingestDomainCoordinates(dataset);
+        addEnvelopeWithTimePeriod(cd, dataset);
+        addRange(cd, dataset);
+
+        hardwireTheCdAndDcdForTesting(dataset.getName(), getDapDatasetUrl(), cd);
+    }
+    /**
+     * Uses JAXB to build a Dataset object from the passed DMR.
+     *
+     * @param dmr The root element of the DMR document to process
+     * @return The Dataset object created by JAXB.
+     * @throws WcsException When the bad things happen.
      */
     private Dataset buildDataset(Element dmr) throws WcsException {
         try {
@@ -110,9 +129,145 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-     * Class to hold the massive parameter list for building TimePeriodWithEnvelope
+     * This method will (in the future) examine the DAP Dataset and see if an SRS reference for the Dataset
+     * can be located. Lacking such a reference the default SRS will be utilized.
+     * @param dataset The dataset to examine.
+     * @param defaultSrs The default SRS.
      */
-    class EwtpParameters{
+    public void ingestSrsFromDataset(Dataset dataset, SimpleSrs defaultSrs) {
+        // TODO We need to examine the Dataset metadata and see if there is something we can use to determine the SRS
+        _srs = new SimpleSrs(defaultSrs);
+    }
+
+    /**
+     * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
+     * utilizes the DynamicService to determine the domain coordinates and their order.
+     * The results are added as state to the object and thus set the stage for later
+     * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
+     * to service the  WCS GetCoverage  operation for the coverage.
+     * <p>
+     * The DAP fields in the coverage will have to have the dimensions in the same order as defined
+     * the DynamicService instance held by this class.
+     *
+     * @param dataset
+     * @throws WcsException
+     */
+    private void ingestDomainCoordinates(Dataset dataset) throws WcsException {
+        try {
+            // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
+            // it's really not, so we handle it like any other coordinate
+            // It should be in the list from the DynamicService if there is a time coordinate.
+            for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
+                DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate, dataset);
+                addDomainCoordinate(domainCoordinate);
+            }
+        } catch (BadParameterException e) {
+            throw new WcsException("Failed to create DomainCoordinate ", WcsException.NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
+     * be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+     * are used to construct the new DomainCoordinate
+     *
+     * @param defaultCoordinate
+     * @param dataset
+     * @return
+     * @throws BadParameterException
+     * @throws WcsException
+     */
+    private DomainCoordinate getDomainCoordinate(DomainCoordinate defaultCoordinate, Dataset dataset)
+            throws BadParameterException, WcsException {
+
+        DomainCoordinate domainCoordinate;
+        String coordinateName = defaultCoordinate.getName();
+        Variable coordinateVariable = findVariableWithCfStandardName(dataset, coordinateName);
+        if (coordinateVariable != null) {
+            String units = coordinateVariable.getAttributeValue("units");
+            if (units == null)
+                units = defaultCoordinate.getUnits();
+
+            Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset, coordinateName);
+
+            long size = defaultCoordinate.getSize();
+            try {
+                size = Long.parseLong(coordinateDimension.getSize());
+            } catch (NumberFormatException nfe) {
+                _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
+            }
+
+            domainCoordinate = new DomainCoordinate(
+                    coordinateName,
+                    coordinateVariable.getName(),
+                    units,
+                    "",
+                    size,
+                    coordinateName);
+        } else {
+            domainCoordinate = new DomainCoordinate(defaultCoordinate);
+        }
+
+        return domainCoordinate;
+
+    }
+
+
+    /**
+     * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a
+     * value of an attribute named standard_name.  This method will lookl for this whether or not
+     * the underlying DMR Dataset is CF compliant
+     *
+     * @param dataset       - a JAXB representation of the DMR response
+     * @param standard_name
+     * @return opendap.dap4.Variable
+     * @throws WcsException throw any exception is handling the dataset
+     */
+    public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
+
+        if(!dataset.usesCfConventions())
+            _log.warn("Dataset does not appear conform to the CF convention. YMMV... Dataset: {}", this.getDapDatasetUrl());
+
+        // proceed to look for it anyway, returning null if not found
+        for (Variable v : dataset.getVariables()) {
+            if (Objects.equals(standard_name, v.getAttributeValue("standard_name"))) {
+                _log.debug("Found variable with standard name ", standard_name, v.getName());
+                return v;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the size of the requested coordinate variable. Since DomainCoordinate may only have a single
+     * dimension it get's all exceptiony if they have more.
+     *
+     * @param dataset
+     * @param standard_name The CF standard_name of the coordinate variable;
+     * @return
+     * @throws WcsException
+     */
+
+    public Dimension getDomainCoordinateVariableDimension(Dataset dataset, String standard_name) throws WcsException {
+
+        Variable coordinateVariable = findVariableWithCfStandardName(dataset, standard_name);
+        if (coordinateVariable == null)
+            return null;
+
+        List<Dim> dims = coordinateVariable.getDims();
+        if (dims.size() > 1)
+            throw new WcsException("Coordinate variable must have a single dimension. dims: {}", dims.size());
+
+        Dim dim = dims.get(0);
+        return dataset.getDimension(dim.getName());
+    }
+
+
+    /**
+     * This class is a C style structure to hold the longthy
+     * parameter list required for building the TimePeriodWithEnvelope
+     */
+    class CewtpParams {
         String coverageID;
         String northernMostLat;
         String southernMostLat;
@@ -131,47 +286,56 @@ public class DynamicCoverageDescription extends CoverageDescription {
     /**
      * I added this layer so that we could get a clear idea of all of the searching, QC, and default values
      * that we will need to have for build the EnvelopeWithTimePeriod. Every one of these has to be checked and QC's
-     * @param cd
-     * @param dataset
+     *
+     * Note that the DomainCoordinates must be sorted out by calling ingestDomainCoordinates() prior to calling
+     * this method.
+     *
+     * @param cd The CoverageDescription to which to add the EnvelopeWithTimePeriod.
+     * @param dataset The DAP dataset to query for the information needed.
      */
     private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset){
 
         DomainCoordinate lat = getDomainCoordinate("latitude");
         DomainCoordinate lon = getDomainCoordinate("longitude");
 
-        EwtpParameters ewtp = new EwtpParameters();
+        CewtpParams cewtp = new CewtpParams();
 
-        // FIXME Every one of these values in the EwtpParameters need to be QC'd and set to a default value if needed!
-        ewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
-        ewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
-        ewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
-        ewtp.westernMostLon = dataset.getValueOfGlobalAttributeWithNameLike("WesternmostLongitude");
-        ewtp.beginDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
-        ewtp.beginTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
-        ewtp.endDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
-        ewtp.endTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
-        ewtp.latitudeSize = lat.getSize();
-        ewtp.longitudeSize = lon.getSize();
-        ewtp.latitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
-        ewtp.longitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
+        // FIXME Every one of these values in the CewtpParams need to be QC'd and set to a default value if needed!
+        cewtp.northernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("NorthernmostLatitude");
+        cewtp.southernMostLat = dataset.getValueOfGlobalAttributeWithNameLike("SouthernmostLatitude");
+        cewtp.easternMostLon =  dataset.getValueOfGlobalAttributeWithNameLike("EasternmostLongitude");
+        cewtp.westernMostLon = dataset.getValueOfGlobalAttributeWithNameLike("WesternmostLongitude");
+        cewtp.beginDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
+        cewtp.beginTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
+        cewtp.endDate = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
+        cewtp.endTime = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
+        cewtp.latitudeSize = lat.getSize();
+        cewtp.longitudeSize = lon.getSize();
+        cewtp.latitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LatitudeResolution"));
+        cewtp.longitudeResolution = Double.parseDouble(dataset.getValueOfGlobalAttributeWithNameLike("LongitudeResolution"));
 
-        constructEnvelopeWithTimePeriod(cd, ewtp);
+        constructEnvelopeWithTimePeriod(cd, cewtp);
     }
 
-    private void constructEnvelopeWithTimePeriod(CoverageDescriptionType cd, EwtpParameters ewtpp) {
+    /**
+     * Build a gml:EnvelopeWithTimePeriod using the passed parameter structure.
+     * @param cd
+     * @param cewtp
+     */
+    private void constructEnvelopeWithTimePeriod(CoverageDescriptionType cd, CewtpParams cewtp) {
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod etp = new EnvelopeWithTimePeriod();
 
-        etp.setNorthernmostLatitude(ewtpp.northernMostLat);
-        etp.setSouthernmostLatitude(ewtpp.southernMostLat);
-        etp.setEasternmostLongitude(ewtpp.easternMostLon);
-        etp.setWesternmostLongitude(ewtpp.westernMostLon);
+        etp.setNorthernmostLatitude(cewtp.northernMostLat);
+        etp.setSouthernmostLatitude(cewtp.southernMostLat);
+        etp.setEasternmostLongitude(cewtp.easternMostLon);
+        etp.setWesternmostLongitude(cewtp.westernMostLon);
 
-        etp.setRangeBeginningDate(ewtpp.beginDate);
-        etp.setRangeBeginningTime(ewtpp.beginTime);
-        etp.setRangeEndingDate(ewtpp.endDate);
-        etp.setRangeEndingTime(ewtpp.endTime);
+        etp.setRangeBeginningDate(cewtp.beginDate);
+        etp.setRangeBeginningTime(cewtp.beginTime);
+        etp.setRangeEndingDate(cewtp.endDate);
+        etp.setRangeEndingTime(cewtp.endTime);
 
         _log.debug(etp.toString());
 
@@ -189,8 +353,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Note: The index values for the arrays are 0 based and so the upper index is
         // one less than the size.
         List<BigInteger> upper = Arrays.asList(
-                BigInteger.valueOf(ewtpp.latitudeSize - 1),
-                BigInteger.valueOf(ewtpp.longitudeSize - 1));
+                BigInteger.valueOf(cewtp.latitudeSize - 1),
+                BigInteger.valueOf(cewtp.longitudeSize - 1));
         List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
         gridEnvelope.withHigh(upper).withLow(lower);
         ////////////////////////////////////////////////////////////
@@ -203,7 +367,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
         rectifiedGrid.setDimension(new BigInteger(this.getDomainCoordinates().size() + ""));
 
-        rectifiedGrid.setId(ewtpp.coverageID);
+        rectifiedGrid.setId(cewtp.coverageID);
 
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
@@ -218,7 +382,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 Double.valueOf(etp.getWesternmostLongitude()));
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
-        point.setId("GridOrigin-" + ewtpp.coverageID);
+        point.setId("GridOrigin-" + cewtp.coverageID);
         point.setSrsName(_srs.getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
@@ -228,12 +392,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
 
-        offset1.withValue(ewtpp.latitudeResolution, 0.0);
+        offset1.withValue(cewtp.latitudeResolution, 0.0);
         offset1.setSrsName(_srs.getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
 
-        offset2.withValue(0.0, ewtpp.longitudeResolution);
+        offset2.withValue(0.0, cewtp.longitudeResolution);
         offset2.setSrsName(_srs.getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
@@ -280,268 +444,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
-    /**
-     * Returns the size of the requested coordinate variable. Since DomainCoordinate may only have a single
-     * dimension it get's all exceptiony if they have more.
-     *
-     * @param dataset
-     * @param standard_name The CF standard_name of the coordinate variable;
-     * @return
-     * @throws WcsException
-     */
-
-    public Dimension getDomainCoordinateVariableDimension(Dataset dataset, String standard_name) throws WcsException {
-
-        Variable coordinateVariable = findVariableWithCfStandardName(dataset, standard_name);
-        if (coordinateVariable == null)
-            return null;
-
-        List<Dim> dims = coordinateVariable.getDims();
-        if (dims.size() > 1)
-            throw new WcsException("Coordinate variable must have a single dimension. dims: {}", dims.size());
-
-        Dim dim = dims.get(0);
-        return dataset.getDimension(dim.getName());
-    }
-
-    /**
-     * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a
-     * value of an attribute named standard_name.  This method will lookl for this whether or not
-     * the underlying DMR Dataset is CF compliant
-     *
-     * @param dataset       - a JAXB representation of the DMR response
-     * @param standard_name
-     * @return opendap.dap4.Variable
-     * @throws WcsException throw any exception is handling the dataset
-     */
-    public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
-
-        if(!dataset.usesCfConventions())
-            _log.warn("Dataset does not appear conform to the CF convention. YMMV... Dataset: {}", this.getDapDatasetUrl());
-
-        // proceed to look for it anyway, returning null if not found
-        for (Variable v : dataset.getVariables()) {
-            if (Objects.equals(standard_name, v.getAttributeValue("standard_name"))) {
-                _log.debug("Found variable with standard name ", standard_name, v.getName());
-                return v;
-            }
-        }
-        return null;
-    }
 
 
     /**
-     * @param dataset
-     * @return The SRS for the coverage represented by the dataset.
-     */
-    public SimpleSrs getSRS(Dataset dataset) {
-        // TODO Add a bunch of code to evaluate the dataset and figure out the SRS.
-        _log.info("Utilizing default SRS for dataset: {}", dataset.getName());
-        return _dynamicService.getSrs();
-    }
-
-
-    /**
-     * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
-     * be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
-     * are used to construct the new DomainCoordinate
-     *
-     * @param defaultCoordinate
-     * @param dataset
-     * @return
-     * @throws BadParameterException
-     * @throws WcsException
-     */
-    private DomainCoordinate getDomainCoordinate(DomainCoordinate defaultCoordinate, Dataset dataset) throws BadParameterException, WcsException {
-
-        DomainCoordinate domainCoordinate;
-        String coordinateName = defaultCoordinate.getName();
-        Variable coordinateVariable = findVariableWithCfStandardName(dataset, coordinateName);
-        if (coordinateVariable != null) {
-            String units = coordinateVariable.getAttributeValue("units");
-            if (units == null)
-                units = defaultCoordinate.getUnits();
-
-            Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset, coordinateName);
-
-            long size = defaultCoordinate.getSize();
-            try {
-                size = Long.parseLong(coordinateDimension.getSize());
-            } catch (NumberFormatException nfe) {
-                _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
-            }
-
-            domainCoordinate = new DomainCoordinate(
-                    coordinateName,
-                    coordinateVariable.getName(),
-                    units,
-                    "",
-                    size,
-                    coordinateName);
-        } else {
-            domainCoordinate = new DomainCoordinate(defaultCoordinate);
-        }
-
-        return domainCoordinate;
-
-    }
-
-
-    /**
-     * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
-     * utilizes the DynamicService to determine the domain coordinates and their order.
-     * The results are added as state to the object and thus set the stage for later
-     * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
-     * to service the  WCS GetCoverage  operation for the coverage.
-     * <p>
-     * The DAP fields in the coverage will have to have the dimensions in the same order as defined
-     * the DynamicService instance held by this class.
-     *
-     * @param dataset
-     * @throws WcsException
-     */
-    private void ingestDomainCoordinates(Dataset dataset) throws WcsException {
-        try {
-            // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
-            // it's really not, so we handle it like any other coordinate
-            // It should be in the list from the DynamicService if there is a time coordinate.
-            for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
-                DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate, dataset);
-                addDomainCoordinate(domainCoordinate);
-            }
-        } catch (BadParameterException e) {
-            throw new WcsException("Failed to create DomainCoordinate ", WcsException.NO_APPLICABLE_CODE);
-        }
-    }
-
-
-    public void ingestSrsFromDataset(SimpleSrs defaultSrs) {
-        // TODO We need to examine the Dataset metadata and see if there is something we can use to determine the SRS
-        _srs = new SimpleSrs(defaultSrs);
-    }
-
-
-    /**
-     * This method uses a DMR to build state into the CoverageDescrption
-     *
-     * @param dmr
-     * @throws WcsException
-     */
-    private void ingestDmr(Element dmr) throws WcsException {
-
-        Dataset dataset = buildDataset(dmr);
-        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
-
-        CoverageDescriptionType cd = new CoverageDescriptionType();
-        ingestSrsFromDataset(_dynamicService.getSrs());
-        ingestDomainCoordinates(dataset);
-        addEnvelopeWithTimePeriod(cd, dataset);
-        addRange(cd, dataset);
-
-        hardwireTheCdAndDcdForTesting(dataset.getName(), getDapDatasetUrl(), cd);
-    }
-
-
-    public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
-
-        // Boiler plate JAXB marshaling of Coverage Description object into JDOM
-
-        ////////////////////////////////////////////////////////
-        // Since this was generated from third-party XML schema
-        // need to bootstrap the JAXBContext
-        // from the package name of the generated model
-        // or the ObjectFactory class
-        // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
-
-        // Required: First, bootstrap context with known WCS package name
-
-        Marshaller jaxbMarshaller;
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
-            jaxbMarshaller = jaxbContext.createMarshaller();
-        } catch (JAXBException e) {
-            String msg = "Failed to get JAXB Marshaller! JAXBException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-
-        try {
-
-            // optional:  output "pretty printed"
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            // optional: this is a list of the schema definitions.
-            jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-                    "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
-                            "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
-                            "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd " +
-                            "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
-
-            // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
-            //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
-            jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
-
-        } catch (PropertyException e) {
-            _log.warn("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used" +
-                    "...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc. Message" + e.getMessage());
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
-        // method#1:  need to wrap CoverageDescription as JAXB element
-        // marshal coverage description into console (more specifically, System.out)
-        //jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0", "wcs"), CoverageDescriptionType.class, cd), System.out);
-
-        // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            String msg = "Failed to get DocumentBuilder! ParserConfigurationException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-        Document doc = db.newDocument();
-
-        //////////////////////////////////////////////////////////////////////////////////////////
-        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
-        // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
-        // marshal coverage description into a org.w3c.dom.Document...first
-
-        // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on
-        // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
-        net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
-        try {
-            jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
-        } catch (JAXBException e) {
-            String msg = "Failed to get marshall CoverageDescription! JAXBException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-        }
-        org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
-        org.jdom.Document jdoc = jdb.build(doc);
-
-        // gotcha!  This is what integrates into OLFS (mostly).
-        // The rest of CoverageDescription object can be derive from whatever has been captured so far
-        // or from _myCD (TODO).
-
-        Element cdElement = jdoc.getRootElement();
-        cdElement.detach();
-
-        // couple of quick sanity checks
-        _log.debug(cdElement.toString());
-        Element coverageId = cdElement.getChild("CoverageId", WCS.WCS_NS);
-        _log.debug(coverageId.getText());
-        return cdElement;
-    }
-
-
-    /**
-     * I _think_ the goal here is too decide of the variable has the semantics of a WCS Covergage
+     * I _think_ the goal here is too decide if the variable has the semantics of a WCS Covergage
      *
      * // FIXME this evaluation is flawed because it depends on the dataset having exactly the same top level dimensions as declared in the candidate coverage variable. A different more reliabel test is required.
      * @param var
@@ -593,10 +499,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Generates a DataRecord.Field from Dap4 variable
+     * Generates a DataRecord.Field from Dap4 variable.
      *
      * @param var The DAP4 Variable from which to produce a field.
-     * @return
+     * @return The DataRecord.Field built from var, or returns null if the process failed.
      */
     private net.opengis.swecommon.v_2_0.DataRecordType.Field buildSweFieldFromDapVar(Variable var, DynamicService.FieldDef fieldDef) {
 
@@ -608,8 +514,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         double max=NaN;
         String s;
         Vector<String> errors = new Vector<>();
-
-
 
         // FIXME Check for NCNAME issues.
         field.setName(var.getName());
@@ -677,8 +581,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             }
             return null;
         }
-
-
 
         net.opengis.swecommon.v_2_0.QuantityType quantity = new net.opengis.swecommon.v_2_0.QuantityType();
         quantity.setDefinition(sweMeasureDefinition);
@@ -786,5 +688,103 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _myCD = coverageDescriptionType2JDOM(cd);
 
     }
+
+    public Element coverageDescriptionType2JDOM(CoverageDescriptionType cd) throws WcsException {
+
+        // Boiler plate JAXB marshaling of Coverage Description object into JDOM
+
+        ////////////////////////////////////////////////////////
+        // Since this was generated from third-party XML schema
+        // need to bootstrap the JAXBContext
+        // from the package name of the generated model
+        // or the ObjectFactory class
+        // (i.e. just have to know the package: net.opengis.wcs.v_2_0)
+
+        // Required: First, bootstrap context with known WCS package name
+
+        Marshaller jaxbMarshaller;
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.wcs.v_2_0");
+            jaxbMarshaller = jaxbContext.createMarshaller();
+        } catch (JAXBException e) {
+            String msg = "Failed to get JAXB Marshaller! JAXBException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+
+        try {
+
+            // optional:  output "pretty printed"
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            // optional: this is a list of the schema definitions.
+            jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                    "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd " +
+                            "http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " +
+                            "http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd " +
+                            "http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd");
+
+            // optional:  capture namespaces per MyMapper, instead of ns2, ns8 etc
+            //jaxbMarshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new MyNamespaceMapper());
+            jaxbMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new MyNamespaceMapper());
+
+        } catch (PropertyException e) {
+            _log.warn("NON-FATAL ISSUE WARNING: Another JAXB impl (not the reference implementation) is being used" +
+                    "...namespace prefixes like wcs, gml will not show up...instead you will ns2, ns8 etc. Message" + e.getMessage());
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb
+        // method#1:  need to wrap CoverageDescription as JAXB element
+        // marshal coverage description into console (more specifically, System.out)
+        //jaxbMarshaller.marshal(new JAXBElement(new QName("http://www.opengis.net/wcs/2.0", "wcs"), CoverageDescriptionType.class, cd), System.out);
+
+        // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            String msg = "Failed to get DocumentBuilder! ParserConfigurationException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+        Document doc = db.newDocument();
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // per https://stackoverflow.com/questions/819720/no-xmlrootelement-generated-by-jaxb/
+        // method#2: wrap WCS Coverage Description as JAXB Element using Object Factory
+        // marshal coverage description into a org.w3c.dom.Document...first
+
+        // ... and then convert the resultant org.w3c.dom.Document to JDOM (1.1.3) ..which is what OLFS runs on
+        // (for JDOM 2, the Builder would be org.jdom2.input.DOMBuilder)
+        net.opengis.wcs.v_2_0.ObjectFactory wcsObjFactory = new net.opengis.wcs.v_2_0.ObjectFactory();
+        try {
+            jaxbMarshaller.marshal(wcsObjFactory.createCoverageDescription(cd), doc);
+        } catch (JAXBException e) {
+            String msg = "Failed to get marshall CoverageDescription! JAXBException Message: " + e.getMessage();
+            _log.error(msg);
+            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        }
+        org.jdom.input.DOMBuilder jdb = new org.jdom.input.DOMBuilder();
+        org.jdom.Document jdoc = jdb.build(doc);
+
+        // gotcha!  This is what integrates into OLFS (mostly).
+        // The rest of CoverageDescription object can be derive from whatever has been captured so far
+        // or from _myCD (TODO).
+
+        Element cdElement = jdoc.getRootElement();
+        cdElement.detach();
+
+        // couple of quick sanity checks
+        _log.debug(cdElement.toString());
+        Element coverageId = cdElement.getChild("CoverageId", WCS.WCS_NS);
+        _log.debug(coverageId.getText());
+        return cdElement;
+    }
+
 
 }
