@@ -439,16 +439,18 @@ public class DynamicCoverageDescription extends CoverageDescription {
         GridLimitsType gridLimits = gmlFactory.createGridLimitsType();
         gridLimits.withGridEnvelope(gridEnvelope);
 
-        net.opengis.gml.v_3_2_1.DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
-        net.opengis.gml.v_3_2_1.RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
+        // Make the RectifiedGRidType instance
+        DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
+        RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
 
+        // Set it's dimensions
         rectifiedGrid.setDimension(BigInteger.valueOf(_srs.getSrsDimension()));
 
+        // TODO: Check this in out examples but I think we need to add something to make it dcument unique, like: "rgrid-"
         rectifiedGrid.setId(ewtpp.coverageID);
 
         //Create the grid envelope for the limits
         rectifiedGrid.setLimits(gridLimits);
-
         rectifiedGrid.setAxisLabels(_srs.getAxisLabelsList());
 
         // Create the Origin.
@@ -462,7 +464,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         origin.withPoint(point);
         rectifiedGrid.setOrigin(origin);
 
-        // Create the offset vector.
+        // Create the offset vectors .
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
 
