@@ -33,6 +33,8 @@ import java.util.Vector;
 
 import net.opengis.gml.v_3_2_1.*;
 import opendap.wcs.srs.SimpleSrs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,6 +45,8 @@ import opendap.wcs.srs.SimpleSrs;
  *
  */
 public class EnvelopeWithTimePeriod {
+
+    private Logger _log;
 
     private Vector<Double> _lowerCorner;
     private Vector<Double> _upperCorner;
@@ -67,11 +71,8 @@ public class EnvelopeWithTimePeriod {
         return sb.toString();
     }
 
-
-
-
-
     public EnvelopeWithTimePeriod(){
+        _log = LoggerFactory.getLogger(getClass());
 	    _lowerCorner = new Vector<>();
 	    _upperCorner = new Vector<>();
     }
@@ -126,14 +127,22 @@ public class EnvelopeWithTimePeriod {
 
 	}
 
-    // TODO Use the expected pattern and Date to parse time for QC
     public void setBeginTimePosition(String beginTime){
-        _beginTimePosition = beginTime;
+	    _beginTimePosition = beginTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_beginTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse begin time position string '"+_beginTimePosition+"' Error message: {}",e.getMessage());
+        }
     }
 
-    // TODO Use the expected pattern and Date to parse time for QC
     public void setEndTimePosition(String endTime){
         _endTimePosition = endTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_endTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse end time position string '"+_endTimePosition+"' Error message: {}",e.getMessage());
+        }
     }
 
     public void addLowerCornerCoordinateValues(List<Double> values){

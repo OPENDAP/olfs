@@ -280,6 +280,9 @@ public class Util {
         return s.toString();
     }
 
+    public static String WHITE_SPACE_REGEX_STRING = "\\s+";
+
+
 
 
 

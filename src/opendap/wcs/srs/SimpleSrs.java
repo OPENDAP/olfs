@@ -1,7 +1,6 @@
 package opendap.wcs.srs;
 
-import opendap.wcs.v2_0.ConfigurationException;
-import org.jdom.Element;
+import opendap.coreServlet.Util;
 import opendap.wcs.v2_0.BadParameterException;
 import java.util.Arrays;
 import java.util.List;
@@ -45,14 +44,13 @@ public class SimpleSrs {
         if(axisLabels==null || axisLabels.isEmpty()) throw new BadParameterException("The axisLabels element must have content!");
         _axisLabels = axisLabels;
 
-        String whiteSpaceRegex = "\\s+";
 
-        String[] labels = _axisLabels.split(whiteSpaceRegex);
+        String[] labels = _axisLabels.split(Util.WHITE_SPACE_REGEX_STRING);
         _axisLabelList.addAll(Arrays.asList(labels));
 
         if(uomLabels==null || uomLabels.isEmpty()) throw new BadParameterException("The uomLabels element must have content!");
         _uomLabels = uomLabels;
-        labels = _uomLabels.split(whiteSpaceRegex);
+        labels = _uomLabels.split(Util.WHITE_SPACE_REGEX_STRING);
         _uomLabelList.addAll(Arrays.asList(labels));
 
 

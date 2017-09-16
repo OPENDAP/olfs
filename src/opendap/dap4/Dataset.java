@@ -26,6 +26,7 @@
 
 package opendap.dap4;
 
+import opendap.wcs.v2_0.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -261,20 +262,7 @@ public class Dataset {
     }
 
 
-    /**
-    * Helper method returning the size attribute of Dimension tag
-    * @param name of Dimension
-    * @return size attribute value 
-    */
-   
-   public String getSizeOfDimensionWithNameLike(String name)
-   {
-     for (Dimension dim : dimensions)
-       if (Util.caseInsensitiveStringContains(dim.getName(), name)) return dim.getSize();
-    
-     return null;
-   }
-   
+
    /**
     * Helper method to scan dataset by variable name 
     * @param name of variable
