@@ -72,19 +72,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
-
-    private void addServiceParameters(CoverageDescriptionType cd) throws WcsException {
-        net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
-        serviceParameters.setCoverageSubtype(
-                new QName(
-                        "http://www.opengis.net/wcs/2.0",
-                        "RectifiedGridCoverage",
-                        "wcs")
-        );
-        serviceParameters.setNativeFormat("application/octet-stream");
-        cd.setServiceParameters(serviceParameters);
-    }
-
     /**
      * This method uses a DMR to build state into the CoverageDescrption
      *
@@ -146,6 +133,24 @@ public class DynamicCoverageDescription extends CoverageDescription {
             throw new WcsException(sb.toString(), WcsException.NO_APPLICABLE_CODE);
         }
     }
+
+    /**
+     * Adds wcs:ServiceParameters section to the CoverageDescription
+     * @param cd The instance of CoverageDescriptionType to which to add the stuff.
+     * @throws WcsException
+     */
+    private void addServiceParameters(CoverageDescriptionType cd) throws WcsException {
+        net.opengis.wcs.v_2_0.ServiceParametersType serviceParameters = new net.opengis.wcs.v_2_0.ServiceParametersType();
+        serviceParameters.setCoverageSubtype(
+                new QName(
+                        "http://www.opengis.net/wcs/2.0",
+                        "RectifiedGridCoverage",
+                        "wcs")
+        );
+        serviceParameters.setNativeFormat("application/octet-stream");
+        cd.setServiceParameters(serviceParameters);
+    }
+
 
 
     /**
