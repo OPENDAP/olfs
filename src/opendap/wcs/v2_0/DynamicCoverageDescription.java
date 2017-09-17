@@ -434,9 +434,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Add the DomainSet to the coverages.
         cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-
     }
-
 
     /**
      *
