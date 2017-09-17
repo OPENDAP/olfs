@@ -691,7 +691,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             weveGotIssuesMan.add("OUCH! SRS has more dimensions (" + srs.getSrsDimension() + " " +
                     "than the variable " + dapVar.getName() + " which has " + dapVarDims.size() + " dimensions.");
 
-
         // Check to see that the DAP variable dapVar the same crucial dimensions as the Coverage SRS
         // Since we know that this all hinges on  the inner most (last) dimensions matching because
         // in DAP land that's how we can get multidimensional arrays into WCS, by focusing on the
@@ -716,11 +715,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             // Get the next coordinate/axis name from the SRS
             String axisLabel = axisLabelIter.previous();
+
             // Find the DomainCoordinate associated with theis axis
             DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
+            
             // Find the DAP Variable referenced by the DomainCoordinate
             Variable domainCoordinateVariable = dataset.getVariable(domainCoordinate.getDapID());
-
 
             //////////////////////////////////////////////////////////////////////////
             // TEST
@@ -733,15 +733,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
             }
             ////////////////////////////////////////////////////////////////////
 
-
-
             //////////////////////////////////////////////////////////////////////////
             // TEST
             // Check to see if the domainCoordinate is associate with the DAP variable with the same name as the
             // Dimension we grabbed from the Dataset.
             // FIXME Is this a bogus test? I think maybe so because the name of the "dimension" may not be the name of the Array that holds the data for the dimension.
-
-
             // Get the Dimension instance referenced by the Dim from the Dataset
             Dimension dapVarDatasetDimension = dataset.getDimension(dapVarDim.getName());
 
@@ -752,9 +748,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                         "DOES NOT match the dimension name '" + dapVarDatasetDimension.getName() + "'");
             }
             ////////////////////////////////////////////////////////////////////
-
-
-
+            
             ////////////////////////////////////////////////////////////////////
             // TEST
             // FIXME This next test maybe redundant since we have already confirmed that the current dapVarDim and the domainCoordVarDim  both reference the Dataset Dimension
@@ -766,8 +760,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
                         "DOES NOT match the dimension size '" + dapVarDatasetDimension.getSize() + "'");
             }
             ////////////////////////////////////////////////////////////////////
-
-
         }
         if (!weveGotIssuesMan.isEmpty()) {
             _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.\n");
@@ -815,7 +807,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     }
-
 
 
     /**
