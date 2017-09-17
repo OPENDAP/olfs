@@ -56,7 +56,17 @@ public class Dimension {
 	public void setSize(String size) {
 		this.size = size;
 	}
-	
+
+	public long getSizeAsLong(){
+		long value = -1;
+		try {
+			value = Long.parseLong(getSize());
+		}
+		catch (NumberFormatException nfe){
+		}
+		return value;
+
+	}
 	
 	public String toString()
 	{
