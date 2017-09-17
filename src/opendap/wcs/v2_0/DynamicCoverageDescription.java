@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
 
@@ -56,12 +57,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _myDMR = dmr;
 
         if (dynamicService == null)
-            throw new WcsException("There must be a DynamicService associated with the coverage!", WcsException.NO_APPLICABLE_CODE);
+            throw new WcsException("There must be a DynamicService associated with the coverage!",
+                    WcsException.NO_APPLICABLE_CODE);
         _dynamicService = dynamicService;
-
 
         ingestDmr(dmr);
 
+        // If it all went south we just make an empt one as null fighting punt.
         if (_myCD == null) {
             _myCD = new Element("CoverageDescription", WCS.WCS_NS);
             Element coverageId = new Element("CoverageId", WCS.WCS_NS);
@@ -96,9 +98,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         ingestSrsFromDataset(dataset, _dynamicService.getSrs());
         ingestDomainCoordinates(dataset);
-        addEnvelopeWithTimePeriod(cd, dataset);
-        addRange(cd, dataset);
+        addBoundedByAndDomainSet(cd, dataset,_srs);
+        addRange(cd, dataset, _srs);
 
+        // Last Step, woot.
+        // Produce the JDOM object for the CoverageDescription
         _myCD = coverageDescriptionType2JDOM(cd);
 
         if (_log.isDebugEnabled()) {
@@ -301,7 +305,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * This class is a C style structure to hold the longthy
      * parameter list required for building the TimePeriodWithEnvelope
      */
-    class EnvelopeWithTimePeriodParams {
+    class BoundedByAndDomainSetParams {
+        SimpleSrs srs;
         String coverageID;
         String beginDate;
         String endDate;
@@ -314,29 +319,29 @@ public class DynamicCoverageDescription extends CoverageDescription {
         double longitudeResolution;
 
         // This little constructor ensures the collections are never null;
-        EnvelopeWithTimePeriodParams() {
+        BoundedByAndDomainSetParams() {
             lowerCorner = new Vector<>();
             upperCorner = new Vector<>();
         }
     }
 
     /**
-     * I added this layer so that we could get a clear idea of all of the searching, QC, and default values
-     * that we will need to have for build the EnvelopeWithTimePeriod. Every one of these has to be checked and QC's
-     * <p>
-     * Note that the DomainCoordinates must be sorted out by calling ingestDomainCoordinates() prior to calling
-     * this method.
+     * This is the first step in a two step process:. Here we collect and QC the information
+     * needed to build the DomainSet and Envlope. If time information can be found then an
+     * EnvelopeWithTimePeriod is built otherwise a simple Envelope is built. The DomainSet
+     * is added in eithe case.
      *
-     * @param cd      The CoverageDescription to which to add the EnvelopeWithTimePeriod.
+     * @param cd The CoverageDescription to which to add the DomainSet and ENvelope content.
      * @param dataset The DAP dataset to query for the information needed.
      */
-    private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset) throws WcsException {
+    private void addBoundedByAndDomainSet(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
 
-        EnvelopeWithTimePeriodParams ewtpp = new EnvelopeWithTimePeriodParams();
+        BoundedByAndDomainSetParams ewtpp = new BoundedByAndDomainSetParams();
 
+        ewtpp.srs = srs;
         ewtpp.coverageID = cd.getCoverageId();
 
-        for (String axisLabel : _srs.getAxisLabelsList()) {
+        for (String axisLabel : srs.getAxisLabelsList()) {
             DomainCoordinate dc = getDomainCoordinate(axisLabel);
             if (dc == null)
                 throw new WcsException("Failed to locate DomainCoordinate for SRS axis '" +
@@ -375,7 +380,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             Date endDate = TimeConversion.getTime(timeVal, timeUnits);
             ewtpp.endDate = TimeConversion.formatDateInGmlTimeFormat(endDate);
         } else {
-            _log.warn("addEnvelopeWithTimePeriod() - No coordinate for 'time' could be located. A default time period will not be utilized.");
+            _log.warn("addBoundedByAndDomainSet() - No coordinate for 'time' could be located. A default time period will not be utilized.");
         }
 
         // Look for obvious start time information in the  Dataset metadata.
@@ -384,7 +389,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         if (date != null && time != null) {
             ewtpp.beginDate = date + "T" + time + "Z";
         } else {
-            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+            // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
 
         // Look for obvious end time information in the  Dataset metadata.
@@ -393,99 +398,131 @@ public class DynamicCoverageDescription extends CoverageDescription {
         if (date != null && time != null) {
             ewtpp.endDate = date + "T" + time + "Z";
         } else {
-            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+            // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
-        
-        if (ewtpp.beginDate == null || ewtpp.endDate == null) {
-            _log.warn("Failed to determine time period information. Need a fall back..");
-            addDomainEnvelope(cd,ewtpp);
 
+        addBoundedByAndDomainSet(cd,ewtpp);
+
+    }
+
+    /**
+     * Adds BoundedBy and DomainSet objects to the CoverageDescription.
+     * The BoundedBy is built conditionally based on the presence of time bounds. If the time
+     * bounds are missing or incomplete  a gml:Envelope will be included, otherwise a
+     * gml:EnvelopeWithTimePeriod will be included in the BoundedBy
+     * @param cd An instance of CoverageDescriptionType to which to add stuff
+     * @param params  An initialized instance BoundedByAndDomainSetParams, no bad values man.
+     * @throws WcsException When the bad things happen.
+     */
+    private void addBoundedByAndDomainSet(CoverageDescriptionType cd, BoundedByAndDomainSetParams params) throws WcsException {
+        // Construct the BoundedBy element - a wrapper for the more informative Envelope
+        // and EnvelopeWithTimePeriod content
+        ObjectFactory gmlFactory = new ObjectFactory();
+        BoundingShapeType boundedBy;
+        if (params.beginDate == null || params.endDate == null) {
+            _log.warn("Failed to determine time period information. Need a fall back..");
+            boundedBy = getEnvelope(params);
         }
-        addDomainEnvelopeWithTimePeriod(cd, ewtpp);
+        else {
+            boundedBy = getEnvelopeWitTimePeriod(params);
+        }
+        // Add BoundedBy to the coverage
+        cd.setBoundedBy(boundedBy);
+
+        // Get the Domain Set
+        DomainSetType domainSet = getDomainSet(params);
+
+        // Add the DomainSet to the coverages.
+        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
+
     }
 
 
-    private EnvelopeType addDomainEnvelope(CoverageDescriptionType cd, EnvelopeWithTimePeriodParams ewtpp){
+    /**
+     *
+     * @param params An instance of BoundedByAndDomainSetParams containing the information needed to build the gml:Envelope.
+     * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:Envelope
+     */
+    private BoundingShapeType getEnvelope(BoundedByAndDomainSetParams params){
 
         EnvelopeType envelope = new EnvelopeType();
 
-        envelope.setAxisLabels(_srs.getAxisLabelsList());
-        envelope.setSrsName(_srs.getName());
+        SimpleSrs srs = params.srs;
+
+        envelope.setAxisLabels(srs.getAxisLabelsList());
+        envelope.setSrsName(srs.getName());
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
         // both are equivalent spatial reference systems for the ENTIRE globe
 
-        envelope.setSrsName(_srs.getName());
-        envelope.setAxisLabels(_srs.getAxisLabelsList());
-        envelope.setUomLabels(_srs.getUomLabelsList());
-        envelope.setSrsDimension(BigInteger.valueOf(_srs.getSrsDimension()));
+        envelope.setSrsName(srs.getName());
+        envelope.setAxisLabels(srs.getAxisLabelsList());
+        envelope.setUomLabels(srs.getUomLabelsList());
+        envelope.setSrsDimension(BigInteger.valueOf(srs.getSrsDimension()));
 
         DirectPositionType envelopeLowerCorner = new DirectPositionType();
-        envelopeLowerCorner.setValue(ewtpp.lowerCorner);
+        envelopeLowerCorner.setValue(params.lowerCorner);
         envelope.setLowerCorner(envelopeLowerCorner);
 
         DirectPositionType envelopeUpperCorner = new DirectPositionType();
-        envelopeUpperCorner.setValue(ewtpp.upperCorner);
+        envelopeUpperCorner.setValue(params.upperCorner);
         envelope.setUpperCorner(envelopeUpperCorner);
 
         BoundingShapeType bs = new BoundingShapeType();
         ObjectFactory gmlFactory = new ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelope(envelope));
 
-        DomainSetType domainSet = getDomainSet(gmlFactory,ewtpp);
-        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-        cd.setBoundedBy(bs);
-
-        return envelope;
+        return bs;
     }
 
     /**
      * Build a gml:EnvelopeWithTimePeriod using the passed parameter structure.
      *
-     * @param cd
-     * @param ewtpp
+     * @param params An instance of BoundedByAndDomainSetParams containing the information
+     *               needed to build the gml:EnvelopeWithTimePeriod.
+     * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:EnvelopeWithTimePeriod
      */
-    private void addDomainEnvelopeWithTimePeriod(CoverageDescriptionType cd, EnvelopeWithTimePeriodParams ewtpp) throws WcsException {
+    private BoundingShapeType getEnvelopeWitTimePeriod(BoundedByAndDomainSetParams params) throws WcsException {
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod etp = new EnvelopeWithTimePeriod();
-        etp.addLowerCornerCoordinateValues(ewtpp.lowerCorner);
-        etp.addUpperCornerCoordinateValues(ewtpp.upperCorner);
-        etp.setBeginTimePosition(ewtpp.beginDate);
-        etp.setEndTimePosition(ewtpp.endDate);
+        etp.addLowerCornerCoordinateValues(params.lowerCorner);
+        etp.addUpperCornerCoordinateValues(params.upperCorner);
+        etp.setBeginTimePosition(params.beginDate);
+        etp.setEndTimePosition(params.endDate);
 
         _log.debug(etp.toString());
 
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(_srs);
-
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(params.srs);
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
 
         ////////////////////////////////////////////////////////////////////////////////////////
 
-        DomainSetType domainSet = getDomainSet(gmlFactory,ewtpp);
-        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-        cd.setBoundedBy(bs);
+        return bs;
     }
 
     /**
      *
-     * @param gmlFactory
-     * @param ewtpp
-     * @return
+     * @param params An instance of BoundedByAndDomainSetParams containing the information needed to build the
+     *              components of the DomainSet.
+     * @return  An instance of DomainSetType (aka DomainSet) based on the passed params.
      */
-    public DomainSetType getDomainSet(ObjectFactory gmlFactory, EnvelopeWithTimePeriodParams ewtpp){
+    public DomainSetType getDomainSet(BoundedByAndDomainSetParams params){
         // Grid Envelope
+        ObjectFactory gmlFactory = new ObjectFactory();
         net.opengis.gml.v_3_2_1.GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
+
+        SimpleSrs srs = params.srs;
 
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
         // Note: The index values for the arrays are 0 based and so the upper index is
         // one less than the size.
         List<BigInteger> upper = Arrays.asList(
-                BigInteger.valueOf(ewtpp.latitudeSize - 1),
-                BigInteger.valueOf(ewtpp.longitudeSize - 1));
+                BigInteger.valueOf(params.latitudeSize - 1),
+                BigInteger.valueOf(params.longitudeSize - 1));
         List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
         gridEnvelope.withHigh(upper).withLow(lower);
         ////////////////////////////////////////////////////////////
@@ -497,18 +534,18 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Make the RectifiedGridType instance
         DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
         RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-        rectifiedGrid.setId("RectifiedGrid-" + ewtpp.coverageID);
-        rectifiedGrid.setDimension(BigInteger.valueOf(_srs.getSrsDimension()));
-        rectifiedGrid.setAxisLabels(_srs.getAxisLabelsList());
+        rectifiedGrid.setId("RectifiedGrid-" + params.coverageID);
+        rectifiedGrid.setDimension(BigInteger.valueOf(srs.getSrsDimension()));
+        rectifiedGrid.setAxisLabels(srs.getAxisLabelsList());
         rectifiedGrid.setLimits(gridLimits);
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(ewtpp.origin_lat, ewtpp.origin_lon);
+        position.withValue(params.origin_lat, params.origin_lon);
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
-        point.setId("GridOrigin-" + ewtpp.coverageID);
-        point.setSrsName(_srs.getName());
+        point.setId("GridOrigin-" + params.coverageID);
+        point.setSrsName(srs.getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
         rectifiedGrid.setOrigin(origin);
@@ -516,13 +553,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
 
-        offset1.withValue(ewtpp.latitudeResolution, 0.0);
-        offset1.setSrsName(_srs.getName());
+        offset1.withValue(params.latitudeResolution, 0.0);
+        offset1.setSrsName(srs.getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
 
-        offset2.withValue(0.0, ewtpp.longitudeResolution);
-        offset2.setSrsName(_srs.getName());
+        offset2.withValue(0.0, params.longitudeResolution);
+        offset2.setSrsName(srs.getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
 
@@ -540,14 +577,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param cd
      * @param dataset
      */
-    private void addRange(CoverageDescriptionType cd, Dataset dataset) throws WcsException {
+    private void addRange(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
         DataRecordPropertyType rangeType = new DataRecordPropertyType();
         DataRecordType dataRecord = new DataRecordType();
         List<DataRecordType.Field> fieldList = new ArrayList<>();
 
         for (Variable var : dataset.getVariables()) {
 
-            boolean varFitsCoverageSrs = variableDimensionsAreCompatibleWithSrs(dataset, var, _srs);
+            boolean varFitsCoverageSrs = variableDimensionsAreCompatibleWithSrs(dataset, var, srs);
             _log.debug("The variable dimensions{}match the SRS.", varFitsCoverageSrs ? " " : " DO NOT ");
 
             boolean dimsMatchDataset = compareVariableDimensionsWithDataSet(var,dataset);
@@ -780,6 +817,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
+
     /**
      * Generates a swe:Field from Dap4 variable.
      *
@@ -797,8 +835,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String s;
         Vector<String> errors = new Vector<>();
 
-        // FIXME Check for NCNAME issues.
-        field.setName(var.getName());
+        // Makes sure that the field name is an NCNAME...
+        String  fieldNcName = var.getName();
+        if(!opendap.xml.Util.isNCNAME(var.getName()))
+            fieldNcName =  opendap.xml.Util.convertToNCNAME(var.getName());
+        field.setName(fieldNcName);
 
         String description = var.getAttributeValue("long_name");
         if (description == null) {
@@ -1003,6 +1044,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param args Ignored...
      */
     public static void main(String[] args) {
+
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
 
@@ -1051,5 +1093,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 }

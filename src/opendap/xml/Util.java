@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 /**
  * User: ndp
@@ -163,6 +164,54 @@ public class Util {
         info += "    getUserInfo():     " + url.getUserInfo() + "\n";
 
         return info;
+    }
+
+    public static String NCNAME_REGEX_STRING = "^[^\\.\\-\\d][\\w-\\._\\d]*$";
+    public static boolean isNCNAME(String s){
+        Pattern pattern = Pattern.compile(NCNAME_REGEX_STRING);
+        return pattern.matcher(s).matches();
+    }
+
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static String convertToNCNAME(String s){
+        /*
+        char[] allowedChars = {
+                '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+        char[] disallowedFirstChars = { '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        */
+
+        char[] disallowedChars = {
+                ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ':',
+                ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~'} ;
+
+        // Grind out a char by char replacement.
+        for(char badChar: disallowedChars){
+            s = s.replace(badChar,'_');
+        }
+        // Clean up first char - easy regex check
+        String badFirstRegexString = "^[-\\.\\d].*$";
+        if(Pattern.compile(badFirstRegexString).matcher(s).matches())
+            s =  "_"+s.substring(1);
+        return s;
+    }
+
+
+    public static void main(String[] args) {
+        String[]  ncNameConversionTests = {
+                "jhbwf", "2ljhb", "kbwv::(&^", "kbwv::(&^bartmight","238kbwv::(&^bartmight" };
+
+        for(String testStr: ncNameConversionTests)
+            System.out.println(testStr+" --> "+convertToNCNAME(testStr));
+
     }
 
 
