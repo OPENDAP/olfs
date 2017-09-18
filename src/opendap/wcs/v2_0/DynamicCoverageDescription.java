@@ -643,11 +643,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
         _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
-        for (Dim dim : var.getDims()) {
+        for (Dim varDim : var.getDims()) {
             boolean found = false;
-            String dimName = dim.getName();
+            String dimName = varDim.getName();
+
+            Dimension datasetDimension = dataset.getDimension(dimName);
+            if(datasetDimension!=null){
+                found=true;
+            }
+                /*
             if (dimName.charAt(0) == '/')
                 dimName = dimName.substring(1);
+
+
             _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
             for (Dimension dimension : dataset.getDimensions()) {
                 _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName());
@@ -655,6 +663,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 if (dimName.equalsIgnoreCase(dimension.getName()))
                     found = true;
             }
+            */
             if (found) {
                 _log.debug("Dimension " + dimName + " found in Dataset");
                 continue;
