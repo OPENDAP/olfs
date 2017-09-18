@@ -145,6 +145,7 @@ public class Util {
     }
 
 
+    // FIXME Add support for authentication ala opendap.xml.Util.getDocument(String docUrlString, CredentialsProvider credsProvider);
     public static void forwardUrlContent(
             String url,
             HttpServletResponse response,
@@ -155,6 +156,7 @@ public class Util {
 
 
 
+    // FIXME Add support for authentication ala opendap.xml.Util.getDocument(String docUrlString, CredentialsProvider credsProvider);
     public static void forwardUrlContent(
             String url,
             HttpServletResponse response,
@@ -222,9 +224,11 @@ public class Util {
     }
 
 
+    // FIXME Add support for authentication ala opendap.xml.Util.getDocument(String docUrlString, CredentialsProvider credsProvider);
     public static void forwardUrlContent(String url, ServletOutputStream os) throws URISyntaxException, IOException {
         forwardUrlContent(url,os, DEFAULT_BUFFER_SIZE);
     }
+    // FIXME Add support for authentication ala opendap.xml.Util.getDocument(String docUrlString, CredentialsProvider credsProvider);
     public static void forwardUrlContent(String url, ServletOutputStream os, int bufferSize) throws URISyntaxException, IOException {
 
         log.debug("Retrieving URL: "+url);

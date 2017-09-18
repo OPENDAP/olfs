@@ -76,7 +76,7 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
 
 
-    public boolean datasetCanBeViewed(Document ddx) {
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
 
         Element dataset = ddx.getRootElement();
 

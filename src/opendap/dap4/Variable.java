@@ -39,8 +39,8 @@ public class Variable {
 	private String name;
 	private List<Dim> dims;
 	private List<Attribute> attributes;
-	
-	Variable(){
+
+  Variable(){
 		name="";
 		dims = new Vector<>();
 		attributes = new Vector<>();
@@ -73,6 +73,19 @@ public class Variable {
 		this.attributes = attributes;
 	}
 	
-
+	
+	/**
+	 * return value of attribute given its name 
+	 * @param attributeName
+	 * @return attributeValue
+	 */
+  public String getAttributeValue(String attributeName)
+  {
+    for (Attribute a : this.attributes) {
+      if (a.getName().equalsIgnoreCase(attributeName)) return a.getValue();
+    }
+    
+    return null;
+  }
 
 }

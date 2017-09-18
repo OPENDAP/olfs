@@ -78,7 +78,7 @@ public class Dap2Service  implements WebServiceHandler {
     }
 
     @Override
-    public boolean datasetCanBeViewed(Document ddx) {
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
         return true;
     }
 

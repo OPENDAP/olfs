@@ -13,6 +13,7 @@ import javax.xml.bind.*;
  * @author ukari
  *
  */
+@Deprecated
 public class LfcMarshaller {
 	public static void main(String[] args) {
 	
@@ -39,7 +40,8 @@ public class LfcMarshaller {
 		
 		// domain coordinates
 		LinkedHashMap lhm = new LinkedHashMap();
-		
+
+		/*
 		try
 		{
 			DomainCoordinate d1  = new DomainCoordinate("time","time","seconds since 1978-01-01","",108);
@@ -55,7 +57,7 @@ public class LfcMarshaller {
 			
 		}
 
-
+        */
 
 		try
 		{
@@ -64,7 +66,7 @@ public class LfcMarshaller {
 			ArrayList<Field> fields = new ArrayList<Field>();
 			fields.add(f1);
 			fields.add(f2);
-			cd.setFields(fields);
+			// cd.setFields(fields);
 		}
 		catch (Exception e)
 		{
@@ -97,7 +99,7 @@ public class LfcMarshaller {
 		
 		// domain coordinates
 		LinkedHashMap elhm = new LinkedHashMap();
-		
+		      /*
 		try
 		{
 
@@ -117,7 +119,7 @@ public class LfcMarshaller {
 		{
 			
 		}
-
+        */
 
 		try
 		{
@@ -126,7 +128,7 @@ public class LfcMarshaller {
 			ArrayList<Field> efields = new ArrayList<Field>(); 
 			efields.add(f3);
 			efields.add(f4);
-			ecd.setFields(efields);
+			// ecd.setFields(efields);
 		}
 		catch (Exception e)
 		{

@@ -1,12 +1,9 @@
 package opendap.wcs.v2_0;
 
-import org.apache.http.HttpEntity;
+import opendap.PathBuilder;
+import opendap.wcs.srs.SimpleSrs;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
@@ -17,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import org.apache.commons.codec.binary.Hex;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,24 +26,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class DynamicServiceCatalog implements WcsCatalog{
     private Logger _log;
-    private boolean _intiialized;
+    private boolean _intialized;
 
     private String _cacheDir;
     private ReentrantReadWriteLock _cacheLock;
-    private ConcurrentHashMap<String,String> _dynamicServicesMap;
 
-    private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
+   // private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
 
     private CredentialsProvider _credsProvider;
+
+    private ConcurrentHashMap<String,DynamicService> _dynamicServices;
 
 
 
     public DynamicServiceCatalog(){
-        _intiialized = false;
+        _intialized = false;
         _log = LoggerFactory.getLogger(getClass());
-        _dynamicServicesMap = new ConcurrentHashMap<>();
-        _defaultSRS = new ConcurrentHashMap<>();
         _cacheLock = new ReentrantReadWriteLock();
+        _dynamicServices = new ConcurrentHashMap<>();
     }
 
     /**
@@ -68,12 +63,40 @@ public class DynamicServiceCatalog implements WcsCatalog{
      */
     @Override
     public void init(Element config, String cacheDir, String resourcePath) throws Exception {
-        if(_intiialized)
+        if(_intialized)
             return;
 
         Element e1;
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        ///////////////////////////////////////////////////////////////
+        // Sort out access credentials for getting things from places
+        // that require such...
+        _credsProvider = null;
+        e1 = config.getChild("Credentials");
+        if(e1!=null){
+            // There was a Credentials thing in the config, lets try it...
+            String filename = e1.getTextTrim();
+            try {
+                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider(filename, true);
+            }
+            catch (IOException ioe){
+                _log.error("init() - The file '{}' cannot be processed as a .netrc file. " +
+                        "msg: {}",filename,ioe.getMessage());
+            }
+        }
+        if(_credsProvider==null){
+            _log.warn("Looking in default location for .netrc");
+            try {
+                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
+            } catch (IOException e) {
+                msg = "Unable to load authentication credentials from defult location. " +
+                        "Try specifying the credentials location if credentials are required.";
+                _log.warn(msg);
+            }
+
+        }
 
         e1 = config.getChild("CacheDirectory");
         if(e1==null){
@@ -100,38 +123,17 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
         List<Element> dynamicServices = config.getChildren("DynamicService");
-        for(Element dservice:dynamicServices) {
-            String name = dservice.getAttributeValue("name");
-            String href = dservice.getAttributeValue("href");
-
-            if(name==null || href==null)
-                throw new BadParameterException("The Dynamic service MUST have both a name and an href attribute.");
-
-            _dynamicServicesMap.put(name, href);
-            _log.info("WCS-2.0 DynamicService Loaded! name: {} href: {} ",name,href);
-
-            Element defaultSrsElement =  dservice.getChild("DefaultSRS");
-            if(defaultSrsElement==null)
-                throw new IOException("Failed to locate required DefaultSRS configuration for DynamicService '"+name+"'");
-            SimpleSrs defaultSrs = new SimpleSrs(defaultSrsElement);
-            _defaultSRS.put(name,defaultSrs);
-            _log.info("WCS-2.0 DynamicService {} has default SRS of {}",name, defaultSrs.getName());
+        for(Element dsElement:dynamicServices) {
+            DynamicService dynamicService = new DynamicService(dsElement);
+            DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
+            if(previous!=null){
+                //FIXME Do we care that something was in the way? I think so...
+                _log.warn("The addtion of the DynamicService: {} bumped this instance from the map:{}",
+                        dynamicService.toString(),previous.toString());
+            }
         }
 
-        _credsProvider = null;
-        try {
-            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
-        } catch (IOException e) {
-            msg = "Unable to load authentication credentials from defult location. " +
-                    "Try specifying the credentials location if credentials are required.";
-            _log.warn(msg);
-        }
-
-
-
-
-
-        _intiialized = true;
+        _intialized = true;
     }
 
     private String anyId2CacheId(String someId) throws WcsException {
@@ -145,26 +147,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
         } catch (NoSuchAlgorithmException e) {
             throw new WcsException("Oops! No SHA-256 hashing available. msg: "+ e.getMessage(),WcsException.NO_APPLICABLE_CODE, getClass().getClass().getCanonicalName()+".getCacheId()");
 
-        }
-    }
-
-    private void writeRemoteContent(String url, OutputStream os) throws IOException, JDOMException {
-
-        _log.debug("writeRemoteContent() - URL: {}",url);
-
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(_credsProvider)
-                .build();
-
-        HttpGet httpGet = new HttpGet(url);
-        CloseableHttpResponse resp = httpclient.execute(httpGet);
-        try {
-            _log.debug("writeRemoteContent() - HTTP STATUS: {}",resp.getStatusLine());
-            HttpEntity entity1 = resp.getEntity();
-            entity1.writeTo(os);
-            EntityUtils.consume(entity1);
-        } finally {
-            resp.close();
         }
     }
 
@@ -203,9 +185,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(cacheFile);
-                writeRemoteContent(dmrUrl,fos);
+                opendap.http.Util.writeRemoteContent(dmrUrl, _credsProvider, fos);
                 fos.close();
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
+                // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.
                 dmrElement.setAttribute("name",coverageId);
                 return dmrElement;
 
@@ -230,6 +213,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
         return false;
     }
 
+    /**
+     * TODO In this method should be set up to utilize a cached instance of the DynamicCoverageDescription object as the getDMR() method does for the DMR document.
+     * @param coverageId The Coverage ID (wcs:Identifier)
+     * @return
+     * @throws InterruptedException
+     * @throws WcsException
+     */
     @Override
     public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException {
 
@@ -238,7 +228,12 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
             if(dmr==null)
                 return null;
-            CoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,getDefaultSrs(coverageId));
+
+            DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+            if(dynamicService==null)
+                return null;
+
+            DynamicCoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,dynamicService);
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {
@@ -276,7 +271,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     @Override
     public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException {
-        return new Vector<>();
+
+        Vector<Element> results = new Vector<>();
+        CoverageDescription cDesc = getCoverageDescription("foo");
+        if (cDesc != null) {
+
+
+        }
+        return results;
     }
 
     @Override
@@ -292,32 +294,39 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
-    public String getLongestMatchingDynamicServiceName(String coverageId){
+    public DynamicService getLongestMatchingDynamicService(String coverageId){
         String longestMatchingDynamicServiceName=null;
-        for(String dsName:_dynamicServicesMap.keySet()){
+        DynamicService match = null;
+        for(DynamicService dynamicService:_dynamicServices.values()){
+            String dsName = dynamicService.getName();
+
             if(coverageId.startsWith(dsName)){
                 if(longestMatchingDynamicServiceName==null){
                     longestMatchingDynamicServiceName=dsName;
+                    match = dynamicService;
                 }
                 else {
                     if(longestMatchingDynamicServiceName.length() < dsName.length()) {
                         longestMatchingDynamicServiceName = dsName;
+                        match = dynamicService;
                     }
                 }
             }
         }
-        return longestMatchingDynamicServiceName;
+        return match;
     }
 
 
     @Override
     public String getDataAccessUrl(String coverageId) throws InterruptedException {
-        String longestMatchingDynamicServiceName= getLongestMatchingDynamicServiceName(coverageId);
-        if(longestMatchingDynamicServiceName==null)
+        DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+        if(dynamicService==null)
             return null;
-        String dapServer = _dynamicServicesMap.get(longestMatchingDynamicServiceName);
-        String datasetUrl = coverageId.replace(longestMatchingDynamicServiceName,dapServer);
-        return datasetUrl;
+        String resourceId = coverageId.replace(dynamicService.getName(),"");
+        PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrl().toString());
+        pb.pathAppend(resourceId);
+        pb.append("");
+        return pb.toString();
     }
 
     @Override
@@ -352,9 +361,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     public SimpleSrs getDefaultSrs(String coverageId){
-        String dsName = getLongestMatchingDynamicServiceName(coverageId);
-        if(dsName==null)
+        DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+
+        if(dynamicService==null)
             return null;
-        return _defaultSRS.get(dsName);
+
+        return dynamicService.getSrs();
     }
 }

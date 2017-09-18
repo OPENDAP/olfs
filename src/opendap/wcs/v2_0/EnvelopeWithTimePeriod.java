@@ -26,82 +26,133 @@
 
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 
+import net.opengis.gml.v_3_2_1.*;
+import opendap.wcs.srs.SimpleSrs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ * Thin wrapper of net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType
+ * facilitates setting of its parameters while iterating over 
+ * the container attributes in DMR Dataset
+ * @author Uday Kari
+ *
+ */
 public class EnvelopeWithTimePeriod {
 
-	private String srsName = "";
-	private String axisLabels = "";
-	private String uomLabels = "";
-	private String srsDimension = "";
-	
-	private String lowerCorner = "";
-	private String upperCorner = "";
-	private String beginPosition = "";
-	private String endPosition = "";
-    
-	@XmlAttribute
-	public String getSrsName() {
-		return srsName;
+    private Logger _log;
+
+    private Vector<Double> _lowerCorner;
+    private Vector<Double> _upperCorner;
+
+	private String _beginTimePosition = "";
+	private String _endTimePosition = "";
+
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+
+        sb.append(": lowerCorner: [");
+        for(double value:_lowerCorner)
+            sb.append(" ").append(value);
+        sb.append("]");
+        sb.append(", upperCorner: [");
+        for(double value:_upperCorner)
+            sb.append(" ").append(value);
+        sb.append("]");
+        sb.append(", beginTime: ").append(_beginTimePosition);
+        sb.append(", endTime: ").append(_endTimePosition);
+        return sb.toString();
+    }
+
+    public EnvelopeWithTimePeriod(){
+        _log = LoggerFactory.getLogger(getClass());
+	    _lowerCorner = new Vector<>();
+	    _upperCorner = new Vector<>();
+    }
+	/**
+	 * Provides the OGC GML EnvelopeWithTimePeriodType object using 
+	 * member variables that were captured while iterating 
+	 * over container attributes of a DMR
+	 */
+	public EnvelopeWithTimePeriodType getEnvelope(SimpleSrs srs)
+	{
+        // EnvelopeWithTimePeriodType is part of GML
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = new net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
+        // both are equivalent spatial reference systems for the ENTIRE globe
+
+        envelope.setSrsName(srs.getName());
+        List<String> axisLabelsAsList = srs.getAxisLabelsList();
+        envelope.setAxisLabels(axisLabelsAsList);
+        List<String> uomLabelsAsList = srs.getUomLabelsList();
+        envelope.setUomLabels(uomLabelsAsList);
+        envelope.setSrsDimension(BigInteger.valueOf(srs.getSrsDimension()));
+
+        net.opengis.gml.v_3_2_1.DirectPositionType envelopeLowerCorner = new net.opengis.gml.v_3_2_1.DirectPositionType();
+        envelopeLowerCorner.setValue(_lowerCorner);
+        envelope.setLowerCorner(envelopeLowerCorner);
+
+        DirectPositionType envelopeUpperCorner = new DirectPositionType();
+        envelopeUpperCorner.setValue(_upperCorner);
+        envelope.setUpperCorner(envelopeUpperCorner);
+
+        TimePositionType beginTimePosition = new TimePositionType();
+        // attribute called frame seems like right place to put ISO-8601 timestamp
+        beginTimePosition.setFrame(_beginTimePosition);
+        // However, it can also be specified as below.
+        List<String> timeStrings = Arrays.asList(_beginTimePosition);
+        beginTimePosition.setValue(timeStrings);
+        envelope.setBeginPosition(beginTimePosition);
+
+        TimePositionType endTimePosition = new TimePositionType();
+        endTimePosition.setFrame(_endTimePosition);
+        // However, it can also be specified as below.
+        timeStrings = Arrays.asList(_endTimePosition);
+        endTimePosition.setValue(timeStrings);
+        envelope.setEndPosition(endTimePosition);
+        
+        return envelope;
+
 	}
-	public void setSrsName(String srsName) {
-		this.srsName = srsName;
-	}
-	
-	@XmlAttribute
-	public String getAxisLabels() {
-		return axisLabels;
-	}
-	public void setAxisLabels(String axisLabels) {
-		this.axisLabels = axisLabels;
-	}
-	
-	@XmlAttribute
-	public String getUomLabels() {
-		return uomLabels;
-	}
-	public void setUomLabels(String uomLabels) {
-		this.uomLabels = uomLabels;
-	}
-	
-	@XmlAttribute
-	public String getSrsDimension() {
-		return srsDimension;
-	}
-	public void setSrsDimension(String srsDimension) {
-		this.srsDimension = srsDimension;
-	}
-	
-	@XmlElement
-	public String getLowerCorner() {
-		return lowerCorner;
-	}
-	public void setLowerCorner(String lowerCorner) {
-		this.lowerCorner = lowerCorner;
-	}
-	
-	@XmlElement
-	public String getUpperCorner() {
-		return upperCorner;
-	}
-	public void setUpperCorner(String upperCorner) {
-		this.upperCorner = upperCorner;
-	}
-	
-	@XmlElement
-	public String getBeginPosition() {
-		return beginPosition;
-	}
-	public void setBeginPosition(String beginPosition) {
-		this.beginPosition = beginPosition;
-	}
-	
-	@XmlElement
-	public String getEndPosition() {
-		return endPosition;
-	}
-	public void setEndPosition(String endPosition) {
-		this.endPosition = endPosition;
-	}
+
+    public void setBeginTimePosition(String beginTime){
+	    _beginTimePosition = beginTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_beginTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse begin time position string '"+_beginTimePosition+"' Error message: {}",e.getMessage());
+        }
+    }
+
+    public void setEndTimePosition(String endTime){
+        _endTimePosition = endTime;
+        try {
+            TimeConversion.parseWCSTimePosition(_endTimePosition);
+        } catch (WcsException e) {
+            _log.warn("Failed to parse end time position string '"+_endTimePosition+"' Error message: {}",e.getMessage());
+        }
+    }
+
+    public void addLowerCornerCoordinateValues(List<Double> values){
+        _lowerCorner.addAll(values);
+
+    }
+
+    public void addUpperCornerCoordinateValues(List<Double> values){
+        _upperCorner.addAll(values);
+    }
+
+
+
+
+
 }

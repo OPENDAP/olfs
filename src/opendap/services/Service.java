@@ -44,7 +44,7 @@ public interface Service {
 
     public String getBase();
 
-    public boolean datasetCanBeViewed(Document ddx);
+    public boolean datasetCanBeViewed(String datasetId, Document ddx);
 
 
 }

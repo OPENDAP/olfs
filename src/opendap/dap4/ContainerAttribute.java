@@ -26,19 +26,13 @@
 
 package opendap.dap4;
 
-import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.*;
 
 /**
  * JAXB spec for Top Level Container Attribute elements of DMR
  *   <Attribute name="HDF5_GLOBAL" type="container">
- *     No children like <Value>CF-1</Value>
- *     but could contain other attributes...ugh!
  *   </Attribute>
- * 
  */
 public class ContainerAttribute {
 	
@@ -81,4 +75,47 @@ public class ContainerAttribute {
 			   ",  type = " + type;
     }
 
+    /**
+     * Returns the value of the requested attribute, ignore the case of the name as directed, and returning null
+     * or empty string as directed.
+     * @param name Name of Attribute whose value to return
+     * @param ignoreCase Ignore case in the name search
+     * @param nullProof If true return empty string instead of null.
+     * @return
+     */
+    public String getAttributeValue(String name, boolean ignoreCase, boolean nullProof){
+        String value;
+		for(Attribute attribute:attributes){
+			if(ignoreCase) {
+                if (name.equalsIgnoreCase(attribute.getName())) {
+                    value = attribute.getValue();
+                    value = (value == null && nullProof) ? "" : value;
+                    return value;
+                }
+            }
+            else {
+                if (name.equals(attribute.getName())) {
+                    value = attribute.getValue();
+                    value = (value == null && nullProof) ? "" : value;
+                    return value;
+                }
+            }
+		}
+		return nullProof?"":null;
+	}
+  
+    
+    /**
+     * return value of attribute given its name 
+     * @param attributeName
+     * @return attributeValue
+     */
+    public String getAttributeValue(String attributeName)
+    {
+      for (Attribute a : this.attributes) {
+        if (a.getName().equalsIgnoreCase(attributeName)) return a.getValue();
+      }
+      
+      return null;
+    }
 }

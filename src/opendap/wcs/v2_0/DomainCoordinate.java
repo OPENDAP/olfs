@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,65 +44,120 @@ public class DomainCoordinate {
     private String _dapId;
     private String _units;
     private String _arraySubset;
+    private String _role;
     private long _size;
+    private double _min;
+    private double _max;
 
     public DomainCoordinate(Element dc) throws ConfigurationException {
+        Vector<String> problems = new Vector<>();
 
         _name = dc.getAttributeValue("name");
-        if(_name ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_name == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'name'.");
         }
 
         _dapId = dc.getAttributeValue("dapID");
-        if(_dapId ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_dapId == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'dapID'.");
         }
 
         _units = dc.getAttributeValue("units");
-        if(_units ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+        if(_units == null){
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'units'.");
         }
 
 
         String s = dc.getAttributeValue("size");
         if(s ==null){
-            throw new ConfigurationException("In the configuration a DomainCoordinate element is " +
+            problems.add("In the configuration a DomainCoordinate element is " +
                     "missing the required attribute 'size'.");
         }
-        try {
-            _size = Long.parseLong(s);
+        else {
+            try {
+                _size = Long.parseLong(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "'size' attribute: '" + s + "' as a long integer. msg: " + e.getMessage());
+            }
         }
-        catch (NumberFormatException e){
-            throw new ConfigurationException("Unable to parse the value of the " +
-                    "size attribute: '"+s+"' as a long integer. msg: "+e.getMessage());
+
+        _role = dc.getAttributeValue("role");
+
+        if(!problems.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Dynamic Configuration Failed To Ingest!\n");
+            for(String msg: problems){
+                sb.append(msg).append("\n");
+                throw new ConfigurationException(sb.toString());
+            }
+
         }
+
+
+        s = dc.getAttributeValue("min");
+        if(s ==null){
+            problems.add("In the configuration a DomainCoordinate element is " +
+                    "missing the required attribute 'min'.");
+        }
+        else {
+            try {
+                _min = Double.parseDouble(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "'min' attribute: '" + s + "' as a double. msg: " + e.getMessage());
+            }
+        }
+        s = dc.getAttributeValue("max");
+        if(s ==null){
+            problems.add("In the configuration a DomainCoordinate element is " +
+                    "missing the required attribute 'max'.");
+        }
+        else {
+            try {
+                _min = Double.parseDouble(s);
+            } catch (NumberFormatException e) {
+                problems.add("Unable to parse the value of the " +
+                        "'max' attribute: '" + s + "' as a double. msg: " + e.getMessage());
+            }
+        }
+
+
 
 
     }
 
+    /**
+     * Copy Constructor
+     * @param dc
+     */
     public DomainCoordinate(DomainCoordinate dc){
-
-        _name = dc._name;
-        _dapId = dc._dapId;
-        _units = dc._units;
+        _name        = dc._name;
+        _dapId       = dc._dapId;
+        _units       = dc._units;
         _arraySubset = dc._arraySubset;
-        _size = dc._size;
-
+        _size        = dc._size;
+        _role        = dc._role;
+        _min         = dc._min;
+        _max         = dc._max;
     }
+
     public DomainCoordinate(String name,
                             String dapId,
                             String units,
                             String arraySubset,
-                            long size)
+                            long size,
+                            String role)
             throws BadParameterException {
         _name = name;
         _dapId = dapId;
         _units = units;
         _arraySubset = arraySubset;
         _size = size;
+        _role = role;
 
         if (_name == null) {
             throw new BadParameterException("In DomainCoordinate the 'name' parameter may not have a null value.");
@@ -177,5 +233,21 @@ public class DomainCoordinate {
         return _size;
     }
 
+    public String getRole(){ return _role; }
+
+    public double getMin(){ return _min; }
+    public void setMin(String minStr) {
+        setMin(Double.parseDouble(minStr));
+    }
+    public void setMin(double min) {
+        _min = min;
+    }
+    public double getMax(){ return _max; }
+    public void setMax(String maxStr) {
+        setMax(Double.parseDouble(maxStr));
+    }
+    public void setMax(double max) {
+        _max = max;
+    }
 
 }

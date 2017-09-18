@@ -45,7 +45,7 @@ public class TimeConversion {
 
 
 
-    // @todo Implement time format conversion to build correct dap constraints. Need units for dap time variable.
+    // TODO Implement time format conversion to build correct dap constraints. Need units for dap time variable.
 
 
     /*
@@ -250,13 +250,37 @@ public class TimeConversion {
     }
 
 
+
+    public static Date getTime(double time, String timeUnits){
+        Date date = getEpoch(timeUnits);
+
+        double milliseconds = time;
+        if(timeUnits.toLowerCase().startsWith("days")){
+            milliseconds = time * 24 * 60 * 60 * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("hours")){
+            milliseconds = time * 60 * 60 * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("minutes")){
+            milliseconds = time * 60  * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("seconds")){
+            milliseconds = time  * 1000;
+        }
+        date.setTime((long)milliseconds);
+
+        return date;
+
+    }
+
+
     public static void testTimeConversion(Date date, String timeUnits) throws WcsException{
 
         GregorianCalendar gc = new GregorianCalendar();
         Date epoch = getEpoch(timeUnits);
 
 
-        System.out.println("Testing Date: "+date);
+        System.out.println("Testing Date: " + date);
         System.out.println("    timeUnits:     " + timeUnits);
         System.out.println("    epoch is:      " + epoch);
         System.out.println("    convertDateToTimeUnits(): " + convertDateToTimeUnits(date, timeUnits));

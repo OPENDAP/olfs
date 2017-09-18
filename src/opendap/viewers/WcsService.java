@@ -4,8 +4,16 @@ import opendap.PathBuilder;
 import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /*
@@ -33,6 +41,7 @@ import javax.servlet.http.HttpServlet;
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 /**
  * Created with IntelliJ IDEA.
  * User: ndp
@@ -42,69 +51,134 @@ import javax.servlet.http.HttpServlet;
  */
 public class WcsService implements WebServiceHandler {
 
-
-    public static final String ID = "WCS-2.0";
-
-
+    Logger _log;
     private String _serviceId;
-    private String _base;
     private String _applicationName;
-    private String _wcsDynamicServiceId;
+
+    public static final String ID = "WCS";
+
+    private String _serviceEndpoint;
+    private String _dynamicServiceId;
+    private String  _pathMatchRegexString;
+    private Pattern _pathMatchPattern;
+
 
     private Element _config;
 
-    private String _wcsServiceUrl;
-
     public WcsService() {
-
+        _log = LoggerFactory.getLogger(this.getClass());
         _serviceId = ID;
         _applicationName = ID + " Service";
-        _wcsServiceUrl = "http://localhost:8080/"+ID+"/";
-        _base = "/" + ID;
-        _wcsDynamicServiceId = "lds";
-
-
     }
 
 
     @Override
-    public void init(HttpServlet servlet, Element config) {
-
+    public void init(HttpServlet servlet, Element config) throws ServletException {
 
         _config = config;
 
         Element e;
         String s;
 
-        s = _config.getAttributeValue("serviceId");
-        if (s != null && s.length() != 0)
-            _serviceId = s;
+        Vector<String> configErrors = new Vector<>();
 
-        e = _config.getChild("applicationName");
+        s = _config.getAttributeValue("serviceId");
+        if (s != null && s.length() != 0) {
+            _serviceId = s;
+        }
+        else {
+            configErrors.add("Failed to locate required attribute 'serviceId'");
+        }
+
+        // <ApplicationName>Testbed-12 WCS Service</applicationName>
+        e = _config.getChild("ApplicationName");
         if (e != null) {
             s = e.getTextTrim();
-            if (s != null && s.length() != 0)
+            if (s != null && s.length() != 0) {
                 _applicationName = s;
+            }
+            else {
+            }
+        }
+        else {
+            _applicationName = "WCS";
+            _log.warn("Using Default Application Name for WCS service! name: {}",_applicationName);
+        }
+
+        // <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
+        e = _config.getChild("ServiceEndpoint");
+        if (e != null) {
+            s = e.getTextTrim();
+            if (s != null && s.length() != 0) {
+                if(s.startsWith("http://") || s.startsWith("https://") ) {
+                    try {
+                        URL url = new URL(s);
+                        _serviceEndpoint = url.toString();
+                    } catch (MalformedURLException e1) {
+                        configErrors.add("The value of 'ServiceEndpoint' element could not be parsed as a URL. msg: "+e1.getMessage());
+                    }
+                }
+                else
+                    _serviceEndpoint = s;
+            }
+            else {
+                configErrors.add("The 'ServiceEndpoint' element did not contain any text.");
+            }
+        }
+        else {
+            configErrors.add("Failed to locate required element 'ServiceEndpoint'");
         }
 
 
-        e = _config.getChild("WcsService");
-
+        // <MatchRegex>testbed-12/.*</MatchRegex>
+        e = _config.getChild("MatchRegex");
         if (e != null) {
+            s = e.getTextTrim();
+            if (s != null && s.length() != 0) {
+                try {
+                    _pathMatchPattern = Pattern.compile(s);
+                    _pathMatchRegexString = s;
+                }
+                catch(PatternSyntaxException pse){
+                    configErrors.add("The value of the 'MatchRegex' failed to compile as a regular expression. msg: "+pse.getMessage());
+                }
+            }
+            else {
+                configErrors.add("The 'MatchRegex' element did not contain any text.");
+            }
+        }
+        else {
+            configErrors.add("Failed to locate required element 'MatchRegex'");
+        }
 
-            s = e.getAttributeValue("href");
-            if (s != null && s.length() != 0)
-                _wcsServiceUrl = s;
 
-            s = e.getAttributeValue("base");
-            if (s != null && s.length() != 0)
-                _base = s;
+        // <DynamicServiceId>tb12</DynamicServiceId>
+        e = _config.getChild("DynamicServiceId");
+        if (e != null) {
+            s = e.getTextTrim();
+            if (s != null && s.length() != 0) {
+                _dynamicServiceId = s;
+            }
+            else {
+                configErrors.add("The 'DynamicServiceId' element did not contain any text.");
+            }
+        }
+        else {
+            configErrors.add("Failed to locate required element 'DynamicServiceId'");
+        }
 
-            s = e.getAttributeValue("wcsDynamicServiceId");
-            if (s != null && s.length() != 0)
-                _wcsDynamicServiceId = s;
+        if(!configErrors.isEmpty()){
+            StringBuilder sb = new StringBuilder("WCS Service Configuration ERRORS!");
+            _log.error("init() - {}",sb.toString());
+            sb.append("\n");
+            for(String errMsg:configErrors){
+                sb.append(errMsg).append("\n");
+                _log.error("init() - {}",errMsg);
+            }
+            throw new ServletException(sb.toString());
         }
     }
+
 
     @Override
     public String getName() {
@@ -118,55 +192,35 @@ public class WcsService implements WebServiceHandler {
 
 
     @Override
-    public boolean datasetCanBeViewed(Document ddx) {
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
+
+        return _pathMatchPattern.matcher(datasetId).matches();
+
         //Element dataset = ddx.getRootElement();
 
         //Iterator i = dataset.getDescendants(new ElementFilter("Grid", DAP.DAPv32_NS));
 
-        return true; // i.hasNext();
+        //return true; // i.hasNext();
     }
 
     @Override
-    public String getServiceLink(String datasetUrl) {
-        PathBuilder pb = new PathBuilder();
-
-
-        pb.append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities");
-
-        /*
-
-        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
-        pb.pathAppend(datasetUrl).append("\">");
-        pb.append(_applicationName).append("</a>");
-
-        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
-        pb.pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities\">");
-        pb.append("GetCapabilities").append("</a>");
-
-        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId);
-        pb.pathAppend(datasetUrl).append("?SERVICE=WCS&VERSION=2.0.1&REQUEST=DescribeCoverage");
-        pb.append("&coverageId=").append(_wcsDynamicServiceId).pathAppend(datasetUrl).append("\">");
-        pb.append("DescribeCoverage").append("</a>");
-
-        */
-
-//        pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
-  //      pb.append("<a href=\"").append(_wcsServiceUrl).pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
-
-
+    public String getServiceLink(String datasetId) {
+        PathBuilder pb = new PathBuilder(_serviceEndpoint);
+        pb.pathAppend(_dynamicServiceId).pathAppend(datasetId).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
         return pb.toString();
     }
 
+    public String getThreddsUrlPath(String datasetId) {
+        return getServiceLink(datasetId);
+    }
 
     public String getBase() {
-
-        return _base;
-
+        return _serviceEndpoint;
     }
 
 
-    public String getDynamicServiceId(){
-        return _wcsDynamicServiceId;
+    public String getDynamicServiceId() {
+        return _dynamicServiceId;
     }
 
     @Override
@@ -174,11 +228,10 @@ public class WcsService implements WebServiceHandler {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName()).append("\n");
         sb.append("    serviceId: ").append(_serviceId).append("\n");
-        sb.append("    base: ").append(_base).append("\n");
-        sb.append("    dynamicServiceId: ").append(_wcsDynamicServiceId).append("\n");
-        sb.append("    applicationName: ").append(_applicationName).append("\n");
-        sb.append("    WcsService: ").append(_wcsServiceUrl).append("\n");
-
+        sb.append("    ApplicationName: ").append(_applicationName).append("\n");
+        sb.append("    WcsService: ").append(_serviceEndpoint).append("\n");
+        sb.append("    DynamicServiceId: ").append(_dynamicServiceId).append("\n");
+        sb.append("    MatchRegex: ").append(_pathMatchRegexString).append("\n");
         return sb.toString();
     }
 
@@ -186,14 +239,9 @@ public class WcsService implements WebServiceHandler {
         return "WCS";
     }
 
-
-
-    public String getThreddsUrlPath(String datasetUrl)  {
-        PathBuilder pb = new PathBuilder();
-        pb.pathAppend(_wcsDynamicServiceId).pathAppend(datasetUrl).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
-        return pb.toString();
+    public String getMatchRegexString(){
+        return _pathMatchRegexString;
     }
-
 
 }
 

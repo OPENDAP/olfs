@@ -100,6 +100,24 @@ public class Util {
     }
 
 
-
+    /**
+     * Performs a null proof case insensitive check to see
+     * if s1 contains s2.
+     * @param s1 The string to search
+     * @param s2 The candiate sub-string
+     * @return true only if str contains sub
+     */
+    public static boolean caseInsensitiveStringContains(String s1, String s2) {
+    	if(
+            s1!=null &&
+            s2!=null &&
+            s1.trim().length()>0 &&
+            s2.trim().length()>0
+            ){
+    	    return s1.trim().toLowerCase().contains(s2.trim().toLowerCase());
+        }
+    	return false;
+    }
+    
 
 }

@@ -268,7 +268,8 @@ public class ThreddsCatalogUtil {
 			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
 
 			// Get one DMR document and print it.
-			Document dmr = tcc.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml");
+			Document dmr = opendap.xml.Util.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml",
+					opendap.http.Util.getNetRCCredentialsProvider());
 			tcc.log.debug(tcc.xmlo.outputString(dmr));
 
 			// Get all the DMR URLs in the collection
@@ -424,7 +425,7 @@ public class ThreddsCatalogUtil {
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
 
 		for (String url : ddxUrls) {
-			ddxRootElements.add(getDocumentRoot(url));
+			ddxRootElements.add(opendap.xml.Util.getDocumentRoot(url,credsProvider));
 		}
 
 		return ddxRootElements;
@@ -438,9 +439,9 @@ public class ThreddsCatalogUtil {
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
 
 		for (String url : ddxUrls) {
-            Document doc = getDocument(url);
+            Document doc = opendap.xml.Util.getDocument(url,credsProvider);
             if(doc!=null)
-                ddxDocs.add(getDocument(url));
+                ddxDocs.add(opendap.xml.Util.getDocument(url,credsProvider));
 		}
 
 		return ddxDocs;
@@ -472,7 +473,7 @@ public class ThreddsCatalogUtil {
         Vector<String> dmrUrls = getDMRUrls(catalogUrlString, recurse);
 
         for (String url : dmrUrls) {
-            dmrRootElements.add(getDocumentRoot(url));
+            dmrRootElements.add(opendap.xml.Util.getDocumentRoot(url,credsProvider));
         }
 
         return dmrRootElements;
@@ -488,9 +489,9 @@ public class ThreddsCatalogUtil {
         Vector<String> dmrUrls = getDMRUrls(catalogUrlString, recurse);
 
         for (String url : dmrUrls) {
-            Document doc = getDocument(url);
+            Document doc = opendap.xml.Util.getDocument(url,credsProvider);
             if(doc!=null)
-                dmrDocs.add(getDocument(url));
+                dmrDocs.add(opendap.xml.Util.getDocument(url,credsProvider));
         }
 
         return dmrDocs;
@@ -607,7 +608,7 @@ public class ThreddsCatalogUtil {
 
         Vector<String> catalogURLs = new Vector<String>();
 
-        Element catalog = getDocumentRoot(catalogUrlString);
+        Element catalog = opendap.xml.Util.getDocumentRoot(catalogUrlString,credsProvider);
         if (catalog != null)
             catalogURLs = getCatalogRefURLs(catalogUrlString, catalog, recurse);
 
@@ -827,107 +828,13 @@ public class ThreddsCatalogUtil {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
-		Element catalog = getDocumentRoot(catalogUrlString);
+		Element catalog = opendap.xml.Util.getDocumentRoot(catalogUrlString, credsProvider);
 		if (catalog != null)
 			serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service,
 					recurse);
 
 		return serviceURLs;
 	}
-
-	/**
-	 * Returns the root Element of the XML document located at the URL contained
-	 * in the passed parameter <code>docUrlString</code>
-	 * 
-	 * @param docUrlString
-	 *            The URL of the document to retrieve
-	 * @return The Document
-	 */
-	private Element getDocumentRoot(String docUrlString) throws InterruptedException, IOException, JDOMException {
-
-		Element docRoot = null;
-
-		Document doc = getDocument(docUrlString);
-		if (doc != null) {
-			docRoot = doc.getRootElement();
-			docRoot.detach();
-		}
-		return docRoot;
-	}
-
-	/**
-	 * Returns the Document object for the XML document located at the URL
-	 * contained in the passed parameter String <code>docUrlString</code>.
-	 * 
-	 * @note This is the point in the class where a response is (possibly)
-	 * cached.
-	 * 
-	 * @param docUrlString
-	 *            The URL of the document to retrieve.
-	 * @return The Document
-	 */
-    public Document  getDocument(String docUrlString) throws IOException, JDOMException {
-
-
-        log.debug("getDocument() - URL: {}",docUrlString);
-        Document doc = null;
-
-
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credsProvider)
-                .build();
-
-        HttpGet httpGet = new HttpGet(docUrlString);
-        CloseableHttpResponse resp = httpclient.execute(httpGet);
-        try {
-            log.debug("HTTP STATUS: {}",resp.getStatusLine());
-            HttpEntity entity1 = resp.getEntity();
-            doc = opendap.xml.Util.getDocument(entity1.getContent());
-            EntityUtils.consume(entity1);
-        } finally {
-            resp.close();
-        }
-
-        return doc;
-
-    }
-
-
-	/*
-	private Document getDocument(String docUrlString)  throws InterruptedException {
-
-		Document doc = null;
-		try {
-
-			URL docUrl = new URL(docUrlString);
-
-			SAXBuilder sb = new SAXBuilder();
-
-			log.debug("Retrieving XML Document: " + docUrlString);
-			log.debug("Document URL INFO: \n" + getUrlInfo(docUrl));
-
-			doc = sb.build(docUrl);
-			log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-		}
-		catch (MalformedURLException e) {
-			log.error("Problem with XML Document URL: " + docUrlString
-					+ " Caught a MalformedURLException.  Message: "
-					+ e.getMessage());
-		}
-		catch (IOException e) {
-			log.error("Problem retrieving XML Document: " + docUrlString
-					+ " Caught a IOException.  Message: " + e.getMessage());
-		}
-		catch (JDOMException e) {
-			log.error("Problem parsing XML Document: " + docUrlString
-					+ " Caught a JDOMException.  Message: " + e.getMessage());
-		}
-
-		return doc;
-
-	}
- */
-
 
 	private String getCatalogURL(String catalogUrlString, String href)
 			 throws InterruptedException,  MalformedURLException {

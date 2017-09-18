@@ -82,8 +82,8 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
 
 
-    public boolean datasetCanBeViewed(Document ddx) {
-            return true;
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
+        return true;
     }
 
 

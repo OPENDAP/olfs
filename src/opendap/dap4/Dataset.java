@@ -26,19 +26,33 @@
 
 package opendap.dap4;
 
+import opendap.wcs.v2_0.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import javax.xml.bind.annotation.*;
 
 /**
- * JAXB spec for DMR dataset
- * @author ukari
+ * JAXB for DMR dataset, with some helper, aggregation methods 
+ * 
+ * Supports unmarshaling the DMR XML into Java by reflection
+ * 
+ * This is NOT complete (i.e. supporting yet of all possible DMRs)  
+ * 
+ * Specifically, does not cover all DAP4 variables, and, 
+ * supports nesting of container attributes to one level only.
+ * 
+ * @author Uday Kari
+ * @author Nathan Potter
  *
  */
 @XmlRootElement (name="Dataset")
 public class Dataset {
 
-	// FIXME: change the name from "coverageId" to "name" and modify setter and getter accordingly. ndp 9/7/17
-	private String coverageId;
+  Logger _log;
+
+	private String name;
 	private String url;
 	
 	private List<Dimension> dimensions; 
@@ -49,12 +63,15 @@ public class Dataset {
 	private List<Int64>   vars64bitIntegers;
 	private List<Int32>   vars32bitIntegers;
 
+	private boolean _checkedForCF;
+	private boolean _isCFConvention;
 
 	/**
-	 * This default constructor intializes all of the stuff so things can never be null.
+	 * This default constructor initializes all of the stuff so things can never be null.
 	 */
 	public Dataset() {
-		coverageId = "";
+	    _log = LoggerFactory.getLogger(this.getClass());
+		name = "";
 		url = "";
 		dimensions = new Vector<>();
 		attributes = new Vector<>();
@@ -62,21 +79,23 @@ public class Dataset {
 		vars32bitFloats = new Vector<>();
 		vars64bitIntegers = new Vector<>();
 		vars32bitIntegers = new Vector<>();
+		_checkedForCF = false;
+		_isCFConvention = false;
 	}
 	
 	
-	@XmlAttribute(name="name")
-	public String getCoverageId() {
-		return coverageId;
+	@XmlAttribute
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCoverageId(String coverageId) {
-		this.coverageId = coverageId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	// DMR generate prefixed attribute "xml:base", 
-	// just using base here
-	// the xml prefix is handled in package.info
+	// DMR generates prefixed attribute "xml:base", 
+	// just using base here, the respective xml prefix 
+	// being handled in package.info
 	@XmlAttribute(name="base")
 	public String getUrl() {
 		return url;
@@ -86,7 +105,7 @@ public class Dataset {
 		this.url = url;
 	}
 
-    @XmlElement(name="Attribute")
+  @XmlElement(name="Attribute")
 	public List<ContainerAttribute> getAttributes() {
 		return attributes;
 	}
@@ -101,8 +120,7 @@ public class Dataset {
 		return dimensions;
 	}
 
-	
-	public void setDimensions(List<Dimension> dimensions) {
+ 	public void setDimensions(List<Dimension> dimensions) {
 		this.dimensions = dimensions;
 	}
 
@@ -145,4 +163,116 @@ public class Dataset {
 		this.vars64bitIntegers = vars64bitIntegers;
 	}
 
+	public Vector<Variable> getVariables() {
+
+	    Vector<Variable> vars = new Vector<>();
+
+		vars.addAll(getVars32bitFloats());
+		vars.addAll(getVars64bitFloats());
+		vars.addAll(getVars32bitIntegers());
+		vars.addAll(getVars64bitIntegers());
+
+        return vars;
+    }
+
+  /**
+   * This finds the named Dimension if it exists.
+   * First scans the root of Dataset
+   * FIXME: Next it should scan all its variable groups
+   *
+   * @param name attribution of Dimesion tag
+   * @return opendap.dap4.Dimension 
+   */
+  public Dimension getDimension(String name){
+    while(name.startsWith("/") && name.length()>1)
+        name = name.substring(1);
+
+    // First, scan the root of Dataset
+    for(Dimension dim: getDimensions()){
+        if(dim.getName().equals(name))
+            return dim;
+      }
+    
+    // next scan its variable groups
+
+      return null;
+  }
+  
+  /**
+   * Searches for global container attributes and looks for conventions tag
+   * if it is found with value CF, then sets the CF compliance flag, returns true
+   * @return true
+   */
+  public boolean usesCfConventions(){
+        if(_checkedForCF)
+            return _isCFConvention;
+
+        _checkedForCF = true;
+        for (ContainerAttribute containerAttribute : attributes) {
+            if (containerAttribute.getName().toLowerCase().endsWith("_global") || 
+                containerAttribute.getName().equalsIgnoreCase("DODS_EXTRA")) {
+              
+                _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
+                _log.debug("Looking for conventions...attribute");
+                
+                if (containerAttribute.getAttributeValue("Conventions", true, true).contains("CF")) _isCFConvention = true;
+           } 
+        }
+        return _isCFConvention;
+    }
+
+   /**
+    * Scans the attributes of all container attributes and returns the FIRST match
+    *  
+    * @param name The Attribute name being searched for
+    * @return value of attribute, if found, null otherwise 
+    */
+   public String getValueOfGlobalAttributeWithNameLike(String name) {
+     for (ContainerAttribute containerAttribute : attributes) {
+       	for (Attribute a : containerAttribute.getAttributes()) {
+          if (Util.caseInsensitiveStringContains(a.getName(), name))
+            return a.getValue();
+        }
+      }
+     return null;
+   }
+
+    public double getValueOfGlobalAttributeWithNameLikeAsDouble(String attributeName, double defaultValue){
+
+        String valueStr = getValueOfGlobalAttributeWithNameLike(attributeName);
+        double result =defaultValue;
+        if(valueStr != null){
+            try{
+                result = Double.parseDouble(valueStr);;
+            }
+            catch(NumberFormatException nfe){
+                String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                        "Failed to parse value of Dataset global Attribute '"+attributeName+
+                        "' value: "+valueStr+"  Using value: "+result;
+                _log.warn(msg);
+            }
+        }
+        else {
+            String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
+                    "Failed to locate global Attribute named '"+attributeName+
+                    "'  Using value: "+result;
+            _log.warn(msg);
+        }
+        return result;
+    }
+
+
+
+   /**
+    * Helper method to scan dataset by variable name 
+    * @param name of variable
+    * @return first instance of opendap.dap4.Variable matching the name, case insensitive
+    */
+   public Variable getVariable (String name)
+   {
+     for (Variable v : this.getVariables())
+       if (v.getName().equalsIgnoreCase(name)) return v;
+     
+     return null;
+   }  
 }

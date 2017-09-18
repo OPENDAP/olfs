@@ -79,8 +79,8 @@ public class FileService implements WebServiceHandler {
     }
 
     @Override
-    public boolean datasetCanBeViewed(Document ddx) {
-        return false;
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
+        return true;
     }
 
     @Override

@@ -157,8 +157,9 @@
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
-    <property name="WCS-Resources.dir" location="${resources.dir}/WCS/2.0"/>
-    <property name="distributionResources.dir"  location="${WCS-Resources.dir}/distribution"/>
+    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
+    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
+    <property name="distributionResources.dir"  location="${wcs.resources.dir}/distribution"/>
 
 
 
@@ -212,7 +213,7 @@
     <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
     <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
     <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>	
+    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
     <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
     <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
     <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
@@ -253,21 +254,20 @@
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
 
-	    <include name="${owlim.lib}"/>
+	        <include name="${owlim.lib}"/>
             <include name="${openrdf-sesame.lib}"/>
+        </fileset>
 
+        <fileset dir="${wcs.lib.dir}">
             <include name="${ogc-wcs.lib}" />
             <include name="${ogc-gml.lib}" />
             <include name="${ogc-swe.lib}" />
             <include name="${ogc-gmlcov.lib}" />
             <include name="${ogc-ows.lib}" />
             <include name="${ogc-jaxb.lib}" />
-        	
         	<include name="${jaxb-core.lib}" />
         	<include name="${jaxb-impl.lib}" />
         	<include name="${xlink.lib}" />
-
-
         </fileset>
     </path>
 
@@ -318,7 +318,8 @@
             <fileset dir="${src.dir}">
                 <!-- include all the WCS 2.0 java files -->
                 <include name="opendap/wcs/v2_0/**/*.java"/>
-                
+                <include name="opendap/wcs/srs/**/*.java"/>
+
                 <!-- include name="opendap/semantics/**/*.java"/ -->
                 
                 <include name="opendap/bes/BESManager.java"/>
@@ -387,6 +388,7 @@
 
 
                 <include name="opendap/io/HyraxStringEncoding.java"/>
+                <include name="opendap/PathBuilder.java"/>
 
 
 
@@ -396,7 +398,7 @@
         </copy>
 
         <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${WCS-Resources.dir}">
+            <fileset dir="${wcs.resources.dir}">
                 <!-- include all the java files -->
                 <include name="**"/>
 
@@ -506,12 +508,12 @@
 
 
         <echo level="info" message="Building WCS server war file."/>
-        <echo level="info" message="WCS-Resources.dir: ${WCS-Resources.dir}"/>
+        <echo level="info" message="WCS-Resources.dir: ${wcs.resources.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
 
 
         <war destfile="${build.dist}/WCS-2.0.war"
-             webxml="${WCS-Resources.dir}/WEB-INF/web.xml"
+             webxml="${wcs.resources.dir}/WEB-INF/web.xml"
                 >
 
             <lib dir="${lib.dir}">
@@ -537,8 +539,9 @@
 
 	            <include name="${owlim.lib}"/>
                 <include name="${openrdf-sesame.lib}"/>
+            </lib>
 
-
+            <lib dir="${wcs.lib.dir}">
                 <include name="${ogc-wcs.lib}"/>
                 <include name="${ogc-gml.lib}"/>
                 <include name="${ogc-swe.lib}"/>
@@ -548,8 +551,8 @@
                 <include name="${jaxb-core.lib}"/>
                 <include name="${jaxb-impl.lib}"/>
                 <include name="${xlink.lib}"/>
-
             </lib>
+            
             <classes dir="${build.classes}"/>
 
             <zipfileset dir="${doc.dir}" prefix="docs" >
