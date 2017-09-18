@@ -175,7 +175,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         _log.debug("getCachedDMR() - cacheId: {}",cacheId);
         File cacheFile = new File(_cacheDir,cacheId);
 
-
+        // TODO Improve by adding a shared read lock. jhrg 9/18/17
         WriteLock writeLock = _cacheLock.writeLock();
 
         writeLock.lock();
