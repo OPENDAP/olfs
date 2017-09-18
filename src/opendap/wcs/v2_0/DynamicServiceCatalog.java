@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
- * This catalog doesn;t maintain a catalog persay, but uses incoming requests to access remote services to build a
+ * This catalog doesn't maintain a catalog persay, but uses incoming requests to access remote services to build a
  * single coverage catalog for the requested
  */
 public class DynamicServiceCatalog implements WcsCatalog{

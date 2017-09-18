@@ -219,7 +219,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     /**
      * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * can be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+=======
+     * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+>>>>>>> Stashed changes
 =======
      * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
 >>>>>>> Stashed changes
@@ -582,9 +586,15 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * This method examines the variables in the Dataset to determine which variables are members of the range (i.e.
      * fields. It determines which variables can be used as fields in the coverage and then adds them to the
      * CoverageDescription
+=======
+     * Examine all of the variables in the dataset and determine which ones make up the Range
+     * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
+     * passed in at the first argument.
+>>>>>>> Stashed changes
 =======
      * Examine all of the variables in the dataset and determine which ones make up the Range
      * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
@@ -683,8 +693,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * Compares the dataset Dimensions of the DAP Variable _var_ with
      * the associated SRS DomainCoordinate's DAP variable. In particular
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * comparsiom is made by working in reverse order through the dimensions of the SRS
      * and the varable. If all of the dimensions have matched when the SRS runs out of DomainCoordinates
+=======
+     * comparison made by working in reverse order through the dimensions of the SRS
+     * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
+>>>>>>> Stashed changes
 =======
      * comparison made by working in reverse order through the dimensions of the SRS
      * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
