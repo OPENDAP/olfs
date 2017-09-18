@@ -585,21 +585,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-     * This method examines the variables in the Dataset to determine which variables are members of the range (i.e.
-     * fields. It determines which variables can be used as fields in the coverage and then adds them to the
-     * CoverageDescription
-=======
      * Examine all of the variables in the dataset and determine which ones make up the Range
      * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
      * passed in at the first argument.
->>>>>>> Stashed changes
-=======
-     * Examine all of the variables in the dataset and determine which ones make up the Range
-     * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
-     * passed in at the first argument.
->>>>>>> Stashed changes
      *
      * @param cd
      * @param dataset
