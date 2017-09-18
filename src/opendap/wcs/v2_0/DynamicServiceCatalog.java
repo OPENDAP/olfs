@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
- * This catalog doesn;t maintain a catalog persay, but uses incoming requests to access remote services to build a
+ * This catalog doesn't maintain a catalog persay, but uses incoming requests to access remote services to build a
  * single coverage catalog for the requested
  */
 public class DynamicServiceCatalog implements WcsCatalog{
@@ -175,7 +175,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         _log.debug("getCachedDMR() - cacheId: {}",cacheId);
         File cacheFile = new File(_cacheDir,cacheId);
 
-
+        // TODO Improve by adding a shared read lock. jhrg 9/18/17
         WriteLock writeLock = _cacheLock.writeLock();
 
         writeLock.lock();

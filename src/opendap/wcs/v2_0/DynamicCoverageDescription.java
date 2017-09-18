@@ -40,9 +40,8 @@ import static java.lang.Double.NaN;
  * role in the service, mapping WCS requests into DAP requests
  * that are used to provide the expected WCS response content.
  *
- *
- *  TODO This class needs a thoughtful "serialization" to perisit itself so that we don't have to do the dynamic part every single time.
- *
+ * @todo This class needs a thoughtful "serialization" to persist itself
+ * so that we don't have to do the dynamic part every single time.
  */
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
@@ -87,7 +86,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * This method uses a DMR to build state into the CoverageDescrption
+     * This method uses a DMR to build state into the CoverageDescription
      *
      * @param dmr
      * @throws WcsException
@@ -189,7 +188,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
     /**
-     * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This acitvity
+     * Examines the passed Dataset object and determines the DomainCoordinates for the coverage. This activity
      * utilizes the DynamicService to determine the domain coordinates and their order.
      * The results are added as state to the object and thus set the stage for later
      * deciding which DAP variables will be fields in the coverage, and later for building functional DAP data requests
@@ -219,12 +218,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * can be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+=======
+     * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+>>>>>>> Stashed changes
+=======
+     * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+>>>>>>> Stashed changes
      * are used to construct the new DomainCoordinate
      *
      * @param defaultCoordinate
      * @param dataset
-     * @return
+     * @return The new DomainCoordinate.
      * @throws BadParameterException
      * @throws WcsException
      */
@@ -247,7 +254,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             domainCoordinate = new DomainCoordinate(
                     coordinateName,  // This is the WCS coordinate name as defined in the SRS
-                    coordinateVariable.getName(), // This is the name of the cooresponding DAP variable
+                    coordinateVariable.getName(), // This is the name of the corresponding DAP variable
                     units,  // The units string, typically deg or the like
                     "",
                     size,
@@ -264,7 +271,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a
-     * value of an attribute named standard_name.  This method will lookl for this whether or not
+     * value of an attribute named standard_name.  This method will look for this whether or not
      * the underlying DMR Dataset is CF compliant
      *
      * @param dataset       - a JAXB representation of the DMR response
@@ -342,7 +349,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * EnvelopeWithTimePeriod is built otherwise a simple Envelope is built. The DomainSet
      * is added in either case.
      *
-     * @param cd The CoverageDescription to which to add the DomainSet and ENvelope content.
+     * @param cd The CoverageDescription to which to add the DomainSet and Envelope content.
      * @param dataset The DAP dataset to query for the information needed.
      */
     private void addBoundedByAndDomainSet(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
@@ -377,8 +384,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
             bbadsp.upperCorner.add(max);
         }
 
-        // Since time is special in WCS land we have to handle it special
-        // First we attempt assign the default time values from the time coordinate
+        // Since time is special in WCS land we have to handle it specially.
+        // First we attempt to assign the default time values from the time coordinate
         String date, time;
         DomainCoordinate timeCoordinate = getDomainCoordinate("time");
         if (timeCoordinate != null) {
@@ -394,7 +401,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.warn("addBoundedByAndDomainSet() - No coordinate for 'time' could be located. A default time period will not be utilized.");
         }
 
-        // Look for obvious start time information in the  Dataset metadata.
+        // Look for obvious start time information in the Dataset metadata.
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
         if (date != null && time != null) {
@@ -403,7 +410,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
 
-        // Look for obvious end time information in the  Dataset metadata.
+        // Look for obvious end time information in the Dataset metadata.
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
         if (date != null && time != null) {
@@ -578,9 +585,21 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * This method examines the variables in the Dataset to determine which variables are members of the range (i.e.
      * fields. It determines which variables can be used as fields in the coverage and then adds them to the
      * CoverageDescription
+=======
+     * Examine all of the variables in the dataset and determine which ones make up the Range
+     * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
+     * passed in at the first argument.
+>>>>>>> Stashed changes
+=======
+     * Examine all of the variables in the dataset and determine which ones make up the Range
+     * variables (i.e., the fields). Add the list of range variables to the CoverageDescription
+     * passed in at the first argument.
+>>>>>>> Stashed changes
      *
      * @param cd
      * @param dataset
@@ -686,13 +705,27 @@ public class DynamicCoverageDescription extends CoverageDescription {
     /**
      * Compares the dataset Dimensions of the DAP Variable _var_ with
      * the associated SRS DomainCoordinate's DAP variable. In particular
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * comparsiom is made by working in reverse order through the dimensions of the SRS
      * and the varable. If all of the dimensions have matched when the SRS runs out of DomainCoordinates
+=======
+     * comparison made by working in reverse order through the dimensions of the SRS
+     * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
+>>>>>>> Stashed changes
+=======
+     * comparison made by working in reverse order through the dimensions of the SRS
+     * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
+>>>>>>> Stashed changes
      * then it's a positive result.
      *
+     * @note This particular trick, using reverse iteration on the SRS dimensions, is
+     * used because the SRS dimensions only need to match the _last_ dimensions of the
+     * variable.
+     *
      * @param dataset The Dataset that's being turned into a coverage.
-     * @param dapVar     The variable to be evaluated.
-     * @param srs     The SRS which to compare the variable against.
+     * @param dapVar The variable to be evaluated.
+     * @param srs The SRS which to compare the variable against.
      * @return True when the DAP variable is dimensionally SRS conformant.
      */
     private boolean variableDimensionsAreCompatibleWithSrs(Dataset dataset, Variable dapVar, SimpleSrs srs) {
@@ -720,7 +753,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // one dimensional items). We verify that the domainCoordDapVarDim  references the
         // same Dataset Dimension  as the variable dapVar does in the dimension being assessed.
         //
-        // Aditional tests are performed that need reviewed and possibly dropped:
+        // Additional tests are performed that need reviewed and possibly dropped:
         //
         // - Compare the size of the domainCoordinate and dapVarDatasetDimension
         //   (Redundant? See comment below)
@@ -750,7 +783,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
             Dim domainCoordVarDim = dims.get(0);   // TODO Someday there may be multidimensional DomainCoordinates.
             if (domainCoordVarDim.getName().equals(dapVarDim.getName())) {
                 _log.debug("woot. The domainCoordinate DAP variable references the same dimension name as the variable.");
-            } else {
+            }
+            else {
                 weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT " +
                         "have the same dimension name as the variable.");
             }
