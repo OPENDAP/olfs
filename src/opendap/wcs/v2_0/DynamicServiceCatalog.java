@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class DynamicServiceCatalog implements WcsCatalog{
     private Logger _log;
-    private boolean _intiialized;
+    private boolean _intialized;
 
     private String _cacheDir;
     private ReentrantReadWriteLock _cacheLock;
@@ -40,7 +40,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     public DynamicServiceCatalog(){
-        _intiialized = false;
+        _intialized = false;
         _log = LoggerFactory.getLogger(getClass());
         _cacheLock = new ReentrantReadWriteLock();
         _dynamicServices = new ConcurrentHashMap<>();
@@ -63,12 +63,40 @@ public class DynamicServiceCatalog implements WcsCatalog{
      */
     @Override
     public void init(Element config, String cacheDir, String resourcePath) throws Exception {
-        if(_intiialized)
+        if(_intialized)
             return;
 
         Element e1;
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        ///////////////////////////////////////////////////////////////
+        // Sort out access credentials for getting things from places
+        // that require such...
+        _credsProvider = null;
+        e1 = config.getChild("Credentials");
+        if(e1!=null){
+            // There was a Credentials thing in the config, lets try it...
+            String filename = e1.getTextTrim();
+            try {
+                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider(filename, true);
+            }
+            catch (IOException ioe){
+                _log.error("init() - The file '{}' cannot be processed as a .netrc file. " +
+                        "msg: {}",filename,ioe.getMessage());
+            }
+        }
+        if(_credsProvider==null){
+            _log.warn("Looking in default location for .netrc");
+            try {
+                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
+            } catch (IOException e) {
+                msg = "Unable to load authentication credentials from defult location. " +
+                        "Try specifying the credentials location if credentials are required.";
+                _log.warn(msg);
+            }
+
+        }
 
         e1 = config.getChild("CacheDirectory");
         if(e1==null){
@@ -96,7 +124,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
         List<Element> dynamicServices = config.getChildren("DynamicService");
         for(Element dsElement:dynamicServices) {
-
             DynamicService dynamicService = new DynamicService(dsElement);
             //TODO Check return value to see if an exisiting DynamicService got pushed out when we put
             DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
@@ -105,20 +132,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             }
         }
 
-        _credsProvider = null;
-        try {
-            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
-        } catch (IOException e) {
-            msg = "Unable to load authentication credentials from defult location. " +
-                    "Try specifying the credentials location if credentials are required.";
-            _log.warn(msg);
-        }
-
-
-
-
-
-        _intiialized = true;
+        _intialized = true;
     }
 
     private String anyId2CacheId(String someId) throws WcsException {
