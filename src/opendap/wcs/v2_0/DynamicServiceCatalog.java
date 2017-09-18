@@ -2,13 +2,8 @@ package opendap.wcs.v2_0;
 
 import opendap.PathBuilder;
 import opendap.wcs.srs.SimpleSrs;
-import org.apache.http.HttpEntity;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
@@ -19,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import org.apache.commons.codec.binary.Hex;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -142,26 +135,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
         }
     }
 
-    private void writeRemoteContent(String url, OutputStream os) throws IOException, JDOMException {
-
-        _log.debug("writeRemoteContent() - URL: {}",url);
-
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(_credsProvider)
-                .build();
-
-        HttpGet httpGet = new HttpGet(url);
-        CloseableHttpResponse resp = httpclient.execute(httpGet);
-        try {
-            _log.debug("writeRemoteContent() - HTTP STATUS: {}",resp.getStatusLine());
-            HttpEntity entity1 = resp.getEntity();
-            entity1.writeTo(os);
-            EntityUtils.consume(entity1);
-        } finally {
-            resp.close();
-        }
-    }
-
 
     /**
      * Thread safe DMR acquisition and caching.
@@ -197,9 +170,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(cacheFile);
-                writeRemoteContent(dmrUrl,fos);
+                opendap.http.Util.writeRemoteContent(dmrUrl, _credsProvider, fos);
                 fos.close();
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
+                // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.
                 dmrElement.setAttribute("name",coverageId);
                 return dmrElement;
 

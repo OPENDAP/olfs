@@ -1037,8 +1037,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
         try {
-            Element dmrElement = opendap.xml.Util.getDocumentRoot(testDmrUrl);
-            dmrElement.detach();
+            Element dmrElement =
+                    opendap.xml.Util.getDocumentRoot(testDmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
             DynamicService ds = new DynamicService();

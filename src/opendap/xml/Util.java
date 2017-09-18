@@ -25,6 +25,13 @@
  */
 package opendap.xml;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -47,19 +54,21 @@ import java.util.regex.Pattern;
  */
 public class Util {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(Util.class);
-
-
-    public static Element loadXML(String fname)throws IOException, JDOMException{
-        File f = new File(fname);
-        return getDocumentRoot(f);
+    private static final Logger _log;
+    static {
+        _log = org.slf4j.LoggerFactory.getLogger(Util.class);
     }
 
     public static Element getDocumentRoot(File f)throws IOException, JDOMException {
+        Element root = null;
         Document cdDoc = getDocument(f);
-        Element root = cdDoc.getRootElement();
+        if(cdDoc!=null){
+            root = cdDoc.getRootElement();
+            root.detach();
+        }
         return root;
     }
+
     public static Document getDocument(File f)throws IOException, JDOMException{
 
         String msg;
@@ -67,18 +76,18 @@ public class Util {
 
         if(!f.exists()){
             msg = "Cannot find file: "+ f.getAbsoluteFile();
-            log.error(msg);
+            _log.error(msg);
             throw new IOException(msg);
         }
 
         if(!f.canRead()){
             msg = "Cannot read file: "+ f.getAbsoluteFile();
-            log.error(msg);
+            _log.error(msg);
             throw new IOException(msg);
         }
         if(!f.isFile()){
             msg = "The file " + f.getAbsoluteFile() +" is not actually a file.";
-            log.error(msg);
+            _log.error(msg);
             throw new IOException(msg);
         }
 
@@ -87,65 +96,123 @@ public class Util {
     }
 
     public static Document getDocument(InputStream f)throws IOException, JDOMException{
-
-        String msg;
         SAXBuilder sb = new SAXBuilder();
         return sb.build(f);
     }
 
-    public static Element  getDocumentRoot(String docUrlString)throws MalformedURLException, IOException, JDOMException {
 
+    /**
+     * Opens, parses, and returns the root JDOM Element of the XML docuument
+     * located at the supplied URL.
+     * The provided credentials will be consulted if an HTTP authentication challenge
+     * is encountered.
+     * @param docUrlString  The URL of the document to parse.
+     * @param credsProvider  The authentication credentials to use when encountering an
+     *                       HTTP authentication challenge
+     * @return The root JDOM of the Document produced by parsing the content retrieved from
+     *          docUrlString
+     * @throws IOException
+     * @throws JDOMException
+     */
+    static public Element  getDocumentRoot(String docUrlString, CredentialsProvider credsProvider)
+            throws IOException, JDOMException {
         Element docRoot = null;
-
-        Document doc = getDocument(docUrlString);
+        Document doc = getDocument(docUrlString,credsProvider);
         if(doc!=null){
             docRoot = doc.getRootElement();
             docRoot.detach();
         }
         return docRoot;
-
     }
 
-    public static Document getDocument(String docUrlString) throws MalformedURLException, IOException, JDOMException {
 
+    /**
+     * Opens, parses, and returns the XML docuument
+     * located at the supplied URL.
+     * The provided credentials will be consulted if an HTTP authentication challenge
+     * is encountered.
+     * @param docUrlString  The URL of the document to parse.
+     * @param credsProvider  The authentication credentials to use when encountering an
+     *                       HTTP authentication challenge
+     * @return The JDOM Document produced by parsing the content retrieved from
+     *         docUrlString
+     * @throws IOException
+     * @throws JDOMException
+     */     static public Document  getDocument(String docUrlString, CredentialsProvider credsProvider) throws IOException, JDOMException {
+
+        _log.debug("getDocument() - URL: {}",docUrlString);
         Document doc = null;
 
-        SAXBuilder sb = new SAXBuilder();
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider)
+                .build();
 
-
-        log.debug("Retrieving XML Document: "+docUrlString);
-
-        if(docUrlString.startsWith("http://") || docUrlString.startsWith("https://")){
-            URL docUrl = new URL(docUrlString);
-            log.debug("Document URL INFO: \n"+getUrlInfo(docUrl));
-            doc = sb.build(docUrl);
-
+        HttpGet httpGet = new HttpGet(docUrlString);
+        CloseableHttpResponse resp = httpclient.execute(httpGet);
+        try {
+            _log.debug("HTTP STATUS: {}",resp.getStatusLine());
+            HttpEntity entity1 = resp.getEntity();
+            doc = opendap.xml.Util.getDocument(entity1.getContent());
+            EntityUtils.consume(entity1);
+        } finally {
+            resp.close();
         }
-        else {
-            String fname =  docUrlString;
-            if (docUrlString.startsWith("file:")){
-
-                fname =  docUrlString.substring(5,docUrlString.length());
-
-                if(fname.startsWith("/")){
-                    while(fname.startsWith("/")){
-                        fname =  fname.substring(1);
-                    }
-                    fname = "/" + fname;
-                }
-            }
-            File f = new File(fname);
-
-            doc = getDocument(f);
-
-        }
-
-
-        log.debug("Loaded XML Document: \n"+xmlo.outputString(doc));
 
         return doc;
 
+    }
+
+
+    /**
+     * Opens, parses, and returns the root JDOM Element of the XML docuument
+     * located at the supplied filename path.
+     * @param filename The file to open.
+     * @return The root element of the document generated by SAX parsing the content of filenam
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static Element  getDocumentRoot(String filename)throws MalformedURLException, IOException, JDOMException {
+        Element docRoot = null;
+        Document doc = getDocument(filename);
+        if(doc!=null){
+            docRoot = doc.getRootElement();
+            docRoot.detach();
+        }
+        return docRoot;
+    }
+
+
+    /**
+     * Opens, parses, and returns  the JDOM Docuument
+     * located at the supplied filename path.
+     * @param filename The file to open.
+     * @return The JDOM Document generated by SAX parsing the content of filenam
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static Document getDocument(String filename) throws MalformedURLException, IOException, JDOMException {
+
+        _log.debug("getDocument() - Retrieving: "+filename);
+
+        Document doc = null;
+        SAXBuilder sb = new SAXBuilder();
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
+        String fname =  filename;
+        if (filename.toLowerCase().startsWith("file:")){
+            fname =  filename.substring(5,filename.length());
+            if(fname.startsWith("/")){
+                while(fname.startsWith("/")){
+                    fname =  fname.substring(1);
+                }
+                fname = "/" + fname;
+            }
+        }
+        File f = new File(fname);
+        doc = getDocument(f);
+        _log.debug("getDocument() - Loaded XML Document: \n"+xmlo.outputString(doc));
+        return doc;
     }
 
 
@@ -173,7 +240,9 @@ public class Util {
     }
 
     /**
-     *
+     *  Convert the passed string to an NCNAME by replacing any disallowed character
+     *  with n under score ("_") character. If needed this could expanded to a simple underscore
+     *  escaping scheme, because, why not...
      * @param s
      * @return
      */
