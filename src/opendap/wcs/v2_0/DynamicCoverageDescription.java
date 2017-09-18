@@ -601,10 +601,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             boolean varFitsCoverageSrs = variableDimensionsAreCompatibleWithSrs(dataset, var, srs);
             _log.debug("The variable dimensions{}match the SRS.", varFitsCoverageSrs ? " " : " DO NOT ");
-
-            boolean dimsMatchDataset = compareVariableDimensionsWithDataSet(var,dataset);
-
-            if (varFitsCoverageSrs && dimsMatchDataset ) {
+            
+            if (varFitsCoverageSrs ) {
                 DynamicService.FieldDef defaultFieldDef = _dynamicService.getFieldDefFromDapId(var.getName());
 
                 if (defaultFieldDef == null)
@@ -627,68 +625,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     }
 
-
-    /**
-     * @param var
-     * @param dataset
-     * @return
-     * @author uday
-     */
-    private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset) {
-        boolean flag = true;
-
-        List<Dim> vdims = var.getDims();
-        List<Dimension> dimensions = dataset.getDimensions();
-
-        if (vdims == null || dimensions == null || vdims.isEmpty() || dimensions.isEmpty()) {
-            return false;
-        }
-        if (vdims.size() != dimensions.size()) {
-            _log.debug("OOPS! Variable '" + var.getName() + "' has " + vdims.size() + " dimensions, while the parent Dataset has " + dimensions.size());
-            return false;
-        }
-
-
-        _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
-        for (Dim varDim : var.getDims()) {
-            boolean found = false;
-            String dimName = varDim.getName();
-
-            Dimension datasetDimension = dataset.getDimension(dimName);
-            if(datasetDimension!=null){
-                found=true;
-            }
-                /*
-            if (dimName.charAt(0) == '/')
-                dimName = dimName.substring(1);
-
-
-            _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
-            for (Dimension dimension : dataset.getDimensions()) {
-                _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName());
-                // probably need a better test
-                if (dimName.equalsIgnoreCase(dimension.getName()))
-                    found = true;
-            }
-            */
-            if (found) {
-                _log.debug("Dimension " + dimName + " found in Dataset");
-                continue;
-            } else {
-                _log.debug("Dimension " + dimName + " NOT found in DataSet");
-                flag = false;
-                break;
-            }
-        }
-
-        if (flag) {
-            _log.debug("All dimensions in DAP variable '" + var.getName() + "' match the Dataset dimensions, so it will be included in WCS coverage ");
-        } else {
-            _log.debug("All dimensions in DAP variable '" + var.getName() + "' did NOT match Dataset dimensions, so it will be NOT included in WCS coverage ");
-        }
-
-        return flag;
-    }
 
     /**
      * Compares the dataset Dimensions of the DAP Variable _var_ with
