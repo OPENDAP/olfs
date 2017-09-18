@@ -743,7 +743,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT " +
                         "have the same dimension name as the variable.");
             }
-            ////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////
 
             //////////////////////////////////////////////////////////////////////////
             // TEST
@@ -759,9 +759,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 weveGotIssuesMan.add("OUCH! SRS domainCoordinate dapId '" + domainCoordinate.getDapID() + "' " +
                         "DOES NOT match the dimension name '" + dapVarDatasetDimension.getName() + "'");
             }
-            ////////////////////////////////////////////////////////////////////
-            
-            ////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////
+
+            //////////////////////////////////////////////////////////////////////////
             // TEST
             // Compare the size of the domainCordinate for this dimension with the
             // size of the Dataset Dimension referecned by the variables Dim for
@@ -773,7 +773,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 weveGotIssuesMan.add("OUCH! SRS domainCoordinate size '" + domainCoordinate.getSize() + "' " +
                         "DOES NOT match the dimension size '" + dapVarDatasetDimension.getSize() + "'");
             }
-            ////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////
         }
         if (!weveGotIssuesMan.isEmpty()) {
             _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.\n");
