@@ -32,6 +32,18 @@ import java.util.*;
 
 import static java.lang.Double.NaN;
 
+/**
+ * This class embodies the mapping between a DAP DMR and a WCS Coverage.
+ * It's main trick is that it can, utilizing a DMR document as input
+ * to it's constructor, output a wc:CoverageDescription document
+ * representing the DAP dataset. It also serves the operational
+ * role in the service, mapping WCS requests into DAP requests
+ * that are used to provide the expected WCS response content.
+ *
+ *
+ *  TODO This class needs a thoughful "serialization" to perisit itself so that we don't have to do the dynamic part every single time.
+ *
+ */
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
@@ -824,8 +836,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Makes sure that the field name is an NCNAME...
         String  fieldNcName = var.getName();
-        if(!opendap.xml.Util.isNCNAME(var.getName()))
-            fieldNcName =  opendap.xml.Util.convertToNCNAME(var.getName());
+        if(!opendap.xml.Util.isNCNAME(var.getName())) {
+            // it's not an NCNAME. Is there default supplied?
+            fieldNcName = fieldDef.name;
+            if(fieldNcName == null)  {
+                // nope, we'll punt...
+                fieldNcName = opendap.xml.Util.convertToNCNAME(var.getName());
+            }
+        }
         field.setName(fieldNcName);
 
         String description = var.getAttributeValue("long_name");

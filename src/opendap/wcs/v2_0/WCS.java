@@ -293,7 +293,7 @@ public class WCS {
 
     public static void checkTimePosition(Element e) throws WcsException{
         checkNamespace(e,"timePosition",WCS.GML_NS);
-        //@todo Check the content of gml:timePosition
+        //TODO Check the content of gml:timePosition
 
 
     }
@@ -313,7 +313,7 @@ public class WCS {
             throw new WcsException("wcs:TimePeriod MUST have a wcs:EndPosition element ",
                     WcsException.MISSING_PARAMETER_VALUE,"wcs:EndPosition");
 
-        //@todo Check the content of wcs:BeginPosition and wcs:EndPosition
+        //TODO Check the content of wcs:BeginPosition and wcs:EndPosition
     }
 
 

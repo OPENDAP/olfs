@@ -174,7 +174,6 @@ public class DynamicService {
                     borked = true;
                 }
             }
-
             if(borked){
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                 String badFieldHeader =  "Bad FieldDef: "+ xmlo.outputString(fieldElement);

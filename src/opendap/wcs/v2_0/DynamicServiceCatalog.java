@@ -125,10 +125,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
         List<Element> dynamicServices = config.getChildren("DynamicService");
         for(Element dsElement:dynamicServices) {
             DynamicService dynamicService = new DynamicService(dsElement);
-            //TODO Check return value to see if an exisiting DynamicService got pushed out when we put
             DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
             if(previous!=null){
-                _log.warn("The addtion of the DynamicService called ");
+                //FIXME Do we care that something was in the way? I think so...
+                _log.warn("The addtion of the DynamicService: {} bumped this instance from the map:{}",
+                        dynamicService.toString(),previous.toString());
             }
         }
 
@@ -212,6 +213,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
         return false;
     }
 
+    /**
+     * TODO In this method should be set up to utilize a cached instance of the DynamicCoverageDescription object as the getDMR() method does for the DMR document.
+     * @param coverageId The Coverage ID (wcs:Identifier)
+     * @return
+     * @throws InterruptedException
+     * @throws WcsException
+     */
     @Override
     public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException {
 
