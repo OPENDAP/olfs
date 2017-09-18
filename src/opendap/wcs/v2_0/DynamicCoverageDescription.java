@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
 
@@ -421,10 +420,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         BoundingShapeType boundedBy;
         if (params.beginDate == null || params.endDate == null) {
             _log.warn("Failed to determine time period information. Need a fall back..");
-            boundedBy = getEnvelope(params);
+            boundedBy = getBoundedByWithEnvelope(params);
         }
         else {
-            boundedBy = getEnvelopeWitTimePeriod(params);
+            boundedBy = getBoundedByWithEnvelopeWithTimePeriod(params);
         }
         // Add BoundedBy to the coverage
         cd.setBoundedBy(boundedBy);
@@ -438,10 +437,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      *
-     * @param params An instance of BoundedByAndDomainSetParams containing the information needed to build the gml:Envelope.
+     * @param params An instance of BoundedByAndDomainSetParams containing
+     *               the information needed to build the gml:Envelope.
      * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:Envelope
      */
-    private BoundingShapeType getEnvelope(BoundedByAndDomainSetParams params){
+    private BoundingShapeType getBoundedByWithEnvelope(BoundedByAndDomainSetParams params){
 
         EnvelopeType envelope = new EnvelopeType();
 
@@ -449,9 +449,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         envelope.setAxisLabels(srs.getAxisLabelsList());
         envelope.setSrsName(srs.getName());
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // default to EPSG 4326 - or WGS 84 - or use "SRS" instead of "CRS"
-        // both are equivalent spatial reference systems for the ENTIRE globe
 
         envelope.setSrsName(srs.getName());
         envelope.setAxisLabels(srs.getAxisLabelsList());
@@ -480,7 +477,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      *               needed to build the gml:EnvelopeWithTimePeriod.
      * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:EnvelopeWithTimePeriod
      */
-    private BoundingShapeType getEnvelopeWitTimePeriod(BoundedByAndDomainSetParams params) throws WcsException {
+    private BoundingShapeType getBoundedByWithEnvelopeWithTimePeriod(BoundedByAndDomainSetParams params) throws WcsException {
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod etp = new EnvelopeWithTimePeriod();
@@ -714,7 +711,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // Get the next coordinate/axis name from the SRS
             String axisLabel = axisLabelIter.previous();
 
-            // Find the DomainCoordinate associated with theis axis
+            // Find the DomainCoordinate associated with this axis
             DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
             
             // Find the DAP Variable referenced by the DomainCoordinate
@@ -722,7 +719,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             //////////////////////////////////////////////////////////////////////////
             // TEST
-            // TODO My getting only the first Dim and not checking futher we assume that the domainCoordinateVariable is single dimensioned. While the case for now this will have to be modifed in the future to accomodate multidimensional DomainCoordinate variables.
+            // Compare the variable's Dim for this dimension with
+            // the DomainCoordinate's DAP Variable shared Dimension ref.
+            // TODO By getting only the first Dim and not checking further we assume that the domainCoordinateVariable is single dimensioned. This bit will have to be modifed in the future to accomodate multidimensional DomainCoordinate variables.
             List<Dim> dims = domainCoordinateVariable.getDims();
             Dim domainCoordVarDim = dims.get(0);   // TODO Someday there may be multidimensional DomainCoordinates.
             if (domainCoordVarDim.getName().equals(dapVarDim.getName())) {
@@ -749,8 +748,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
             
             ////////////////////////////////////////////////////////////////////
             // TEST
+            // Compare the size of the domainCordinate for this dimension with the
+            // size of the Dataset Dimension referecned by the variables Dim for
+            // this dimension.
             // FIXME This next test maybe redundant since we have already confirmed that the current dapVarDim and the domainCoordVarDim  both reference the Dataset Dimension
-            // Compare the sizes.
             if (domainCoordinate.getSize() == dapVarDatasetDimension.getSizeAsLong()) {
                 _log.debug("woot.  domainCoordinate.size() matches dimension.size()");
             } else {
@@ -802,10 +803,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         */
-
-
     }
-
 
     /**
      * Generates a swe:Field from Dap4 variable.
