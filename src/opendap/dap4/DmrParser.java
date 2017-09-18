@@ -51,7 +51,9 @@ public class DmrParser {
 	Dataset dataset=null;
 	try
 	{
-	  Document dmr = tcc.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml");
+	  Document dmr = opendap.xml.Util.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml",
+			  opendap.http.Util.getNetRCCredentialsProvider());
+
 	  dmrXml = tcc.getXmlo().outputString(dmr);
 	  
 	  InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));

@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

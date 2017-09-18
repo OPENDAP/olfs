@@ -283,9 +283,6 @@ public class Util {
     public static String WHITE_SPACE_REGEX_STRING = "\\s+";
 
 
-
-
-
     public static String dropSuffixFrom(String s, Pattern suffixPattern){
 
         Logger log =  LoggerFactory.getLogger(Util.class);

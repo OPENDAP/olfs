@@ -1,6 +1,7 @@
 package opendap.wcs.v2_0;
 
 import net.opengis.gml.v_3_2_1.*;
+import net.opengis.swecommon.v_2_0.DataRecordPropertyType;
 import net.opengis.swecommon.v_2_0.DataRecordType;
 import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
@@ -31,6 +32,18 @@ import java.util.*;
 
 import static java.lang.Double.NaN;
 
+/**
+ * This class embodies the mapping between a DAP DMR and a WCS Coverage.
+ * It's main trick is that it can, utilizing a DMR document as input
+ * to it's constructor, output a wc:CoverageDescription document
+ * representing the DAP dataset. It also serves the operational
+ * role in the service, mapping WCS requests into DAP requests
+ * that are used to provide the expected WCS response content.
+ *
+ *
+ *  TODO This class needs a thoughful "serialization" to perisit itself so that we don't have to do the dynamic part every single time.
+ *
+ */
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
     private Element _myDMR;
@@ -55,12 +68,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _myDMR = dmr;
 
         if (dynamicService == null)
-            throw new WcsException("There must be a DynamicService associated with the coverage!", WcsException.NO_APPLICABLE_CODE);
+            throw new WcsException("There must be a DynamicService associated with the coverage!",
+                    WcsException.NO_APPLICABLE_CODE);
         _dynamicService = dynamicService;
-
 
         ingestDmr(dmr);
 
+        // If it all went south we just make an empt one as null fighting punt.
         if (_myCD == null) {
             _myCD = new Element("CoverageDescription", WCS.WCS_NS);
             Element coverageId = new Element("CoverageId", WCS.WCS_NS);
@@ -95,17 +109,20 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         ingestSrsFromDataset(dataset, _dynamicService.getSrs());
         ingestDomainCoordinates(dataset);
-        addEnvelopeWithTimePeriod(cd, dataset);
-        addRange(cd, dataset);
+        addBoundedByAndDomainSet(cd, dataset,_srs);
+        addRange(cd, dataset, _srs);
 
+        // Last Step, woot.
+        // Produce the JDOM object for the CoverageDescription
         _myCD = coverageDescriptionType2JDOM(cd);
 
-        if(_log.isDebugEnabled()){
+        if (_log.isDebugEnabled()) {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            _log.debug("ingestDMR() - END  Built CoverageDescription:\n{}",xmlo.outputString(_myCD));
+            _log.debug("ingestDMR() - END  Built CoverageDescription:\n{}", xmlo.outputString(_myCD));
         }
 
     }
+
     /**
      * Uses JAXB to build a Dataset object from the passed DMR.
      *
@@ -142,6 +159,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * Adds wcs:ServiceParameters section to the CoverageDescription
+     *
      * @param cd The instance of CoverageDescriptionType to which to add the stuff.
      * @throws WcsException
      */
@@ -158,11 +176,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
-
     /**
      * This method will (in the future) examine the DAP Dataset and see if an SRS reference for the Dataset
      * can be located. Lacking such a reference the default SRS will be utilized.
-     * @param dataset The dataset to examine.
+     *
+     * @param dataset    The dataset to examine.
      * @param defaultSrs The default SRS.
      */
     public void ingestSrsFromDataset(Dataset dataset, SimpleSrs defaultSrs) {
@@ -227,16 +245,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
             } catch (NumberFormatException nfe) {
                 _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
             }
-
-
             domainCoordinate = new DomainCoordinate(
-                    coordinateName,
-                    coordinateVariable.getName(),
-                    units,
+                    coordinateName,  // This is the WCS coordinate name as defined in the SRS
+                    coordinateVariable.getName(), // This is the name of the cooresponding DAP variable
+                    units,  // The units string, typically deg or the like
                     "",
                     size,
                     coordinateName);
-            
+
         } else {
             domainCoordinate = new DomainCoordinate(defaultCoordinate);
         }
@@ -258,7 +274,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      */
     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {
 
-        if(!dataset.usesCfConventions())
+        if (!dataset.usesCfConventions())
             _log.warn("Dataset does not appear conform to the CF convention. YMMV... Dataset: {}", this.getDapDatasetUrl());
 
         // proceed to look for it anyway, returning null if not found
@@ -300,46 +316,47 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * This class is a C style structure to hold the longthy
      * parameter list required for building the TimePeriodWithEnvelope
      */
-    class EnvelopeWithTimePeriodParams {
+    class BoundedByAndDomainSetParams {
+        SimpleSrs srs;
         String coverageID;
         String beginDate;
         String endDate;
         Vector<Double> lowerCorner;
         Vector<Double> upperCorner;
         double origin_lat, origin_lon;
-        long   latitudeSize;
+        long latitudeSize;
         double latitudeResolution;
-        long   longitudeSize;
+        long longitudeSize;
         double longitudeResolution;
 
         // This little constructor ensures the collections are never null;
-        EnvelopeWithTimePeriodParams(){
+        BoundedByAndDomainSetParams() {
             lowerCorner = new Vector<>();
             upperCorner = new Vector<>();
         }
     }
 
     /**
-     * I added this layer so that we could get a clear idea of all of the searching, QC, and default values
-     * that we will need to have for build the EnvelopeWithTimePeriod. Every one of these has to be checked and QC's
+     * This is the first step in a two step process:. Here we collect and QC the information
+     * needed to build the DomainSet and Envlope. If time information can be found then an
+     * EnvelopeWithTimePeriod is built otherwise a simple Envelope is built. The DomainSet
+     * is added in eithe case.
      *
-     * Note that the DomainCoordinates must be sorted out by calling ingestDomainCoordinates() prior to calling
-     * this method.
-     *
-     * @param cd The CoverageDescription to which to add the EnvelopeWithTimePeriod.
+     * @param cd The CoverageDescription to which to add the DomainSet and ENvelope content.
      * @param dataset The DAP dataset to query for the information needed.
      */
-    private void addEnvelopeWithTimePeriod(CoverageDescriptionType cd, Dataset dataset) throws WcsException{
+    private void addBoundedByAndDomainSet(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
 
-        EnvelopeWithTimePeriodParams ewtpp = new EnvelopeWithTimePeriodParams();
+        BoundedByAndDomainSetParams ewtpp = new BoundedByAndDomainSetParams();
 
+        ewtpp.srs = srs;
         ewtpp.coverageID = cd.getCoverageId();
-        
-        for (String axisLabel : _srs.getAxisLabelsList()) {
+
+        for (String axisLabel : srs.getAxisLabelsList()) {
             DomainCoordinate dc = getDomainCoordinate(axisLabel);
             if (dc == null)
                 throw new WcsException("Failed to locate DomainCoordinate for SRS axis '" +
-                        axisLabel+"'", WcsException.NO_APPLICABLE_CODE);
+                        axisLabel + "'", WcsException.NO_APPLICABLE_CODE);
             double min = dc.getMin();
             double max = dc.getMax();
             if (dc.getName().equalsIgnoreCase("latitude")) {
@@ -347,15 +364,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("NorthernmostLatitude", max);
                 ewtpp.origin_lat = min;
                 ewtpp.latitudeSize = dc.getSize();
-                ewtpp.latitudeResolution = max-min/dc.getSize();
+                ewtpp.latitudeResolution = max - min / dc.getSize();
 
-            }
-            else if (dc.getName().equalsIgnoreCase("longitude")) {
+            } else if (dc.getName().equalsIgnoreCase("longitude")) {
                 min = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("EasternmostLongitude", min);
                 max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("WesternmostLongitude", max);
                 ewtpp.origin_lon = min;
                 ewtpp.longitudeSize = dc.getSize();
-                ewtpp.longitudeResolution = max-min/dc.getSize();
+                ewtpp.longitudeResolution = max - min / dc.getSize();
             }
             ewtpp.lowerCorner.add(min);
             ewtpp.upperCorner.add(max);
@@ -363,9 +379,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // Since time is special in WCS land we have to handle it special
         // First we attempt assign the default time values from the time coordinate
-        String date,time;
+        String date, time;
         DomainCoordinate timeCoordinate = getDomainCoordinate("time");
-        if(timeCoordinate!=null){
+        if (timeCoordinate != null) {
             String timeUnits = timeCoordinate.getUnits();
             double timeVal = timeCoordinate.getMin();
             Date beginDate = TimeConversion.getTime(timeVal, timeUnits);
@@ -374,71 +390,146 @@ public class DynamicCoverageDescription extends CoverageDescription {
             timeVal = timeCoordinate.getMax();
             Date endDate = TimeConversion.getTime(timeVal, timeUnits);
             ewtpp.endDate = TimeConversion.formatDateInGmlTimeFormat(endDate);
-        }
-        else {
-            _log.warn("addEnvelopeWithTimePeriod() - No coordinate for 'time' could be located. A default time period will not be utilized.");
+        } else {
+            _log.warn("addBoundedByAndDomainSet() - No coordinate for 'time' could be located. A default time period will not be utilized.");
         }
 
         // Look for obvious start time information in the  Dataset metadata.
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
-        if(date!=null && time!=null){
-            ewtpp.beginDate = date +"T"+time+"Z";
-        }
-        else {
-            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+        if (date != null && time != null) {
+            ewtpp.beginDate = date + "T" + time + "Z";
+        } else {
+            // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
 
         // Look for obvious end time information in the  Dataset metadata.
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
-        if(date!=null && time!=null){
-            ewtpp.endDate = date +"T"+time+"Z";
+        if (date != null && time != null) {
+            ewtpp.endDate = date + "T" + time + "Z";
+        } else {
+            // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+        }
+
+        addBoundedByAndDomainSet(cd,ewtpp);
+
+    }
+
+    /**
+     * Adds BoundedBy and DomainSet objects to the CoverageDescription.
+     * The BoundedBy is built conditionally based on the presence of time bounds. If the time
+     * bounds are missing or incomplete  a gml:Envelope will be included, otherwise a
+     * gml:EnvelopeWithTimePeriod will be included in the BoundedBy
+     * @param cd An instance of CoverageDescriptionType to which to add stuff
+     * @param params  An initialized instance BoundedByAndDomainSetParams, no bad values man.
+     * @throws WcsException When the bad things happen.
+     */
+    private void addBoundedByAndDomainSet(CoverageDescriptionType cd, BoundedByAndDomainSetParams params) throws WcsException {
+        // Construct the BoundedBy element - a wrapper for the more informative Envelope
+        // and EnvelopeWithTimePeriod content
+        ObjectFactory gmlFactory = new ObjectFactory();
+        BoundingShapeType boundedBy;
+        if (params.beginDate == null || params.endDate == null) {
+            _log.warn("Failed to determine time period information. Need a fall back..");
+            boundedBy = getBoundedByWithEnvelope(params);
         }
         else {
-            // TODO uh... not sure how to pun here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
+            boundedBy = getBoundedByWithEnvelopeWithTimePeriod(params);
         }
+        // Add BoundedBy to the coverage
+        cd.setBoundedBy(boundedBy);
 
-        // FIXME at this point the time bounds for the envelope may be empty We should check and then build an envelope sans time if there's no time info, and print a warning...
+        // Get the Domain Set
+        DomainSetType domainSet = getDomainSet(params);
 
+        // Add the DomainSet to the coverages.
+        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
+    }
 
-        constructEnvelopeWithTimePeriod(cd, ewtpp);
+    /**
+     *
+     * @param params An instance of BoundedByAndDomainSetParams containing
+     *               the information needed to build the gml:Envelope.
+     * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:Envelope
+     */
+    private BoundingShapeType getBoundedByWithEnvelope(BoundedByAndDomainSetParams params){
+
+        EnvelopeType envelope = new EnvelopeType();
+
+        SimpleSrs srs = params.srs;
+
+        envelope.setAxisLabels(srs.getAxisLabelsList());
+        envelope.setSrsName(srs.getName());
+
+        envelope.setSrsName(srs.getName());
+        envelope.setAxisLabels(srs.getAxisLabelsList());
+        envelope.setUomLabels(srs.getUomLabelsList());
+        envelope.setSrsDimension(BigInteger.valueOf(srs.getSrsDimension()));
+
+        DirectPositionType envelopeLowerCorner = new DirectPositionType();
+        envelopeLowerCorner.setValue(params.lowerCorner);
+        envelope.setLowerCorner(envelopeLowerCorner);
+
+        DirectPositionType envelopeUpperCorner = new DirectPositionType();
+        envelopeUpperCorner.setValue(params.upperCorner);
+        envelope.setUpperCorner(envelopeUpperCorner);
+
+        BoundingShapeType bs = new BoundingShapeType();
+        ObjectFactory gmlFactory = new ObjectFactory();
+        bs.setEnvelope(gmlFactory.createEnvelope(envelope));
+
+        return bs;
     }
 
     /**
      * Build a gml:EnvelopeWithTimePeriod using the passed parameter structure.
-     * @param cd
-     * @param ewtpp
+     *
+     * @param params An instance of BoundedByAndDomainSetParams containing the information
+     *               needed to build the gml:EnvelopeWithTimePeriod.
+     * @return  An instance of BoundingShapeType (aka BoundedBy) containing a gml:EnvelopeWithTimePeriod
      */
-    private void constructEnvelopeWithTimePeriod(CoverageDescriptionType cd, EnvelopeWithTimePeriodParams ewtpp) throws WcsException {
+    private BoundingShapeType getBoundedByWithEnvelopeWithTimePeriod(BoundedByAndDomainSetParams params) throws WcsException {
 
         // compute the envelope from dataset
         EnvelopeWithTimePeriod etp = new EnvelopeWithTimePeriod();
-
-        etp.addLowerCornerCoordinateValues(ewtpp.lowerCorner);
-        etp.addUpperCornerCoordinateValues(ewtpp.upperCorner);
-
-        etp.setBeginTimePosition(ewtpp.beginDate);
-        etp.setEndTimePosition(ewtpp.endDate);
+        etp.addLowerCornerCoordinateValues(params.lowerCorner);
+        etp.addUpperCornerCoordinateValues(params.upperCorner);
+        etp.setBeginTimePosition(params.beginDate);
+        etp.setEndTimePosition(params.endDate);
 
         _log.debug(etp.toString());
 
-        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(_srs);
-
+        net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(params.srs);
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
 
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+        return bs;
+    }
+
+    /**
+     *
+     * @param params An instance of BoundedByAndDomainSetParams containing the information needed to build the
+     *              components of the DomainSet.
+     * @return  An instance of DomainSetType (aka DomainSet) based on the passed params.
+     */
+    public DomainSetType getDomainSet(BoundedByAndDomainSetParams params){
         // Grid Envelope
+        ObjectFactory gmlFactory = new ObjectFactory();
         net.opengis.gml.v_3_2_1.GridEnvelopeType gridEnvelope = gmlFactory.createGridEnvelopeType();
+
+        SimpleSrs srs = params.srs;
 
         ////////////////////////////////////////////////////////////
         // Crucial member variable state setting...
         // Note: The index values for the arrays are 0 based and so the upper index is
         // one less than the size.
         List<BigInteger> upper = Arrays.asList(
-                BigInteger.valueOf(ewtpp.latitudeSize - 1),
-                BigInteger.valueOf(ewtpp.longitudeSize - 1));
+                BigInteger.valueOf(params.latitudeSize - 1),
+                BigInteger.valueOf(params.longitudeSize - 1));
         List<BigInteger> lower = Arrays.asList(BigInteger.ZERO, BigInteger.ZERO);
         gridEnvelope.withHigh(upper).withLow(lower);
         ////////////////////////////////////////////////////////////
@@ -450,40 +541,40 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // Make the RectifiedGridType instance
         DomainSetType domainSet = new net.opengis.gml.v_3_2_1.DomainSetType();
         RectifiedGridType rectifiedGrid = new net.opengis.gml.v_3_2_1.RectifiedGridType();
-        rectifiedGrid.setId("RectifiedGrid-"+ewtpp.coverageID);
-        rectifiedGrid.setDimension(BigInteger.valueOf(_srs.getSrsDimension()));
-        rectifiedGrid.setAxisLabels(_srs.getAxisLabelsList());
+        rectifiedGrid.setId("RectifiedGrid-" + params.coverageID);
+        rectifiedGrid.setDimension(BigInteger.valueOf(srs.getSrsDimension()));
+        rectifiedGrid.setAxisLabels(srs.getAxisLabelsList());
         rectifiedGrid.setLimits(gridLimits);
 
         // Create the Origin.
         DirectPositionType position = gmlFactory.createDirectPositionType();
-        position.withValue(ewtpp.origin_lat, ewtpp.origin_lon);
+        position.withValue(params.origin_lat, params.origin_lon);
         PointType point = gmlFactory.createPointType();
         point.withPos(position);
-        point.setId("GridOrigin-" + ewtpp.coverageID);
-        point.setSrsName(_srs.getName());
+        point.setId("GridOrigin-" + params.coverageID);
+        point.setSrsName(srs.getName());
         PointPropertyType origin = gmlFactory.createPointPropertyType();
         origin.withPoint(point);
         rectifiedGrid.setOrigin(origin);
-
         // Create the offset vectors .
         List<VectorType> offsetList = new ArrayList<VectorType>();
         VectorType offset1 = gmlFactory.createVectorType();
 
-        offset1.withValue(ewtpp.latitudeResolution, 0.0);
-        offset1.setSrsName(_srs.getName());
+        offset1.withValue(params.latitudeResolution, 0.0);
+        offset1.setSrsName(srs.getName());
         offsetList.add(offset1);
         VectorType offset2 = gmlFactory.createVectorType();
 
-        offset2.withValue(0.0, ewtpp.longitudeResolution);
-        offset2.setSrsName(_srs.getName());
+        offset2.withValue(0.0, params.longitudeResolution);
+        offset2.setSrsName(srs.getName());
         offsetList.add(offset2);
         rectifiedGrid.setOffsetVector(offsetList);
 
         domainSet.setAbstractGeometry(gmlFactory.createRectifiedGrid(rectifiedGrid));
-        cd.setDomainSet(gmlFactory.createDomainSet(domainSet));
-        cd.setBoundedBy(bs);
+
+        return domainSet;
     }
+
 
 
     /**
@@ -493,28 +584,34 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param cd
      * @param dataset
      */
-    private void addRange(CoverageDescriptionType cd, Dataset dataset) throws WcsException {
-        net.opengis.swecommon.v_2_0.DataRecordPropertyType rangeType = new net.opengis.swecommon.v_2_0.DataRecordPropertyType();
-        net.opengis.swecommon.v_2_0.DataRecordType dataRecord = new net.opengis.swecommon.v_2_0.DataRecordType();
-        List<net.opengis.swecommon.v_2_0.DataRecordType.Field> fieldList = new ArrayList<>();
-
+    private void addRange(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
+        DataRecordPropertyType rangeType = new DataRecordPropertyType();
+        DataRecordType dataRecord = new DataRecordType();
+        List<DataRecordType.Field> fieldList = new ArrayList<>();
 
         for (Variable var : dataset.getVariables()) {
-            if (compareVariableDimensionsWithDataSet(var, dataset)) {
-                DynamicService.FieldDef fieldDef = _dynamicService.getFieldDefFromDapId(var.getName());
 
-                if(fieldDef==null)
-                    _log.warn("addRange() - No defaults WCS mapping was located for DAP variable '"+var.getName()+"'");
+            boolean varFitsCoverageSrs = variableDimensionsAreCompatibleWithSrs(dataset, var, srs);
+            _log.debug("The variable dimensions{}match the SRS.", varFitsCoverageSrs ? " " : " DO NOT ");
 
-                DataRecordType.Field sweField = buildSweFieldFromDapVar(var,fieldDef);
-                if(sweField!=null)
-                    fieldList.add(buildSweFieldFromDapVar(var, fieldDef));
+            boolean dimsMatchDataset = compareVariableDimensionsWithDataSet(var,dataset);
+
+            if (varFitsCoverageSrs && dimsMatchDataset ) {
+                DynamicService.FieldDef defaultFieldDef = _dynamicService.getFieldDefFromDapId(var.getName());
+
+                if (defaultFieldDef == null)
+                    _log.warn("addRange() - No defaults WCS mapping was located for DAP variable '" + var.getName() + "'");
+
+                DataRecordType.Field sweField = buildSweFieldFromDapVar(var, defaultFieldDef);
+                if (sweField != null)
+                    fieldList.add(sweField);
                 else
-                    _log.warn("Failed to convert DAP variable '{}' to an swe:Field object. SKIPPING",var.getName());
+                    _log.warn("Failed to convert DAP variable '{}' to an swe:Field object. SKIPPING", var.getName());
+
             }
         }
-        if(fieldList.isEmpty())
-            throw new WcsException("Failed to generate swe:Field elements from DAP variables. There Is No Coverage Here.",WcsException.NO_APPLICABLE_CODE);
+        if (fieldList.isEmpty())
+            throw new WcsException("Failed to generate swe:Field elements from DAP variables. There Is No Coverage Here.", WcsException.NO_APPLICABLE_CODE);
 
         dataRecord.setField(fieldList);
         rangeType.setDataRecord(dataRecord);
@@ -523,14 +620,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
     }
 
 
-
     /**
-     * I _think_ the goal here is too decide if the variable has the semantics of a WCS Covergage
-     *
-     * // FIXME this evaluation is flawed because it depends on the dataset having exactly the same top level dimensions as declared in the candidate coverage variable. A different more reliabel test is required.
      * @param var
      * @param dataset
      * @return
+     * @author uday
      */
     private boolean compareVariableDimensionsWithDataSet(Variable var, Dataset dataset) {
         boolean flag = true;
@@ -549,7 +643,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
                 for (Dimension dimension : dataset.getDimensions()) {
                     _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName());
-
                     // probably need a better test
                     if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
                 }
@@ -564,7 +657,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             }
         } else {
             flag = false;
-            _log.debug("Variable " + var.getName() + " has " + vdims.size() + " dimensions, while Dataset has " + dimensions.size());
+            _log.debug("OOPS! Variable '" + var.getName() + "' has " + vdims.size() + " dimensions, while the parent Dataset has " + dimensions.size());
         }
 
         if (flag) {
@@ -574,6 +667,154 @@ public class DynamicCoverageDescription extends CoverageDescription {
         }
 
         return flag;
+    }
+
+    /**
+     * Compares the dataset Dimensions of the DAP Variable _var_ with
+     * the associated SRS DomainCoordinate's DAP variable. In particular
+     * comparsiom is made by working in reverse order through the dimensions of the SRS
+     * and the varable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
+     * then it's a positive result.
+     *
+     * @param dataset The Dataset that's being turned into a coverage.
+     * @param dapVar     The variable to be evaluated.
+     * @param srs     The SRS which to compare the variable against.
+     * @return True when the DAP variable is dimensionally SRS conformant.
+     */
+    private boolean variableDimensionsAreCompatibleWithSrs(Dataset dataset, Variable dapVar, SimpleSrs srs) {
+
+        if (dataset == null || dapVar == null || srs == null)
+            return false;
+
+        boolean result = true;
+        Vector<String> weveGotIssuesMan = new Vector<>();
+        List<Dim> dapVarDims = dapVar.getDims();
+        ListIterator<Dim> dapVarDimIter = dapVarDims.listIterator(dapVarDims.size());
+
+        List<String> srsAxisLabels = srs.getAxisLabelsList();
+        ListIterator<String> axisLabelIter = srsAxisLabels.listIterator(srsAxisLabels.size());
+
+        if (dapVarDims.size() < srsAxisLabels.size())
+            weveGotIssuesMan.add("OUCH! SRS has more dimensions (" + srs.getSrsDimension() + " " +
+                    "than the variable " + dapVar.getName() + " which has " + dapVarDims.size() + " dimensions.");
+
+        // Check to see that the DAP variable dapVar the same crucial dimensions as the Coverage SRS
+        // Since we know that this all hinges on  the inner most (last) dimensions matching because
+        // in DAP land that's how we can get multidimensional arrays into WCS, by focusing on the
+        // last dims. Anyway, thus, we iterate backwards across the SRS DomainCoordinates and the
+        // the DAP variable's dimensions. The DomainCoordinate's dapVar is collected and it's Dim
+        // reference (there should only be one because in the WCS and DAP models 'dimensions' are
+        // one dimensional items). We verify that the domainCoordDapVarDim  references the
+        // same Dataset Dimension  as the variable dapVar does in the dimension being assessed.
+        //
+        // Aditional tests are performed that need reviewed and possibly dropped:
+        //
+        // -  Compare the name of the  domainCoordDapVar to the name of the dapVarDatasetDimension
+        //    (Bad assumotion? I don't believe they are always the same.)
+        // - Compare the size of the domainCoordinate and dapVarDatasetDimension
+        //   (Redundant? See comment below)
+        //
+        //
+        while (axisLabelIter.hasPrevious() && dapVarDimIter.hasPrevious()) {
+
+            // The next dimension reference from the DAP variable
+            Dim dapVarDim = dapVarDimIter.previous();
+
+            // Get the next coordinate/axis name from the SRS
+            String axisLabel = axisLabelIter.previous();
+
+            // Find the DomainCoordinate associated with this axis
+            DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
+            
+            // Find the DAP Variable referenced by the DomainCoordinate
+            Variable domainCoordinateVariable = dataset.getVariable(domainCoordinate.getDapID());
+
+            //////////////////////////////////////////////////////////////////////////
+            // TEST
+            // Compare the variable's Dim for this dimension with
+            // the DomainCoordinate's DAP Variable shared Dimension ref.
+            // TODO By getting only the first Dim and not checking further we assume that the domainCoordinateVariable is single dimensioned. This bit will have to be modifed in the future to accomodate multidimensional DomainCoordinate variables.
+            List<Dim> dims = domainCoordinateVariable.getDims();
+            Dim domainCoordVarDim = dims.get(0);   // TODO Someday there may be multidimensional DomainCoordinates.
+            if (domainCoordVarDim.getName().equals(dapVarDim.getName())) {
+                _log.debug("woot. The domainCoordinate DAP variable references the same dimension name as the variable.");
+            } else {                                                                                                                        weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT have the same dimension name as the variable.");
+            }
+            ////////////////////////////////////////////////////////////////////
+
+            //////////////////////////////////////////////////////////////////////////
+            // TEST
+            // Check to see if the domainCoordinate is associate with the DAP variable with the same name as the
+            // Dimension we grabbed from the Dataset.
+            // FIXME Is this a bogus test? I think maybe so because the name of the "dimension" may not be the name of the Array that holds the data for the dimension.
+            // Get the Dimension instance referenced by the Dim from the Dataset
+            Dimension dapVarDatasetDimension = dataset.getDimension(dapVarDim.getName());
+
+            if (domainCoordinateVariable.getName().equals(dapVarDatasetDimension.getName())) {
+                _log.debug("woot. domainCoordinate.getDapID() matches dimension.getName()");
+            } else {
+                weveGotIssuesMan.add("OUCH! SRS domainCoordinate dapId '" + domainCoordinate.getDapID() + "' " +
+                        "DOES NOT match the dimension name '" + dapVarDatasetDimension.getName() + "'");
+            }
+            ////////////////////////////////////////////////////////////////////
+            
+            ////////////////////////////////////////////////////////////////////
+            // TEST
+            // Compare the size of the domainCordinate for this dimension with the
+            // size of the Dataset Dimension referecned by the variables Dim for
+            // this dimension.
+            // FIXME This next test maybe redundant since we have already confirmed that the current dapVarDim and the domainCoordVarDim  both reference the Dataset Dimension
+            if (domainCoordinate.getSize() == dapVarDatasetDimension.getSizeAsLong()) {
+                _log.debug("woot.  domainCoordinate.size() matches dimension.size()");
+            } else {
+                weveGotIssuesMan.add("OUCH! SRS domainCoordinate size '" + domainCoordinate.getSize() + "' " +
+                        "DOES NOT match the dimension size '" + dapVarDatasetDimension.getSize() + "'");
+            }
+            ////////////////////////////////////////////////////////////////////
+        }
+        if (!weveGotIssuesMan.isEmpty()) {
+            _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.\n");
+            for (String msg : weveGotIssuesMan)
+                _log.error("OUCH! {}", msg);
+            result = false;
+        }
+
+        if (dapVarDimIter.hasPrevious())
+            _log.debug("the dapVar '{}' has more dimensions than the SRS", dapVar.getName());
+
+
+        return result;
+
+        /*
+
+        //List<DomainCoordinate> domainCoordinates = getDomainCoordinatesAsList();
+        //Vector<Variable> dapVars = dataset.getVariables();
+        //List<Dimension> datasetDimensions =  dataset.getDimensions();
+
+
+        for(Variable dapVar: dapVars){
+            StringBuilder sb = new StringBuilder("variableDimensionsAreCompatibleWithSrs() - ");
+            sb.append("dapVar name: '").append(dapVar.getName()).append("'");
+            int i=0;
+            for(Dim dim : dapVar.getDims()){
+                sb.append(" dim[").append(i++).append("]: '").append(dim.getName()).append("' ").append(dapVar.getDims().size()==var.getDims().size()?"DIMENSION MATCH":"");
+            }
+            _log.debug(sb.toString());
+        }
+
+        int i=0;
+        for(Dim dim: dapVarDims) {
+            Dimension datasetDimension  = datasetDimensions.get(i);
+            DomainCoordinate domainCoordinate = domainCoordinates.get(i);
+            StringBuilder sb = new StringBuilder("variableDimensionsAreCompatibleWithSrs() - ");
+            sb.append(" dim: '").append(dim.getName()).append("' ");
+            sb.append(" datasetDimension: ").append(datasetDimension.getName()).append("[").append(datasetDimension.getSize()).append("]");
+            sb.append(" domainCoordinate: ").append(domainCoordinate.getName()).append("[").append(domainCoordinate.getSize()).append("]");
+            _log.debug(sb.toString());
+            i++;
+        }
+
+        */
     }
 
     /**
@@ -588,42 +829,49 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 new net.opengis.swecommon.v_2_0.DataRecordType.Field();
 
         String sweMeasureDefinition = "urn:ogc:def:dataType:OGC:1.1:measure";
-        double min=NaN;
-        double max=NaN;
+        double min = NaN;
+        double max = NaN;
         String s;
         Vector<String> errors = new Vector<>();
 
-        // FIXME Check for NCNAME issues.
-        field.setName(var.getName());
+        // Makes sure that the field name is an NCNAME...
+        String  fieldNcName = var.getName();
+        if(!opendap.xml.Util.isNCNAME(var.getName())) {
+            // it's not an NCNAME. Is there default supplied?
+            fieldNcName = fieldDef.name;
+            if(fieldNcName == null)  {
+                // nope, we'll punt...
+                fieldNcName = opendap.xml.Util.convertToNCNAME(var.getName());
+            }
+        }
+        field.setName(fieldNcName);
 
         String description = var.getAttributeValue("long_name");
-        if(description==null){
-            if(fieldDef!=null)
+        if (description == null) {
+            if (fieldDef != null)
                 description = fieldDef.description;
             else
                 errors.add("Failed to locate DAP Attribute 'long_name', no default value available.");
         }
         String units = var.getAttributeValue("units");
-        if(units==null){
-            if(fieldDef!=null)
+        if (units == null) {
+            if (fieldDef != null)
                 units = fieldDef.units;
             else
                 errors.add("Failed to locate DAP Attribute 'units', no default value available.");
         }
 
         s = var.getAttributeValue("vmin");
-        if(s!=null){
+        if (s != null) {
             try {
                 min = Double.parseDouble(s);
+            } catch (NumberFormatException nfe) {
+                if (fieldDef != null)
+                    min = fieldDef.min;
+                else
+                    errors.add("Failed to parse the value of DAP Attribute 'vmin' as a Double. msg: " + nfe.getMessage());
             }
-            catch (NumberFormatException nfe){
-               if(fieldDef!=null)
-                   min = fieldDef.min;
-               else
-                   errors.add("Failed to parse the value of DAP Attribute 'vmin' as a Double. msg: "+nfe.getMessage());
-            }
-        }
-        else {
+        } else {
             if (fieldDef != null)
                 min = fieldDef.min;
             else
@@ -632,29 +880,27 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
         s = var.getAttributeValue("vmax");
-        if(s!=null){
+        if (s != null) {
             try {
                 max = Double.parseDouble(s);
-            }
-            catch (NumberFormatException nfe){
-                if(fieldDef!=null)
+            } catch (NumberFormatException nfe) {
+                if (fieldDef != null)
                     max = fieldDef.max;
                 else
-                    errors.add("Failed to parse the value of DAP Attribute 'vmax' as a Double. msg: "+nfe.getMessage());
+                    errors.add("Failed to parse the value of DAP Attribute 'vmax' as a Double. msg: " + nfe.getMessage());
             }
-        }
-        else {
-            if(fieldDef!=null)
+        } else {
+            if (fieldDef != null)
                 max = fieldDef.max;
             else
                 errors.add("Failed to locate DAP Attribute 'vmax', no default value available.");
 
         }
 
-        if(!errors.isEmpty()){
-            String s1 = "Failed to map DAP variable '"+var.getName()+"' to swe:Field. SKIPPING!\n";
+        if (!errors.isEmpty()) {
+            String s1 = "Failed to map DAP variable '" + var.getName() + "' to swe:Field. SKIPPING!\n";
             _log.error(s1);
-            for(String msg: errors){
+            for (String msg : errors) {
                 _log.error(msg);
             }
             return null;
@@ -670,7 +916,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         net.opengis.swecommon.v_2_0.AllowedValuesPropertyType allowedValues = new net.opengis.swecommon.v_2_0.AllowedValuesPropertyType();
         net.opengis.swecommon.v_2_0.AllowedValuesType allowed = new net.opengis.swecommon.v_2_0.AllowedValuesType();
-        List<Double> allowedInterval = Arrays.asList(min,max);
+        List<Double> allowedInterval = Arrays.asList(min, max);
         List<JAXBElement<List<Double>>> coordinates = new Vector<>();
         net.opengis.swecommon.v_2_0.ObjectFactory sweFactory = new net.opengis.swecommon.v_2_0.ObjectFactory();
         coordinates.add(sweFactory.createAllowedValuesTypeInterval(allowedInterval));
@@ -690,7 +936,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * Converts the JAXB generated CoverageDescriptionType to a JDOM representation of the CoverageDescription
-     * @param cd  The CoverageDescriptionType instance to process
+     *
+     * @param cd The CoverageDescriptionType instance to process
      * @return The JDOM representation of the CoverageDescription
      * @throws WcsException
      */
@@ -802,13 +1049,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @param args Ignored...
      */
     public static void main(String[] args) {
+
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
 
         testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
         try {
-            Element dmrElement = opendap.xml.Util.getDocumentRoot(testDmrUrl);
-            dmrElement.detach();
+            Element dmrElement =
+                    opendap.xml.Util.getDocumentRoot(testDmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
             DynamicService ds = new DynamicService();
@@ -823,13 +1071,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
             s = "latitude";
             dc = new DomainCoordinate(s, s, "deg", "", 361, s);
             dc.setMin(-90.0);
-            dc.setMax( 90.0);
+            dc.setMax(90.0);
             ds.setLatitudeCoordinate(dc);
 
             s = "longitude";
             dc = new DomainCoordinate(s, s, "deg", "", 576, s);
             dc.setMin(-180.0);
-            dc.setMax( 179.625);
+            dc.setMax(179.625);
             ds.setLongitudeCoordinate(dc);
 
             CoverageDescription cd = new DynamicCoverageDescription(dmrElement, ds);
@@ -850,5 +1098,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 }

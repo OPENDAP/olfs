@@ -26,45 +26,25 @@
 
 package opendap.wcs.v2_0;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.math.*;
-import javax.xml.bind.*;
-import javax.xml.namespace.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import java.util.*;
-
-import net.opengis.wcs.v_2_0.*;
 import net.opengis.gml.v_3_2_1.*;
-import net.opengis.gmlcov.v_1_0.*;
-
-import opendap.threddsHandler.*;
+import net.opengis.wcs.v_2_0.CoverageDescriptionType;
 import opendap.dap4.*;
-import opendap.dap4.Attribute;
-import opendap.dap4.ContainerAttribute;
-import opendap.dap4.Dataset;
-import opendap.dap4.Dim;
-import opendap.dap4.Dimension;
-import opendap.dap4.Float32;
-import opendap.dap4.Float64;
-import opendap.dap4.Int32;
-import opendap.dap4.Int64;
-import opendap.dap4.XMLReaderWithNamespaceInMyPackageDotInfo;
-
-import opendap.threddsHandler.*;
-
+import opendap.threddsHandler.ThreddsCatalogUtil;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
+
+import javax.xml.bind.*;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Marshalling WCS coverage description per OGC
@@ -908,7 +888,8 @@ public class WcsMarshaller {
             testDmrUrl="http://test.opendap.org/opendap/testbed-13/MERRA2_100.tavgM_2d_int_Nx.198001.nc4.dmr.xml";
 
             ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
-            org.jdom.Document dmrDoc = tcc.getDocument(testDmrUrl);
+            org.jdom.Document dmrDoc = opendap.xml.Util.getDocument(testDmrUrl,
+                    opendap.http.Util.getNetRCCredentialsProvider());
             Element dmrElement = dmrDoc.getRootElement();
             dmrElement.detach();
 
