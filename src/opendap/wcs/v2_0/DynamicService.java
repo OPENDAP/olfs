@@ -20,21 +20,11 @@ public class DynamicService {
     private URL _dapServiceUrl;
     private SimpleSrs _srs;
     private Vector<DomainCoordinate> _domainCoordinates;
-    private DomainCoordinate _time;
-    private DomainCoordinate _latitude;
-    private DomainCoordinate _longitude;
+    private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
 
 
     public class FieldDef {
-        // <field
-        // name="HOURNORAIN"
-        // dapID="HOURNORAIN"
-        // description="time-during_an_hour_with_no_precipitation"
-        // units="s"
-        // vmin="-9.99999987e+14"
-        // vmax="9.99999987e+14"
-        // />
         String name;
         String dapID;
         String description;
@@ -48,11 +38,9 @@ public class DynamicService {
         _log = LoggerFactory.getLogger(this.getClass());
         _name = null;
         _dapServiceUrl = null;
-        _time = null;
-        _latitude = null;
-        _longitude = null;
         _srs = null;
         _domainCoordinates =  new Vector<>();
+        _dcMap = new ConcurrentHashMap<>();
         _wcsFieldsByDapID = new ConcurrentHashMap<>();
     }
 
@@ -103,16 +91,8 @@ public class DynamicService {
 
         for(Element dcElement: domainCoordinateElements){
             DomainCoordinate dc = new DomainCoordinate(dcElement);
-            _domainCoordinates.add(dc);
+            addDomainCoordinate(dc);
             String role = dc.getRole();
-            if(role!=null){
-                if(role.equalsIgnoreCase("latitude"))
-                    _latitude = dc;
-                else if(role.equalsIgnoreCase("longitude"))
-                    _longitude = dc;
-                else if(role.equalsIgnoreCase("time"))
-                    _time = dc;
-            }
         }
 
         List<Element> fields = (List<Element>) config.getChildren("field");
@@ -195,15 +175,22 @@ public class DynamicService {
 
     }
 
+    public void addDomainCoordinate(DomainCoordinate dc){
+        _domainCoordinates.add(dc);
+        _dcMap.put(dc.getName(),dc);
+    }
+
+    public DomainCoordinate getDomainCoordinate(String coordinateName){
+        return _dcMap.get(coordinateName);
+    }
 
 
+    /*
     private void orderPreservingCoordinateReplace(DomainCoordinate newCoordinate, DomainCoordinate oldCoordinate){
-
         if(oldCoordinate==null){
             _domainCoordinates.add(newCoordinate);
             return;
         }
-
         if(_domainCoordinates.contains(oldCoordinate)){
             int index = _domainCoordinates.indexOf(oldCoordinate);
             if(index>=0){
@@ -217,26 +204,8 @@ public class DynamicService {
         else{
             _domainCoordinates.add(newCoordinate);
         }
-
     }
-
-    public void setTimeCoordinate(DomainCoordinate time){
-        orderPreservingCoordinateReplace(time,_time);
-        _time = time;
-    }
-    public DomainCoordinate getTimeCoordinate(){ return _time; }
-
-    public void setLatitudeCoordinate(DomainCoordinate latitude){
-        orderPreservingCoordinateReplace(latitude,_latitude);
-        _latitude = latitude;
-    }
-    public DomainCoordinate getLatitudeCoordinate(){ return _latitude; }
-
-    public void setLongitudeCoordinate(DomainCoordinate longitude){
-        orderPreservingCoordinateReplace(longitude,_longitude);
-        _longitude = longitude;
-    }
-    public DomainCoordinate getLongitudeCoordinate(){ return _longitude; }
+    */
 
 
     public void setSrs(SimpleSrs srs){ _srs = srs; }
@@ -280,10 +249,7 @@ public class DynamicService {
         sb.append("  name: ").append(_name).append("\n");
         sb.append("  dapServiceUrl: ").append(_dapServiceUrl).append("\n");
         sb.append("  srs: ").append(_srs.getName()).append("\n");
-        sb.append("  time: ").append(_time).append("\n");
-        sb.append("  latitude: ").append(_latitude).append("\n");
-        sb.append("  longitude: ").append(_longitude).append("\n");
-        sb.append("  Variable Mappings: ").append(_longitude).append("\n");
+        sb.append("  Variable Mappings:\n");
         for(FieldDef field: _wcsFieldsByDapID.values()) {
             sb.append("  ").append(field.name).append("<-->").append(field.dapID).append("\n");
             sb.append("     description: "+field.description).append("\n");

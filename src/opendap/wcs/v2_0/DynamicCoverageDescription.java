@@ -40,8 +40,7 @@ import static java.lang.Double.NaN;
  * role in the service, mapping WCS requests into DAP requests
  * that are used to provide the expected WCS response content.
  *
- * @todo This class needs a thoughtful "serialization" to persist itself
- * so that we don't have to do the dynamic part every single time.
+ * @todo This class needs a thoughtful "serialization" to persist itself so that we don't have to do the dynamic part every single time.
  */
 public class DynamicCoverageDescription extends CoverageDescription {
     private Logger _log;
@@ -206,6 +205,24 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // it's really not, so we handle it like any other coordinate
             // It should be in the list from the DynamicService if there is a time coordinate.
             // FIXME Should this be iterating over the SRS dimension or at leaset checking alignment?
+
+
+
+            
+            StringBuilder troubles = new StringBuilder();
+            for(String axisLabel: _srs.getAxisLabelsList()){
+                DomainCoordinate  domainCoordinate = _dynamicService.getDomainCoordinate(axisLabel);
+                if(domainCoordinate==null){
+                    troubles.append("ingestCoordinates() - ");
+                    troubles.append("The DynamicService must define DomainCoordinates for each axis in the SRS. ");
+                    troubles.append("We could not locate a DomainCoordinate whose name matches the SRS axis ");
+                    troubles.append("label '").append(axisLabel).append("'\n ");
+                }
+            }
+            if(troubles.length()>0){
+                _log.error(troubles.toString());
+                throw new ConfigurationException(troubles.toString())
+            }
 
             for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
                 DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate, dataset);
@@ -613,7 +630,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     fieldList.add(sweField);
                 else
                     _log.warn("Failed to convert DAP variable '{}' to an swe:Field object. SKIPPING", var.getName());
-
             }
         }
         if (fieldList.isEmpty())
@@ -966,19 +982,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
             DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1, s);
             dc.setMin(690);
             dc.setMax(9330);
-            ds.setTimeCoordinate(dc);
+            ds.addDomainCoordinate(dc);
 
             s = "latitude";
             dc = new DomainCoordinate(s, s, "deg", "", 361, s);
             dc.setMin(-90.0);
             dc.setMax(90.0);
-            ds.setLatitudeCoordinate(dc);
+            ds.addDomainCoordinate(dc);
 
             s = "longitude";
             dc = new DomainCoordinate(s, s, "deg", "", 576, s);
             dc.setMin(-180.0);
             dc.setMax(179.625);
-            ds.setLongitudeCoordinate(dc);
+            ds.addDomainCoordinate(dc);
 
             CoverageDescription cd = new DynamicCoverageDescription(dmrElement, ds);
 
