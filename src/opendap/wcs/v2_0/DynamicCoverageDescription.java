@@ -635,30 +635,34 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         if (vdims == null || dimensions == null || vdims.isEmpty() || dimensions.isEmpty()) {
             return false;
-        } else if (vdims.size() == dimensions.size()) {
-            _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
-            for (Dim dim : var.getDims()) {
-                boolean found = false;
-                String dimName = dim.getName();
-                if (dimName.charAt(0) == '/') dimName = dimName.substring(1);
-                _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
-                for (Dimension dimension : dataset.getDimensions()) {
-                    _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName());
-                    // probably need a better test
-                    if (dimName.equalsIgnoreCase(dimension.getName())) found = true;
-                }
-                if (found) {
-                    _log.debug("Dimension " + dimName + " found in Dataset");
-                    continue;
-                } else {
-                    _log.debug("Dimension " + dimName + " NOT found in DataSet");
-                    flag = false;
-                    break;
-                }
-            }
-        } else {
-            flag = false;
+        }
+        if (vdims.size() != dimensions.size()) {
             _log.debug("OOPS! Variable '" + var.getName() + "' has " + vdims.size() + " dimensions, while the parent Dataset has " + dimensions.size());
+            return false;
+        }
+
+
+        _log.debug("Examining dimension of Variable " + var.getName() + " which has same number of dimensions as Dataset, " + vdims.size());
+        for (Dim dim : var.getDims()) {
+            boolean found = false;
+            String dimName = dim.getName();
+            if (dimName.charAt(0) == '/')
+                dimName = dimName.substring(1);
+            _log.debug("Look at " + var.getName() + " dimension " + dimName + ", assume it is not in dataset to begin with");
+            for (Dimension dimension : dataset.getDimensions()) {
+                _log.debug("comparing variable dimension " + dimName + " with Dataset dimension name " + dimension.getName());
+                // probably need a better test
+                if (dimName.equalsIgnoreCase(dimension.getName()))
+                    found = true;
+            }
+            if (found) {
+                _log.debug("Dimension " + dimName + " found in Dataset");
+                continue;
+            } else {
+                _log.debug("Dimension " + dimName + " NOT found in DataSet");
+                flag = false;
+                break;
+            }
         }
 
         if (flag) {
@@ -687,7 +691,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         if (dataset == null || dapVar == null || srs == null)
             return false;
 
-        boolean result = true;
         Vector<String> weveGotIssuesMan = new Vector<>();
         List<Dim> dapVarDims = dapVar.getDims();
         ListIterator<Dim> dapVarDimIter = dapVarDims.listIterator(dapVarDims.size());
@@ -710,8 +713,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //
         // Aditional tests are performed that need reviewed and possibly dropped:
         //
-        // -  Compare the name of the  domainCoordDapVar to the name of the dapVarDatasetDimension
-        //    (Bad assumotion? I don't believe they are always the same.)
         // - Compare the size of the domainCoordinate and dapVarDatasetDimension
         //   (Redundant? See comment below)
         //
@@ -734,7 +735,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // TEST
             // Compare the variable's Dim for this dimension with
             // the DomainCoordinate's DAP Variable shared Dimension ref.
-            // TODO By getting only the first Dim and not checking further we assume that the domainCoordinateVariable is single dimensioned. This bit will have to be modifed in the future to accomodate multidimensional DomainCoordinate variables.
+            // TODO By getting only the first Dim and not checking further we assume that the domainCoordinateVariable is single dimensioned.
+            // TODO This bit will have to be modifed in the future to accomodate multidimensional DomainCoordinate variables.
             List<Dim> dims = domainCoordinateVariable.getDims();
             Dim domainCoordVarDim = dims.get(0);   // TODO Someday there may be multidimensional DomainCoordinates.
             if (domainCoordVarDim.getName().equals(dapVarDim.getName())) {
@@ -745,79 +747,17 @@ public class DynamicCoverageDescription extends CoverageDescription {
             }
             //////////////////////////////////////////////////////////////////////////
 
-            //////////////////////////////////////////////////////////////////////////
-            // TEST
-            // Check to see if the domainCoordinate is associate with the DAP variable with the same name as the
-            // Dimension we grabbed from the Dataset.
-            // FIXME Is this a bogus test? I think maybe so because the name of the "dimension" may not be the name of the Array that holds the data for the dimension.
-            // Get the Dimension instance referenced by the Dim from the Dataset
-            Dimension dapVarDatasetDimension = dataset.getDimension(dapVarDim.getName());
-
-            if (domainCoordinateVariable.getName().equals(dapVarDatasetDimension.getName())) {
-                _log.debug("woot. domainCoordinate.getDapID() matches dimension.getName()");
-            } else {
-                weveGotIssuesMan.add("OUCH! SRS domainCoordinate dapId '" + domainCoordinate.getDapID() + "' " +
-                        "DOES NOT match the dimension name '" + dapVarDatasetDimension.getName() + "'");
-            }
-            //////////////////////////////////////////////////////////////////////////
-
-            //////////////////////////////////////////////////////////////////////////
-            // TEST
-            // Compare the size of the domainCordinate for this dimension with the
-            // size of the Dataset Dimension referecned by the variables Dim for
-            // this dimension.
-            // FIXME This next test maybe redundant since we have already confirmed that the current dapVarDim and the domainCoordVarDim  both reference the Dataset Dimension
-            if (domainCoordinate.getSize() == dapVarDatasetDimension.getSizeAsLong()) {
-                _log.debug("woot.  domainCoordinate.size() matches dimension.size()");
-            } else {
-                weveGotIssuesMan.add("OUCH! SRS domainCoordinate size '" + domainCoordinate.getSize() + "' " +
-                        "DOES NOT match the dimension size '" + dapVarDatasetDimension.getSize() + "'");
-            }
-            //////////////////////////////////////////////////////////////////////////
         }
+        if (dapVarDimIter.hasPrevious())
+            _log.debug("the dapVar '{}' has more dimensions than the SRS", dapVar.getName());
+
         if (!weveGotIssuesMan.isEmpty()) {
             _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.\n");
             for (String msg : weveGotIssuesMan)
                 _log.error("OUCH! {}", msg);
-            result = false;
+            return false;
         }
-
-        if (dapVarDimIter.hasPrevious())
-            _log.debug("the dapVar '{}' has more dimensions than the SRS", dapVar.getName());
-
-
-        return result;
-
-        /*
-
-        //List<DomainCoordinate> domainCoordinates = getDomainCoordinatesAsList();
-        //Vector<Variable> dapVars = dataset.getVariables();
-        //List<Dimension> datasetDimensions =  dataset.getDimensions();
-
-
-        for(Variable dapVar: dapVars){
-            StringBuilder sb = new StringBuilder("variableDimensionsAreCompatibleWithSrs() - ");
-            sb.append("dapVar name: '").append(dapVar.getName()).append("'");
-            int i=0;
-            for(Dim dim : dapVar.getDims()){
-                sb.append(" dim[").append(i++).append("]: '").append(dim.getName()).append("' ").append(dapVar.getDims().size()==var.getDims().size()?"DIMENSION MATCH":"");
-            }
-            _log.debug(sb.toString());
-        }
-
-        int i=0;
-        for(Dim dim: dapVarDims) {
-            Dimension datasetDimension  = datasetDimensions.get(i);
-            DomainCoordinate domainCoordinate = domainCoordinates.get(i);
-            StringBuilder sb = new StringBuilder("variableDimensionsAreCompatibleWithSrs() - ");
-            sb.append(" dim: '").append(dim.getName()).append("' ");
-            sb.append(" datasetDimension: ").append(datasetDimension.getName()).append("[").append(datasetDimension.getSize()).append("]");
-            sb.append(" domainCoordinate: ").append(domainCoordinate.getName()).append("[").append(domainCoordinate.getSize()).append("]");
-            _log.debug(sb.toString());
-            i++;
-        }
-
-        */
+        return true;
     }
 
     /**
