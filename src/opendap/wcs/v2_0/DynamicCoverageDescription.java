@@ -693,18 +693,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
     /**
      * Compares the dataset Dimensions of the DAP Variable _var_ with
      * the associated SRS DomainCoordinate's DAP variable. In particular
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-     * comparsiom is made by working in reverse order through the dimensions of the SRS
-     * and the varable. If all of the dimensions have matched when the SRS runs out of DomainCoordinates
-=======
      * comparison made by working in reverse order through the dimensions of the SRS
      * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
->>>>>>> Stashed changes
-=======
-     * comparison made by working in reverse order through the dimensions of the SRS
-     * and the variable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
->>>>>>> Stashed changes
      * then it's a positive result.
      *
      * @note This particular trick, using reverse iteration on the SRS dimensions, is
