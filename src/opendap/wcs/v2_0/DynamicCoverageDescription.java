@@ -41,7 +41,7 @@ import static java.lang.Double.NaN;
  * that are used to provide the expected WCS response content.
  *
  *
- *  TODO This class needs a thoughful "serialization" to perisit itself so that we don't have to do the dynamic part every single time.
+ *  TODO This class needs a thoughtful "serialization" to perisit itself so that we don't have to do the dynamic part every single time.
  *
  */
 public class DynamicCoverageDescription extends CoverageDescription {
@@ -206,6 +206,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
             // it's really not, so we handle it like any other coordinate
             // It should be in the list from the DynamicService if there is a time coordinate.
+            // FIXME Should this be iterating over the SRS dimension or at leaset checking alignment?
+
             for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
                 DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate, dataset);
                 addDomainCoordinate(domainCoordinate);
@@ -217,7 +219,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
-     * be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
+     * can be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
      * are used to construct the new DomainCoordinate
      *
      * @param defaultCoordinate
@@ -239,19 +241,17 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset, coordinateName);
 
-            long size = defaultCoordinate.getSize();
-            try {
-                size = Long.parseLong(coordinateDimension.getSize());
-            } catch (NumberFormatException nfe) {
-                _log.warn("Failed to parse Dimension size string: " + coordinateDimension.getSize());
-            }
+            long size = coordinateDimension.getSizeAsLong();
+            if(size<1)
+                size = defaultCoordinate.getSize();
+
             domainCoordinate = new DomainCoordinate(
                     coordinateName,  // This is the WCS coordinate name as defined in the SRS
                     coordinateVariable.getName(), // This is the name of the cooresponding DAP variable
                     units,  // The units string, typically deg or the like
                     "",
                     size,
-                    coordinateName);
+                    defaultCoordinate.getRole());
 
         } else {
             domainCoordinate = new DomainCoordinate(defaultCoordinate);
@@ -338,19 +338,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * This is the first step in a two step process:. Here we collect and QC the information
-     * needed to build the DomainSet and Envlope. If time information can be found then an
+     * needed to build the DomainSet and Envelope. If time information can be found then an
      * EnvelopeWithTimePeriod is built otherwise a simple Envelope is built. The DomainSet
-     * is added in eithe case.
+     * is added in either case.
      *
      * @param cd The CoverageDescription to which to add the DomainSet and ENvelope content.
      * @param dataset The DAP dataset to query for the information needed.
      */
     private void addBoundedByAndDomainSet(CoverageDescriptionType cd, Dataset dataset, SimpleSrs srs) throws WcsException {
 
-        BoundedByAndDomainSetParams ewtpp = new BoundedByAndDomainSetParams();
+        BoundedByAndDomainSetParams bbadsp = new BoundedByAndDomainSetParams();
 
-        ewtpp.srs = srs;
-        ewtpp.coverageID = cd.getCoverageId();
+        bbadsp.srs = srs;
+        bbadsp.coverageID = cd.getCoverageId();
 
         for (String axisLabel : srs.getAxisLabelsList()) {
             DomainCoordinate dc = getDomainCoordinate(axisLabel);
@@ -362,19 +362,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
             if (dc.getName().equalsIgnoreCase("latitude")) {
                 min = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("SouthernmostLatitude", min);
                 max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("NorthernmostLatitude", max);
-                ewtpp.origin_lat = min;
-                ewtpp.latitudeSize = dc.getSize();
-                ewtpp.latitudeResolution = max - min / dc.getSize();
+                bbadsp.origin_lat = min;
+                bbadsp.latitudeSize = dc.getSize();
+                bbadsp.latitudeResolution = max - min / dc.getSize();
 
             } else if (dc.getName().equalsIgnoreCase("longitude")) {
                 min = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("EasternmostLongitude", min);
                 max = dataset.getValueOfGlobalAttributeWithNameLikeAsDouble("WesternmostLongitude", max);
-                ewtpp.origin_lon = min;
-                ewtpp.longitudeSize = dc.getSize();
-                ewtpp.longitudeResolution = max - min / dc.getSize();
+                bbadsp.origin_lon = min;
+                bbadsp.longitudeSize = dc.getSize();
+                bbadsp.longitudeResolution = max - min / dc.getSize();
             }
-            ewtpp.lowerCorner.add(min);
-            ewtpp.upperCorner.add(max);
+            bbadsp.lowerCorner.add(min);
+            bbadsp.upperCorner.add(max);
         }
 
         // Since time is special in WCS land we have to handle it special
@@ -385,11 +385,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
             String timeUnits = timeCoordinate.getUnits();
             double timeVal = timeCoordinate.getMin();
             Date beginDate = TimeConversion.getTime(timeVal, timeUnits);
-            ewtpp.beginDate = TimeConversion.formatDateInGmlTimeFormat(beginDate);
+            bbadsp.beginDate = TimeConversion.formatDateInGmlTimeFormat(beginDate);
 
             timeVal = timeCoordinate.getMax();
             Date endDate = TimeConversion.getTime(timeVal, timeUnits);
-            ewtpp.endDate = TimeConversion.formatDateInGmlTimeFormat(endDate);
+            bbadsp.endDate = TimeConversion.formatDateInGmlTimeFormat(endDate);
         } else {
             _log.warn("addBoundedByAndDomainSet() - No coordinate for 'time' could be located. A default time period will not be utilized.");
         }
@@ -398,7 +398,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeBeginningTime");
         if (date != null && time != null) {
-            ewtpp.beginDate = date + "T" + time + "Z";
+            bbadsp.beginDate = date + "T" + time + "Z";
         } else {
             // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
@@ -407,12 +407,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         date = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingDate");
         time = dataset.getValueOfGlobalAttributeWithNameLike("RangeEndingTime");
         if (date != null && time != null) {
-            ewtpp.endDate = date + "T" + time + "Z";
+            bbadsp.endDate = date + "T" + time + "Z";
         } else {
             // TODO uh... not sure how to punt here as this is typically a per coverage/dataset value. Should this come from config? That would flatten the time to a single instance....
         }
 
-        addBoundedByAndDomainSet(cd,ewtpp);
+        addBoundedByAndDomainSet(cd,bbadsp);
 
     }
 
@@ -578,8 +578,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-     * This method examines the variables in the dataset. It determines which variables can be added to the coverage
-     * as fields and then adds them to the CoverageDescription
+     * This method examines the variables in the dataset to determine which variables are members of the rnage (i.e.
+     * fields. It determines which variables can be used as fields in the coverage and then adds them to the
+     * CoverageDescription
      *
      * @param cd
      * @param dataset
