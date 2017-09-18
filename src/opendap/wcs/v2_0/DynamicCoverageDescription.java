@@ -674,7 +674,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * Compares the dataset Dimensions of the DAP Variable _var_ with
      * the associated SRS DomainCoordinate's DAP variable. In particular
      * comparsiom is made by working in reverse order through the dimensions of the SRS
-     * and the varable. If all of the dimensions have matched when the SRS runs of DomainCoordinates
+     * and the varable. If all of the dimensions have matched when the SRS runs out of DomainCoordinates
      * then it's a positive result.
      *
      * @param dataset The Dataset that's being turned into a coverage.
@@ -739,7 +739,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             Dim domainCoordVarDim = dims.get(0);   // TODO Someday there may be multidimensional DomainCoordinates.
             if (domainCoordVarDim.getName().equals(dapVarDim.getName())) {
                 _log.debug("woot. The domainCoordinate DAP variable references the same dimension name as the variable.");
-            } else {                                                                                                                        weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT have the same dimension name as the variable.");
+            } else {
+                weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT " +
+                        "have the same dimension name as the variable.");
             }
             ////////////////////////////////////////////////////////////////////
 
