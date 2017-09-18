@@ -30,7 +30,8 @@
         <!-- CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile -->
     <!-- /WcsCatalog -->
     <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog" >
-        <Credentials>/Users/ndp/.netrc</Credentials>
+        <!-- Credentials>/Users/ndp/.netrc</Credentials !-->
+        <!-- CacheDirectory>/tmp/DSC</CacheDirectory !-->
         <DynamicService name="tb12" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
             <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" role="time"/>
             <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" role="latitude"/>
