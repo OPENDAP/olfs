@@ -578,7 +578,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-     * This method examines the variables in the dataset to determine which variables are members of the rnage (i.e.
+     * This method examines the variables in the Dataset to determine which variables are members of the range (i.e.
      * fields. It determines which variables can be used as fields in the coverage and then adds them to the
      * CoverageDescription
      *
