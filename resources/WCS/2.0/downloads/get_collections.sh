@@ -17,7 +17,7 @@ function get_daily_hourly_collection () {
     do
         echo "Year: $year";
         mkdir -p $year;
-        yearDir=$collectionsDir"/"$year
+        yearDir=$collectionDir"/"$year
         cd $yearDir
         for month in $months
         do
