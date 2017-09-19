@@ -1,6 +1,6 @@
 #!/bin/bash
 
-years="1980 1985 1990 1995 2000 2005 2010 2015"
+years="1995 2000 2005 2010 2015"
 months="07"
 
 auth=" --load-cookies tmp/urs_cookies --save-cookies tmp/urs_cookies --keep-session-cookies ";
@@ -8,7 +8,7 @@ wget_opts=" -r -c -nH -nd -np -A nc4";
 
 # wget --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --keep-session-cookies -r -c -nH -nd -np -A nc4,xml "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2_MONTHLY/M2TMNXSLV.5.12.4/1981/"
 
-function get_daily_collection () {
+function get_daily_hourly_collection () {
     collection_url=$1;
     
     mkdir -p tmp;
@@ -20,7 +20,8 @@ function get_daily_collection () {
             echo "Month: $month";
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
-            wget "$auth" "$wget_opts" "$target_url"
+            
+            wget $auth $wget_opts $target_url
         done
     done
 }
@@ -45,7 +46,7 @@ function get_monthly_collection () {
 
 
 
-for collection_url in `cat one_month_collections`
+for collection_url in `cat one_day_collections`
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
