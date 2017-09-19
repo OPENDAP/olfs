@@ -3,7 +3,7 @@
 years="1995 2000 2005 2010 2015"
 months="07"
 
-auth=" --load-cookies tmp/urs_cookies --save-cookies tmp/urs_cookies --keep-session-cookies ";
+auth=" --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --keep-session-cookies ";
 wget_opts=" -r -c -nH -nd -np -A nc4";
 
 # wget --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --keep-session-cookies -r -c -nH -nd -np -A nc4,xml "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2_MONTHLY/M2TMNXSLV.5.12.4/1981/"
