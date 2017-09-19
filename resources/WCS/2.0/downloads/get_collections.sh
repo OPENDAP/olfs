@@ -1,6 +1,6 @@
 #!/bin/bash
 
-years="1995 2000 2005 2010 2015"
+years="1995 2005 2015"
 months="07"
 
 auth=" --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --keep-session-cookies ";
@@ -10,7 +10,6 @@ wget_opts=" -r -c -nH -nd -np -A nc4";
 
 function get_daily_hourly_collection () {
     collection_url=$1;
-    
     collectionDir=`pwd`
     for year in $years
     do
@@ -39,12 +38,20 @@ function get_daily_hourly_collection () {
 
 function get_monthly_collection () {
     collection_url=$1;
+    collectionDir=`pwd`
     for year in $years
     do
+        echo "Year: $year";
+        mkdir -p $year;
+        yearDir=$collectionDir"/"$year
+        echo "YearDir: $yearDir"
+        cd $yearDir
+
         echo "Year: $year";
         target_url=$collection_url"/"$year"/";
         echo "Target URL: $target_url";
         wget $auth $wget_opts $target_url
+        cd $collectionDir
     done
 }
 
