@@ -12,22 +12,23 @@ function get_daily_hourly_collection () {
     collection_url=$1;
     
     collectionDir=`pwd`
-    mkdir -p tmp;
     for year in $years
     do
         echo "Year: $year";
         mkdir -p $year;
         yearDir=$collectionDir"/"$year
+        echo "YearDir: $yearDir"
         cd $yearDir
         for month in $months
         do
             echo "Month: $month";
             mkdir -p $month;
             monthDir=$yearDir"/"$month
+            echo "MonthDir: $monthDir"
             cd $monthDir
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
-            
+            echo "Download dir "`pwd`
             wget $auth $wget_opts $target_url > wget.log 2>&1
             
             cd $yearDir
@@ -38,7 +39,6 @@ function get_daily_hourly_collection () {
 
 function get_monthly_collection () {
     collection_url=$1;
-    mkdir -p tmp;
     for year in $years
     do
         echo "Year: $year";
