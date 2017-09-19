@@ -20,7 +20,7 @@ function get_collection () {
             echo "Month: $month";
             target_url=$collection_url"/"$year"/"$month;
             echo "Target URL: $target_url";
-            # wget $auth $wget_opts $target_url
+            wget $auth $wget_opts $target_url
         done
     done
         
