@@ -52,7 +52,7 @@ do
     mkdir -p $myDir
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
-    cd tmp
+    cd $myDir
     get_monthly_collection $collection_url;
     cd $startDir
     
