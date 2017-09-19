@@ -337,7 +337,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         _log.debug("getDataAccessUrl() - DynamicService instance: {}",dynamicService);
         if(dynamicService==null)
             return null;
-        String resourceId = coverageId.replace(dynamicService.getName(),"");
+        String resourceId = coverageId.replaceFirst(dynamicService.getName(),"");
         PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrl().toString());
         pb.pathAppend(resourceId);
         pb.append("");
