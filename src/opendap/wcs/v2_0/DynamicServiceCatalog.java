@@ -310,6 +310,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         DynamicService match = null;
         for(DynamicService dynamicService:_dynamicServices.values()){
             String dsName = dynamicService.getName();
+            _log.debug("Checking DynamicService '{}'",dsName);
 
             if(coverageId.startsWith(dsName)){
                 _log.debug("CoverageId '{}' matchs DynamicService name '{}'",coverageId,dsName);
