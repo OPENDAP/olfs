@@ -13,11 +13,14 @@ function get_collection () {
     mkdir -p tmp;
     for year in $years
     do
+        echo "Year: $year";
+
         for month in $months
         do
+            echo "Month: $month";
             target_url=$collection_url"/"$year"/"$month;
-            echo $target_url;
-            wget $auth $wget_opts $target_url
+            echo "Target URL: $target_url";
+            # wget $auth $wget_opts $target_url
         done
     done
         
@@ -25,8 +28,10 @@ function get_collection () {
 
 #month_url_example="https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I1NXASM.5.12.4/1980/06/"
 
-for collection_url in `cat *collections`
+for collection_url in `cat *_collections`
 do
+    echo "--------------------------------------------------------------"
+    echo "Retrieving collection: $collection_url";
     get_collection $collection_url;
     
 done
