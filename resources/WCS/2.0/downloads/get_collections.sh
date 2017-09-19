@@ -28,7 +28,7 @@ function get_daily_hourly_collection () {
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
             
-            wget $auth $wget_opts $target_url
+            # wget $auth $wget_opts $target_url
             
             cd $yearDir
         done
