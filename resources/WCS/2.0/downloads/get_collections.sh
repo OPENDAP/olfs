@@ -53,6 +53,7 @@ do
     mkdir -p $myDir
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
+    echo "collecitonDir: $myDir"
     cd $myDir
     get_monthly_collection $collection_url;
     cd $startDir
