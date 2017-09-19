@@ -33,7 +33,8 @@ function get_monthly_collection () {
         echo "Year: $year";
         target_url=$collection_url"/"$year"/";
         echo "Target URL: $target_url";
-        wget $auth $wget_opts $target_url
+        
+        # wget $auth $wget_opts $target_url
     done
 }
 
@@ -48,7 +49,7 @@ function get_monthly_collection () {
 for collection_url in `cat one_month_collections`
 do
     startDir=`pwd`
-    myDir=tmp/`basename $colelction_url`
+    myDir=tmp/`basename $collection_url`
     mkdir -p $myDir
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
