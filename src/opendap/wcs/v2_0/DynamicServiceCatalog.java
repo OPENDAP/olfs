@@ -331,7 +331,9 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     @Override
     public String getDataAccessUrl(String coverageId) throws InterruptedException {
+        _log.debug("getDataAccessUrl() - BEGIN coverageId: {}",coverageId);
         DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
+        _log.debug("getDataAccessUrl() - DynamicService instance: {}",dynamicService);
         if(dynamicService==null)
             return null;
         String resourceId = coverageId.replace(dynamicService.getName(),"");
