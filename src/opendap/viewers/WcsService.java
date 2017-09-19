@@ -206,7 +206,8 @@ public class WcsService implements WebServiceHandler {
     @Override
     public String getServiceLink(String datasetId) {
         PathBuilder pb = new PathBuilder(_serviceEndpoint);
-        pb.pathAppend(_dynamicServiceId).pathAppend(datasetId).append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
+        pb.pathAppend(_dynamicServiceId).pathAppend(datasetId);
+        //pb.append("?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=2.0.1");
         return pb.toString();
     }
 
