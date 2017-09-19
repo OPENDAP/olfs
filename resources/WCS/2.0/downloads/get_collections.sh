@@ -65,7 +65,7 @@ do
     echo "Retrieving collection: $collection_url";
     echo "collecitonDir: $myDir"
     cd $myDir
-    get_monthly_collection $collection_url;
+    get_daily_hourly_collection $collection_url;
     cd $startDir
     
 done
