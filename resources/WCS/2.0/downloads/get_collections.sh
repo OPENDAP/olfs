@@ -29,7 +29,7 @@ function get_daily_hourly_collection () {
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
             echo "Download dir "`pwd`
-            wget $auth $wget_opts $target_url > wget.log 2>&1
+            wget $auth $wget_opts $target_url
             
             cd $yearDir
         done
@@ -56,7 +56,22 @@ function get_monthly_collection () {
 
 
 
-for collection_url in `cat gpm_collections`
+for collection_url in `cat  one_month_collections`
+do
+    startDir=`pwd`
+    myDir=tmp/`basename $collection_url`
+    mkdir -p $myDir
+    echo "--------------------------------------------------------------"
+    echo "Retrieving collection: $collection_url";
+    echo "collecitonDir: $myDir"
+    cd $myDir
+    get_monthly_collection $collection_url;
+    cd $startDir
+    
+done
+
+
+for collection_url in `cat  one_day_collections gpm_collections one_hour_collections`
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
