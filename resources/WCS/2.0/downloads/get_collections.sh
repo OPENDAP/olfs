@@ -47,10 +47,12 @@ function get_monthly_collection () {
 
 for collection_url in `cat one_month_collections`
 do
+    startDir=`pwd`
+    myDir=tmp/`basename $colelction_url`
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
     cd tmp
     get_monthly_collection $collection_url;
-    cd ..
+    cd $startDir
     
 done
