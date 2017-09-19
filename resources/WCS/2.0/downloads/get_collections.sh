@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+one_month_collections="https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2_MONTHLY/M2IMNXINT.5.12.4
+                     https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2_MONTHLY/M2TMNPMST.5.12.4
+                     https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2_MONTHLY/M2TMNXCHM.5.12.4"
+
+one_hour_collections="https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I1NXASM.5.12.4"
+one_day_collections="https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2SDNXSLV.5.12.4"
+gpm_collections="https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDE.04"
+
+
 years="1995 2005 2015"
 months="07"
 
@@ -63,7 +73,7 @@ function get_monthly_collection () {
 
 
 
-for collection_url in `cat  one_month_collections`
+for collection_url in $one_month_collections
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
@@ -78,7 +88,7 @@ do
 done
 
 
-for collection_url in `cat  one_day_collections gpm_collections one_hour_collections`
+for collection_url in $one_day_collections $gpm_collections $one_hour_collections
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
