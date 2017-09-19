@@ -77,7 +77,7 @@
         <ApplicationName>MERRA2 M2IMNXINT WCS Service</ApplicationName>
         <ServiceEndpoint>http://http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
         <MatchRegex>/testbed-13/M2IMNXINT.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>tb13</DynamicServiceId>
+        <DynamicServiceId>M2IMNXINT</DynamicServiceId>
     </WebServiceHandler>
 
 
