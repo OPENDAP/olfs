@@ -56,7 +56,7 @@ function get_monthly_collection () {
 
 
 
-for collection_url in `cat one_hour_collections`
+for collection_url in `cat gpm_collections`
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
