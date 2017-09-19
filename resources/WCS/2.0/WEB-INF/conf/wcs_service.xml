@@ -69,7 +69,14 @@
         </DynamicService>
 
 
+        <DynamicService name="M2I1NXASM" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="24" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+        </DynamicService>
 
+
+        
 
 
 
