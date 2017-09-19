@@ -298,6 +298,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
+    /**
+     * Compares the passed coverageID with the collection Dynamix services and returns the one,
+     * if any, with the lingest matching name.
+     *
+     * @param coverageId
+     * @return
+     */
     public DynamicService getLongestMatchingDynamicService(String coverageId){
         String longestMatchingDynamicServiceName=null;
         DynamicService match = null;
@@ -305,16 +312,17 @@ public class DynamicServiceCatalog implements WcsCatalog{
             String dsName = dynamicService.getName();
 
             if(coverageId.startsWith(dsName)){
+                _log.debug("CoverageId '{}' matchs DynamicService name '{}'",coverageId,dsName);
                 if(longestMatchingDynamicServiceName==null){
                     longestMatchingDynamicServiceName=dsName;
                     match = dynamicService;
                 }
-                else {
-                    if(longestMatchingDynamicServiceName.length() < dsName.length()) {
+                else if(longestMatchingDynamicServiceName.length() < dsName.length()) {
                         longestMatchingDynamicServiceName = dsName;
                         match = dynamicService;
-                    }
                 }
+                _log.debug("DynamicService '{}' matched.",match.getName());
+
             }
         }
         return match;
