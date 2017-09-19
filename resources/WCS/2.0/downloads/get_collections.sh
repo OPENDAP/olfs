@@ -56,7 +56,7 @@ function get_monthly_collection () {
 
 
 
-for collection_url in `cat one_day_collections`
+for collection_url in `cat one_hour_collections`
 do
     startDir=`pwd`
     myDir=tmp/`basename $collection_url`
@@ -69,3 +69,5 @@ do
     cd $startDir
     
 done
+
+
