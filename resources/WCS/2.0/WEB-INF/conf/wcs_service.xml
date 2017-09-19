@@ -49,6 +49,16 @@
             <field name="T2MMIN" dapID="T2MMIN" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
             <field name="PrecipitationRate" dapID="TPRECMAX" description="total_precipitation" units="kg m-2 s-1" min="-9.99999987e+14" max="9.99999987e+14"/>
         </DynamicService>
+
+        <DynamicService name="M2IMNXINT" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+        </DynamicService>
+
+
+
+
     </WcsCatalog>
 </WcsService>
 <!--

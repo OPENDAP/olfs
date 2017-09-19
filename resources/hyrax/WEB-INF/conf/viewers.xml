@@ -73,7 +73,15 @@
         <DynamicServiceId>tb13</DynamicServiceId>
     </WebServiceHandler>
 
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2IMNXINT" >
+        <ApplicationName>MERRA2 M2IMNXINT WCS Service</ApplicationName>
+        <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
+        <MatchRegex>/testbed-13/M2IMNXINT.5.12.4/.*</MatchRegex>
+        <DynamicServiceId>tb13</DynamicServiceId>
+    </WebServiceHandler>
 
+
+    M2IMNXINT
 
 </ViewersConfig>
 
