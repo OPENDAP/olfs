@@ -1,5 +1,6 @@
 package opendap.wcs.v2_0;
 
+import opendap.dap4.Dim;
 import opendap.wcs.srs.SimpleSrs;
 import opendap.wcs.srs.SrsFactory;
 import org.jdom.Element;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -92,7 +94,35 @@ public class DynamicService {
         for(Element dcElement: domainCoordinateElements){
             DomainCoordinate dc = new DomainCoordinate(dcElement);
             addDomainCoordinate(dc);
-            String role = dc.getRole();
+        }
+        // Now we QC the DomainCoordinates and the SRS to make sure they are compatible.
+        // And since there may be more DomainCoordinates defined than there SRS dimension
+        // We require reverse iterators.
+        Vector<DomainCoordinate> domainCoordinates = getDomainCoordinates();
+        ListIterator<DomainCoordinate> domainCoordRevIter = domainCoordinates.listIterator(domainCoordinates.size());
+
+        List<String> srsAxisLabels = _srs.getAxisLabelsList();
+        ListIterator<String> axisLabelRevIter = srsAxisLabels.listIterator(srsAxisLabels.size());
+
+        if(domainCoordinates.size() < srsAxisLabels.size())
+            badThingsHappened.add("OUCH! There must be at least as many DomainCoordinates as t" +
+                    "he SRS has dimensions. srs has "+srsAxisLabels.size()+" and the DynamicService " +
+                    "definition '"+getName()+"' has only "+domainCoordinates.size());
+
+        while(axisLabelRevIter.hasPrevious() && domainCoordRevIter.hasPrevious()){
+            String axisLabel = axisLabelRevIter.previous();
+            DomainCoordinate domainCoord  =domainCoordRevIter.previous();
+
+            if(!axisLabel.equalsIgnoreCase(domainCoord.getName())){
+                StringBuilder troubles = new StringBuilder();
+                troubles.append("The DynamicService must define DomainCoordinates for each axis in the SRS. ");
+                troubles.append("They must appear in the DynamicService definition in the order they appear in the SRS, ");
+                troubles.append("and their names must match as well.");
+                troubles.append("We could not locate a DomainCoordinate in the correct position ");
+                troubles.append("whose name matches the SRS axis ");
+                troubles.append("label '").append(axisLabel).append("'\n ");
+                badThingsHappened.add(troubles.toString());
+            }
         }
 
         List<Element> fields = (List<Element>) config.getChildren("field");

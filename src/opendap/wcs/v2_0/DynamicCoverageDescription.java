@@ -204,26 +204,6 @@ public class DynamicCoverageDescription extends CoverageDescription {
             // Everyone thinks that somehow Time is a "special" coordinate (Oy, still with that) but
             // it's really not, so we handle it like any other coordinate
             // It should be in the list from the DynamicService if there is a time coordinate.
-            // FIXME Should this be iterating over the SRS dimension or at leaset checking alignment?
-
-
-
-            
-            StringBuilder troubles = new StringBuilder();
-            for(String axisLabel: _srs.getAxisLabelsList()){
-                DomainCoordinate  domainCoordinate = _dynamicService.getDomainCoordinate(axisLabel);
-                if(domainCoordinate==null){
-                    troubles.append("ingestCoordinates() - ");
-                    troubles.append("The DynamicService must define DomainCoordinates for each axis in the SRS. ");
-                    troubles.append("We could not locate a DomainCoordinate whose name matches the SRS axis ");
-                    troubles.append("label '").append(axisLabel).append("'\n ");
-                }
-            }
-            if(troubles.length()>0){
-                _log.error(troubles.toString());
-                throw new ConfigurationException(troubles.toString())
-            }
-
             for (DomainCoordinate defaultCoordinate : _dynamicService.getDomainCoordinates()) {
                 DomainCoordinate domainCoordinate = getDomainCoordinate(defaultCoordinate, dataset);
                 addDomainCoordinate(domainCoordinate);
@@ -235,15 +215,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
     /**
      * The code builds a DomainCoordinate starting with a default. It examines the dataset and if the DomainCoordinate
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-     * can be located then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
-=======
      * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
->>>>>>> Stashed changes
-=======
-     * can be located, then the Dataset version is used to populate the new DomainCoordinate, otherwise the default values
->>>>>>> Stashed changes
      * are used to construct the new DomainCoordinate
      *
      * @param defaultCoordinate
@@ -665,10 +637,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         Vector<String> weveGotIssuesMan = new Vector<>();
         List<Dim> dapVarDims = dapVar.getDims();
-        ListIterator<Dim> dapVarDimIter = dapVarDims.listIterator(dapVarDims.size());
+        ListIterator<Dim> dapVarDimRevIter = dapVarDims.listIterator(dapVarDims.size());
 
         List<String> srsAxisLabels = srs.getAxisLabelsList();
-        ListIterator<String> axisLabelIter = srsAxisLabels.listIterator(srsAxisLabels.size());
+        ListIterator<String> axisLabelRevIter = srsAxisLabels.listIterator(srsAxisLabels.size());
 
         if (dapVarDims.size() < srsAxisLabels.size())
             weveGotIssuesMan.add("OUCH! SRS has more dimensions (" + srs.getSrsDimension() + " " +
@@ -689,13 +661,13 @@ public class DynamicCoverageDescription extends CoverageDescription {
         //   (Redundant? See comment below)
         //
         //
-        while (axisLabelIter.hasPrevious() && dapVarDimIter.hasPrevious()) {
+        while (axisLabelRevIter.hasPrevious() && dapVarDimRevIter.hasPrevious()) {
 
             // The next dimension reference from the DAP variable
-            Dim dapVarDim = dapVarDimIter.previous();
+            Dim dapVarDim = dapVarDimRevIter.previous();
 
             // Get the next coordinate/axis name from the SRS
-            String axisLabel = axisLabelIter.previous();
+            String axisLabel = axisLabelRevIter.previous();
 
             // Find the DomainCoordinate associated with this axis
             DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
@@ -721,7 +693,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             //////////////////////////////////////////////////////////////////////////
 
         }
-        if (dapVarDimIter.hasPrevious())
+        if (dapVarDimRevIter.hasPrevious())
             _log.debug("the dapVar '{}' has more dimensions than the SRS", dapVar.getName());
 
         if (!weveGotIssuesMan.isEmpty()) {
