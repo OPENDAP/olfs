@@ -83,8 +83,10 @@
             <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
         </DynamicService>
 
-
-
+        <DynamicService name="GPM_3IMERGDE" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="latitude" dapID="lat" size="1800" units="deg" role="latitude" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="3600" units="deg" role="longitude" min="" max=""/>
+        </DynamicService>
 
 
 
