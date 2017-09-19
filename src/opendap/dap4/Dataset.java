@@ -26,7 +26,6 @@
 
 package opendap.dap4;
 
-import opendap.wcs.v2_0.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +229,7 @@ public class Dataset {
    public String getValueOfGlobalAttributeWithNameLike(String name) {
      for (ContainerAttribute containerAttribute : attributes) {
        	for (Attribute a : containerAttribute.getAttributes()) {
-          if (Util.caseInsensitiveStringContains(a.getName(), name))
+          if (caseInsensitiveStringContains(a.getName(), name))
             return a.getValue();
         }
       }
@@ -261,9 +260,28 @@ public class Dataset {
         return result;
     }
 
+	/**
+	 * Performs a null proof case insensitive check to see
+	 * if s1 contains s2.
+	 * @param s1 The string to search
+	 * @param s2 The candiate sub-string
+	 * @return true only if str contains sub
+	 */
+	private boolean caseInsensitiveStringContains(String s1, String s2) {
+		if(
+				s1!=null &&
+						s2!=null &&
+						s1.trim().length()>0 &&
+						s2.trim().length()>0
+				){
+			return s1.trim().toLowerCase().contains(s2.trim().toLowerCase());
+		}
+		return false;
+	}
 
 
-   /**
+
+	/**
     * Helper method to scan dataset by variable name 
     * @param name of variable
     * @return first instance of opendap.dap4.Variable matching the name, case insensitive
