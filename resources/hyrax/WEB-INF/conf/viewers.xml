@@ -108,13 +108,6 @@
         <DynamicServiceId>M2TMNPMST</DynamicServiceId>
     </WebServiceHandler>
 
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-GPM_3IMERGDE" >
-        <ApplicationName>MERRA2 GPM_3IMERGDE WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/testbed-13/GPM_3IMERGDE.04/.*</MatchRegex>
-        <DynamicServiceId>GPM_3IMERGDE</DynamicServiceId>
-    </WebServiceHandler>
-
 
 
 

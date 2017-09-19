@@ -78,8 +78,6 @@ public class EOCoverageDescription extends CoverageDescription {
             bb.ingestTimePeriod(timePeriodEnvelope);
 
         }
-
-
         return bb;
     }
 

@@ -33,16 +33,16 @@
         <!-- Credentials>/Users/ndp/.netrc</Credentials !-->
         <!-- CacheDirectory>/tmp/DSC</CacheDirectory !-->
         <DynamicService name="tb12" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" role="time"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" role="latitude"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="deg" role="longitude"/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="deg" />
             <field name="tb12" dapID="foo" description="time-foobar" units="s" min="-9.99999987e+14" max="9.99999987e+14"/>
         </DynamicService>
 
         <DynamicService name="tb13" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
             <field name="HOURNORAIN" dapID="HOURNORAIN" description="time-during_an_hour_with_no_precipitation" units="s" min="-9.99999987e+14" max="9.99999987e+14"/>
             <field name="T2MMAX" dapID="T2MMAX" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
             <field name="T2MMEAN" dapID="T2MMEAN" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
@@ -51,42 +51,34 @@
         </DynamicService>
 
         <DynamicService name="M2IMNXINT" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
         </DynamicService>
 
         <DynamicService name="M2TMNXCHM" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg"  min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
         </DynamicService>
 
         <DynamicService name="M2SDNXSLV" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
         </DynamicService>
-
 
         <DynamicService name="M2I1NXASM" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
+            <DomainCoordinate name="time" dapID="time" size="24" units="Days since 1900-01-01T00:00:00.000Z"  min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
         </DynamicService>
-
         
         <DynamicService name="M2TMNPMST" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="lev" dapID="lev" size="42" units="Days since 1900-01-01T00:00:00.000Z" role="time" min="" max=""/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" role="longitude" min="" max=""/>
-        </DynamicService>
-
-        <DynamicService name="GPM_3IMERGDE" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="latitude" dapID="lat" size="1800" units="deg" role="latitude" min="" max=""/>
-            <DomainCoordinate name="longitude" dapID="lon" size="3600" units="deg" role="longitude" min="" max=""/>
-            <field name="precipitationCal" dapID="precipitationCal" description="Daily accumulated precipitation (combined microwave-IR) estimate" units="mm" min="-9.99999987e+14" max="9.99999987e+14"/>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="" max=""/>
+            <DomainCoordinate name="lev" dapID="lev" size="42" units="hPa" min="" max=""/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg"  min="" max=""/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="" max=""/>
         </DynamicService>
         
     </WcsCatalog>
