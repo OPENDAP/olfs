@@ -49,6 +49,8 @@ for collection_url in `cat one_month_collections`
 do
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
+    cd tmp
     get_monthly_collection $collection_url;
+    cd ..
     
 done
