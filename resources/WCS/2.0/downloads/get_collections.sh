@@ -49,6 +49,7 @@ for collection_url in `cat one_month_collections`
 do
     startDir=`pwd`
     myDir=tmp/`basename $colelction_url`
+    mkdir -p $myDir
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
     cd tmp
