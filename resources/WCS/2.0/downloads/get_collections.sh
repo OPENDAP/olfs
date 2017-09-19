@@ -11,18 +11,28 @@ wget_opts=" -r -c -nH -nd -np -A nc4";
 function get_daily_hourly_collection () {
     collection_url=$1;
     
+    collectionDir=`pwd`
     mkdir -p tmp;
     for year in $years
     do
         echo "Year: $year";
+        mkdir -p $year;
+        yearDir=$collectionsDir"/"$year
+        cd $yearDir
         for month in $months
         do
             echo "Month: $month";
+            mkdir -p $month;
+            monthDir=$yearDir"/"$month
+            cd $monthDir
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
             
             wget $auth $wget_opts $target_url
+            
+            cd $yearDir
         done
+        cd $collectionDir
     done
 }
 
