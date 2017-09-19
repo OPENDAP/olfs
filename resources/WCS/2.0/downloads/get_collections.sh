@@ -19,7 +19,7 @@ function get_daily_collection () {
             echo "Month: $month";
             target_url=$collection_url"/"$year"/"$month"/";
             echo "Target URL: $target_url";
-            wget $auth $wget_opts $target_url
+            wget "$auth" "$wget_opts" "$target_url"
         done
     done
 }
@@ -41,7 +41,7 @@ function get_monthly_collection () {
 #month_url_example="https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I1NXASM.5.12.4/1980/06/"
 
 
-for collection_url in `cat monthly_collections`
+for collection_url in `cat one_month_collections`
 do
     echo "--------------------------------------------------------------"
     echo "Retrieving collection: $collection_url";
