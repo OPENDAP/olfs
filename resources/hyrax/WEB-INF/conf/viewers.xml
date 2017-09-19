@@ -87,6 +87,13 @@
         <DynamicServiceId>M2TMNXCHM</DynamicServiceId>
     </WebServiceHandler>
 
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2SDNXSLV" >
+        <ApplicationName>MERRA2 M2SDNXSLV WCS Service</ApplicationName>
+        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
+        <MatchRegex>/testbed-13/M2SDNXSLV.5.12.4/.*</MatchRegex>
+        <DynamicServiceId>M2SDNXSLV</DynamicServiceId>
+    </WebServiceHandler>
+
 
     M2IMNXINT
 
