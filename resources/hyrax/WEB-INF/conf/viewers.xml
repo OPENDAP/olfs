@@ -66,12 +66,12 @@
         <DynamicServiceId>tb12</DynamicServiceId>
     </WebServiceHandler>
 
-    <!-- WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-TB13" >
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-TB13" >
         <ApplicationName>Testbed-13 WCS Service</ApplicationName>
         <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
         <MatchRegex>/testbed-13/.*</MatchRegex>
         <DynamicServiceId>tb13</DynamicServiceId>
-    </WebServiceHandler -->
+    </WebServiceHandler>
 
     <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2IMNXINT" >
         <ApplicationName>MERRA2 M2IMNXINT WCS Service</ApplicationName>

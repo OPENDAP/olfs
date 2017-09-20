@@ -643,7 +643,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         ListIterator<String> axisLabelRevIter = srsAxisLabels.listIterator(srsAxisLabels.size());
 
         if (dapVarDims.size() < srsAxisLabels.size())
-            weveGotIssuesMan.add("OUCH! SRS has more dimensions (" + srs.getSrsDimension() + " " +
+            weveGotIssuesMan.add("SRS has more dimensions (" + srs.getSrsDimension() + ") " +
                     "than the variable " + dapVar.getName() + " which has " + dapVarDims.size() + " dimensions.");
 
         // Check to see that the DAP variable dapVar the same crucial dimensions as the Coverage SRS
@@ -687,19 +687,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 _log.debug("woot. The domainCoordinate DAP variable references the same dimension name as the variable.");
             }
             else {
-                weveGotIssuesMan.add("OUCH - The domainCoordinate DAP variable DOES NOT " +
+                weveGotIssuesMan.add("The domainCoordinate DAP variable DOES NOT " +
                         "have the same dimension name as the variable.");
             }
             //////////////////////////////////////////////////////////////////////////
 
         }
         if (dapVarDimRevIter.hasPrevious())
-            _log.debug("the dapVar '{}' has more dimensions than the SRS", dapVar.getName());
+            _log.debug("The dapVar '{}' has more dimensions than the SRS", dapVar.getName());
 
         if (!weveGotIssuesMan.isEmpty()) {
-            _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.\n");
+            _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.");
             for (String msg : weveGotIssuesMan)
-                _log.error("OUCH! {}", msg);
+                _log.info("variableDimensionsAreCompatibleWithSrs() -   issue: {}",msg);
             return false;
         }
         return true;

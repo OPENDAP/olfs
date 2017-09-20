@@ -210,12 +210,12 @@ public class DynamicService {
         _dcMap.put(dc.getName(),dc);
     }
 
-    public DomainCoordinate getDomainCoordinate(String coordinateName){
-        return _dcMap.get(coordinateName);
-    }
 
 
     /*
+    public DomainCoordinate getDomainCoordinate(String coordinateName){
+        return _dcMap.get(coordinateName);
+    }
     private void orderPreservingCoordinateReplace(DomainCoordinate newCoordinate, DomainCoordinate oldCoordinate){
         if(oldCoordinate==null){
             _domainCoordinates.add(newCoordinate);

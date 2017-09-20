@@ -54,7 +54,7 @@ import java.util.Vector;
 public class GetCoverageRequestProcessor {
 
 
-    private static Logger log = LoggerFactory.getLogger(GetCoverageRequestProcessor.class);
+    private static Logger _log = LoggerFactory.getLogger(GetCoverageRequestProcessor.class);
 
 
     public static String coveragesContentID = "urn:ogc:wcs:1.1:coverages";
@@ -96,7 +96,7 @@ public class GetCoverageRequestProcessor {
 
     public static void sendFormatResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
 
-        log.debug("Sending binary data response...");
+        _log.debug("Sending binary data response...");
 
         response.setHeader("Content-Disposition", getContentDisposition(req));
 
@@ -114,7 +114,7 @@ public class GetCoverageRequestProcessor {
     public static void sendMultipartGmlResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException {
 
 
-        log.debug("Building multi-part Response...");
+        _log.debug("Building multi-part Response...");
 
         String rangePartId = "cid:" + req.getCoverageID();
 
@@ -143,7 +143,7 @@ public class GetCoverageRequestProcessor {
         Element coverageElement = coverage.getCoverageElement(rangePartId, getReturnMimeType(req));
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        log.debug(xmlo.outputString(coverageElement));
+        _log.debug(xmlo.outputString(coverageElement));
 
 
         Document doc = new Document(coverageElement);
@@ -246,6 +246,8 @@ public class GetCoverageRequestProcessor {
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 
 
+        HashMap<DomainCoordinate,DimensionSubset> domCordToDimSubsetMap = new HashMap<>();
+
         // The user may have provided domain subsets.
         // Let's first just QC the request - We'll make sure that the user is asking for dimension
         // subsets of coordinate dimensions that this field has, and while we do that we will associate
@@ -272,7 +274,7 @@ public class GetCoverageRequestProcessor {
                 }
                 msg.append("\n");
 
-                log.debug(msg.toString());
+                _log.debug(msg.toString());
 
                 throw new WcsException(msg.toString(),
                         WcsException.INVALID_PARAMETER_VALUE,
@@ -280,7 +282,7 @@ public class GetCoverageRequestProcessor {
             }
 
             ds.setDomainCoordinate(dc);
-
+            domCordToDimSubsetMap.put(dc,ds);
         }
 
 
@@ -326,18 +328,21 @@ public class GetCoverageRequestProcessor {
             }
             else {
 
+                StringBuilder valueSubsetClause = new StringBuilder();
+                boolean arraySubset = false;
 
                 // So we need to process the value based subsets by using a call to the grid() ssf
                 // The array index subsets, if any need to be applied to the variable as it is
                 // passed into the grid() function
 
+                for(DomainCoordinate domainCoordinate : domainCoordinates.values()){
 
-                StringBuilder valueSubsetClause = new StringBuilder();
+                    DimensionSubset dimSub = domCordToDimSubsetMap.get(domainCoordinate);
+                    if(dimSub==null){
+                        // No subset on this Coordinate? that's ok, make one that get's the entire dim
+                        dimSub = new DimensionSubset(domainCoordinate);
+                    }
 
-                boolean arraySubset = false;
-
-                // Process each dimension subset term the user has submitted
-                for (DimensionSubset dimSub : dimensionSubsets.values()) {
 
 
                     if(dimSub.isValueSubset()) {
@@ -409,11 +414,12 @@ public class GetCoverageRequestProcessor {
             dap2CE.append(comma_as_needed).append(subsetClause);
         }
 
+        _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+
         try {
-            log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
             return URLEncoder.encode(dap2CE.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
+            _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
             throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
         }
 
@@ -456,7 +462,7 @@ public class GetCoverageRequestProcessor {
                 }
                 msg.append("\n");
 
-                log.debug(msg.toString());
+                _log.debug(msg.toString());
 
                 throw new WcsException(msg.toString(),
                         WcsException.INVALID_PARAMETER_VALUE,
@@ -607,10 +613,10 @@ public class GetCoverageRequestProcessor {
         }
 
         try {
-            log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+            _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
             return URLEncoder.encode(dap2CE.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
+            _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
             throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
         }
 
