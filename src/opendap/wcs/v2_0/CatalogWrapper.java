@@ -26,6 +26,7 @@
 package opendap.wcs.v2_0;
 
 import opendap.xml.Util;
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
@@ -354,12 +355,9 @@ public class CatalogWrapper {
    public static  EODatasetSeries getEODatasetSeries(String id) throws WcsException {
         return _catalogImpl.getEODatasetSeries(id);
     }
-
-    public boolean hasEoCoverage(String id){
-        return _catalogImpl.hasEoCoverage(id);
+    
+    public static CredentialsProvider getCredentialsProvider(){
+        return _catalogImpl.getCredentials();
     }
-
-
-
 
 }

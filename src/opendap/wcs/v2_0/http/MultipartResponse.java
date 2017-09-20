@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.wcs.v2_0.CatalogWrapper;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -161,35 +162,9 @@ public class MultipartResponse {
 
     }
 
-
     public void addAttachment(Attachment attachment) {
-
         attachments.add(attachment);
-
     }
-    public Attachment addAttachment(String contentType, String contentId, InputStream is) {
-
-        Attachment attachment = new Attachment(contentType, contentId, is);
-        attachments.add(attachment);
-
-        return attachment;
-    }
-
-    public Attachment addAttachment(String contentType, String contentId, String url) {
-
-        Attachment attachment = new Attachment(contentType, contentId, url);
-        attachments.add(attachment);
-        return attachment;
-    }
-
-
-    public Attachment addAttachment(String contentType, String contentId, Document doc) {
-
-        Attachment attachment = new Attachment(contentType, contentId, doc);
-        attachments.add(attachment);
-        return attachment;
-    }
-
 
     private void closeMimeDoc(ServletOutputStream sos) throws IOException {
         sos.println("--" + mimeBoundary + "--");

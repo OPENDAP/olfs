@@ -25,12 +25,16 @@
  */
 package opendap.wcs.v2_0.http;
 
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
@@ -57,6 +61,7 @@ public class Attachment {
     private final String contentType = "Content-Type";
     private InputStream _istream;
     private String _sourceUrl;
+    private CredentialsProvider _credentialsProvider;
     private Document _doc;
     private ContentModel _myContentModel;
 
@@ -76,6 +81,11 @@ public class Attachment {
     public Attachment(String ctype, String cid){
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         mimeHeaders = new HashMap<String, String>();
+        _credentialsProvider = null;
+        _sourceUrl = null;
+        _istream = null;
+        _doc = null;
+        _myContentModel = null;
 
         setHeader(contentType,ctype);
         setHeader(contentId,"<"+cid+">");
@@ -91,11 +101,9 @@ public class Attachment {
      */
     public Attachment(String ctype, String cid, InputStream is) {
         this(ctype,cid);
-
         _istream = is;
         _doc = null;
         _myContentModel = ContentModel.stream;
-
     }
 
 
@@ -104,11 +112,10 @@ public class Attachment {
      * @param cid   String containing the value if the HTTP header Content-Id for this attachment.
      * @param url   A URL that when dereferenced will provide the content for this attachment.
      */
-    public Attachment(String ctype, String cid, String url) {
+    public Attachment(String ctype, String cid, String url, CredentialsProvider creds) {
         this(ctype,cid);
-
-        _istream = null;
         _sourceUrl = url;
+        _credentialsProvider =creds;
         _doc = null;
         _myContentModel = ContentModel.url;
     }
@@ -120,9 +127,6 @@ public class Attachment {
      */
     public Attachment(String ctype, String cid, Document doc) {
         this(ctype,cid);
-
-        _istream = null;
-        _sourceUrl = null;
         _doc = doc;
         _myContentModel = ContentModel.document;
     }
@@ -156,7 +160,7 @@ public class Attachment {
         switch (_myContentModel) {
             case stream:
                 try {
-                    Util.drainInputStream(_istream, sos);
+                    drainInputStream(_istream, sos);
                 } finally {
                     if (_istream != null) {
                         try {
@@ -171,11 +175,11 @@ public class Attachment {
                 break;
 
             case url:
-                Util.forwardUrlContent(_sourceUrl, sos);
+                opendap.http.Util.writeRemoteContent(_sourceUrl, _credentialsProvider, sos);
                 break;
 
             case document:
-                Util.sendDocument(_doc, sos);
+                sendDocument(_doc, sos);
                 break;
 
             default:
@@ -187,6 +191,46 @@ public class Attachment {
         sos.println();
 
 
+    }
+
+    public static final int DEFAULT_BUFFER_SIZE = 10240; // 10k read buffer
+
+    private int drainInputStream(InputStream is, OutputStream os) throws IOException {
+        return drainInputStream(is,os,DEFAULT_BUFFER_SIZE);
+    }
+
+    private int drainInputStream(InputStream is, OutputStream os, int bufferSize) throws IOException {
+        byte[] buf = new byte[bufferSize];
+        boolean done = false;
+        int totalBytesRead = 0;
+        int totalBytesWritten = 0;
+        int bytesRead;
+
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (!done) {
+            bytesRead = is.read(buf);
+            if (bytesRead == -1) {
+                //   if (totalBytesRead == 0)
+                //      totalBytesRead = -1;
+                done = true;
+            } else {
+                totalBytesRead += bytesRead;
+                os.write(buf, 0, bytesRead);
+                // baos.write(buf,0,bytesRead);
+                totalBytesWritten += bytesRead;
+            }
+        }
+        if (totalBytesRead != totalBytesWritten)
+            throw new IOException("Failed to write as many bytes as I read! " +
+                    "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
+        //System.out.println("################################################################");
+        //System.out.write(baos.toByteArray());
+        //System.out.println("################################################################");
+        return totalBytesRead;
+    }
+    private void sendDocument(Document doc,OutputStream os) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(doc, os);
     }
 
 

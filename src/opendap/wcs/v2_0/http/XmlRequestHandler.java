@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
@@ -158,7 +159,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Document wcsRequestDoc = parseWcsRequest(sis, encoding);
 
         Element wcsRequest = wcsRequestDoc.getRootElement();
-        String serviceUrl = Util.getServiceUrlString(request, _prefix);
+        String serviceUrl = PathBuilder.pathConcat(Util.getServiceUrl(request),_prefix);
 
         String requestUrl=HttpGetHandler.getRequestUrl(request);
 

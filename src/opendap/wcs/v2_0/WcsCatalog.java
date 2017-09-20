@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 
 import java.util.Collection;
@@ -292,5 +293,7 @@ public interface WcsCatalog {
 
     public boolean hasEoCoverage(String id);
 
+    public CredentialsProvider getCredentials();
 
-    }
+
+}

@@ -120,8 +120,6 @@ public class GetCoverageRequest {
                     WcsException.NO_APPLICABLE_CODE);
         }
 
-
-
         // Get the identifier for the coverage.
         s = kvp.get("coverageId".toLowerCase());
         if(s==null){
@@ -132,7 +130,6 @@ public class GetCoverageRequest {
         }
         _coverageID = Util.stripQuotes(s[0]);
 
-
         CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
@@ -140,8 +137,6 @@ public class GetCoverageRequest {
                     WcsException.INVALID_PARAMETER_VALUE,
                     "coverageId");
         }
-
-
 
         // Get the _format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
         // it was not specified.
@@ -179,7 +174,6 @@ public class GetCoverageRequest {
                 _dimensionSubsets.put(subset.getDimensionId(), subset);
             }
         }
-
         // Get the range subset expressions
         s = kvp.get("RangeSubset".toLowerCase());
         if(s!=null) {
@@ -204,7 +198,6 @@ public class GetCoverageRequest {
 
         Element e;
         String s;
-
         _requestUrl = requestUrl;
 
         // Make sure we got the correct request object.
@@ -246,7 +239,7 @@ public class GetCoverageRequest {
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
         // part and the second part must contain whatever response _format the user specified in the _format parameter.
-        Element mediaTypeElement = getCoverageRequestElem.getChild("_mediaType",WCS.WCS_NS);
+        Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
         if(mediaTypeElement!=null){
             s = mediaTypeElement.getTextTrim();
             setMediaType(s);

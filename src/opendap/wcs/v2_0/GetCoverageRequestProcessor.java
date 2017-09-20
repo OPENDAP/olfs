@@ -31,6 +31,7 @@ import opendap.wcs.v2_0.formats.WcsResponseFormat;
 import opendap.wcs.v2_0.http.Attachment;
 import opendap.wcs.v2_0.http.MultipartResponse;
 import opendap.wcs.v2_0.http.SoapHandler;
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -73,6 +74,7 @@ public class GetCoverageRequestProcessor {
 
         String id = req.getCoverageID();
         boolean b = CatalogWrapper.hasCoverage(id);
+        CredentialsProvider authCreds = CatalogWrapper.getCredentialsProvider();
 
         if (!b)
             throw new WcsException("No such wcs:Coverage: " + Scrub.fileName(id),
@@ -83,31 +85,23 @@ public class GetCoverageRequestProcessor {
         // only has a single value we know it means we have to send the multipart response with the gml:Coverage
         // in the first part and then the binary stuff as specified in the format parameter in the next part.
         if (req.getMediaType() != null) {
-
             sendMultipartGmlResponse(req, response, useSoapEnvelope);
-
-
         } else {
-            sendFormatResponse(req, response, useSoapEnvelope);
+            sendFormatResponse(req, response, useSoapEnvelope, authCreds);
         }
 
 
     }
 
-    public static void sendFormatResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
-
+    public static void sendFormatResponse(
+            GetCoverageRequest req,
+            HttpServletResponse response,
+            boolean useSoapEnvelope,
+            CredentialsProvider authCreds
+    ) throws WcsException, InterruptedException, IOException {
         _log.debug("Sending binary data response...");
-
         response.setHeader("Content-Disposition", getContentDisposition(req));
-
-        try {
-            opendap.wcs.v2_0.http.Util.forwardUrlContent(getDataAccessUrl(req), response, true);
-        } catch (URISyntaxException e) {
-            throw new WcsException("Internal server error. Server failed to generate a valid server access URI: " + Scrub.fileName(getDataAccessUrl(req)),
-                    WcsException.NO_APPLICABLE_CODE, "DataAccessUrl");
-        }
-
-
+        opendap.http.Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
     }
 
 
@@ -157,7 +151,7 @@ public class GetCoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDataAccessUrl(req));
+        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req),CatalogWrapper.getCredentialsProvider());
         rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
@@ -191,7 +185,7 @@ public class GetCoverageRequestProcessor {
      * @throws WcsException
      * @throws InterruptedException
      */
-    public static String getDataAccessUrl(GetCoverageRequest req) throws WcsException, InterruptedException {
+    public static String getDap2DataAccessUrl(GetCoverageRequest req) throws WcsException, InterruptedException {
 
         String format = getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
@@ -200,9 +194,9 @@ public class GetCoverageRequestProcessor {
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
-        StringBuilder dataAccessURL = new StringBuilder(requestURL);
-        dataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
-        return dataAccessURL.toString();
+        StringBuilder dap2DataAccessURL = new StringBuilder(requestURL);
+        dap2DataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
+        return dap2DataAccessURL.toString();
     }
 
 

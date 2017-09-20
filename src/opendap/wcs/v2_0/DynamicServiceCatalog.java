@@ -383,4 +383,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
         return dynamicService.getSrs();
     }
+
+
+    public CredentialsProvider getCredentials(){
+        return _credsProvider;
+    }
+
 }

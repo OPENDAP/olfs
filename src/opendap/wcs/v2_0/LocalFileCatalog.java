@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -61,6 +62,7 @@ public class LocalFileCatalog implements WcsCatalog {
     public static final String NamespacePrefix = "lfc";
     public static final Namespace NS = Namespace.getNamespace(NamespacePrefix,NamespaceName);
 
+    private CredentialsProvider _credsProvider;
 
 
     private  Logger log;
@@ -167,6 +169,16 @@ public class LocalFileCatalog implements WcsCatalog {
         log.debug("CatalogFile: " + _catalogConfigFile);
 
 
+        e1 = config.getChild("Credentials");
+        if(e1==null){
+            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
+            log.debug("Using Credentials file: ~/.netrc");
+        }
+        else {
+            String credsFilename  = e1.getTextTrim();
+            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider(credsFilename,true);
+            log.debug("Using Credentials file: {}",credsFilename );
+        }
 
         ingestCatalog();
 
@@ -618,4 +630,7 @@ public class LocalFileCatalog implements WcsCatalog {
       this.datasetSeriesMap = dataSeries;	
     }
 
+    public CredentialsProvider getCredentials() {
+        return _credsProvider;
+    }
 }
