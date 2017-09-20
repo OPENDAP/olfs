@@ -100,5 +100,43 @@ public class Util {
     }
 
 
+    /**
+     * Removes lead and trailing occurances of single quote, double quoute, and back tic (",',`)
+     * Fromt he string s
+     * @param s The String to unqupte
+     * @return  The string s with out leading or trailing quote chars.
+     */
+    public static String stripQuotes(String s) {
+        return s.replaceAll("^`|^\"|^'|`$|\"$|'$", "");
+    }
+
+    public static void main(String[] args) {
+
+        String testStr;
+        testStr = "\"foo\"";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "'foo'";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "`foo`";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "'foo`";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "\"foo'";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "\"foo\"'bar'";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+        testStr = "foobar";
+        System.out.println("testStr: "+testStr+"  stripQuotes: "+stripQuotes(testStr));
+
+
+    }
+
+
 
 }

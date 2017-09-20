@@ -240,7 +240,6 @@ public class GetCoverageRequestProcessor {
 
         String coverageID = req.getCoverageID();
 
-
         CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
@@ -331,10 +330,10 @@ public class GetCoverageRequestProcessor {
                 StringBuilder valueSubsetClause = new StringBuilder();
                 boolean arraySubset = false;
 
-                // So we need to process the value based subsets by using a call to the grid() ssf
-                // The array index subsets, if any need to be applied to the variable as it is
-                // passed into the grid() function
-
+                // We need to process the value based subsets by using a call to the grid() ssf
+                // The array index subsets, if anyexist, need to be applied to the variable as it is
+                // passed into the grid() function and we need to get them in the order of the
+                // DomainCoordinate variables
                 for(DomainCoordinate domainCoordinate : domainCoordinates.values()){
 
                     DimensionSubset dimSub = domCordToDimSubsetMap.get(domainCoordinate);
@@ -343,13 +342,12 @@ public class GetCoverageRequestProcessor {
                         dimSub = new DimensionSubset(domainCoordinate);
                     }
 
-
-
                     if(dimSub.isValueSubset()) {
                         // A value subset means that the user supplied values of the domain coordinates that specify
                         // the bounds of the subset that they want
                         if(valueSubsetClause.length()>0){
-                            valueSubsetClause.append(",");
+                      _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+                  valueSubsetClause.append(",");
                         }
                         // Then we tack on the value constraint expression: "low<=dimName<=high"
                         valueSubsetClause.append(dimSub.getDap2GridValueConstraint());

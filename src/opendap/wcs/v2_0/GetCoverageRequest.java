@@ -130,7 +130,17 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "coverageId");
         }
-        _coverageID = s[0];
+        String id = s[0];
+        while(id.startsWith("\"") && id.length()>0)
+            id = id.substring(1);
+        while(id.endsWith("\"") && id.length()>0)
+            id = id.substring(0,id.length()-1);
+        if (id.length() == 0) {
+            throw new WcsException("THe supplied 'coverageId' was empty. :(",
+                    WcsException.MISSING_PARAMETER_VALUE,
+                    "coverageId");
+        }
+        _coverageID = id;
 
 
         CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);

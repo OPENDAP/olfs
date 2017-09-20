@@ -145,9 +145,16 @@ public class DescribeCoverageRequest {
         if(s!=null){
             tmp = s[0].split(",");
             Vector<String> cids = new Vector<>();
-            for(String t:tmp){
-                if(!t.isEmpty()){
-                    cids.add(t);
+            for(String cid:tmp){
+
+                if(!cid.isEmpty()){
+                    cid = Util.stripQuotes(cid);
+                    if (cid.length() == 0) {
+                        throw new WcsException("A/The supplied 'coverageId' was empty. :(",
+                                WcsException.MISSING_PARAMETER_VALUE,
+                                "coverageId");
+                    }
+                    cids.add(cid);
                 }
             }
             if(cids.size()>0){

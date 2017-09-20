@@ -26,8 +26,8 @@ public class RangeSubset {
                     if(ss.length!=2)
                         throw new WcsException("Unable to process field list range expression.",
                                 WcsException.INVALID_PARAMETER_VALUE);
-                    String start = ss[0];
-                    String stop = ss[1];
+                    String start = Util.stripQuotes(ss[0]);
+                    String stop = Util.stripQuotes(ss[1]);
 
                     boolean gitit = false;
                     for(Field field : fields){
@@ -39,7 +39,7 @@ public class RangeSubset {
                     }
                 }
                 else {
-                    _requestedFields.add(id);
+                    _requestedFields.add(Util.stripQuotes(id));
                 }
 
 

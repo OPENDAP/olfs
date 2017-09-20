@@ -66,16 +66,6 @@ public class CatalogWrapper {
 
     private static boolean intitialized = false;
 
-    public static void init(Element config, WcsCatalog catalog) throws Exception {
-        if(intitialized)
-            return;
-
-        ingestCapabilitiesMetadata(config);
-
-        _catalogImpl = catalog;
-
-        intitialized = true;
-    }
 
 
     public static void init(String  metadataDir, WcsCatalog catalog) throws Exception {

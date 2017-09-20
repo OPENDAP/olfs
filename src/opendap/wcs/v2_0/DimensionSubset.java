@@ -85,37 +85,6 @@ public class DimensionSubset implements Cloneable {
         _domainCoordinate = source._domainCoordinate==null ? null : new DomainCoordinate(source._domainCoordinate);
     }
 
-    public DimensionSubset(
-            String dimId,
-            String low,
-            String high,
-            boolean isInditial,
-            DomainCoordinate dc
-    )  {
-        this();
-        _mySubsetType = Type.TRIM;
-        _dimensionId = dimId;
-        _trimLow = low;
-        _trimHigh = high;
-        _isArrayIndexSubset = isInditial;
-        _domainCoordinate = dc;
-    }
-
-    public DimensionSubset(
-            String dimId,
-            String slicePoint,
-            boolean isInditial,
-            DomainCoordinate dc
-    )  {
-        this();
-        _mySubsetType = Type.SLICE_POINT;
-        _dimensionId = dimId;
-        _slicePoint = slicePoint;
-        _isArrayIndexSubset = isInditial;
-        _domainCoordinate = dc;
-    }
-
-
     /**
      * Makes a DimensioSubset that requests the entire DomainCoordinate
      * @param dc
@@ -131,10 +100,10 @@ public class DimensionSubset implements Cloneable {
 
 
     /**
-         * Accepts the KVP encoding of a subset parameter for WCS 2.0
-         * @param kvpSubsetString  the KVP encoding of a subset parameter value.
-         * @throws WcsException When it's funky, like an old sock.
-         */
+     * Accepts the KVP encoding of a subset parameter for WCS 2.0
+     * @param kvpSubsetString  the KVP encoding of a subset parameter value.
+     * @throws WcsException When it's funky, like an old sock.
+     */
     public DimensionSubset(String kvpSubsetString) throws WcsException {
         this();
 
@@ -156,7 +125,7 @@ public class DimensionSubset implements Cloneable {
                 WcsException.INVALID_PARAMETER_VALUE,
                 "subset");
         }
-        setDimensionId(s);
+        setDimensionId(Util.stripQuotes(s));
 
         String intervalOrPoint = kvpSubsetString.substring(leftParen+1,rghtParen);
 
