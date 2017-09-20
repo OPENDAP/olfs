@@ -130,17 +130,7 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "coverageId");
         }
-        String id = s[0];
-        while(id.startsWith("\"") && id.length()>0)
-            id = id.substring(1);
-        while(id.endsWith("\"") && id.length()>0)
-            id = id.substring(0,id.length()-1);
-        if (id.length() == 0) {
-            throw new WcsException("THe supplied 'coverageId' was empty. :(",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "coverageId");
-        }
-        _coverageID = id;
+        _coverageID = Util.stripQuotes(s[0]);
 
 
         CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);
@@ -235,7 +225,7 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "wcs:CoverageId");
         }
-        _coverageID =e.getText();
+        _coverageID = Util.stripQuotes(e.getText());
 
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
@@ -295,12 +285,6 @@ public class GetCoverageRequest {
     public String getCoverageID() {
         return _coverageID;
     }
-
-
-    public void setCoverageID(String coverageID) {
-        this._coverageID = coverageID;
-    }
-
 
     public String getFormat() {
         return _format;
