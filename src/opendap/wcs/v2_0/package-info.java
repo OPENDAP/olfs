@@ -67,4 +67,6 @@
  */
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlNs;
+import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlSchema;

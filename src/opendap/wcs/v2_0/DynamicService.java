@@ -1,6 +1,5 @@
 package opendap.wcs.v2_0;
 
-import opendap.dap4.Dim;
 import opendap.wcs.srs.SimpleSrs;
 import opendap.wcs.srs.SrsFactory;
 import org.jdom.Element;
@@ -285,7 +284,7 @@ public class DynamicService {
             sb.append("     description: "+field.description).append("\n");
             sb.append("     units: "+field.units).append("\n");
             sb.append("     vmin: "+field.min).append("\n");
-            sb.append("     vmzx: "+field.max).append("\n");
+            sb.append("     vmax: "+field.max).append("\n");
             sb.append("\n");
         }
 

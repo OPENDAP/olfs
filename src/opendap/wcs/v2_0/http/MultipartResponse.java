@@ -25,8 +25,6 @@
  */
 package opendap.wcs.v2_0.http;
 
-import opendap.wcs.v2_0.CatalogWrapper;
-import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.rmi.server.UID;
 import java.util.Vector;

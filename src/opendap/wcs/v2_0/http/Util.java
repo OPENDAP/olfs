@@ -27,16 +27,10 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.dap.Request;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 
 

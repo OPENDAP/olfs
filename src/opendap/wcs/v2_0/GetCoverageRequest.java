@@ -32,7 +32,9 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * User: ndp

@@ -1,11 +1,12 @@
 package opendap.wcs.v2_0;
 
-import org.jdom.Element;
-
-import java.util.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.bind.*;
 
 
 /**

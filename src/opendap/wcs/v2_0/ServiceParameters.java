@@ -26,7 +26,6 @@
 
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 public class ServiceParameters {

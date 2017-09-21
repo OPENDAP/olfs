@@ -26,15 +26,17 @@
 
 package opendap.wcs.v2_0;
 
+import net.opengis.gml.v_3_2_1.DirectPositionType;
+import net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType;
+import net.opengis.gml.v_3_2_1.TimePositionType;
+import opendap.wcs.srs.SimpleSrs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-
-import net.opengis.gml.v_3_2_1.*;
-import opendap.wcs.srs.SimpleSrs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
