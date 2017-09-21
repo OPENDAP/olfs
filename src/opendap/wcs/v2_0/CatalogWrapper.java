@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -59,7 +59,13 @@ public class CatalogWrapper {
     private static File opsMetadataFile;
     private static AtomicReference<Element> operationsMetadata    = new AtomicReference<Element>();
 
-    
+
+    /**
+     * This is the string in the template OperationsMetadata file and we replace it with the one
+     * we get from Tomcat
+     * TODO Make the value of this something like @SERVICE_ENDPOINT_URL@ so people don't spaz ad change it when the localize their Capabilities conent.
+     * TODO And change the variable name from _defaultServiceUrl to SERVICE_END_POINT;
+     */
     private static String _defaultServiceUrl= "http://your.domain.name:8080/opendap/WCS";
 
 

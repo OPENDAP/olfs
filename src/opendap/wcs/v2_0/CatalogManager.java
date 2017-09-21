@@ -23,15 +23,7 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-package opendap.wcs.v2_0.formats;
+package opendap.wcs.v2_0;
 
-import opendap.coreServlet.MimeTypes;
-
-public class Dap4DataFormat extends WcsResponseFormat {
-    public Dap4DataFormat() {
-        super();
-        _name = "dap4";
-        _dapSuffix = "dap";
-        _mimeType = MimeTypes.getMimeType(_dapSuffix);
-    }
+public class CatalogManager {
 }
