@@ -22,7 +22,7 @@ public class DynamicService {
     private URL _dapServiceUrl;
     private SimpleSrs _srs;
     private Vector<DomainCoordinate> _domainCoordinates;
-    private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
+    // private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
 
 
@@ -42,7 +42,7 @@ public class DynamicService {
         _dapServiceUrl = null;
         _srs = null;
         _domainCoordinates =  new Vector<>();
-        _dcMap = new ConcurrentHashMap<>();
+        //_dcMap = new ConcurrentHashMap<>();
         _wcsFieldsByDapID = new ConcurrentHashMap<>();
     }
 
@@ -207,7 +207,7 @@ public class DynamicService {
 
     public void addDomainCoordinate(DomainCoordinate dc){
         _domainCoordinates.add(dc);
-        _dcMap.put(dc.getName(),dc);
+        //_dcMap.put(dc.getName(),dc);
     }
 
 
