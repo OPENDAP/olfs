@@ -45,7 +45,6 @@ public class DomainCoordinate {
     private String _dapId;
     private String _units;
     private String _arraySubset;
-    private String _role;
     private long _size;
     private double _min;
     private double _max;
@@ -86,19 +85,6 @@ public class DomainCoordinate {
             }
         }
 
-        _role = dc.getAttributeValue("role");
-
-        if(!problems.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Dynamic Configuration Failed To Ingest!\n");
-            for(String msg: problems){
-                sb.append(msg).append("\n");
-                throw new ConfigurationException(sb.toString());
-            }
-
-        }
-
-
         s = dc.getAttributeValue("min");
         if(s ==null){
             problems.add("In the configuration a DomainCoordinate element is " +
@@ -127,6 +113,15 @@ public class DomainCoordinate {
         }
 
 
+        if(!problems.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Dynamic Configuration Failed To Ingest!\n");
+            for(String msg: problems){
+                sb.append(msg).append("\n");
+                throw new ConfigurationException(sb.toString());
+            }
+
+        }
 
 
     }
@@ -141,7 +136,6 @@ public class DomainCoordinate {
         _units       = dc._units;
         _arraySubset = dc._arraySubset;
         _size        = dc._size;
-        _role        = dc._role;
         _min         = dc._min;
         _max         = dc._max;
     }
@@ -150,15 +144,13 @@ public class DomainCoordinate {
                             String dapId,
                             String units,
                             String arraySubset,
-                            long size,
-                            String role)
+                            long size)
             throws BadParameterException {
         _name = name;
         _dapId = dapId;
         _units = units;
         _arraySubset = arraySubset;
         _size = size;
-        _role = role;
 
         if (_name == null) {
             throw new BadParameterException("In DomainCoordinate the 'name' parameter may not have a null value.");
@@ -190,17 +182,12 @@ public class DomainCoordinate {
             {
                 throw new Error();
             }
-
             // Deep clone member fields here
-
-
             _name = dc._name;
             _dapId = dc._dapId;
             _units = dc._units;
             _arraySubset = dc._arraySubset;
             _size = dc._size;
-
-
 
             return dc;
         }
@@ -234,7 +221,6 @@ public class DomainCoordinate {
         return _size;
     }
 
-    public String getRole(){ return _role; }
 
     public double getMin(){ return _min; }
     public void setMin(String minStr) {

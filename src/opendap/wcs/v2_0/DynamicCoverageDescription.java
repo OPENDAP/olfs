@@ -246,8 +246,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
                     coordinateVariable.getName(), // This is the name of the corresponding DAP variable
                     units,  // The units string, typically deg or the like
                     "",
-                    size,
-                    defaultCoordinate.getRole());
+                    size);
 
         } else {
             domainCoordinate = new DomainCoordinate(defaultCoordinate);
@@ -951,19 +950,19 @@ public class DynamicCoverageDescription extends CoverageDescription {
             ds.setSrs(defaultSrs);
 
             String s = "time";
-            DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1, s);
+            DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1);
             dc.setMin(690);
             dc.setMax(9330);
             ds.addDomainCoordinate(dc);
 
             s = "latitude";
-            dc = new DomainCoordinate(s, s, "deg", "", 361, s);
+            dc = new DomainCoordinate(s, s, "deg", "", 361);
             dc.setMin(-90.0);
             dc.setMax(90.0);
             ds.addDomainCoordinate(dc);
 
             s = "longitude";
-            dc = new DomainCoordinate(s, s, "deg", "", 576, s);
+            dc = new DomainCoordinate(s, s, "deg", "", 576);
             dc.setMin(-180.0);
             dc.setMax(179.625);
             ds.addDomainCoordinate(dc);
