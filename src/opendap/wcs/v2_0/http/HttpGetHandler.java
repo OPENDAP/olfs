@@ -429,7 +429,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public static String getRequestUrl(HttpServletRequest request){
         StringBuilder requestUrl =  new StringBuilder(request.getRequestURL());
         String query = request.getQueryString();
-        if(query!=null || !query.isEmpty()){
+        if(query!=null && !query.isEmpty()){
             query = Scrub.completeURL(request.getQueryString());
             requestUrl.append("?").append(query);
         }
