@@ -364,7 +364,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         String baseServiceUrl = Util.getServiceUrl(request);
         String relativeURL = ReqInfo.getLocalUrl(request);
-
         String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
 
         log.debug("sendCapabilitesPresentationPage()  baseServiceUrl: "+baseServiceUrl);
