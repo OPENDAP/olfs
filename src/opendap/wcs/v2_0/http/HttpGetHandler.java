@@ -371,8 +371,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Map<String, String[]> kvp = getKVP(request);
         String[] cids= kvp.get("coverageId".toLowerCase());
         Document capabilitiesDoc = GetCapabilitiesRequestProcessor.getFullCapabilitiesDocument(wcsServiceUrl,cids);
-
-
         log.debug(xmlo.outputString(capabilitiesDoc));
 
         response.setContentType("text/html");
@@ -381,19 +379,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",baseServiceUrl);
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
-
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
-
         t.transform(capDoc,response.getOutputStream());
-
-
-
     }
-
-
-
-
-
 
 
     public void echoWcsRequest(HttpServletRequest request,
@@ -403,11 +391,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
         String requestUrl = getRequestUrl(request);
-
         response.setContentType("text/xml");
-
         try {
-
             switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
@@ -429,28 +414,20 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                     throw new WcsException("INTERNAL ERROR: getRequestType() returned an invalid value.",
                             WcsException.NO_APPLICABLE_CODE);
             }
-
             xmlo.output(reqDoc,response.getOutputStream());
-
-
         }
         catch(WcsException e){
             log.error(e.getMessage());
             WcsExceptionReport er = new WcsExceptionReport(e);
             response.getOutputStream().println(er.toString());
         }
-
-
-
     }
 
 
 
     public static String getRequestUrl(HttpServletRequest request){
         String query = Scrub.completeURL(request.getQueryString());
-        String requestUrl = request.getRequestURL() + "?" + query;
-
-        return requestUrl;
+        return request.getRequestURL() + (query.isEmpty()?"":"?"+query);
     }
 
 
