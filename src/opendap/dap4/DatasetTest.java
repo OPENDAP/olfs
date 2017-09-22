@@ -58,12 +58,52 @@ public class DatasetTest {
       }
   }
 
+  // The methods in this class are trivial, 
+  // so we test them all indirectly by looking 
+  // for meaningful properties like CF, SRS
+  // e.g. hasDataResolution "tests" getValueOfGlobalAttributeWithNameLike
+  //      usesCfConventions tests both usesCfConventions as well as presence 
+  //      of global attribute via looping of container attributes
+  
   @Test
   public void usesCfConventions() {
     Assume.assumeTrue(_datasetIsNotNull);
     assertTrue(dataset.usesCfConventions());
   }
+  
+  @Test
+  public void hasVariables() {
+    Assume.assumeTrue(_datasetIsNotNull);
+    assertTrue(dataset.getVariables().size() > 0);
+  }
+  
+  @Test
+  //TODO: This is non-trivial test
+  public void hasSrs() {
+    Assume.assumeTrue(_datasetIsNotNull);
+    assertTrue(true);
+  }
+  
+  @Test
+  //TODO: this is non-trivial test
+  public void hasDimensions() {
+    Assume.assumeTrue(_datasetIsNotNull);
+    assertTrue(true);
+  }
+  
+  @Test
+  //TODO:  non-trivial
+  public void hasEnvelopeWithTimePeriod() {
+    Assume.assumeTrue(_datasetIsNotNull);
+    assertTrue(true);
+  }
 
+  @Test
+  public void hasDataResolution() {
+    Assume.assumeTrue(_datasetIsNotNull);
+    assertTrue(dataset.getValueOfGlobalAttributeWithNameLike("DataResolution") != null);
+  }
+  
   @Parameters
   public static Collection<Object[]> data() {
       return Arrays.asList(new Object[][]{
