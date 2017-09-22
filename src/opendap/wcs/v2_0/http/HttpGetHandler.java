@@ -421,13 +421,19 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
             WcsExceptionReport er = new WcsExceptionReport(e);
             response.getOutputStream().println(er.toString());
         }
+
+
+
     }
-
-
-
+    
     public static String getRequestUrl(HttpServletRequest request){
-        String query = Scrub.completeURL(request.getQueryString());
-        return request.getRequestURL() + (query.isEmpty()?"":"?"+query);
+        StringBuilder requestUrl =  new StringBuilder(request.getRequestURL());
+        String query = request.getQueryString();
+        if(query!=null || !query.isEmpty()){
+            query = Scrub.completeURL(request.getQueryString());
+            requestUrl.append("?").append(query);
+        }
+        return requestUrl.toString();
     }
 
 
