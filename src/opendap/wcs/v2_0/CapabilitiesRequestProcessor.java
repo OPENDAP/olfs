@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  *
@@ -61,9 +62,9 @@ public class CapabilitiesRequestProcessor {
         capabilities.setAttribute("updateSequence", updateSequence);
 
 
-        capabilities.addContent(CatalogWrapper.getServiceIdentificationElement());
-        capabilities.addContent(CatalogWrapper.getServiceProviderElement());
-        capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
+        capabilities.addContent(ServiceManager.getServiceIdentificationElement());
+        capabilities.addContent(ServiceManager.getServiceProviderElement());
+        capabilities.addContent(ServiceManager.getOperationsMetadataElement(serviceUrl));
         capabilities.addContent(ServerCapabilities.getServiceMetadata());
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -138,15 +139,15 @@ public class CapabilitiesRequestProcessor {
 
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_IDENTIFICATION)){
-                capabilities.addContent(CatalogWrapper.getServiceIdentificationElement());
+                capabilities.addContent(ServiceManager.getServiceIdentificationElement());
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_PROVIDER)){
-                capabilities.addContent(CatalogWrapper.getServiceProviderElement());
+                capabilities.addContent(ServiceManager.getServiceProviderElement());
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.OPERATIONS_METADATA)){
-                capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
+                capabilities.addContent(ServiceManager.getOperationsMetadataElement(serviceUrl));
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_METADATA)){
@@ -179,9 +180,7 @@ public class CapabilitiesRequestProcessor {
      * catalogs last modified time in seconds since 1/1/1970
      */
     public static String getUpdateSequence(){
-
-        return CatalogWrapper.getLastModified()+"";
-
+        return ServiceManager.getLastModified()+"";
     }
 
 
@@ -192,55 +191,67 @@ public class CapabilitiesRequestProcessor {
      * @throws WcsException   When bad things happen.
      * @throws InterruptedException
      */
-    public static Element getContents(boolean allContent, boolean dataset_series_summary, boolean coverage_summary, long maxContentsSectionsCount, String[] coverageIds)  throws InterruptedException, WcsException {
+    public static Element getContents(
+            boolean allContent,
+            boolean dataset_series_summary,
+            boolean coverage_summary,
+            long maxContentsSectionsCount,
+            String[] coverageIds
+    )  throws InterruptedException, WcsException {
+
+        Vector<Element> extensionElements =  new Vector<>();
+        long sectionCount = 0;
 
         Element contentsElement = new Element("Contents",WCS.WCS_NS);
-
-        long count = 0;
 
 
         if(allContent  | coverage_summary){
             if(coverageIds!=null && coverageIds.length>0){
+
                 log.info("getContents() Building contents from supplied list of coverageIds");
                 for(String coverageId:coverageIds) {
-                    Element coverageSummaryElement = CatalogWrapper.getCoverageSummaryElement(coverageId);
+                    WcsCatalog wcsCatalog = ServiceManager.getCatalog(coverageId);
+                    Element coverageSummaryElement = wcsCatalog.getCoverageSummaryElement(coverageId);
                     log.debug("coverageId: {} coverageSummaryElement: {}",coverageId, coverageSummaryElement);
                     if(coverageSummaryElement!=null){
                         contentsElement.addContent(coverageSummaryElement);
+                        sectionCount++;
                     }
-                    if( maxContentsSectionsCount < count++)
+                    if(sectionCount<maxContentsSectionsCount && (allContent | dataset_series_summary)) {
+                        sectionCount =
+                                getExtensionsElements(extensionElements, wcsCatalog,
+                                        sectionCount,maxContentsSectionsCount);
+                        contentsElement.addContent(extensionElements);
+
+                    }
+
+                    if( maxContentsSectionsCount < sectionCount)
                         break;
                 }
             }
             else {
-                log.info("getContents() Building contents from WcsCatalog API");
-                Iterator i = CatalogWrapper.getCoverageSummaryElements().iterator();
+                log.info("getContents() Building contents from the default WcsCatalog");
+                WcsCatalog defaultWcsCatalog = ServiceManager.getDefaultCatalog();
+                Iterator i = defaultWcsCatalog.getCoverageSummaryElements().iterator();
                 if (i.hasNext()) {
                     Element cs;
                     while (i.hasNext()) {
                         cs = (Element) i.next();
-                        count++;
-                        if (count < maxContentsSectionsCount)
+                        sectionCount++;
+                        if (sectionCount < maxContentsSectionsCount)
                             contentsElement.addContent(cs);
                     }
+                }
+                if(sectionCount<maxContentsSectionsCount && (allContent | dataset_series_summary)) {
+                    getExtensionsElements(extensionElements, defaultWcsCatalog,
+                                    sectionCount,maxContentsSectionsCount);
+                    contentsElement.addContent(extensionElements);
                 }
             }
         }
 
-        if(count<maxContentsSectionsCount && (allContent | dataset_series_summary)) {
-            Iterator i = CatalogWrapper.getDatasetSeriesSummaryElements().iterator();
-            if(i.hasNext()){
-                Element wcsExtensionElement = new Element("Extension",WCS.WCS_NS);
-                Element dss;
-                while(i.hasNext()){
-                    dss = (Element) i.next();
-                    count++;
-                    if(count<maxContentsSectionsCount)
-                        wcsExtensionElement.addContent(dss);
-                }
-                contentsElement.addContent(wcsExtensionElement);
-            }
-        }
+
+
 
         if(contentsElement.getChildren().isEmpty()){
             Element os;
@@ -253,6 +264,23 @@ public class CapabilitiesRequestProcessor {
     }
 
 
+    private static long getExtensionsElements(Vector<Element> extensionElements, WcsCatalog wcsCatalog, long sectionsCount, long maxContentsSectionsCount) throws WcsException, InterruptedException {
+
+        Iterator i = wcsCatalog.getDatasetSeriesSummaryElements().iterator();
+        if(i.hasNext()){
+            Element wcsExtensionElement = new Element("Extension",WCS.WCS_NS);
+            Element dss;
+            while(i.hasNext()){
+                dss = (Element) i.next();
+                sectionsCount++;
+                if(sectionsCount<maxContentsSectionsCount)
+                    wcsExtensionElement.addContent(dss);
+            }
+            extensionElements.add(wcsExtensionElement);
+        }
+        return sectionsCount;
+
+    }
 
 
 }

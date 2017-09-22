@@ -45,12 +45,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * This class is used to wrap an instance of the WcsCatalog class with a set of
  * static methods, creating a singleton catalog from a non-singleton class.
  */
+
 public class CatalogWrapper {
 
 
     private Date _cacheTime;
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(CatalogWrapper.class);
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger("CatalogWrapper");
 
     private static File serviceIdFile;
     private static AtomicReference<Element> serviceIdentification = new AtomicReference<Element>();
@@ -79,7 +80,7 @@ public class CatalogWrapper {
         if(intitialized)
             return;
 
-        ingestCapabilitiesMetadata(metadataDir);
+        // ingestCapabilitiesMetadata(metadataDir);
 
         _catalogImpl = catalog;
 
@@ -93,11 +94,6 @@ public class CatalogWrapper {
     }
 
 
-    public static boolean hasCoverage(String id) throws InterruptedException {
-        return _catalogImpl.hasCoverage(id);
-
-    }
-
     public static CoverageDescription getCoverageDescription(String id) throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageDescription(id);
 
@@ -109,114 +105,13 @@ public class CatalogWrapper {
 
 
 
-    public static Element getCoverageSummaryElement(String coverageId)  throws InterruptedException, WcsException{
-        return _catalogImpl.getCoverageSummaryElement(coverageId);
-    }
-
     public static Collection<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();
     }
 
 
-    public static Collection<Element> getDatasetSeriesSummaryElements()  throws InterruptedException, WcsException{
-        return _catalogImpl.getDatasetSeriesSummaryElements();
-    }
 
 
-
-    private static void ingestCapabilitiesMetadata(Element config) throws Exception  {
-        Element e1, e2;
-        String msg;
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        e1 = config.getChild("ServiceIdentification");
-        if(e1==null){
-            msg = "Cannot find ServiceIdentification element in " +
-                    "configuration element: \n"+ xmlo.outputString(config);
-            log.error(msg);
-            throw new IOException(msg);
-        }
-        serviceIdFile = new File(e1.getTextTrim());
-        e2 = Util.getDocumentRoot(serviceIdFile);
-        serviceIdentification.set(e2);
-        log.debug("Loaded wcs:ServiceIdentfication from: "+serviceIdFile);
-
-
-        e1 = config.getChild("ServiceProvider");
-        if(e1==null){
-            msg = "Cannot find ServiceProvider element in " +
-                    "configuration element: \n"+ xmlo.outputString(config);
-            log.error(msg);
-            throw new IOException(msg);
-        }
-        serviceProviderFile = new File(e1.getTextTrim());
-        e2 = Util.getDocumentRoot(serviceProviderFile);
-        serviceProvider.set(e2);
-        log.debug("Loaded wcs:ServiceProvider from: "+serviceProviderFile);
-
-        e1 = config.getChild("OperationsMetadata");
-        if(e1==null){
-            msg = "Cannot find OperationsMetadata element in " +
-                    "configuration element: \n"+ xmlo.outputString(config);
-            log.error(msg);
-            throw new IOException(msg);
-        }
-        opsMetadataFile = new File(e1.getTextTrim());
-        e2 = Util.getDocumentRoot(opsMetadataFile);
-        operationsMetadata.set(e2);
-        log.debug("Loaded wcs:OperationsMetadata from: "+opsMetadataFile);
-
-    }
-
-
-    public static void ingestCapabilitiesMetadata(String metadataDir) throws Exception  {
-
-        Element e2;
-
-        if(!metadataDir.endsWith("/"))
-            metadataDir += "/";
-
-
-
-        serviceIdFile = new File(metadataDir + "ServiceIdentification.xml");
-        e2 = Util.getDocumentRoot(serviceIdFile);
-        serviceIdentification.set(e2);
-        log.debug("Loaded wcs:ServiceIdentfication from: "+serviceIdFile);
-
-        serviceProviderFile = new File(metadataDir + "ServiceProvider.xml");
-        e2 = Util.getDocumentRoot(serviceProviderFile);
-        serviceProvider.set(e2);
-        log.debug("Loaded wcs:ServiceProvider from: "+serviceProviderFile);
-
-        opsMetadataFile = new File(metadataDir + "OperationsMetadata.xml");
-        e2 = Util.getDocumentRoot(opsMetadataFile);
-        operationsMetadata.set(e2);
-        log.debug("Loaded wcs:OperationsMetadata from: "+opsMetadataFile);
-
-
-    }
-
-    private void updateCapabilitiesMetadata() throws Exception{
-
-        Element e2;
-
-        if(_cacheTime.getTime() < serviceIdFile.lastModified()){
-            e2 = Util.getDocumentRoot(serviceIdFile);
-            serviceIdentification.set(e2);
-        }
-
-        if(_cacheTime.getTime() < serviceProviderFile.lastModified()){
-            e2 = Util.getDocumentRoot(serviceProviderFile);
-            serviceProvider.set(e2);
-        }
-
-        if(_cacheTime.getTime() < opsMetadataFile.lastModified()){
-            e2 = Util.getDocumentRoot(opsMetadataFile);
-            operationsMetadata.set(e2);
-        }
-        _cacheTime = new Date();
-
-    }
 
 
     public static long getLastModified(){
@@ -231,107 +126,6 @@ public class CatalogWrapper {
 
 
 
-
-
-    public  static Element getServiceIdentificationElement(){
-        return (Element) serviceIdentification.get().clone();
-    }
-
-    public  static Element getServiceProviderElement(){
-        return (Element) serviceProvider.get().clone();
-
-    }
-
-    public  static Element getOperationsMetadataElement(String serviceUrl){
-
-        Element omd = (Element)operationsMetadata.get().clone();
-        Element get, post, operation, allowedValues, parameter;
-        String href, name;
-        boolean foundIt;
-        Iterator i, j;
-
-
-        // Localize the access links
-        i =  omd.getDescendants(new ElementFilter("Get",WCS.OWS_NS));
-        while(i.hasNext()){
-            get =  (Element)i.next();
-            href = get.getAttributeValue("href",WCS.XLINK_NS);
-            if(href.startsWith(_defaultServiceUrl)){
-                href = href.replaceFirst(_defaultServiceUrl,serviceUrl);
-            }
-            get.setAttribute("href",href,WCS.XLINK_NS);
-        }
-
-        i =  omd.getDescendants(new ElementFilter("Post",WCS.OWS_NS));
-        while(i.hasNext()){
-            post =  (Element)i.next();
-            href = post.getAttributeValue("href",WCS.XLINK_NS);
-            if(href.startsWith(_defaultServiceUrl)){
-                href = href.replaceFirst(_defaultServiceUrl,serviceUrl);
-            }
-            post.setAttribute("href",href,WCS.XLINK_NS);
-        }
-
-
-
-        // Set the supported Formats
-
-        i=omd.getChildren("Operation",WCS.OWS_NS).iterator();
-        while(i.hasNext()){
-            operation = (Element) i.next();
-            name = operation.getAttributeValue("name");
-            if(name!=null && name.equals("GetCoverage")){
-                foundIt = false;
-                j = operation.getChildren("Parameter",WCS.OWS_NS).iterator();
-                while(j.hasNext()){
-                    parameter = (Element) j.next();
-                    name = parameter.getAttributeValue("name");
-                    if(name!= null && name.equals("Format")){
-                        foundIt = true;
-                        allowedValues =  parameter.getChild("AllowedValues",WCS.OWS_NS);
-                        if(allowedValues==null){
-                            allowedValues =  new Element("AllowedValues",WCS.OWS_NS);
-                            parameter.addContent(allowedValues);
-                        }
-
-                        allowedValues.addContent(getSupportedFormatNames());
-
-
-                    }
-
-                }
-     
-            }
-
-        }
-
-
-
-
-
-
-        return omd;
-    }
-
-
-
-    private static Vector<Element> getSupportedFormatNames(){
-
-        Vector<Element> sfEs = new Vector<Element>();
-        Vector<String> formats = ServerCapabilities.getSupportedFormatNames(null);
-        Element sf;
-
-        for(String format: formats){
-            sf = new Element("Value",WCS.OWS_NS);
-            sf.setText(format);
-            sfEs.add(sf);
-        }
-
-        return sfEs;
-
-
-
-    }
 
 
 
@@ -362,8 +156,5 @@ public class CatalogWrapper {
         return _catalogImpl.getEODatasetSeries(id);
     }
     
-    public static CredentialsProvider getCredentialsProvider(){
-        return _catalogImpl.getCredentials();
-    }
 
 }

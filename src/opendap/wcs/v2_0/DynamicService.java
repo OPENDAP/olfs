@@ -112,8 +112,11 @@ public class DynamicService {
 
         List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");
         if(domainCoordinateElements.size()<2) {
-            _log.warn("The DynamicService '" + _name + "' has " + domainCoordinateElements.size() + " DomainCoordinate elements . This is probably going to break something.");
+            _log.warn("The DynamicService '" + _name + "' has " +
+                    domainCoordinateElements.size() + " DomainCoordinate elements . " +
+                    "This is probably going to break something.");
         }
+
 
         for(Element dcElement: domainCoordinateElements){
             DomainCoordinate dc = new DomainCoordinate(dcElement);
@@ -187,7 +190,7 @@ public class DynamicService {
                 try {
                     field.min = Double.parseDouble(s);
                 } catch (NumberFormatException nue) {
-                    badThingsHappened.add("Failed to parse the value of the 'vmin' attribute as a double. vmin: "+s
+                    badThingsHappened.add("Failed to parse the value of the 'min' attribute as a double. min: "+s
                             +" msg: "+nue.getMessage());
                     borked = true;
                 }

@@ -125,7 +125,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         _xmlEchoPath           = "echoXML";
         _describeCoveragePath  = "describeCoverage";
 
-
         _resourcePath = resourcePath;
         log.debug("_resourcePath: "+_resourcePath);
 
@@ -151,12 +150,12 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return CatalogWrapper.getLastModified();
+        return ServiceManager.getLastModified();
     }
 
     public void destroy() {
         log.info("Shutting down catalog.");
-        CatalogWrapper.destroy();
+        ServiceManager.destroy();
         log.info("Destroy Complete");
     }
 
@@ -194,6 +193,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         return requestParameters;
 
     }
+
 
 
     private boolean wcsRequestDispatch(HttpServletRequest request,
@@ -296,7 +296,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
        public void run(){
            try {
-           CatalogWrapper.update();
+           ServiceManager.updateCatalogs();
            } catch (Exception e) {
                log.error("catalogUpdater(): Caught "+e.getClass().getName()+" Message: "+e.getMessage());
            }
@@ -324,7 +324,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Document coverageDescription = null;
         Element cde;
         try {
-            cde = CatalogWrapper.getCoverageDescriptionElement(id);
+            WcsCatalog wcsCatalog = ServiceManager.getCatalog(id);
+            cde = wcsCatalog.getCoverageDescriptionElement(id);
             coverageDescription = new Document(cde);
         }
         catch(WcsException e){
@@ -594,7 +595,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         GetCoverageRequest gcr = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(gcr.getCoverageID());
+        WcsCatalog wcsCatalog = ServiceManager.getCatalog(gcr.getCoverageID());
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(gcr.getCoverageID());
 
         Coverage coverage = new Coverage(coverageDescription,requestUrl);
 

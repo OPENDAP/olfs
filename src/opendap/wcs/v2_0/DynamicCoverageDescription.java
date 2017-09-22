@@ -254,9 +254,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         DomainCoordinate domainCoordinate;
         String coordinateName = defaultCoordinate.getName();
-        Variable coordinateVariable = findVariableWithCfStandardName(dataset, coordinateName);
-        if (coordinateVariable != null) {
-            String units = coordinateVariable.getAttributeValue("units");
+        Variable coordinateDapVariable = findVariableWithCfStandardName(dataset, coordinateName);
+        if (coordinateDapVariable != null) {
+
+            String units = coordinateDapVariable.getAttributeValue("units");
             if (units == null)
                 units = defaultCoordinate.getUnits();
 
@@ -266,9 +267,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
             if(size<1)
                 size = defaultCoordinate.getSize();
 
+
+
             domainCoordinate = new DomainCoordinate(
                     coordinateName,  // This is the WCS coordinate name as defined in the SRS
-                    coordinateVariable.getName(), // This is the name of the corresponding DAP variable
+                    coordinateDapVariable.getName(), // This is the name of the corresponding DAP variable
                     units,  // The units string, typically deg or the like
                     "",
                     size);

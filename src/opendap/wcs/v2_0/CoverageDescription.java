@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.PathBuilder;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
@@ -87,6 +88,7 @@ public class CoverageDescription {
 
 
     public CoverageDescription() {
+        super();
         _log = LoggerFactory.getLogger(this.getClass());
         _lastModified = System.currentTimeMillis();
         _dapGridId = new HashMap<>();
@@ -94,7 +96,7 @@ public class CoverageDescription {
     }
 
     public CoverageDescription(CoverageDescription cd) throws IOException {
-        super();
+        this();
         _myCD = (Element) cd._myCD.clone();
         _lastModified = cd._lastModified;
         _myFile = cd._myFile.getCanonicalFile();
@@ -164,7 +166,7 @@ public class CoverageDescription {
      */
     public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent)
             throws IOException, JDOMException, ConfigurationException, WcsException {
-        init();
+        this();
 
         this._validateContent = validateContent;
 
@@ -179,11 +181,11 @@ public class CoverageDescription {
             throw new ConfigurationException(msg);
         }
 
-        String fileName = catalogDir == null ? "" : (catalogDir + "/") + coverageDescriptionFileName;
+        String fileName = catalogDir == null ? "" : PathBuilder.pathConcat(catalogDir, coverageDescriptionFileName);
         File coverageDescriptionFile = new File(fileName);
 
         // Ingest the CoverageDescription File
-        _log.debug("Loading coverage description '{}'", coverageDescriptionFile);
+        _log.debug("Loading coverage description '{}'", coverageDescriptionFile.getAbsolutePath());
 
         _myCD = ingestCoverageDescription(coverageDescriptionFile);
         _myFile = coverageDescriptionFile;
@@ -258,12 +260,6 @@ public class CoverageDescription {
         }
     }
 
-    private void init() {
-        if (_initialized)
-            return;
-
-        _initialized = true;
-    }
 
     private Element parseXmlDoc(InputStream is, boolean validateContent) throws JDOMException, IOException {
         // get a validating jdom parser to parse and validate the XML document.

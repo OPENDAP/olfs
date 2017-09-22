@@ -84,8 +84,10 @@ public class DescribeEOCoverageSetRequestProcessor {
 
         if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
+
             for (String id : req.getEoIds()) {
-                EOCoverageDescription eoCoverageDescription = CatalogWrapper.getEOCoverageDescription(id);
+                WcsCatalog wcsCatalog = ServiceManager.getCatalog(id);
+                EOCoverageDescription eoCoverageDescription = wcsCatalog.getEOCoverageDescription(id);
                 if (eoCoverageDescription != null) {
 
 
@@ -119,7 +121,7 @@ public class DescribeEOCoverageSetRequestProcessor {
             resultDSs  = new HashMap<>();
 
             for(String eoId: remaingIds){
-                EODatasetSeries eoDatasetSeries = CatalogWrapper.getEODatasetSeries(eoId);
+                EODatasetSeries eoDatasetSeries = ServiceManager.getCatalog(eoId).getEODatasetSeries(eoId);
                 if(eoDatasetSeries!=null ) {
 
                     boolean matches = evaluate_subset(req,eoDatasetSeries.getBoundingBox());

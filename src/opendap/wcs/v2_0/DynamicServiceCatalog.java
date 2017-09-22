@@ -62,7 +62,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
    // private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
 
-    private CredentialsProvider _credsProvider;
+    // private CredentialsProvider _credsProvider;
 
     private ConcurrentHashMap<String,DynamicService> _dynamicServices;
 
@@ -102,6 +102,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         ///////////////////////////////////////////////////////////////
         // Sort out access credentials for getting things from places
         // that require such...
+        /*
         _credsProvider = null;
         e1 = config.getChild("Credentials");
         if(e1!=null){
@@ -126,6 +127,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             }
 
         }
+        */
 
         e1 = config.getChild("CacheDirectory");
         if(e1==null){
@@ -214,7 +216,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(cacheFile);
-                opendap.http.Util.writeRemoteContent(dmrUrl, _credsProvider, fos);
+                opendap.http.Util.writeRemoteContent(dmrUrl, ServiceManager.getCredentialsProvider(), fos);
                 fos.close();
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
                 // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.
@@ -410,8 +412,17 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
-    public CredentialsProvider getCredentials(){
-        return _credsProvider;
+    // public CredentialsProvider getCredentials(){
+    //    return _credsProvider;
+    //}
+
+    public boolean matches(String coverageId){
+        for(DynamicService dynamicService:_dynamicServices.values()){
+            if(coverageId.startsWith(dynamicService.getName()))
+                return true;
+        }
+        return false;
     }
+
 
 }
