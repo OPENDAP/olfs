@@ -39,9 +39,9 @@ import java.util.Vector;
  *
  *
  */
-public class CapabilitiesRequestProcessor {
+public class GetCapabilitiesRequestProcessor {
 
-    static Logger log = LoggerFactory.getLogger(CapabilitiesRequestProcessor.class);
+    static Logger log = LoggerFactory.getLogger(GetCapabilitiesRequestProcessor.class);
 
 
     /**

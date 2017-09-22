@@ -364,7 +364,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         Map<String, String[]> kvp = getKVP(request);
         String[] cids= kvp.get("coverageId".toLowerCase());
-        Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl,cids);
+        Document capabilitiesDoc = GetCapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl,cids);
 
 
         log.debug(xmlo.outputString(capabilitiesDoc));
