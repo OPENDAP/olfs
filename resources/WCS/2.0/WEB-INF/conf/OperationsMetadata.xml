@@ -34,7 +34,7 @@
     <ows:Operation name="GetCapabilities">
         <ows:DCP>
             <ows:HTTP>
-                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@?"/>
+                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@"/>
                 <ows:Post xlink:href="@SERVICE_ENDPOINT_URL@/post">
                     <ows:Constraint name="PostEncoding">
                         <ows:AllowedValues>
@@ -60,7 +60,7 @@
     <ows:Operation name="GetCoverage">
         <ows:DCP>
             <ows:HTTP>
-                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@?"/>
+                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@"/>
                 <ows:Post xlink:href="@SERVICE_ENDPOINT_URL@/post">
                     <ows:Constraint name="PostEncoding">
                         <ows:AllowedValues>
@@ -84,7 +84,7 @@
     <ows:Operation name="DescribeCoverage">
         <ows:DCP>
             <ows:HTTP>
-                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@?"/>
+                <ows:Get xlink:href="@SERVICE_ENDPOINT_URL@"/>
                 <ows:Post xlink:href="@SERVICE_ENDPOINT_URL@/post">
                     <ows:Constraint name="PostEncoding">
                         <ows:AllowedValues>

@@ -45,7 +45,7 @@ public class GetCapabilitiesRequestProcessor {
 
 
     /**
-     * Queries the CatalogWrapper for all of the components of the wcs:Capablitites response.
+     * Queries the WcsServiceManager for all of the components of the wcs:Capablitites response.
      * and returns the complete wcs:Capabilities document.
      *
      * @param serviceUrl The service URL of the WCS service. Used to build the service URLs that appear in the
@@ -81,7 +81,7 @@ public class GetCapabilitiesRequestProcessor {
 
     /**
      * Evaluates the passed GetCapabilitiesRequest object and builds the appropriate wcs:Capabilities document.
-     * by query the CatalogWrapper for all the requestd components of the wcs:Capablitites response.
+     * by query the WcsServiceManager for all the requestd components of the wcs:Capablitites response.
      *
      *
      *

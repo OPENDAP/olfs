@@ -26,8 +26,6 @@
 
 package opendap.wcs.v2_0.http;
 
-import opendap.PathBuilder;
-import opendap.coreServlet.ReqInfo;
 import opendap.dap.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +43,7 @@ public class Util {
     }
 
     public static String getServiceUrl(HttpServletRequest request){
-
-        String serviceURL = new Request(null,request).getServiceUrl();
-
-        String relativeURL = ReqInfo.getLocalUrl(request);
-
-        return PathBuilder.pathConcat(serviceURL,relativeURL);
+        return new Request(null,request).getServiceUrl();
     }
 
 

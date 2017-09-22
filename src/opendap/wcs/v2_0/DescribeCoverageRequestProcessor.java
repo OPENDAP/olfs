@@ -61,7 +61,8 @@ public class DescribeCoverageRequestProcessor {
         String ids[] = req.getIds();
         if(ids!=null && ids.length>0){
             for(String id: ids){
-                cd = CatalogWrapper.getCoverageDescription(id);
+                WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
+                cd = wcsCatalog.getCoverageDescription(id);
                 coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
             }
         }
