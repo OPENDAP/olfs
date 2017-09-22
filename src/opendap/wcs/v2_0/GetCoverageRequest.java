@@ -132,7 +132,8 @@ public class GetCoverageRequest {
         }
         _coverageID = Util.stripQuotes(s[0]);
 
-        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+        CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
             throw new WcsException("No such _coverageID: '"+ _coverageID +"'",
@@ -222,9 +223,12 @@ public class GetCoverageRequest {
         }
         _coverageID = Util.stripQuotes(e.getText());
 
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+
+
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
-        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(_coverageID);
+        CoverageDescription cvrDsc = wcsCatalog.getCoverageDescription(_coverageID);
 
 
         ingestDimensionSubset(getCoverageRequestElem, cvrDsc);

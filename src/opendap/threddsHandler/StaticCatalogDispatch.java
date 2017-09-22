@@ -695,7 +695,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _log.debug("init() - Top Level Catalog - fileName: " + fileName);
 
         /*
-        CatalogManager.addRootCatalog(
+        ServiceManager.addRootCatalog(
                 pathPrefix,
                 thisUrlPrefix,
                 fileName,

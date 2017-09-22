@@ -27,6 +27,7 @@
 package opendap.wcs.v2_0.http;
 
 import net.sf.saxon.s9api.XdmNode;
+import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -125,7 +126,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         _xmlEchoPath           = "echoXML";
         _describeCoveragePath  = "describeCoverage";
 
-
         _resourcePath = resourcePath;
         log.debug("_resourcePath: "+_resourcePath);
 
@@ -151,12 +151,12 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return CatalogWrapper.getLastModified();
+        return WcsServiceManager.getLastModified();
     }
 
     public void destroy() {
         log.info("Shutting down catalog.");
-        CatalogWrapper.destroy();
+        WcsServiceManager.destroy();
         log.info("Destroy Complete");
     }
 
@@ -196,17 +196,19 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
+
     private boolean wcsRequestDispatch(HttpServletRequest request,
                                        HttpServletResponse response,
                                        boolean sendResponse)
             throws Exception {
 
+        String baseServiceUrl = Util.getServiceUrl(request);
         String relativeURL = ReqInfo.getLocalUrl(request);
+        String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
 
         while(relativeURL.startsWith("/") && relativeURL.length()>0)
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String serviceURL = Util.getServiceUrl(request);
         String query      = request.getQueryString();
 
         String requestUrl = getRequestUrl(request);
@@ -224,7 +226,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                     log.debug("Sent redirect from / to "+_contextPath+"/");
                 }
                 else if(relativeURL.equals("") && query!=null){
-                    KvpHandler.processKvpWcsRequest(serviceURL, requestUrl ,getKVP(request),response);
+
+                    KvpHandler.processKvpWcsRequest(wcsServiceUrl, requestUrl ,getKVP(request),response);
                     log.info("Sent WCS Response");
                 }
                 else if(relativeURL.startsWith(_testPath)){
@@ -252,7 +255,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                     log.info("Trying extra path as coverageId: {}",relativeURL);
                     Map<String, String[]> kvp = getKVP(request);
                     try {
-                        KvpHandler.processKvpWcsRequest(serviceURL, requestUrl, kvp, response);
+                        KvpHandler.processKvpWcsRequest(wcsServiceUrl, requestUrl, kvp, response);
                     }
                     catch(Exception e){
                         String msg = "The request was a failure. Caught "+e.getClass().getName()+
@@ -296,7 +299,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
        public void run(){
            try {
-           CatalogWrapper.update();
+           WcsServiceManager.updateCatalogs();
            } catch (Exception e) {
                log.error("catalogUpdater(): Caught "+e.getClass().getName()+" Message: "+e.getMessage());
            }
@@ -314,8 +317,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc = _resourcePath+ "xsl/coverageDescription.xsl";
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = Util.getServiceUrl(request);
-        log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
+        String baseServiceUrl = Util.getServiceUrl(request);
+        log.debug("sendDescribeCoveragePage()  serviceUrl: "+baseServiceUrl);
 
         String id = request.getQueryString();
 
@@ -324,7 +327,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Document coverageDescription = null;
         Element cde;
         try {
-            cde = CatalogWrapper.getCoverageDescriptionElement(id);
+            WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
+            cde = wcsCatalog.getCoverageDescriptionElement(id);
             coverageDescription = new Document(cde);
         }
         catch(WcsException e){
@@ -339,7 +343,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",serviceUrl);
+        t.setParameter("ServicePrefix",baseServiceUrl);
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
         XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
@@ -358,35 +362,26 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc =  _resourcePath + "xsl/capabilities.xsl";
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = Util.getServiceUrl(request);
-        log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
+        String baseServiceUrl = Util.getServiceUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
+        String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
+
+        log.debug("sendCapabilitesPresentationPage()  baseServiceUrl: "+baseServiceUrl);
 
         Map<String, String[]> kvp = getKVP(request);
         String[] cids= kvp.get("coverageId".toLowerCase());
-        Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl,cids);
-
-
+        Document capabilitiesDoc = GetCapabilitiesRequestProcessor.getFullCapabilitiesDocument(wcsServiceUrl,cids);
         log.debug(xmlo.outputString(capabilitiesDoc));
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",serviceUrl);
+        t.setParameter("ServicePrefix",baseServiceUrl);
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
-
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
-
         t.transform(capDoc,response.getOutputStream());
-
-
-
     }
-
-
-
-
-
 
 
     public void echoWcsRequest(HttpServletRequest request,
@@ -396,11 +391,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
         String requestUrl = getRequestUrl(request);
-
         response.setContentType("text/xml");
-
         try {
-
             switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
@@ -422,10 +414,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                     throw new WcsException("INTERNAL ERROR: getRequestType() returned an invalid value.",
                             WcsException.NO_APPLICABLE_CODE);
             }
-
             xmlo.output(reqDoc,response.getOutputStream());
-
-
         }
         catch(WcsException e){
             log.error(e.getMessage());
@@ -436,14 +425,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     }
-
-
-
+    
     public static String getRequestUrl(HttpServletRequest request){
-        String query = Scrub.completeURL(request.getQueryString());
-        String requestUrl = request.getRequestURL() + "?" + query;
-
-        return requestUrl;
+        StringBuilder requestUrl =  new StringBuilder(request.getRequestURL());
+        String query = request.getQueryString();
+        if(query!=null && !query.isEmpty()){
+            query = Scrub.completeURL(request.getQueryString());
+            requestUrl.append("?").append(query);
+        }
+        return requestUrl.toString();
     }
 
 
@@ -453,7 +443,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                                   HttpServletResponse response) throws InterruptedException, IOException {
 
         Map<String,String[]> keyValuePairs = getKVP(request);
-        String serviceUrl = Util.getServiceUrl(request);
+        String baseServiceUrl = Util.getServiceUrl(request);
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
         String query = Scrub.completeURL(request.getQueryString());
@@ -462,11 +452,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         String page = "<html>";
         page += "    <head>";
-        page += "        <link rel='stylesheet' href='"+serviceUrl+"/docs/css/contents.css' type='text/css' >";
+        page += "        <link rel='stylesheet' href='"+baseServiceUrl+"/docs/css/contents.css' type='text/css' >";
         page += "        <title>OPeNDAP Hyrax WCS Test</title>";
         page += "    </head>";
         page += "    <body>";
-        page += "    <img alt=\"OPeNDAP Logo\" src='"+serviceUrl+"/docs/images/logo.gif'/>";
+        page += "    <img alt=\"OPeNDAP Logo\" src='"+baseServiceUrl+"/docs/images/logo.gif'/>";
         page += "    <h2>OPeNDAP WCS Test Harness</h2>";
         page += "    How Nice! You sent a WCS request.";
         page += "    <h3>KVP request: </h3>";
@@ -477,7 +467,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
             switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
-                    page += getCapabilitiesTestPage(serviceUrl, keyValuePairs);
+                    page += getCapabilitiesTestPage(baseServiceUrl, keyValuePairs);
                     break;
 
                 case  DESCRIBE_COVERAGE:
@@ -594,7 +584,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         GetCoverageRequest gcr = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(gcr.getCoverageID());
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(gcr.getCoverageID());
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(gcr.getCoverageID());
 
         Coverage coverage = new Coverage(coverageDescription,requestUrl);
 

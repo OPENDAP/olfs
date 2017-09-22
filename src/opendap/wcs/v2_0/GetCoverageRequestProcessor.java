@@ -72,8 +72,8 @@ public class GetCoverageRequestProcessor {
     public static void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
 
         String id = req.getCoverageID();
-        boolean b = CatalogWrapper.hasCoverage(id);
-        CredentialsProvider authCreds = CatalogWrapper.getCredentialsProvider();
+        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(id);
+        boolean b = wcsCatalog.hasCoverage(id);
 
         if (!b)
             throw new WcsException("No such wcs:Coverage: " + Scrub.fileName(id),
@@ -86,7 +86,7 @@ public class GetCoverageRequestProcessor {
         if (req.getMediaType() != null) {
             sendMultipartGmlResponse(req, response, useSoapEnvelope);
         } else {
-            sendFormatResponse(req, response, useSoapEnvelope, authCreds);
+            sendFormatResponse(req, response);
         }
 
 
@@ -94,12 +94,11 @@ public class GetCoverageRequestProcessor {
 
     public static void sendFormatResponse(
             GetCoverageRequest req,
-            HttpServletResponse response,
-            boolean useSoapEnvelope,
-            CredentialsProvider authCreds
+            HttpServletResponse response
     ) throws WcsException, InterruptedException, IOException {
         _log.debug("Sending binary data response...");
         response.setHeader("Content-Disposition", getContentDisposition(req));
+        CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();
         opendap.http.Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
     }
 
@@ -108,10 +107,12 @@ public class GetCoverageRequestProcessor {
 
 
         _log.debug("Building multi-part Response...");
+        String coverageId = req.getCoverageID();
+        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(coverageId);
 
-        String rangePartId = "cid:" + req.getCoverageID();
+        String rangePartId = "cid:" + coverageId;
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(req.getCoverageID());
 
         /**
          * If this an EO coverage then update its bounding box to reflect the subset.
@@ -150,7 +151,7 @@ public class GetCoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req),CatalogWrapper.getCredentialsProvider());
+        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
         rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
@@ -170,8 +171,10 @@ public class GetCoverageRequestProcessor {
 
     public static String getReturnFormat(GetCoverageRequest req) throws WcsException, InterruptedException {
         String format = req.getFormat();
+        String id = req.getCoverageID();
         if (format == null) {
-            CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
+            CoverageDescription coverageDescription =
+                    WcsServiceManager.getCatalog(id).getCoverageDescription(id);
             format = coverageDescription.getNativeFormat();
         }
         return format;
@@ -192,7 +195,8 @@ public class GetCoverageRequestProcessor {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(req.getCoverageID());
+        String requestURL = wcsCatalog.getDataAccessUrl(req.getCoverageID());
         StringBuilder dap2DataAccessURL = new StringBuilder(requestURL);
         dap2DataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
         return dap2DataAccessURL.toString();
@@ -233,7 +237,8 @@ public class GetCoverageRequestProcessor {
 
         String coverageID = req.getCoverageID();
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 
@@ -422,7 +427,8 @@ public class GetCoverageRequestProcessor {
         String coverageID = req.getCoverageID();
 
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 

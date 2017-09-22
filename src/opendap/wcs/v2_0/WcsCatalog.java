@@ -293,7 +293,9 @@ public interface WcsCatalog {
 
     public boolean hasEoCoverage(String id);
 
-    public CredentialsProvider getCredentials();
+    // public CredentialsProvider getCredentials();
+
+    public boolean matches(String coverageId);
 
 
 }

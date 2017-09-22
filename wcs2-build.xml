@@ -414,7 +414,7 @@
             depends="PreProcessSourceCode"
             description="Compiles the Web Coverage Service 2.0 software."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling WCS-2.0"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>

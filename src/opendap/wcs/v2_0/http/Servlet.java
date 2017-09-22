@@ -29,13 +29,10 @@ package opendap.wcs.v2_0.http;
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
-import opendap.wcs.v2_0.CatalogWrapper;
-import opendap.wcs.v2_0.WcsCatalog;
+import opendap.wcs.v2_0.WcsServiceManager;
 import opendap.wcs.v2_0.WcsException;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -45,10 +42,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -70,8 +64,15 @@ public class Servlet extends HttpServlet {
 
     //private Document configDoc;
 
+    private boolean _initialized;
+
+    private String _defaultWcsServiceConfigFilename = "wcs_service.xml";
+
 
     public void init() throws ServletException {
+        if(_initialized)
+            return;
+
         super.init();
         reqNumber = new AtomicInteger(0);
 
@@ -92,32 +93,23 @@ public class Servlet extends HttpServlet {
         enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
         log.debug("enableUpdateUrl: "+enableUpdateUrl);
 
-        String _serviceConfigPath = configPath;
-        if(!_serviceConfigPath.endsWith("/"))
-            _serviceConfigPath += "/";
-        log.debug("_serviceConfigPath: "+_serviceConfigPath);
+        String serviceConfigPath = configPath;
+        if(!serviceConfigPath.endsWith("/"))
+            serviceConfigPath += "/";
+        log.debug("serviceConfigPath: {}",serviceConfigPath);
 
-
-        //String configFilename = this.getInitParameter("ConfigFileName");
-        //if(configFilename==null) configFilename = "wcs_service.xml";
-        //log.info("configFilename: "+configFilename);
 
         String wcsConfigFileName = getInitParameter("WCSConfigFileName");
         if (wcsConfigFileName == null) {
+            wcsConfigFileName = _defaultWcsServiceConfigFilename;
             String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
-                    "the WCS service configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
+                    "the WCS service configuration! This on is MISSING. Using default configuration file name.\n";
+            log.warn(msg);
         }
         log.info("configFilename: "+wcsConfigFileName);
-
-
         PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
 
-        // installDefaultConfiguration(resourcePath, _serviceConfigPath, configFilename);
-
-        initializeCatalog(contextPath, _serviceConfigPath, wcsConfigFileName);
-
+        WcsServiceManager.init(contextPath, serviceConfigPath, wcsConfigFileName);
 
         // Build Handler Objects
         httpGetService = new HttpGetHandler(enableUpdateUrl);
@@ -147,25 +139,30 @@ public class Servlet extends HttpServlet {
         } catch (Exception e) {
             throw new ServletException(e);
         }
+
+        _initialized = true;
     }
 
 
 
 
-    private boolean _initialized;
 
-    private String _defaultWcsServiceConfigFilename = "wcs_service.xml";
+   /*
 
-
-
-    public void initializeCatalog(String serviceContextPath, String serviceContentPath,  String configFileName) throws ServletException {
+    public void initializeCatalog(String serviceContextPath, String serviceConfigPath,  String configFileName) throws ServletException {
 
         if (_initialized) return;
 
-        Element e1, e2;
+
+        WcsServiceManager.init(serviceContextPath, serviceConfigPath,configFileName);
+
+        _initialized = true;
+        log.info("Initialized. ");
+
+
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
+        URL serviceConfigFile = getServiceConfigurationUrl(serviceConfigPath,configFileName);
         SAXBuilder sb = new SAXBuilder();
         Document configDoc = null;
 
@@ -189,6 +186,12 @@ public class Servlet extends HttpServlet {
             log.error(msg);
             throw new ServletException(msg);
         }
+
+
+
+
+
+
 
         Element catalogConfig = configFileRoot.getChild("WcsCatalog");
         if(catalogConfig==null) {
@@ -220,22 +223,23 @@ public class Servlet extends HttpServlet {
         }
 
         try {
-            wcsCatalog.init(catalogConfig, serviceContentPath, serviceContextPath);
+            wcsCatalog.init(catalogConfig, serviceConfigPath, serviceContextPath);
         } catch (Exception e) {
             log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
         try {
-            CatalogWrapper.init(serviceContentPath, wcsCatalog);
+            CatalogWrapper.init(serviceConfigPath, wcsCatalog);
         } catch (Exception e) {
             log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
-        _initialized = true;
-        log.info("Initialized. ");
+
+
     }
 
+           */
 
     /*
 
@@ -278,7 +282,6 @@ public class Servlet extends HttpServlet {
 
     }
 
-            */
 
 
     private URL getServiceConfigurationUrl(String _serviceContentPath, String configFileName) throws ServletException{
@@ -292,7 +295,7 @@ public class Servlet extends HttpServlet {
         }
 
         serviceConfigFilename = Scrub.fileName(serviceConfigFilename);
-        
+
         log.info("getServiceConfigurationUrl() - Using WCS Service configuration file: "+serviceConfigFilename);
 
         File configFile = new File(serviceConfigFilename);
@@ -323,9 +326,10 @@ public class Servlet extends HttpServlet {
 
 
 
+                */
 
 
-
+     /*
     private void installDefaultConfiguration(String serviceResourcePath, String serviceConfigDir, String semaphoreFileName) throws ServletException{
 
         String msg;
@@ -371,7 +375,7 @@ public class Servlet extends HttpServlet {
 
 
 
-
+   */
 
 
 

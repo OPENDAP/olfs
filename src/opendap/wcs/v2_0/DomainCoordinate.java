@@ -27,20 +27,23 @@
 package opendap.wcs.v2_0;
 
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import java.util.Vector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 12/19/12
- * Time: 1:55 PM
- * To change this template use File | Settings | File Templates.
+ * THis class is used to contain teh explict mapping from the WCS coordinate variables in to
+ * the underlying DAP dataset variables.  Genrally we expect that the DAP variables may actually
+ * have more DomainCoordinates than WCS SRS that actually might apply to the geocoordinates
+ * (latitude and longitude)
  */
 public class DomainCoordinate {
 
-
+    private Logger _log = LoggerFactory.getLogger(getClass());
     private String _name;
     private String _dapId;
     private String _units;
@@ -49,8 +52,24 @@ public class DomainCoordinate {
     private double _min;
     private double _max;
 
+    public DomainCoordinate()  {
+
+        _name  = null;
+        _dapId = null;
+        _units  = null;
+        _arraySubset = null;
+        _size = -1;
+        _min  = -9.99999987e+14;
+        _max  =  9.99999987e+14;
+    }
+
+
+
     public DomainCoordinate(Element dc) throws ConfigurationException {
+        this();
         Vector<String> problems = new Vector<>();
+
+
 
         _name = dc.getAttributeValue("name");
         if(_name == null){
@@ -114,12 +133,16 @@ public class DomainCoordinate {
 
 
         if(!problems.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Dynamic Configuration Failed To Ingest!\n");
+            StringBuilder sb = new StringBuilder("DomainCoodinate() - Configuration Failed To Ingest: \n");
+            _log.error(sb.toString());
+            XMLOutputter xmlo =  new XMLOutputter(Format.getPrettyFormat());
+            sb.append(xmlo.outputString(dc)).append("\n");
+            _log.error("DomainCoordinate() - " + xmlo.outputString(dc));
             for(String msg: problems){
+                _log.error("DomainCoodinate() - {}",msg);
                 sb.append(msg).append("\n");
-                throw new ConfigurationException(sb.toString());
             }
+            throw new ConfigurationException(sb.toString());
 
         }
 
@@ -223,16 +246,13 @@ public class DomainCoordinate {
 
 
     public double getMin(){ return _min; }
-    public void setMin(String minStr) {
-        setMin(Double.parseDouble(minStr));
-    }
+    // public void setMin(String minStr) { setMin(Double.parseDouble(minStr)); }
     public void setMin(double min) {
         _min = min;
     }
+
     public double getMax(){ return _max; }
-    public void setMax(String maxStr) {
-        setMax(Double.parseDouble(maxStr));
-    }
+    //public void setMax(String maxStr) { setMax(Double.parseDouble(maxStr)); }
     public void setMax(double max) {
         _max = max;
     }
