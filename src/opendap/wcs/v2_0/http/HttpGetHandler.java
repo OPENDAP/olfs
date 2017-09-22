@@ -150,12 +150,12 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return ServiceManager.getLastModified();
+        return WcsServiceManager.getLastModified();
     }
 
     public void destroy() {
         log.info("Shutting down catalog.");
-        ServiceManager.destroy();
+        WcsServiceManager.destroy();
         log.info("Destroy Complete");
     }
 
@@ -296,7 +296,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
        public void run(){
            try {
-           ServiceManager.updateCatalogs();
+           WcsServiceManager.updateCatalogs();
            } catch (Exception e) {
                log.error("catalogUpdater(): Caught "+e.getClass().getName()+" Message: "+e.getMessage());
            }
@@ -324,7 +324,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Document coverageDescription = null;
         Element cde;
         try {
-            WcsCatalog wcsCatalog = ServiceManager.getCatalog(id);
+            WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
             cde = wcsCatalog.getCoverageDescriptionElement(id);
             coverageDescription = new Document(cde);
         }
@@ -595,7 +595,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         GetCoverageRequest gcr = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(gcr.getCoverageID());
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(gcr.getCoverageID());
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(gcr.getCoverageID());
 
         Coverage coverage = new Coverage(coverageDescription,requestUrl);

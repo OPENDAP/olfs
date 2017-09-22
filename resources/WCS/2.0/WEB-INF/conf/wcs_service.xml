@@ -27,7 +27,6 @@
 <WcsService>
     <Credentials>/Users/ndp/.netrc</Credentials>
     <WcsCatalog name="lfc" className="opendap.wcs.v2_0.LocalFileCatalog">
-        <!-- Credentials>/Users/ndp/.netrc</Credentials -->
         <!-- CatalogDirectory>/etc/olfs/LocalFileCatalog</CatalogDirectory -->
         <!-- CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile -->
     </WcsCatalog>

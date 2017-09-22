@@ -44,9 +44,21 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ServiceManager {
+/**
+ * This class manages the WCS service.
+ *
+ * STARTUP: Reads the ServiceIdentification.xml, ServiceProvider.xml,
+ * OperationsMetadata.xml in the config directory to determine the service metadata. When the Operations
+ * Metadata is transmited the service endpoint is adjusted to match the runtime service. Additionally
+ * all of the WcsCatalog instances defined in the configuration and instantiated and intialized.
+ *
+ * RUNTIME: Provides WCS request processing a one stop should for the WcsCatalog instance needed to
+ * fufill the requiest.
+ *
+ */
+public class WcsServiceManager {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ServiceManager.class);
+    private static final Logger _log = org.slf4j.LoggerFactory.getLogger(WcsServiceManager.class);
 
     private static Date _serviceStartTime;
 
@@ -112,7 +124,7 @@ public class ServiceManager {
             configDoc = sb.build(serviceConfigFile);
             if(configDoc==null) {
                 msg = "The WCS 2.0 servlet is unable to locate the configuration document '"+serviceConfigFile+"'";
-                log.error(msg);
+                _log.error(msg);
                 throw new ServletException(msg);
             }
 
@@ -127,7 +139,7 @@ public class ServiceManager {
         Element configFileRoot = configDoc.getRootElement();
         if(configFileRoot==null) {
             msg = "The WCS 2.0 servlet is unable to locate the root element of the configuration document '"+serviceConfigFile+"'";
-            log.error(msg);
+            _log.error(msg);
             throw new ServletException(msg);
         }
 
@@ -135,17 +147,17 @@ public class ServiceManager {
         try {
             if (e1 == null) {
                 _credentialsProvider = opendap.http.Util.getNetRCCredentialsProvider();
-                log.info("Using Default Credentials file: ~/.netrc");
+                _log.info("Using Default Credentials file: ~/.netrc");
             } else {
                 String credsFilename = e1.getTextTrim();
                 _credentialsProvider = opendap.http.Util.getNetRCCredentialsProvider(credsFilename, true);
-                log.info("Using Credentials file: {}", credsFilename);
+                _log.info("Using Credentials file: {}", credsFilename);
             }
         } catch (IOException e) {
-            log.warn("I was unable to generate a CredentialsProvider for authenticated activities :(");
+            _log.warn("I was unable to generate a CredentialsProvider for authenticated activities :(");
             _credentialsProvider = null;
         }
-        ingestWcsCatalogs(configFileRoot);
+        ingestWcsCatalogDefs(configFileRoot);
 
         _serviceStartTime = new Date();
         _intitialized = true;
@@ -158,17 +170,17 @@ public class ServiceManager {
         serviceIdFile = new File(metadataDir,SERVICE_ID_FILENAME);
         e2 = opendap.xml.Util.getDocumentRoot(serviceIdFile);
         serviceIdentification.set(e2);
-        log.debug("Loaded wcs:ServiceIdentfication from: "+serviceIdFile);
+        _log.debug("Loaded wcs:ServiceIdentfication from: "+serviceIdFile);
 
         serviceProviderFile = new File(metadataDir,SERVICE_PROVIDER_FILENAME);
         e2 = opendap.xml.Util.getDocumentRoot(serviceProviderFile);
         serviceProvider.set(e2);
-        log.debug("Loaded wcs:ServiceProvider from: "+serviceProviderFile);
+        _log.debug("Loaded wcs:ServiceProvider from: "+serviceProviderFile);
 
         opsMetadataFile = new File(metadataDir, OPERATIONS_METADATA_FILENAME);
         e2 = opendap.xml.Util.getDocumentRoot(opsMetadataFile);
         operationsMetadata.set(e2);
-        log.debug("Loaded wcs:OperationsMetadata from: "+opsMetadataFile);
+        _log.debug("Loaded wcs:OperationsMetadata from: "+opsMetadataFile);
     }
 
     private void updateCapabilitiesMetadata() throws Exception{
@@ -194,48 +206,46 @@ public class ServiceManager {
     }
 
 
-    private static void ingestWcsCatalogs(Element config) throws ServletException {
+    private static void ingestWcsCatalogDefs(Element config) throws ServletException {
 
-        log.info("ingestWcsCatalogs() - BEGIN.");
-
+        _log.info("ingestWcsCatalogs() - BEGIN.");
+        String msg;
         List<Element> wcsCatalogElements = (List<Element>) config.getChildren(WCS_CATALOG_ELEMENT_NAME);
 
-        String msg;
         if(wcsCatalogElements.isEmpty()) {
             msg = "The WCS service could not find a catalog implmentation! No child "+
                     WCS_CATALOG_ELEMENT_NAME+ " elements were found. Only the default " +
                     "catalog implementation will be available.";
-            log.warn(msg);
+            _log.warn(msg);
             throw new ServletException(msg);
         }
-
 
         for(Element wcsCatalogElement: wcsCatalogElements){
             String className =  wcsCatalogElement.getAttributeValue("className");
             if(className==null) {
                 msg = "The WCS 2.0 servlet is unable to locate the 'className' attribute of the <WcsCatalog> element"+
                         "in the configuration file: " + _serviceConfigFileName + "'";
-                log.error(msg);
+                _log.error(msg);
                 throw new ServletException(msg);
             }
 
             WcsCatalog wcsCatalog = null;
             try {
-                log.debug("Building WcsCatalog implementation: " + className);
+                _log.debug("Building WcsCatalog implementation: " + className);
                 Class classDefinition = Class.forName(className);
                 wcsCatalog = (WcsCatalog) classDefinition.newInstance();
             }
             catch ( Exception e){
                 msg = "Failed to build WcsCatalog implementation: "+className+
                         " Caught an exception of type "+e.getClass().getName() + " Message: "+ e.getMessage();
-                log.error(msg);
+                _log.error(msg);
                 throw new ServletException(msg, e);
             }
 
             try {
                 wcsCatalog.init(wcsCatalogElement, _serviceContentPath, _serviceContextPath);
             } catch (Exception e) {
-                log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+                _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
                 throw new ServletException(e);
             }
 
@@ -244,7 +254,7 @@ public class ServiceManager {
 
             _catalogsByPrefix.put("",wcsCatalog);
         }
-        log.info("ingestWcsCatalogs() - DONE.");
+        _log.info("ingestWcsCatalogs() - DONE.");
     }
 
 
@@ -259,7 +269,7 @@ public class ServiceManager {
         for(WcsCatalog wcsCatalog: _catalogsByPrefix.values()){
             if(wcsCatalog.matches(coverageId)) {
                 matches.add(wcsCatalog);
-                log.debug("getCatalog() - WcsCatalog '{}' matched coverageId '{}'",wcsCatalog.getClass().getSimpleName(),coverageId);
+                _log.debug("getCatalog() - WcsCatalog '{}' matched coverageId '{}'",wcsCatalog.getClass().getSimpleName(),coverageId);
             }
         }
         WcsCatalog result;
@@ -268,7 +278,7 @@ public class ServiceManager {
         else
             result = matches.get(0);
 
-        log.debug("getCatalog() - Returning  instanceOf '{}'",result.getClass().getSimpleName(),coverageId);
+        _log.debug("getCatalog() - Returning  instanceOf '{}'",result.getClass().getSimpleName(),coverageId);
 
         return result;
     }

@@ -62,9 +62,9 @@ public class CapabilitiesRequestProcessor {
         capabilities.setAttribute("updateSequence", updateSequence);
 
 
-        capabilities.addContent(ServiceManager.getServiceIdentificationElement());
-        capabilities.addContent(ServiceManager.getServiceProviderElement());
-        capabilities.addContent(ServiceManager.getOperationsMetadataElement(serviceUrl));
+        capabilities.addContent(WcsServiceManager.getServiceIdentificationElement());
+        capabilities.addContent(WcsServiceManager.getServiceProviderElement());
+        capabilities.addContent(WcsServiceManager.getOperationsMetadataElement(serviceUrl));
         capabilities.addContent(ServerCapabilities.getServiceMetadata());
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -139,15 +139,15 @@ public class CapabilitiesRequestProcessor {
 
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_IDENTIFICATION)){
-                capabilities.addContent(ServiceManager.getServiceIdentificationElement());
+                capabilities.addContent(WcsServiceManager.getServiceIdentificationElement());
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_PROVIDER)){
-                capabilities.addContent(ServiceManager.getServiceProviderElement());
+                capabilities.addContent(WcsServiceManager.getServiceProviderElement());
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.OPERATIONS_METADATA)){
-                capabilities.addContent(ServiceManager.getOperationsMetadataElement(serviceUrl));
+                capabilities.addContent(WcsServiceManager.getOperationsMetadataElement(serviceUrl));
             }
 
             if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_METADATA)){
@@ -180,7 +180,7 @@ public class CapabilitiesRequestProcessor {
      * catalogs last modified time in seconds since 1/1/1970
      */
     public static String getUpdateSequence(){
-        return ServiceManager.getLastModified()+"";
+        return WcsServiceManager.getLastModified()+"";
     }
 
 
@@ -210,7 +210,7 @@ public class CapabilitiesRequestProcessor {
 
                 log.info("getContents() Building contents from supplied list of coverageIds");
                 for(String coverageId:coverageIds) {
-                    WcsCatalog wcsCatalog = ServiceManager.getCatalog(coverageId);
+                    WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageId);
                     Element coverageSummaryElement = wcsCatalog.getCoverageSummaryElement(coverageId);
                     log.debug("coverageId: {} coverageSummaryElement: {}",coverageId, coverageSummaryElement);
                     if(coverageSummaryElement!=null){
@@ -231,7 +231,7 @@ public class CapabilitiesRequestProcessor {
             }
             else {
                 log.info("getContents() Building contents from the default WcsCatalog");
-                WcsCatalog defaultWcsCatalog = ServiceManager.getDefaultCatalog();
+                WcsCatalog defaultWcsCatalog = WcsServiceManager.getDefaultCatalog();
                 Iterator i = defaultWcsCatalog.getCoverageSummaryElements().iterator();
                 if (i.hasNext()) {
                     Element cs;

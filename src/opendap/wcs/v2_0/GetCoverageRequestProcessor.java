@@ -72,7 +72,7 @@ public class GetCoverageRequestProcessor {
     public static void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
 
         String id = req.getCoverageID();
-        WcsCatalog wcsCatalog =  ServiceManager.getCatalog(id);
+        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(id);
         boolean b = wcsCatalog.hasCoverage(id);
 
         if (!b)
@@ -98,7 +98,7 @@ public class GetCoverageRequestProcessor {
     ) throws WcsException, InterruptedException, IOException {
         _log.debug("Sending binary data response...");
         response.setHeader("Content-Disposition", getContentDisposition(req));
-        CredentialsProvider authCreds = ServiceManager.getCredentialsProvider();
+        CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();
         opendap.http.Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
     }
 
@@ -108,7 +108,7 @@ public class GetCoverageRequestProcessor {
 
         _log.debug("Building multi-part Response...");
         String coverageId = req.getCoverageID();
-        WcsCatalog wcsCatalog =  ServiceManager.getCatalog(coverageId);
+        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(coverageId);
 
         String rangePartId = "cid:" + coverageId;
 
@@ -151,7 +151,7 @@ public class GetCoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req),ServiceManager.getCredentialsProvider());
+        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
         rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
@@ -174,7 +174,7 @@ public class GetCoverageRequestProcessor {
         String id = req.getCoverageID();
         if (format == null) {
             CoverageDescription coverageDescription =
-                    ServiceManager.getCatalog(id).getCoverageDescription(id);
+                    WcsServiceManager.getCatalog(id).getCoverageDescription(id);
             format = coverageDescription.getNativeFormat();
         }
         return format;
@@ -195,7 +195,7 @@ public class GetCoverageRequestProcessor {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(req.getCoverageID());
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(req.getCoverageID());
         String requestURL = wcsCatalog.getDataAccessUrl(req.getCoverageID());
         StringBuilder dap2DataAccessURL = new StringBuilder(requestURL);
         dap2DataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
@@ -237,7 +237,7 @@ public class GetCoverageRequestProcessor {
 
         String coverageID = req.getCoverageID();
 
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
@@ -427,7 +427,7 @@ public class GetCoverageRequestProcessor {
         String coverageID = req.getCoverageID();
 
 
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();

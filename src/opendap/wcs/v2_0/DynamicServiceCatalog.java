@@ -28,7 +28,6 @@ package opendap.wcs.v2_0;
 import opendap.PathBuilder;
 import opendap.wcs.srs.SimpleSrs;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
@@ -216,7 +215,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(cacheFile);
-                opendap.http.Util.writeRemoteContent(dmrUrl, ServiceManager.getCredentialsProvider(), fos);
+                opendap.http.Util.writeRemoteContent(dmrUrl, WcsServiceManager.getCredentialsProvider(), fos);
                 fos.close();
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
                 // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.

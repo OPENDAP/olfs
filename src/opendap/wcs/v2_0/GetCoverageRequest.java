@@ -132,7 +132,7 @@ public class GetCoverageRequest {
         }
         _coverageID = Util.stripQuotes(s[0]);
 
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(_coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
         CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
@@ -223,7 +223,7 @@ public class GetCoverageRequest {
         }
         _coverageID = Util.stripQuotes(e.getText());
 
-        WcsCatalog wcsCatalog = ServiceManager.getCatalog(_coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
 
 
         // This call checks that there is a coverage matching the requested ID and it will

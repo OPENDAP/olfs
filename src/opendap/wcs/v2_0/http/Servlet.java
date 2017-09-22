@@ -29,7 +29,7 @@ package opendap.wcs.v2_0.http;
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
 import opendap.logging.LogUtil;
-import opendap.wcs.v2_0.ServiceManager;
+import opendap.wcs.v2_0.WcsServiceManager;
 import opendap.wcs.v2_0.WcsException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -109,7 +109,7 @@ public class Servlet extends HttpServlet {
         log.info("configFilename: "+wcsConfigFileName);
         PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
 
-        ServiceManager.init(contextPath, serviceConfigPath,wcsConfigFileName);
+        WcsServiceManager.init(contextPath, serviceConfigPath, wcsConfigFileName);
 
         // Build Handler Objects
         httpGetService = new HttpGetHandler(enableUpdateUrl);
@@ -154,7 +154,7 @@ public class Servlet extends HttpServlet {
         if (_initialized) return;
 
 
-        ServiceManager.init(serviceContextPath, serviceConfigPath,configFileName);
+        WcsServiceManager.init(serviceContextPath, serviceConfigPath,configFileName);
 
         _initialized = true;
         log.info("Initialized. ");
