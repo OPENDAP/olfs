@@ -24,7 +24,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
+/**
+ * Traditional  UnitOfWork_StateUnderTest Junit Tests on Dataset to assist in refactor, regression etc
+ * and also an be do double duty as diagnostics on various Dataset DMRs through parameterization
+ * which provides for the "happy path" of injecting the test Dataset as URL (in addition to this the 
+ * dataset can be injected as a file or raw XML with known values - last option being useful for 
+ * the traditional (as opposed to diagnostic) assertions.
+ *     
+ * @author udaykari
+ *
+ */
 @RunWith(Parameterized.class)
 public class DatasetTest {
 
@@ -58,13 +67,6 @@ public class DatasetTest {
       }
   }
 
-  // The methods in this class are trivial, 
-  // so we test them all indirectly by looking 
-  // for meaningful properties like CF, SRS
-  // e.g. hasDataResolution "tests" getValueOfGlobalAttributeWithNameLike
-  //      usesCfConventions tests both usesCfConventions as well as presence 
-  //      of global attribute via looping of container attributes
-  
   @Test
   public void usesCfConventions() {
     Assume.assumeTrue(_datasetIsNotNull);
