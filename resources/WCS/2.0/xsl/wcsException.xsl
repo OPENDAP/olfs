@@ -28,6 +28,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:ows="http://www.opengis.net/ows/2.0"
         >
+    <xsl:param name="DocsService" />
 
     <xsl:template match="/ows:WcsExceptionReport">
         <html>
@@ -35,7 +36,7 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$DocsService"/>/css/contents.css</xsl:attribute>
                 </xsl:element>
                 <title>OPeNDAP: Web Coverage Service Exception</title>
             </head>

@@ -26,6 +26,12 @@
 package opendap.wcs.v2_0;
 
 import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.dap4.QueryParameters;
+import opendap.http.Util;
+import opendap.ppt.PPTException;
 import opendap.wcs.srs.SimpleSrs;
 import org.apache.commons.codec.binary.Hex;
 import org.jdom.Element;
@@ -53,6 +59,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * single coverage catalog for the requested
  */
 public class DynamicServiceCatalog implements WcsCatalog{
+
     private Logger _log;
     private boolean _intialized;
 
@@ -195,29 +202,56 @@ public class DynamicServiceCatalog implements WcsCatalog{
         if(datasetUrl==null)
             return null;
 
-        String dmrUrl = datasetUrl + ".dmr.xml";
-        _log.debug("getCachedDMR() - DMR URL: {}",dmrUrl);
-        String cacheId = anyId2CacheId(dmrUrl);
-        _log.debug("getCachedDMR() - cacheId: {}",cacheId);
-        File cacheFile = new File(_cacheDir,cacheId);
+        String datasetCacheId = anyId2CacheId(datasetUrl);
+
+        _log.debug("getCachedDMR() - datasetCacheId: {}", datasetCacheId);
+        String dmrCacheFileName = datasetCacheId + ".dmr.xml";
+        File dmrCacheFile = new File(_cacheDir, dmrCacheFileName);
 
         // TODO Improve by adding a shared read lock. jhrg 9/18/17
         WriteLock writeLock = _cacheLock.writeLock();
 
         writeLock.lock();
         try {
-            if(cacheFile.exists()){
+            if(dmrCacheFile.exists()){
                 _log.debug("getCachedDMR() - Reading cached DMR.");
-                Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
+                Element dmrElement = opendap.xml.Util.getDocumentRoot(dmrCacheFile);
                 dmrElement.setAttribute("name",coverageId);
                 return dmrElement;
             }
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
-                FileOutputStream fos = new FileOutputStream(cacheFile);
-                opendap.http.Util.writeRemoteContent(dmrUrl, WcsServiceManager.getCredentialsProvider(), fos);
-                fos.close();
-                Element dmrElement = opendap.xml.Util.getDocumentRoot(cacheFile);
+                FileOutputStream fos = new FileOutputStream(dmrCacheFile);
+
+                try {
+                    if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
+                        String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
+                        BesApi besApi = new BesApi();
+                        QueryParameters qp = new QueryParameters();
+                        try {
+                            besApi.writeDMR(besDatasource, qp, datasetUrl, fos);
+                        } catch (BadConfigurationException | PPTException | BESError error) {
+                            String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
+                                    " Message: " + error.getMessage();
+                            _log.error("getCachedDMR() - {}", msg);
+                            throw new IOException(msg, error);
+                        }
+
+                    } else if (datasetUrl.startsWith(Util.HTTP_PROTOCOL) || datasetUrl.startsWith(Util.HTTPS_PROTOCOL)) {
+                        String dmrUrl = datasetUrl + ".dmr.xml";
+                        _log.debug("getCachedDMR() - DMR URL: {}",dmrUrl);
+
+                        opendap.http.Util.writeRemoteContent(dmrUrl, WcsServiceManager.getCredentialsProvider(), fos);
+                    } else {
+                        String msg = "Unrecognized protocol: " + datasetUrl;
+                        _log.error("getCachedDMR() - {}", msg);
+                        throw new IOException(msg);
+                    }
+                }
+                finally {
+                    fos.close();
+                }
+                Element dmrElement = opendap.xml.Util.getDocumentRoot(dmrCacheFile);
                 // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.
                 dmrElement.setAttribute("name",coverageId);
                 return dmrElement;
@@ -267,8 +301,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {
-            _log.error("getCoverageDescription() - FAILED to get CoverageDescription for id: {} msg: {}"+
-            coverageId, e.getMessage());
+            StringBuilder sb = new StringBuilder("getCoverageDescription() - ");
+            sb.append("FAILED to get CoverageDescription for id: '").append(coverageId).append("' ");
+            sb.append(" Caught ").append(e.getClass().getName()).append(" message: ").append(e.getMessage());
+            _log.error(sb.toString());
         }
 
         return null;
@@ -364,7 +400,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         if(dynamicService==null)
             return null;
         String resourceId = coverageId.replaceFirst(dynamicService.getName(),"");
-        PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrl().toString());
+        PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrlString().toString());
         pb.pathAppend(resourceId);
         pb.append("");
         return pb.toString();

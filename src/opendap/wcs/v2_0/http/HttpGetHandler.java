@@ -31,6 +31,7 @@ import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
+import opendap.dap.Request;
 import opendap.http.error.BadRequest;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
@@ -313,6 +314,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void sendDescribeCoveragePage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        Request oreq = new Request(null,request);
 
         String xsltDoc = _resourcePath+ "xsl/coverageDescription.xsl";
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
@@ -343,7 +345,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",baseServiceUrl);
+        t.setParameter("WcsService",baseServiceUrl);
+        t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
         XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
@@ -358,15 +361,18 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void sendCapabilitesPresentationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        Request oreq = new Request(null,request);
 
         String xsltDoc =  _resourcePath + "xsl/capabilities.xsl";
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
 
         String baseServiceUrl = Util.getServiceUrl(request);
+        log.debug("sendCapabilitesPresentationPage() - baseServiceUrl: "+baseServiceUrl);
         String relativeURL = ReqInfo.getLocalUrl(request);
+        log.debug("sendCapabilitesPresentationPage() - relativeURL: "+relativeURL);
         String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
+        log.debug("sendCapabilitesPresentationPage() - wcsServiceUrl: "+wcsServiceUrl);
 
-        log.debug("sendCapabilitesPresentationPage()  baseServiceUrl: "+baseServiceUrl);
 
         Map<String, String[]> kvp = getKVP(request);
         String[] cids= kvp.get("coverageId".toLowerCase());
@@ -376,8 +382,10 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
 
+
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",baseServiceUrl);
+        t.setParameter("WcsService",baseServiceUrl);
+        t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
         t.transform(capDoc,response.getOutputStream());
@@ -444,6 +452,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         Map<String,String[]> keyValuePairs = getKVP(request);
         String baseServiceUrl = Util.getServiceUrl(request);
+        Request oreq = new Request(null,request);
+        String docsService = oreq.getDocsServiceLocalID();
+
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
         String query = Scrub.completeURL(request.getQueryString());
@@ -452,11 +463,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         String page = "<html>";
         page += "    <head>";
-        page += "        <link rel='stylesheet' href='"+baseServiceUrl+"/docs/css/contents.css' type='text/css' >";
+        page += "        <link rel='stylesheet' href='"+docsService+"/css/contents.css' type='text/css' >";
         page += "        <title>OPeNDAP Hyrax WCS Test</title>";
         page += "    </head>";
         page += "    <body>";
-        page += "    <img alt=\"OPeNDAP Logo\" src='"+baseServiceUrl+"/docs/images/logo.gif'/>";
+        page += "    <img alt=\"OPeNDAP Logo\" src='"+docsService+"/images/logo.gif'/>";
         page += "    <h2>OPeNDAP WCS Test Harness</h2>";
         page += "    How Nice! You sent a WCS request.";
         page += "    <h3>KVP request: </h3>";

@@ -472,26 +472,21 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     public Element getCoverageSummaryElement(String id) throws WcsException {
-        return _coveragesMap.get(id).getCoverageSummary();
+        CoverageDescription cd = _coveragesMap.get(id);
+        return cd==null?null:cd.getCoverageSummary();
     }
 
     @Override
     public Collection<Element> getCoverageSummaryElements() throws WcsException {
 
-
         TreeMap<String, Element> coverageSummaries = new TreeMap<>();
-
         Enumeration e = _coveragesMap.elements();
-
         CoverageDescription cd;
-
+        
         while (e.hasMoreElements()) {
             cd = (CoverageDescription) e.nextElement();
-
             coverageSummaries.put(cd.getCoverageId(), cd.getCoverageSummary());
-
         }
-
         return coverageSummaries.values();
     }
 
