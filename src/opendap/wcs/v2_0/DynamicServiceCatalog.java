@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 import opendap.PathBuilder;
 import opendap.bes.BESError;
+import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.dap4.QueryParameters;
@@ -226,6 +227,9 @@ public class DynamicServiceCatalog implements WcsCatalog{
                 try {
                     if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
                         String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
+                        if(!BESManager.isInitialized())
+                            throw new WcsException("The BESManager has not been configured. " +
+                                    "Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
                         BesApi besApi = new BesApi();
                         QueryParameters qp = new QueryParameters();
                         try {

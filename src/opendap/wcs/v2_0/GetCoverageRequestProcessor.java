@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 
 import opendap.bes.BESError;
+import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
@@ -115,6 +116,10 @@ public class GetCoverageRequestProcessor {
             CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageId);
             String besDatasetId = dapDatasetUrl.substring(Util.BES_PROTOCOL.length());
             Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+
+            if(!BESManager.isInitialized())
+                throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+
             BesApi besApi = new BesApi();
             besApi.besTransaction(besDatasetId,besCmd,response.getOutputStream());
         }
@@ -663,7 +668,6 @@ public class GetCoverageRequestProcessor {
 
         Document besCmd = null;
         String dap2ce = GetCoverageRequestProcessor.getDap2CE(req);
-        opendap.bes.dap2Responders.BesApi besApi = new opendap.bes.dap2Responders.BesApi();
         String format = GetCoverageRequestProcessor.getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
 
@@ -671,6 +675,10 @@ public class GetCoverageRequestProcessor {
         String besUrl = wcsCatalog.getDapDatsetUrl(cd.getCoverageId());
         String besDatatsetId = besUrl.substring(Util.BES_PROTOCOL.length());
 
+        if(!BESManager.isInitialized())
+            throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+
+        BesApi besApi = new BesApi();
         try {
 
             switch (rFormat.type()) {

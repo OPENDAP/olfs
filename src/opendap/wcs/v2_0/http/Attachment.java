@@ -26,6 +26,7 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.bes.BESError;
+import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.ppt.PPTException;
@@ -203,8 +204,12 @@ public class Attachment {
                 break;
 
             case bes:
+                if(!BESManager.isInitialized()) {
+                    throw new BadConfigurationException("The BESManager has not been configured. " +
+                            "Unable to access BES!");
+                }
                 BesApi besApi = new BesApi();
-                besApi.besTransaction(_besDatasetId,_besCmd,sos);
+                besApi.besTransaction(_besDatasetId, _besCmd, sos);
                 break;
 
             case document:

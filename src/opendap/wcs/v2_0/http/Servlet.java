@@ -163,15 +163,14 @@ public class Servlet extends HttpServlet {
         } catch (IOException | JDOMException e) {
             String msg = "Unable to read BES configuration file. Caught " + e.getClass().getSimpleName() +
                     " message: " + e.getMessage();
-            _log.warn(msg);
-            // throw new ServletException(msg);
+            _log.error(msg);
             return;
         }
         Element besManagerElement = config.getChild("BESManager");
 
         if (besManagerElement == null) {
-            String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
-            _log.warn(msg);
+            String msg = "Invalid BES configuration. Missing required 'BESManager' element. BES was not initialized!";
+            _log.error(msg);
             return;
         }
 
@@ -180,9 +179,9 @@ public class Servlet extends HttpServlet {
             try {
                 besManager.init(besManagerElement);
             } catch (Exception e) {
-                String msg = "BES initialization was an abject failure ";
-
-                throw new ServletException(e);
+                String msg = "BESManager initialization was an abject failure. BES was not initialized! " +
+                        "Caught "+e.getClass().getName()+ " message: "+e.getMessage();
+                _log.error(msg);
             }
         }
 
