@@ -26,7 +26,10 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -330,7 +333,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      * @throws WcsException  When bad things happen.
      * @throws InterruptedException When it gets interrupted.
      */
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
         GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 

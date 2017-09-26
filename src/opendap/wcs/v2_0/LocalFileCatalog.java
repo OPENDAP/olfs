@@ -585,7 +585,7 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
     @Override
-    public String getDataAccessUrl(String coverageID) {
+    public String getDapDatsetUrl(String coverageID) {
         CoverageDescription cd = _coveragesMap.get(coverageID);
         if (cd == null)
             return null;

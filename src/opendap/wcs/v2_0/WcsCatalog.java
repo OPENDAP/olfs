@@ -261,7 +261,7 @@ public interface WcsCatalog {
      * @return  The base data access URL for this coverage. Null otherwise.
      * @throws InterruptedException
      */
-    public String getDataAccessUrl(String coverageID) throws InterruptedException;
+    public String getDapDatsetUrl(String coverageID) throws InterruptedException;
 
 
 

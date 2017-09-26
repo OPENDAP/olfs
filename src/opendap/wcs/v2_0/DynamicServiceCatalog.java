@@ -197,7 +197,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
         _log.debug("getCachedDMR() - BEGIN coverageId: {}",coverageId);
 
-        String datasetUrl = getDataAccessUrl(coverageId);
+        String datasetUrl = getDapDatsetUrl(coverageId);
         _log.debug("getCachedDMR() - DAP Dataset URL: {}",datasetUrl);
         if(datasetUrl==null)
             return null;
@@ -387,10 +387,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     @Override
-    public String getDataAccessUrl(String coverageId) throws InterruptedException {
-        _log.debug("getDataAccessUrl() - BEGIN coverageId: {}",coverageId);
+    public String getDapDatsetUrl(String coverageId) throws InterruptedException {
+        _log.debug("getDapDatsetUrl() - BEGIN coverageId: {}",coverageId);
         DynamicService dynamicService = getLongestMatchingDynamicService(coverageId);
-        _log.debug("getDataAccessUrl() - DynamicService instance: {}",dynamicService);
+        _log.debug("getDapDatsetUrl() - DynamicService instance: {}",dynamicService);
         if(dynamicService==null)
             return null;
         String resourceId = coverageId.substring(dynamicService.getName().length());

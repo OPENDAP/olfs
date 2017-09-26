@@ -26,7 +26,10 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -67,7 +70,7 @@ public class KvpHandler {
 
     }
 
-    public static void processKvpWcsRequest(HttpServletRequest request, HttpServletResponse response) throws InterruptedException, IOException {
+    public static void processKvpWcsRequest(HttpServletRequest request, HttpServletResponse response) throws InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
         Map<String,String[]> keyValuePairs  =  getKVP(request);
         Document wcsResponse;
         ServletOutputStream os  = null;
@@ -180,7 +183,7 @@ public class KvpHandler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public static void getCoverage(HttpServletRequest request, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public static void getCoverage(HttpServletRequest request, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
         String requestUrl = HttpGetHandler.getRequestUrlWithQuery(request);
         GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);

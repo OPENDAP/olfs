@@ -203,6 +203,10 @@ public class MimeTypes {
         typeMap.put("dods",    new String[] {"application","octet-stream"});
         typeMap.put("xdods",   new String[] {"text","xml"});
 
+        typeMap.put("dap",     new String[] {"application", "vnd.opendap.dap4.data"});
+        typeMap.put("dmr",     new String[] {"application", "vnd.opendap.dap4.dataset-metadata+xml"});
+        typeMap.put("dsr",     new String[] {"application", "vnd.opendap.dap4.dataset-services+xml"});
+
 
         typeMap.put("jnlp",    new String[] {"application","x-java-jnlp-file"});
 
