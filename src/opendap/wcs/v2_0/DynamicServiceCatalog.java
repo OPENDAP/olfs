@@ -158,7 +158,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
             if(previous!=null){
                 //FIXME Do we care that something was in the way? I think so...
-                _log.warn("The addtion of the DynamicService: {} bumped this instance from the map:{}",
+                _log.warn("The addition of the DynamicService: {} bumped this instance from the map:{}",
                         dynamicService.toString(),previous.toString());
             }
         }
