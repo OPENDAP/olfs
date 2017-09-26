@@ -109,7 +109,8 @@ public class AutoplotRequestHandler  extends JwsHandler {
      * @return true if Autoplot can display the specified dataset or
      *     false if it cannot.
      */
-    public boolean datasetCanBeViewed(Document ddx) {
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
+
 
         Element dataset = ddx.getRootElement();
                                        // root ddx element

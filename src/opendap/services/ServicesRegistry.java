@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -101,6 +102,16 @@ public class ServicesRegistry {
         return _webServiceHandlers.get(id);
     }
 
+
+    public static Vector<WebServiceHandler> getWebServicesLike(String serviceType){
+        Vector<WebServiceHandler> stuffWeLike =  new Vector<>();
+        for(WebServiceHandler wsh: _webServiceHandlers.values()){
+            if(wsh.getServiceId().contains(serviceType)){
+                stuffWeLike.add(wsh);
+            }
+        }
+        return stuffWeLike;
+    }
 
 
 }

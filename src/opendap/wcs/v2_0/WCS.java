@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 /**
@@ -194,7 +193,7 @@ public class WCS {
     }
 
 
-
+               /*
 
 
     public static void checkCoverageDescription(Element cd) throws WcsException{
@@ -213,12 +212,12 @@ public class WCS {
 
 
     }
+    */
 
-
+               /*
     public static void checkBoundedBy(Element e) throws WcsException{
         checkNamespace(e,"boundedBy",GML_NS);
     }
-
 
     public static void checkCoverageId(Element e) throws WcsException{
         checkNamespace(e,"CoverageId",WCS_NS);
@@ -239,8 +238,9 @@ public class WCS {
 
     }
 
+        */
 
-
+        /*
 
     public static void checkDomainSet(Element e) throws WcsException{
 
@@ -249,6 +249,8 @@ public class WCS {
         checkTemporalDomain(e.getChild("TemporalDomain",WCS.WCS_NS));
 
     }
+    */
+        /*
     public static void checkSpatialDomain(Element e) throws WcsException{
 
         checkNamespace(e,"SpatialDomain",WCS.WCS_NS);
@@ -258,6 +260,8 @@ public class WCS {
 
 
     }
+    */
+        /*
 
 
     public static void checkTemporalDomain(Element e) throws WcsException{
@@ -268,7 +272,7 @@ public class WCS {
         boolean hasContent = false;
         Iterator tpositions = e.getChildren("timePosition",WCS.GML_NS).iterator();
         Iterator tperiods = e.getChildren("TimePeriod",WCS.WCS_NS).iterator();
-        
+
         while(tpositions.hasNext()){
             hasContent = true;
             checkTimePosition((Element)tpositions.next());
@@ -288,7 +292,7 @@ public class WCS {
 
     public static void checkTimePosition(Element e) throws WcsException{
         checkNamespace(e,"timePosition",WCS.GML_NS);
-        //@todo Check the content of gml:timePosition
+        //TODO Check the content of gml:timePosition
 
 
     }
@@ -308,13 +312,14 @@ public class WCS {
             throw new WcsException("wcs:TimePeriod MUST have a wcs:EndPosition element ",
                     WcsException.MISSING_PARAMETER_VALUE,"wcs:EndPosition");
 
-        //@todo Check the content of wcs:BeginPosition and wcs:EndPosition
+        //TODO Check the content of wcs:BeginPosition and wcs:EndPosition
     }
 
 
+  */
 
 
-
+        /*
 
 
 
@@ -441,7 +446,8 @@ public class WCS {
 
     }
 
-
+      */
+        
     public static NewBoundingBox getSubsetBoundingBox(
             HashMap<String, DimensionSubset> dimensionSubsets,
             TemporalDimensionSubset temporalSubset,

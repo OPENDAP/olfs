@@ -70,6 +70,7 @@ public class MimeTypes {
         typeMap.put("jpg",   new String[] {"image", "jpeg"});
         typeMap.put("jfif",  new String[] {"image", "jpeg"});
         typeMap.put("jpe",   new String[] {"image", "jpeg"});
+        typeMap.put("jp2",   new String[] {"image", "jp2"});
 
         typeMap.put("gif",   new String[] {"image", "gif"});
 
@@ -201,6 +202,10 @@ public class MimeTypes {
         typeMap.put("dds",     new String[] {"text", "x-dods_dds"});
         typeMap.put("dods",    new String[] {"application","octet-stream"});
         typeMap.put("xdods",   new String[] {"text","xml"});
+
+        typeMap.put("dap",     new String[] {"application", "vnd.opendap.dap4.data"});
+        typeMap.put("dmr",     new String[] {"application", "vnd.opendap.dap4.dataset-metadata+xml"});
+        typeMap.put("dsr",     new String[] {"application", "vnd.opendap.dap4.dataset-services+xml"});
 
 
         typeMap.put("jnlp",    new String[] {"application","x-java-jnlp-file"});

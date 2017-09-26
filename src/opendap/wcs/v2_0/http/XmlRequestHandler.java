@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,7 +25,11 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -158,9 +162,9 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Document wcsRequestDoc = parseWcsRequest(sis, encoding);
 
         Element wcsRequest = wcsRequestDoc.getRootElement();
-        String serviceUrl = Util.getServiceUrlString(request, _prefix);
+        String serviceUrl = PathBuilder.pathConcat(Util.getServiceUrl(request),_prefix);
 
-        String requestUrl=HttpGetHandler.getRequestUrl(request);
+        String requestUrl=HttpGetHandler.getRequestUrlWithQuery(request);
 
         handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
 
@@ -311,7 +315,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
     public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
 
-        return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
     }
 
 
@@ -329,7 +333,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      * @throws WcsException  When bad things happen.
      * @throws InterruptedException When it gets interrupted.
      */
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
         GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 

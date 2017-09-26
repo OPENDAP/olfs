@@ -73,6 +73,9 @@
 
     <xsl:template match="webService" mode="WebServiceLinks">
         <li><a href="{@serviceUrl}"><xsl:value-of select="@applicationName"/></a></li>
+        <!-- xsl:copy-of select="@serviceUrl"/ -->
+        <!-- li> <xsl:copy-of select="@serviceUrl"/> </li -->
+        <!-- li> <xsl:copy-of select="."/> </li -->
     </xsl:template>
 
 

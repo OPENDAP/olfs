@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.coreServlet.Util;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +164,7 @@ public class NewBoundingBox {
 
 
             String axisLabelsString = envelope.getAttributeValue("axisLabels");
-            String axisLabels[] = axisLabelsString.split(" ");
+            String axisLabels[] = axisLabelsString.split(Util.WHITE_SPACE_REGEX_STRING);
             if (axisLabels.length < 2)
                 throw new WcsException("The axisLabels attribute must contain at least two values.",
                         WcsException.INVALID_PARAMETER_VALUE,

@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -23,19 +23,8 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-
-
-
-
 package opendap.wcs.v2_0;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 10/30/12
- * Time: 11:46 AM
- * To change this template use File | Settings | File Templates.
- */
 public class NCName {
 
 

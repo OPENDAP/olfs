@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -143,7 +144,23 @@ public class DescribeCoverageRequest {
         s = kvp.get("coverageId".toLowerCase());
         if(s!=null){
             tmp = s[0].split(",");
-            ids = tmp;
+            Vector<String> cids = new Vector<>();
+            for(String cid:tmp){
+
+                if(!cid.isEmpty()){
+                    cid = Util.stripQuotes(cid);
+                    if (cid.length() == 0) {
+                        throw new WcsException("A/The supplied 'coverageId' was empty. :(",
+                                WcsException.MISSING_PARAMETER_VALUE,
+                                "coverageId");
+                    }
+                    cids.add(cid);
+                }
+            }
+            if(cids.size()>0){
+                ids = new String[cids.size()];
+                cids.toArray(ids);
+            }
         }
         else {
             throw new WcsException("Request is missing required list of " +

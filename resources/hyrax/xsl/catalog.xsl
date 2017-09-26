@@ -39,7 +39,7 @@
     <xsl:param name="useDAP2ResourceUrlResponse"/>
     <xsl:param name="ncWmsServiceBase"/>
     <xsl:param name="ncWmsDynamicServiceId"/>
-
+    <xsl:param name="WcsServices"/>
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -69,12 +69,13 @@
             <xsl:if test="$ncWmsServiceBase">
                 <thredds:service name="wms" serviceType="WMS" base="{$ncWmsServiceBase}" />
             </xsl:if>
+            <xsl:if test="$WcsServices">
+                <xsl:apply-templates select="$WcsServices" mode="serviceBase"/>
+            </xsl:if>
 
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
-
-
 
     <!--***********************************************
        -
@@ -91,10 +92,7 @@
      -->
     <xsl:template match="bes:dataset">
 
-
-
-
-        <xsl:choose>
+        <xsl:choose> <!-- Top level dataset or further down ?? -->
             <xsl:when test="bes:dataset">
                 <!--
                 This dataset is the  top level dataset. The only dataset that the bes
@@ -102,7 +100,6 @@
                 the showCatalog response. This a major assumption and this XSLT will
                 fail if the bes changes this arrangement
                 -->
-
                 <xsl:variable name="name">
                     <xsl:choose>
                         <xsl:when test="@name='/'" >
@@ -113,7 +110,7 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                
+
                 <xsl:variable name="ID">
                     <xsl:choose>
                         <xsl:when test="$name='/'" >
@@ -129,10 +126,7 @@
                     <xsl:apply-templates />
                 </thredds:dataset>
             </xsl:when>
-
-            <xsl:otherwise>
-                <!-- It's not a top level dataset... -->
-                
+            <xsl:otherwise> <!-- It's not a top level dataset... -->
                 <xsl:variable name="ID">
                     <xsl:choose>
                         <xsl:when test="../@name='/'">
@@ -143,30 +137,23 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-
                 <!-- <sanityCheck besDapService="{$besDapService}" parentName="{../@name}" myName="{@name}"  ID="{$ID}"/>  -->
-
-                <xsl:choose>
+                <xsl:choose>  <!-- node or leaf? -->
                     <xsl:when test="@node='true'">
                         <!-- This dataset is a node, aka a directory or collection -->
-
                         <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" ID="{$ID}/" />
                     </xsl:when >
-
                     <xsl:otherwise>
                         <!-- This dataset  a simple dataset, aka a file or a granule or a leaf -->
-
                         <thredds:dataset name="{@name}" ID="{$ID}" >
                             <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
                             <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
                             <xsl:call-template name="DatasetAccess"/>
                         </thredds:dataset>
                     </xsl:otherwise >
-
-                </xsl:choose>
+                </xsl:choose><!-- node or leaf? -->
             </xsl:otherwise>
-
-        </xsl:choose>
+        </xsl:choose>  <!-- Top level dataset or further down ?? -->
 
 
     </xsl:template>
@@ -206,6 +193,11 @@
                         <xsl:attribute name="urlPath">?DATASET=<xsl:value-of select="$ncWmsDynamicServiceId" /><xsl:value-of select="$urlPath" />&amp;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities</xsl:attribute>
                     </thredds:access>
                 </xsl:if>
+                <xsl:if test="$WcsServices">
+                    <xsl:apply-templates select="$WcsServices" mode="dataAccess">
+                        <xsl:with-param name="urlPath"><xsl:value-of select="$urlPath"/></xsl:with-param>
+                    </xsl:apply-templates>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
                 <thredds:access>
@@ -216,6 +208,27 @@
         </xsl:choose>
 
     </xsl:template>
+
+
+    <xsl:template match="Wcs" mode="serviceBase">
+        <thredds:service name="{@name}" serviceType="WCS" base="{@base}" />
+    </xsl:template>
+
+    <xsl:template match="Wcs" mode="dataAccess">
+        <xsl:param name="urlPath"/>
+
+        <xsl:if test="matches($urlPath, @matchRegex)" >
+            <thredds:access>
+                <xsl:attribute name="serviceName"><xsl:value-of select="@name"/></xsl:attribute>
+                <xsl:attribute name="urlPath">/<xsl:value-of select="@dynamicServiceId" /><xsl:value-of select="$urlPath" />?SERVICE=WCS&amp;REQUEST=GetCapabilities</xsl:attribute>
+            </thredds:access>
+        </xsl:if>
+
+
+
+    </xsl:template>
+
+
 
 
 </xsl:stylesheet>

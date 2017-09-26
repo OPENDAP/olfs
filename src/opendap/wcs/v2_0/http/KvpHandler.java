@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,6 +25,11 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.coreServlet.ReqInfo;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -32,8 +37,10 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -63,23 +70,21 @@ public class KvpHandler {
 
     }
 
-    public static void processKvpWcsRequest(String serviceURL, String requestUrl, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
-
+    public static void processKvpWcsRequest(HttpServletRequest request, HttpServletResponse response) throws InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
+        Map<String,String[]> keyValuePairs  =  getKVP(request);
         Document wcsResponse;
-        XMLOutputter xmlo;
-
         ServletOutputStream os  = null;
-
-
         try {
             os  = response.getOutputStream();
-
             WCS.REQUEST wcsRequestType = getRequestType(keyValuePairs);
 
             switch(wcsRequestType){
 
                 case GET_CAPABILITIES:
-                    wcsResponse = getCapabilities(keyValuePairs, serviceURL);
+                    String baseServiceUrl = Util.getServiceUrl(request);
+                    String relativeURL = ReqInfo.getLocalUrl(request);
+                    String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
+                    wcsResponse = getCapabilities(keyValuePairs, wcsServiceUrl);
                     response.setContentType("text/xml");
                     transmitXML(wcsResponse,os);
                     break;
@@ -98,7 +103,7 @@ public class KvpHandler {
 
                 case GET_COVERAGE:
 
-                    getCoverage(requestUrl, keyValuePairs,response);
+                    getCoverage(request, keyValuePairs, response);
 
                     break;
 
@@ -140,7 +145,7 @@ public class KvpHandler {
 
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
 
-        return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
     }
 
 
@@ -178,10 +183,12 @@ public class KvpHandler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public static void getCoverage(String requestUrl, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public static void getCoverage(HttpServletRequest request, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
+        String requestUrl = HttpGetHandler.getRequestUrlWithQuery(request);
         GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);
 
+        req.setCfHistoryAttribute(ReqInfo.getCFHistoryEntry(request));
         GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 
     }
@@ -201,7 +208,7 @@ public class KvpHandler {
         // Make sure the client is looking for a WCS service....
         String[] s = keyValuePairs.get("service");
         if(s==null || !s[0].equals(WCS.SERVICE))
-            throw new WcsException("Only the WCS service (version "+
+            throw new WcsException("Only the "+WCS.SERVICE+ " service (version "+
                     WCS.CURRENT_VERSION+") is supported.",
                     WcsException.OPERATION_NOT_SUPPORTED,"service");
 
@@ -232,6 +239,44 @@ public class KvpHandler {
 
 
     }
+
+
+    public static Map<String, String[]> getKVP(HttpServletRequest request){
+        Map<String,String[]> requestParameters = new HashMap<>();
+        Map pmap =  request.getParameterMap();
+
+        for(Object o: pmap.keySet()){
+            String key = (String) o;   // Get the key String
+            String[] value = (String[]) pmap.get(key);  // Get the value before we change the key
+            key = key.toLowerCase(); // Make the key set case insensitive;
+            requestParameters.put(key,value);
+        }
+
+
+        String localUrl = ReqInfo.getLocalUrl(request);
+        while(localUrl.startsWith("/") && !localUrl.isEmpty()){
+            localUrl = localUrl.substring(1,localUrl.length());
+        }
+        while(localUrl.endsWith("/") && !localUrl.isEmpty()){
+            localUrl = localUrl.substring(0,localUrl.length()-1);
+        }
+        if( localUrl!=null &&
+                !localUrl.isEmpty() &&
+                !requestParameters.containsKey("coverageId".toLowerCase())){
+
+            String[] vals;
+            vals = new String[1];
+            vals[0] = localUrl;
+            requestParameters.put("coverageId".toLowerCase(), vals);
+        }
+
+
+        return requestParameters;
+
+    }
+
+
+
 
 
 }

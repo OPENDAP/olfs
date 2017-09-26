@@ -1,3 +1,28 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "Hyrax Data Server" project.
+ * //
+ * //
+ * // Copyright (c) 2017 OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 package opendap.wcs.v2_0;
 
 import org.jdom.Element;
@@ -5,14 +30,21 @@ import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+
 
 /**
  * Created by ndp on 7/26/16.
  */
+@XmlRootElement(name = "EODatasetSeries")
 public class EODatasetSeries {
 
     private String _id;
@@ -35,6 +67,7 @@ public class EODatasetSeries {
 
     //boolean _initialized = false;
 
+    public EODatasetSeries(){}
 
     public EODatasetSeries(Element eodsElement, String catalogDir, boolean validateContent)
             throws WcsException, JDOMException, ConfigurationException, IOException {
@@ -80,11 +113,14 @@ public class EODatasetSeries {
      *
      * @return Returns the value of the unique wcs:CoverageId associated with this CoverageDescription.
      */
+    @XmlAttribute
     public String getId(){
         return _id;
     }
 
-
+    public void setId(String myId){
+    	this._id = myId;
+    }
 
     public NewBoundingBox getBoundingBox() throws WcsException {
         NewBoundingBox seriesBoundingBox = null;
@@ -178,6 +214,16 @@ public class EODatasetSeries {
 
     }
 
-
+    
+    @XmlElement(name = "EOWcsCoverage")
+    public List<EOCoverageDescription> getEoCoverageDescriptionElements() {
+    	if (members == null || members.isEmpty()) return Collections.<EOCoverageDescription>emptyList();
+    	return Collections.list(members.elements());
+    }
+  
+    public void setEoCoverageDescriptionElements(Vector<EOCoverageDescription> ecovs)
+    {
+      this.members = ecovs;	
+    }
 
 }

@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,9 +25,12 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.DispatchServlet;
 import opendap.namespaces.NS;
 import opendap.namespaces.SOAP;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -117,7 +120,7 @@ public class SoapHandler extends XmlRequestHandler {
 
 
     @Override
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
         GetCoverageRequestProcessor.sendCoverageResponse(req, response, true );
 

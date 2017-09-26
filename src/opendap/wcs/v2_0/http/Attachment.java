@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,12 +25,22 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.bes.BESError;
+import opendap.bes.BESManager;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.ppt.PPTException;
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
@@ -47,7 +57,7 @@ import java.util.HashMap;
 public class Attachment {
 
     private enum ContentModel {
-        stream, url, document
+        stream, url, document, bes
     }
 
 
@@ -57,8 +67,12 @@ public class Attachment {
     private final String contentType = "Content-Type";
     private InputStream _istream;
     private String _sourceUrl;
+    private CredentialsProvider _credentialsProvider;
     private Document _doc;
     private ContentModel _myContentModel;
+
+    private Document _besCmd;
+    private String _besDatasetId;
 
     private HashMap<String, String> mimeHeaders;
 
@@ -75,7 +89,13 @@ public class Attachment {
 
     public Attachment(String ctype, String cid){
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        mimeHeaders = new HashMap<String, String>();
+        mimeHeaders = new HashMap<>();
+        _credentialsProvider = null;
+        _sourceUrl = null;
+        _istream = null;
+        _doc = null;
+        _myContentModel = null;
+        _besCmd = null;
 
         setHeader(contentType,ctype);
         setHeader(contentId,"<"+cid+">");
@@ -91,11 +111,9 @@ public class Attachment {
      */
     public Attachment(String ctype, String cid, InputStream is) {
         this(ctype,cid);
-
         _istream = is;
         _doc = null;
         _myContentModel = ContentModel.stream;
-
     }
 
 
@@ -104,13 +122,27 @@ public class Attachment {
      * @param cid   String containing the value if the HTTP header Content-Id for this attachment.
      * @param url   A URL that when dereferenced will provide the content for this attachment.
      */
-    public Attachment(String ctype, String cid, String url) {
+    public Attachment(String ctype, String cid, String url, CredentialsProvider creds) {
         this(ctype,cid);
-
-        _istream = null;
         _sourceUrl = url;
+        _credentialsProvider =creds;
         _doc = null;
         _myContentModel = ContentModel.url;
+    }
+
+    /**
+     *
+     * @param ctype String containing the value of the HTTP header Content-Type for this attachment.
+     * @param cid   String containing the value if the HTTP header Content-Id for this attachment.
+     * @param datasetId The unique ID for the dataset in the BES
+     * @param besCmd  The BES command to execute in order to  transmit the attachment.
+     */
+    public Attachment(String ctype, String cid, String datasetId, Document besCmd) {
+        this(ctype,cid);
+        _doc = null;
+        _besCmd = besCmd;
+        _besDatasetId = datasetId;
+        _myContentModel = ContentModel.bes;
     }
 
     /**
@@ -120,15 +152,12 @@ public class Attachment {
      */
     public Attachment(String ctype, String cid, Document doc) {
         this(ctype,cid);
-
-        _istream = null;
-        _sourceUrl = null;
         _doc = doc;
         _myContentModel = ContentModel.document;
     }
 
 
-    public String getContentType(){
+    public String getContentType() {
         return getHeader(contentType);
     }
 
@@ -141,7 +170,7 @@ public class Attachment {
      * @throws IOException                 When things can't be read or written.
      * @throws java.net.URISyntaxException If the target URL is hosed.
      */
-    public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException {
+    public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
 
 
         sos.println("--" + mimeBoundary);
@@ -156,7 +185,7 @@ public class Attachment {
         switch (_myContentModel) {
             case stream:
                 try {
-                    Util.drainInputStream(_istream, sos);
+                    drainInputStream(_istream, sos);
                 } finally {
                     if (_istream != null) {
                         try {
@@ -171,11 +200,20 @@ public class Attachment {
                 break;
 
             case url:
-                Util.forwardUrlContent(_sourceUrl, sos);
+                opendap.http.Util.writeRemoteContent(_sourceUrl, _credentialsProvider, sos);
+                break;
+
+            case bes:
+                if(!BESManager.isInitialized()) {
+                    throw new BadConfigurationException("The BESManager has not been configured. " +
+                            "Unable to access BES!");
+                }
+                BesApi besApi = new BesApi();
+                besApi.besTransaction(_besDatasetId, _besCmd, sos);
                 break;
 
             case document:
-                Util.sendDocument(_doc, sos);
+                sendDocument(_doc, sos);
                 break;
 
             default:
@@ -187,6 +225,46 @@ public class Attachment {
         sos.println();
 
 
+    }
+
+    public static final int DEFAULT_BUFFER_SIZE = 10240; // 10k read buffer
+
+    private int drainInputStream(InputStream is, OutputStream os) throws IOException {
+        return drainInputStream(is,os,DEFAULT_BUFFER_SIZE);
+    }
+
+    private int drainInputStream(InputStream is, OutputStream os, int bufferSize) throws IOException {
+        byte[] buf = new byte[bufferSize];
+        boolean done = false;
+        int totalBytesRead = 0;
+        int totalBytesWritten = 0;
+        int bytesRead;
+
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (!done) {
+            bytesRead = is.read(buf);
+            if (bytesRead == -1) {
+                //   if (totalBytesRead == 0)
+                //      totalBytesRead = -1;
+                done = true;
+            } else {
+                totalBytesRead += bytesRead;
+                os.write(buf, 0, bytesRead);
+                // baos.write(buf,0,bytesRead);
+                totalBytesWritten += bytesRead;
+            }
+        }
+        if (totalBytesRead != totalBytesWritten)
+            throw new IOException("Failed to write as many bytes as I read! " +
+                    "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
+        //System.out.println("################################################################");
+        //System.out.write(baos.toByteArray());
+        //System.out.println("################################################################");
+        return totalBytesRead;
+    }
+    private void sendDocument(Document doc,OutputStream os) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(doc, os);
     }
 
 

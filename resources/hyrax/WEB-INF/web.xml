@@ -175,6 +175,20 @@
         <load-on-startup>1</load-on-startup>
 
     </servlet>
+
+    <!-- - - - - - - - - WCS Servlet - - - - - - - - - -->
+    <servlet>
+        <servlet-name>wcs</servlet-name>
+        <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
+        <init-param>
+            <param-name>WCSConfigFileName</param-name>
+            <param-value>wcs_service.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+
     <servlet>
         <servlet-name>w10n</servlet-name>
         <servlet-class>opendap.w10n.W10nServlet</servlet-class>
@@ -282,7 +296,12 @@
         <url-pattern>/w10n/*</url-pattern>
     </servlet-mapping>
 
-  <!-- ==================== Default Session Configuration ================= -->
+    <servlet-mapping>
+        <servlet-name>wcs</servlet-name>
+        <url-pattern>/wcs/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->
 
