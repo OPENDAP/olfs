@@ -314,7 +314,7 @@
     </target>
 
 
-    <!-- It would be better if this target only copied the files that have chenaged.
+    <!-- It would be better if this target only copied the files that have changed.
          jhrg 5/26/16 -->
     <target name="check"
             description="Run Unit Tests"

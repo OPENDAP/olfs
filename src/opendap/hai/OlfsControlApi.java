@@ -61,7 +61,7 @@ import java.util.regex.Pattern;
 public class OlfsControlApi extends HttpResponder {
 
 
-    private Logger log;
+    private org.slf4j.Logger log;
 
     private static String defaultRegex = ".*\\/olfsctl";
 
@@ -72,35 +72,35 @@ public class OlfsControlApi extends HttpResponder {
     private String ROOT_NAME = "ROOT";
 
 
-    private CyclicBufferAppender cyclicBufferAppender;
+    private CyclicBufferAppender _cyclicBufferAppender;
 
     public void init() {
-        log = (Logger) LoggerFactory.getLogger(getClass());
+        log = LoggerFactory.getLogger(getClass());
+        _cyclicBufferAppender = null;
+
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-
-
         if(log.isDebugEnabled()) {
             StringBuilder msg = new StringBuilder();
 
             for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
                 msg.append("   Logger: ").append(logger.getName()).append("\n");
-
                 Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
                 while (i.hasNext()) {
                     Appender<ILoggingEvent> a = i.next();
                     msg.append("        Appender: ").append(a.getName()).append("\n");
-
                 }
-
-
             }
             log.debug("Initializing ViewLastLog Servlet. \n" + msg);
         }
+    }
 
+    private CyclicBufferAppender getCyclicBufferAppender(){
+        if(_cyclicBufferAppender!=null)
+            return _cyclicBufferAppender;
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger rootLogger = lc.getLogger(ROOT_NAME);
-
-        cyclicBufferAppender = (CyclicBufferAppender) rootLogger.getAppender(AdminLogger);
-
+        _cyclicBufferAppender = (CyclicBufferAppender) rootLogger.getAppender(AdminLogger);
+        return _cyclicBufferAppender;
     }
 
 
@@ -126,8 +126,6 @@ public class OlfsControlApi extends HttpResponder {
 
         HashMap<String,String> kvp = Util.processQuery(request);
 
-
-
         response.getWriter().print(processOlfsCommand(kvp));
 
     }
@@ -138,12 +136,14 @@ public class OlfsControlApi extends HttpResponder {
         StringBuilder logContent = new StringBuilder();
         int count = -1;
 
+        CyclicBufferAppender cyclicBufferAppender = getCyclicBufferAppender();
+
         if(lines!=null){
 
             try {
                 int maxLines = Integer.parseInt(lines);
 
-                if(maxLines>0 && maxLines<20000)
+                if(maxLines>0 && maxLines<20000 && cyclicBufferAppender!=null)
                     cyclicBufferAppender.setMaxSize(maxLines);
 
             }

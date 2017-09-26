@@ -204,7 +204,12 @@
     <servlet>
         <servlet-name>adminInterface</servlet-name>
         <servlet-class>opendap.hai.DispatchServlet</servlet-class>
+        <!-- init-param>
+            <param-name>DeveloperMode</param-name>
+            <param-value>true</param-value>
+        </init-param -->
         <!-- Most people don't use the HAI, so don't load it by default -->
+        <!-- load-on-startup>1</load-on-startup -->
     </servlet>
 
     <servlet>
@@ -382,7 +387,7 @@
         <user-data-constraint>
             <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-            <!-- transport-guarantee>NONE</transport-guarantee  -->
+            <!-- transport-guarantee>NONE</transport-guarantee -->
         </user-data-constraint>
     </security-constraint>
 
