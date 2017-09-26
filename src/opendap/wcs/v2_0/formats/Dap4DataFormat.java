@@ -33,5 +33,6 @@ public class Dap4DataFormat extends WcsResponseFormat {
         _name = "dap4";
         _dapSuffix = "dap";
         _mimeType = MimeTypes.getMimeType(_dapSuffix);
+        _type = Type.dap4;
     }
 }

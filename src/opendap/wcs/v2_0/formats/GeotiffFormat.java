@@ -33,5 +33,6 @@ public class GeotiffFormat extends WcsResponseFormat {
         _name = "geotiff";
         _dapSuffix = "tiff";
         _mimeType = MimeTypes.getMimeType(_dapSuffix);
+        _type = Type.geotiff;
     }
 }

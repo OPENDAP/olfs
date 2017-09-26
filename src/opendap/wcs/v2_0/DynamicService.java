@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DynamicService {
     private Logger _log;
     private String _name;
-    private URL _dapServiceUrl;
+    private String _dapServiceUrlString;
     private SimpleSrs _srs;
     private Vector<DomainCoordinate> _domainCoordinates;
     // private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
@@ -63,7 +63,7 @@ public class DynamicService {
         super();
         _log = LoggerFactory.getLogger(this.getClass());
         _name = null;
-        _dapServiceUrl = null;
+        _dapServiceUrlString = null;
         _srs = null;
         _domainCoordinates =  new Vector<>();
         //_dcMap = new ConcurrentHashMap<>();
@@ -90,12 +90,25 @@ public class DynamicService {
             badThingsHappened.add("Failed to locate required attribute 'href' in the DynamicService configuration element!");
         }
         else {
-            try {
-                _dapServiceUrl = new URL(s);
-            }
-            catch(MalformedURLException mue){
-                badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
-            }
+                // The java.net.URL class supports: http, https, ftp, file, and jar
+                // We want two things here:
+                //   a) Only allow http and https
+                //   b) Utilize the protocol to direct requests to the BES.
+                if(s.toLowerCase().startsWith("http://") || s.toLowerCase().startsWith("https://")) {
+                    try {
+                        _dapServiceUrlString = new URL(s).toString();
+                    }
+                    catch(MalformedURLException mue){
+                        badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
+                    }
+                }
+                else if( s.toLowerCase().startsWith("bes://")){
+                    _dapServiceUrlString = s;
+                }
+                else {
+                    badThingsHappened.add("The DyanmicService 'href' attribute references an unkonw protocol." +
+                            "Only 'http', 'https', and 'bes' are supportd.");
+                }
         }
 
         s = config.getAttributeValue("srs");
@@ -283,10 +296,10 @@ public class DynamicService {
     public void setName(String name) { _name = name; }
     public String getName() { return  _name; }
 
-    public void setDapServiceUrl(String dapServiceUrl) throws MalformedURLException {
-        _dapServiceUrl = new URL(dapServiceUrl);
-    }
-    public URL getDapServiceUrl(){ return _dapServiceUrl; }
+    //public void setDapServiceUrl(String dapServiceUrl) throws MalformedURLException {
+    //    _dapServiceUrlString = new URL(dapServiceUrl);
+    //}
+    public String getDapServiceUrlString(){ return _dapServiceUrlString; }
 
 
     @Override
@@ -294,7 +307,7 @@ public class DynamicService {
         /*
         Logger _log;
         private String _name;
-        private URL _dapServiceUrl;
+        private URL _dapServiceUrlString;
         private SimpleSrs _srs;
         private Vector<DomainCoordinate> _domainCoordinates;
         private DomainCoordinate _time;
@@ -304,7 +317,7 @@ public class DynamicService {
         StringBuilder sb = new StringBuilder();
         sb.append("DynamicService {\n)");
         sb.append("  name: ").append(_name).append("\n");
-        sb.append("  dapServiceUrl: ").append(_dapServiceUrl).append("\n");
+        sb.append("  dapServiceUrl: ").append(_dapServiceUrlString).append("\n");
         sb.append("  srs: ").append(_srs.getName()).append("\n");
         sb.append("  Variable Mappings:\n");
         for(FieldDef field: _wcsFieldsByDapID.values()) {
@@ -326,6 +339,30 @@ public class DynamicService {
     }
     public FieldDef getFieldDefFromDapId(String dapId){
         return _wcsFieldsByDapID.get(dapId);
+    }
+
+
+    public static void main(String args[]) {
+
+        String urlStrings[] =
+                {
+                        "http://wcs.opendap.org:8080/opendap",
+                        "file://etc/olfs/",
+                        "bes://data/nc/",
+                        "wcs://wcs.opendap.org:8080/WCS-2.0/"
+                };
+        URL url;
+        for (String urlString : urlStrings) {
+            try {
+                url = new URL(urlString);
+                System.out.println("urlString: " + urlString + "  URL: " + url.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
     }
 
 }

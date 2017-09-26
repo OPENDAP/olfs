@@ -69,7 +69,7 @@ public class CoverageDescription {
     /**
      * Use getDapDatsetUrl() and setDapDatasetUrl() for access
      */
-    private URL _dapDatasetUrl;
+    private String _dapDatasetUrl;
 
     /**
      * Use addFieldToDapVarIdAssociation(String, String) add and getDapGridArrayId(String fieldName) to access.
@@ -93,6 +93,8 @@ public class CoverageDescription {
         _lastModified = System.currentTimeMillis();
         _dapGridId = new HashMap<>();
         _domainCoordinates = new LinkedHashMap<>();
+        _myFile = null;
+        _dapDatasetUrl = null;
     }
 
     public CoverageDescription(CoverageDescription cd) throws IOException {
@@ -101,7 +103,7 @@ public class CoverageDescription {
         _lastModified = cd._lastModified;
         _myFile = cd._myFile.getCanonicalFile();
         _validateContent = cd._validateContent;
-        _dapDatasetUrl = new URL(cd._dapDatasetUrl.toString());
+        _dapDatasetUrl = cd._dapDatasetUrl;
         _dapGridId.putAll(cd._dapGridId);
         _domainCoordinates.putAll(cd._domainCoordinates);
         _initialized = cd._initialized;
@@ -205,8 +207,7 @@ public class CoverageDescription {
             _log.error(msg);
             throw new ConfigurationException(msg);
         }
-        URL datasetUrl = new URL(e.getTextTrim());
-        setDapDatasetUrl(datasetUrl);
+        setDapDatasetUrl(e.getTextTrim());
 
         /**
          * Load DAP ID (The Fully Qualified Name) for the variable that holds the domain
@@ -674,16 +675,26 @@ public class CoverageDescription {
         return new DomainCoordinate(dc);
     }
 
-    public void setDapDatasetUrl(URL datasetUrl) throws WcsException {
+    public void setDapDatasetUrl(String datasetUrl) throws WcsException {
 
-        try {
-            _dapDatasetUrl = new URL(datasetUrl.toExternalForm());
-        } catch (MalformedURLException e) {
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        if(datasetUrl.toLowerCase().startsWith(opendap.http.Util.BES_PROTOCOL)){
+            _dapDatasetUrl = datasetUrl;
+        }
+        else if( datasetUrl.toLowerCase().startsWith(opendap.http.Util.HTTP_PROTOCOL) ||
+                 datasetUrl.toLowerCase().startsWith(opendap.http.Util.HTTPS_PROTOCOL) ){
+            try {
+                _dapDatasetUrl = new URL(datasetUrl).toString();
+            } catch (MalformedURLException e) {
+                throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+            }
+
+        }
+        else {
+            throw new WcsException("Unrecognized protocol: "+datasetUrl,WcsException.INVALID_PARAMETER_VALUE);
         }
     }
 
-    public URL getDapDatasetUrl() {
+    public String getDapDatasetUrl() {
 
         return _dapDatasetUrl;
     }

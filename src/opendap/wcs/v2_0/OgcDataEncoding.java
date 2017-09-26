@@ -40,8 +40,21 @@ public class OgcDataEncoding {
     private static ConcurrentHashMap<String, String> ogcDataEncodings;
     static {
         ogcDataEncodings = new ConcurrentHashMap<String, String>();
-        ogcDataEncodings.put("application/x-netcdf","http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/req/CF-netCDF");
-        ogcDataEncodings.put("application/octet-stream","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/dap2");
+
+        ogcDataEncodings.put(
+                "application/x-netcdf","http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/req/CF-netCDF");
+
+        ogcDataEncodings.put(
+                "application/octet-stream","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/dap2");
+
+        ogcDataEncodings.put(
+                "application/vnd.opendap.dap4.data","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/dap4");
+
+        ogcDataEncodings.put(
+                "image/tiff","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/geotiff");
+
+        ogcDataEncodings.put(
+                "image/jp2","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/gml-jpeg2000");
     }
 
     public static String getEncodingUri(String mimeType){

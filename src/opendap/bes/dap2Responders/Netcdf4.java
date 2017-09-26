@@ -106,7 +106,7 @@ public class Netcdf4 extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
-        String cf_history_entry = getCFHistoryEntry(request);
+        String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
 
         BesApi besApi = getBesApi();
 

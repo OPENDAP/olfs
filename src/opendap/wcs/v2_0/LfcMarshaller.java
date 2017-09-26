@@ -29,7 +29,7 @@ public class LfcMarshaller {
 		CoverageDescription cd = new CoverageDescription();
 		try
 		{
-		 cd.setDapDatasetUrl(new java.net.URL("http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201601.nc4"));
+		 cd.setDapDatasetUrl("http://localhost:8080/opendap/testbed-13/MERRA2_400.tavgM_2d_int_Nx.201601.nc4");
 		}
 		catch (Exception e)
 		{
@@ -89,7 +89,7 @@ public class LfcMarshaller {
 		EOCoverageDescription ecd = new EOCoverageDescription();
 		try
 		{
-		 ecd.setDapDatasetUrl(new java.net.URL("http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc"));
+		 ecd.setDapDatasetUrl("http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc");
 		}
 		catch (Exception e)
 		{

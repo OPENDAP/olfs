@@ -26,6 +26,10 @@
 package opendap.wcs.v2_0.formats;
 
 public class WcsResponseFormat {
+    public enum Type {
+        dap2, dap4, geotiff, jpeg2000, netcdf
+    }
+    protected Type _type;
     protected String _name;
     protected String _mimeType;
     protected String _dapSuffix;
@@ -33,8 +37,10 @@ public class WcsResponseFormat {
         _name = null;
         _mimeType = null;
         _dapSuffix = null;
+        _type = null;
     }
     public String dapDataResponseSuffix(){ return _dapSuffix.toLowerCase();};
     public String name(){ return _name.toLowerCase(); }
     public String mimeType(){return _mimeType.toLowerCase();}
+    public Type type(){return  _type;}
 }

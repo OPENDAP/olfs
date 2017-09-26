@@ -25,6 +25,9 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.ppt.PPTException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -119,7 +122,7 @@ public class MultipartResponse {
      *
      * @throws java.io.IOException When things go wrong
      */
-    public void send(HttpServletResponse servResponse) throws IOException, URISyntaxException {
+    public void send(HttpServletResponse servResponse) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
         log.debug("Sending Response...");
 
         log.debug("MIME Boundary: " + mimeBoundary);
