@@ -25,8 +25,13 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
+import opendap.ppt.PPTException;
 import org.apache.http.client.CredentialsProvider;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -51,7 +56,7 @@ import java.util.HashMap;
 public class Attachment {
 
     private enum ContentModel {
-        stream, url, document
+        stream, url, document, bes
     }
 
 
@@ -64,6 +69,9 @@ public class Attachment {
     private CredentialsProvider _credentialsProvider;
     private Document _doc;
     private ContentModel _myContentModel;
+
+    private Document _besCmd;
+    private String _besDatasetId;
 
     private HashMap<String, String> mimeHeaders;
 
@@ -80,12 +88,13 @@ public class Attachment {
 
     public Attachment(String ctype, String cid){
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        mimeHeaders = new HashMap<String, String>();
+        mimeHeaders = new HashMap<>();
         _credentialsProvider = null;
         _sourceUrl = null;
         _istream = null;
         _doc = null;
         _myContentModel = null;
+        _besCmd = null;
 
         setHeader(contentType,ctype);
         setHeader(contentId,"<"+cid+">");
@@ -121,6 +130,21 @@ public class Attachment {
     }
 
     /**
+     *
+     * @param ctype String containing the value of the HTTP header Content-Type for this attachment.
+     * @param cid   String containing the value if the HTTP header Content-Id for this attachment.
+     * @param datasetId The unique ID for the dataset in the BES
+     * @param besCmd  The BES command to execute in order to  transmit the attachment.
+     */
+    public Attachment(String ctype, String cid, String datasetId, Document besCmd) {
+        this(ctype,cid);
+        _doc = null;
+        _besCmd = besCmd;
+        _besDatasetId = datasetId;
+        _myContentModel = ContentModel.bes;
+    }
+
+    /**
      * @param ctype String containing the value of the HTTP header Content-Type for this attachment.
      * @param cid String containing the value if the HTTP header Content-Id for this attachment.
      * @param doc A JDOM XML document to provide the content for this attachment.
@@ -132,7 +156,7 @@ public class Attachment {
     }
 
 
-    public String getContentType(){
+    public String getContentType() {
         return getHeader(contentType);
     }
 
@@ -145,7 +169,7 @@ public class Attachment {
      * @throws IOException                 When things can't be read or written.
      * @throws java.net.URISyntaxException If the target URL is hosed.
      */
-    public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException {
+    public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
 
 
         sos.println("--" + mimeBoundary);
@@ -176,6 +200,11 @@ public class Attachment {
 
             case url:
                 opendap.http.Util.writeRemoteContent(_sourceUrl, _credentialsProvider, sos);
+                break;
+
+            case bes:
+                BesApi besApi = new BesApi();
+                besApi.besTransaction(_besDatasetId,_besCmd,sos);
                 break;
 
             case document:

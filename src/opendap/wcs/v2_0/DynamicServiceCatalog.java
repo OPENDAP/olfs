@@ -352,12 +352,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
         return new Vector<>();
     }
 
-    public String getDmrUrl(String coverageId) throws InterruptedException {
-        String datasetUrl =  getDataAccessUrl(coverageId);
-        if(datasetUrl==null)
-            return null;
-        return datasetUrl + ".dmr.xml";
-    }
 
 
     /**
@@ -399,7 +393,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         _log.debug("getDataAccessUrl() - DynamicService instance: {}",dynamicService);
         if(dynamicService==null)
             return null;
-        String resourceId = coverageId.replaceFirst(dynamicService.getName(),"");
+        String resourceId = coverageId.substring(dynamicService.getName().length());
         PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrlString().toString());
         pb.pathAppend(resourceId);
         pb.append("");

@@ -53,6 +53,7 @@ public class GetCoverageRequest {
     private HashMap<String, DimensionSubset> _dimensionSubsets;
     private TemporalDimensionSubset _temporalSubset;
     private RangeSubset _rangeSubset;
+    private String _cfHistoryAttribute;
 
     private String _requestUrl;
 
@@ -73,7 +74,7 @@ public class GetCoverageRequest {
         _mediaType      = null;
         _dimensionSubsets = new HashMap<>();
         _requestUrl     = null;
-
+        _cfHistoryAttribute = null;
 
         _scaleRequest   = null;
         _rangeSubset    = null;
@@ -427,5 +428,12 @@ public class GetCoverageRequest {
     }
 
 
+    public void setCfHistoryAttribute(String s){
+        _cfHistoryAttribute = s;
+    }
+
+    public String getCfHistoryAttribute(){
+        return _cfHistoryAttribute;
+    }
 
 }

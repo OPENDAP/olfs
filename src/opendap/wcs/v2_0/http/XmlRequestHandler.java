@@ -161,7 +161,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Element wcsRequest = wcsRequestDoc.getRootElement();
         String serviceUrl = PathBuilder.pathConcat(Util.getServiceUrl(request),_prefix);
 
-        String requestUrl=HttpGetHandler.getRequestUrl(request);
+        String requestUrl=HttpGetHandler.getRequestUrlWithQuery(request);
 
         handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
 

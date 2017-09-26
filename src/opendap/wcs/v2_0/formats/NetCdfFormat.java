@@ -33,5 +33,6 @@ public class NetCdfFormat extends WcsResponseFormat {
         _name = "netcdf";
         _dapSuffix = "nc";
         _mimeType = MimeTypes.getMimeType(_dapSuffix);
+        _type = Type.netcdf;
     }
 };

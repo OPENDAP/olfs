@@ -26,7 +26,9 @@
 package opendap.wcs.v2_0;
 
 
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.Scrub;
+import opendap.http.Util;
 import opendap.wcs.v2_0.formats.WcsResponseFormat;
 import opendap.wcs.v2_0.http.Attachment;
 import opendap.wcs.v2_0.http.MultipartResponse;
@@ -43,9 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.*;
+
 
 /**
  * Process GetCoverage requests. Static methods are used to construct a wcs:Coverages
@@ -151,7 +152,20 @@ public class GetCoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
+
+        Attachment rangePart = null;
+        String dapDataAccessUrl = wcsCatalog.getDataAccessUrl(coverageId);
+        if(dapDataAccessUrl.toLowerCase().startsWith(opendap.http.Util.BES_PROTOCOL)){
+            String besDatasetId = dapDataAccessUrl.substring(Util.BES_PROTOCOL.length());
+            Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+            rangePart = new Attachment(getReturnMimeType(req), rangePartId, besDatasetId, besCmd);
+        }
+        else {
+            rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
+
+        }
+
+
         rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
@@ -197,6 +211,7 @@ public class GetCoverageRequestProcessor {
         }
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(req.getCoverageID());
         String requestURL = wcsCatalog.getDataAccessUrl(req.getCoverageID());
+
         StringBuilder dap2DataAccessURL = new StringBuilder(requestURL);
         dap2DataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
         return dap2DataAccessURL.toString();
@@ -616,7 +631,74 @@ public class GetCoverageRequestProcessor {
             _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
             throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
         }
+    }
+
+
+
+
+
+    public static Document getBesCmd(GetCoverageRequest req, CoverageDescription cd, WcsCatalog wcsCatalog) throws WcsException, InterruptedException {
+
+        Document besCmd = null;
+        String dap2ce = GetCoverageRequestProcessor.getDap2CE(req);
+        opendap.bes.dap2Responders.BesApi besApi = new opendap.bes.dap2Responders.BesApi();
+        String format = GetCoverageRequestProcessor.getReturnFormat(req);
+        WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+
+
+        String besUrl = wcsCatalog.getDataAccessUrl(cd.getCoverageId());
+        String besDatatsetId = besUrl.substring(Util.BES_PROTOCOL.length());
+
+        try {
+
+            switch (rFormat.type()) {
+                case dap2:
+                    besCmd =
+                            besApi.getDap2RequestDocument(
+                                    opendap.bes.dap2Responders.BesApi.DAP2_DATA,
+                                    besDatatsetId,
+                                    dap2ce,
+                                    null,
+                                    null,
+                                    "3.2",
+                                    0,
+                                    null,
+                                    null,
+                                    null,
+                                    opendap.bes.dap2Responders.BesApi.XML_ERRORS);
+
+                    break;
+                case dap4:
+                    //besCmd =
+                           // besApi.getDap4RequestDocument();
+                    break;
+
+                case netcdf:
+                    besCmd =
+                            besApi.getDap2DataAsNetcdf4Request(
+                                    besDatatsetId,
+                                    dap2ce,
+                                    req.getCfHistoryAttribute(),
+                                    "3.2",
+                                    0);
+                    break;
+                case geotiff:
+                    break;
+                case jpeg2000:
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        catch (BadConfigurationException bce){
+
+        }
+
+        return besCmd;
+
 
     }
+
 
 }

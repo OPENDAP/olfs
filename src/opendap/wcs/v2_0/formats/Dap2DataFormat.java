@@ -33,5 +33,6 @@ public class Dap2DataFormat extends WcsResponseFormat {
         _name = "dap2";
         _dapSuffix = "dods";
         _mimeType = MimeTypes.getMimeType(_dapSuffix);
+        _type = Type.dap2;
     }
 }

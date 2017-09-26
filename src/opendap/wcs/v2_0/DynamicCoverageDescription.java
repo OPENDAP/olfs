@@ -119,14 +119,14 @@ public class DynamicCoverageDescription extends CoverageDescription {
         _log.debug("ingestDMR() - BEGIN");
 
         Dataset dataset = buildDataset(dmr);
-        _log.debug("Marshalling WCS from DMR at Url: {}", dataset.getUrl());
+        _log.debug("Building wcs:CoverageDescription from DMR at Url: {}", dataset.getUrl());
 
         CoverageDescriptionType cd = new CoverageDescriptionType();
         cd.setCoverageId(dataset.getName());
         cd.setId(dataset.getName());
 
         String datasetUrl = dmr.getAttributeValue("base", XML.NS);
-        setDapDatasetUrl(new URL(datasetUrl));
+        setDapDatasetUrl(datasetUrl);
 
         addServiceParameters(cd);
 

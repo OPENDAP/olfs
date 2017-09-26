@@ -52,7 +52,7 @@ public class ServerCapabilities {
         rf = new GeotiffFormat();
         _responseFormats.put(rf.name(),rf);
 
-        rf = new Jpeg200Format();
+        rf = new Jpeg2000Format();
         _responseFormats.put(rf.name(),rf);
 
         rf = new Dap2DataFormat();
