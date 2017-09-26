@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -84,7 +85,7 @@ public class WcsServiceManager {
 
 
     private static WcsCatalog _defaultCatalog;
-    private static ConcurrentHashMap<String, WcsCatalog> _catalogsByPrefix;
+    private static CopyOnWriteArrayList<WcsCatalog> _wcsCatalogs;
     private static boolean _intitialized;
     private static String _serviceConfigFileName;
     private static String _serviceContentPath;
@@ -94,7 +95,7 @@ public class WcsServiceManager {
 
     static {
         _defaultCatalog = null;
-        _catalogsByPrefix =  new ConcurrentHashMap<>();
+        _wcsCatalogs =  new CopyOnWriteArrayList<>();
         _intitialized = false;
         _serviceConfigFileName = null;
         _serviceContentPath=null;
@@ -214,10 +215,11 @@ public class WcsServiceManager {
 
         if(wcsCatalogElements.isEmpty()) {
             msg = "The WCS service could not find a catalog implmentation! No child "+
-                    WCS_CATALOG_ELEMENT_NAME+ " elements were found. Only the default " +
-                    "catalog implementation will be available.";
-            _log.warn(msg);
-            throw new ServletException(msg);
+                    WCS_CATALOG_ELEMENT_NAME+ " elements were found. The catalog is empty. :(";
+            _log.error(msg);
+            _defaultCatalog = new DummyCatalog();
+            _wcsCatalogs.add(_defaultCatalog);
+            return;
         }
 
         for(Element wcsCatalogElement: wcsCatalogElements){
@@ -252,7 +254,7 @@ public class WcsServiceManager {
             if(wcsCatalogElements.indexOf(wcsCatalogElement)==0)
                 _defaultCatalog = wcsCatalog;
 
-            _catalogsByPrefix.put("",wcsCatalog);
+            _wcsCatalogs.add(wcsCatalog);
         }
         _log.info("ingestWcsCatalogs() - DONE.");
     }
@@ -266,7 +268,7 @@ public class WcsServiceManager {
      */
     public static WcsCatalog getCatalog(String coverageId){
         Vector<WcsCatalog> matches = new Vector<>();
-        for(WcsCatalog wcsCatalog: _catalogsByPrefix.values()){
+        for(WcsCatalog wcsCatalog: _wcsCatalogs){
             if(wcsCatalog.matches(coverageId)) {
                 matches.add(wcsCatalog);
                 _log.debug("getCatalog() - WcsCatalog '{}' matched coverageId '{}'",wcsCatalog.getClass().getSimpleName(),coverageId);
