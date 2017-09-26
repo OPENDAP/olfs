@@ -25,14 +25,29 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <WcsService>
-    <Credentials>/Users/ndp/.netrc</Credentials>
+    <!-- Credentials>/Users/centos/.netrc</Credentials -->
+
+    <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog">
+        <DynamicService name="coads" href="bes://" srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="12" units="hour since 0000-01-01 00:00:00" min="366.0" max="8401.335"/>
+            <DomainCoordinate name="latitude" dapID="COADSY" size="90" units="deg" min="-90" max="90" />
+            <DomainCoordinate name="longitude" dapID="COADSX" size="180" units="deg" min="-180" max="180" />
+            <field name="SST" dapID="SST" description="SEA SURFACE TEMPERATURE" units="Deg C" min="-9.99999979e+33" max="9.99999979e+33"/>
+            <field name="AIRT" dapID="AIRT" description="AIR TEMPERATURE" units="DEG C" min="-9.99999979e+33" max="9.99999979e+33"/>
+            <field name="UWND" dapID="UWND" description="ZONAL WIND" units="M/S" min="-9.99999979e+33" max="9.99999979e+33"/>
+            <field name="VWND" dapID="VWND" description="MERIDIONAL WIND" units="M/S" min="-9.99999979e+33" max="9.99999979e+33"/>
+        </DynamicService>
+    </WcsCatalog>
+
+    
+<!--
     <WcsCatalog name="lfc" className="opendap.wcs.v2_0.LocalFileCatalog">
-        <!-- CatalogDirectory>/etc/olfs/LocalFileCatalog</CatalogDirectory -->
-        <!-- CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile -->
+        <CatalogDirectory>/etc/olfs/LocalFileCatalog</CatalogDirectory>
+        <CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile>
     </WcsCatalog>
 
     <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog" >
-        <!-- CacheDirectory>/tmp/DSC</CacheDirectory !-->
+        <CacheDirectory>/tmp/DSC</CacheDirectory >
         <DynamicService name="tb12" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
             <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" min="690" max="690"/>
             <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" min="-90" max="90" />
@@ -81,8 +96,8 @@
             <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg"  min="-90" max="90"/>
             <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
         </DynamicService>
-        
     </WcsCatalog>
+-->
 </WcsService>
 <!--
 <WcsService>

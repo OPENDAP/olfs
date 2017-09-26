@@ -59,13 +59,15 @@
         <NcWmsService href="http://localhost:8080/ncWMS2/wms" base="/ncWMS2/wms" ncWmsDynamicServiceId="lds"/>
         <Godiva href="/ncWMS2/Godiva3.html" base="/ncWMS2/Godiva3.html"/>
     </WebServiceHandle  -->
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-TB12" >
-        <ApplicationName>Testbed-12 WCS Service</ApplicationName>
-        <ServiceEndpoint>http://localhost:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/testbed-12/.*</MatchRegex>
-        <DynamicServiceId>tb12</DynamicServiceId>
+
+    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-COADS" >
+        <ApplicationName>COADS Climatology WCS Service/</ApplicationName>
+        <ServiceEndpoint>http://localhost:8080/opendap/wcs/</ServiceEndpoint>
+        <MatchRegex>^.*coads.*\.nc$</MatchRegex>
+        <DynamicServiceId>coads</DynamicServiceId>
     </WebServiceHandler>
-    
+
+<!--
     <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2IMNXINT" >
         <ApplicationName>MERRA2 M2IMNXINT WCS Service</ApplicationName>
         <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
@@ -100,12 +102,7 @@
         <MatchRegex>/gesdisc/M2TMNPMST.5.12.4/.*</MatchRegex>
         <DynamicServiceId>M2TMNPMST</DynamicServiceId>
     </WebServiceHandler>
-
-
-
-
-
-
+-->
 
 </ViewersConfig>
 
