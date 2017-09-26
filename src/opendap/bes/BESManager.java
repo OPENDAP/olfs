@@ -31,11 +31,13 @@ import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -45,36 +47,45 @@ import java.util.Vector;
  */
 public class BESManager {
 
-
+    private static  org.slf4j.Logger _log;
+    private static boolean _initialized;
     private static Vector<BesGroup> _besCollection;
-
-    private static boolean _isConfigured = false;
-
+    private static boolean _isConfigured;
     private static Element _config;
+    private static ReentrantLock _lock;
+    static {
+        _log = LoggerFactory.getLogger(BESManager.class);
+        _besCollection = new Vector<>();
+        _initialized = false;
+        _isConfigured = false;
+        _config = null;
+        _lock = new ReentrantLock();
 
-    private static  org.slf4j.Logger log = null;
-
-    private static boolean initialized = false;
-
-
-
-
-
-    public BESManager(){
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
     }
+
 
     public void init(Element config) throws Exception{
 
-        if(initialized) return;
+        _lock.lock();
 
-        _config = (Element) config.clone();
-        configure(config);
+        try {
+            if (_initialized) return;
 
-        log.info("Initialized.");
+            _config = (Element) config.clone();
+            configure(config);
 
-        initialized = true;
+            _log.info("Initialized.");
 
+            _initialized = true;
+        }
+        finally {
+            _lock.unlock();
+        }
+
+    }
+
+    public static boolean isInitialized(){
+        return _initialized;
     }
 
 
@@ -82,7 +93,7 @@ public class BESManager {
 
     public void destroy(){
         shutdown();
-        log.info("Destroy complete.");
+        _log.info("Destroy complete.");
 
     }
 
@@ -92,15 +103,14 @@ public class BESManager {
     }
 
 
-    public void configure(Element besConfiguration) throws Exception {
+    private void configure(Element besConfiguration) throws Exception {
 
         if(_isConfigured) return;
 
-        _besCollection  = new Vector<BesGroup>();
 
         List besList = besConfiguration.getChildren("BES");
 
-        if(besList.isEmpty())
+        if (besList.isEmpty())
             throw new BadConfigurationException("OLFS Configuration must " +
                     "contain at LEAST one BES configuration element. And " +
                     "the value of it's prefix element  must be \"/\".");
@@ -112,7 +122,7 @@ public class BESManager {
         Element besConfigElement;
         for (Object o : besList) {
             besConfigElement = (Element) o;
-            besConfig   = new BESConfig(besConfigElement);
+            besConfig = new BESConfig(besConfigElement);
             bes = new BES(besConfig);
 
             BesGroup groupForThisPrefix = getBesGroup(bes.getPrefix());
@@ -120,7 +130,7 @@ public class BESManager {
             // Since the BES with prefix '/' will always match we have to check to make sure
             // that if a non null group is returned that it's prefix does in fact match the one
             // for the new BES - if it doesn't match the returned group prefix then we need to make a new group.
-            if(groupForThisPrefix == null || !groupForThisPrefix.getGroupPrefix().equals(bes.getPrefix())){
+            if (groupForThisPrefix == null || !groupForThisPrefix.getGroupPrefix().equals(bes.getPrefix())) {
                 groupForThisPrefix = new BesGroup(bes.getPrefix());
                 _besCollection.add(groupForThisPrefix);
             }
@@ -129,11 +139,11 @@ public class BESManager {
             groupForThisPrefix.add(bes);
 
 
-            if(groupForThisPrefix.getGroupPrefix().equals("/"))
+            if (groupForThisPrefix.getGroupPrefix().equals("/"))
                 foundRootBES = true;
         }
 
-        if(!foundRootBES)
+        if (!foundRootBES)
             throw new BadConfigurationException("OLFS Configuration must " +
                     "contain at LEAST one BES configuration element. Whose " +
                     "prefix is \"/\". (Why? Think about it...)");
@@ -181,7 +191,7 @@ public class BESManager {
             path = "/";
 
         if(path.indexOf("/")!=0){
-            log.debug("Pre-pending / to path: "+ path);
+            _log.debug("Pre-pending / to path: "+ path);
             path = "/"+path;
         }
 
@@ -211,7 +221,7 @@ public class BESManager {
 
         if (bes == null) {
             String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(path);
-            log.error(msg);
+            _log.error(msg);
             throw new BadConfigurationException(msg);
         }
 
@@ -230,7 +240,7 @@ public class BESManager {
             path = "/";
 
         if(path.indexOf("/")!=0){
-            log.debug("Pre-pending / to path: "+ path);
+            _log.debug("Pre-pending / to path: "+ path);
             path = "/"+path;
         }
 
@@ -264,10 +274,10 @@ public class BESManager {
 
     public static void shutdown(){
         for(BesGroup besGroup : _besCollection){
-            log.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
+            _log.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
             besGroup.destroy();
         }
-        log.debug("All BesGroup's have been shut down.");
+        _log.debug("All BesGroup's have been shut down.");
 
     }
 
@@ -329,7 +339,7 @@ public class BESManager {
 
 //    public static void removeThreadCache(Thread t){
 //        threadCache.remove(t);
-//        log.info("Removing ThreadCache for thread "+t.getName());
+//        _log.info("Removing ThreadCache for thread "+t.getName());
 //    }
 
 

@@ -35,7 +35,8 @@
                 xmlns:gml="http://www.opengis.net/gml/3.2"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
-    <xsl:param name="ServicePrefix" />
+    <xsl:param name="WcsService" />
+    <xsl:param name="DocsService" />
     <xsl:param name="UpdateIsRunning"/>
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
@@ -52,7 +53,7 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$DocsService"/>/css/contents.css</xsl:attribute>
                 </xsl:element>
 
                 <xsl:choose>
@@ -77,7 +78,7 @@
 
                 <table border="0" width="90%"><tr>
 
-                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                    <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.gif')}" /></td>
 
                     <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
 
@@ -131,13 +132,13 @@
                 <div class= "medium">
                 <ul>
                     <li>
-                        <a href="{$ServicePrefix}/test?service=WCS&amp;request=GetCapabilities">KVP Test Page</a>
+                        <a href="{$WcsService}/test?service=WCS&amp;request=GetCapabilities">KVP Test Page</a>
                         - Parses a KVP request and returns a page
                         reporting any problems.
                     </li>
                     <br/>
                     <li>
-                        <a href="{$ServicePrefix}/echoXML?service=WCS&amp;request=GetCapabilities">Return KVP as XML</a>
+                        <a href="{$WcsService}/echoXML?service=WCS&amp;request=GetCapabilities">Return KVP as XML</a>
                         - Translates a KVP encoded request into
                         an XML encoded version of the request.
                     </li>
@@ -151,7 +152,7 @@
                 <br/>
                 A WCS response will be returned.
 
-                <form action="{$ServicePrefix}/form" method="post">
+                <form action="{$WcsService}/form" method="post">
                     <p>
                         <textarea name="WCS_QUERY" rows="20" cols="80">Insert your WCS query here...</textarea>
                     </p>
@@ -314,7 +315,7 @@
             <td align="left">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:CoverageId"/>
+                        <xsl:value-of select="$WcsService"/>/describeCoverage?<xsl:value-of select="wcs:CoverageId"/>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="ows:Title">
@@ -359,7 +360,7 @@
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <!-- xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcseo:DatasetSeriesId"/ -->
-                        <xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;version=2.0.1&amp;request=DescribeEOCoverageSet&amp;eoId=<xsl:value-of select="wcseo:DatasetSeriesId"/>
+                        <xsl:value-of select="$WcsService"/>?service=WCS&amp;version=2.0.1&amp;request=DescribeEOCoverageSet&amp;eoId=<xsl:value-of select="wcseo:DatasetSeriesId"/>
 
                         <!--
                         http://localhost:8080/WCS-2.0?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002_nc4_min_eo

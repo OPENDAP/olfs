@@ -27,12 +27,12 @@ package opendap.wcs.v2_0.formats;
 
 import opendap.coreServlet.MimeTypes;
 
-public class Jpeg200Format extends WcsResponseFormat {
-    public Jpeg200Format(){
+public class Jpeg2000Format extends WcsResponseFormat {
+    public Jpeg2000Format(){
         super();
         _name = "jpeg2000";
         _dapSuffix = "jp2";
         _mimeType = MimeTypes.getMimeType(_dapSuffix);
-
+        _type = Type.jpeg2000;
     }
 }

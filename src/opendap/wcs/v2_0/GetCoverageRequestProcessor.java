@@ -26,7 +26,13 @@
 package opendap.wcs.v2_0;
 
 
+import opendap.bes.BESError;
+import opendap.bes.BESManager;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
+import opendap.http.Util;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.formats.WcsResponseFormat;
 import opendap.wcs.v2_0.http.Attachment;
 import opendap.wcs.v2_0.http.MultipartResponse;
@@ -43,9 +49,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.*;
+
 
 /**
  * Process GetCoverage requests. Static methods are used to construct a wcs:Coverages
@@ -69,7 +74,11 @@ public class GetCoverageRequestProcessor {
      * @throws InterruptedException When the server may need to stop a (possibly length) request
      * @throws IOException          Wen in the disk or the internets are broken.
      */
-    public static void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
+    public static void sendCoverageResponse(
+            GetCoverageRequest req,
+            HttpServletResponse response,
+            boolean useSoapEnvelope
+    ) throws WcsException, InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
 
         String id = req.getCoverageID();
         WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(id);
@@ -95,11 +104,30 @@ public class GetCoverageRequestProcessor {
     public static void sendFormatResponse(
             GetCoverageRequest req,
             HttpServletResponse response
-    ) throws WcsException, InterruptedException, IOException {
+    ) throws WcsException, InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
         _log.debug("Sending binary data response...");
         response.setHeader("Content-Disposition", getContentDisposition(req));
-        CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();
-        opendap.http.Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
+
+        String coverageId = req.getCoverageID();
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageId);
+        String dapDatasetUrl = wcsCatalog.getDapDatsetUrl(coverageId);
+
+        if(dapDatasetUrl.toLowerCase().startsWith(Util.BES_PROTOCOL)){
+            CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageId);
+            String besDatasetId = dapDatasetUrl.substring(Util.BES_PROTOCOL.length());
+            Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+
+            if(!BESManager.isInitialized())
+                throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+
+            BesApi besApi = new BesApi();
+            besApi.besTransaction(besDatasetId,besCmd,response.getOutputStream());
+        }
+        else if(dapDatasetUrl.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
+                dapDatasetUrl.toLowerCase().startsWith((Util.HTTPS_PROTOCOL))) {
+            CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();
+            Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
+        }
     }
 
 
@@ -151,7 +179,20 @@ public class GetCoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
+
+        Attachment rangePart = null;
+        String dapDataAccessUrl = wcsCatalog.getDapDatsetUrl(coverageId);
+        if(dapDataAccessUrl.toLowerCase().startsWith(opendap.http.Util.BES_PROTOCOL)){
+            String besDatasetId = dapDataAccessUrl.substring(Util.BES_PROTOCOL.length());
+            Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+            rangePart = new Attachment(getReturnMimeType(req), rangePartId, besDatasetId, besCmd);
+        }
+        else {
+            rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
+
+        }
+
+
         rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
@@ -196,7 +237,8 @@ public class GetCoverageRequestProcessor {
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(req.getCoverageID());
-        String requestURL = wcsCatalog.getDataAccessUrl(req.getCoverageID());
+        String requestURL = wcsCatalog.getDapDatsetUrl(req.getCoverageID());
+
         StringBuilder dap2DataAccessURL = new StringBuilder(requestURL);
         dap2DataAccessURL.append(".").append(rFormat.dapDataResponseSuffix()).append("?").append(getDap2CE(req));
         return dap2DataAccessURL.toString();
@@ -616,7 +658,80 @@ public class GetCoverageRequestProcessor {
             _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
             throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
         }
+    }
+
+
+
+
+
+    public static Document getBesCmd(GetCoverageRequest req, CoverageDescription cd, WcsCatalog wcsCatalog) throws WcsException, InterruptedException {
+
+        Document besCmd = null;
+        String dap2ce = GetCoverageRequestProcessor.getDap2CE(req);
+        String format = GetCoverageRequestProcessor.getReturnFormat(req);
+        WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+
+
+        String besUrl = wcsCatalog.getDapDatsetUrl(cd.getCoverageId());
+        String besDatatsetId = besUrl.substring(Util.BES_PROTOCOL.length());
+
+        if(!BESManager.isInitialized())
+            throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+
+        BesApi besApi = new BesApi();
+        try {
+
+            switch (rFormat.type()) {
+                case dap2:
+                    besCmd =
+                            besApi.getDap2RequestDocument(
+                                    opendap.bes.dap2Responders.BesApi.DAP2_DATA,
+                                    besDatatsetId,
+                                    dap2ce,
+                                    null,
+                                    null,
+                                    "3.2",
+                                    0,
+                                    null,
+                                    null,
+                                    null,
+                                    opendap.bes.dap2Responders.BesApi.XML_ERRORS);
+                    break;
+
+                case netcdf:
+                    besCmd =
+                            besApi.getDap2DataAsNetcdf4Request(
+                                    besDatatsetId,
+                                    dap2ce,
+                                    req.getCfHistoryAttribute(),
+                                    "3.2",
+                                    0);
+                    break;
+
+                case geotiff:
+                    besCmd = besApi.getDap2DataAsGeoTiffRequest(besDatatsetId, dap2ce,"3.2", 0);
+                    break;
+
+                case jpeg2000:
+                    besCmd = besApi.getDap2DataAsGmlJpeg2000Request(besDatatsetId,dap2ce,"3.2",0);
+                    break;
+
+                case dap4:
+                default:
+                    throw new WcsException(("Unsupported format: '"+rFormat.name())+"' :(",WcsException.INVALID_PARAMETER_VALUE,"format");
+            }
+
+        }
+        catch (BadConfigurationException bce){
+            throw new WcsException("Failed to generate a BES command for the GetCoverage request: '" + req.toString()
+                    ,WcsException.NO_APPLICABLE_CODE);
+
+        }
+
+        return besCmd;
+
 
     }
+
 
 }
