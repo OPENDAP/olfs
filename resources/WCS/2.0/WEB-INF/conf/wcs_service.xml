@@ -37,14 +37,6 @@
             <field name="UWND" dapID="UWND" description="ZONAL WIND" units="M/S" min="-9.99999979e+33" max="9.99999979e+33"/>
             <field name="VWND" dapID="VWND" description="MERIDIONAL WIND" units="M/S" min="-9.99999979e+33" max="9.99999979e+33"/>
         </DynamicService>
-
-        <DynamicService name="M2IMNXINT" href="bes://^.*/M2IMNXINT.*$" srs="urn:ogc:def:crs:EPSG::4326" >
-            <ApplicationName>MERRA-2 WCS Service/</ApplicationName>
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-
     </WcsCatalog>
 
     
