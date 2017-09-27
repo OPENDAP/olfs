@@ -33,14 +33,16 @@ import java.util.*;
 import javax.xml.bind.annotation.*;
 
 /**
- * JAXB for DMR dataset, with some helper, aggregation methods 
+ * JAXB for DMR dataset, with some helper access, aggregation methods 
  * 
  * Supports unmarshaling the DMR XML into Java by reflection
  * 
  * This is NOT complete (i.e. supporting yet of all possible DMRs)  
  * 
- * Specifically, does not cover all DAP4 variables, and, 
- * supports nesting of container attributes to one level only.
+ * Specifically, does NOT
+ * 1.  cover all DAP4 variables
+ * 2.  support nesting of container attributes beyond one level
+ * 3.  provide for variable groups
  * 
  * @author Uday Kari
  * @author Nathan Potter
