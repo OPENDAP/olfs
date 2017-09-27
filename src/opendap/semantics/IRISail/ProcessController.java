@@ -93,7 +93,7 @@ public class ProcessController {
         if(thread.isInterrupted() || stopWorking.get()){
             interruptProcessing();
         }
-        //log.debug("checkState(): "+thread.getName()+ " has not been interrupted.");
+        //log.debug("checkState(): "+thread.getPrefix()+ " has not been interrupted.");
 
     }
 

@@ -421,7 +421,7 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
             last = -1;
             for(int i=0; i<ringSize ;i++){
                 TestThing thisThing = cr.getNext();
-                name = thisThing.getName();
+                name = thisThing.getPrefix();
                 int thisVal = Integer.parseInt(name.substring(name.length() - 2), name.length());
                 System.out.println("TestThing(" + thisVal + ") has " + thisThing.strokes() + " strokes.");
                 if(thisVal<=last)

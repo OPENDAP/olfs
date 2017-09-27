@@ -547,10 +547,10 @@ public class CatalogManager {
                 href = cat.getUrlPrefix() + cat.getFileName();
                 catRef.setAttribute(XLINK.HREF,href,XLINK.NS);
 
-                title = cat.getName();
+                title = cat.getPrefix();
                 catRef.setAttribute(XLINK.TITLE,title,XLINK.NS);
 
-                name = cat.getName();
+                name = cat.getPrefix();
                 catRef.setAttribute(THREDDS.NAME,name);
 
                 catalogRoot.addContent(catRef);

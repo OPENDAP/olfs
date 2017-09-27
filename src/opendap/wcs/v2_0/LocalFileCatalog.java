@@ -106,7 +106,7 @@ public class LocalFileCatalog implements WcsCatalog {
      * @throws Exception
      */
     @Override
-    public void init(Element config, String persistentContentPath, String contextPath) throws Exception {
+    public void init(Element config, String persistentContentPath, String serviceContextPath) throws Exception {
 
         if (_intitialized)
             return;

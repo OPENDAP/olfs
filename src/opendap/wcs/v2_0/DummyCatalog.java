@@ -33,7 +33,7 @@ import java.util.Vector;
 public class DummyCatalog implements WcsCatalog {
 
     @Override
-    public void init(Element config, String cacheDir, String resourcePath) throws Exception {
+    public void init(Element config, String cacheDir, String serviceContext) throws Exception {
 
     }
 

@@ -71,6 +71,20 @@ public class WcsService implements WebServiceHandler {
         _applicationName = ID + " Service";
     }
 
+    public WcsService(
+            String serviceId,
+            String applicationName,
+            String serviceEndpoint,
+            String dynamicServiceId,
+            String pathMatchRegexString){
+        _serviceId = serviceId;
+        _applicationName = applicationName;
+        _serviceEndpoint = serviceEndpoint;
+        _dynamicServiceId = dynamicServiceId;
+        _pathMatchRegexString = pathMatchRegexString;
+        _pathMatchPattern = Pattern.compile(_pathMatchRegexString);
+
+    }
 
     @Override
     public void init(HttpServlet servlet, Element config) throws ServletException {

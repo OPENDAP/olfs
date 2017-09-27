@@ -44,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServicesRegistry {
 
-    private static Logger log = LoggerFactory.getLogger(ServicesRegistry.class);
+    private static Logger _log = LoggerFactory.getLogger(ServicesRegistry.class);
 
     private static ConcurrentHashMap<String, Service> services;
     private static ConcurrentHashMap<String, WebServiceHandler> _webServiceHandlers;
@@ -59,10 +59,13 @@ public class ServicesRegistry {
     public static int addService(Service service){
         if(service instanceof WebServiceHandler){
             _webServiceHandlers.put(service.getServiceId(), (WebServiceHandler) service);
+            _log.debug("Added WebService Handler '{}'",service.getName());
+
 
         }
         else if(service instanceof JwsHandler){
             _jwsHandlers.put(service.getServiceId(), (JwsHandler) service);
+            _log.debug("Added Java Webstart Handler '{}'",service.getName());
 
         }
         services.put(service.getServiceId(),service);

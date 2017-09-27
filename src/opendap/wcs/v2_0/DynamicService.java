@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.http.Util;
 import opendap.wcs.srs.SimpleSrs;
 import opendap.wcs.srs.SrsFactory;
 import org.jdom.Element;
@@ -39,15 +40,19 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class DynamicService {
     private Logger _log;
-    private String _name;
+    private String _prefix;
+    private String _longName;
     private String _dapServiceUrlString;
     private SimpleSrs _srs;
     private Vector<DomainCoordinate> _domainCoordinates;
     // private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
+    private String _catalogMatchRegexString;
 
 
     public class FieldDef {
@@ -62,12 +67,13 @@ public class DynamicService {
     public DynamicService(){
         super();
         _log = LoggerFactory.getLogger(this.getClass());
-        _name = null;
+        _prefix = null;
         _dapServiceUrlString = null;
         _srs = null;
         _domainCoordinates =  new Vector<>();
         //_dcMap = new ConcurrentHashMap<>();
         _wcsFieldsByDapID = new ConcurrentHashMap<>();
+        _catalogMatchRegexString = null;
     }
 
     /**
@@ -81,9 +87,13 @@ public class DynamicService {
         Vector<String> badThingsHappened = new Vector<>();
 
         String s;
-        _name = config.getAttributeValue("name");
-        if(_name==null)
+        _prefix = config.getAttributeValue("prefix");
+        if(_prefix ==null)
             badThingsHappened.add("Failed to locate required attribute 'name' in the DynamicService configuration element!");
+
+        _longName = config.getAttributeValue("name");
+        if(_longName==null)
+            _longName = _prefix;
 
         s = config.getAttributeValue("href");
         if(s==null) {
@@ -94,7 +104,8 @@ public class DynamicService {
                 // We want two things here:
                 //   a) Only allow http and https
                 //   b) Utilize the protocol to direct requests to the BES.
-                if(s.toLowerCase().startsWith("http://") || s.toLowerCase().startsWith("https://")) {
+                if(s.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
+                        s.toLowerCase().startsWith(Util.HTTPS_PROTOCOL)) {
                     try {
                         _dapServiceUrlString = new URL(s).toString();
                     }
@@ -102,14 +113,33 @@ public class DynamicService {
                         badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
                     }
                 }
-                else if( s.toLowerCase().startsWith("bes://")){
-                    _dapServiceUrlString = s;
+                else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
+
+                    _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
+
+                    if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
+                        badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
+                                "the attribute value must begin with 'bes://' and then be followed by a catalog " +
+                                "matching regex. So fix it then...");
+                    }
+                    else {
+                        try {
+                             Pattern p  = Pattern.compile(_catalogMatchRegexString);
+                             _log.debug("Compiled pattern {}",p.toString());
+                        } catch (PatternSyntaxException pse) {
+                            badThingsHappened.add("Failed to compile regular expression pattern: '" +
+                                    _catalogMatchRegexString + "  message: " + pse.getMessage());
+                        }
+                    }
+
+                    _dapServiceUrlString = Util.BES_PROTOCOL;
                 }
                 else {
-                    badThingsHappened.add("The DyanmicService 'href' attribute references an unkonw protocol." +
+                    badThingsHappened.add("The DynamicService 'href' attribute references an unknown protocol." +
                             "Only 'http', 'https', and 'bes' are supportd.");
                 }
         }
+
 
         s = config.getAttributeValue("srs");
         if(s==null)
@@ -120,12 +150,12 @@ public class DynamicService {
             badThingsHappened.add("Failed to locate requested SRS '" + s + "' Unable to configure Dynamic service!");
         }
         else {
-            _log.info("WCS-2.0 DynamicService {} has default SRS of {}", _name, _srs.getName());
+            _log.info("WCS-2.0 DynamicService {} has default SRS of {}", _prefix, _srs.getName());
         }
 
         List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");
         if(domainCoordinateElements.size()<2) {
-            _log.warn("The DynamicService '" + _name + "' has " +
+            _log.warn("The DynamicService '" + _prefix + "' has " +
                     domainCoordinateElements.size() + " DomainCoordinate elements . " +
                     "This is probably going to break something.");
         }
@@ -147,7 +177,7 @@ public class DynamicService {
         if(domainCoordinates.size() < srsAxisLabels.size())
             badThingsHappened.add("OUCH! There must be at least as many DomainCoordinates as t" +
                     "he SRS has dimensions. srs has "+srsAxisLabels.size()+" and the DynamicService " +
-                    "definition '"+getName()+"' has only "+domainCoordinates.size());
+                    "definition '"+ getPrefix()+"' has only "+domainCoordinates.size());
 
         while(axisLabelRevIter.hasPrevious() && domainCoordRevIter.hasPrevious()){
             String axisLabel = axisLabelRevIter.previous();
@@ -242,12 +272,11 @@ public class DynamicService {
             }
             throw new ConfigurationException(sb.toString());
         }
-
     }
 
     public void addDomainCoordinate(DomainCoordinate dc){
         _domainCoordinates.add(dc);
-        //_dcMap.put(dc.getName(),dc);
+        //_dcMap.put(dc.getPrefix(),dc);
     }
 
 
@@ -293,8 +322,8 @@ public class DynamicService {
         return _domainCoordinates;
     }
 
-    public void setName(String name) { _name = name; }
-    public String getName() { return  _name; }
+    public void setPrefix(String prefix) { _prefix = prefix; }
+    public String getPrefix() { return _prefix; }
 
     //public void setDapServiceUrl(String dapServiceUrl) throws MalformedURLException {
     //    _dapServiceUrlString = new URL(dapServiceUrl);
@@ -305,19 +334,21 @@ public class DynamicService {
     @Override
     public String toString(){
         /*
-        Logger _log;
-        private String _name;
-        private URL _dapServiceUrlString;
-        private SimpleSrs _srs;
-        private Vector<DomainCoordinate> _domainCoordinates;
-        private DomainCoordinate _time;
-        private DomainCoordinate _latitude;
-        private DomainCoordinate _longitude;
+    private Logger _log;
+    private String _prefix;
+    private String _longName;
+    private String _dapServiceUrlString;
+    private SimpleSrs _srs;
+    private Vector<DomainCoordinate> _domainCoordinates;
+    private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
+    private String _catalogMatchRegexString;
         */
         StringBuilder sb = new StringBuilder();
         sb.append("DynamicService {\n)");
-        sb.append("  name: ").append(_name).append("\n");
+        sb.append("  prefix: ").append(_prefix).append("\n");
+        sb.append("  name: ").append(_longName).append("\n");
         sb.append("  dapServiceUrl: ").append(_dapServiceUrlString).append("\n");
+        sb.append("  catalogMatchRegexString: ").append(_catalogMatchRegexString).append("\n");
         sb.append("  srs: ").append(_srs.getName()).append("\n");
         sb.append("  Variable Mappings:\n");
         for(FieldDef field: _wcsFieldsByDapID.values()) {
@@ -363,6 +394,12 @@ public class DynamicService {
 
 
 
+    }
+
+    public String getLongName() { return _longName; }
+
+    public String getCatalogMatchRegexString(){
+        return _catalogMatchRegexString;
     }
 
 }

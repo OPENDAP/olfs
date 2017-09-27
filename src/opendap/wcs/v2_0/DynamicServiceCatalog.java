@@ -33,6 +33,8 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.dap4.QueryParameters;
 import opendap.http.Util;
 import opendap.ppt.PPTException;
+import opendap.services.ServicesRegistry;
+import opendap.viewers.WcsService;
 import opendap.wcs.srs.SimpleSrs;
 import org.apache.commons.codec.binary.Hex;
 import org.jdom.Element;
@@ -94,11 +96,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
      * a WcsCatalog configuration element as a child of the root element.
      * @param cacheDir The directory into which the catalog may choose to write persistent content,
      * intermediate files, etc.
-     * @param resourcePath The path to the resource bundle delivered with the software.
+     * @param serviceContextPath Service context.
      * @throws Exception
      */
     @Override
-    public void init(Element config, String cacheDir, String resourcePath) throws Exception {
+    public void init(Element config, String cacheDir, String serviceContextPath) throws Exception {
         if(_intialized)
             return;
 
@@ -163,12 +165,24 @@ public class DynamicServiceCatalog implements WcsCatalog{
         List<Element> dynamicServices = config.getChildren("DynamicService");
         for(Element dsElement:dynamicServices) {
             DynamicService dynamicService = new DynamicService(dsElement);
-            DynamicService previous = _dynamicServices.put(dynamicService.getName(),dynamicService);
+            DynamicService previous = _dynamicServices.put(dynamicService.getPrefix(),dynamicService);
             if(previous!=null){
                 //FIXME Do we care that something was in the way? I think so...
                 _log.warn("The addition of the DynamicService: {} bumped this instance from the map:{}",
                         dynamicService.toString(),previous.toString());
             }
+            if(dynamicService.getDapServiceUrlString().equalsIgnoreCase(Util.BES_PROTOCOL)){
+                String serviceId = WcsService.ID+"-"+dynamicService.getPrefix();
+                WcsService wcsService = new WcsService(
+                        serviceId,
+                        dynamicService.getLongName(),
+                        serviceContextPath,
+                        dynamicService.getPrefix(),
+                        dynamicService.getCatalogMatchRegexString());
+
+                ServicesRegistry.addService(wcsService);
+            }
+
         }
 
         _intialized = true;
@@ -369,7 +383,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         String longestMatchingDynamicServiceName=null;
         DynamicService match = null;
         for(DynamicService dynamicService:_dynamicServices.values()){
-            String dsName = dynamicService.getName();
+            String dsName = dynamicService.getPrefix();
             _log.debug("Checking DynamicService '{}'",dsName);
 
             if(coverageId.startsWith(dsName)){
@@ -382,7 +396,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
                         longestMatchingDynamicServiceName = dsName;
                         match = dynamicService;
                 }
-                _log.debug("DynamicService '{}' matched.",match.getName());
+                _log.debug("DynamicService '{}' matched.",match.getPrefix());
 
             }
         }
@@ -397,7 +411,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         _log.debug("getDapDatsetUrl() - DynamicService instance: {}",dynamicService);
         if(dynamicService==null)
             return null;
-        String resourceId = coverageId.substring(dynamicService.getName().length());
+        String resourceId = coverageId.substring(dynamicService.getPrefix().length());
         PathBuilder pb = new PathBuilder(dynamicService.getDapServiceUrlString().toString());
         pb.pathAppend(resourceId);
         pb.append("");
@@ -451,7 +465,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     public boolean matches(String coverageId){
         for(DynamicService dynamicService:_dynamicServices.values()){
-            if(coverageId.startsWith(dynamicService.getName()))
+            if(coverageId.startsWith(dynamicService.getPrefix()))
                 return true;
         }
         return false;

@@ -833,7 +833,7 @@ public class WcsMarshaller {
 
         dataRecord1FieldQuantity.setDefinition("urn:ogc:def:dataType:OGC:1.1:measure");
         dataRecord1FieldQuantity.setDescription(attributesHash.get("long_name").getValue());
-        // dataRecord1FieldQuantity.setId(var.getName());
+        // dataRecord1FieldQuantity.setId(var.getPrefix());
 
         net.opengis.swecommon.v_2_0.UnitReference dataRecord1FieldQuantityUom = new net.opengis.swecommon.v_2_0.UnitReference();
         dataRecord1FieldQuantityUom.setCode(attributesHash.get("units").getValue());

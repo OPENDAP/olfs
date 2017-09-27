@@ -60,49 +60,7 @@
         <Godiva href="/ncWMS2/Godiva3.html" base="/ncWMS2/Godiva3.html"/>
     </WebServiceHandle  -->
 
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-COADS" >
-        <ApplicationName>COADS Climatology WCS Service/</ApplicationName>
-        <ServiceEndpoint>http://localhost:8080/opendap/wcs/</ServiceEndpoint>
-        <MatchRegex>^.*coads.*\.nc$</MatchRegex>
-        <DynamicServiceId>coads</DynamicServiceId>
-    </WebServiceHandler>
 
-<!--
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2IMNXINT" >
-        <ApplicationName>MERRA2 M2IMNXINT WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/gesdisc/M2IMNXINT.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>M2IMNXINT</DynamicServiceId>
-    </WebServiceHandler>
-
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2TMNXCHM" >
-        <ApplicationName>MERRA2 M2TMNXCHM WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/gesdisc/M2TMNXCHM.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>M2TMNXCHM</DynamicServiceId>
-    </WebServiceHandler>
-
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2SDNXSLV" >
-        <ApplicationName>MERRA2 M2SDNXSLV WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/gesdisc/M2SDNXSLV.5.12.4/.*|/testbed-13/M2SDNXSLV.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>M2SDNXSLV</DynamicServiceId>
-    </WebServiceHandler>
-
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2I1NXASM" >
-        <ApplicationName>MERRA2 M2I1NXASM WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/gesdisc/M2I1NXASM.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>M2I1NXASM</DynamicServiceId>
-    </WebServiceHandler>
-
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-M2TMNPMST" >
-        <ApplicationName>MERRA2 M2TMNPMST WCS Service</ApplicationName>
-        <ServiceEndpoint>http://wcs.opendap.org:8080/WCS-2.0/</ServiceEndpoint>
-        <MatchRegex>/gesdisc/M2TMNPMST.5.12.4/.*</MatchRegex>
-        <DynamicServiceId>M2TMNPMST</DynamicServiceId>
-    </WebServiceHandler>
--->
 
 </ViewersConfig>
 

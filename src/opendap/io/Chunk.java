@@ -349,7 +349,7 @@ public class Chunk {
         }
         catch(IOException e)  {
 
-            log.error(" - Caught {} Msg: {}",e.getClass().getName(),e.getMessage());
+            log.error(" - Caught {} Msg: {}",e.getClass().getPrefix(),e.getMessage());
 
             StringBuilder sb =  new StringBuilder();
             sb.append("  -  InputStream Dump: \n");
@@ -368,14 +368,14 @@ public class Chunk {
                 }
             }
             catch (Exception m){
-                sb.append("OUCH! FAILED TO DRAIN STREAM! Caught ").append(m.getClass().getName());
+                sb.append("OUCH! FAILED TO DRAIN STREAM! Caught ").append(m.getClass().getPrefix());
                 sb.append(" Message: ").append(m.getMessage());
             }
             finally {
                 sb.append("\nDUMP END\n");
             }
 
-            sb.append("RETHROWING ").append(e.getClass().getName()).append("\n");
+            sb.append("RETHROWING ").append(e.getClass().getPrefix()).append("\n");
             log.error(sb.toString());
 
             throw e;

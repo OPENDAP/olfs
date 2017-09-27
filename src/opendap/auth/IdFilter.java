@@ -417,7 +417,7 @@ public class IdFilter implements Filter {
         out.println("<p>request.getRemoteUser(): " + request.getRemoteUser() + "</p>");
         out.println("<p>request.getUserPrincipal(): " + request.getUserPrincipal() + "</p>");
         if(request.getUserPrincipal() !=null){
-            out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
+            out.println("<p>request.getUserPrincipal().getPrefix(): " + request.getUserPrincipal().getName() + "</p>");
 
         }
 
