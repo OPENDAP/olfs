@@ -1242,7 +1242,7 @@ public class BesApi {
         Procedure timedProc = Timer.start();
         try {
 
-            //String responseCacheKey = this.getClass().getPrefix() + ".getBesCatalog(\"" + dataSource + "\")";
+            //String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
 
             log.info(logPrefix + "Looking for cached copy of BES showCatalog response for dataSource \"" +
                     dataSource + "\"");

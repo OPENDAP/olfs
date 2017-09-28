@@ -551,8 +551,8 @@ public class Transformer {
                 Class classDefinition = Class.forName(impl);
                 javax.xml.transform.TransformerFactory s = (javax.xml.transform.TransformerFactory) classDefinition.newInstance();
 
-                str += "    TransformerFactory class  = "+s.getClass().getPrefix() +"\n";
-                str += "    Transformer class         = "+s.newTransformer().getClass().getPrefix()+"\n";
+                str += "    TransformerFactory class  = "+s.getClass().getName() +"\n";
+                str += "    Transformer class         = "+s.newTransformer().getClass().getName()+"\n";
             }
             else {
                 str += "    Java System Property Not Set.\n";

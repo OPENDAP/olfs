@@ -102,7 +102,7 @@ public class Namer {
 
             Matcher matcher;
             if (nameFromPathMatch) {
-                _log.error("getPrefix() - {} not supported.", THREDDS.REG_EXP_ON_PATH);
+                _log.error("getName() - {} not supported.", THREDDS.REG_EXP_ON_PATH);
                 return null;
             } else {
                 matcher = this.regExpPattern.matcher(name);

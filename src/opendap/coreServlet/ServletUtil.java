@@ -48,18 +48,18 @@ public class ServletUtil {
     /**
      * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
      * keep service related content such as:
-     * <ui>
-     * <li>Configuration information</li>
-     * <li>THREDDS catalog files.</li>
-     * <li>Log files</li>
-     * </ui>
-     * <p>
+     *   <ui>
+     *     <li>Configuration information</li>
+     *     <li>THREDDS catalog files.</li>
+     *     <li>Log files</li>
+     *   </ui>
+     *
      * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
      * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
      * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
      *
-     * @param servlet The HttpServlet that is running.
-     * @return A String containing the content path (aka the peristent content path) for the web application.
+     * @param servlet  The HttpServlet that is running.
+     * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
     public static String getConfigPath(HttpServlet servlet) {
         return getConfigPath(servlet.getServletContext());
@@ -69,18 +69,18 @@ public class ServletUtil {
     /**
      * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
      * keep service related content such as:
-     * <ui>
-     * <li>Configuration information</li>
-     * <li>THREDDS catalog files.</li>
-     * <li>Log files</li>
-     * </ui>
-     * <p>
+     *   <ui>
+     *     <li>Configuration information</li>
+     *     <li>THREDDS catalog files.</li>
+     *     <li>Log files</li>
+     *   </ui>
+     *
      * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
      * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
      * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
      *
-     * @param sc The ServletContext for this servlet that is running.
-     * @return A String containing the content path (aka the peristent content path) for the web application.
+     * @param sc  The ServletContext for this servlet that is running.
+     * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
     public static String getConfigPath(ServletContext sc) {
 
@@ -129,32 +129,28 @@ public class ServletUtil {
         /**
          * OLD WAY - used a path relative application's deployment dir which sux for rpm installed Tomcat
          *
-         String contentPath="FAILED_To_Determine_Content_Path!";
-         String tmpContentPath = "../../content" + sc.getContextPath() + "/";
-         String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
+        String contentPath="FAILED_To_Determine_Content_Path!";
+        String tmpContentPath = "../../content" + sc.getContextPath() + "/";
+        String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
 
-         File cf = new File( filename );
-         try{
-         contentPath = cf.getCanonicalPath() +"/";
-         contentPath = contentPath.replace('\\','/');
-         } catch (IOException e) {
-         log.error("Failed to produce a content path! Error: "+e.getMessage());
+        File cf = new File( filename );
+        try{
+          contentPath = cf.getCanonicalPath() +"/";
+          contentPath = contentPath.replace('\\','/');
+        } catch (IOException e) {
+            log.error("Failed to produce a content path! Error: "+e.getMessage());
          }
-         log.debug("content path: '"+contentPath+"'");
+        log.debug("content path: '"+contentPath+"'");
 
-         */
+        */
 
 
         return configPath;
     }
 
-    private static boolean pathIsGood(String path) {
-
+    private static boolean pathIsGood(String path){
         File confDirPath = new File(path);
-
-        return confDirPath.exists() || confDirPath.canRead();
-
-
+        return  confDirPath.exists() || confDirPath.canRead();
     }
 
 
@@ -163,11 +159,11 @@ public class ServletUtil {
      * web appications &lt;initParameter&gt; ContextPath. This directory is where the web application is unpacked. It
      * contains:
      * <ui>
-     * <li> All of the libraries (jar files, class files, etc.).</li>
-     * <li> Initial content used to bootstrap a new installation.</li>
-     * <li> XSL, HTML, CSS, XML, nad other documents.</li>
-     * <li> Images.</li>
-     * <li> Other resources bundled with the web application</li>
+     *   <li> All of the libraries (jar files, class files, etc.).</li>
+     *   <li> Initial content used to bootstrap a new installation.</li>
+     *   <li> XSL, HTML, CSS, XML, nad other documents.</li>
+     *   <li> Images.</li>
+     *   <li> Other resources bundled with the web application</li>
      * </ui>
      * Code in many DispatchHandlers uses this path string to locate required files for use during
      * runtime.
@@ -175,8 +171,8 @@ public class ServletUtil {
      * @param servlet Servlet instance to evaluate
      * @return Returns the path to the web applications "context" directory
      */
-    public static String getContextPath(HttpServlet servlet) {
-        return getContextPath(servlet.getServletContext());
+    public static String getContextPath( HttpServlet servlet ) {
+      return getContextPath(servlet.getServletContext());
     }
 
 
@@ -185,11 +181,11 @@ public class ServletUtil {
      * web appications &lt;initParameter&gt; ContextPath. This directory is where the web application is unpacked. It
      * contains:
      * <ui>
-     * <li> All of the libraries (jar files, class files, etc.).</li>
-     * <li> Initial content used to bootstrap a new installation.</li>
-     * <li> XSL, HTML, CSS, XML, nad other documents.</li>
-     * <li> Images.</li>
-     * <li> Other resources bundled with the web application</li>
+     *   <li> All of the libraries (jar files, class files, etc.).</li>
+     *   <li> Initial content used to bootstrap a new installation.</li>
+     *   <li> XSL, HTML, CSS, XML, nad other documents.</li>
+     *   <li> Images.</li>
+     *   <li> Other resources bundled with the web application</li>
      * </ui>
      * Code in many DispatchHandlers uses this path string to locate required files for use during
      * runtime.
@@ -197,7 +193,7 @@ public class ServletUtil {
      * @param sc ServletContext to evaluate
      * @return Returns the path to the web applications "context" directory
      */
-    public static String getContextPath(ServletContext sc) {
+    public static String getContextPath( ServletContext sc ) {
 /*
       if ( contextPath == null ) {
         ServletContext servletContext = servlet.getServletContext();
@@ -210,11 +206,14 @@ public class ServletUtil {
       }
       return contextPath;
 */
-        String contextPath = sc.getContextPath();
-        log.debug("context path: '" + contextPath + "'");
+      String contextPath = sc.getContextPath();
+      log.debug("context path: '"+contextPath+"'");
 
-        return contextPath;
+      return contextPath;
     }
+
+
+
 
 
     public static String getSystemPath(HttpServlet servlet, String path) {
@@ -301,13 +300,14 @@ public class ServletUtil {
         s.append("       getServletName():").append(scfg.getServletName()).append("\n");
         e = scfg.getInitParameterNames();
         s.append("       Servlet Parameters:\n");
-        if (e.hasMoreElements()) {
-            while (e.hasMoreElements()) {
+        if(e.hasMoreElements()){
+            while(e.hasMoreElements()){
                 pName = (String) e.nextElement();
                 pVal = scfg.getInitParameter(pName);
                 s.append("            name: ").append(pName).append(" value: ").append(pVal).append("\n");
             }
-        } else
+        }
+        else
             s.append("            No Servlet Parameters Found.\n");
         ServletContext scntxt = scfg.getServletContext();
         s.append("       ServletConfig.getServletContext(): ").append(scntxt).append("\n");

@@ -268,7 +268,7 @@ public class Servlet extends HttpServlet {
         }
         catch ( Exception e){
             msg = "Failed to build WcsCatalog implementation: "+className+
-                    " Caught an exception of type "+e.getClass().getPrefix() + " Message: "+ e.getMessage();
+                    " Caught an exception of type "+e.getClass().getName() + " Message: "+ e.getMessage();
             _log.error(msg);
             throw new ServletException(msg, e);
         }
@@ -276,14 +276,14 @@ public class Servlet extends HttpServlet {
         try {
             wcsCatalog.init(catalogConfig, serviceConfigPath, serviceContextPath);
         } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
         try {
             CatalogWrapper.init(serviceConfigPath, wcsCatalog);
         } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
@@ -303,7 +303,7 @@ public class Servlet extends HttpServlet {
 
         StaticRdfCatalog semanticCatalog = new StaticRdfCatalog();
 
-        _log.info("Using "+semanticCatalog.getClass().getPrefix()+" WCS catalog implementation.");
+        _log.info("Using "+semanticCatalog.getClass().getName()+" WCS catalog implementation.");
 
 
         _log.debug("Initializing semantic WCS catalog engine...");
@@ -315,7 +315,7 @@ public class Servlet extends HttpServlet {
         try {
             semanticCatalog.init(serviceConfigFile, semanticPreload, resourcePath, defaultCatalogCacheDir);
         } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
@@ -324,7 +324,7 @@ public class Servlet extends HttpServlet {
         try {
             CatalogWrapper.init(serviceContentPath, semanticCatalog);
         } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
@@ -366,7 +366,7 @@ public class Servlet extends HttpServlet {
         try{
             serviceConfigUrl = new URL("file://" + serviceConfigFilename);
         } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
         }
 
@@ -414,7 +414,7 @@ public class Servlet extends HttpServlet {
                 PersistentConfigurationHandler.copyDirTree(confDir, serviceConfigDir);
                 semaphore.createNewFile();
             } catch (IOException e) {
-                _log.error("Caught "+e.getClass().getPrefix()+"  Msg: "+e.getMessage());
+                _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
                 throw new ServletException(e);
             }
             _log.info("WCS Service default configuration and initial content installed.");
