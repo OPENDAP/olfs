@@ -724,9 +724,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.debug("The dapVar '{}' has more dimensions than the SRS", dapVar.getName());
 
         if (!weveGotIssuesMan.isEmpty()) {
-            _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.");
+            _log.debug("variableDimensionsAreCompatibleWithSrs() - You've got issues man.");
             for (String msg : weveGotIssuesMan)
-                _log.info("variableDimensionsAreCompatibleWithSrs() -   issue: {}",msg);
+                _log.debug("variableDimensionsAreCompatibleWithSrs() -   issue: {}",msg);
             return false;
         }
         return true;
