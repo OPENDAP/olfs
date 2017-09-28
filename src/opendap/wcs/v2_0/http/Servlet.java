@@ -193,241 +193,7 @@ public class Servlet extends HttpServlet {
         }
 
     }
-
-
-
-
-
-   /*
-
-    public void initializeCatalog(String serviceContextPath, String serviceConfigPath,  String configFileName) throws ServletException {
-
-        if (_initialized) return;
-
-
-        WcsServiceManager.init(serviceContextPath, serviceConfigPath,configFileName);
-
-        _initialized = true;
-        _log.info("Initialized. ");
-
-
-        String msg;
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        URL serviceConfigFile = getServiceConfigurationUrl(serviceConfigPath,configFileName);
-        SAXBuilder sb = new SAXBuilder();
-        Document configDoc = null;
-
-        try {
-            configDoc = sb.build(serviceConfigFile);
-            if(configDoc==null) {
-                msg = "The WCS 2.0 servlet is unable to locate the configuration document '"+serviceConfigFile+"'";
-                _log.error(msg);
-                throw new ServletException(msg);
-            }
-
-        } catch (JDOMException e) {
-            throw new ServletException(e);
-        } catch (IOException e) {
-            throw new ServletException(e);
-        }
-
-        Element configFileRoot = configDoc.getRootElement();
-        if(configFileRoot==null) {
-            msg = "The WCS 2.0 servlet is unable to locate the root element of the configuration document '"+serviceConfigFile+"'";
-            _log.error(msg);
-            throw new ServletException(msg);
-        }
-
-
-
-
-
-
-
-        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
-        if(catalogConfig==null) {
-            msg = "The WCS 2.0 servlet is unable to locate the configuration Directory <WcsCatalog> element " +
-                    "in the configuration file: " + serviceConfigFile + "'";
-            _log.error(msg);
-            throw new ServletException(msg);
-        }
-
-        String className =  catalogConfig.getAttributeValue("className");
-        if(className==null) {
-            msg = "The WCS 2.0 servlet is unable to locate the 'className' attribute of the <WcsCatalog> element"+
-                    "in the configuration file: " + serviceConfigFile + "'";
-            _log.error(msg);
-            throw new ServletException(msg);
-        }
-
-        WcsCatalog wcsCatalog = null;
-        try {
-            _log.debug("Building WcsCatalog implementation: " + className);
-            Class classDefinition = Class.forName(className);
-            wcsCatalog = (WcsCatalog) classDefinition.newInstance();
-        }
-        catch ( Exception e){
-            msg = "Failed to build WcsCatalog implementation: "+className+
-                    " Caught an exception of type "+e.getClass().getName() + " Message: "+ e.getMessage();
-            _log.error(msg);
-            throw new ServletException(msg, e);
-        }
-
-        try {
-            wcsCatalog.init(catalogConfig, serviceConfigPath, serviceContextPath);
-        } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-            throw new ServletException(e);
-        }
-
-        try {
-            CatalogWrapper.init(serviceConfigPath, wcsCatalog);
-        } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-            throw new ServletException(e);
-        }
-
-
-    }
-
-           */
-
-    /*
-
-
-    public void initializeSemanticCatalog(String resourcePath, String serviceContentPath,  String configFileName, String semanticPreload) throws ServletException {
-
-        if (_initialized) return;
-
-        URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
-
-        StaticRdfCatalog semanticCatalog = new StaticRdfCatalog();
-
-        _log.info("Using "+semanticCatalog.getClass().getName()+" WCS catalog implementation.");
-
-
-        _log.debug("Initializing semantic WCS catalog engine...");
-
-
-        String defaultCatalogCacheDir = serviceContentPath + semanticCatalog.getClass().getSimpleName()+"/";
-
-
-        try {
-            semanticCatalog.init(serviceConfigFile, semanticPreload, resourcePath, defaultCatalogCacheDir);
-        } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-            throw new ServletException(e);
-        }
-
-
-
-        try {
-            CatalogWrapper.init(serviceContentPath, semanticCatalog);
-        } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-            throw new ServletException(e);
-        }
-
-        _initialized = true;
-        _log.info("Initialized. ");
-
-    }
-
-
-
-    private URL getServiceConfigurationUrl(String _serviceContentPath, String configFileName) throws ServletException{
-        String msg;
-        URL serviceConfigUrl;
-
-        String serviceConfigFilename = _serviceContentPath + _defaultWcsServiceConfigFilename;
-
-        if(configFileName!=null){
-            serviceConfigFilename = _serviceContentPath + configFileName;
-        }
-
-        serviceConfigFilename = Scrub.fileName(serviceConfigFilename);
-
-        _log.info("getServiceConfigurationUrl() - Using WCS Service configuration file: "+serviceConfigFilename);
-
-        File configFile = new File(serviceConfigFilename);
-        if(!configFile.exists()){
-            msg = "Failed to located WCS Service Configuration File '"+serviceConfigFilename+"'";
-            _log.error(msg);
-            throw new ServletException(msg);
-        }
-        if(!configFile.canRead()){
-            String userName = System.getProperty("user.name");
-            msg = "The WCS Service Configuration File '"+serviceConfigFilename+"' exists but cannot be read." +
-                    " Is there a file permission problem? Is the user '"+userName+"' allowed read access on that file?";
-            _log.error(msg);
-            throw new ServletException(msg);
-        }
-
-        try{
-            serviceConfigUrl = new URL("file://" + serviceConfigFilename);
-        } catch (Exception e) {
-            _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-            throw new ServletException(e);
-        }
-
-        return  serviceConfigUrl;
-
-
-    }
-
-
-
-                */
-
-
-     /*
-    private void installDefaultConfiguration(String serviceResourcePath, String serviceConfigDir, String semaphoreFileName) throws ServletException{
-
-        String msg;
-        File f = new File(serviceConfigDir);
-
-        if(f.exists()){
-            if(!f.isDirectory()) {
-                msg = "The service content path "+serviceConfigDir+
-                        "exists, but it is not directory and cannot be used.";
-                _log.error(msg);
-                throw new ServletException(msg);
-            }
-            if(!f.canWrite()) {
-                msg = "The service content path "+serviceConfigDir+
-                        "exists, but the directory is not writable.";
-                _log.error(msg);
-                throw new ServletException(msg);
-            }
-
-        }
-        else {
-            _log.info("Creating WCS Service content directory: "+serviceConfigDir);
-            f.mkdirs();
-        }
-
-        File semaphore = new File(serviceConfigDir+semaphoreFileName);
-        if(!semaphore.exists()){
-            String confDir = serviceResourcePath + "WEB-INF/conf/";
-            _log.info("Attempting to copy default configuration for WCS from "+confDir+" to "+serviceConfigDir);
-            try {
-                PersistentConfigurationHandler.copyDirTree(confDir, serviceConfigDir);
-                semaphore.createNewFile();
-            } catch (IOException e) {
-                _log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
-                throw new ServletException(e);
-            }
-            _log.info("WCS Service default configuration and initial content installed.");
-        }
-
-
-
-    }
-
-
-
-   */
-
+    
 
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -545,16 +311,10 @@ public class Servlet extends HttpServlet {
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "LastModified", Long.toString(reqno));
-
-
         try {
-            return -1;
-
-        } catch (Exception e) {
             return -1;
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "WCS_2.0_ACCESS");
-
         }
 
 
@@ -563,14 +323,12 @@ public class Servlet extends HttpServlet {
 
 
     public void destroy() {
-
         LogUtil.logServerShutdown("destroy()");
 
         httpGetService.destroy();
         formService.destroy();
         wcsPostService.destroy();
         wcsSoapService.destroy();
-
 
         super.destroy();
     }
