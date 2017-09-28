@@ -1336,7 +1336,7 @@ public class BesApi {
 
         Procedure timedProc = Timer.start();
         try {
-            String responseCacheKey = this.getClass().getPrefix() + ".showInfo(\"" + dataSource + "\")";
+            String responseCacheKey = this.getClass().getName() + ".showInfo(\"" + dataSource + "\")";
 
             log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \"" + dataSource + "\"  (responseCacheKey=\"" + responseCacheKey + "\")");
 
@@ -1375,7 +1375,7 @@ public class BesApi {
                 }
 
             } else {
-                log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\"" +responseCacheKey + "\" returned an object of type " + o.getClass().getPrefix());
+                log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\"" +responseCacheKey + "\" returned an object of type " + o.getClass().getName());
 
 
                 Document result;
