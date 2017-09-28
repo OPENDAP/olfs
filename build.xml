@@ -52,6 +52,7 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION"  value="Not.A.Release"/>
+    <property name="WCS_VERSION"   value="Not.A.Release"/>
     <property name="WEBAPP_DIST"   value="olfs-${OLFS_VERSION}-webapp"/>
     <property name="SRC_DIST"      value="olfs-${OLFS_VERSION}-src"/>
     <property name="DOC_DIST"      value="olfs-${OLFS_VERSION}-doc"/>
@@ -68,7 +69,7 @@
     <property name="compile.SOURCE" value="1.7"/>
 
 
-    <property name="modern.compiler" value="modern"/>
+    <property name="modern.compiler"  value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
     <!--  build.compiler: This is a "magic" property.
@@ -329,6 +330,7 @@
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -403,12 +405,11 @@
         </copy>
 
 
-        <!-- Copy and filter all of the hyrax resources   -->
         <copy todir="${build.resources}" filtering="true">
+            <!-- Copy and filter all of the hyrax resources   -->
             <fileset dir="${hyraxResources.dir}"/>
-
+            <!-- get the WCS stuff but don't stomp on Hyrax things -->
             <fileset dir="${wcs.resources.dir}">
-                <!-- include all the java files -->
                 <include name="xsl/**"/>
                 <include name="WEB-INF/**"/>
                 <exclude name="WEB-INF/web.xml"/>
