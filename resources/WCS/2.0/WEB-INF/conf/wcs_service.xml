@@ -38,6 +38,56 @@
             <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
             <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
         </DynamicService>
+        
+        <DynamicService
+                prefix="M2IMNXINT"
+                name="MERRA-2 M2IMNXINT WCS Service"
+                href="bes://^/gesdisc/M2IMNXINT\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
+
+        <DynamicService
+                prefix="M2TMNXCHM"
+                name="MERRA-2 M2TMNXCHM WCS Service"
+                href="bes://^/gesdisc/M2TMNXCHM\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
+
+        <DynamicService
+                prefix="M2SDNXSLV"
+                name="MERRA-2 M2SDNXSLV WCS Service"
+                href="bes://^/gesdisc/M2SDNXSLV\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
+
+        <DynamicService
+                prefix="M2I1NXASM"
+                name="MERRA-2 M2I1NXASM WCS Service"
+                href="bes://^/gesdisc/M2I1NXASM\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
+
+        <DynamicService
+                prefix="M2TMNPMST"
+                name="MERRA-2 M2TMNPMST WCS Service"
+                href="bes://^/gesdisc/M2TMNPMST\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
 
         <DynamicService
                 prefix="coads"
