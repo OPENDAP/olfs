@@ -25,10 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Traditional  UnitOfWork_StateUnderTest Junit Tests on Dataset to assist in refactor, regression etc
- * and also an be do double duty as diagnostics on various Dataset DMRs through parameterization
- * which provides for the "happy path" of injecting the test Dataset as URL (in addition to this the
- * dataset can be injected as a file or raw XML with known values - last option being useful for
- * the traditional (as opposed to diagnostic) assertions.
+ * parameterization provides for the "happy path" of injecting the test Dataset as URL, XML
  *
  * @author Uday Kari
  */
