@@ -406,12 +406,16 @@
         <!-- Copy and filter all of the hyrax resources   -->
         <copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyraxResources.dir}"/>
-            
+
             <fileset dir="${wcs.resources.dir}">
                 <!-- include all the java files -->
-                <include name="**"/>
-
+                <include name="xsl/**"/>
+                <include name="WEB-INF/**"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+                <exclude name="WEB-INF/logback.xml"/>
             </fileset>
+
         </copy>
     </target>
 
