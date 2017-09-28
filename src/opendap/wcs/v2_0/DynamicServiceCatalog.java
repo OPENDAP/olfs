@@ -269,11 +269,11 @@ public class DynamicServiceCatalog implements WcsCatalog{
                 finally {
                     fos.close();
                 }
+                // FIXME Add something to limit cache size and to purge the stuff.
                 Element dmrElement = opendap.xml.Util.getDocumentRoot(dmrCacheFile);
                 // TODO QC the dmrElement to be sure it's not a DAP error object and then maybe uncache it if it's an error.
                 dmrElement.setAttribute("name",coverageId);
                 return dmrElement;
-
             }
         }
         finally {
