@@ -34,4 +34,20 @@ import opendap.dap4.DatasetTest;
  */
 public class DynamicCoverageDescriptionTest extends DatasetTest {
 
+  @Test
+  addServiceParameters(cd);
+
+  @Test
+  ingestSrsFromDataset(dataset, _dynamicService.getSrs());
+  
+  @Test
+  ingestDomainCoordinates(dataset);
+  
+  @Test
+  addBoundedByAndDomainSet(cd, dataset,_srs);
+  
+  @Test
+  addRange(cd, dataset, _srs);
+
+
 }
