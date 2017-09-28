@@ -197,6 +197,8 @@
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
 
+    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
+    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
     <property name="json.lib"       value="gson-2.3.1.jar"/>
@@ -241,11 +243,20 @@
     <property name="json.lib"      value="json-simple-1.1.1.jar"/>
 
 
-    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
-               property="fortify.present"/>
+    <!-- WCS Libs -->
+    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
+    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
-    <property name="rules.dir" value="fortify"/>
+
+
+
 
 
     <!-- Library (class)paths -->
@@ -276,9 +287,19 @@
             <include name="${slf4j.lib}"/>
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
-
-            
         </fileset>
+        <fileset dir="${wcs.lib.dir}">
+            <include name="${ogc-wcs.lib}" />
+            <include name="${ogc-gml.lib}" />
+            <include name="${ogc-swe.lib}" />
+            <include name="${ogc-gmlcov.lib}" />
+            <include name="${ogc-ows.lib}" />
+            <include name="${ogc-jaxb.lib}" />
+            <include name="${jaxb-core.lib}" />
+            <include name="${jaxb-impl.lib}" />
+            <include name="${xlink.lib}" />
+        </fileset>
+
     </path>
 
 
@@ -366,8 +387,8 @@
                 <!-- Exclude the Metacat code  -->
                 <exclude name="opendap/metacat/**"/>
 
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcs/**"/>
+                <!-- Exclude WCS 1.1.2 and semantics code  -->
+                <exclude name="opendap/wcs/v1_1_2/**"/>
                 <exclude name="opendap/semantics/**"/>
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
@@ -377,10 +398,6 @@
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
 
-
-                <!-- Exclude the Hyrax Admin Interface code  -->
-                <!-- <exclude name="opendap/hai/**"/>  -->
-
             </fileset>
 
         </copy>
@@ -389,6 +406,12 @@
         <!-- Copy and filter all of the hyrax resources   -->
         <copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyraxResources.dir}"/>
+            
+            <fileset dir="${wcs.resources.dir}">
+                <!-- include all the java files -->
+                <include name="**"/>
+
+            </fileset>
         </copy>
     </target>
 
@@ -707,14 +730,9 @@
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
-
-
-
         <echo level="info" message="Building Hyrax server war file."/>
         <echo level="info" message="build.resources: ${build.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
-
-
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
              webxml="${build.resources}/WEB-INF/web.xml"
@@ -748,6 +766,18 @@
                 <include name="${logback-classic.lib}"/>
 
             </lib>
+            <lib dir="${wcs.lib.dir}">
+                <include name="${ogc-wcs.lib}"/>
+                <include name="${ogc-gml.lib}"/>
+                <include name="${ogc-swe.lib}"/>
+                <include name="${ogc-gmlcov.lib}"/>
+                <include name="${ogc-ows.lib}"/>
+                <include name="${ogc-jaxb.lib}"/>
+                <include name="${jaxb-core.lib}"/>
+                <include name="${jaxb-impl.lib}"/>
+                <include name="${xlink.lib}"/>
+            </lib>
+
             <classes dir="${build.classes}"/>
 
 
