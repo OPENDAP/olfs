@@ -24,8 +24,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * Traditional  UnitOfWork_StateUnderTest Junit Tests on Dataset to assist in refactor, regression etc
- * parameterization provides for the "happy path" of injecting the test Dataset as URL, XML
+ * Junit Tests on Dataset to assist in refactor, regression etc
+ * parameterization provides for injecting test Dataset(s) as URL, XML
  *
  * @author Uday Kari
  */
