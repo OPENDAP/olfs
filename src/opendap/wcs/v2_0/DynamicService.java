@@ -100,44 +100,44 @@ public class DynamicService {
             badThingsHappened.add("Failed to locate required attribute 'href' in the DynamicService configuration element!");
         }
         else {
-                // The java.net.URL class supports: http, https, ftp, file, and jar
-                // We want two things here:
-                //   a) Only allow http and https
-                //   b) Utilize the protocol to direct requests to the BES.
-                if(s.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
-                        s.toLowerCase().startsWith(Util.HTTPS_PROTOCOL)) {
-                    try {
-                        _dapServiceUrlString = new URL(s).toString();
-                    }
-                    catch(MalformedURLException mue){
-                        badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
-                    }
+            // The java.net.URL class supports: http, https, ftp, file, and jar
+            // We want two things here:
+            //   a) Only allow http and https
+            //   b) Utilize the protocol to direct requests to the BES.
+            if(s.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
+                    s.toLowerCase().startsWith(Util.HTTPS_PROTOCOL)) {
+                try {
+                    _dapServiceUrlString = new URL(s).toString();
                 }
-                else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
+                catch(MalformedURLException mue){
+                    badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
+                }
+            }
+            else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
 
-                    _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
+                _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
 
-                    if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
-                        badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
-                                "the attribute value must begin with 'bes://' and then be followed by a catalog " +
-                                "matching regex. So fix it then...");
-                    }
-                    else {
-                        try {
-                             Pattern p  = Pattern.compile(_catalogMatchRegexString);
-                             _log.debug("Compiled pattern {}",p.toString());
-                        } catch (PatternSyntaxException pse) {
-                            badThingsHappened.add("Failed to compile regular expression pattern: '" +
-                                    _catalogMatchRegexString + "  message: " + pse.getMessage());
-                        }
-                    }
-
-                    _dapServiceUrlString = Util.BES_PROTOCOL;
+                if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
+                    badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
+                            "the attribute value must begin with 'bes://' and then be followed by a catalog " +
+                            "matching regex. So fix it then...");
                 }
                 else {
-                    badThingsHappened.add("The DynamicService 'href' attribute references an unknown protocol." +
-                            "Only 'http', 'https', and 'bes' are supportd.");
+                    try {
+                         Pattern p  = Pattern.compile(_catalogMatchRegexString);
+                         _log.debug("Compiled pattern {}",p.toString());
+                    } catch (PatternSyntaxException pse) {
+                        badThingsHappened.add("Failed to compile regular expression pattern: '" +
+                                _catalogMatchRegexString + "  message: " + pse.getMessage());
+                    }
                 }
+
+                _dapServiceUrlString = Util.BES_PROTOCOL;
+            }
+            else {
+                badThingsHappened.add("The DynamicService 'href' attribute references an unknown protocol." +
+                        "Only 'http', 'https', and 'bes' are supportd.");
+            }
         }
 
 
