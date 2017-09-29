@@ -26,13 +26,12 @@
 package opendap.wcs.v2_0;
 
 import java.io.IOException;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
-
 import org.jdom.JDOMException;
-import org.junit.*;
+
 import static org.junit.Assert.*;
+import org.junit.Test;
 import opendap.dap4.DatasetTest;
 
 /**
@@ -40,7 +39,6 @@ import opendap.dap4.DatasetTest;
  * @author Uday Kari
  *
  */
-
 public class DynamicCoverageDescriptionTest extends DatasetTest {
 
   public DynamicCoverageDescriptionTest(String dmr) throws
@@ -48,8 +46,9 @@ public class DynamicCoverageDescriptionTest extends DatasetTest {
     super (dmr);
   }
   
-  @Test public void trySomething()
-  {
-    assertTrue(true);
+  @Test
+  public final void test() {
+    fail("Not yet implemented"); // TODO
   }
+
 }
