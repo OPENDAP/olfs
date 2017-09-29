@@ -178,7 +178,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
                         dynamicService.getLongName(),
                         serviceContextPath,
                         dynamicService.getPrefix(),
-                        dynamicService.getCatalogMatchRegexString());
+                        dynamicService.getPathMatchRegexString());
 
                 ServicesRegistry.addService(wcsService);
             }
