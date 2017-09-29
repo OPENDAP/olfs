@@ -52,7 +52,7 @@ public class DynamicService {
     private Vector<DomainCoordinate> _domainCoordinates;
     // private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
-    private String _catalogMatchRegexString;
+    private String _pathMatchRegexString;
 
 
     public class FieldDef {
@@ -73,7 +73,7 @@ public class DynamicService {
         _domainCoordinates =  new Vector<>();
         //_dcMap = new ConcurrentHashMap<>();
         _wcsFieldsByDapID = new ConcurrentHashMap<>();
-        _catalogMatchRegexString = null;
+        _pathMatchRegexString = null;
     }
 
     /**
@@ -95,49 +95,76 @@ public class DynamicService {
         if(_longName==null)
             _longName = _prefix;
 
-        s = config.getAttributeValue("href");
-        if(s==null) {
-            badThingsHappened.add("Failed to locate required attribute 'href' in the DynamicService configuration element!");
-        }
-        else {
-            // The java.net.URL class supports: http, https, ftp, file, and jar
-            // We want two things here:
-            //   a) Only allow http and https
-            //   b) Utilize the protocol to direct requests to the BES.
-            if(s.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
-                    s.toLowerCase().startsWith(Util.HTTPS_PROTOCOL)) {
-                try {
-                    _dapServiceUrlString = new URL(s).toString();
-                }
-                catch(MalformedURLException mue){
-                    badThingsHappened.add("Failed to build URL from string '"+s+"' msg: "+ mue.getMessage());
-                }
-            }
-            else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
-
-                _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
-
-                if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
-                    badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
-                            "the attribute value must begin with 'bes://' and then be followed by a catalog " +
-                            "matching regex. So fix it then...");
-                }
-                else {
-                    try {
-                         Pattern p  = Pattern.compile(_catalogMatchRegexString);
-                         _log.debug("Compiled pattern {}",p.toString());
-                    } catch (PatternSyntaxException pse) {
-                        badThingsHappened.add("Failed to compile regular expression pattern: '" +
-                                _catalogMatchRegexString + "  message: " + pse.getMessage());
-                    }
-                }
-
-                _dapServiceUrlString = Util.BES_PROTOCOL;
+        s = config.getAttributeValue("pathMatch");
+        if(s!=null){
+            if(s.isEmpty()){
+                badThingsHappened.add("In the DynamicService element, the 'pathMatch' attribute's " +
+                        " value must be a valid regular expression. The empty string is not a valid regular expression," +
+                        "at least not in this context. Please fix the empty 'pathMatch' and try again... ");
             }
             else {
-                badThingsHappened.add("The DynamicService 'href' attribute references an unknown protocol." +
-                        "Only 'http', 'https', and 'bes' are supportd.");
+                try {
+                    Pattern p  = Pattern.compile(s);
+                    _log.debug("Compiled pathMatch pattern: {}",p.pattern());
+                    _pathMatchRegexString = p.pattern();
+                } catch (PatternSyntaxException pse) {
+                    badThingsHappened.add("Failed to compile regular expression pattern: '" +
+                            s + "  message: " + pse.getMessage());
+                }
+                _dapServiceUrlString = Util.BES_PROTOCOL;
             }
+        }
+
+        s = config.getAttributeValue("href");
+        if(s!=null){
+            if(_pathMatchRegexString!=null) {
+                badThingsHappened.add("A DynamicService element may have either a 'pathMatch' attritbute or an 'href' " +
+                    "attribute but not BOTH. Decide, fix, try again...");
+            }
+            else {
+
+                // The java.net.URL class supports: http, https, ftp, file, and jar
+                // We want two things here:  http and https
+                if (s.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
+                        s.toLowerCase().startsWith(Util.HTTPS_PROTOCOL)) {
+                    try {
+                        _dapServiceUrlString = new URL(s).toString();
+                    } catch (MalformedURLException mue) {
+                        badThingsHappened.add("Failed to build URL from string '" + s + "' msg: " + mue.getMessage());
+                    }
+                }
+                /**  Turned this off for now, but we may want to allow it?
+                 else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
+
+                 _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
+
+                 if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
+                 badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
+                 "the attribute value must begin with 'bes://' and then be followed by a catalog " +
+                 "matching regex. So fix it then...");
+                 }
+                 else {
+                 try {
+                 Pattern p  = Pattern.compile(_catalogMatchRegexString);
+                 _log.debug("Compiled pattern {}",p.toString());
+                 } catch (PatternSyntaxException pse) {
+                 badThingsHappened.add("Failed to compile regular expression pattern: '" +
+                 _catalogMatchRegexString + "  message: " + pse.getMessage());
+                 }
+                 }
+
+                 _dapServiceUrlString = Util.BES_PROTOCOL;
+                 }
+                 **/
+                else {
+                    badThingsHappened.add("The DynamicService 'href' attribute references an unsupported protocol." +
+                            "Only 'http' and 'https' are supported.");
+                }
+            }
+        }
+        else if(_pathMatchRegexString==null){
+            badThingsHappened.add("OUCH! The DynamicService element must have either " +
+                    "an 'href' attribute or a 'pathMatch' attribute to be correct!");
         }
 
 
@@ -341,14 +368,14 @@ public class DynamicService {
     private SimpleSrs _srs;
     private Vector<DomainCoordinate> _domainCoordinates;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
-    private String _catalogMatchRegexString;
+    private String _pathMatchRegexString;
         */
         StringBuilder sb = new StringBuilder();
         sb.append("DynamicService {\n)");
         sb.append("  prefix: ").append(_prefix).append("\n");
         sb.append("  name: ").append(_longName).append("\n");
         sb.append("  dapServiceUrl: ").append(_dapServiceUrlString).append("\n");
-        sb.append("  catalogMatchRegexString: ").append(_catalogMatchRegexString).append("\n");
+        sb.append("  pathMatchRegexString: ").append(_pathMatchRegexString).append("\n");
         sb.append("  srs: ").append(_srs.getName()).append("\n");
         sb.append("  Variable Mappings:\n");
         for(FieldDef field: _wcsFieldsByDapID.values()) {
@@ -398,8 +425,8 @@ public class DynamicService {
 
     public String getLongName() { return _longName; }
 
-    public String getCatalogMatchRegexString(){
-        return _catalogMatchRegexString;
+    public String getPathMatchRegexString(){
+        return _pathMatchRegexString;
     }
 
 }
