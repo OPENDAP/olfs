@@ -58,7 +58,8 @@ import javax.xml.stream.XMLStreamException;
 @RunWith(Parameterized.class)
 
 /**
- * Tests Dynamic Coverage Description
+ * Test for 
+ * Dynamic Coverage Description
  */
 public class DynamicCoverageDescriptionTest {
 
