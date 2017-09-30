@@ -59,8 +59,6 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * Tests Dynamic Coverage Description
- * @author Uday Kari
- *
  */
 public class DynamicCoverageDescriptionTest {
 

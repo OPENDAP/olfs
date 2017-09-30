@@ -50,10 +50,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * Test Dataset; with JUnit 4 parameterization providing for 
+ * Dataset Tests
+ * JUnit 4 parameterization providing for 
  * injecting test Dataset(s) 
- *
- * @author Uday Kari
  */
 @RunWith(Parameterized.class)
 public class DatasetTest {
