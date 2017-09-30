@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" xml:base="http://test.opendap.org:80/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4" dapVersion="4.0" dmrVersion="1.0" name="MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4">
+<Dataset xmlns="http://xml.opendap.org/ns/DAP/4.0#" 
+         xml:base="http://test.opendap.org:80/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4" 
+         dapVersion="4.0" 
+         dmrVersion="1.0" 
+         name="MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4">
     <Dimension name="time" size="1"/>
     <Dimension name="lat" size="361"/>
     <Dimension name="lon" size="576"/>
