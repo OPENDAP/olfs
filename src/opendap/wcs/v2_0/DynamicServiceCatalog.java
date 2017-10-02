@@ -30,6 +30,7 @@ import opendap.bes.BESError;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
 import opendap.http.Util;
 import opendap.ppt.PPTException;
@@ -37,16 +38,16 @@ import opendap.services.ServicesRegistry;
 import opendap.viewers.WcsService;
 import opendap.wcs.srs.SimpleSrs;
 import org.apache.commons.codec.binary.Hex;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -203,8 +204,122 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
+
+
+
+
+    private Element getDmrFromBes(String besDatasource, String datasetUrl)
+            throws WcsException, IOException, JDOMException {
+
+        if(!BESManager.isInitialized())
+            throw new WcsException("The BESManager has not been configured. " +
+                    "Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+        BesApi besApi = new BesApi();
+        QueryParameters qp = new QueryParameters();
+        try {
+            Document dmrDoc = new Document();
+            besApi.getDMRDocument(besDatasource, qp, datasetUrl, dmrDoc);
+            return dmrDoc.detachRootElement();
+        } catch (BadConfigurationException | PPTException | BESError error) {
+            String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
+                    " Message: " + error.getMessage();
+            _log.error("getCachedDMR() - {}", msg);
+            throw new IOException(msg, error);
+        }
+    }
+
+
+    private void writeDmrFromBes(String besDatasource, String datasetUrl, OutputStream fos)
+            throws WcsException, IOException {
+        
+        if(!BESManager.isInitialized())
+            throw new WcsException("The BESManager has not been configured. " +
+                    "Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+        BesApi besApi = new BesApi();
+        QueryParameters qp = new QueryParameters();
+        try {
+            besApi.writeDMR(besDatasource, qp, datasetUrl, fos);
+        } catch (BadConfigurationException | PPTException | BESError error) {
+            String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
+                    " Message: " + error.getMessage();
+            _log.error("getCachedDMR() - {}", msg);
+            throw new IOException(msg, error);
+        }
+    }
+
+
     /**
-     * Thread safe DMR acquisition and caching.
+     * Get the DMR associated with the DAP dataset associated with the Coverage 'coverageId'
+     * @param coverageId  The name of the Coverage
+     * @return The DMR of the DAP dataset associated with the coverage.
+     * @throws IOException
+     * @throws JDOMException
+     * @throws InterruptedException
+     * @throws WcsException
+     */
+    private Element getDMR(String coverageId)
+            throws IOException, JDOMException, InterruptedException, WcsException {
+        _log.debug("getDMR() - BEGIN coverageId: {}", coverageId);
+
+        // Have we been here before in this thread/request?
+        // Check the RequestCache and get the goods that will be there if
+        // the answer to the question is true.
+        String responseCacheKey = this.getClass().getName()+".getDMR()";
+        Element dmr  = (Element) RequestCache.get(responseCacheKey);
+        if(dmr!=null)
+            return dmr;
+        
+        String datasetUrl = getDapDatsetUrl(coverageId);
+        _log.debug("getDMR() - DAP Dataset URL: {}", datasetUrl);
+        if (datasetUrl == null)
+            return null;
+
+        if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
+            // Build the BES Data Source name from the datasetUrl by stripping the protocol part.
+            String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
+            // Get the DMR element for the besDatasource from the BES.
+            Element dmrElement = getDmrFromBes(besDatasource, datasetUrl);
+            dmrElement.setAttribute("name", coverageId);
+            // Throw a ref to it in the per-thread request cache so we don't do this again within a request
+            RequestCache.put(responseCacheKey,dmrElement);
+            // Done!
+            return dmrElement;
+        }
+
+        if (datasetUrl.startsWith(Util.HTTP_PROTOCOL) ||
+                datasetUrl.startsWith(Util.HTTPS_PROTOCOL)) {
+            // Buid the DMR request URL
+            String dmrUrl = datasetUrl + ".dmr.xml";
+            _log.debug("getDMR() - DMR URL: {}", dmrUrl);
+            // Go get the bytes.
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            opendap.http.Util.writeRemoteContent(dmrUrl, WcsServiceManager.getCredentialsProvider(), baos);
+            // Parse the bytes into JDOM
+            SAXBuilder sb = new SAXBuilder();
+            Document dmrDoc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+            // Get the DMR element and set it's name
+            Element dmrElement = dmrDoc.detachRootElement();
+            dmrElement.setAttribute("name", coverageId);
+            // Throw a ref to it in the per-thread request cache so we don't do this again within a request
+            RequestCache.put(responseCacheKey,dmrElement);
+            // Done!
+            return dmrElement;
+        }
+        String msg = "Unrecognized protocol: " + datasetUrl;
+        _log.error("getDMR() - {}", msg);
+        throw new IOException(msg);
+    }
+
+
+
+
+    /**
+     * Prototype caching thing. Has known issues:
+     * - No size control.
+     * - No ejection operation
+     * - no read lock.
+     * Plus more that will surely turn up.
+     * FIXME: Actually make a cching thing work here. Use a lib?
      * @param coverageId  The cacheId (aka cache file name)
      * @return
      */
@@ -218,8 +333,8 @@ public class DynamicServiceCatalog implements WcsCatalog{
             return null;
 
         String datasetCacheId = anyId2CacheId(datasetUrl);
-
         _log.debug("getCachedDMR() - datasetCacheId: {}", datasetCacheId);
+
         String dmrCacheFileName = datasetCacheId + ".dmr.xml";
         File dmrCacheFile = new File(_cacheDir, dmrCacheFileName);
 
@@ -241,20 +356,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
                 try {
                     if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
                         String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
-                        if(!BESManager.isInitialized())
-                            throw new WcsException("The BESManager has not been configured. " +
-                                    "Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
-                        BesApi besApi = new BesApi();
-                        QueryParameters qp = new QueryParameters();
-                        try {
-                            besApi.writeDMR(besDatasource, qp, datasetUrl, fos);
-                        } catch (BadConfigurationException | PPTException | BESError error) {
-                            String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
-                                    " Message: " + error.getMessage();
-                            _log.error("getCachedDMR() - {}", msg);
-                            throw new IOException(msg, error);
-                        }
-
+                        writeDmrFromBes(besDatasource,datasetUrl,fos);
                     } else if (datasetUrl.startsWith(Util.HTTP_PROTOCOL) || datasetUrl.startsWith(Util.HTTPS_PROTOCOL)) {
                         String dmrUrl = datasetUrl + ".dmr.xml";
                         _log.debug("getCachedDMR() - DMR URL: {}",dmrUrl);
@@ -285,7 +387,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
     @Override
     public boolean hasCoverage(String coverageId) throws InterruptedException {
         try {
-            if(getCachedDMR(coverageId) != null)
+            if(getDMR(coverageId) != null)
                 return true;
 
         } catch (IOException | JDOMException | WcsException e) {
@@ -306,8 +408,15 @@ public class DynamicServiceCatalog implements WcsCatalog{
     public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException {
 
         try {
-            Element dmr = getCachedDMR(coverageId);
+            // Have we been here before in this thread/request?
+            // Check the RequestCache and get the goods that will be there if
+            // the answer to the question is true.
+            String responseCacheKey = this.getClass().getName()+".getCoverageDescription()";
+            CoverageDescription coverageDescription  = (CoverageDescription) RequestCache.get(responseCacheKey);
+            if(coverageDescription!=null)
+                return coverageDescription;
 
+            Element dmr = getDMR(coverageId);
             if(dmr==null)
                 return null;
 
@@ -315,7 +424,8 @@ public class DynamicServiceCatalog implements WcsCatalog{
             if(dynamicService==null)
                 return null;
 
-            DynamicCoverageDescription coverageDescription = new DynamicCoverageDescription(dmr,dynamicService);
+            coverageDescription = new DynamicCoverageDescription(dmr,dynamicService);
+            RequestCache.put(responseCacheKey,coverageDescription);
             return coverageDescription;
 
         } catch (JDOMException | IOException e) {
