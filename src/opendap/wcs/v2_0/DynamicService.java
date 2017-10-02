@@ -133,29 +133,6 @@ public class DynamicService {
                         badThingsHappened.add("Failed to build URL from string '" + s + "' msg: " + mue.getMessage());
                     }
                 }
-                /**  Turned this off for now, but we may want to allow it?
-                 else if( s.toLowerCase().startsWith(Util.BES_PROTOCOL)){
-
-                 _catalogMatchRegexString = s.substring(Util.BES_PROTOCOL.length());
-
-                 if(_catalogMatchRegexString==null || _catalogMatchRegexString.isEmpty()){
-                 badThingsHappened.add("When utilizing the BES protocol in the DynamicService 'href' attribute " +
-                 "the attribute value must begin with 'bes://' and then be followed by a catalog " +
-                 "matching regex. So fix it then...");
-                 }
-                 else {
-                 try {
-                 Pattern p  = Pattern.compile(_catalogMatchRegexString);
-                 _log.debug("Compiled pattern {}",p.toString());
-                 } catch (PatternSyntaxException pse) {
-                 badThingsHappened.add("Failed to compile regular expression pattern: '" +
-                 _catalogMatchRegexString + "  message: " + pse.getMessage());
-                 }
-                 }
-
-                 _dapServiceUrlString = Util.BES_PROTOCOL;
-                 }
-                 **/
                 else {
                     badThingsHappened.add("The DynamicService 'href' attribute references an unsupported protocol." +
                             "Only 'http' and 'https' are supported.");
