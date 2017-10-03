@@ -314,12 +314,13 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     /**
-     * Prototype caching thing. Has known issues:
+     * Prototype DMR retrieval using a rudimentary cache.
+     * This implmentation has the following known issues:
      * - No size control.
      * - No ejection operation
      * - no read lock.
      * Plus more that will surely turn up.
-     * FIXME: Actually make a cching thing work here. Use a lib?
+     * FIXME: Make a cache based retrieval work here. Use a cache lib?  It would be best if the cache could accept both the DMR JDOM Element and the DynamicCoverageDescription object.
      * @param coverageId  The cacheId (aka cache file name)
      * @return
      */
