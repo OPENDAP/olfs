@@ -25,10 +25,13 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <WcsService>
-    <!-- Credentials>/Users/centos/.netrc</Credentials -->
-
+    <!-- Credentials>/path/to/a/.netrc</Credentials -->
     <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog">
-        <DynamicService name="coads" href="bes://" srs="urn:ogc:def:crs:EPSG::4326" >
+        <DynamicService
+                prefix="coads"
+                name="COADS WCS Service"
+                pathMatch="^.*coads.*\.nc$"
+                srs="urn:ogc:def:crs:EPSG::4326">
             <DomainCoordinate name="time" dapID="time" size="12" units="hour since 0000-01-01 00:00:00" min="366.0" max="8401.335"/>
             <DomainCoordinate name="latitude" dapID="COADSY" size="90" units="deg" min="-90" max="90" />
             <DomainCoordinate name="longitude" dapID="COADSX" size="180" units="deg" min="-180" max="180" />
@@ -38,97 +41,35 @@
             <field name="VWND" dapID="VWND" description="MERIDIONAL WIND" units="M/S" min="-9.99999979e+33" max="9.99999979e+33"/>
         </DynamicService>
     </WcsCatalog>
-
-    
-<!--
-    <WcsCatalog name="lfc" className="opendap.wcs.v2_0.LocalFileCatalog">
-        <CatalogDirectory>/etc/olfs/LocalFileCatalog</CatalogDirectory>
-        <CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile>
-    </WcsCatalog>
-
-    <WcsCatalog className="opendap.wcs.v2_0.DynamicServiceCatalog" >
-        <CacheDirectory>/tmp/DSC</CacheDirectory >
-        <DynamicService name="tb12" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="deg" min="-90" max="90" />
-            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="deg" min="-180" max="180" />
-            <field name="tb12" dapID="foo" description="time-foobar" units="s" min="-9.99999987e+14" max="9.99999987e+14"/>
-        </DynamicService>
-
-        <DynamicService name="tb13" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-            <field name="HOURNORAIN" dapID="HOURNORAIN" description="time-during_an_hour_with_no_precipitation" units="s" min="-9.99999987e+14" max="9.99999987e+14"/>
-            <field name="T2MMAX" dapID="T2MMAX" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
-            <field name="T2MMEAN" dapID="T2MMEAN" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
-            <field name="T2MMIN" dapID="T2MMIN" description="2-meter_air_temperature" units="K" min="-9.99999987e+14" max="9.99999987e+14"/>
-            <field name="PrecipitationRate" dapID="TPRECMAX" description="total_precipitation" units="kg m-2 s-1" min="-9.99999987e+14" max="9.99999987e+14"/>
-        </DynamicService>
-
-        <DynamicService name="M2IMNXINT" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-
-        <DynamicService name="M2TMNXCHM" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg"  min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-
-        <DynamicService name="M2SDNXSLV" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-
-        <DynamicService name="M2I1NXASM" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="24" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-        
-        <DynamicService name="M2TMNPMST" href="http://localhost:8080/opendap/" srs="urn:ogc:def:crs:EPSG::4326" >
-            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
-            <DomainCoordinate name="lev" dapID="lev" size="42" units="hPa" min="0" max="1000"/>
-            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg"  min="-90" max="90"/>
-            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
-        </DynamicService>
-    </WcsCatalog>
--->
 </WcsService>
-<!--
-<WcsService>
-    <WcsCatalog className="opendap.semantics.wcs.SemanticRdfCatalog">
-        <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="3"/>
-
-        <dataset>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
-        <dataset>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
-        <dataset>http://test.opendap.org:8080/opendap/ioos/mday_joinExist.ncml.ddx</dataset>
--->
-        <!--
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/1km/declouded_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/1km/raw_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/6km/declouded_6km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/6km/raw_6km_aggregated.ncml</dataset>
-
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/1km/declouded_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/1km/raw_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/6km/declouded_6km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/6km/raw_6km_aggregated.ncml</dataset>
 
 
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/1km/declouded_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/1km/raw_1km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/6km/declouded_6km_aggregated.ncml</dataset>
-        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/6km/raw_6km_aggregated.ncml</dataset>
-
-        -->
 
 <!--
+        <WcsCatalog name="lfc" className="opendap.wcs.v2_0.LocalFileCatalog">
+            <Credentials>/Users/ndp/.netrc</Credentials>
+            <CatalogDirectory>/etc/olfs/LocalFileCatalog</CatalogDirectory>
+            <CatalogFile>/etc/olfs/LocalFileCatalog/LFC.xml</CatalogFile>
+        </WcsCatalog>
 
-    </WcsCatalog>
-</WcsService>
+
+        <DynamicService
+                prefix="tb13"
+                name="testbed-13 MERRA-2 M2SDNXSLV WCS Service"
+                pathMatch="^/testbed-13/M2SDNXSLV\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
+
+        <DynamicService
+                prefix="merra2"
+                name="MERRA-2 WCS Service"
+                pathMatch="^/gesdisc/(M2IMNXINT|M2TMNXCHM|M2SDNXSLV|M2I1NXASM|M2TMNPMST)\.5\.12\.4/.*$"
+                srs="urn:ogc:def:crs:EPSG::4326" >
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 1900-01-01T00:00:00.000Z" min="690" max="690"/>
+            <DomainCoordinate name="latitude" dapID="lat" size="361" units="deg" min="-90" max="90"/>
+            <DomainCoordinate name="longitude" dapID="lon" size="576" units="deg" min="-180" max="180"/>
+        </DynamicService>
 -->

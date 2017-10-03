@@ -59,10 +59,10 @@ public interface WcsCatalog {
      * a WcsCatalog configuration element as a child of the root element.
      * @param cacheDir The directory into which the catalog may choose to write persistent content,
      * intermediate files, etc.
-     * @param resourcePath The path to the resource bundle delivered with the software.
+     * @param serviceContextPath The service context, should be /context/servlet
      * @throws Exception When the bad things happen.
      */
-    public void init(Element config, String cacheDir, String resourcePath) throws Exception;
+    public void init(Element config, String cacheDir, String serviceContextPath) throws Exception;
 
 
 

@@ -563,7 +563,7 @@ public class CoverageDescription {
             covSum.addContent(bb);
         }
 
-        // @todo Add metadata records if available.
+        // @todo Add metadata records if available.  For example the time domain might be useful if we can squeeze it into their allowed content model.
 
         return covSum;
     }

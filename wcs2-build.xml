@@ -491,26 +491,18 @@
     <target
             name="DISTRO"
             depends="clean,src-dist,server-dist"
-            description="Builds complete distribution"
+            description="Builds complete WCS-2.0 distribution"
             >
-
     </target>
-
-
-
-
 
     <target
             name="server"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
-
-
         <echo level="info" message="Building WCS server war file."/>
         <echo level="info" message="WCS-Resources.dir: ${wcs.resources.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
-
 
         <war destfile="${build.dist}/WCS-2.0.war"
              webxml="${wcs.resources.dir}/WEB-INF/web.xml"

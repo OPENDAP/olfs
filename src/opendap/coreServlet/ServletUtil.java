@@ -62,7 +62,7 @@ public class ServletUtil {
      * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
     public static String getConfigPath(HttpServlet servlet) {
-      return getConfigPath(servlet.getServletContext());
+        return getConfigPath(servlet.getServletContext());
     }
 
 
@@ -92,15 +92,14 @@ public class ServletUtil {
         String configDirName = System.getenv(envVarName);
 
 
-        if(configDirName==null){
+        if (configDirName == null) {
             log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
             configDirName = defaultConfigDir;
-            if(pathIsGood(configDirName)){
+            if (pathIsGood(configDirName)) {
                 log.info("Using config location: " + configDirName);
                 return configDirName;
             }
-        }
-        else {
+        } else {
 
             if (!configDirName.endsWith("/")) {
                 configDirName += "/";
@@ -113,18 +112,18 @@ public class ServletUtil {
 
         configDirName = sc.getRealPath(webappConfDir);
 
-        log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}",configDirName );
+        log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}", configDirName);
 
         String configPath="FAILED_To_Determine_Config_Path!";
 
-        File cf = new File( configDirName );
-        try{
-            configPath = cf.getCanonicalPath() +"/";
-          // @TODO Understand (again) why the backslash replacement happens below and investigate if ask for a path separator from some java api the way to go.
-            configPath = configPath.replace('\\','/');
+        File cf = new File(configDirName);
+        try {
+            configPath = cf.getCanonicalPath() + "/";
+            // @TODO Understand (again) why the backslash replacement happens below and investigate if ask for a path separator from some java api the way to go.
+            configPath = configPath.replace('\\', '/');
         } catch (IOException e) {
-            log.error("Failed to produce a config path! Error: "+e.getMessage());
-         }
+            log.error("Failed to produce a config path! Error: " + e.getMessage());
+        }
 
 
         /**
@@ -146,24 +145,13 @@ public class ServletUtil {
         */
 
 
-      return configPath;
+        return configPath;
     }
+
     private static boolean pathIsGood(String path){
-
         File confDirPath = new File(path);
-
         return  confDirPath.exists() || confDirPath.canRead();
-
-
     }
-
-
-
-
-
-
-
-
 
 
     /**
@@ -230,7 +218,7 @@ public class ServletUtil {
 
     public static String getSystemPath(HttpServlet servlet, String path) {
         ServletContext sc = servlet.getServletContext();
-        return getSystemPath(sc,path);
+        return getSystemPath(sc, path);
     }
 
     public static String getSystemPath(ServletContext sc, String path) {
@@ -241,18 +229,17 @@ public class ServletUtil {
 
 
     public static String getRootPath(HttpServlet servlet) {
-      return getRootPath( servlet.getServletContext());
+        return getRootPath(servlet.getServletContext());
     }
 
     public static String getRootPath(ServletContext sc) {
-      String rootPath = sc.getRealPath("/");
-      rootPath = rootPath.replace('\\','/');
-      return rootPath;
+        String rootPath = sc.getRealPath("/");
+        rootPath = rootPath.replace('\\', '/');
+        return rootPath;
     }
 
 
-
-    public static String toString(HttpServlet servlet){
+    public static String toString(HttpServlet servlet) {
         StringBuilder s = new StringBuilder("ServletUtil:\n");
 
         s.append("    getContentPath(): ").append(getConfigPath(servlet)).append("\n");
@@ -267,7 +254,7 @@ public class ServletUtil {
     }
 
 
-    public static String probeServlet(HttpServlet servlet){
+    public static String probeServlet(HttpServlet servlet) {
 
         String pName;
         String pVal;
@@ -278,18 +265,16 @@ public class ServletUtil {
         s.append("    getServletInfo(): ").append(servlet.getServletInfo()).append("\n");
         s.append("    getServletName(): ").append(servlet.getServletName()).append("\n");
 
-        Enumeration e  = servlet.getInitParameterNames();
+        Enumeration e = servlet.getInitParameterNames();
         s.append("    Servlet Parameters:\n");
-        if(e.hasMoreElements()){
-            while(e.hasMoreElements()){
+        if (e.hasMoreElements()) {
+            while (e.hasMoreElements()) {
                 pName = (String) e.nextElement();
                 pVal = servlet.getInitParameter(pName);
                 s.append("        name: ").append(pName).append(" value: ").append(pVal).append("\n");
             }
-        }
-        else
+        } else
             s.append("        No Servlet Parameters Found.\n");
-        
 
 
         ServletConfig scfg = servlet.getServletConfig();
@@ -306,14 +291,14 @@ public class ServletUtil {
 
     }
 
-    public static String probeServletConfig(ServletConfig scfg){
+    public static String probeServletConfig(ServletConfig scfg) {
         StringBuilder s = new StringBuilder();
         Enumeration e;
         String pName, pVal;
 
         s.append("    ServletConfig:\n");
         s.append("       getServletName():").append(scfg.getServletName()).append("\n");
-        e  = scfg.getInitParameterNames();
+        e = scfg.getInitParameterNames();
         s.append("       Servlet Parameters:\n");
         if(e.hasMoreElements()){
             while(e.hasMoreElements()){
@@ -332,7 +317,7 @@ public class ServletUtil {
 
     }
 
-    public static String probeServletContext(ServletContext sc){
+    public static String probeServletContext(ServletContext sc) {
         StringBuilder s = new StringBuilder();
         String pVal, pName;
         Enumeration e;
@@ -341,38 +326,35 @@ public class ServletUtil {
 
         s.append("       getServletContextName():").append(sc.getServletContextName()).append("\n");
         s.append("       getContextPath():").append(sc.getContextPath()).append("\n");
-       
+
         e = sc.getAttributeNames();
         s.append("       ServletContext Attributes:\n");
-        if(e.hasMoreElements()){
-            while(e.hasMoreElements()){
+        if (e.hasMoreElements()) {
+            while (e.hasMoreElements()) {
                 pName = (String) e.nextElement();
                 s.append("            name: ").append(pName).append("\n");
             }
 
-        }
-        else
+        } else
             s.append("        No Servlet Context Attributes Found.\n");
 
 
-        e  = sc.getInitParameterNames();
+        e = sc.getInitParameterNames();
         s.append("       ServletContext Parameters:\n");
-        if(e.hasMoreElements()){
-            while(e.hasMoreElements()){
+        if (e.hasMoreElements()) {
+            while (e.hasMoreElements()) {
                 pName = (String) e.nextElement();
                 pVal = sc.getInitParameter(pName);
                 s.append("           name: ").append(pName).append(" value: ").append(pVal).append("\n");
             }
-        }
-        else
+        } else
             s.append("           No ServletContext Parameters Found.\n");
 
 
         try {
             s.append("       getResource(\"/\"): ").append(sc.getResource("/")).append("\n");
-        }
-        catch (MalformedURLException e1) {
-            log.error("Could not perform ServletCOntext.getREsource \"/\". Error Message: "+e1.getMessage());
+        } catch (MalformedURLException e1) {
+            log.error("Could not perform ServletCOntext.getREsource \"/\". Error Message: " + e1.getMessage());
         }
 
 
@@ -387,14 +369,15 @@ public class ServletUtil {
 
     /**
      * Writes information about the incomming request to a String.
-     * @param req The current request
+     *
+     * @param req   The current request
      * @param reqno The request number.
      * @return A string containing infformation about the passed HttpServletRequest req
      */
     public static String showRequest(HttpServletRequest req, long reqno) {
 
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("\n-------------------------------------------\n");
         sb.append("showRequest()\n");
         sb.append("  Request #").append(reqno).append("\n");
@@ -425,9 +408,9 @@ public class ServletUtil {
         sb.append("    getLocalName():           ").append(req.getLocalName()).append("\n");
 
         sb.append("  HttpServletRequest Attributes: \n");
-        
-        Enumeration attrNames =  req.getAttributeNames();
-        while(attrNames.hasMoreElements()){
+
+        Enumeration attrNames = req.getAttributeNames();
+        while (attrNames.hasMoreElements()) {
             String attrName = (String) attrNames.nextElement();
             Object value = req.getAttribute(attrName);
             sb.append("    ").append(value.getClass().getName()).append(" ").append(attrName).append("='");
@@ -462,7 +445,6 @@ public class ServletUtil {
         StringBuilder sb = new StringBuilder();
 
 
-
         sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
         sb.append("  Session: \n");
         sb.append("    getId():                   ").append(session.getId()).append("\n");
@@ -472,8 +454,8 @@ public class ServletUtil {
 
 
         sb.append("    Attributes: \n");
-        Enumeration attrNames =  session.getAttributeNames();
-        while(attrNames.hasMoreElements()){
+        Enumeration attrNames = session.getAttributeNames();
+        while (attrNames.hasMoreElements()) {
             String attrName = (String) attrNames.nextElement();
             Object value = session.getAttribute(attrName);
             sb.append("      ").append(value.getClass().getName()).append(" ").append(attrName).append("=\"");
@@ -488,9 +470,6 @@ public class ServletUtil {
         return sb.toString();
 
     }
-
-
-
 
 
     /**
@@ -513,97 +492,100 @@ public class ServletUtil {
         StringBuilder probeMsg = new StringBuilder();
         probeMsg.append("####################### PROBE ##################################\n");
 
-        probeMsg.append("\n");
-        probeMsg.append("The HttpServletRequest object is actually an instance of:").append("\n");
-        probeMsg.append("    ").append(request.getClass().getName()).append("\n");
-        probeMsg.append("\n");
-        probeMsg.append("HttpServletRequest Interface: \n");
-        probeMsg.append("    getAuthType:           ").append( request.getAuthType()).append( "\n");
-        probeMsg.append("    getContextPath:        ").append( request.getContextPath()).append( "\n");
-        probeMsg.append("    getMethod:             ").append( request.getMethod()).append( "\n");
-        probeMsg.append("    getPathInfo:           ").append( request.getPathInfo()).append( "\n");
-        probeMsg.append("    getPathTranslated:     ").append( request.getPathTranslated()).append( "\n");
-        probeMsg.append("    getRequestURL:         ").append( request.getRequestURL()).append( "\n");
-        probeMsg.append("    getQueryString:        ").append( request.getQueryString()).append( "\n");
-        probeMsg.append("    getRemoteUser:         ").append( request.getRemoteUser()).append( "\n");
-        probeMsg.append("    getRequestedSessionId: ").append( request.getRequestedSessionId()).append( "\n");
-        probeMsg.append("    getRequestURI:         ").append( request.getRequestURI()).append( "\n");
-        probeMsg.append("    getServletPath:        ").append( request.getServletPath()).append( "\n");
-        probeMsg.append("    isRequestedSessionIdFromCookie: ").append( request.isRequestedSessionIdFromCookie()).append( "\n");
-        probeMsg.append("    isRequestedSessionIdValid:      ").append( request.isRequestedSessionIdValid()).append( "\n");
-        probeMsg.append("    isRequestedSessionIdFromURL:    ").append( request.isRequestedSessionIdFromURL()).append( "\n");
-        probeMsg.append("\n");
-        probeMsg.append("    Cookies:\n");
+        if (request == null) {
+            probeMsg.append("The passed HttpServletRequest instance was 'null'. Nothing to report.\n");
+        } else {
 
-        Cookie c[] = request.getCookies();
-        if (c == null)
-            probeMsg.append("   None.").append("\n");
-        else {
             probeMsg.append("\n");
-            for (i = 0; i < c.length; i++)
-                probeMsg.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
+            probeMsg.append("The HttpServletRequest object is actually an instance of:").append("\n");
+            probeMsg.append("    ").append(request.getClass().getName()).append("\n");
+            probeMsg.append("\n");
+            probeMsg.append("HttpServletRequest Interface: \n");
+            probeMsg.append("    getAuthType:           ").append(request.getAuthType()).append("\n");
+            probeMsg.append("    getContextPath:        ").append(request.getContextPath()).append("\n");
+            probeMsg.append("    getMethod:             ").append(request.getMethod()).append("\n");
+            probeMsg.append("    getPathInfo:           ").append(request.getPathInfo()).append("\n");
+            probeMsg.append("    getPathTranslated:     ").append(request.getPathTranslated()).append("\n");
+            probeMsg.append("    getRequestURL:         ").append(request.getRequestURL()).append("\n");
+            probeMsg.append("    getQueryString:        ").append(request.getQueryString()).append("\n");
+            probeMsg.append("    getRemoteUser:         ").append(request.getRemoteUser()).append("\n");
+            probeMsg.append("    getRequestedSessionId: ").append(request.getRequestedSessionId()).append("\n");
+            probeMsg.append("    getRequestURI:         ").append(request.getRequestURI()).append("\n");
+            probeMsg.append("    getServletPath:        ").append(request.getServletPath()).append("\n");
+            probeMsg.append("    isRequestedSessionIdFromCookie: ").append(request.isRequestedSessionIdFromCookie()).append("\n");
+            probeMsg.append("    isRequestedSessionIdValid:      ").append(request.isRequestedSessionIdValid()).append("\n");
+            probeMsg.append("    isRequestedSessionIdFromURL:    ").append(request.isRequestedSessionIdFromURL()).append("\n");
+            probeMsg.append("\n");
+            probeMsg.append("    Cookies:\n");
+
+            Cookie c[] = request.getCookies();
+            if (c == null)
+                probeMsg.append("   None.").append("\n");
+            else {
+                probeMsg.append("\n");
+                for (i = 0; i < c.length; i++)
+                    probeMsg.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
+            }
+
+            probeMsg.append("\n");
+            i = 0;
+            e = request.getHeaderNames();
+            probeMsg.append("    Header Names:").append("\n");
+            while (e.hasMoreElements()) {
+                i++;
+                String s = (String) e.nextElement();
+                probeMsg.append("       Header[").append(i).append("]: ").append(s);
+                probeMsg.append(": ").append(request.getHeader(s)).append("\n");
+            }
+
+            probeMsg.append("\n");
+            probeMsg.append("ServletRequest Interface:").append("\n");
+            probeMsg.append("    getCharacterEncoding:  ").append(request.getCharacterEncoding()).append("\n");
+            probeMsg.append("    getContentType:        ").append(request.getContentType()).append("\n");
+            probeMsg.append("    getContentLength:      ").append(request.getContentLength()).append("\n");
+            probeMsg.append("    getProtocol:           ").append(request.getProtocol()).append("\n");
+            probeMsg.append("    getScheme:             ").append(request.getScheme()).append("\n");
+            probeMsg.append("    getServerName:         ").append(request.getServerName()).append("\n");
+            probeMsg.append("    getServerPort:         ").append(request.getServerPort()).append("\n");
+            probeMsg.append("    getRemoteAddr:         ").append(request.getRemoteAddr()).append("\n");
+            probeMsg.append("    getRemoteHost:         ").append(request.getRemoteHost()).append("\n");
+            //probeMsg.append("    getRealPath:           "+request.getRealPath()).append("\n");
+
+
+            probeMsg.append(".............................").append("\n");
+            probeMsg.append("\n");
+            i = 0;
+            e = request.getAttributeNames();
+            probeMsg.append("    Attribute Names:").append("\n");
+            while (e.hasMoreElements()) {
+                i++;
+                String s = (String) e.nextElement();
+                probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
+                probeMsg.append(" Value: ").append(request.getAttribute(s)).append("\n");
+            }
+
+            probeMsg.append(".............................").append("\n");
+            probeMsg.append("\n");
+            i = 0;
+            e = request.getParameterNames();
+            probeMsg.append("    Parameter Names:").append("\n");
+            while (e.hasMoreElements()) {
+                i++;
+                String s = (String) e.nextElement();
+                probeMsg.append("        Parameter[").append(i).append("]: ").append(s);
+                probeMsg.append(" Value: ").append(request.getParameter(s)).append("\n");
+            }
+
         }
-
-        probeMsg.append("\n");
-        i = 0;
-        e = request.getHeaderNames();
-        probeMsg.append("    Header Names:").append("\n");
-        while (e.hasMoreElements()) {
-            i++;
-            String s = (String) e.nextElement();
-            probeMsg.append("       Header[").append(i).append("]: ").append(s);
-            probeMsg.append(": ").append(request.getHeader(s)).append("\n");
-        }
-
-        probeMsg.append("\n");
-        probeMsg.append("ServletRequest Interface:").append("\n");
-        probeMsg.append("    getCharacterEncoding:  ").append(request.getCharacterEncoding()).append("\n");
-        probeMsg.append("    getContentType:        ").append(request.getContentType()).append("\n");
-        probeMsg.append("    getContentLength:      ").append(request.getContentLength()).append("\n");
-        probeMsg.append("    getProtocol:           ").append(request.getProtocol()).append("\n");
-        probeMsg.append("    getScheme:             ").append(request.getScheme()).append("\n");
-        probeMsg.append("    getServerName:         ").append(request.getServerName()).append("\n");
-        probeMsg.append("    getServerPort:         ").append(request.getServerPort()).append("\n");
-        probeMsg.append("    getRemoteAddr:         ").append(request.getRemoteAddr()).append("\n");
-        probeMsg.append("    getRemoteHost:         ").append(request.getRemoteHost()).append("\n");
-        //probeMsg.append("    getRealPath:           "+request.getRealPath()).append("\n");
-
-
-        probeMsg.append(".............................").append("\n");
-        probeMsg.append("\n");
-        i = 0;
-        e = request.getAttributeNames();
-        probeMsg.append("    Attribute Names:").append("\n");
-        while (e.hasMoreElements()) {
-            i++;
-            String s = (String) e.nextElement();
-            probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
-            probeMsg.append(" Value: ").append(request.getAttribute(s)).append("\n");
-        }
-
-        probeMsg.append(".............................").append("\n");
-        probeMsg.append("\n");
-        i = 0;
-        e = request.getParameterNames();
-        probeMsg.append("    Parameter Names:").append("\n");
-        while (e.hasMoreElements()) {
-            i++;
-            String s = (String) e.nextElement();
-            probeMsg.append("        Parameter[").append(i).append("]: ").append(s);
-            probeMsg.append(" Value: ").append(request.getParameter(s)).append("\n");
-        }
-
         probeMsg.append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").append("\n");
         probeMsg.append(" . . . . . . . . . Servlet Information API  . . . . . . . . . . . . . .").append("\n");
         probeMsg.append("\n");
 
 
-
-        if(servlet == null){
+        if (servlet == null) {
             probeMsg.append("Supplied reference to HttpServlet was null.\nNothing additional to report.").append("\n");
 
-        }
-        else {
+        } else {
             probeMsg.append("HttpServlet:").append("\n");
             probeMsg.append("    getServletName(): ").append(servlet.getServletName()).append("\n");
             probeMsg.append("    getServletInfo(): ").append(servlet.getServletInfo()).append("\n");
@@ -634,15 +616,12 @@ public class ServletUtil {
 
             probeMsg.append("    ServletContext.getRealPath(\".\"): ").append(scntxt.getRealPath(".")).append("\n");
             probeMsg.append("    ServletContext.getMajorVersion(): ").append(scntxt.getMajorVersion()).append("\n");
-    //        probeMsg.append("ServletContext.getMimeType():     ").append(scntxt.getMimeType()).append("\n");
+            //        probeMsg.append("ServletContext.getMimeType():     ").append(scntxt.getMimeType()).append("\n");
             probeMsg.append("    ServletContext.getMinorVersion(): ").append(scntxt.getMinorVersion()).append("\n");
-    //        probeMsg.append("ServletContext.getRealPath(): ").append(sc.getRealPath()).append("\n");
-
-
+            //        probeMsg.append("ServletContext.getRealPath(): ").append(sc.getRealPath()).append("\n");
 
 
             probeMsg.append(".............................").append("\n");
-
 
 
             probeMsg.append("Servlet Config:").append("\n");
