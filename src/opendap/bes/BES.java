@@ -953,8 +953,13 @@ public class BES {
 
         besApi.getBesVersion(getPrefix(), version);
 
+        Element root =  version.getRootElement();
+        if(root==null)
+            throw new IOException("BES version response was emtpy! No root element");
 
-        Element ver = version.getRootElement().getChild("showVersion", BES_NS);
+        Element ver = root.getChild("showVersion", BES_NS);
+        if(ver==null)
+            throw new IOException("BES version response was emtpy! No showVersion element");
 
 
         // Disconnect it from it's parent.

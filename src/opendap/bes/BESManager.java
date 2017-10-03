@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -48,16 +49,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BESManager {
 
     private static  org.slf4j.Logger _log;
-    private static boolean _initialized;
+    private static AtomicBoolean _initialized;
     private static Vector<BesGroup> _besCollection;
-    private static boolean _isConfigured;
+    private static AtomicBoolean _isConfigured;
     private static Element _config;
     private static ReentrantLock _lock;
+
     static {
         _log = LoggerFactory.getLogger(BESManager.class);
         _besCollection = new Vector<>();
-        _initialized = false;
-        _isConfigured = false;
+        _initialized = new AtomicBoolean(false);
+        _isConfigured = new AtomicBoolean(false);
         _config = null;
         _lock = new ReentrantLock();
 
@@ -67,16 +69,16 @@ public class BESManager {
     public void init(Element config) throws Exception{
 
         _lock.lock();
-
         try {
-            if (_initialized) return;
+            
+            if (_initialized.get()) return;
 
             _config = (Element) config.clone();
             configure(config);
 
             _log.info("Initialized.");
 
-            _initialized = true;
+            _initialized.set(true);
         }
         finally {
             _lock.unlock();
@@ -85,7 +87,7 @@ public class BESManager {
     }
 
     public static boolean isInitialized(){
-        return _initialized;
+        return _initialized.get();
     }
 
 
@@ -105,7 +107,7 @@ public class BESManager {
 
     private void configure(Element besConfiguration) throws Exception {
 
-        if(_isConfigured) return;
+        if(_isConfigured.get()) return;
 
 
         List besList = besConfiguration.getChildren("BES");
@@ -148,7 +150,7 @@ public class BESManager {
                     "contain at LEAST one BES configuration element. Whose " +
                     "prefix is \"/\". (Why? Think about it...)");
 
-        _isConfigured = true;
+        _isConfigured.set(true);
 
 
     }
@@ -177,7 +179,7 @@ public class BESManager {
 
 
     public static boolean isConfigured(){
-        return _isConfigured;
+        return _isConfigured.get();
     }
 
 

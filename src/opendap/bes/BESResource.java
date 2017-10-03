@@ -33,6 +33,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -104,8 +105,18 @@ public class BESResource implements ResourceInfo {
 
             exists = true;
             accessible = true;
+            Element root = info.getRootElement();
+            if(root==null)
+                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No root element");
 
-            Element dataset = info.getRootElement().getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
+            Element catalog  = root.getChild("showCatalog",BES_NS);
+            if(catalog==null)
+                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No showCatalog element");
+
+            Element dataset = catalog.getChild("dataset",BES_NS);
+            if(catalog==null)
+                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No top level dataset element");
+
 
             name = dataset.getAttributeValue("name");
             String s = dataset.getAttributeValue("size");

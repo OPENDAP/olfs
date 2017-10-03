@@ -1260,9 +1260,16 @@ public class BesApi {
                     besTransaction(dataSource, getCatalogRequest, response);
                     // Get the root element.
                     Element root = response.getRootElement();
+                    if(root==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No root element");
 
+                    Element showCatalog  = root.getChild("showCatalog", BES_NS);
+                    if(showCatalog==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No showCatalog element");
                     // Find the top level dataset Element
-                    Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
+                    Element topDataset = showCatalog.getChild("dataset", BES_NS);
+                    if(topDataset==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No dataset element.");
 
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 

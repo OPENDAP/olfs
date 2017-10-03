@@ -148,20 +148,6 @@ public class MultipartResponse {
 
     }
 
-    private void writeSoapPart(ServletOutputStream sos) throws IOException {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        sos.println("--" + mimeBoundary);
-        sos.println("Content-Type: text/xml; charset=UTF-8");
-        sos.println("Content-Transfer-Encoding: binary");
-        sos.println("Content-Id: " + startID);
-        sos.println();
-
-        //xmlo.output(new Document(soapEnvelope), sos);
-
-
-    }
-
     public void addAttachment(Attachment attachment) {
         attachments.add(attachment);
     }

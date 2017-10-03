@@ -115,7 +115,7 @@ public class GetCoverageRequest {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(!s[0].equalsIgnoreCase(_request)){
+        else if(!((s[0]).equalsIgnoreCase(_request))){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +

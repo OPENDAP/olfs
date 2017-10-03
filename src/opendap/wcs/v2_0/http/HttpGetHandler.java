@@ -60,17 +60,9 @@ import java.util.Map;
  */
 public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
-
-
     private final Logger log;
     private boolean _initialized;
-    private HttpServlet dispatchServlet;
-    private String _predfix;
 
-    private Element _config;
-
-
-    private static final String _coveragesTerminus = "/coverages";
 
     private String _testPath;
     private String _xmlEchoPath;
