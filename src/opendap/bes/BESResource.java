@@ -107,15 +107,15 @@ public class BESResource implements ResourceInfo {
             accessible = true;
             Element root = info.getRootElement();
             if(root==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No root element");
+                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No root element");
 
             Element catalog  = root.getChild("showCatalog",BES_NS);
             if(catalog==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No showCatalog element");
+                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No showCatalog element");
 
             Element dataset = catalog.getChild("dataset",BES_NS);
-            if(catalog==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was emtpy! No top level dataset element");
+            if(dataset==null)
+                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No top level dataset element");
 
 
             name = dataset.getAttributeValue("name");

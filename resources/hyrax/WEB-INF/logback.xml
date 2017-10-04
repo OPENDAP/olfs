@@ -27,13 +27,7 @@
 
 <configuration>
 
-
-
-
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}]  %-5p - %c - %m%n" />
-
-
-
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -76,8 +70,7 @@
             <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
     </appender>
-
-
+    
     <appender name="AnonymousAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/AnonymousAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -89,7 +82,6 @@
             <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
     </appender>
-
 
     <appender name="BESCommandLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/BESCommands.log</File>
@@ -103,30 +95,21 @@
         </encoder>
     </appender>
 
-
-
-
     <!-- OPeNDAP Hyrax Logging -->
-
-
 
     <logger name="opendap" level="error" >
         <appender-ref ref="stdout"/>
         <appender-ref ref="ErrorLog"/>
     </logger>
 
-
-
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
     </logger -->
-
 
     <root level="error">
         <!--
@@ -136,6 +119,5 @@
         -->
         <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>
-
 
 </configuration>

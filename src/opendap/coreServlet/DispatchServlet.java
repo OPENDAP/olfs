@@ -296,14 +296,21 @@ public class DispatchServlet extends HttpServlet {
 
         String msg;
 
+        Element configRoot = configDoc.getRootElement();
+        if(configRoot==null)
+            throw new ServletException("Bad configuration! No root element in configuration document");
 
-        Element httpHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild(type);
+        Element dispatchHandlersElement = configRoot.getChild("DispatchHandlers");
+        if(dispatchHandlersElement==null)
+            throw new ServletException("Bad configuration! No DispatchHandlers element!");
+
+        Element handlerElements = dispatchHandlersElement.getChild(type);
 
         log.debug("Building "+ type);
 
-        if(httpHandlerElements!=null){
+        if(handlerElements!=null){
 
-            for (Object o : httpHandlerElements.getChildren("Handler")) {
+            for (Object o : handlerElements.getChildren("Handler")) {
                 Element handlerElement = (Element) o;
                 handlerConfigs.add(handlerElement);
                 String className = handlerElement.getAttributeValue("className");
