@@ -378,11 +378,16 @@ public class CoverageDescription {
 
     /**
      *
-     * @return Returns the unique wcs:Identifier associated with this
+     * @return Returns the unique wcs:CoverageId associated with this
      *         CoverageDescription.
      */
     public Element getCoverageIdElement() {
-        return (Element) _myCD.getChild("CoverageId", WCS.WCS_NS).clone();
+
+        Element cid  = _myCD.getChild("CoverageId", WCS.WCS_NS);
+        if(cid==null)
+            return null;
+
+        return (Element) cid.clone();
     }
 
     /**
@@ -546,6 +551,9 @@ public class CoverageDescription {
         Element covSum = new Element("CoverageSummary", WCS.WCS_NS);
 
         Element coverageID = getCoverageIdElement();
+        if(coverageID==null)
+            throw new WcsException("Missing CoverageId element!",WcsException.INVALID_PARAMETER_VALUE);
+        
         covSum.addContent(coverageID);
 
         Element coverageSubType = getCoverageSubtypeElement();
@@ -559,6 +567,8 @@ public class CoverageDescription {
 
         if (hasBoundedBy()) {
             NewBoundingBox boundingBox = getBoundingBox();
+            if(boundingBox==null)
+                throw new WcsException("COverage is missing Bounding Box!!",WcsException.INVALID_PARAMETER_VALUE);
             Element bb = boundingBox.getOwsBoundingBoxElement();
             covSum.addContent(bb);
         }

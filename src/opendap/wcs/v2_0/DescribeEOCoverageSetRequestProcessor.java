@@ -82,7 +82,7 @@ public class DescribeEOCoverageSetRequestProcessor {
         HashMap<String,EOCoverageDescription> resultCDs = null;
         HashMap<String,EODatasetSeries > resultDSs = null;
 
-        if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
+        if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) ||
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
 
             for (String id : req.getEoIds()) {
@@ -119,105 +119,69 @@ public class DescribeEOCoverageSetRequestProcessor {
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
 
             resultDSs  = new HashMap<>();
-
             for(String eoId: remaingIds){
                 EODatasetSeries eoDatasetSeries = WcsServiceManager.getCatalog(eoId).getEODatasetSeries(eoId);
                 if(eoDatasetSeries!=null ) {
-
                     boolean matches = evaluate_subset(req,eoDatasetSeries.getBoundingBox());
-
                     if(matches){
                         numberMatched++;
-
                         if( numberReturned < req.getMaxItemCount()) {
                             resultDSs.put(eoId,eoDatasetSeries);
                             numberReturned++;
                         }
 
                     }
-
-
                     if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
                             req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
                         for (EOCoverageDescription eoCoverageDescription : eoDatasetSeries.getMembers()) {
                             if (resultCDs == null) {
                                 resultCDs = new HashMap<>();
                             }
-
                             matches = evaluate_subset(req,eoCoverageDescription.getBoundingBox());
-
                             if(matches){
                                 numberMatched++;
                                 if (numberReturned < req.getMaxItemCount()) {
                                     resultCDs.put(eoCoverageDescription.getCoverageId(), eoCoverageDescription);
                                     numberReturned++;
                                 }
-
                             }
-
                         }
                     }
-
-
-
-
                 }
                 else {
                     unprocessedIds.add(eoId);
                 }
-
             }
-
         }
-
         if(!unprocessedIds.isEmpty()){
-
             StringBuilder sb = new StringBuilder();
-
             sb.append("Only IDs associated with EOCoverages or DatasetSeries may be submitted to ");
             sb.append("DescribeEOCoverageSet request. The the submitted coverage identifiers '");
             for(String id:unprocessedIds){
                 sb.append(unprocessedIds.indexOf(id)>0?",":"").append(id);
             }
             sb.append("' is/are not associated with a recognized EOCoverage or DatsetSeries.");
-
             throw new WcsException(sb.toString(),
                     WcsException.INVALID_PARAMETER_VALUE,"wcseo:DescribeEOCoverageSetRequest");
 
         }
-
-
-
-
-
         if(resultCDs!=null) {
             Element eoCoverageDescriptions = new Element("CoverageDescriptions", WCS.WCS_NS);
             eoCoverageSetDescription.addContent(eoCoverageDescriptions);
-            for (String eoId : resultCDs.keySet()) {
-                EOCoverageDescription eoCoverageDescription = resultCDs.get(eoId);
+            for (EOCoverageDescription eoCoverageDescription : resultCDs.values()) {
                 eoCoverageDescriptions.addContent(eoCoverageDescription.getCoverageDescriptionElement());
 
             }
         }
-
         if(resultDSs!=null) {
             Element eoDatasetSeriesDescriptions = new Element("DatasetSeriesDescriptions", WCS.WCSEO_NS);
             eoCoverageSetDescription.addContent(eoDatasetSeriesDescriptions);
-            for (String eoId : resultDSs.keySet()) {
-                EODatasetSeries eoDatasetSeries = resultDSs.get(eoId);
+            for (EODatasetSeries eoDatasetSeries : resultDSs.values()) {
                 eoDatasetSeriesDescriptions.addContent(eoDatasetSeries.getDatasetSeriesDescriptionElement());
             }
         }
-
-
-
         eoCoverageSetDescription.setAttribute("numberMatched",Integer.toString(numberMatched));
-
         eoCoverageSetDescription.setAttribute("numberReturned",Integer.toString(numberReturned));
-
-
-
-
         return new Document(eoCoverageSetDescription);
     }
 

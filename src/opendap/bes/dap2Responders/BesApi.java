@@ -1663,8 +1663,12 @@ public class BesApi {
                         XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
+        if(req==null)
+            throw new BadConfigurationException("Request document is corrupt! No root element!");
 
         Element getReq = req.getChild("get",BES_NS);
+        if(getReq==null)
+            throw new BadConfigurationException("Request document is corrupt! No 'get' element!");
 
         Element e = new Element("contentStartId",BES_NS);
         e.setText(contentID);

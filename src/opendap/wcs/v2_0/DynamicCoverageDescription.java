@@ -949,7 +949,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // couple of quick sanity checks
         _log.debug(cdElement.toString());
         Element coverageId = cdElement.getChild("CoverageId", WCS.WCS_NS);
-        _log.debug(coverageId.getText());
+        if(coverageId!=null)
+            _log.debug(coverageId.getText());
         return cdElement;
     }
 
@@ -972,6 +973,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         try {
             Element dmrElement =
                     opendap.xml.Util.getDocumentRoot(testDmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
+            if(dmrElement==null){
+                System.err.println("Failed to get DMR from: "+testDmrUrl);
+                System.exit(-1);
+            }
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
             DynamicService ds = new DynamicService();
