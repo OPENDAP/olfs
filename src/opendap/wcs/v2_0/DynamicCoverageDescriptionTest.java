@@ -65,6 +65,9 @@ public class DynamicCoverageDescriptionTest {
 
   private Element _dmrElement;
   private DynamicService _dynamicService;
+  
+  // flags for various tests
+  private boolean _dmrDataset_01 = false;
 
   /**
    * Inject DMR via constructor
@@ -82,6 +85,9 @@ public class DynamicCoverageDescriptionTest {
       dmr = new String(Files.readAllBytes(file));
       InputStream stream = new ByteArrayInputStream(dmr.getBytes(StandardCharsets.UTF_8.name()));
       _dmrElement = opendap.xml.Util.getDocument(stream).detachRootElement();
+      
+      // set dataset flags
+      if (dmr.equals("dmrDataset_01.xml")) _dmrDataset_01 = true;
     }
     
     // construct mock dynamic service
@@ -111,11 +117,17 @@ public class DynamicCoverageDescriptionTest {
 
   }
   
-
   @Test
   public void itAllWorks() throws IOException, WcsException {
     CoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
     assertTrue(cd != null);
+  }
+  
+  @Test
+  public void dataSet01_is_Correctly_diagnosed_As_Being_CF_Compliant() throws IOException, WcsException {
+    Assume.assumeTrue(_dmrDataset_01);
+    DynamicCoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
+    assertTrue(cd.findVariableWithCfStandardName(cd.buildDataset(_dmrElement), "standard_name") != null);
   }
   
   

@@ -153,7 +153,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @return The Dataset object created by JAXB.
      * @throws WcsException When the bad things happen.
      */
-    private Dataset buildDataset(Element dmr) throws WcsException {
+    protected Dataset buildDataset(Element dmr) throws WcsException {
         try {
             JAXBContext jc = JAXBContext.newInstance(Dataset.class);
             Unmarshaller um = jc.createUnmarshaller();
