@@ -319,7 +319,7 @@ public class CoverageDescription {
             if (_myFile != null && _lastModified < _myFile.lastModified()) {
                 _myCD = ingestCoverageDescription(_myFile);
             }
-        } catch (Exception e) {
+        } catch (IOException | WcsException | JDOMException e) {
 
             String msg = "Failed to update CoverageDescription from file ";
 

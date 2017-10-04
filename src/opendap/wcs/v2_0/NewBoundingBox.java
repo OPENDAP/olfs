@@ -412,21 +412,21 @@ public class NewBoundingBox {
             bbox.setAttribute("crs", _srsName.toString());
 
 
-        String txt = "";
+        StringBuilder txt = new StringBuilder();
         Element e = new Element("LowerCorner", WCS.OWS_NS);
         for (double coordinate : getLowerCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
 
-        txt = "";
+        txt = new StringBuilder();
         e = new Element("UpperCorner", WCS.OWS_NS);
         for (double coordinate : getUpperCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
         return bbox;

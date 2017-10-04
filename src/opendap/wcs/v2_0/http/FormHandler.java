@@ -114,7 +114,7 @@ public class FormHandler extends XmlRequestHandler {
             }
             log.debug("XML to Parse: " +reqDoc);
             try {
-                InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(reqDoc.getBytes(encoding)));
+                InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(reqDoc.getBytes(encoding)),encoding);
                 return new BufferedReader(isr);
             }
             catch (UnsupportedEncodingException e) {

@@ -191,20 +191,13 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
                 break;
 
             case GET_COVERAGE:
-
                 GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
-
-                 /*
-                if (getCoverageRequest.isStore()) {
-                    wcsResponse = getStoredCoverage(getCoverageRequest);
-                    sendWcsResponse(wcsResponse,response);
-                }
-                else {
+                try {
                     sendCoverageResponse(getCoverageRequest, response);
+                } catch (IOException | PPTException | BadConfigurationException | BESError e) {
+                    throw new WcsException("FAILED to complete the GetCoverage operation, :(  Caught "+
+                    e.getClass().getName()+ "  message: "+ e.getMessage(),WcsException.NO_APPLICABLE_CODE);
                 }
-                */
-
-
                 break;
 
             default:

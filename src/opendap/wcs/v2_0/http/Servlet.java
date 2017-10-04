@@ -223,7 +223,7 @@ public class Servlet extends HttpServlet {
                     msg.append("Message: ").append(t.getMessage()).append("\n");
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    t.printStackTrace(new PrintStream(baos));
+                    t.printStackTrace(new PrintStream(baos,true,HyraxStringEncoding.getCharset().name()));
                     msg.append("StackTrace: ").append(baos.toString(HyraxStringEncoding.getCharset().name())).append("\n");
 
                     myBadThang = new WcsException(msg.toString(),WcsException.NO_APPLICABLE_CODE);
