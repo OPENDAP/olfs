@@ -70,13 +70,18 @@ public class SoapHandler extends XmlRequestHandler {
         soapRequestDocument = super.parseWcsRequest(sis,encoding);
 
         soapEnvelope = soapRequestDocument.getRootElement();
+        if(soapEnvelope==null)
+            throw new WcsException("Root element located in request document! ",
+                    WcsException.INVALID_PARAMETER_VALUE);
 
         if(NS.checkNamespace(soapEnvelope,"Envelope", SOAP.NS)){
             soapBody = soapEnvelope.getChild("Body", SOAP.NS);
-            List soapContents = soapBody.getChildren();
+            if(soapBody==null)
+                throw new WcsException("SOAP Envelope is missing SOAP Body element.",
+                        WcsException.INVALID_PARAMETER_VALUE);
 
+            List<Element> soapContents = soapBody.getChildren();
             log.debug("Got " + soapContents.size() + " child elements of SOAP body.");
-
 
             if(soapContents.size()!=1){
                 String msg = "SOAP message body contains "+soapContents.size()+" items. Only one item is allowed.";
@@ -85,8 +90,7 @@ public class SoapHandler extends XmlRequestHandler {
                         WcsException.INVALID_PARAMETER_VALUE,
                         "WCS Request Document");
             }
-
-            Element wcsRequest = (Element) soapContents.get(0);
+            Element wcsRequest = soapContents.get(0);
             wcsRequest.detach();
             return new Document(wcsRequest);
         }
@@ -97,8 +101,6 @@ public class SoapHandler extends XmlRequestHandler {
                     WcsException.INVALID_PARAMETER_VALUE,
                     "WCS Request Document");
         }
-
-
     }
 
 

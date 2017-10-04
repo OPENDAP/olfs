@@ -192,12 +192,11 @@ public class Util {
      * @throws IOException
      * @throws JDOMException
      */
-    public static Document getDocument(String filename) throws MalformedURLException, IOException, JDOMException {
+    public static Document getDocument(String filename) throws IOException, JDOMException {
 
         _log.debug("getDocument() - Retrieving: "+filename);
 
-        Document doc = null;
-        SAXBuilder sb = new SAXBuilder();
+        Document doc;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
         String fname =  filename;
         if (filename.toLowerCase().startsWith("file:")){

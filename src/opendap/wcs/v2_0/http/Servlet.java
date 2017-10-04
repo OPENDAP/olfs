@@ -30,6 +30,7 @@ import opendap.PathBuilder;
 import opendap.bes.BESManager;
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.wcs.v2_0.WcsServiceManager;
 import opendap.wcs.v2_0.WcsException;
@@ -168,11 +169,16 @@ public class Servlet extends HttpServlet {
         try {
             config = Util.getDocumentRoot(besConfigFilename);
         } catch (IOException | JDOMException e) {
-            String msg = "Unable to read BES configuration file. Caught " + e.getClass().getSimpleName() +
+            String msg = "Unable to read BES configuration file: '"+besConfigFilename+"' Caught " + e.getClass().getSimpleName() +
                     " message: " + e.getMessage();
             _log.error(msg);
             return;
         }
+        if(config==null) {
+            _log.error("Failed to get BES configuration document: '{}'", besConfigFilename);
+            return;
+        }
+        
         Element besManagerElement = config.getChild("BESManager");
 
         if (besManagerElement == null) {
@@ -218,7 +224,7 @@ public class Servlet extends HttpServlet {
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     t.printStackTrace(new PrintStream(baos));
-                    msg.append("StackTrace: ").append(baos.toString()).append("\n");
+                    msg.append("StackTrace: ").append(baos.toString(HyraxStringEncoding.getCharset().name())).append("\n");
 
                     myBadThang = new WcsException(msg.toString(),WcsException.NO_APPLICABLE_CODE);
                     myBadThang.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

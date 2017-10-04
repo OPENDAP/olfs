@@ -33,7 +33,7 @@ import java.util.Date;
  * This class extends DimensionSubset concept to correctly handle time strings.
  *
 */
-public class TemporalDimensionSubset  extends DimensionSubset implements Cloneable {
+public class TemporalDimensionSubset  extends DimensionSubset { // implements Cloneable {
 
 
     private String _units;

@@ -33,6 +33,7 @@ import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.dap.Request;
 import opendap.http.error.BadRequest;
+import opendap.io.HyraxStringEncoding;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -208,7 +209,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                 }
                 else {
                     log.info("Trying extra path as coverageId: {}",relativeURL);
-                    Map<String, String[]> kvp = KvpHandler.getKVP(request);
+                    // Map<String, String[]> kvp = KvpHandler.getKVP(request);
                     try {
                         KvpHandler.processKvpWcsRequest(request,response);
                     }
@@ -303,7 +304,10 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
-        XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
+        XdmNode descCover =
+                t.build(
+                        new StreamSource(
+                                new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes(HyraxStringEncoding.getCharset()))));
 
         t.transform(descCover,response.getOutputStream());
 
@@ -341,7 +345,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         t.setParameter("WcsService",baseServiceUrl);
         t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
-        XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
+        XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes(HyraxStringEncoding.getCharset()))));
         t.transform(capDoc,response.getOutputStream());
     }
 

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -49,7 +50,7 @@ public class DynamicService {
     private String _longName;
     private String _dapServiceUrlString;
     private SimpleSrs _srs;
-    private Vector<DomainCoordinate> _domainCoordinates;
+    private CopyOnWriteArrayList<DomainCoordinate> _domainCoordinates;
     // private ConcurrentHashMap<String, DomainCoordinate> _dcMap;
     private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
     private String _pathMatchRegexString;
@@ -70,7 +71,7 @@ public class DynamicService {
         _prefix = null;
         _dapServiceUrlString = null;
         _srs = null;
-        _domainCoordinates =  new Vector<>();
+        _domainCoordinates =  new CopyOnWriteArrayList<>();
         //_dcMap = new ConcurrentHashMap<>();
         _wcsFieldsByDapID = new ConcurrentHashMap<>();
         _pathMatchRegexString = null;
@@ -157,6 +158,16 @@ public class DynamicService {
                 _log.info("WCS-2.0 DynamicService {} has default SRS of {}", _prefix, _srs.getName());
             }
         }
+        if(!badThingsHappened.isEmpty()){
+            StringBuilder sb = new StringBuilder();
+            sb.append("Dynamic Configuration Failed To Ingest!\n");
+            for(String msg: badThingsHappened){
+                sb.append(msg).append("\n");
+                _log.error("DynamicService() - {}",msg);
+            }
+            throw new ConfigurationException(sb.toString());
+        }
+        
 
         List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");
         if(domainCoordinateElements.size()<2) {
@@ -173,7 +184,7 @@ public class DynamicService {
         // Now we QC the DomainCoordinates and the SRS to make sure they are compatible.
         // And since there may be more DomainCoordinates defined than there SRS dimension
         // We require reverse iterators.
-        Vector<DomainCoordinate> domainCoordinates = getDomainCoordinates();
+        CopyOnWriteArrayList<DomainCoordinate> domainCoordinates = getDomainCoordinates();
         ListIterator<DomainCoordinate> domainCoordRevIter = domainCoordinates.listIterator(domainCoordinates.size());
 
         List<String> srsAxisLabels = _srs.getAxisLabelsList();
@@ -323,7 +334,7 @@ public class DynamicService {
      * of the data
      * @return
      */
-    public Vector<DomainCoordinate> getDomainCoordinates(){
+    public CopyOnWriteArrayList<DomainCoordinate> getDomainCoordinates(){
         return _domainCoordinates;
     }
 

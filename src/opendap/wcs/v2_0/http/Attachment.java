@@ -62,9 +62,9 @@ public class Attachment {
 
 
     private Logger log;
-    private String contentTransferEncoding = "binary";
-    private final String contentId = "Content-Id";
-    private final String contentType = "Content-Type";
+    // private String contentTransferEncoding = "binary";
+    private static final String contentId   = "Content-Id";
+    private static final String contentType = "Content-Type";
     private InputStream _istream;
     private String _sourceUrl;
     private CredentialsProvider _credentialsProvider;

@@ -337,7 +337,8 @@ public class GetCoverageRequestProcessor {
         else {
             requestedFields = new Vector<>();
         }
-        if (requestedFields.isEmpty()) {
+        boolean flag = requestedFields.isEmpty();
+        if (flag) {
             // if they didn't ask for a subset of the set of fields, then take them all.
             for (Field field : fields) {
                 requestedFields.add(field.getName());
@@ -347,7 +348,7 @@ public class GetCoverageRequestProcessor {
         /**
          * Is there a Scale request?
          */
-        ScaleRequest scaleRequest = req.getScaleRequest();
+        // TODO: Handle scale requests. ScaleRequest scaleRequest = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
 
@@ -670,6 +671,8 @@ public class GetCoverageRequestProcessor {
         String dap2ce = GetCoverageRequestProcessor.getDap2CE(req);
         String format = GetCoverageRequestProcessor.getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
+        if(rFormat==null)
+            throw new WcsException("The requested return format '"+format+"' is not recognized by this service.",WcsException.INVALID_PARAMETER_VALUE,"format");
 
 
         String besUrl = wcsCatalog.getDapDatsetUrl(cd.getCoverageId());

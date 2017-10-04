@@ -61,8 +61,6 @@ public class FormHandler extends XmlRequestHandler {
 
     @Override
     public BufferedReader getRequestReader(HttpServletRequest request) throws WcsException {
-
-
         BufferedReader sis;
         try {
             sis = request.getReader();
@@ -71,27 +69,22 @@ public class FormHandler extends XmlRequestHandler {
                     WcsException.INVALID_PARAMETER_VALUE,
                     "WCS Request Document");
         }
-
-
-
         int length;
-
         String formTag = "WCS_QUERY=";
-
         String sb = "";
-        String reqDoc = "";
+        StringBuilder reqDocBuilder = new StringBuilder();
 
         //  Slurp up the document.
         try {
             while(sb!= null){
-                length =  sb.length() + reqDoc.length();
+                length =  sb.length() + reqDocBuilder.length();
                 if( length > WCS.MAX_REQUEST_LENGTH){
                     throw new WcsException("Form Content Body too long. Try again with something smaller.",
                             WcsException.INVALID_PARAMETER_VALUE,
                             "WCS Request Document");
 
                 }
-                reqDoc += sb;
+                reqDocBuilder.append(sb);
                 sb = sis.readLine();
             }
         } catch (IOException e) {
@@ -100,17 +93,15 @@ public class FormHandler extends XmlRequestHandler {
                     "WCS Request Document");
         }
 
-        log.debug("Form Interface received: " +reqDoc);
+        log.debug("Form Interface received: " +reqDocBuilder.toString());
 
-
+        String reqDoc = reqDocBuilder.toString();
         String encoding = getEncoding(request);
-
         // If you got a document,
-        if(reqDoc!=null){
-
+        if(reqDoc.length()>0){
             try {
-            // Decode it, because browsers seem to want to URL encode their post content. Whatever...
-            reqDoc = URLDecoder.decode(reqDoc,encoding);
+                // Decode it, because browsers seem to want to URL encode their post content. Whatever...
+                reqDoc = URLDecoder.decode(reqDoc,encoding);
             } catch (UnsupportedEncodingException e) {
                 throw new WcsException("Failed to Decode request document. Message:"+e.getMessage(),
                         WcsException.INVALID_PARAMETER_VALUE,
@@ -122,25 +113,21 @@ public class FormHandler extends XmlRequestHandler {
                 reqDoc = reqDoc.substring(formTag.length());
             }
             log.debug("XML to Parse: " +reqDoc);
-
-            InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(reqDoc.getBytes()));
-
-            return new BufferedReader(isr);
-
-
-
+            try {
+                InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(reqDoc.getBytes(encoding)));
+                return new BufferedReader(isr);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new WcsException("Request was submitted in an unsupported " +
+                        "character encoding: "+encoding+ " msg: "+e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE);
+            }
         }
         else {
             throw new WcsException("Failed locate request document.",
                     WcsException.INVALID_PARAMETER_VALUE,
                     "WCS Request Document");
-
         }
-
-
-
-
-
     }
 
 

@@ -462,8 +462,11 @@ public class WCS {
         double min, max;
 
         Date startTime=null, endTime=null;
-        for(String dimName : cvrgDims.keySet()) {
-            CoordinateDimension cDim = cvrgDims.get(dimName);
+
+        for(CoordinateDimension cDim : cvrgDims.values()) {
+
+            String dimName = cDim.getName();
+
             DimensionSubset dimSubset = dimensionSubsets.get(dimName);
 
             if(dimSubset==null){

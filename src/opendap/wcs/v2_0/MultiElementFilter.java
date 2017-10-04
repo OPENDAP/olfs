@@ -41,20 +41,20 @@ import java.util.Vector;
 */
 public class MultiElementFilter implements Filter {
 
-    private Vector<String> targetNames;
-    private Vector<Namespace> targetNamespaces;
+    private Vector<String> _targetNames;
+    private Vector<Namespace> _targetNamespaces;
 
 
     public MultiElementFilter(String name, Namespace ns){
-        targetNames = new Vector<String>();
-        targetNamespaces = new Vector<Namespace>();
+        _targetNames = new Vector<>();
+        _targetNamespaces = new Vector<>();
 
         addTargetElement(name,ns);
     }
 
     public void addTargetElement(String name, Namespace ns){
-        targetNames.add(name);
-        targetNamespaces.add(ns);
+        _targetNames.add(name);
+        _targetNamespaces.add(ns);
     }
 
     public void addTargetElement(String name){
@@ -80,9 +80,9 @@ public class MultiElementFilter implements Filter {
             Namespace targetNamespace;
 
 
-            for(int i=0; i<targetNames.size() ;i++){
-                targetName = targetNames.get(i);
-                targetNamespace = targetNamespaces.get(i);
+            for(int i = 0; i< _targetNames.size() ; i++){
+                targetName = _targetNames.get(i);
+                targetNamespace = _targetNamespaces.get(i);
 
                 if(cName!=null){
 
@@ -122,6 +122,4 @@ public class MultiElementFilter implements Filter {
         }
         return false;
     }
-
-
 }
