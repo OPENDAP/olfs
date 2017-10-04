@@ -372,8 +372,10 @@ public class CoverageDescription {
      *         CoverageDescription.
      */
     public String getCoverageId() {
-        Element coverageId = _myCD.getChild("CoverageId", WCS.WCS_NS);
-        return coverageId.getText();
+        Element cid  = _myCD.getChild("CoverageId", WCS.WCS_NS);
+        if(cid==null)
+            return null;
+        return cid.getTextTrim();
     }
 
     /**
@@ -568,7 +570,7 @@ public class CoverageDescription {
         if (hasBoundedBy()) {
             NewBoundingBox boundingBox = getBoundingBox();
             if(boundingBox==null)
-                throw new WcsException("COverage is missing Bounding Box!!",WcsException.INVALID_PARAMETER_VALUE);
+                throw new WcsException("Coverage is missing Bounding Box!!",WcsException.INVALID_PARAMETER_VALUE);
             Element bb = boundingBox.getOwsBoundingBoxElement();
             covSum.addContent(bb);
         }

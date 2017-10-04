@@ -55,7 +55,7 @@ public class DynamicService {
     private String _pathMatchRegexString;
 
 
-    public class FieldDef {
+    static public class FieldDef {
         String name;
         String dapID;
         String description;
@@ -146,15 +146,16 @@ public class DynamicService {
 
 
         s = config.getAttributeValue("srs");
-        if(s==null)
+        if(s==null) {
             badThingsHappened.add("DynamicService element is missing required 'srs' attribute whose value should be the URN of the SRS desired, for example 'urn:ogc:def:crs:EPSG::4326'");
-
-        _srs = SrsFactory.getSrs(s);
-        if(_srs==null) {
-            badThingsHappened.add("Failed to locate requested SRS '" + s + "' Unable to configure Dynamic service!");
         }
         else {
-            _log.info("WCS-2.0 DynamicService {} has default SRS of {}", _prefix, _srs.getName());
+            _srs = SrsFactory.getSrs(s);
+            if (_srs == null) {
+                badThingsHappened.add("Failed to locate requested SRS '" + s + "' Unable to configure Dynamic service!");
+            } else {
+                _log.info("WCS-2.0 DynamicService {} has default SRS of {}", _prefix, _srs.getName());
+            }
         }
 
         List<Element> domainCoordinateElements  =  (List<Element>)config.getChildren("DomainCoordinate");

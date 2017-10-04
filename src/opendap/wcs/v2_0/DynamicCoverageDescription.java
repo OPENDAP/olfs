@@ -262,6 +262,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 units = defaultCoordinate.getUnits();
 
             Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset, coordinateName);
+            if(coordinateDimension==null)
+                throw new WcsException("Failed to locate the Dataset " +
+                        "Dimension for coordinate "+coordinateName,WcsException.NO_APPLICABLE_CODE);
 
             long size = coordinateDimension.getSizeAsLong();
             if(size<1)
@@ -339,7 +342,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * This class is a C style structure to hold the longthy
      * parameter list required for building the TimePeriodWithEnvelope
      */
-    class BoundedByAndDomainSetParams {
+    static class BoundedByAndDomainSetParams {
         SimpleSrs srs;
         String coverageID;
         String beginDate;
@@ -698,10 +701,18 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             // Find the DomainCoordinate associated with this axis
             DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
-            
+            if(domainCoordinate==null) {
+                _log.error("There is no DomainCoordinate for axis '{}' This should never happen...",axisLabel);
+                return false;
+            }
+
             // Find the DAP Variable referenced by the DomainCoordinate
             Variable domainCoordinateVariable = dataset.getVariable(domainCoordinate.getDapID());
-
+            if(domainCoordinateVariable==null) {
+                _log.error("Failed to locate DAP variable '{}' referenced by DomainCoordinate '{}'",
+                        domainCoordinate.getDapID(), domainCoordinate.getName());
+                return false;
+            }
             //////////////////////////////////////////////////////////////////////////
             // TEST
             // Compare the variable's Dim for this dimension with
@@ -753,7 +764,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String  fieldNcName = var.getName();
         if(!opendap.xml.Util.isNCNAME(var.getName())) {
             // it's not an NCNAME. Is there default supplied?
-            fieldNcName = fieldDef.name;
+            fieldNcName = fieldDef==null?null:fieldDef.name;
             if(fieldNcName == null)  {
                 // nope, we'll punt...
                 fieldNcName = opendap.xml.Util.convertToNCNAME(var.getName());

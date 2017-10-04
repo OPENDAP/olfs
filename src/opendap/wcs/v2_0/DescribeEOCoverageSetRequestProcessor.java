@@ -31,9 +31,14 @@ public class DescribeEOCoverageSetRequestProcessor {
     }
 
 
-    private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, NewBoundingBox datasetBB) throws WcsException{
+    private static boolean evaluate_subset(DescribeEOCoverageSetRequest req, NewBoundingBox datasetBB)
+            throws WcsException{
 
 
+        if(datasetBB==null)
+            throw new WcsException("evaluate_subset() - Unable to evaluate subset! Dataset Bounding Box is null!",
+                    WcsException.MISSING_PARAMETER_VALUE);
+        
         NewBoundingBox requestSubset = WCS.getSubsetBoundingBox(
                                             req.getDimensionSubsets(),
                                             req.getTemporalSubset(),
@@ -115,7 +120,7 @@ public class DescribeEOCoverageSetRequestProcessor {
         unprocessedIds = new Vector<>();
 
 
-        if(req.hasSection(DescribeEOCoverageSetRequest.Sections.DatasetSeriesDescriptions) |
+        if(req.hasSection(DescribeEOCoverageSetRequest.Sections.DatasetSeriesDescriptions) ||
                 req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
 
             resultDSs  = new HashMap<>();
@@ -131,7 +136,7 @@ public class DescribeEOCoverageSetRequestProcessor {
                         }
 
                     }
-                    if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) |
+                    if(req.hasSection(DescribeEOCoverageSetRequest.Sections.CoverageDescriptions) ||
                             req.hasSection(DescribeEOCoverageSetRequest.Sections.All)) {
                         for (EOCoverageDescription eoCoverageDescription : eoDatasetSeries.getMembers()) {
                             if (resultCDs == null) {

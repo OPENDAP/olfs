@@ -28,12 +28,10 @@ package opendap.wcs.v2_0;
 /**
  * Created by ndp on 9/22/16.
  */
-public class CoordinateDimension implements Cloneable {
+public class CoordinateDimension { //implements Cloneable {
 
     private double _lowerBound;
     private double _upperBound;
-
-
     private String _name;
 
 
@@ -58,6 +56,19 @@ public class CoordinateDimension implements Cloneable {
         setMin(min);
         setMax(max);
     }
+
+    /*
+    @Override
+    public CoordinateDimension clone() throws CloneNotSupportedException {
+        CoordinateDimension cd;
+        cd = (CoordinateDimension) super.clone();
+        // Deep clone member fields here
+        cd._name = _name;
+        cd._lowerBound = _lowerBound;
+        cd._upperBound = _upperBound;
+        return cd;
+    }
+   */
 
     public void setMin(double min){ _lowerBound = min; }
     public double getMin(){ return _lowerBound;}
