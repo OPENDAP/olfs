@@ -56,7 +56,7 @@ public class Field {
     public Field(Element swe) throws WcsException {
 
         if(swe.getName().equals("field") && swe.getNamespace().equals(WCS.SWE_NS)){
-            _mySweElement = swe;
+            _mySweElement = (Element)swe.clone();
         }
         else {
             throw new WcsException("Cannot instantiate a Field class with a non-conformant " +
