@@ -42,10 +42,9 @@
 
 package opendap.http;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import opendap.io.HyraxStringEncoding;
+
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -210,7 +209,8 @@ public class NetRC {
 
         BufferedReader bufRdr = null;
         try {
-            bufRdr = new BufferedReader(new FileReader(netrc));
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(netrc), HyraxStringEncoding.getCharset());
+            bufRdr = new BufferedReader(isr);
             String line = null;
 
             NetRCEntry entry = new NetRCEntry();
