@@ -292,10 +292,10 @@ public class GetCoverageRequestProcessor {
             DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
             if(dc==null){
 
-                /**
-                 * It's likely to happen frequently that the user submits a bad dimension name. So
-                 * take the time to give an informative error message.
-                 */
+                //
+                // It's likely to happen frequently that the user submits a bad dimension name. So
+                // take the time to give an informative error message.
+                //
                 StringBuilder msg = new StringBuilder();
                 msg.append("Bad subsetting request.\n");
                 msg.append("A subset was requested for dimension '").append(ds.getDimensionId()).append("'");
@@ -319,10 +319,10 @@ public class GetCoverageRequestProcessor {
             ds.setDomainCoordinate(dc);
             domCordToDimSubsetMap.put(dc,ds);
         }
-        /**
-         * Determines which fields (variables) will be sent back with the response.
-         * If none are specified, all are sent.
-         */
+        //
+        // Determines which fields (variables) will be sent back with the response.
+        // If none are specified, all are sent.
+        //
         Vector<String> requestedFields;
         RangeSubset rangeSubset = req.getRangeSubset();
         if(rangeSubset!=null) {
@@ -338,19 +338,18 @@ public class GetCoverageRequestProcessor {
             }
         }
 
-        /**
-         * Is there a Scale request?
-         */
-        // TODO: Handle scale requests. ScaleRequest scaleRequest = req.getScaleRequest();
+        //
+        // Is there a Scale request?
+        //
+        // TODO - Handle scale requests: ScaleRequest scaleRequest = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
 
-        /**
-         * Here we begin building the DAP2 CE
-         * For every field (variable) to be transmitted we (may) need server side functional expressions,
-         * array subset expressions, etc.
-         *
-         */
+        //
+        // Here we begin building the DAP2 CE
+        // For every field (variable) to be transmitted we (may) need server side functional expressions,
+        // array subset expressions, etc.
+        //
         Vector<String> subsetClauses =  new Vector<>();
         for(String fieldId: requestedFields){
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
@@ -381,7 +380,7 @@ public class GetCoverageRequestProcessor {
                         // the bounds of the subset that they want
                         if(valueSubsetClause.length()>0){
                       _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
-                  valueSubsetClause.append(",");
+                      valueSubsetClause.append(",");
                         }
                         // Then we tack on the value constraint expression: "low<=dimName<=high"
                         valueSubsetClause.append(dimSub.getDap2GridValueConstraint());
@@ -404,8 +403,6 @@ public class GetCoverageRequestProcessor {
 
                 // So we've processed all the user requested dimension subsets, now we need to build the inditial
                 // array subsetting clause if needed.
-
-
                 StringBuilder fieldSubsetClause = new StringBuilder();
 
                 // If theres value based subsetting to be done we'll need the grid() ssf
@@ -680,16 +677,27 @@ public class GetCoverageRequestProcessor {
                     break;
 
                 case geotiff:
-                    besCmd = besApi.getDap2DataAsGeoTiffRequest(besDatatsetId, dap2ce,"3.2", 0);
+                    besCmd =
+                            besApi.getDap2DataAsGeoTiffRequest(
+                                    besDatatsetId,
+                                    dap2ce,
+                                    "3.2",
+                                    0);
                     break;
 
                 case jpeg2000:
-                    besCmd = besApi.getDap2DataAsGmlJpeg2000Request(besDatatsetId,dap2ce,"3.2",0);
+                    besCmd =
+                            besApi.getDap2DataAsGmlJpeg2000Request(
+                                    besDatatsetId,
+                                    dap2ce,
+                                    "3.2",
+                                    0);
                     break;
 
                 case dap4:
                 default:
-                    throw new WcsException(("Unsupported format: '"+rFormat.name())+"' :(",WcsException.INVALID_PARAMETER_VALUE,"format");
+                    throw new WcsException(("Unsupported format: '"+rFormat.name())+"' :(",
+                            WcsException.INVALID_PARAMETER_VALUE,"format");
             }
 
         }
