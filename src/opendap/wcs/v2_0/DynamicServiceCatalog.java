@@ -67,8 +67,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
     private Logger _log;
     private boolean _intialized;
 
-    private String _cacheDir;
-    private ReentrantReadWriteLock _cacheLock;
+    // private String _cacheDir;
 
    // private ConcurrentHashMap<String,SimpleSrs> _defaultSRS;
 
@@ -81,7 +80,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
     public DynamicServiceCatalog(){
         _intialized = false;
         _log = LoggerFactory.getLogger(getClass());
-        _cacheLock = new ReentrantReadWriteLock();
         _dynamicServices = new ConcurrentHashMap<>();
     }
 
@@ -139,6 +137,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         }
         */
 
+        /*
         e1 = config.getChild("CacheDirectory");
         if(e1==null){
 
@@ -161,7 +160,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             _cacheDir =  e1.getTextTrim();
         }
         _log.debug("WCS-2.0 Cache Directory: " + _cacheDir);
-
+        */
 
         List<Element> dynamicServices = config.getChildren("DynamicService");
         for(Element dsElement:dynamicServices) {
@@ -324,9 +323,17 @@ public class DynamicServiceCatalog implements WcsCatalog{
      * @param coverageId  The cacheId (aka cache file name)
      * @return
      */
+
     private Element getCachedDMR(String coverageId) throws IOException, JDOMException, InterruptedException, WcsException {
 
         _log.debug("getCachedDMR() - BEGIN coverageId: {}",coverageId);
+
+        String _cacheDir = "/tmp";
+        ReentrantReadWriteLock _cacheLock = new ReentrantReadWriteLock();
+
+
+
+
 
         String datasetUrl = getDapDatsetUrl(coverageId);
         _log.debug("getCachedDMR() - DAP Dataset URL: {}",datasetUrl);
@@ -338,6 +345,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
         String dmrCacheFileName = datasetCacheId + ".dmr.xml";
         File dmrCacheFile = new File(_cacheDir, dmrCacheFileName);
+
 
         // TODO Improve by adding a shared read lock. jhrg 9/18/17
         WriteLock writeLock = _cacheLock.writeLock();

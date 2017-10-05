@@ -33,16 +33,13 @@ import org.jdom.filter.Filter;
 import java.util.Vector;
 
 /**
-* Created by IntelliJ IDEA.
-* User: ndp
-* Date: 10/17/12
-* Time: 7:21 PM
-* To change this template use File | Settings | File Templates.
-*/
+ *
+ *
+ */
 public class MultiElementFilter implements Filter {
 
     private Vector<String> _targetNames;
-    private Vector<Namespace> _targetNamespaces;
+    private transient Vector<Namespace> _targetNamespaces;
 
 
     public MultiElementFilter(String name, Namespace ns){
@@ -71,54 +68,39 @@ public class MultiElementFilter implements Filter {
     public boolean matches(Object obj){
 
         if(obj instanceof Element){
-            Element candidate = (Element) obj;
 
+            Element candidate = (Element) obj;
             Namespace cNS = candidate.getNamespace();
             String cName  = candidate.getName();
 
             String targetName;
             Namespace targetNamespace;
-
-
             for(int i = 0; i< _targetNames.size() ; i++){
                 targetName = _targetNames.get(i);
                 targetNamespace = _targetNamespaces.get(i);
-
                 if(cName!=null){
-
                     if(targetName == null){
-
                         if(targetNamespace==null)
                             return true;
-
                         if(cNS==null || cNS.equals(targetNamespace))
                             return true;
-
                     }
                     else {
-
                         if(cName.equals(targetName)){
-
                             if(targetNamespace==null)
                                 return true;
-
                             if(cNS.equals(targetNamespace))
                                 return true;
                         }
                     }
                 }
                 else {
-
                     if(targetNamespace==null)
                         return true;
-
                     if(cNS!=null && cNS.equals(targetNamespace))
                         return true;
-
                 }
-
             }
-
         }
         return false;
     }
