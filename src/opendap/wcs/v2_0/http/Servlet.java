@@ -61,18 +61,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Servlet extends HttpServlet {
 
     private Logger _log;
-    private HttpGetHandler httpGetService = null;
-
-    private FormHandler formService = null;
-    private XmlRequestHandler wcsPostService = null;
-    private SoapHandler wcsSoapService = null;
+    private transient HttpGetHandler httpGetService;
+    private transient FormHandler formService;
+    private transient XmlRequestHandler wcsPostService ;
+    private transient SoapHandler wcsSoapService;
     private AtomicInteger reqNumber;
 
     //private Document configDoc;
+    private String _defaultWcsServiceConfigFilename;
 
     private boolean _initialized;
 
-    private String _defaultWcsServiceConfigFilename = "wcs_service.xml";
+    public Servlet(){
+        httpGetService = null;
+        formService = null;
+        wcsPostService = null;
+        wcsSoapService = null;
+        reqNumber = new AtomicInteger(0);
+        _defaultWcsServiceConfigFilename = "wcs_service.xml";
+    }
+
 
 
     public void init() throws ServletException {
@@ -80,7 +88,6 @@ public class Servlet extends HttpServlet {
             return;
 
         super.init();
-        reqNumber = new AtomicInteger(0);
 
         LogUtil.initLogging(this);
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
