@@ -462,18 +462,25 @@ public class GetCoverageRequestProcessor {
 
     }
 
+
+
+
+
+    /**
+     *
+     * @param req
+     * @return
+     * @throws InterruptedException
+     * @throws WcsException
+     */
+    /*
     private static String getDap2CE_OLD(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-
         String coverageID = req.getCoverageID();
-
-
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
-
-
+        //
         // The user may have provided domain subsets.
         // Let's first just QC the request - We'll make sure that the user is asking for dimension
         // subsets of coordinate dimensions that this field has, and while we do that we will associate
@@ -482,40 +489,32 @@ public class GetCoverageRequestProcessor {
         for(DimensionSubset ds: dimensionSubsets.values()){
             DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
             if(dc==null){
-
-                /**
-                 * It's likely to happen frequently that the user submits a bad dimension name. So
-                 * take the time to give an informative error message.
-                 */
+                //
+                //It's likely to happen frequently that the user submits a bad dimension name. So
+                //take the time to give an informative error message.
+                //
                 StringBuilder msg = new StringBuilder();
                 msg.append("Bad subsetting request.\n");
                 msg.append("A subset was requested for dimension '").append(ds.getDimensionId()).append("'");
                 msg.append(" and there is no coordinate dimension of that name in the Coverage ");
                 msg.append("'").append(coverageDescription.getCoverageId()).append("'\n");
-
                 msg.append("Valid coordinate dimension names for '").append(coverageDescription.getCoverageId()).append("' ");
                 msg.append("are: ");
                 for(String dcName :domainCoordinates.keySet()){
                     msg.append("\n    ").append(dcName);
                 }
                 msg.append("\n");
-
                 _log.debug(msg.toString());
-
                 throw new WcsException(msg.toString(),
                         WcsException.INVALID_PARAMETER_VALUE,
                         "wcs:dimension");
             }
-
             ds.setDomainCoordinate(dc);
-
         }
-
-
-        /**
-         * Determines which fields (variables) will be sent back with the response.
-         * If none are specified, all are sent.
-         */
+        //
+        // Determines which fields (variables) will be sent back with the response.
+        // If none are specified, all are sent.
+        //
         Vector<String> requestedFields;
         RangeSubset rangeSubset =  req.getRangeSubset();
         if(rangeSubset!=null) {
@@ -531,43 +530,32 @@ public class GetCoverageRequestProcessor {
             requestedFields = new Vector<>();
         }
 
-        /**
-         * Is there a Scale request?
-         */
+        //
+        // Is there a Scale request?
+        //
         ScaleRequest sr = req.getScaleRequest();
-
         StringBuilder dap2CE = new StringBuilder();
-
-        /**
-         * Here we begin building the DAP2 CE
-         * For every field (variable) to be transmitted we (may) need server side functional expressions,
-         * array subset expressions, ect.
-         *
-         */
+        //
+        // Here we begin building the DAP2 CE
+        // For every field (variable) to be transmitted we (may) need server side functional expressions,
+        // array subset expressions, ect.
+        //
+        //
         Vector<String> gridSubsetClauses = new Vector<>();
         Vector<String> arraySubsetClauses =  new Vector<>();
         for(String fieldId: requestedFields){
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
-
             if(dimensionSubsets.isEmpty()){
                 // no dimension subsets means take the whole enchilada
                 arraySubsetClauses.add(dapGridArrayName);
             }
             else {
-
-
                 // So we need to process the value based subsets with a call to grid
                 // and the array index subsets with an appended array index subset for that.
-
-
                 StringBuilder ssfGridSubsetClause = new StringBuilder();
-
                 boolean arraySubset = false;
-
                 // Process each dimension subset term the user has submitted
                 for (DimensionSubset dimSub : dimensionSubsets.values()) {
-
-
                     if(dimSub.isValueSubset()) {
                         // A value subset means that the user supplied values of the domain coordinates that specify
                         // the bounds of the subset that they want
@@ -590,7 +578,6 @@ public class GetCoverageRequestProcessor {
                         // Because order of the [] array notation in DAP URL's is important, we collect
                         // all of the user provided array constraints here and then literally sort them out below
                         // for inclusion in the response.
-
                         DomainCoordinate domCoord =  domainCoordinates.get(dimSub.getDimensionId());
                         domCoord.setArraySubset(dimSub.getDapArrayIndexConstraint());
                         arraySubset = true;
@@ -599,15 +586,11 @@ public class GetCoverageRequestProcessor {
                         throw new WcsException("Unrecognized dimension subset.",WcsException.NO_APPLICABLE_CODE);
                     }
                 }
-
                 // So we've processed all the user requested dimension subsets, now we need to build the inditial
                 // array subsetting clause if needed.
-
-
                 StringBuilder arraySubsetClause = new StringBuilder();
                 if(arraySubset){
                     arraySubsetClause.append(dapGridArrayName);
-
                     // We build the subsetting string using the domain coordinates in the order they
                     // appear in the DAP dataset, which is how they MUST occur in the configuration
                     // or this all gets broken.
@@ -617,8 +600,6 @@ public class GetCoverageRequestProcessor {
                         arraySubsetClause.append(clause);
                     }
                 }
-
-
                 if(ssfGridSubsetClause.length()>0){
                     ssfGridSubsetClause.append(")");
                     //if(arraySubsetClause.length()>0){
@@ -626,22 +607,16 @@ public class GetCoverageRequestProcessor {
                     //}
                     gridSubsetClauses.add(ssfGridSubsetClause.toString());
                 }
-
-
                 if(arraySubsetClause.length()>0){
                     arraySubsetClauses.add(arraySubsetClause.toString());
                     //ssfGridSubsetClause.append(arraySubsetClause);
                 }
-
                 //dap2CE.append(ssfGridSubsetClause);
-
             } // dimension subsets
         } // fields
         for(String gridSubsetClause: gridSubsetClauses){
             String comma_as_needed = dap2CE.length()>0 ? "," : "";
-
             String possiblyScaledGridSubset = sr.getScaleExpression(gridSubsetClause);
-
             dap2CE.append(comma_as_needed).append(possiblyScaledGridSubset);
         }
 
@@ -659,7 +634,7 @@ public class GetCoverageRequestProcessor {
         }
     }
 
-
+*/
 
 
 
