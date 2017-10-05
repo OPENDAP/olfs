@@ -276,14 +276,11 @@ public class GetCoverageRequestProcessor {
 
     private static String getDap2CE(GetCoverageRequest req) throws InterruptedException, WcsException {
 
-
         String coverageID = req.getCoverageID();
 
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
-
-
         HashMap<DomainCoordinate,DimensionSubset> domCordToDimSubsetMap = new HashMap<>();
 
         // The user may have provided domain subsets.
@@ -322,8 +319,6 @@ public class GetCoverageRequestProcessor {
             ds.setDomainCoordinate(dc);
             domCordToDimSubsetMap.put(dc,ds);
         }
-
-
         /**
          * Determines which fields (variables) will be sent back with the response.
          * If none are specified, all are sent.
