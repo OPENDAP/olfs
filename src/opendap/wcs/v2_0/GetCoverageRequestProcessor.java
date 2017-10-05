@@ -281,7 +281,6 @@ public class GetCoverageRequestProcessor {
 
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
-        Vector<Field> fields = coverageDescription.getFields();
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
 
 
@@ -330,17 +329,16 @@ public class GetCoverageRequestProcessor {
          * If none are specified, all are sent.
          */
         Vector<String> requestedFields;
-        RangeSubset rangeSubset =  req.getRangeSubset();
+        RangeSubset rangeSubset = req.getRangeSubset();
         if(rangeSubset!=null) {
             requestedFields = rangeSubset.getRequestedFields();
         }
         else {
             requestedFields = new Vector<>();
         }
-        boolean flag = requestedFields.isEmpty();
-        if (flag) {
+        if (requestedFields.isEmpty()) {
             // if they didn't ask for a subset of the set of fields, then take them all.
-            for (Field field : fields) {
+            for (Field field : coverageDescription.getFields()) {
                 requestedFields.add(field.getName());
             }
         }
