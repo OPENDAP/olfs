@@ -333,11 +333,15 @@ public class GetCoverageRequestProcessor {
         }
         if (requestedFields.isEmpty()) {
             // if they didn't ask for a subset of the set of fields, then take them all.
+            String fieldNames[] = coverageDescription.getFieldNames();
+            requestedFields.addAll(Arrays.asList(fieldNames));
+            /*
             Vector<Field> fields  = coverageDescription.getFields();
             for (Field field : fields) {
                 String requestedFieldName = field.getName();
                 requestedFields.add(requestedFieldName);
             }
+            */
         }
 
         //

@@ -61,10 +61,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Servlet extends HttpServlet {
 
     private Logger _log;
-    private transient HttpGetHandler httpGetService;
-    private transient FormHandler formService;
-    private transient XmlRequestHandler wcsPostService ;
-    private transient SoapHandler wcsSoapService;
+    private HttpGetHandler httpGetService;
+    private FormHandler formService;
+    private XmlRequestHandler wcsPostService ;
+    private SoapHandler wcsSoapService;
     private AtomicInteger reqNumber;
 
     //private Document configDoc;

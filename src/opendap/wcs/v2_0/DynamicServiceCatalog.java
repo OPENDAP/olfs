@@ -103,6 +103,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         if(_intialized)
             return;
 
+        /*
         Element e1;
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -110,7 +111,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
         ///////////////////////////////////////////////////////////////
         // Sort out access credentials for getting things from places
         // that require such...
-        /*
         _credsProvider = null;
         e1 = config.getChild("Credentials");
         if(e1!=null){

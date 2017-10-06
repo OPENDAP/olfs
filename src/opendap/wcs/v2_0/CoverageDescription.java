@@ -786,6 +786,15 @@ public class CoverageDescription {
                 WcsException.MISSING_PARAMETER_VALUE, "gmlcov:rangeType");
     }
 
+    public String[] getFieldNames() throws WcsException {
+        Vector<Field> fields = getFields();
+        String name[] = new String[fields.size()];
+        int i=0;
+        for(Field field: fields)
+            name[i++]=field.getName();
+        return name;
+    }
+
     public Vector<Field> getFields() throws WcsException {
 
         Element rangeType;

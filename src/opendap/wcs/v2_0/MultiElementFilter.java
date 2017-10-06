@@ -39,7 +39,7 @@ import java.util.Vector;
 public class MultiElementFilter implements Filter {
 
     private Vector<String> _targetNames;
-    private transient Vector<Namespace> _targetNamespaces;
+    private Vector<Namespace> _targetNamespaces;
 
 
     public MultiElementFilter(String name, Namespace ns){
