@@ -786,26 +786,28 @@ public class CoverageDescription {
                 WcsException.MISSING_PARAMETER_VALUE, "gmlcov:rangeType");
     }
 
+    /**
+     * @return An array of strings containing the name of every Field in the Coverage
+     * @throws WcsException
+     */
     public String[] getFieldNames() throws WcsException {
         Vector<Field> fields = getFields();
-        String name[] = new String[fields.size()];
+        String names[] = new String[fields.size()];
         int i=0;
         for(Field field: fields)
-            name[i++]=field.getName();
-        return name;
+            names[i++]=field.getName();
+        return names;
     }
 
     public Vector<Field> getFields() throws WcsException {
 
         Element rangeType;
-
         rangeType = _myCD.getChild("rangeType",WCS.GMLCOV_NS);
         if(rangeType==null)
             throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
                 WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
 
         Vector<Field> fields = new Vector<>();
-
         ElementFilter filter = new ElementFilter("field",WCS.SWE_NS);
         Iterator i = rangeType.getDescendants(filter);
         while(i.hasNext()){
@@ -813,16 +815,13 @@ public class CoverageDescription {
             Field field = new Field(fieldElement);
             fields.add(field);
         }
-
         return fields;
     }
 
 
 
     public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
-
         Coverage coverage = new Coverage(this, requestUrl);
-
         return coverage;
     }
 
