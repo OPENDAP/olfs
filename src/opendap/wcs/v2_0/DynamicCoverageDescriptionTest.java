@@ -77,7 +77,7 @@ public class DynamicCoverageDescriptionTest {
      */
     public DynamicCoverageDescriptionTest(String dmrUrl) throws
             IOException, JDOMException, JAXBException, XMLStreamException {
-        JAXBContext jc = JAXBContext.newInstance(Dataset.class);
+
         if (dmrUrl.startsWith("http")) {
             _dmrElement = opendap.xml.Util.getDocumentRoot(dmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
         } else {
