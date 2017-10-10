@@ -39,7 +39,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
-import opendap.dap4.Dataset;
 import opendap.wcs.srs.SimpleSrs;
 
 import java.io.*;
@@ -57,11 +56,6 @@ import javax.xml.stream.XMLStreamException;
  * @author Uday Kari
  */
 @RunWith(Parameterized.class)
-
-/**
- * Test for 
- * Dynamic Coverage Description
- */
 public class DynamicCoverageDescriptionTest {
 
     private Element _dmrElement;
@@ -120,7 +114,7 @@ public class DynamicCoverageDescriptionTest {
     @Test
     public void itAllWorks() throws IOException, WcsException {
         CoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
-        assertTrue(cd != null);
+        assertTrue(cd != null); // FIXME This test is always true
     }
 
     @Test
