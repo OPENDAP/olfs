@@ -26,24 +26,77 @@
 
 package opendap.wcs.v2_0;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.List;
 
-public class BoundedBy {
+public class RectifiedGrid {
 	
-	private EnvelopeWithTimePeriod envelope = new EnvelopeWithTimePeriod();
+	String dimension = "";
+	String id = "";
+	
+	Limits limits = new Limits();
+	String axisLabels = "";
+	
+	Origin origin = new Origin();
+	
+	List<OffsetVector> offsetVector;
 
-	public BoundedBy() {
-		
-	}
-    
-	@XmlElement(name="EnvelopeWithTimePeriod")
-	public EnvelopeWithTimePeriod getEnvelope() {
-		return envelope;
+	@XmlAttribute
+	public String getDimension() {
+		return dimension;
 	}
 
-	public void setEnvelope(EnvelopeWithTimePeriod envelope) {
-		this.envelope = envelope;
+	public void setDimension(String dimension) {
+		this.dimension = dimension;
+	}
+
+	@XmlAttribute
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@XmlElement
+	public Limits getLimits() {
+		return limits;
+	}
+
+	public void setLimits(Limits limits) {
+		this.limits = limits;
+	}
+
+	@XmlElement
+	public String getAxisLabels() {
+		return axisLabels;
+	}
+
+	public void setAxisLabels(String axisLabels) {
+		this.axisLabels = axisLabels;
+	}
+
+	@XmlElement
+	public Origin getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(Origin origin) {
+		this.origin = origin;
+	}
+
+	@XmlElement
+	public List<OffsetVector> getOffsetVector() {
+		return offsetVector;
+	}
+
+	public void setOffsetVector(List<OffsetVector> offsetVector) {
+		this.offsetVector = offsetVector;
 	}
 	
 	
+	
+
 }

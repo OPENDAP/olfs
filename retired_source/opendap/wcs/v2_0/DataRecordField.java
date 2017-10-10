@@ -27,72 +27,26 @@ package opendap.wcs.v2_0;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.List;
 
-public class RectifiedGrid {
+public class DataRecordField {
 	
-	String dimension = "";
-	String id = "";
+	private String name = "";
+	private Quantity quantity = new Quantity();
 	
-	Limits limits = new Limits();
-	String axisLabels = "";
-	
-	Origin origin = new Origin();
-	
-	List<OffsetVector> offsetVector;
-
 	@XmlAttribute
-	public String getDimension() {
-		return dimension;
+	public String getName() {
+		return name;
 	}
-
-	public void setDimension(String dimension) {
-		this.dimension = dimension;
+	public void setName(String name) {
+		this.name = name;
 	}
-
-	@XmlAttribute
-	public String getId() {
-		return id;
+	
+	@XmlElement(name="Quantity")
+	public Quantity getQuantity() {
+		return quantity;
 	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	@XmlElement
-	public Limits getLimits() {
-		return limits;
-	}
-
-	public void setLimits(Limits limits) {
-		this.limits = limits;
-	}
-
-	@XmlElement
-	public String getAxisLabels() {
-		return axisLabels;
-	}
-
-	public void setAxisLabels(String axisLabels) {
-		this.axisLabels = axisLabels;
-	}
-
-	@XmlElement
-	public Origin getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(Origin origin) {
-		this.origin = origin;
-	}
-
-	@XmlElement
-	public List<OffsetVector> getOffsetVector() {
-		return offsetVector;
-	}
-
-	public void setOffsetVector(List<OffsetVector> offsetVector) {
-		this.offsetVector = offsetVector;
+	public void setQuantity(Quantity quantity) {
+		this.quantity = quantity;
 	}
 	
 	

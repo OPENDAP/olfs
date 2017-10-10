@@ -24,6 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+
 @XmlSchema (
       elementFormDefault=XmlNsForm.QUALIFIED,
       namespace="http://www.opengis.net/wcs/2.0",
