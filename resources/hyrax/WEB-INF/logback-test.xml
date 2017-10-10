@@ -158,6 +158,7 @@
     <logger name="opendap.w10n" level="all" />
 
 
+    <logger name="opendap.wcs.v2_0" level="all"/>
 
 
 
