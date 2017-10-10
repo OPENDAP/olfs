@@ -357,10 +357,8 @@
 
             <test name="opendap.bes.dap4Responders.Dap4ResponderTest" />
 
-            <!--
             <test name="opendap.dap4.DatasetTest" />
             <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
-            -->
             
         </junit>
     </target>

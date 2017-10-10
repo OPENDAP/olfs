@@ -690,9 +690,6 @@
 
     <!-- *******************************************************  -->
 
-
-
-    <!--
     <target name="check"
             description="Run Unit Tests"
             depends="compile"
@@ -711,9 +708,6 @@
 
         </junit>
     </target>
-
-    -->
-
 
 </project>
 
