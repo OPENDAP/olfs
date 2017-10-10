@@ -27,6 +27,7 @@ package opendap.dap4;
 
 import java.util.*;
 
+import opendap.io.HyraxStringEncoding;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -68,22 +69,25 @@ public class DatasetTest {
      *
      * @param dmrUrl
      */
-    public DatasetTest(String dmr) throws
-            IOException, JDOMException, JAXBException, XMLStreamException {
+    public DatasetTest(String dmrUrl)
+            throws IOException, JDOMException, JAXBException, XMLStreamException {
         _log = LoggerFactory.getLogger(this.getClass());
         String dmrXml = "";
         JAXBContext jc = JAXBContext.newInstance(Dataset.class);
         Unmarshaller um = jc.createUnmarshaller();
-        if (dmr.startsWith("http")) {
-            Element dmrElement = opendap.xml.Util.getDocumentRoot(dmr, opendap.http.Util.getNetRCCredentialsProvider());
+        if (dmrUrl.startsWith("http")) {
+            Element dmrElement = opendap.xml.Util.getDocumentRoot(dmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
+            if(dmrElement==null)
+                throw new IOException("Failed to get DMR document root for "+dmrUrl);
+            
             XMLOutputter xmlo = new XMLOutputter();
             dmrXml = xmlo.outputString(dmrElement);
         } else {
             // not protocol like http or ftp?  then raw hard-wired data from resources directory
             _log.debug("Current relative path is: " + Paths.get(".").toAbsolutePath().normalize().toString());
             //TODO: get this from configs
-            Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmr);
-            dmrXml = new String(Files.readAllBytes(file));
+            Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmrUrl);
+            dmrXml = new String(Files.readAllBytes(file), HyraxStringEncoding.getCharset());
         }
         InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
         XMLInputFactory factory = XMLInputFactory.newInstance();

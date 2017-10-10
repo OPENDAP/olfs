@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 import java.util.*;
 
+import opendap.io.HyraxStringEncoding;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -74,20 +75,19 @@ public class DynamicCoverageDescriptionTest {
      *
      * @param dmrUrl
      */
-    public DynamicCoverageDescriptionTest(String dmr) throws
+    public DynamicCoverageDescriptionTest(String dmrUrl) throws
             IOException, JDOMException, JAXBException, XMLStreamException {
         JAXBContext jc = JAXBContext.newInstance(Dataset.class);
-        Unmarshaller um = jc.createUnmarshaller();
-        if (dmr.startsWith("http")) {
-            _dmrElement = opendap.xml.Util.getDocumentRoot(dmr, opendap.http.Util.getNetRCCredentialsProvider());
+        if (dmrUrl.startsWith("http")) {
+            _dmrElement = opendap.xml.Util.getDocumentRoot(dmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
         } else {
-            Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmr);
-            dmr = new String(Files.readAllBytes(file));
-            InputStream stream = new ByteArrayInputStream(dmr.getBytes(StandardCharsets.UTF_8.name()));
+            Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmrUrl);
+            dmrUrl = new String(Files.readAllBytes(file), HyraxStringEncoding.getCharset());
+            InputStream stream = new ByteArrayInputStream(dmrUrl.getBytes(StandardCharsets.UTF_8.name()));
             _dmrElement = opendap.xml.Util.getDocument(stream).detachRootElement();
 
             // set dataset flags
-            if (dmr.equals("dmrDataset_01.xml")) _dmrDataset_01 = true;
+            if (dmrUrl.equals("dmrDataset_01.xml")) _dmrDataset_01 = true;
         }
 
         // construct mock dynamic service
