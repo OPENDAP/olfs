@@ -288,7 +288,7 @@ public class GetCapabilitiesRequest {
         }
         else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
-                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "have failed. The WCS request for the operation '"+s[0]+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
@@ -455,7 +455,7 @@ public class GetCapabilitiesRequest {
         if(AcceptLanguages != null){
             Element af = new Element("AcceptLanguages",WCS.WCS_NS);
             Element fe;
-            for(String f : AcceptFormats){
+            for(String f : AcceptLanguages){
                 fe = new Element("Language",WCS.WCS_NS);
                 fe.setText(f);
                 af.addContent(fe);

@@ -233,7 +233,7 @@ public class KvpHandler {
         }
         else {
             throw new WcsException("The parameter 'request' has an invalid " +
-                    "value of '"+s+"'.",
+                    "value of '"+s[0]+"'.",
                     WcsException.INVALID_PARAMETER_VALUE,"request");
         }
 

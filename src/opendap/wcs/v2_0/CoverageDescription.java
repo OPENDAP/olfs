@@ -319,7 +319,7 @@ public class CoverageDescription {
             if (_myFile != null && _lastModified < _myFile.lastModified()) {
                 _myCD = ingestCoverageDescription(_myFile);
             }
-        } catch (Exception e) {
+        } catch (IOException | WcsException | JDOMException e) {
 
             String msg = "Failed to update CoverageDescription from file ";
 
@@ -372,17 +372,24 @@ public class CoverageDescription {
      *         CoverageDescription.
      */
     public String getCoverageId() {
-        Element coverageId = _myCD.getChild("CoverageId", WCS.WCS_NS);
-        return coverageId.getText();
+        Element cid  = _myCD.getChild("CoverageId", WCS.WCS_NS);
+        if(cid==null)
+            return null;
+        return cid.getTextTrim();
     }
 
     /**
      *
-     * @return Returns the unique wcs:Identifier associated with this
+     * @return Returns the unique wcs:CoverageId associated with this
      *         CoverageDescription.
      */
     public Element getCoverageIdElement() {
-        return (Element) _myCD.getChild("CoverageId", WCS.WCS_NS).clone();
+
+        Element cid  = _myCD.getChild("CoverageId", WCS.WCS_NS);
+        if(cid==null)
+            return null;
+
+        return (Element) cid.clone();
     }
 
     /**
@@ -546,6 +553,9 @@ public class CoverageDescription {
         Element covSum = new Element("CoverageSummary", WCS.WCS_NS);
 
         Element coverageID = getCoverageIdElement();
+        if(coverageID==null)
+            throw new WcsException("Missing CoverageId element!",WcsException.INVALID_PARAMETER_VALUE);
+        
         covSum.addContent(coverageID);
 
         Element coverageSubType = getCoverageSubtypeElement();
@@ -559,11 +569,13 @@ public class CoverageDescription {
 
         if (hasBoundedBy()) {
             NewBoundingBox boundingBox = getBoundingBox();
+            if(boundingBox==null)
+                throw new WcsException("Coverage is missing Bounding Box!!",WcsException.INVALID_PARAMETER_VALUE);
             Element bb = boundingBox.getOwsBoundingBoxElement();
             covSum.addContent(bb);
         }
 
-        // @todo Add metadata records if available.
+        // @todo Add metadata records if available.  For example the time domain might be useful if we can squeeze it into their allowed content model.
 
         return covSum;
     }
@@ -774,17 +786,28 @@ public class CoverageDescription {
                 WcsException.MISSING_PARAMETER_VALUE, "gmlcov:rangeType");
     }
 
+    /**
+     * @return An array of strings containing the name of every Field in the Coverage
+     * @throws WcsException
+     */
+    public String[] getFieldNames() throws WcsException {
+        Vector<Field> fields = getFields();
+        String names[] = new String[fields.size()];
+        int i=0;
+        for(Field field: fields)
+            names[i++]=field.getName();
+        return names;
+    }
+
     public Vector<Field> getFields() throws WcsException {
 
         Element rangeType;
-
         rangeType = _myCD.getChild("rangeType",WCS.GMLCOV_NS);
         if(rangeType==null)
             throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
                 WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
 
         Vector<Field> fields = new Vector<>();
-
         ElementFilter filter = new ElementFilter("field",WCS.SWE_NS);
         Iterator i = rangeType.getDescendants(filter);
         while(i.hasNext()){
@@ -792,16 +815,13 @@ public class CoverageDescription {
             Field field = new Field(fieldElement);
             fields.add(field);
         }
-
         return fields;
     }
 
 
 
     public Coverage getCoverage(String requestUrl) throws WcsException, InterruptedException {
-
         Coverage coverage = new Coverage(this, requestUrl);
-
         return coverage;
     }
 

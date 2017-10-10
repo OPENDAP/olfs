@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
+ * Time utils for WCS. Understands both time string and units string parsing.
  * User: ndp
  * Date: Sep 5, 2010
  * Time: 8:31:16 AM
@@ -144,9 +144,7 @@ public class TimeConversion {
         String timeUnits;
         Date epoch;
         Date now = new Date();
-
         String dateFormat = "yyyy-MM-d hh:mm:ss";
-
 
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         String epochDateStr = "1900-01-01 00:00:0.0";
@@ -156,11 +154,9 @@ public class TimeConversion {
         System.out.println("epoch:      "+epoch);
         System.out.println("epoch.getTime():      "+epoch.getTime());
 
-
         gc.setTime(epoch);
         System.out.println("    Epoch GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
 
         timeUnits =  "hours since "+epochDateStr;
         epoch = getEpoch(timeUnits);
@@ -168,11 +164,7 @@ public class TimeConversion {
         gc.setTime(epoch);
         System.out.println("    getEpoch() GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
         System.out.println("    convertDateToTimeUnits(epoch,timeUnits): " + convertDateToTimeUnits(epoch, timeUnits));
-
-
-
         try {
             System.out.println("    timeUnits: '" + timeUnits +"'");
             String timePosStr = "2002-07-18T12:00Z";
@@ -183,20 +175,9 @@ public class TimeConversion {
         } catch (WcsException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
-
-
-
-
-
         gc.setTime(now);
         System.out.println("    NOW GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
-
-
-
-
 
         System.out.println("########################################################");
         System.out.println("Testing time units conversion...");
@@ -215,38 +196,23 @@ public class TimeConversion {
         testTimeConversion(now, timeUnits);
 
         //epoch = new Date((long)1139961600*1000);
-
         //testTimeConversion(epoch, timeUnits);
-
 
         System.out.println("########################################################");
         System.out.println("Parsing WCS (ISO-8601) Dates.");
-
-
         String wcsDate = "2002-07-18T10:00Z";
-
         testWcsTimeStringParsing(wcsDate,timeUnits);
-
-
     }
 
     public static void testWcsTimeStringParsing(String wcsDateString, String timeUnits){
-
         System.out.println("wcsDateString: "+wcsDateString);
-
         try {
             Date date = parseWCSTimePosition(wcsDateString);
             System.out.println("    parsed to: "+date);
-
             testTimeConversion(date, timeUnits);
-
-
-
-
         } catch (WcsException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
     }
 
 

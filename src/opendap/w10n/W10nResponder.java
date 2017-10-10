@@ -215,11 +215,24 @@ public class W10nResponder {
         _log.debug("send_w10n_response() - getPathInfo response: \n {}",xmlo.outputString(pathInfoDoc));
 
         Element besResponse = pathInfoDoc.getRootElement();
+        if(besResponse==null)
+            throw new IOException("BES failed to include a root element in the PathInfoDocument.");
+
         Element showPathInfo =  besResponse.getChild("showPathInfo", BES.BES_NS);
+        if(showPathInfo==null)
+            throw new IOException("BES failed to include a 'showPathInfo' element in the PathInfoDocument.");
+
         Element pathInfo =  showPathInfo.getChild("PathInfo", BES.BES_NS);
+        if(pathInfo==null)
+            throw new IOException("BES failed to include a 'PathInfo' element in the PathInfoDocument.");
 
         Element vpE =  pathInfo.getChild("validPath", BES.BES_NS);
+        if(vpE==null)
+            throw new IOException("BES failed to include a 'validPath' element in the PathInfoDocument.");
+
         Element remE =  pathInfo.getChild("remainder", BES.BES_NS);
+        if(remE==null)
+            throw new IOException("BES failed to include a 'remainder' element in the PathInfoDocument.");
 
 
         String validResourcePath = vpE.getTextTrim();
@@ -416,8 +429,12 @@ public class W10nResponder {
 
 
         Element showCatalogElement = showCatalogDoc.getRootElement().getChild("showCatalog",BES.BES_NS);
+        if(showCatalogElement==null)
+            throw new IOException("BES showCatalog response document is missing the root element!");
 
         Element topDataset = showCatalogElement.getChild("dataset",BES.BES_NS);
+        if(topDataset==null)
+            throw new IOException("BES showCatalog response document is missing the 'dataset' element!");
 
         String type = getW10nTypeStringForBesCatalogDataset(topDataset);
 

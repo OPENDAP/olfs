@@ -41,7 +41,7 @@ import java.util.Vector;
  * have more DomainCoordinates than WCS SRS that actually might apply to the geocoordinates
  * (latitude and longitude)
  */
-public class DomainCoordinate {
+public class DomainCoordinate {//implements Cloneable  {
 
     private Logger _log = LoggerFactory.getLogger(getClass());
     private String _name;
@@ -191,7 +191,7 @@ public class DomainCoordinate {
 
 
 
-
+             /*
 
     @Override
         public DomainCoordinate clone()
@@ -206,14 +206,17 @@ public class DomainCoordinate {
                 throw new Error();
             }
             // Deep clone member fields here
-            _name = dc._name;
-            _dapId = dc._dapId;
-            _units = dc._units;
-            _arraySubset = dc._arraySubset;
-            _size = dc._size;
+
+            dc._name = _name;
+            dc._dapId = _dapId;
+            dc._units = _units;
+            dc._arraySubset = _arraySubset;
+            dc._size = _size;
 
             return dc;
         }
+        */
+             
 
     @XmlAttribute(name="dapId")
     public String getDapID(){

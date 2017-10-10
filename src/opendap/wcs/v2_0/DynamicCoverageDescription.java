@@ -262,6 +262,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
                 units = defaultCoordinate.getUnits();
 
             Dimension coordinateDimension = getDomainCoordinateVariableDimension(dataset, coordinateName);
+            if(coordinateDimension==null)
+                throw new WcsException("Failed to locate the Dataset " +
+                        "Dimension for coordinate "+coordinateName,WcsException.NO_APPLICABLE_CODE);
 
             long size = coordinateDimension.getSizeAsLong();
             if(size<1)
@@ -336,10 +339,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-     * This class is a C style structure to hold the longthy
-     * parameter list required for building the TimePeriodWithEnvelope
+     * This class is a C style structure to hold the lengthy
+     * parameter list required for building the BoundedBy and
+     * DomainSet content (Which is ultimately the
+     * EnvelopeWithTomePeriod business)
      */
-    class BoundedByAndDomainSetParams {
+    static class BoundedByAndDomainSetParams {
         SimpleSrs srs;
         String coverageID;
         String beginDate;
@@ -520,16 +525,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         etp.addUpperCornerCoordinateValues(params.upperCorner);
         etp.setBeginTimePosition(params.beginDate);
         etp.setEndTimePosition(params.endDate);
-
         _log.debug(etp.toString());
 
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(params.srs);
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
         return bs;
     }
 
@@ -698,10 +699,18 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
             // Find the DomainCoordinate associated with this axis
             DomainCoordinate domainCoordinate = getDomainCoordinate(axisLabel);
-            
+            if(domainCoordinate==null) {
+                _log.error("There is no DomainCoordinate for axis '{}' This should never happen...",axisLabel);
+                return false;
+            }
+
             // Find the DAP Variable referenced by the DomainCoordinate
             Variable domainCoordinateVariable = dataset.getVariable(domainCoordinate.getDapID());
-
+            if(domainCoordinateVariable==null) {
+                _log.error("Failed to locate DAP variable '{}' referenced by DomainCoordinate '{}'",
+                        domainCoordinate.getDapID(), domainCoordinate.getName());
+                return false;
+            }
             //////////////////////////////////////////////////////////////////////////
             // TEST
             // Compare the variable's Dim for this dimension with
@@ -724,9 +733,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
             _log.debug("The dapVar '{}' has more dimensions than the SRS", dapVar.getName());
 
         if (!weveGotIssuesMan.isEmpty()) {
-            _log.error("variableDimensionsAreCompatibleWithSrs() - You've got issues man.");
+            _log.debug("variableDimensionsAreCompatibleWithSrs() - You've got issues man.");
             for (String msg : weveGotIssuesMan)
-                _log.info("variableDimensionsAreCompatibleWithSrs() -   issue: {}",msg);
+                _log.debug("variableDimensionsAreCompatibleWithSrs() -   issue: {}",msg);
             return false;
         }
         return true;
@@ -753,7 +762,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
         String  fieldNcName = var.getName();
         if(!opendap.xml.Util.isNCNAME(var.getName())) {
             // it's not an NCNAME. Is there default supplied?
-            fieldNcName = fieldDef.name;
+            fieldNcName = fieldDef==null?null:fieldDef.name;
             if(fieldNcName == null)  {
                 // nope, we'll punt...
                 fieldNcName = opendap.xml.Util.convertToNCNAME(var.getName());
@@ -949,7 +958,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
         // couple of quick sanity checks
         _log.debug(cdElement.toString());
         Element coverageId = cdElement.getChild("CoverageId", WCS.WCS_NS);
-        _log.debug(coverageId.getText());
+        if(coverageId!=null)
+            _log.debug(coverageId.getText());
         return cdElement;
     }
 
@@ -972,6 +982,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
         try {
             Element dmrElement =
                     opendap.xml.Util.getDocumentRoot(testDmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
+            if(dmrElement==null){
+                System.err.println("Failed to get DMR from: "+testDmrUrl);
+                System.exit(-1);
+            }
 
             SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
             DynamicService ds = new DynamicService();

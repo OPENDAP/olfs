@@ -129,7 +129,7 @@
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
                 <h3>WCS-<xsl:value-of select="$WcsServiceVersion"/>
-                    <span class="small"> (OPeNDAP WCS service implementation version
+                    <span class="small"> (Hyrax-WCS  version
                         <xsl:value-of select="$WcsSoftwareVersion"/>)</span>
                     <br />
                     <span class="uuid">

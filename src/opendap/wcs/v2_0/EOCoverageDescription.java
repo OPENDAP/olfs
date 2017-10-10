@@ -78,6 +78,9 @@ public class EOCoverageDescription extends CoverageDescription {
     @Override
     public NewBoundingBox getBoundingBox() throws WcsException {
         NewBoundingBox bb = super.getBoundingBox();
+        if(bb==null)
+            throw new WcsException("Parent class ("+super.getClass().getName()+
+                    ") returned a null BoundingBox!",WcsException.NO_APPLICABLE_CODE);
 
         if(!bb.hasTimePeriod()){
             // No time period? Check the  EO metadata section for that...
@@ -134,10 +137,8 @@ public class EOCoverageDescription extends CoverageDescription {
      */
 
     public  Element getEOMetadata(){
-
         Element eoMetadata =  getEOMetadata(_myCD);
-
-        return (Element)eoMetadata.clone();
+        return eoMetadata==null?null:(Element)eoMetadata.clone();
     }
 
     protected  Element getEOMetadata(Element coverageDescriptionElement){
@@ -175,6 +176,8 @@ public class EOCoverageDescription extends CoverageDescription {
     public Element getEOFootprintPositionList(Element coverageDescriptionElement) {
 
         Element eoMetadata = getEOMetadata(coverageDescriptionElement);
+        if(eoMetadata==null)
+            return null;
 
         Element earthObservation =  eoMetadata.getChild("EarthObservation",WCS.EOP_NS);
         if(earthObservation == null)

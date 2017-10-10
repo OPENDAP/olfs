@@ -117,7 +117,7 @@ public class GetCoverageRequest {
         }
         else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
-                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "have failed. The WCS request for the operation '"+s[0]+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
@@ -172,6 +172,8 @@ public class GetCoverageRequest {
                  */
                 if(subset.getDimensionId().toLowerCase().contains("time")){
                     DomainCoordinate timeDomain = cvrgDscrpt.getDomainCoordinate("time");
+                    if(timeDomain==null)
+                        throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage",WcsException.INVALID_PARAMETER_VALUE,"subset");
                     _temporalSubset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
                     subset = _temporalSubset;
                 }
@@ -331,6 +333,8 @@ public class GetCoverageRequest {
 
             if(ds.getDimensionId().toLowerCase().contains("time")){
                 DomainCoordinate timeDomain = cvrDsc.getDomainCoordinate("time");
+                if(timeDomain==null)
+                    throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage.",WcsException.INVALID_PARAMETER_VALUE,"Dimension*");
                 ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
             }
 

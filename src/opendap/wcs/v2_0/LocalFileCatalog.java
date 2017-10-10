@@ -106,7 +106,7 @@ public class LocalFileCatalog implements WcsCatalog {
      * @throws Exception
      */
     @Override
-    public void init(Element config, String persistentContentPath, String contextPath) throws Exception {
+    public void init(Element config, String persistentContentPath, String serviceContextPath) throws Exception {
 
         if (_intitialized)
             return;
@@ -287,19 +287,14 @@ public class LocalFileCatalog implements WcsCatalog {
             log.error(msg);
         }
 
-
         Vector<EOCoverageDescription> processed = new Vector<>();
-
-
         if (eoDatasetSeries != null) {
             String datasetSeriesId = eoDatasetSeries.getId();
             boolean conflict = false;
-
             for (EOCoverageDescription eocd : eoDatasetSeries.getMembers()) {
-
                 String coverageId = eocd.getCoverageId();
-
-                CoverageDescription cd = _coveragesMap.get(coverageId) == null ? _eoCoveragesMap.get(coverageId) : _coveragesMap.get(coverageId);
+                CoverageDescription cd =
+                        _coveragesMap.get(coverageId) == null ? _eoCoveragesMap.get(coverageId) : _coveragesMap.get(coverageId);
                 if (cd != null) {
                     StringBuilder sb = new StringBuilder("ingestDatasetSeries() -");
                     sb.append(" SKIPPING new coverage with duplicate coverageID '").append(coverageId);
@@ -314,16 +309,11 @@ public class LocalFileCatalog implements WcsCatalog {
                     processed.add(eocd);
                 }
             }
-
             if (conflict) {
-
                 for (EOCoverageDescription eocd : processed) {
-                    _coveragesMap.remove(eocd);
-                    _eoCoveragesMap.remove(eocd);
-
+                    _coveragesMap.remove(eocd.getCoverageId());
+                    _eoCoveragesMap.remove(eocd.getCoverageId());
                 }
-
-
                 StringBuilder sb = new StringBuilder("ingestDatasetSeries() - ");
                 sb.append("CoverageId conflicts were found in the DatasetSeries '").append(datasetSeriesId).append("' ");
                 sb.append(" !!SKIPPING!");

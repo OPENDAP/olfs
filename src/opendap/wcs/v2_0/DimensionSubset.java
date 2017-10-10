@@ -47,7 +47,7 @@ import org.jdom.Element;
  * values (non integer). In other words: Both values must be in the arrayIndex facet, or both in the byValue facet.
  *
 */
-public class DimensionSubset implements Cloneable {
+public class DimensionSubset { // implements Cloneable {
 
 
     public enum Type {TRIM, SLICE_POINT}

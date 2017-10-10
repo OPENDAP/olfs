@@ -75,12 +75,18 @@ public class NewBoundingBox {
 
         this();
 
-        for(String coordinate : dims.keySet())
-        {
+        for(CoordinateDimension dim : dims.values()) {
+            CoordinateDimension newDim = new CoordinateDimension(dim);
+            _dimensions.put(newDim.getName(),newDim);
+        }
+
+        /*
+        for(String coordinate : dims.keySet()) {
             CoordinateDimension dim = dims.get(coordinate);
             CoordinateDimension newDim = new CoordinateDimension(dim);
             _dimensions.put(coordinate,newDim);
         }
+        */
 
         if(startTime!=null && endTime!=null) {
 
@@ -406,21 +412,21 @@ public class NewBoundingBox {
             bbox.setAttribute("crs", _srsName.toString());
 
 
-        String txt = "";
+        StringBuilder txt = new StringBuilder();
         Element e = new Element("LowerCorner", WCS.OWS_NS);
         for (double coordinate : getLowerCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
 
-        txt = "";
+        txt = new StringBuilder();
         e = new Element("UpperCorner", WCS.OWS_NS);
         for (double coordinate : getUpperCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
         return bbox;
@@ -439,21 +445,25 @@ public class NewBoundingBox {
         //@todo transform coordinates!!
 
 
-        String txt = "";
+        StringBuilder txt = new StringBuilder();
         Element e = new Element("LowerCorner", WCS.OWS_NS);
         for (double coordinate : getLowerCorner()) {
-            txt += coordinate + "  ";
+            if(txt.length()>0)
+                txt.append("  ");
+            txt.append(coordinate);
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
 
-        txt = "";
+        txt = new StringBuilder();
         e = new Element("UpperCorner", WCS.OWS_NS);
         for (double coordinate : getUpperCorner()) {
-            txt += coordinate + "  ";
+            if(txt.length()>0)
+                txt.append("  ");
+            txt.append(coordinate);
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
         return bbox;
