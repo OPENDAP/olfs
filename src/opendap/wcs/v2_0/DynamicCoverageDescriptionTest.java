@@ -63,84 +63,85 @@ import javax.xml.stream.XMLStreamException;
  */
 public class DynamicCoverageDescriptionTest {
 
-  private Element _dmrElement;
-  private DynamicService _dynamicService;
-  
-  // flags for various tests
-  private boolean _dmrDataset_01 = false;
+    private Element _dmrElement;
+    private DynamicService _dynamicService;
 
-  /**
-   * Inject DMR via constructor
-   *
-   * @param dmrUrl
-   */
-  public DynamicCoverageDescriptionTest(String dmr) throws
-  IOException, JDOMException, JAXBException, XMLStreamException {
-    JAXBContext jc = JAXBContext.newInstance(Dataset.class);
-    Unmarshaller um = jc.createUnmarshaller();
-    if (dmr.startsWith("http")) {
-        _dmrElement = opendap.xml.Util.getDocumentRoot(dmr, opendap.http.Util.getNetRCCredentialsProvider());
-    } else {
-      Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmr);
-      dmr = new String(Files.readAllBytes(file));
-      InputStream stream = new ByteArrayInputStream(dmr.getBytes(StandardCharsets.UTF_8.name()));
-      _dmrElement = opendap.xml.Util.getDocument(stream).detachRootElement();
-      
-      // set dataset flags
-      if (dmr.equals("dmrDataset_01.xml")) _dmrDataset_01 = true;
+    // flags for various tests
+    private boolean _dmrDataset_01 = false;
+
+    /**
+     * Inject DMR via constructor
+     *
+     * @param dmrUrl
+     */
+    public DynamicCoverageDescriptionTest(String dmr) throws
+            IOException, JDOMException, JAXBException, XMLStreamException {
+        JAXBContext jc = JAXBContext.newInstance(Dataset.class);
+        Unmarshaller um = jc.createUnmarshaller();
+        if (dmr.startsWith("http")) {
+            _dmrElement = opendap.xml.Util.getDocumentRoot(dmr, opendap.http.Util.getNetRCCredentialsProvider());
+        } else {
+            Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmr);
+            dmr = new String(Files.readAllBytes(file));
+            InputStream stream = new ByteArrayInputStream(dmr.getBytes(StandardCharsets.UTF_8.name()));
+            _dmrElement = opendap.xml.Util.getDocument(stream).detachRootElement();
+
+            // set dataset flags
+            if (dmr.equals("dmrDataset_01.xml")) _dmrDataset_01 = true;
+        }
+
+        // construct mock dynamic service
+        SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
+        DynamicService ds = new DynamicService();
+        ds.setSrs(defaultSrs);
+
+        String s = "time";
+        DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1);
+        dc.setMin(690);
+        dc.setMax(9330);
+        ds.addDomainCoordinate(dc);
+
+        s = "latitude";
+        dc = new DomainCoordinate(s, s, "deg", "", 361);
+        dc.setMin(-90.0);
+        dc.setMax(90.0);
+        ds.addDomainCoordinate(dc);
+
+        s = "longitude";
+        dc = new DomainCoordinate(s, s, "deg", "", 576);
+        dc.setMin(-180.0);
+        dc.setMax(179.625);
+        ds.addDomainCoordinate(dc);
+
+        _dynamicService = ds;
+
     }
-    
-    // construct mock dynamic service
-    SimpleSrs defaultSrs = new SimpleSrs("urn:ogc:def:crs:EPSG::4326", "latitude longitude", "deg deg", 2);
-    DynamicService ds = new DynamicService();
-    ds.setSrs(defaultSrs);
 
-    String s = "time";
-    DomainCoordinate dc = new DomainCoordinate(s, s, "minutes since 1980-01-01 00:30:00", "", 1);
-    dc.setMin(690);
-    dc.setMax(9330);
-    ds.addDomainCoordinate(dc);
+    @Test
+    public void itAllWorks() throws IOException, WcsException {
+        CoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
+        assertTrue(cd != null);
+    }
 
-    s = "latitude";
-    dc = new DomainCoordinate(s, s, "deg", "", 361);
-    dc.setMin(-90.0);
-    dc.setMax(90.0);
-    ds.addDomainCoordinate(dc);
+    @Test
+    public void dataSet01_is_Correctly_diagnosed_As_Being_CF_Compliant() throws IOException, WcsException {
+        Assume.assumeTrue(_dmrDataset_01);
+        DynamicCoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
+        // FIXME This test looks for a variable whose 'standard_name' attribute has a value of "standard_name"  How does this pass?
+        assertTrue(cd.findVariableWithCfStandardName(cd.buildDataset(_dmrElement), "standard_name") != null);
+    }
 
-    s = "longitude";
-    dc = new DomainCoordinate(s, s, "deg", "", 576);
-    dc.setMin(-180.0);
-    dc.setMax(179.625);
-    ds.addDomainCoordinate(dc);
 
-    _dynamicService = ds;
+    @Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                // run as many tests as needed - each URL corresponding to one DMR dataset (i.e. one test)
 
-  }
-  
-  @Test
-  public void itAllWorks() throws IOException, WcsException {
-    CoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
-    assertTrue(cd != null);
-  }
-  
-  @Test
-  public void dataSet01_is_Correctly_diagnosed_As_Being_CF_Compliant() throws IOException, WcsException {
-    Assume.assumeTrue(_dmrDataset_01);
-    DynamicCoverageDescription cd = new DynamicCoverageDescription(_dmrElement, _dynamicService);
-    assertTrue(cd.findVariableWithCfStandardName(cd.buildDataset(_dmrElement), "standard_name") != null);
-  }
-  
-  
-  @Parameters
-  public static Collection<Object[]> data() {
-      return Arrays.asList(new Object[][]{
-              // run as many tests as needed - each URL corresponding to one DMR dataset (i.e. one test)
+                {"dmrDataset_01.xml"},
+                {"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
+                {"http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
+        });
+    }
 
-              {"dmrDataset_01.xml"},
-              {"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
-              {"http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
-      });
-  }
-  
 
 }
