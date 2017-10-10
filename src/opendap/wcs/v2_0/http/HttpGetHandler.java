@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -27,10 +27,13 @@
 package opendap.wcs.v2_0.http;
 
 import net.sf.saxon.s9api.XdmNode;
+import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
+import opendap.dap.Request;
 import opendap.http.error.BadRequest;
+import opendap.io.HyraxStringEncoding;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -58,17 +61,9 @@ import java.util.Map;
  */
 public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
-
-
     private final Logger log;
     private boolean _initialized;
-    private HttpServlet dispatchServlet;
-    private String _predfix;
 
-    private Element _config;
-
-
-    private static final String _coveragesTerminus = "/coverages";
 
     private String _testPath;
     private String _xmlEchoPath;
@@ -125,7 +120,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         _xmlEchoPath           = "echoXML";
         _describeCoveragePath  = "describeCoverage";
 
-
         _resourcePath = resourcePath;
         log.debug("_resourcePath: "+_resourcePath);
 
@@ -151,29 +145,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return CatalogWrapper.getLastModified();
+        return WcsServiceManager.getLastModified();
     }
 
     public void destroy() {
         log.info("Shutting down catalog.");
-        CatalogWrapper.destroy();
+        WcsServiceManager.destroy();
         log.info("Destroy Complete");
     }
 
-
-    private Map<String, String[]> getKVP(HttpServletRequest request){
-        Map<String,String[]> requestParameters = new HashMap<String, String[]>();
-        Map pmap =  request.getParameterMap();
-
-        for(Object o: pmap.keySet()){
-            String key = (String) o;   // Get the key String
-            String[] value = (String[]) pmap.get(key);  // Get the value before we change the key
-            key = key.toLowerCase(); // Make the key set case insensitive;
-            requestParameters.put(key,value);
-        }
-        return requestParameters;
-
-    }
 
 
     private boolean wcsRequestDispatch(HttpServletRequest request,
@@ -186,57 +166,62 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         while(relativeURL.startsWith("/") && relativeURL.length()>0)
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String serviceURL = Util.getServiceUrl(request);
         String query      = request.getQueryString();
 
-        String requestUrl = getRequestUrl(request);
 
         boolean isWcsEndPoint = false;
 
         if (relativeURL != null) {
 
-                isWcsEndPoint = true;
+            isWcsEndPoint = true;
 
-                if (sendResponse) {
+            if (sendResponse) {
 
-                    if (relativeURL.equals("/")) {
-                        response.sendRedirect(_contextPath+"/");
-                        log.debug("Sent redirect from / to "+_contextPath+"/");
+                if (relativeURL.equals("/")) {
+                    response.sendRedirect(_contextPath+"/");
+                    log.debug("Sent redirect from / to "+_contextPath+"/");
+                }
+                else if(relativeURL.equals("") && query!=null){
+
+                    KvpHandler.processKvpWcsRequest(request,response);
+                    log.info("Sent WCS Response");
+                }
+                else if(relativeURL.startsWith(_testPath)){
+                    testWcsRequest(request, response);
+                    log.info("Sent WCS Test Page");
+                }
+                else if(relativeURL.startsWith(_xmlEchoPath)){
+                    echoWcsRequest(request, response);
+                    log.info("Returned WCS KVP request as an WCS XML request document.");
+                }
+                else if(relativeURL.startsWith(_describeCoveragePath)){
+                    sendDescribeCoveragePage(request, response);
+                    log.info("Returned WCS Describe Coverage Presentation Page.");
+                }
+                else if(_enableUpdateUrl && relativeURL.equals("update()")){
+                    log.info("Updating catalog.");
+                    update(request, response);
+                    log.info("Catalog update complete.");
+                }
+                else if(query==null){
+                    sendCapabilitesPresentationPage(request, response);
+                    log.info("Sent WCS Capabilities Response Presentation Page.");
+                }
+                else {
+                    log.info("Trying extra path as coverageId: {}",relativeURL);
+                    // Map<String, String[]> kvp = KvpHandler.getKVP(request);
+                    try {
+                        KvpHandler.processKvpWcsRequest(request,response);
                     }
-                    else if(relativeURL.equals("") && query!=null){
-                        KvpHandler.processKvpWcsRequest(serviceURL, requestUrl ,getKVP(request),response);
-                        log.info("Sent WCS Response");
-                    }
-                    else if(relativeURL.startsWith(_testPath)){
-                        testWcsRequest(request, response);
-                        log.info("Sent WCS Test Page");
-                    }
-                    else if(relativeURL.startsWith(_xmlEchoPath)){
-                        echoWcsRequest(request, response);
-                        log.info("Returned WCS KVP request as an WCS XML request document.");
-                    }
-                    else if(relativeURL.startsWith(_describeCoveragePath)){
-                        sendDescribeCoveragePage(request, response);
-                        log.info("Returned WCS Describe Coverage Presentation Page.");
-                    }
-                    else if(_enableUpdateUrl && relativeURL.equals("update()")){
-                        log.info("Updating catalog.");
-                        update(request, response);
-                        log.info("Catalog update complete.");
-                    }
-                    else if(query==null){
-                        sendCapabilitesPresentationPage(request, response);
-                        log.info("Sent WCS Capabilities Response Presentation Page.");
-                    }
-                    else {
-                        String msg = "The request does not resolve to a WCS service operation that this server supports.";
+                    catch(Exception e){
+                        String msg = "The request was a failure. Caught "+e.getClass().getName()+
+                        "  Message: "+e.getMessage();
                         log.error("wcsRequestDispatch() - {}",msg);
                         throw new BadRequest(msg);
                     }
-
                 }
+            }
         }
-
         return isWcsEndPoint;
 
     }
@@ -270,7 +255,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
        public void run(){
            try {
-           CatalogWrapper.update();
+           WcsServiceManager.updateCatalogs();
            } catch (Exception e) {
                log.error("catalogUpdater(): Caught "+e.getClass().getName()+" Message: "+e.getMessage());
            }
@@ -284,12 +269,13 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void sendDescribeCoveragePage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        Request oreq = new Request(null,request);
 
         String xsltDoc = _resourcePath+ "xsl/coverageDescription.xsl";
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = Util.getServiceUrl(request);
-        log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
+        String baseServiceUrl = Util.getServiceUrl(request);
+        log.debug("sendDescribeCoveragePage()  serviceUrl: "+baseServiceUrl);
 
         String id = request.getQueryString();
 
@@ -298,7 +284,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Document coverageDescription = null;
         Element cde;
         try {
-            cde = CatalogWrapper.getCoverageDescriptionElement(id);
+            WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
+            cde = wcsCatalog.getCoverageDescriptionElement(id);
             coverageDescription = new Document(cde);
         }
         catch(WcsException e){
@@ -313,10 +300,14 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",serviceUrl);
+        t.setParameter("WcsService",baseServiceUrl);
+        t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
-        XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
+        XdmNode descCover =
+                t.build(
+                        new StreamSource(
+                                new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes(HyraxStringEncoding.getCharset()))));
 
         t.transform(descCover,response.getOutputStream());
 
@@ -328,51 +319,46 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void sendCapabilitesPresentationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        Request oreq = new Request(null,request);
 
         String xsltDoc =  _resourcePath + "xsl/capabilities.xsl";
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = Util.getServiceUrl(request);
-        log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
+        String baseServiceUrl = Util.getServiceUrl(request);
+        log.debug("sendCapabilitesPresentationPage() - baseServiceUrl: "+baseServiceUrl);
+        String relativeURL = ReqInfo.getLocalUrl(request);
+        log.debug("sendCapabilitesPresentationPage() - relativeURL: "+relativeURL);
+        String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
+        log.debug("sendCapabilitesPresentationPage() - wcsServiceUrl: "+wcsServiceUrl);
 
-        Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
 
-
+        Map<String, String[]> kvp = KvpHandler.getKVP(request);
+        String[] cids= kvp.get("coverageId".toLowerCase());
+        Document capabilitiesDoc = GetCapabilitiesRequestProcessor.getFullCapabilitiesDocument(wcsServiceUrl,cids);
         log.debug(xmlo.outputString(capabilitiesDoc));
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
 
+
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
-        t.setParameter("ServicePrefix",serviceUrl);
+        t.setParameter("WcsService",baseServiceUrl);
+        t.setParameter("DocsService",oreq.getDocsServiceLocalID());
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
-
-        XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
-
+        XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes(HyraxStringEncoding.getCharset()))));
         t.transform(capDoc,response.getOutputStream());
-
-
-
     }
-
-
-
-
-
 
 
     public void echoWcsRequest(HttpServletRequest request,
                                   HttpServletResponse response) throws IOException, InterruptedException {
 
-        Map<String,String[]> keyValuePairs = getKVP(request);
+        Map<String,String[]> keyValuePairs = KvpHandler.getKVP(request);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
-        String requestUrl = getRequestUrl(request);
-
+        String requestUrl = getRequestUrlWithQuery(request);
         response.setContentType("text/xml");
-
         try {
-
             switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
@@ -394,10 +380,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                     throw new WcsException("INTERNAL ERROR: getRequestType() returned an invalid value.",
                             WcsException.NO_APPLICABLE_CODE);
             }
-
             xmlo.output(reqDoc,response.getOutputStream());
-
-
         }
         catch(WcsException e){
             log.error(e.getMessage());
@@ -408,14 +391,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     }
-
-
-
-    public static String getRequestUrl(HttpServletRequest request){
-        String query = Scrub.completeURL(request.getQueryString());
-        String requestUrl = request.getRequestURL() + "?" + query;
-
-        return requestUrl;
+    
+    public static String getRequestUrlWithQuery(HttpServletRequest request){
+        StringBuilder requestUrl =  new StringBuilder(ReqInfo.getRequestUrlPath(request));
+        String query = request.getQueryString();
+        if(query!=null && !query.isEmpty()){
+            query = Scrub.completeURL(request.getQueryString());
+            requestUrl.append("?").append(query);
+        }
+        return requestUrl.toString();
     }
 
 
@@ -424,21 +408,24 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void testWcsRequest(HttpServletRequest request,
                                   HttpServletResponse response) throws InterruptedException, IOException {
 
-        Map<String,String[]> keyValuePairs = getKVP(request);
-        String serviceUrl = Util.getServiceUrl(request);
+        Map<String,String[]> keyValuePairs = KvpHandler.getKVP(request);
+        String baseServiceUrl = Util.getServiceUrl(request);
+        Request oreq = new Request(null,request);
+        String docsService = oreq.getDocsServiceLocalID();
+
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
         String query = Scrub.completeURL(request.getQueryString());
-        String requestUrl = getRequestUrl(request);
+        String requestUrl = getRequestUrlWithQuery(request);
         response.setContentType("text/html");
 
         String page = "<html>";
         page += "    <head>";
-        page += "        <link rel='stylesheet' href='"+serviceUrl+"/docs/css/contents.css' type='text/css' >";
+        page += "        <link rel='stylesheet' href='"+docsService+"/css/contents.css' type='text/css' >";
         page += "        <title>OPeNDAP Hyrax WCS Test</title>";
         page += "    </head>";
         page += "    <body>";
-        page += "    <img alt=\"OPeNDAP Logo\" src='"+serviceUrl+"/docs/images/logo.gif'/>";
+        page += "    <img alt=\"OPeNDAP Logo\" src='"+docsService+"/images/logo.gif'/>";
         page += "    <h2>OPeNDAP WCS Test Harness</h2>";
         page += "    How Nice! You sent a WCS request.";
         page += "    <h3>KVP request: </h3>";
@@ -449,7 +436,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
             switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
-                    page += getCapabilitiesTestPage(serviceUrl, keyValuePairs);
+                    page += getCapabilitiesTestPage(baseServiceUrl, keyValuePairs);
                     break;
 
                 case  DESCRIBE_COVERAGE:
@@ -549,7 +536,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
     public String getCoverageTestPage(HttpServletRequest req, Map<String,String[]> keyValuePairs) throws InterruptedException, WcsException {
 
-        String requestUrl = HttpGetHandler.getRequestUrl(req);
+        String requestUrl = HttpGetHandler.getRequestUrlWithQuery(req);
 
         GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl, keyValuePairs);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -566,11 +553,12 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         GetCoverageRequest gcr = new GetCoverageRequest(requestUrl, keyValuePairs);
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(gcr.getCoverageID());
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(gcr.getCoverageID());
+        CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(gcr.getCoverageID());
 
         Coverage coverage = new Coverage(coverageDescription,requestUrl);
 
-        Element coverageElement = coverage.getCoverageElement(GetCoverageRequestProcessor.getDataAccessUrl(gcr), GetCoverageRequestProcessor.getReturnMimeType(gcr));
+        Element coverageElement = coverage.getCoverageElement(GetCoverageRequestProcessor.getDap2DataAccessUrl(gcr), GetCoverageRequestProcessor.getReturnMimeType(gcr));
 
 
         page.append(xmlo.outputString(coverageElement).replaceAll("<","&lt;").replaceAll(">","&gt;"));

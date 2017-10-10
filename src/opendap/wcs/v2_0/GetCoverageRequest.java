@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -32,7 +32,9 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * User: ndp
@@ -50,6 +52,8 @@ public class GetCoverageRequest {
     private String _mediaType;
     private HashMap<String, DimensionSubset> _dimensionSubsets;
     private TemporalDimensionSubset _temporalSubset;
+    private RangeSubset _rangeSubset;
+    private String _cfHistoryAttribute;
 
     private String _requestUrl;
 
@@ -60,7 +64,6 @@ public class GetCoverageRequest {
      *    &RangeSubset=r1,r2,r4& selects three range components
      *    &RangeSubset=r1:r4,r7& selects 5 range components.
      */
-    private Vector<String> _rangeSubset;
 
 
     private ScaleRequest _scaleRequest;
@@ -71,10 +74,10 @@ public class GetCoverageRequest {
         _mediaType      = null;
         _dimensionSubsets = new HashMap<>();
         _requestUrl     = null;
-
+        _cfHistoryAttribute = null;
 
         _scaleRequest   = null;
-        _rangeSubset    = new Vector<>();
+        _rangeSubset    = null;
 
 
 
@@ -114,13 +117,11 @@ public class GetCoverageRequest {
         }
         else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
-                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "have failed. The WCS request for the operation '"+s[0]+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
         }
-
-
 
         // Get the identifier for the coverage.
         s = kvp.get("coverageId".toLowerCase());
@@ -130,18 +131,16 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "coverageId");
         }
-        _coverageID = s[0];
+        _coverageID = Util.stripQuotes(s[0]);
 
-
-        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(_coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+        CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
             throw new WcsException("No such _coverageID: '"+ _coverageID +"'",
                     WcsException.INVALID_PARAMETER_VALUE,
                     "coverageId");
         }
-
-
 
         // Get the _format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
         // it was not specified.
@@ -173,13 +172,22 @@ public class GetCoverageRequest {
                  */
                 if(subset.getDimensionId().toLowerCase().contains("time")){
                     DomainCoordinate timeDomain = cvrgDscrpt.getDomainCoordinate("time");
+                    if(timeDomain==null)
+                        throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage",WcsException.INVALID_PARAMETER_VALUE,"subset");
                     _temporalSubset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
                     subset = _temporalSubset;
                 }
                 _dimensionSubsets.put(subset.getDimensionId(), subset);
             }
         }
-
+        // Get the range subset expressions
+        s = kvp.get("RangeSubset".toLowerCase());
+        if(s!=null) {
+            for (String rangeSubsetString : s) {
+                if(!rangeSubsetString.isEmpty())
+                    _rangeSubset = new RangeSubset(rangeSubsetString,cvrgDscrpt.getFields());
+            }
+        }
     }
 
     /**
@@ -196,7 +204,6 @@ public class GetCoverageRequest {
 
         Element e;
         String s;
-
         _requestUrl = requestUrl;
 
         // Make sure we got the correct request object.
@@ -217,11 +224,14 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "wcs:CoverageId");
         }
-        _coverageID =e.getText();
+        _coverageID = Util.stripQuotes(e.getText());
+
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+
 
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
-        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(_coverageID);
+        CoverageDescription cvrDsc = wcsCatalog.getCoverageDescription(_coverageID);
 
 
         ingestDimensionSubset(getCoverageRequestElem, cvrDsc);
@@ -238,7 +248,7 @@ public class GetCoverageRequest {
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
         // part and the second part must contain whatever response _format the user specified in the _format parameter.
-        Element mediaTypeElement = getCoverageRequestElem.getChild("_mediaType",WCS.WCS_NS);
+        Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
         if(mediaTypeElement!=null){
             s = mediaTypeElement.getTextTrim();
             setMediaType(s);
@@ -251,8 +261,8 @@ public class GetCoverageRequest {
     }
 
 
-    public Vector<String> getRangeSubset(){
-        return new Vector<>(_rangeSubset);
+    public RangeSubset getRangeSubset(){
+        return _rangeSubset;
     }
 
 
@@ -277,12 +287,6 @@ public class GetCoverageRequest {
     public String getCoverageID() {
         return _coverageID;
     }
-
-
-    public void setCoverageID(String coverageID) {
-        this._coverageID = coverageID;
-    }
-
 
     public String getFormat() {
         return _format;
@@ -329,6 +333,8 @@ public class GetCoverageRequest {
 
             if(ds.getDimensionId().toLowerCase().contains("time")){
                 DomainCoordinate timeDomain = cvrDsc.getDomainCoordinate("time");
+                if(timeDomain==null)
+                    throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage.",WcsException.INVALID_PARAMETER_VALUE,"Dimension*");
                 ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
             }
 
@@ -426,5 +432,12 @@ public class GetCoverageRequest {
     }
 
 
+    public void setCfHistoryAttribute(String s){
+        _cfHistoryAttribute = s;
+    }
+
+    public String getCfHistoryAttribute(){
+        return _cfHistoryAttribute;
+    }
 
 }

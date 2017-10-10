@@ -111,7 +111,7 @@ public class Netcdf3 extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
-        String cf_history_entry = getCFHistoryEntry(request);
+        String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
 
         log.debug("sendNormativeRepresentation(): cf_history_entry: '{}'",cf_history_entry);
 

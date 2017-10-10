@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,7 +25,12 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.PathBuilder;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import opendap.io.HyraxStringEncoding;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -50,7 +55,7 @@ import java.net.URLDecoder;
  */
 public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
     protected Logger log;
-    protected HttpServlet dispatchServlet;
+    //protected HttpServlet dispatchServlet;
 
     protected boolean _initialized;
     protected String _prefix;
@@ -66,7 +71,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     public void init(HttpServlet servlet, Element config) throws Exception {
         if (_initialized) return;
 
-        dispatchServlet = servlet;
+        //dispatchServlet = servlet;
         _config = config;
 
         ingestPrefix();
@@ -158,9 +163,9 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         Document wcsRequestDoc = parseWcsRequest(sis, encoding);
 
         Element wcsRequest = wcsRequestDoc.getRootElement();
-        String serviceUrl = Util.getServiceUrlString(request, _prefix);
+        String serviceUrl = PathBuilder.pathConcat(Util.getServiceUrl(request),_prefix);
 
-        String requestUrl=HttpGetHandler.getRequestUrl(request);
+        String requestUrl=HttpGetHandler.getRequestUrlWithQuery(request);
 
         handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
 
@@ -186,20 +191,13 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
                 break;
 
             case GET_COVERAGE:
-
                 GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
-
-                /*
-                if (getCoverageRequest.isStore()) {
-                    wcsResponse = getStoredCoverage(getCoverageRequest);
-                    sendWcsResponse(wcsResponse,response);
-                }
-                else {
+                try {
                     sendCoverageResponse(getCoverageRequest, response);
+                } catch (IOException | PPTException | BadConfigurationException | BESError e) {
+                    throw new WcsException("FAILED to complete the GetCoverage operation, :(  Caught "+
+                    e.getClass().getName()+ "  message: "+ e.getMessage(),WcsException.NO_APPLICABLE_CODE);
                 }
-                */
-
-
                 break;
 
             default:
@@ -241,7 +239,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
 
-    public class NoOpEntityResolver implements EntityResolver {
+    static public class NoOpEntityResolver implements EntityResolver {
         public InputSource resolveEntity(String publicId, String systemId) {
             return new InputSource(new StringReader(""));
         }
@@ -253,7 +251,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
 
         String sb = "";
-        String reqDoc = "";
+        StringBuilder reqDocBuilder = new StringBuilder();
         int length;
 
         while (sb != null) {
@@ -261,13 +259,13 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
                 sb = sis.readLine();
                 if (sb != null) {
 
-                    length = sb.length() + reqDoc.length();
+                    length = sb.length() + reqDocBuilder.length();
                     if (length > WCS.MAX_REQUEST_LENGTH) {
                         throw new WcsException("Post Body (WCS Request Document) too long. Try again with something smaller.",
                                 WcsException.INVALID_PARAMETER_VALUE,
                                 "WCS Request Document");
                     }
-                    reqDoc += sb;
+                    reqDocBuilder.append(sb);
                 }
             } catch (IOException e) {
                 throw new WcsException("Failed to read WCS Request Document. Mesg: " + e.getMessage(),
@@ -275,6 +273,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
                         "WCS Request Document");
             }
         }
+        String reqDoc = reqDocBuilder.toString();
 
         try {
             reqDoc = URLDecoder.decode(reqDoc, encoding);
@@ -295,7 +294,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
             saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             saxBuilder.setEntityResolver(new NoOpEntityResolver());
 
-            ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
+            ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes(HyraxStringEncoding.getCharset()));
             requestDoc = saxBuilder.build(baos);
             return requestDoc;
         } catch (Exception e) {
@@ -311,7 +310,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
     public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
 
-        return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
     }
 
 
@@ -329,7 +328,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      * @throws WcsException  When bad things happen.
      * @throws InterruptedException When it gets interrupted.
      */
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
         GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
 

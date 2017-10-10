@@ -40,11 +40,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -387,6 +386,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
     */
 
+    /*
 
     public String getRequestUrlPath(HttpServletRequest req) {
         String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
@@ -403,12 +403,12 @@ public abstract class Dap4Responder extends BesDapResponder  {
         return requestUrl;
     }
 
-
+     */
 
     @Override
     public String getXmlBase(HttpServletRequest req){
 
-        String requestUrl = getRequestUrlPath(req);
+        String requestUrl = ReqInfo.getRequestUrlPath(req);
         String xmlBase = Util.dropSuffixFrom(requestUrl, Pattern.compile(getCombinedRequestSuffixRegex()));
         _log.debug("getXmlBase(): @xml:base='{}'", xmlBase);
         return xmlBase;
@@ -430,9 +430,11 @@ public abstract class Dap4Responder extends BesDapResponder  {
     }
 
 
+    /*
+
     private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
 
-    public String getCFHistoryEntry(HttpServletRequest request) throws IOException {
+    public  String getCFHistoryEntry(HttpServletRequest request) throws IOException {
 
         StringBuilder cf_history_entry = new StringBuilder();
 
@@ -449,7 +451,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
         cf_history_entry.append(" ");
 
         // Add the complete request URL
-        cf_history_entry.append(getRequestUrlPath(request));
+        cf_history_entry.append(ReqInfo.getRequestUrlPath(request));
         cf_history_entry.append("?");
         cf_history_entry.append(ReqInfo.getConstraintExpression(request));
         cf_history_entry.append("\n");
@@ -459,7 +461,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
 
-
+      */
 
 
 
@@ -548,7 +550,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
     /**
      * If addTypeSuffixToDownloadFilename() is true, append the value of
      * getRequestSuffix() to the name.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -560,10 +562,10 @@ public abstract class Dap4Responder extends BesDapResponder  {
         // new rule: if addType...() is true, then look at 'name' and do one of the following:
         //              file.<ext>: remove '.<ext>' and append the value of getRequestSuffix()
         //              file [no ext at all]: append getRequestSuffix()
-        //           else if addType...() is not true, provide the old behavior 
+        //           else if addType...() is not true, provide the old behavior
         // Assume that all <ext> are no more than three characters long (some are, but this is
         // a reasonable compromise).
-        
+
         if(addTypeSuffixToDownloadFilename()) {
         	int dotPos = name.lastIndexOf('.');	// -1 if '.' not found
         	int extLength = name.length() - (dotPos + 1);
@@ -572,7 +574,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
         		name = name.substring(0, dotPos);
         	}
         }
-        	
+
         name += getRequestSuffix();
 
         return name;

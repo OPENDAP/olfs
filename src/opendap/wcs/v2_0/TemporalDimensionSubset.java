@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ import java.util.Date;
  * This class extends DimensionSubset concept to correctly handle time strings.
  *
 */
-public class TemporalDimensionSubset  extends DimensionSubset implements Cloneable {
+public class TemporalDimensionSubset  extends DimensionSubset { // implements Cloneable {
 
 
     private String _units;

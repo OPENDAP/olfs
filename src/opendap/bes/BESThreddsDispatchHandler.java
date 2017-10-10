@@ -33,8 +33,10 @@ import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
 import opendap.services.Service;
 import opendap.services.ServicesRegistry;
+import opendap.services.WebServiceHandler;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.viewers.NcWmsService;
+import opendap.viewers.WcsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -142,59 +144,57 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
     }
 
 
-
-
-
+    /**
+     * Handles a request for a THREDDS catalog.
+     * @param request The request to be handled.
+     * @param response The response object into which the response information
+     * will be placed.
+     * @throws Exception
+     */
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception {
 
 
-        _log.debug("Processing THREDDS request.");
-
+        _log.debug("handleRequest() - Processing THREDDS request.");
         Request oreq = new Request(_servlet,request);
-
-        // String context = request.getContextPath();
-
-        
 
         _log.debug(ServletUtil.probeRequest(_servlet, request));
 
-
+        // Construct catalog name
         String besCatalogName = Scrub.urlContent(oreq.getRelativeUrl());
-
         if (besCatalogName.endsWith("/catalog.xml")) {
             besCatalogName = besCatalogName.substring(0, besCatalogName.lastIndexOf("catalog.xml"));
         }
-
         if (!besCatalogName.endsWith("/"))
             besCatalogName += "/";
-
-        if (besCatalogName.startsWith("/"))
-            besCatalogName = besCatalogName.substring(1, besCatalogName.length());
-
-        _log.debug("sendThreddsCatalog() - besCatalogName:  " + besCatalogName);
+        while (besCatalogName.startsWith("/") && besCatalogName.length()>1)
+            besCatalogName = besCatalogName.substring(1);
+        _log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
 
 
+        // Get the BES catalog for this node.
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
         Document showCatalogDoc = new Document();
-
         _besApi.getBesCatalog(besCatalogName, showCatalogDoc);
-
-
         _log.debug(xmlo.outputString(showCatalogDoc));
 
+        // Load the XSL for BESCatalog -> THREDDS catalog
         String xsltDoc = _systemPath + "/xsl/catalog.xsl";
         Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
+        //////////////////////////////////////////////////////////////////////
+        // Configure services
 
+        // Add a DAP service, because we are a DAP server above all else.
         showCatalogToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
 
 
         String base = null;
-        String dsId = null;
+        String dsId;
+        String matchRegex;
 
+        // Add WMS if we have it
         Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
         if(s!=null && s instanceof NcWmsService){
             NcWmsService nws = (NcWmsService) s;
@@ -203,10 +203,36 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
             showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
         }
-        _log.debug("ncWMS service base:"+base);
+        _log.debug("handleRequest() - ncWMS service base: {}",base);
 
 
+        // Add WCS Services - We know there may be more than one...
+        Vector<WebServiceHandler> wcsServices = ServicesRegistry.getWebServicesLike(WcsService.ID);
+        if(!wcsServices.isEmpty()) {
 
+            Element wcsServicesElement = new Element("WcsServices");
+            for(WebServiceHandler wsh : wcsServices){
+                if (wsh instanceof WcsService) {
+                    WcsService wcs = (WcsService) wsh;
+                    base = wcs.getBase();
+                    while(base.endsWith("/")&&base.length()>1)
+                        base = base.substring(0,base.length()-1);
+                    dsId = wcs.getDynamicServiceId();
+                    matchRegex =  wcs.getMatchRegexString();
+                    Element wcsService = new Element("Wcs");
+                    wcsService.setAttribute("name",wsh.getServiceId());
+                    wcsService.setAttribute("base",base);
+                    wcsService.setAttribute("dynamicServiceId",dsId);
+                    wcsService.setAttribute("matchRegex",matchRegex);
+                    wcsServicesElement.addContent(wcsService);
+                }
+                _log.debug("handleRequest() - WCS service base: {}", base);
+
+            }
+            if(wcsServicesElement.getContentSize()>0){
+                showCatalogToThreddsCatalog.setParameter(wcsServicesElement);
+            }
+        }
 
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
@@ -225,7 +251,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
-            _log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
+            _log.debug("handleRequest() - Found inherited metadata for collection '"+ besCatalogName +"'");
 
             // Go get the inherited metadata elements.
             Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
@@ -243,12 +269,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Element topDataset = catalog.getChild("dataset", THREDDS.NS);
 
             // Add the metadata content to the dataset element.
-            _log.debug("Adding inherited metadata to catalog");
+            _log.debug("handleRequest() - Adding inherited metadata to catalog");
             topDataset.addContent(1,metadata);
 
             // Get the service definitions (if any) used by the inherited metadata?
             Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
-            _log.debug("Collecting inherited services.");
+            _log.debug("handleRequest() - Collecting inherited services.");
             Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
             HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
             Element service;
@@ -258,23 +284,19 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             }
 
             if(!inheritedServices.isEmpty()){
-
-
-
-                _log.debug("Collecting existing services.");
+                _log.debug("handleRequest() - Collecting existing services.");
                 i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
                 HashMap<String, Element> existingServices = new HashMap<String, Element>();
-                while(i.hasNext()){
-                    service = (Element)i.next();
-                    existingServices.put(service.getAttributeValue("name"),service);
+                while(i.hasNext()) {
+                    service = (Element) i.next();
+                    existingServices.put(service.getAttributeValue("name"), service);
                 }
-
 
                 String iServiceName;
 
                 for(Element inheritedService: inheritedServices.values()){
                     iServiceName = inheritedService.getAttributeValue("name");
-                    _log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
+                    _log.debug("handleRequest() - Inherited service has service '"+iServiceName+"' - Checking existing services...");
 
                     Element existingService = existingServices.get(iServiceName);
 
@@ -292,25 +314,16 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
                     }
                 }
-
                 Collection<Element> servicesToAdd = inheritedServicesElement.getChildren("service",THREDDS.NS);
                 Vector<Element> services = new Vector<Element>();
                 for(Element e : servicesToAdd){
                     services.add(e);
                 }
-
                 for(Element e : services){
                     e.detach();
                 }
-
                threddsCatalog.getRootElement().addContent(1,services);
-
-
-
             }
-
-
-
             // Transmit the catalog.
             xmlo.output(threddsCatalog,response.getOutputStream());
         }
@@ -318,13 +331,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             // Transform the BES showCatalog response intp a THREDDS catalog and send it off to the client.
             showCatalogToThreddsCatalog.transform(besCatalog, response.getOutputStream());
         }
-
-
-
-
-        _log.debug("THREDDS showCatalogDoc request processed.");
-
-
+        _log.debug("handleRequest() - THREDDS showCatalogDoc request processed.");
     }
 
 

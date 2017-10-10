@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -41,36 +41,20 @@ import java.util.Vector;
  *
  */
 public class Coverage {
-
-
     private Logger log;
-
     private CoverageDescription _myCD;
-
     private String _requestUrl;
-
-
-
-
-
 
     void init() throws WcsException {
         log = LoggerFactory.getLogger(getClass());
 
     }
 
-
-
-
     public Coverage( CoverageDescription cd, String requestUrl) throws WcsException, InterruptedException {
-
         _myCD = cd;
-
         if(_myCD==null)
             throw new WcsException("Received a null CoverageDescription",WcsException.NO_APPLICABLE_CODE,"java::opendap.wcs.v_2_0.Coverage");
-
         _requestUrl = requestUrl;
-
         init();
     }
 
@@ -82,9 +66,6 @@ public class Coverage {
 
 
     public Element getCisCoverageElement(String rangeValuesPartID, String mimeType)throws WcsException{
-
-
-
         return null;
     }
 
@@ -97,30 +78,9 @@ public class Coverage {
      * @throws WcsException When the bad things happen.
      */
     public  Element getCoverageElement(String rangeValuesPartID, String mimeType) throws WcsException {
-
-        Element e;
         Element coverage;
-
-
-
-
-
         String coverageSubtype = _myCD.getCoverageSubtype();
         coverage = new Element(coverageSubtype,WCS.GMLCOV_NS);
-
-        /*
-
-        if(coverageSubtype.equals("RectifiedGridCoverage")){
-            coverage = new Element("RectifiedGridCoverage",WCS.GMLCOV_NS);
-        }
-        else if(coverageSubtype.equals("GridCoverage")){
-            coverage = new Element("GridCoverage",WCS.GMLCOV_NS);
-        }
-        else
-            throw new WcsException("This server does not support gml:CoverageSubtype: "+ Scrub.fileName(coverageSubtype),
-                    WcsException.INVALID_PARAMETER_VALUE,"gml:CoverageSubtype");
-        */
-
 
         coverage.addNamespaceDeclaration(WCS.WCS_NS);
         coverage.addNamespaceDeclaration(WCS.OWS_NS);
@@ -137,11 +97,8 @@ public class Coverage {
                 .append(WCS.GMLCOV_SCHEMA_LOCATION_BASE).append("gmlcovAll.xsd").append("   ")
                 .append(WCS.SWE_NAMESPACE_STRING).append(" ")
                 .append(WCS.SWE_SCHEMA_LOCATION_BASE).append("swe.xsd")
-
         ;
         coverage.setAttribute("schemaLocation",schemaLocation.toString(),WCS.XSI_NS);
-
-
 
         String gmlId = _myCD.getGmlId();
         if(gmlId!=null)
@@ -149,20 +106,10 @@ public class Coverage {
 
         Vector<Element> abstractFeatureTypeContent = _myCD.getAbstractFeatureTypeContent();
         coverage.addContent(abstractFeatureTypeContent);
-
-
         coverage.addContent(_myCD.getDomainSet());
         coverage.addContent(getRangeSet(rangeValuesPartID, mimeType));
         coverage.addContent(_myCD.getRangeType());
-
-
-
-
         return coverage;
-
-
-
-        
     }
 
 
@@ -197,7 +144,6 @@ public class Coverage {
      */
     private Element getRangeSet(String rangeValuesPartID, String mimeType) throws WcsException {
 
-
         Element rangeSet = new Element("rangeSet",WCS.GML_NS);
         Element file = new Element("File",WCS.GML_NS);
 
@@ -208,7 +154,6 @@ public class Coverage {
             log.error(msg);
             throw new WcsException(msg,WcsException.NO_APPLICABLE_CODE);
         }
-
 
         Element rangeParameters = new Element("rangeParameters",WCS.GML_NS);
         rangeParameters.setAttribute("href",rangeValuesPartID,WCS.XLINK_NS);
@@ -226,26 +171,13 @@ public class Coverage {
         Element mimeTypeElement =  new Element("mimeType",WCS.GML_NS);
         mimeTypeElement.setText(mimeType);
 
-
         rangeSet.addContent(file);
 
         return rangeSet;
-
-
     }
-
-
 
     public String getRequestUrl() {
         return _requestUrl;
     }
 
-
-
-
-
-
-
-
-    
 }

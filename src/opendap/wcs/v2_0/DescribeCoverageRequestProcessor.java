@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -58,11 +58,14 @@ public class DescribeCoverageRequestProcessor {
 
         CoverageDescription cd;
 
-        for(String id: req.getIds()){
-            cd = CatalogWrapper.getCoverageDescription(id);
-            coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
+        String ids[] = req.getIds();
+        if(ids!=null && ids.length>0){
+            for(String id: ids){
+                WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
+                cd = wcsCatalog.getCoverageDescription(id);
+                coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
+            }
         }
-
         return new Document(coverageDescriptions);
 
     }

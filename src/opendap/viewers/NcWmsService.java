@@ -30,6 +30,7 @@ import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 /**
@@ -67,7 +68,7 @@ public class NcWmsService implements WebServiceHandler {
 
 
     @Override
-    public void init(HttpServlet servlet, Element config) {
+    public void init(HttpServlet servlet, Element config) throws ServletException {
 
 
         _config = config;
@@ -119,7 +120,7 @@ public class NcWmsService implements WebServiceHandler {
 
 
     @Override
-    public boolean datasetCanBeViewed(Document ddx) {
+    public boolean datasetCanBeViewed(String datasetId, Document ddx) {
         //Element dataset = ddx.getRootElement();
 
         //Iterator i = dataset.getDescendants(new ElementFilter("Grid", DAP.DAPv32_NS));

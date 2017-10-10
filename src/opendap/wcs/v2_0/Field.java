@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -28,6 +28,8 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  *
  *
@@ -49,26 +51,34 @@ import org.jdom.Element;
  */
 public class Field {
 
-    Element mySweElement;
-
-    String name;
+    Element _mySweElement;
 
     public Field(Element swe) throws WcsException {
 
         if(swe.getName().equals("field") && swe.getNamespace().equals(WCS.SWE_NS)){
-            mySweElement = swe;
+            _mySweElement = (Element)swe.clone();
         }
         else {
-        throw new WcsException("Cannot instantiate a Field class with a non-conformant " +
+            throw new WcsException("Cannot instantiate a Field class with a non-conformant " +
                 "intializer element.",WcsException.INVALID_PARAMETER_VALUE);
         }
     }
 
 
-
-    public String getName(){
-        return mySweElement.getAttributeValue("name");
+    /**
+     * Builds a Dummy swe:Field with just a name attribute.
+     * Use this only for testing purposes!!!
+     * @param name
+     */
+    public Field(String name){
+        Element e = new Element("field", WCS.SWE_NS);
+        e.setAttribute("name", name);
+        _mySweElement =e;
     }
 
+    @XmlAttribute
+    public String getName(){
+        return _mySweElement.getAttributeValue("name");
+    }
 
 }

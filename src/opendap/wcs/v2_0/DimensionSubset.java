@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ import org.jdom.Element;
  * values (non integer). In other words: Both values must be in the arrayIndex facet, or both in the byValue facet.
  *
 */
-public class DimensionSubset implements Cloneable {
+public class DimensionSubset { // implements Cloneable {
 
 
     public enum Type {TRIM, SLICE_POINT}
@@ -85,6 +85,19 @@ public class DimensionSubset implements Cloneable {
         _domainCoordinate = source._domainCoordinate==null ? null : new DomainCoordinate(source._domainCoordinate);
     }
 
+    /**
+     * Makes a DimensioSubset that requests the entire DomainCoordinate
+     * @param dc
+     */
+    public DimensionSubset(DomainCoordinate dc){
+        _mySubsetType = Type.TRIM;
+        _dimensionId = dc.getName();
+        _trimLow = "0";
+        _trimHigh = ""+(dc.getSize()-1);
+        _isArrayIndexSubset = true;
+        _domainCoordinate = dc;
+    }
+
 
     /**
      * Accepts the KVP encoding of a subset parameter for WCS 2.0
@@ -112,7 +125,7 @@ public class DimensionSubset implements Cloneable {
                 WcsException.INVALID_PARAMETER_VALUE,
                 "subset");
         }
-        setDimensionId(s);
+        setDimensionId(Util.stripQuotes(s));
 
         String intervalOrPoint = kvpSubsetString.substring(leftParen+1,rghtParen);
 

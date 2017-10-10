@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 
 import java.util.Collection;
@@ -58,10 +59,10 @@ public interface WcsCatalog {
      * a WcsCatalog configuration element as a child of the root element.
      * @param cacheDir The directory into which the catalog may choose to write persistent content,
      * intermediate files, etc.
-     * @param resourcePath The path to the resource bundle delivered with the software.
+     * @param serviceContextPath The service context, should be /context/servlet
      * @throws Exception When the bad things happen.
      */
-    public void init(Element config, String cacheDir, String resourcePath) throws Exception;
+    public void init(Element config, String cacheDir, String serviceContextPath) throws Exception;
 
 
 
@@ -147,7 +148,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     // public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
+     public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -260,7 +261,7 @@ public interface WcsCatalog {
      * @return  The base data access URL for this coverage. Null otherwise.
      * @throws InterruptedException
      */
-    public String getDataAccessUrl(String coverageID) throws InterruptedException;
+    public String getDapDatsetUrl(String coverageID) throws InterruptedException;
 
 
 
@@ -292,5 +293,9 @@ public interface WcsCatalog {
 
     public boolean hasEoCoverage(String id);
 
+    // public CredentialsProvider getCredentials();
 
-    }
+    public boolean matches(String coverageId);
+
+
+}

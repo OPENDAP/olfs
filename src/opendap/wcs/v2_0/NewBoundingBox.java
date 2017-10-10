@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.coreServlet.Util;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,12 +75,18 @@ public class NewBoundingBox {
 
         this();
 
-        for(String coordinate : dims.keySet())
-        {
+        for(CoordinateDimension dim : dims.values()) {
+            CoordinateDimension newDim = new CoordinateDimension(dim);
+            _dimensions.put(newDim.getName(),newDim);
+        }
+
+        /*
+        for(String coordinate : dims.keySet()) {
             CoordinateDimension dim = dims.get(coordinate);
             CoordinateDimension newDim = new CoordinateDimension(dim);
             _dimensions.put(coordinate,newDim);
         }
+        */
 
         if(startTime!=null && endTime!=null) {
 
@@ -163,7 +170,7 @@ public class NewBoundingBox {
 
 
             String axisLabelsString = envelope.getAttributeValue("axisLabels");
-            String axisLabels[] = axisLabelsString.split(" ");
+            String axisLabels[] = axisLabelsString.split(Util.WHITE_SPACE_REGEX_STRING);
             if (axisLabels.length < 2)
                 throw new WcsException("The axisLabels attribute must contain at least two values.",
                         WcsException.INVALID_PARAMETER_VALUE,
@@ -405,21 +412,21 @@ public class NewBoundingBox {
             bbox.setAttribute("crs", _srsName.toString());
 
 
-        String txt = "";
+        StringBuilder txt = new StringBuilder();
         Element e = new Element("LowerCorner", WCS.OWS_NS);
         for (double coordinate : getLowerCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
 
-        txt = "";
+        txt = new StringBuilder();
         e = new Element("UpperCorner", WCS.OWS_NS);
         for (double coordinate : getUpperCorner()) {
-            txt += coordinate + "  ";
+            txt.append(coordinate).append("  ");
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
         return bbox;
@@ -438,21 +445,25 @@ public class NewBoundingBox {
         //@todo transform coordinates!!
 
 
-        String txt = "";
+        StringBuilder txt = new StringBuilder();
         Element e = new Element("LowerCorner", WCS.OWS_NS);
         for (double coordinate : getLowerCorner()) {
-            txt += coordinate + "  ";
+            if(txt.length()>0)
+                txt.append("  ");
+            txt.append(coordinate);
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
 
-        txt = "";
+        txt = new StringBuilder();
         e = new Element("UpperCorner", WCS.OWS_NS);
         for (double coordinate : getUpperCorner()) {
-            txt += coordinate + "  ";
+            if(txt.length()>0)
+                txt.append("  ");
+            txt.append(coordinate);
         }
-        e.setText(txt);
+        e.setText(txt.toString());
         bbox.addContent(e);
 
         return bbox;

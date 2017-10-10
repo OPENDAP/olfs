@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -56,11 +56,12 @@ public class GetCapabilitiesRequest {
 
     private boolean _hasCountElement;
     private long    _maxContentsSectionsCount;
-    public static final long DEFAULT_MAX_CONTENTS_SECTIONS_COUNT = 1000;
+    public static final long DEFAULT_MAX_CONTENTS_SECTIONS_COUNT = 10000;
 
     private String[]        AcceptFormats = null;
     private String[]        AcceptLanguages = null;
 
+    private String[] _coverageIds;
 
     public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
     public static String SERVICE_PROVIDER = "ServiceProvider";
@@ -135,8 +136,13 @@ public class GetCapabilitiesRequest {
         AcceptFormats = acceptFormats;
     }
 
+    public GetCapabilitiesRequest() {
+        _coverageIds = null;
+    }
+
     public GetCapabilitiesRequest(Element getCRElem) throws WcsException{
 
+        this();
         Element e;
         String s;
         Iterator i;
@@ -265,6 +271,7 @@ public class GetCapabilitiesRequest {
 
     public GetCapabilitiesRequest(Map<String,String[]> kvp)
             throws WcsException {
+        this();
 
         String tmp[], s[];
 
@@ -281,7 +288,7 @@ public class GetCapabilitiesRequest {
         }
         else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
-                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "have failed. The WCS request for the operation '"+s[0]+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
@@ -375,7 +382,17 @@ public class GetCapabilitiesRequest {
 
         }
 
+        // Get the list of identifiers for the coverage to describe in the contents section.
+        s = kvp.get("coverageId".toLowerCase());
+        if(s!=null){
+            tmp = s[0].split(",");
+            _coverageIds = tmp;
+        }
 
+    }
+
+    public String[] getRequestedCoverageIds(){
+        return _coverageIds;
     }
 
     public Element getRequestElement(){
@@ -438,7 +455,7 @@ public class GetCapabilitiesRequest {
         if(AcceptLanguages != null){
             Element af = new Element("AcceptLanguages",WCS.WCS_NS);
             Element fe;
-            for(String f : AcceptFormats){
+            for(String f : AcceptLanguages){
                 fe = new Element("Language",WCS.WCS_NS);
                 fe.setText(f);
                 af.addContent(fe);

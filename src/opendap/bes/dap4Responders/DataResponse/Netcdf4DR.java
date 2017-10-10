@@ -112,7 +112,7 @@ public class Netcdf4DR extends Dap4Responder{
 
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
-        String cf_history_entry = getCFHistoryEntry(request);
+        String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
 
         BesApi besApi = getBesApi();
 

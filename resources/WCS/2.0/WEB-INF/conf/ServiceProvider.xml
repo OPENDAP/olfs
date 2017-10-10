@@ -4,7 +4,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -29,29 +29,29 @@
 <!-- * SERVICE PROVIDER SECTION                                 * -->
 <!-- ************************************************************ -->
 <ows:ServiceProvider xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <ows:ProviderName>OPeNDAP</ows:ProviderName>
-    <ows:ProviderSite xlink:href="http://www.opendap.org"/>
+    <ows:ProviderName>Your Organization</ows:ProviderName>
+    <ows:ProviderSite xlink:href="http://your.organizations.website.org"/>
     <ows:ServiceContact>
-        <ows:IndividualName>Nathan Potter</ows:IndividualName>
-        <ows:PositionName>Senior Developer</ows:PositionName>
+        <ows:IndividualName>Someone Helpful</ows:IndividualName>
+        <ows:PositionName>Support Guru</ows:PositionName>
         <ows:ContactInfo>
             <ows:Phone>
                 <ows:Voice>401-555-7890</ows:Voice>
                 <ows:Facsimile>401-555-8901</ows:Facsimile>
             </ows:Phone>
             <ows:Address>
-                <ows:DeliveryPoint>165 Dean Knauss Dr.</ows:DeliveryPoint>
-                <ows:City>Narragansett</ows:City>
+                <ows:DeliveryPoint>Some Dr.</ows:DeliveryPoint>
+                <ows:City>Happy Valley</ows:City>
                 <ows:AdministrativeArea>Rhode Island</ows:AdministrativeArea>
                 <ows:PostalCode>02882</ows:PostalCode>
                 <ows:Country>USA</ows:Country>
-                <ows:ElectronicMailAddress>support[at]opendap[dot]org</ows:ElectronicMailAddress>
+                <ows:ElectronicMailAddress>support[at]yourinst[dot]org</ows:ElectronicMailAddress>
             </ows:Address>
             <ows:OnlineResource xlink:href="http://www.opendap.org/support/index.html"/>
             <ows:HoursOfService>24x7x365</ows:HoursOfService>
             <ows:ContactInstructions>email</ows:ContactInstructions>
         </ows:ContactInfo>
-        <ows:Role>Developer</ows:Role>
+        <ows:Role>Support</ows:Role>
     </ows:ServiceContact>
 </ows:ServiceProvider>
 

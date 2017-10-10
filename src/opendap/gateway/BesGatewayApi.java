@@ -246,8 +246,12 @@ public class BesGatewayApi extends BesApi {
         Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, xdap_accept, maxResponseSize, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
+        if(req==null)
+            throw new BadConfigurationException("Request document is corrupt! Missing root element!");
 
         Element getReq = req.getChild("get",BES.BES_NS);
+        if(getReq==null)
+            throw new BadConfigurationException("Request document is corrupt! Missing 'get' element!");
 
         Element e = new Element("contentStartId",BES.BES_NS);
         e.setText(contentID);

@@ -298,8 +298,8 @@ public class DatasetScan  extends Dataset {
         /*
         Replaced by catalogPath computation above
 
-        if(besCatalogResourceId.endsWith(CatalogManager.DEFAULT_CATALOG_NAME)){
-            besCatalogResourceId = besCatalogResourceId.substring(0,besCatalogResourceId.lastIndexOf(CatalogManager.DEFAULT_CATALOG_NAME));
+        if(besCatalogResourceId.endsWith(WcsServiceManager.DEFAULT_CATALOG_NAME)){
+            besCatalogResourceId = besCatalogResourceId.substring(0,besCatalogResourceId.lastIndexOf(WcsServiceManager.DEFAULT_CATALOG_NAME));
         }
          */
 
@@ -324,8 +324,8 @@ public class DatasetScan  extends Dataset {
 
         /*
         Replaced by catalogPath computation above
-        if(catalogKey.endsWith(CatalogManager.DEFAULT_CATALOG_NAME))
-            catalogKey = catalogKey.substring(0,catalogKey.length() - CatalogManager.DEFAULT_CATALOG_NAME.length());
+        if(catalogKey.endsWith(WcsServiceManager.DEFAULT_CATALOG_NAME))
+            catalogKey = catalogKey.substring(0,catalogKey.length() - WcsServiceManager.DEFAULT_CATALOG_NAME.length());
 
         */
 
