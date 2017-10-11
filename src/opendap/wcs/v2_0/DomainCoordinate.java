@@ -124,7 +124,7 @@ public class DomainCoordinate {//implements Cloneable  {
         }
         else {
             try {
-                _min = Double.parseDouble(s);
+                _max = Double.parseDouble(s);
             } catch (NumberFormatException e) {
                 problems.add("Unable to parse the value of the " +
                         "'max' attribute: '" + s + "' as a double. msg: " + e.getMessage());
