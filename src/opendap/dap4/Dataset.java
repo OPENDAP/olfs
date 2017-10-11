@@ -242,7 +242,6 @@ public class Dataset {
         if (valueStr != null) {
             try {
                 result = Double.parseDouble(valueStr);
-                ;
             } catch (NumberFormatException nfe) {
                 String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - " +
                         "Failed to parse value of Dataset global Attribute '" + attributeName +

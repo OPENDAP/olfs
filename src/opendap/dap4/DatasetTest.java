@@ -89,7 +89,7 @@ public class DatasetTest {
             Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmrUrl);
             dmrXml = new String(Files.readAllBytes(file), HyraxStringEncoding.getCharset());
         }
-        InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
+        InputStream is = new ByteArrayInputStream(dmrXml.getBytes(HyraxStringEncoding.getCharset()));
         XMLInputFactory factory = XMLInputFactory.newInstance();
         XMLStreamReader xsr = factory.createXMLStreamReader(is);
         XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
@@ -153,7 +153,7 @@ public class DatasetTest {
         return Arrays.asList(new Object[][]{
                 // run as many tests as needed - each corresponding to one DMR dataset (i.e. one test)
                 {"dmrDataset_01.xml"},
-                {"http://test.opendap.org/opendap/wcs/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
+                // {"http://test.opendap.org/opendap/wcs/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
                 {"http://test.opendap.org/opendap/wcs/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
         });
     }
