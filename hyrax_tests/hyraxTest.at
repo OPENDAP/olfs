@@ -619,6 +619,12 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.json)
 #AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.w10n)
 
 
+####################################################
+# TestName: wcs/bes_forbidden_error
+AT_CURL_RESPONSE_TEST(wcs-2.0/coads_climatology.nc.GetCapabilities)
+AT_CURL_RESPONSE_TEST(wcs-2.0/coads_climatology.nc.DescribeCoverage_00)
+AT_CURL_RESPONSE_TEST(wcs-2.0/coads_climatology.nc.DescribeCoverage_01)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(wcs-2.0/coads_climatology.nc.GetCoverage)
 
 
 

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:CoverageDescriptions xmlns:wcs="http://www.opengis.net/wcs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd ">
+  <CoverageDescription xmlns="http://www.opengis.net/wcs/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="coads/data/nc/coads_climatology.nc" xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd">
+    <gml:boundedBy>
+      <gml:EnvelopeWithTimePeriod axisLabels="latitude longitude" srsDimension="2" srsName="urn:ogc:def:crs:EPSG::4326" uomLabels="deg deg">
+        <gml:lowerCorner>-90.0 -180.0</gml:lowerCorner>
+        <gml:upperCorner>90.0 180.0</gml:upperCorner>
+        <gml:beginPosition frame="1969-12-31T16:00:00.366 -0800">1969-12-31T16:00:00.366 -0800</gml:beginPosition>
+        <gml:endPosition frame="1969-12-31T16:00:08.401 -0800">1969-12-31T16:00:08.401 -0800</gml:endPosition>
+      </gml:EnvelopeWithTimePeriod>
+    </gml:boundedBy>
+    <CoverageId>coads/data/nc/coads_climatology.nc</CoverageId>
+    <gml:domainSet>
+      <gml:RectifiedGrid axisLabels="latitude longitude" dimension="2" gml:id="RectifiedGrid-coads/data/nc/coads_climatology.nc">
+        <gml:limits>
+          <gml:GridEnvelope>
+            <gml:low>0 0</gml:low>
+            <gml:high>89 179</gml:high>
+          </gml:GridEnvelope>
+        </gml:limits>
+        <gml:origin>
+          <gml:Point gml:id="GridOrigin-coads/data/nc/coads_climatology.nc" srsName="urn:ogc:def:crs:EPSG::4326">
+            <gml:pos>-90.0 -180.0</gml:pos>
+          </gml:Point>
+        </gml:origin>
+        <gml:offsetVector srsName="urn:ogc:def:crs:EPSG::4326">91.0 0.0</gml:offsetVector>
+        <gml:offsetVector srsName="urn:ogc:def:crs:EPSG::4326">0.0 181.0</gml:offsetVector>
+      </gml:RectifiedGrid>
+    </gml:domainSet>
+    <gmlcov:rangeType>
+      <swe:DataRecord>
+        <swe:field name="SST">
+          <swe:AbstractDataComponent definition="urn:ogc:def:dataType:OGC:1.1:measure" xsi:type="swe:QuantityType">
+            <swe:description>SEA SURFACE TEMPERATURE</swe:description>
+            <swe:uom code="Deg C" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999979E33 9.99999979E33</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:AbstractDataComponent>
+        </swe:field>
+        <swe:field name="AIRT">
+          <swe:AbstractDataComponent definition="urn:ogc:def:dataType:OGC:1.1:measure" xsi:type="swe:QuantityType">
+            <swe:description>AIR TEMPERATURE</swe:description>
+            <swe:uom code="DEG C" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999979E33 9.99999979E33</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:AbstractDataComponent>
+        </swe:field>
+        <swe:field name="UWND">
+          <swe:AbstractDataComponent definition="urn:ogc:def:dataType:OGC:1.1:measure" xsi:type="swe:QuantityType">
+            <swe:description>ZONAL WIND</swe:description>
+            <swe:uom code="M/S" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999979E33 9.99999979E33</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:AbstractDataComponent>
+        </swe:field>
+        <swe:field name="VWND">
+          <swe:AbstractDataComponent definition="urn:ogc:def:dataType:OGC:1.1:measure" xsi:type="swe:QuantityType">
+            <swe:description>MERIDIONAL WIND</swe:description>
+            <swe:uom code="M/S" />
+            <swe:constraint>
+              <swe:AllowedValues>
+                <swe:interval>-9.99999979E33 9.99999979E33</swe:interval>
+              </swe:AllowedValues>
+            </swe:constraint>
+          </swe:AbstractDataComponent>
+        </swe:field>
+      </swe:DataRecord>
+    </gmlcov:rangeType>
+    <ServiceParameters>
+      <CoverageSubtype>RectifiedGridCoverage</CoverageSubtype>
+      <nativeFormat>application/octet-stream</nativeFormat>
+    </ServiceParameters>
+  </CoverageDescription>
+</wcs:CoverageDescriptions>
+

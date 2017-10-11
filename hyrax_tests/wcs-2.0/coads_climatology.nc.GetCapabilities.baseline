@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:Capabilities xmlns:wcs="http://www.opengis.net/wcs/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0" xsi:schemaLocation="http://www.opengis.net/ows/2.0  http://schemas.opengis.net/ows/2.0/owsAll.xsd http://www.opengis.net/wcs/2.0  http://schemas.opengis.net/wcs/2.0/wcsAll.xsd" updateSequence="SomethingBetterWillBeUsedSoon" version="2.0.1">
+  <ows:ServiceIdentification>
+    <ows:Title>OPeNDAP WCS 2.0 Service</ows:Title>
+    <ows:Abstract>A WCS 2.0 service under development as a part of the OPeNDAP Hyrax server.</ows:Abstract>
+    <ows:Keywords>
+      <ows:Keyword>Web Coverage Service</ows:Keyword>
+      <ows:Keyword>OPeNDAP</ows:Keyword>
+      <ows:Keyword>NetCDF</ows:Keyword>
+    </ows:Keywords>
+    <ows:ServiceType>WCS</ows:ServiceType>
+    <ows:ServiceTypeVersion>2.0.1</ows:ServiceTypeVersion>
+    <ows:Profile>http://www.opengis.net/spec/WCS_protocol-binding_soap/1.0/conf/soap</ows:Profile>
+    <ows:Profile>http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/1.0/conf/netcdf</ows:Profile>
+    <ows:Profile>http://www.opengis.net/spec/WCS_service-model_transaction/1.0/conf/transaction</ows:Profile>
+    <ows:Fees>NONE</ows:Fees>
+    <ows:AccessConstraints>NONE</ows:AccessConstraints>
+  </ows:ServiceIdentification>
+  <ows:ServiceProvider xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ows:ProviderName>OPeNDAP</ows:ProviderName>
+    <ows:ProviderSite xlink:href="http://www.opendap.org" />
+    <ows:ServiceContact>
+      <ows:IndividualName>Nathan Potter</ows:IndividualName>
+      <ows:PositionName>Senior Developer</ows:PositionName>
+      <ows:ContactInfo>
+        <ows:Phone>
+          <ows:Voice>401-555-7890</ows:Voice>
+          <ows:Facsimile>401-555-8901</ows:Facsimile>
+        </ows:Phone>
+        <ows:Address>
+          <ows:DeliveryPoint>165 Dean Knauss Dr.</ows:DeliveryPoint>
+          <ows:City>Narragansett</ows:City>
+          <ows:AdministrativeArea>Rhode Island</ows:AdministrativeArea>
+          <ows:PostalCode>02882</ows:PostalCode>
+          <ows:Country>USA</ows:Country>
+          <ows:ElectronicMailAddress>support[at]opendap[dot]org</ows:ElectronicMailAddress>
+        </ows:Address>
+        <ows:OnlineResource xlink:href="http://www.opendap.org/support/index.html" />
+        <ows:HoursOfService>24x7x365</ows:HoursOfService>
+        <ows:ContactInstructions>email</ows:ContactInstructions>
+      </ows:ContactInfo>
+      <ows:Role>Developer</ows:Role>
+    </ows:ServiceContact>
+  </ows:ServiceProvider>
+  <ows:OperationsMetadata xmlns="http://www.opengis.net/wcs/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ows:Operation name="GetCapabilities">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>XML</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>SOAP</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="Format">
+        <ows:AllowedValues>
+          <ows:Value>text/xml</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="GetCoverage">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>XML</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>SOAP</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="Format">
+        <ows:AllowedValues>
+          <ows:Value>dap2</ows:Value>
+          <ows:Value>netcdf</ows:Value>
+          <ows:Value>jpeg2000</ows:Value>
+          <ows:Value>geotiff</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="DescribeCoverage">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>XML</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+            <ows:Constraint name="PostEncoding">
+              <ows:AllowedValues>
+                <ows:Value>SOAP</ows:Value>
+              </ows:AllowedValues>
+            </ows:Constraint>
+          </ows:Post>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="Format">
+        <ows:AllowedValues>
+          <ows:Value>text/xml</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Constraint name="CountDefault">
+      <ows:NoValues />
+      <ows:DefaultValue>1000</ows:DefaultValue>
+    </ows:Constraint>
+  </ows:OperationsMetadata>
+  <wcs:ServiceMetadata>
+    <wcs:formatSupported>application/octet-stream</wcs:formatSupported>
+    <wcs:formatSupported>application/x-netcdf</wcs:formatSupported>
+    <wcs:formatSupported>image/jp2</wcs:formatSupported>
+    <wcs:formatSupported>image/tiff</wcs:formatSupported>
+  </wcs:ServiceMetadata>
+  <wcs:Contents>
+    <wcs:CoverageSummary>
+      <CoverageId xmlns="http://www.opengis.net/wcs/2.0">coads/data/nc/coads_climatology.nc</CoverageId>
+      <CoverageSubtype xmlns="http://www.opengis.net/wcs/2.0">RectifiedGridCoverage</CoverageSubtype>
+      <ows:BoundingBox crs="urn:ogc:def:crs:EPSG::4326">
+        <ows:LowerCorner>-90.0  -180.0</ows:LowerCorner>
+        <ows:UpperCorner>90.0  180.0</ows:UpperCorner>
+      </ows:BoundingBox>
+    </wcs:CoverageSummary>
+  </wcs:Contents>
+</wcs:Capabilities>
+
