@@ -342,7 +342,7 @@ public class GetCoverageRequestProcessor {
         //
         // Is there a Scale request?
         //
-        // TODO - Handle scale requests: ScaleRequest scaleRequest = req.getScaleRequest();
+        // @TODO - Handle scale requests: ScaleRequest scaleRequest = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
 
