@@ -180,7 +180,7 @@ public class GetCapabilitiesRequestProcessor {
      * catalogs last modified time in seconds since 1/1/1970
      */
     public static String getUpdateSequence(){
-        return WcsServiceManager.getLastModified()+"";
+        return "SomethingBetterWillBeUsedSoon";//WcsServiceManager.getLastModified()+"";
     }
 
 

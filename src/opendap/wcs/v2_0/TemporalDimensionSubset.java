@@ -74,6 +74,14 @@ public class TemporalDimensionSubset  extends DimensionSubset { // implements Cl
      */
     @Override
     public String getDap2GridValueConstraint() throws WcsException {
+
+        if(_domainCoordinate == null){
+            StringBuilder msg = new StringBuilder("The TemporalDimensionSubset '").append(getDimensionId()).append("' ");
+            msg.append("Has not been associated with a DomainCoordinate instance.");
+            throw new WcsException(msg.toString(),WcsException.INVALID_PARAMETER_VALUE,"DimensionSubset");
+        }
+        String dapVarName = _domainCoordinate.getDapID();
+
         StringBuilder subsetClause = new StringBuilder();
 
         if (isValueSubset()) {
@@ -98,7 +106,7 @@ public class TemporalDimensionSubset  extends DimensionSubset { // implements Cl
                             .append("\"")
                             .append(beginPosition)
                             .append("<=")
-                            .append(getDimensionId())
+                            .append(dapVarName)
                             .append("<=")
                             .append(endPosition)
                             .append("\"");
