@@ -83,7 +83,6 @@ public class Dataset {
         _isCFConvention = false;
     }
 
-
     @XmlAttribute
     public String getName() {
         return this.name;
@@ -110,7 +109,6 @@ public class Dataset {
         return attributes;
     }
 
-
     public void setAttributes(List<ContainerAttribute> attributes) {
         this.attributes = attributes;
     }
@@ -129,7 +127,6 @@ public class Dataset {
         return vars64bitFloats;
     }
 
-
     public void setVars64bitFloats(List<Float64> vars64bitFloats) {
         this.vars64bitFloats = vars64bitFloats;
     }
@@ -139,7 +136,6 @@ public class Dataset {
         return vars32bitFloats;
     }
 
-
     public void setVars32bitFloats(List<Float32> vars32bitFloats) {
         this.vars32bitFloats = vars32bitFloats;
     }
@@ -148,7 +144,6 @@ public class Dataset {
     public List<Int32> getVars32bitIntegers() {
         return vars32bitIntegers;
     }
-
 
     public void setVars32bitIntegers(List<Int32> vars32bitIntegers) {
         this.vars32bitIntegers = vars32bitIntegers;
@@ -180,8 +175,9 @@ public class Dataset {
      * First scans the root of Dataset
      * FIXME: Next it should scan all its variable groups
      *
-     * @param name attribution of Dimesion tag
+     * @param name attribution of Dimension tag
      * @return opendap.dap4.Dimension
+     * @todo TEST: With several DMRs, call this with names that are and are not dimensions.
      */
     public Dimension getDimension(String name) {
         while (name.startsWith("/") && name.length() > 1)
@@ -266,21 +262,15 @@ public class Dataset {
      * if s1 contains s2.
      *
      * @param s1 The string to search
-     * @param s2 The candiate sub-string
+     * @param s2 The candidate sub-string
      * @return true only if str contains sub
      */
     private boolean caseInsensitiveStringContains(String s1, String s2) {
-        if (
-                s1 != null &&
-                        s2 != null &&
-                        s1.trim().length() > 0 &&
-                        s2.trim().length() > 0
-                ) {
+        if (s1 != null && s2 != null && s1.trim().length() > 0 && s2.trim().length() > 0) {
             return s1.trim().toLowerCase().contains(s2.trim().toLowerCase());
         }
         return false;
     }
-
 
     /**
      * Helper method to scan dataset by variable name
