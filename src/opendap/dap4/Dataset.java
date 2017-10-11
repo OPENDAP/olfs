@@ -33,266 +33,256 @@ import java.util.*;
 import javax.xml.bind.annotation.*;
 
 /**
- * JAXB for DMR dataset, with some helper access, aggregation methods 
- * 
+ * JAXB for DMR dataset, with some helper access, aggregation methods
+ * <p>
  * Supports unmarshaling the DMR XML into Java by reflection
- * 
- * This is NOT complete (i.e. supporting yet of all possible DMRs)  
- * 
+ * <p>
+ * This is NOT complete (i.e. supporting yet of all possible DMRs)
+ * <p>
  * Specifically, does NOT
  * 1.  cover all DAP4 variables
  * 2.  support nesting of container attributes beyond one level
  * 3.  provide for variable groups
- * 
+ *
  * @author Uday Kari
  * @author Nathan Potter
- *
  */
-@XmlRootElement (name="Dataset")
+@XmlRootElement(name = "Dataset")
 public class Dataset {
 
-  Logger _log;
+    Logger _log;
 
-	private String name;
-	private String url;
-	
-	private List<Dimension> dimensions; 
-	private List<ContainerAttribute> attributes;
-	
-	private List<Float64> vars64bitFloats;
-	private List<Float32> vars32bitFloats;
-	private List<Int64>   vars64bitIntegers;
-	private List<Int32>   vars32bitIntegers;
+    private String name;
+    private String url;
 
-	private boolean _checkedForCF;
-	private boolean _isCFConvention;
+    private List<Dimension> dimensions;
+    private List<ContainerAttribute> attributes;
 
-	/**
-	 * This default constructor initializes all of the stuff so things can never be null.
-	 */
-	public Dataset() {
-	    _log = LoggerFactory.getLogger(this.getClass());
-		name = "";
-		url = "";
-		dimensions = new Vector<>();
-		attributes = new Vector<>();
-		vars64bitFloats = new Vector<>();
-		vars32bitFloats = new Vector<>();
-		vars64bitIntegers = new Vector<>();
-		vars32bitIntegers = new Vector<>();
-		_checkedForCF = false;
-		_isCFConvention = false;
-	}
-	
-	
-	@XmlAttribute
-	public String getName() {
-		return this.name;
-	}
+    private List<Float64> vars64bitFloats;
+    private List<Float32> vars32bitFloats;
+    private List<Int64> vars64bitIntegers;
+    private List<Int32> vars32bitIntegers;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private boolean _checkedForCF;
+    private boolean _isCFConvention;
 
-	// DMR generates prefixed attribute "xml:base", 
-	// just using base here, the respective xml prefix 
-	// being handled in package.info
-	@XmlAttribute(name="base")
-	public String getUrl() {
-		return url;
-	}
+    /**
+     * This default constructor initializes all of the stuff so things can never be null.
+     */
+    public Dataset() {
+        _log = LoggerFactory.getLogger(this.getClass());
+        name = "";
+        url = "";
+        dimensions = new Vector<>();
+        attributes = new Vector<>();
+        vars64bitFloats = new Vector<>();
+        vars32bitFloats = new Vector<>();
+        vars64bitIntegers = new Vector<>();
+        vars32bitIntegers = new Vector<>();
+        _checkedForCF = false;
+        _isCFConvention = false;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    @XmlAttribute
+    public String getName() {
+        return this.name;
+    }
 
-  @XmlElement(name="Attribute")
-	public List<ContainerAttribute> getAttributes() {
-		return attributes;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    // DMR generates prefixed attribute "xml:base",
+    // just using base here, the respective xml prefix
+    // being handled in package.info
+    @XmlAttribute(name = "base")
+    public String getUrl() {
+        return url;
+    }
 
-	public void setAttributes(List<ContainerAttribute> attributes) {
-		this.attributes = attributes;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	@XmlElement(name="Dimension")
-	public List<Dimension> getDimensions() {
-		return dimensions;
-	}
+    @XmlElement(name = "Attribute")
+    public List<ContainerAttribute> getAttributes() {
+        return attributes;
+    }
 
- 	public void setDimensions(List<Dimension> dimensions) {
-		this.dimensions = dimensions;
-	}
+    public void setAttributes(List<ContainerAttribute> attributes) {
+        this.attributes = attributes;
+    }
 
-	@XmlElement(name="Float64")
-	public List<Float64> getVars64bitFloats() {
-		return vars64bitFloats;
-	}
+    @XmlElement(name = "Dimension")
+    public List<Dimension> getDimensions() {
+        return dimensions;
+    }
 
+    public void setDimensions(List<Dimension> dimensions) {
+        this.dimensions = dimensions;
+    }
 
-	public void setVars64bitFloats(List<Float64> vars64bitFloats) {
-		this.vars64bitFloats = vars64bitFloats;
-	}
+    @XmlElement(name = "Float64")
+    public List<Float64> getVars64bitFloats() {
+        return vars64bitFloats;
+    }
 
-	@XmlElement(name="Float32")
-	public List<Float32> getVars32bitFloats() {
-		return vars32bitFloats;
-	}
+    public void setVars64bitFloats(List<Float64> vars64bitFloats) {
+        this.vars64bitFloats = vars64bitFloats;
+    }
 
+    @XmlElement(name = "Float32")
+    public List<Float32> getVars32bitFloats() {
+        return vars32bitFloats;
+    }
 
-	public void setVars32bitFloats(List<Float32> vars32bitFloats) {
-		this.vars32bitFloats = vars32bitFloats;
-	}
+    public void setVars32bitFloats(List<Float32> vars32bitFloats) {
+        this.vars32bitFloats = vars32bitFloats;
+    }
 
-	@XmlElement(name="Int32")
-	public List<Int32> getVars32bitIntegers() {
-		return vars32bitIntegers;
-	}
+    @XmlElement(name = "Int32")
+    public List<Int32> getVars32bitIntegers() {
+        return vars32bitIntegers;
+    }
 
+    public void setVars32bitIntegers(List<Int32> vars32bitIntegers) {
+        this.vars32bitIntegers = vars32bitIntegers;
+    }
 
-	public void setVars32bitIntegers(List<Int32> vars32bitIntegers) {
-		this.vars32bitIntegers = vars32bitIntegers;
-	}
-	
-	@XmlElement(name="Int64")
-	public List<Int64> getVars64bitIntegers() {
-		return vars64bitIntegers;
-	}
+    @XmlElement(name = "Int64")
+    public List<Int64> getVars64bitIntegers() {
+        return vars64bitIntegers;
+    }
 
-	public void setVars64bitIntegers(List<Int64> vars64bitIntegers) {
-		this.vars64bitIntegers = vars64bitIntegers;
-	}
+    public void setVars64bitIntegers(List<Int64> vars64bitIntegers) {
+        this.vars64bitIntegers = vars64bitIntegers;
+    }
 
-	public Vector<Variable> getVariables() {
+    public Vector<Variable> getVariables() {
 
-	    Vector<Variable> vars = new Vector<>();
+        Vector<Variable> vars = new Vector<>();
 
-		vars.addAll(getVars32bitFloats());
-		vars.addAll(getVars64bitFloats());
-		vars.addAll(getVars32bitIntegers());
-		vars.addAll(getVars64bitIntegers());
+        vars.addAll(getVars32bitFloats());
+        vars.addAll(getVars64bitFloats());
+        vars.addAll(getVars32bitIntegers());
+        vars.addAll(getVars64bitIntegers());
 
         return vars;
     }
 
-  /**
-   * This finds the named Dimension if it exists.
-   * First scans the root of Dataset
-   * FIXME: Next it should scan all its variable groups
-   *
-   * @param name attribution of Dimesion tag
-   * @return opendap.dap4.Dimension 
-   */
-  public Dimension getDimension(String name){
-    while(name.startsWith("/") && name.length()>1)
-        name = name.substring(1);
+    /**
+     * This finds the named Dimension if it exists.
+     * First scans the root of Dataset
+     * FIXME: Next it should scan all its variable groups
+     *
+     * @param name attribution of Dimension tag
+     * @return opendap.dap4.Dimension
+     * @todo TEST: With several DMRs, call this with names that are and are not dimensions.
+     */
+    public Dimension getDimension(String name) {
+        while (name.startsWith("/") && name.length() > 1)
+            name = name.substring(1);
 
-    // First, scan the root of Dataset
-    for(Dimension dim: getDimensions()){
-        if(dim.getName().equals(name))
-            return dim;
-      }
-    
-    // next scan its variable groups
+        // First, scan the root of Dataset
+        for (Dimension dim : getDimensions()) {
+            if (dim.getName().equals(name))
+                return dim;
+        }
 
-      return null;
-  }
-  
-  /**
-   * Searches for global container attributes and looks for conventions tag
-   * if it is found with value CF, then sets the CF compliance flag, returns true
-   * @return true
-   */
-  public boolean usesCfConventions(){
-        if(_checkedForCF)
+        // next scan its variable groups
+
+        return null;
+    }
+
+    /**
+     * Searches for global container attributes and looks for conventions tag
+     * if it is found with value CF, then sets the CF compliance flag, returns true
+     *
+     * @return true
+     */
+    public boolean usesCfConventions() {
+        if (_checkedForCF)
             return _isCFConvention;
 
         _checkedForCF = true;
         for (ContainerAttribute containerAttribute : attributes) {
-            if (containerAttribute.getName().toLowerCase().endsWith("_global") || 
-                containerAttribute.getName().equalsIgnoreCase("DODS_EXTRA")) {
-              
+            if (containerAttribute.getName().toLowerCase().endsWith("_global") ||
+                    containerAttribute.getName().equalsIgnoreCase("DODS_EXTRA")) {
+
                 _log.debug("Found container attribute name ending in _GLOBAL or DODS_EXTRA");
                 _log.debug("Looking for conventions...attribute");
-                
-                if (containerAttribute.getAttributeValue("Conventions", true, true).contains("CF")) _isCFConvention = true;
-           } 
+
+                if (containerAttribute.getAttributeValue("Conventions", true, true).contains("CF"))
+                    _isCFConvention = true;
+            }
         }
         return _isCFConvention;
     }
 
-   /**
-    * Scans the attributes of all container attributes and returns the FIRST match
-    *  
-    * @param name The Attribute name being searched for
-    * @return value of attribute, if found, null otherwise 
-    */
-   public String getValueOfGlobalAttributeWithNameLike(String name) {
-     for (ContainerAttribute containerAttribute : attributes) {
-       	for (Attribute a : containerAttribute.getAttributes()) {
-          if (caseInsensitiveStringContains(a.getName(), name))
-            return a.getValue();
+    /**
+     * Scans the attributes of all container attributes and returns the FIRST match
+     *
+     * @param name The Attribute name being searched for
+     * @return value of attribute, if found, null otherwise
+     */
+    public String getValueOfGlobalAttributeWithNameLike(String name) {
+        for (ContainerAttribute containerAttribute : attributes) {
+            for (Attribute a : containerAttribute.getAttributes()) {
+                if (caseInsensitiveStringContains(a.getName(), name))
+                    return a.getValue();
+            }
         }
-      }
-     return null;
-   }
+        return null;
+    }
 
-    public double getValueOfGlobalAttributeWithNameLikeAsDouble(String attributeName, double defaultValue){
+    public double getValueOfGlobalAttributeWithNameLikeAsDouble(String attributeName, double defaultValue) {
 
         String valueStr = getValueOfGlobalAttributeWithNameLike(attributeName);
-        double result =defaultValue;
-        if(valueStr != null){
-            try{
-                result = Double.parseDouble(valueStr);;
-            }
-            catch(NumberFormatException nfe){
-                String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
-                        "Failed to parse value of Dataset global Attribute '"+attributeName+
-                        "' value: "+valueStr+"  Using value: "+result;
+        double result = defaultValue;
+        if (valueStr != null) {
+            try {
+                result = Double.parseDouble(valueStr);
+                ;
+            } catch (NumberFormatException nfe) {
+                String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - " +
+                        "Failed to parse value of Dataset global Attribute '" + attributeName +
+                        "' value: " + valueStr + "  Using value: " + result;
                 _log.warn(msg);
             }
-        }
-        else {
-            String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - "+
-                    "Failed to locate global Attribute named '"+attributeName+
-                    "'  Using value: "+result;
+        } else {
+            String msg = "getValueOfGlobalAttributeWithNameLikeAsDouble() - " +
+                    "Failed to locate global Attribute named '" + attributeName +
+                    "'  Using value: " + result;
             _log.warn(msg);
         }
         return result;
     }
 
-	/**
-	 * Performs a null proof case insensitive check to see
-	 * if s1 contains s2.
-	 * @param s1 The string to search
-	 * @param s2 The candiate sub-string
-	 * @return true only if str contains sub
-	 */
-	private boolean caseInsensitiveStringContains(String s1, String s2) {
-		if(
-				s1!=null &&
-						s2!=null &&
-						s1.trim().length()>0 &&
-						s2.trim().length()>0
-				){
-			return s1.trim().toLowerCase().contains(s2.trim().toLowerCase());
-		}
-		return false;
-	}
+    /**
+     * Performs a null proof case insensitive check to see
+     * if s1 contains s2.
+     *
+     * @param s1 The string to search
+     * @param s2 The candidate sub-string
+     * @return true only if str contains sub
+     */
+    private boolean caseInsensitiveStringContains(String s1, String s2) {
+        if (s1 != null && s2 != null && s1.trim().length() > 0 && s2.trim().length() > 0) {
+            return s1.trim().toLowerCase().contains(s2.trim().toLowerCase());
+        }
+        return false;
+    }
 
+    /**
+     * Helper method to scan dataset by variable name
+     *
+     * @param name of variable
+     * @return first instance of opendap.dap4.Variable matching the name, case insensitive
+     */
+    public Variable getVariable(String name) {
+        for (Variable v : this.getVariables())
+            if (v.getName().equalsIgnoreCase(name)) return v;
 
-
-	/**
-    * Helper method to scan dataset by variable name 
-    * @param name of variable
-    * @return first instance of opendap.dap4.Variable matching the name, case insensitive
-    */
-   public Variable getVariable (String name)
-   {
-     for (Variable v : this.getVariables())
-       if (v.getName().equalsIgnoreCase(name)) return v;
-     
-     return null;
-   }  
+        return null;
+    }
 }
