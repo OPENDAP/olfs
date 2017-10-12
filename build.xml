@@ -52,7 +52,7 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION"  value="Not.A.Release"/>
-    <property name="WCS_VERSION"   value="Not.A.Release"/>
+    <property name="WCS_VERSION"   value="${OLFS_VERSION}"/>
     <property name="WEBAPP_DIST"   value="olfs-${OLFS_VERSION}-webapp"/>
     <property name="SRC_DIST"      value="olfs-${OLFS_VERSION}-src"/>
     <property name="DOC_DIST"      value="olfs-${OLFS_VERSION}-doc"/>
@@ -371,8 +371,11 @@
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="OLFS_VERSION:  ${OLFS_VERSION}"/>
+        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
+        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
+        <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
+
         <echo level="info" message=""/>
 
 
