@@ -62,7 +62,7 @@ public class DimensionSubset { // implements Cloneable {
 
     private boolean _isArrayIndexSubset;
 
-    private DomainCoordinate _domainCoordinate;
+    protected DomainCoordinate _domainCoordinate;
 
 
     private DimensionSubset() {

@@ -49,8 +49,6 @@ import java.util.*;
 /**
  * Marshalling WCS coverage description per OGC
  * for sample MERRA
- *
- * @author ukari
  */
 @Deprecated
 public class WcsMarshaller {

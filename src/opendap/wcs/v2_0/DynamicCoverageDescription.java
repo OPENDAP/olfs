@@ -153,7 +153,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
      * @return The Dataset object created by JAXB.
      * @throws WcsException When the bad things happen.
      */
-    private Dataset buildDataset(Element dmr) throws WcsException {
+    protected Dataset buildDataset(Element dmr) throws WcsException {
         try {
             JAXBContext jc = JAXBContext.newInstance(Dataset.class);
             Unmarshaller um = jc.createUnmarshaller();
@@ -339,8 +339,10 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
 
     /**
-     * This class is a C style structure to hold the longthy
-     * parameter list required for building the TimePeriodWithEnvelope
+     * This class is a C style structure to hold the lengthy
+     * parameter list required for building the BoundedBy and
+     * DomainSet content (Which is ultimately the
+     * EnvelopeWithTomePeriod business)
      */
     static class BoundedByAndDomainSetParams {
         SimpleSrs srs;
@@ -523,16 +525,12 @@ public class DynamicCoverageDescription extends CoverageDescription {
         etp.addUpperCornerCoordinateValues(params.upperCorner);
         etp.setBeginTimePosition(params.beginDate);
         etp.setEndTimePosition(params.endDate);
-
         _log.debug(etp.toString());
 
         net.opengis.gml.v_3_2_1.EnvelopeWithTimePeriodType envelope = etp.getEnvelope(params.srs);
         net.opengis.gml.v_3_2_1.BoundingShapeType bs = new net.opengis.gml.v_3_2_1.BoundingShapeType();
         net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
         bs.setEnvelope(gmlFactory.createEnvelopeWithTimePeriod(envelope));
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
         return bs;
     }
 

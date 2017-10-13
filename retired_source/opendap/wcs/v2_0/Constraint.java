@@ -23,34 +23,22 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-public class DataRecordField {
-	
-	private String name = "";
-	private Quantity quantity = new Quantity();
-	
-	@XmlAttribute
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	@XmlElement(name="Quantity")
-	public Quantity getQuantity() {
-		return quantity;
-	}
-	public void setQuantity(Quantity quantity) {
-		this.quantity = quantity;
-	}
-	
-	
-	
+public class Constraint {
 
+	private AllowedValues allowedValues = new AllowedValues();
+
+	@XmlElement
+	public AllowedValues getAllowedValues() {
+		return allowedValues;
+	}
+
+	public void setAllowedValues(AllowedValues allowedValues) {
+		this.allowedValues = allowedValues;
+	}
+	
+	
 }

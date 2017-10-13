@@ -692,8 +692,27 @@
 
 
 
+    <!--
+    <target name="check"
+            description="Run Unit Tests"
+            depends="compile"
+    >
 
+        <junit
+                showoutput="yes"
+                haltonfailure="yes"
+                printsummary="yes">
+            
+            <formatter type="plain" usefile="false"/>
+            <classpath refid="compile.classpath"/>
 
+            <test name="opendap.dap4.DatasetTest" />
+            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
+
+        </junit>
+    </target>
+
+    -->
 
 
 </project>

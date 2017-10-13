@@ -23,41 +23,21 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-
 package opendap.wcs.v2_0;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+public class DomainSet {
 
-public class Point {
+	private RectifiedGrid rectifiedGrid = new RectifiedGrid();
 
-	String id = "";
-	String srsName = "";
-	String pos = "";
-	
-    @XmlAttribute	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	@XmlAttribute
-	public String getSrsName() {
-		return srsName;
-	}
-	public void setSrsName(String srsName) {
-		this.srsName = srsName;
-	}
-	
 	@XmlElement
-	public String getPos() {
-		return pos;
+	public RectifiedGrid getRectifiedGrid() {
+		return rectifiedGrid;
 	}
-	public void setPos(String pos) {
-		this.pos = pos;
+
+	public void setRectifiedGrid(RectifiedGrid rectifiedGrid) {
+		this.rectifiedGrid = rectifiedGrid;
 	}
 	
 	

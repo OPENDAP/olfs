@@ -81,7 +81,7 @@ public class GetCoverageRequestProcessor {
     ) throws WcsException, InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
 
         String id = req.getCoverageID();
-        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(id);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
         boolean b = wcsCatalog.hasCoverage(id);
 
         if (!b)
@@ -112,18 +112,17 @@ public class GetCoverageRequestProcessor {
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageId);
         String dapDatasetUrl = wcsCatalog.getDapDatsetUrl(coverageId);
 
-        if(dapDatasetUrl.toLowerCase().startsWith(Util.BES_PROTOCOL)){
+        if (dapDatasetUrl.toLowerCase().startsWith(Util.BES_PROTOCOL)) {
             CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageId);
             String besDatasetId = dapDatasetUrl.substring(Util.BES_PROTOCOL.length());
-            Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+            Document besCmd = getBesCmd(req, coverageDescription, wcsCatalog);
 
-            if(!BESManager.isInitialized())
-                throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+            if (!BESManager.isInitialized())
+                throw new WcsException("The BESManager has not been configured. Unable to access BES!", WcsException.NO_APPLICABLE_CODE);
 
             BesApi besApi = new BesApi();
-            besApi.besTransaction(besDatasetId,besCmd,response.getOutputStream());
-        }
-        else if(dapDatasetUrl.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
+            besApi.besTransaction(besDatasetId, besCmd, response.getOutputStream());
+        } else if (dapDatasetUrl.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
                 dapDatasetUrl.toLowerCase().startsWith((Util.HTTPS_PROTOCOL))) {
             CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();
             Util.forwardUrlContent(getDap2DataAccessUrl(req), authCreds, response, true);
@@ -136,7 +135,7 @@ public class GetCoverageRequestProcessor {
 
         _log.debug("Building multi-part Response...");
         String coverageId = req.getCoverageID();
-        WcsCatalog wcsCatalog =  WcsServiceManager.getCatalog(coverageId);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageId);
 
         String rangePartId = "cid:" + coverageId;
 
@@ -145,10 +144,10 @@ public class GetCoverageRequestProcessor {
         /**
          * If this an EO coverage then update its bounding box to reflect the subset.
          */
-        if(coverageDescription instanceof EOCoverageDescription){
+        if (coverageDescription instanceof EOCoverageDescription) {
             try {
                 // Mke a copy so we don't bunk up the original.
-                EOCoverageDescription eocd = new EOCoverageDescription((EOCoverageDescription)coverageDescription);
+                EOCoverageDescription eocd = new EOCoverageDescription((EOCoverageDescription) coverageDescription);
                 // Tweak the foot print
                 eocd.adjustEOMetadataCoverageFootprint(req);
                 // Make it the thing to use...
@@ -182,12 +181,11 @@ public class GetCoverageRequestProcessor {
 
         Attachment rangePart = null;
         String dapDataAccessUrl = wcsCatalog.getDapDatsetUrl(coverageId);
-        if(dapDataAccessUrl.toLowerCase().startsWith(opendap.http.Util.BES_PROTOCOL)){
+        if (dapDataAccessUrl.toLowerCase().startsWith(opendap.http.Util.BES_PROTOCOL)) {
             String besDatasetId = dapDataAccessUrl.substring(Util.BES_PROTOCOL.length());
-            Document besCmd = getBesCmd(req,coverageDescription,wcsCatalog);
+            Document besCmd = getBesCmd(req, coverageDescription, wcsCatalog);
             rangePart = new Attachment(getReturnMimeType(req), rangePartId, besDatasetId, besCmd);
-        }
-        else {
+        } else {
             rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDap2DataAccessUrl(req), WcsServiceManager.getCredentialsProvider());
 
         }
@@ -232,7 +230,7 @@ public class GetCoverageRequestProcessor {
 
         String format = getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
-        if(rFormat ==  null) {
+        if (rFormat == null) {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
@@ -248,7 +246,7 @@ public class GetCoverageRequestProcessor {
     public static String getContentDisposition(GetCoverageRequest req) throws WcsException, InterruptedException {
         String format = getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
-        if(rFormat ==  null) {
+        if (rFormat == null) {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         }
@@ -265,13 +263,11 @@ public class GetCoverageRequestProcessor {
     public static String getReturnMimeType(GetCoverageRequest req) throws WcsException, InterruptedException {
         String format = getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
-        if(rFormat ==  null)
+        if (rFormat == null)
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
                     WcsException.INVALID_PARAMETER_VALUE, "format");
         return rFormat.mimeType();
     }
-
-
 
 
     private static String getDap2CE(GetCoverageRequest req) throws InterruptedException, WcsException {
@@ -281,16 +277,16 @@ public class GetCoverageRequestProcessor {
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageID);
         CoverageDescription coverageDescription = wcsCatalog.getCoverageDescription(coverageID);
         HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
-        HashMap<DomainCoordinate,DimensionSubset> domCordToDimSubsetMap = new HashMap<>();
+        HashMap<DomainCoordinate, DimensionSubset> domCordToDimSubsetMap = new HashMap<>();
 
         // The user may have provided domain subsets.
         // Let's first just QC the request - We'll make sure that the user is asking for dimension
         // subsets of coordinate dimensions that this field has, and while we do that we will associate
         // every matching DomainCoordinate with the DimensionSubset that it matched.
         LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverageDescription.getDomainCoordinates();
-        for(DimensionSubset ds: dimensionSubsets.values()){
+        for (DimensionSubset ds : dimensionSubsets.values()) {
             DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
-            if(dc==null){
+            if (dc == null) {
 
                 //
                 // It's likely to happen frequently that the user submits a bad dimension name. So
@@ -304,7 +300,7 @@ public class GetCoverageRequestProcessor {
 
                 msg.append("Valid coordinate dimension names for '").append(coverageDescription.getCoverageId()).append("' ");
                 msg.append("are: ");
-                for(String dcName :domainCoordinates.keySet()){
+                for (String dcName : domainCoordinates.keySet()) {
                     msg.append("\n    ").append(dcName);
                 }
                 msg.append("\n");
@@ -317,7 +313,7 @@ public class GetCoverageRequestProcessor {
             }
 
             ds.setDomainCoordinate(dc);
-            domCordToDimSubsetMap.put(dc,ds);
+            domCordToDimSubsetMap.put(dc, ds);
         }
         //
         // Determines which fields (variables) will be sent back with the response.
@@ -325,10 +321,9 @@ public class GetCoverageRequestProcessor {
         //
         Vector<String> requestedFields;
         RangeSubset rangeSubset = req.getRangeSubset();
-        if(rangeSubset!=null) {
+        if (rangeSubset != null) {
             requestedFields = rangeSubset.getRequestedFields();
-        }
-        else {
+        } else {
             requestedFields = new Vector<>();
         }
         if (requestedFields.isEmpty()) {
@@ -347,7 +342,7 @@ public class GetCoverageRequestProcessor {
         //
         // Is there a Scale request?
         //
-        // TODO - Handle scale requests: ScaleRequest scaleRequest = req.getScaleRequest();
+        // @TODO - Handle scale requests: ScaleRequest scaleRequest = req.getScaleRequest();
 
         StringBuilder dap2CE = new StringBuilder();
 
@@ -356,15 +351,14 @@ public class GetCoverageRequestProcessor {
         // For every field (variable) to be transmitted we (may) need server side functional expressions,
         // array subset expressions, etc.
         //
-        Vector<String> subsetClauses =  new Vector<>();
-        for(String fieldId: requestedFields){
+        Vector<String> subsetClauses = new Vector<>();
+        for (String fieldId : requestedFields) {
             String dapGridArrayName = coverageDescription.getDapGridArrayId(fieldId);
 
-            if(dimensionSubsets.isEmpty()){
+            if (dimensionSubsets.isEmpty()) {
                 // no dimension subsets means take the whole enchilada
                 subsetClauses.add(dapGridArrayName);
-            }
-            else {
+            } else {
 
                 StringBuilder valueSubsetClause = new StringBuilder();
                 boolean arraySubset = false;
@@ -373,37 +367,35 @@ public class GetCoverageRequestProcessor {
                 // The array index subsets, if anyexist, need to be applied to the variable as it is
                 // passed into the grid() function and we need to get them in the order of the
                 // DomainCoordinate variables
-                for(DomainCoordinate domainCoordinate : domainCoordinates.values()){
+                for (DomainCoordinate domainCoordinate : domainCoordinates.values()) {
 
                     DimensionSubset dimSub = domCordToDimSubsetMap.get(domainCoordinate);
-                    if(dimSub==null){
+                    if (dimSub == null) {
                         // No subset on this Coordinate? that's ok, make one that get's the entire dim
                         dimSub = new DimensionSubset(domainCoordinate);
                     }
 
-                    if(dimSub.isValueSubset()) {
+                    if (dimSub.isValueSubset()) {
                         // A value subset means that the user supplied values of the domain coordinates that specify
                         // the bounds of the subset that they want
-                        if(valueSubsetClause.length()>0){
-                      _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
-                      valueSubsetClause.append(",");
+                        if (valueSubsetClause.length() > 0) {
+                            _log.debug("getDap2CE() - DAP2 CE: {}", dap2CE);
+                            valueSubsetClause.append(",");
                         }
                         // Then we tack on the value constraint expression: "low<=dimName<=high"
                         valueSubsetClause.append(dimSub.getDap2GridValueConstraint());
-                    }
-                    else if(dimSub.isArraySubset()) {
+                    } else if (dimSub.isArraySubset()) {
                         // An Array subset means that user indicated (through the use of integer values in
                         // their subset request) that they are wanting to subset by array index.
                         // Because order of the [] array notation in DAP URL's is important, we collect
                         // all of the user provided array constraints here and then literally sort them out below
                         // for inclusion in the response.
 
-                        DomainCoordinate domCoord =  domainCoordinates.get(dimSub.getDimensionId());
+                        DomainCoordinate domCoord = domainCoordinates.get(dimSub.getDimensionId());
                         domCoord.setArraySubset(dimSub.getDapArrayIndexConstraint());
                         arraySubset = true;
-                    }
-                    else {
-                        throw new WcsException("Unrecognized dimension subset.",WcsException.NO_APPLICABLE_CODE);
+                    } else {
+                        throw new WcsException("Unrecognized dimension subset.", WcsException.NO_APPLICABLE_CODE);
                     }
                 }
 
@@ -412,26 +404,26 @@ public class GetCoverageRequestProcessor {
                 StringBuilder fieldSubsetClause = new StringBuilder();
 
                 // If theres value based subsetting to be done we'll need the grid() ssf
-                if(valueSubsetClause.length()>0) {
+                if (valueSubsetClause.length() > 0) {
                     fieldSubsetClause.append("grid(");
                 }
                 // then the name of the variable
                 fieldSubsetClause.append(dapGridArrayName);
 
                 // Add any inditial array subsets to the variable name
-                if(arraySubset){
+                if (arraySubset) {
                     // We build the subsetting string using the domain coordinates in the order they
                     // appear in the DAP dataset, which is how they MUST occur in the configuration
                     // or this all gets broken.
-                    for(DomainCoordinate dc : domainCoordinates.values()){
+                    for (DomainCoordinate dc : domainCoordinates.values()) {
                         String clause = dc.getArraySubset();
-                        clause = clause==null?"[*]":clause;
+                        clause = clause == null ? "[*]" : clause;
                         fieldSubsetClause.append(clause);
                     }
                 }
 
                 // Add the value subsets (to the grid() syntax)
-                if(valueSubsetClause.length()>0){
+                if (valueSubsetClause.length() > 0) {
                     fieldSubsetClause.append(",");
                     fieldSubsetClause.append(valueSubsetClause);
                     fieldSubsetClause.append(")");
@@ -444,28 +436,24 @@ public class GetCoverageRequestProcessor {
             } // dimension subsets
         } // fields
 
-        for(String subsetClause: subsetClauses){
-            String comma_as_needed = dap2CE.length()>0 ? "," : "";
+        for (String subsetClause : subsetClauses) {
+            String comma_as_needed = dap2CE.length() > 0 ? "," : "";
             dap2CE.append(comma_as_needed).append(subsetClause);
         }
 
-        _log.debug("getDap2CE() - DAP2 CE: {}",dap2CE);
+        _log.debug("getDap2CE() - DAP2 CE: {}", dap2CE);
 
         try {
             return URLEncoder.encode(dap2CE.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'",dap2CE);
-            throw new WcsException("Failed URL encode DAP2 CE: "+dap2CE+"'",WcsException.NO_APPLICABLE_CODE);
+            _log.error("getDap2CE() - Unable to URLEncoder.encode() DAP CE: '{}'", dap2CE);
+            throw new WcsException("Failed URL encode DAP2 CE: " + dap2CE + "'", WcsException.NO_APPLICABLE_CODE);
         }
 
     }
 
 
-
-
-
     /**
-     *
      * @param req
      * @return
      * @throws InterruptedException
@@ -633,24 +621,21 @@ public class GetCoverageRequestProcessor {
     }
 
 */
-
-
-
     public static Document getBesCmd(GetCoverageRequest req, CoverageDescription cd, WcsCatalog wcsCatalog) throws WcsException, InterruptedException {
 
         Document besCmd = null;
         String dap2ce = GetCoverageRequestProcessor.getDap2CE(req);
         String format = GetCoverageRequestProcessor.getReturnFormat(req);
         WcsResponseFormat rFormat = ServerCapabilities.getFormat(format);
-        if(rFormat==null)
-            throw new WcsException("The requested return format '"+format+"' is not recognized by this service.",WcsException.INVALID_PARAMETER_VALUE,"format");
+        if (rFormat == null)
+            throw new WcsException("The requested return format '" + format + "' is not recognized by this service.", WcsException.INVALID_PARAMETER_VALUE, "format");
 
 
         String besUrl = wcsCatalog.getDapDatsetUrl(cd.getCoverageId());
         String besDatatsetId = besUrl.substring(Util.BES_PROTOCOL.length());
 
-        if(!BESManager.isInitialized())
-            throw new WcsException("The BESManager has not been configured. Unable to access BES!",WcsException.NO_APPLICABLE_CODE);
+        if (!BESManager.isInitialized())
+            throw new WcsException("The BESManager has not been configured. Unable to access BES!", WcsException.NO_APPLICABLE_CODE);
 
         BesApi besApi = new BesApi();
         try {
@@ -702,14 +687,13 @@ public class GetCoverageRequestProcessor {
 
                 case dap4:
                 default:
-                    throw new WcsException(("Unsupported format: '"+rFormat.name())+"' :(",
-                            WcsException.INVALID_PARAMETER_VALUE,"format");
+                    throw new WcsException(("Unsupported format: '" + rFormat.name()) + "' :(",
+                            WcsException.INVALID_PARAMETER_VALUE, "format");
             }
 
-        }
-        catch (BadConfigurationException bce){
+        } catch (BadConfigurationException bce) {
             throw new WcsException("Failed to generate a BES command for the GetCoverage request: '" + req.toString()
-                    ,WcsException.NO_APPLICABLE_CODE);
+                    , WcsException.NO_APPLICABLE_CODE);
 
         }
 
