@@ -5,8 +5,8 @@
       <gml:EnvelopeWithTimePeriod axisLabels="latitude longitude" srsDimension="2" srsName="urn:ogc:def:crs:EPSG::4326" uomLabels="deg deg">
         <gml:lowerCorner>-90.0 -180.0</gml:lowerCorner>
         <gml:upperCorner>90.0 180.0</gml:upperCorner>
-        <gml:beginPosition frame="1969-12-31T16:00:00.366 -0800">1969-12-31T16:00:00.366 -0800</gml:beginPosition>
-        <gml:endPosition frame="1969-12-31T16:00:08.401 -0800">1969-12-31T16:00:08.401 -0800</gml:endPosition>
+        <gml:beginPosition frame="1970-01-01T00:00:00.366 Z">1970-01-01T00:00:00.366 Z</gml:beginPosition>
+        <gml:endPosition frame="1970-01-01T00:00:08.401 Z">1970-01-01T00:00:08.401 Z</gml:endPosition>
       </gml:EnvelopeWithTimePeriod>
     </gml:boundedBy>
     <CoverageId>coads/data/nc/coads_climatology.nc</CoverageId>

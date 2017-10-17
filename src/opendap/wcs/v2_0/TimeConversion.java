@@ -622,11 +622,18 @@ public class TimeConversion {
     }
 
 
-    private static String _gmlTimePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S Z";
+    private static String _gmlTimePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S 'Z'";
 
-
+    /**
+     * Returns the date/time in GML Time Format: "yyy-MM-dd'T'HH:mm:ss.S 'Z'"
+     * @param date
+     * @return
+     */
     public static String formatDateInGmlTimeFormat(Date date){
         SimpleDateFormat sdf = new SimpleDateFormat(_gmlTimePeriodFormat);
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        if(utc!=null)
+            sdf.setTimeZone(utc);
         return sdf.format(date);
     }
 
