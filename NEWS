@@ -7,6 +7,8 @@ Version 1.17.0  (16 October 2017)
   activities by having it utilize the ~/.netrc credentials 
   source or one of the same format specified in the configuration. 
 
+- Fixed bug in the generation of the "viewers" pages.
+
 Version 1.16.4  (09 August 2017)
 
 - Repaired broken RDF responses.
