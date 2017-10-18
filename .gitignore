@@ -41,8 +41,7 @@ autom4te.cache
 # Random temp files
 foo
 foo.*
-<<<<<<< Updated upstream
+
+/.externalToolBuilders/
+/.settings/
 /bin/
-=======
-/classes/
->>>>>>> Stashed changes

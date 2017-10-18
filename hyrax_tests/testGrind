@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+
+# Provide a way to set CATALINA_HOME when it's not set in the shell.
+CATALINA_HOME="${CATALINA_HOME:-$1}"
+if test -z "$CATALINA_HOME"
+then
+    echo "Specify tomcat location"
+    exit 1
+fi
+
+# olfs_log_dir="/etc/olfs/logs"
+olfs_log_dir="$CATALINA_HOME/webapps/opendap/WEB-INF/conf/logs"
+
+flush_list="${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/error.log $CATALINA_HOME/logs/catalina.out";
+
+lap_count=0
+status=0
+while [  $status -eq 0 ]; do
+    ./hyraxTest -j5 3 13 14 15 17 24 25 26 35 36 37 43 44 45 53 54 55 > mk.log 2>&1
+    status=$?
+    echo "Test pass: $lap_count     status: $status"
+    if [ $status -ne 0 ]
+    then
+        echo "FAIL DETECTED!!!"
+    else
+        echo "Flushing $flush_list";
+        for flush_me in $flush_list
+        do
+            echo -n "" >  ${flush_me};
+        done
+    fi
+    let lap_count=lap_count+1 
+done
+ 
