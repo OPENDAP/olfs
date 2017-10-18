@@ -1,6 +1,8 @@
 #!/bin/bash 
 
- flush_list="/etc/olfs/logs/BESCommands.log /etc/olfs/logs/HyraxAccess.log /etc/olfs/logs/error.log $CATALINA_HOME/logs/catalina.out";
+olfs_log_dir="/etc/orls/logs"
+
+flush_list=${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/error.log $CATALINA_HOME/logs/catalina.out";
 
 lap_count=0
 status=0
