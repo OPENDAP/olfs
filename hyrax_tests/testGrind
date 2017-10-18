@@ -1,5 +1,62 @@
 #!/bin/bash
 #
+#  DAP4 Data tests
+#
+#   5: CURL $abs_srcdir/nc3/fnoc1.nc.dap               ok
+#  17: CURL $abs_srcdir/nc3/fnoc1.nc_lat.dap           ok
+#  28: CURL $abs_srcdir/nc3/bears.nc.dap               ok
+#  39: CURL $abs_srcdir/nc3/bears.nc_bears_aloan_i.dap expected failure (hyraxTest.at:73)
+#  44: CURL $abs_srcdir/nc3/zero_length_array.nc.dap   ok
+#  57: CURL $abs_srcdir/ff/1998-6-avhrr.dat.dap        ok
+#  68: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint01.dap expected failure (hyraxTest.at:128)
+#  79: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint02.dap expected failure (hyraxTest.at:146)
+#  90: CURL $abs_srcdir/ff/avhrr.dat.dap               ok
+# 101: CURL $abs_srcdir/ff/gsodock.dat.dap             ok
+# 112: CURL $abs_srcdir/ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dap ok
+# 123: CURL $abs_srcdir/hdf4/S2000415.hdf.dap          ok
+# 134: CURL $abs_srcdir/hdf4/S2000415.hdf_ArraySubset.dap ok
+# 171: CURL $abs_srcdir/errors/NoSuchVariable.dap      ok
+# 180: CURL $abs_srcdir/errors/BadConstraintSyntax.dap ok
+#
+# DMR Tests
+#
+#   3: CURL $abs_srcdir/nc3/fnoc1.nc.dmr               ok
+#  13: CURL $abs_srcdir/nc3/fnoc1.nc_lat.dmr           ok
+#  15: CURL $abs_srcdir/nc3/fnoc1.nc_lat.dmr.xml       ok
+#  24: CURL $abs_srcdir/nc3/bears.nc.dmr               ok
+#  26: CURL $abs_srcdir/nc3/bears.nc.dmr.xml           ok
+#  35: CURL $abs_srcdir/nc3/bears.nc_bears_aloan_i.dmr ok
+#  37: CURL $abs_srcdir/nc3/bears.nc_bears_aloan_i.dmr.xml ok
+#  43: CURL $abs_srcdir/nc3/zero_length_array.nc.dmr   ok
+#  45: CURL $abs_srcdir/nc3/zero_length_array.nc.dmr.xml ok
+#  53: CURL $abs_srcdir/ff/1998-6-avhrr.dat.dmr        ok
+#  55: CURL $abs_srcdir/ff/1998-6-avhrr.dat.dmr.xml    ok
+#  64: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint01.dmr ok
+#  66: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint01.dmr.xml ok
+#  75: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint02.dmr ok
+#  77: CURL $abs_srcdir/ff/1998-6-avhrr.dat_RelationalConstraint02.dmr.xml ok
+#  86: CURL $abs_srcdir/ff/avhrr.dat.dmr               ok
+#  88: CURL $abs_srcdir/ff/avhrr.dat.dmr.xml           ok
+#  97: CURL $abs_srcdir/ff/gsodock.dat.dmr             ok
+#  99: CURL $abs_srcdir/ff/gsodock.dat.dmr.xml         ok
+# 108: CURL $abs_srcdir/ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dmr ok
+# 110: CURL $abs_srcdir/ff/gsodock.dat_URI_GSO-Dock.Air_Temp_URI_GSO-Dock.Depth.dmr.xml ok
+# 119: CURL $abs_srcdir/hdf4/S2000415.hdf.dmr          ok
+# 121: CURL $abs_srcdir/hdf4/S2000415.hdf.dmr.xml      ok
+# 130: CURL $abs_srcdir/hdf4/S2000415.hdf_ArraySubset.dmr ok
+# 132: CURL $abs_srcdir/hdf4/S2000415.hdf_ArraySubset.dmr.xml ok
+# 169: CURL $abs_srcdir/errors/NoSuchVariable.dmr      ok
+# 178: CURL $abs_srcdir/errors/BadConstraintSyntax.dmr ok
+
+
+dap_tests="5 17 28 39 44 57 68 79 90 101 112 123 134 171 180";
+echo "DAP4 data response tests: $dap_tests";
+
+dmr_tests="3 13 15 24 26 35 37 43 45 53 55 64 66 75 77 86 88 97 99 108 110 119 121 130 132 169 178";
+echo "DAP4 DMR response tests: $dmr_tests";
+
+all_dap4_xml_tests=`echo $dap_tests $dmr_tests | sort -n`;
+echo "All DAP4 XML tests: $all_dap4_xml_tests"
 
 # Provide a way to set CATALINA_HOME when it's not set in the shell.
 CATALINA_HOME="${CATALINA_HOME:-$1}"
@@ -9,15 +66,15 @@ then
     exit 1
 fi
 
-# olfs_log_dir="/etc/olfs/logs"
-olfs_log_dir="$CATALINA_HOME/webapps/opendap/WEB-INF/conf/logs"
+olfs_log_dir="/etc/olfs/logs"
+# olfs_log_dir="$CATALINA_HOME/webapps/opendap/WEB-INF/conf/logs"
 
 flush_list="${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/error.log $CATALINA_HOME/logs/catalina.out";
 
 lap_count=0
 status=0
 while [  $status -eq 0 ]; do
-    ./hyraxTest -j5 3 13 14 15 17 24 25 26 35 36 37 43 44 45 53 54 55 > mk.log 2>&1
+    ./hyraxTest -j10 ${all_dap4_xml_tests} | tee mk.log 2>&1
     status=$?
     echo "Test pass: $lap_count     status: $status"
     if [ $status -ne 0 ]
