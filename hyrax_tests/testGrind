@@ -74,7 +74,7 @@ flush_list="${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${ol
 lap_count=0
 status=0
 while [  $status -eq 0 ]; do
-    ./hyraxTest -j10 ${all_dap4_xml_tests} | tee mk.log 2>&1
+    time ./hyraxTest -j10 ${all_dap4_xml_tests} | tee mk.log 2>&1
     status=$?
     echo "Test pass: $lap_count     status: $status"
     if [ $status -ne 0 ]
