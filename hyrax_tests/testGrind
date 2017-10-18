@@ -1,22 +1,24 @@
 #!/bin/bash 
- 
+
+ flush_list="/etc/olfs/logs/BESCommands.log /etc/olfs/logs/HyraxAccess.log /etc/olfs/logs/error.log $CATALINA_HOME/logs/catalina.out";
+
 lap_count=0
 status=0
 while [  $status -eq 0 ]; do
     # echo The counter is $COUNTER
-    ./hyraxTest -j9 3 13 14 15 17 24 25 26 35 36 37 43 44 45 53 54 55 
+    ./hyraxTest -j5 3 13 14 15 17 24 25 26 35 36 37 43 44 45 53 54 55 > mk.log 2>&1
     status=$?
     echo "Test pass: $lap_count     status: $status"
     if [ $status -ne 0 ]
     then
         echo "FAIL DETECTED!!!"
-    else 
-        echo -n "" > /etc/olfs/logs/BESCommands.log
-        echo -n "" > /etc/olfs/logs/HyraxAccess.log
-        echo -n "" > /etc/olfs/logs/error.log
+    else
+        echo "Flushing $flush_list";
+        for flush_me in $flush_list
+        do
+            echo -n "" >  ${flush_me};
+        done
     fi
     let lap_count=lap_count+1 
 done
  
- 
-# 
