@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-olfs_log_dir="/etc/orls/logs"
+olfs_log_dir="/etc/olfs/logs"
 
 flush_list=${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/error.log $CATALINA_HOME/logs/catalina.out";
 
