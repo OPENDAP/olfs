@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Usage: testGrind [value for catalina_home] [processes] [num laps] [tests to run]
+
 #  DAP4 Data tests
 #
 #   5: CURL $abs_srcdir/nc3/fnoc1.nc.dap               ok
@@ -66,27 +68,47 @@ then
     exit 1
 fi
 
-olfs_log_dir="/etc/olfs/logs"
-# olfs_log_dir="$CATALINA_HOME/webapps/opendap/WEB-INF/conf/logs"
+PROCS=${2:-"9"}
+echo "PROCS: $PROCS"
 
-flush_list="${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/error.log $CATALINA_HOME/logs/catalina.out";
+# num laps is the number of failing laps
+num_laps=${3:-1}
+echo "num laps: $num_laps"
 
+TESTS=${4:-"$dap_tests $dmr_tests"}
+echo "TESTS: $TESTS"
+
+PATH=/Users/jimg/src/opendap/hyrax_git/build/bin:/Users/jimg/src/opendap/hyrax_git/build/deps/bin:$PATH
+echo "which getdap4: `which getdap4`"
+
+# olfs_log_dir="/etc/olfs/logs"
+olfs_log_dir="$CATALINA_HOME/webapps/opendap/WEB-INF/conf/logs"
+
+flush_list="${olfs_log_dir}/BESCommands.log ${olfs_log_dir}/HyraxAccess.log ${olfs_log_dir}/HyraxErrors.log $CATALINA_HOME/logs/catalina.out";
+
+fail_count=0
 lap_count=0
 status=0
-while [  $status -eq 0 ]; do
-    time ./hyraxTest -j10 ${all_dap4_xml_tests} | tee mk.log 2>&1
+
+while [  $fail_count -lt $num_laps ]; do
+    # echo "Flushing $flush_list";
+
+    for flush_me in $flush_list
+    do
+        >  ${flush_me};
+    done
+
+    echo "./hyraxTest --jobs=$PROCS $TESTS > mk-$fail_count.log 2>&1"
+    time ./hyraxTest --jobs=$PROCS $TESTS > mk-$fail_count.log 2>&1
     status=$?
+
     echo "Test pass: $lap_count     status: $status"
     if [ $status -ne 0 ]
     then
         echo "FAIL DETECTED!!!"
-    else
-        echo "Flushing $flush_list";
-        for flush_me in $flush_list
-        do
-            echo -n "" >  ${flush_me};
-        done
+        let fail_count=$fail_count+1
     fi
-    let lap_count=lap_count+1 
+
+    let lap_count=lap_count+1
 done
  

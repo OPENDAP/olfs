@@ -680,6 +680,25 @@ public class BES {
 
 
     /**
+     * Helper method that adds the bes client identifier to the request ID.
+     * @param request
+     * @param oc
+     * @throws IOException
+     */
+    private void tweakRequestId(Document request, OPeNDAPClient oc) throws IOException {
+        Element reqElement = request.getRootElement();
+        if(reqElement==null){
+            throw new IOException("The BES Request document must have a root element!");
+        }
+        String reqID = reqElement.getAttributeValue(BesApi.REQUEST_ID);
+        if(reqID==null)
+            reqID="";
+
+        reqID += "[bes_client:"+oc.getID()+"]";
+        reqElement.setAttribute(BesApi.REQUEST_ID,reqID);
+    }
+
+    /**
      * Executes a command/response transaction with the BES
      *
      * @param request   The BES request document.
@@ -695,8 +714,6 @@ public class BES {
             throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
-        log.debug("besTransaction() request document: \n{}-----------\n",showRequest(request));
-        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
 
 
         boolean trouble = false;
@@ -713,6 +730,9 @@ public class BES {
             log.error("besTransaction() - {}", msg);
             throw new IOException(msg);
         }
+        tweakRequestId(request,oc);
+        log.debug("besTransaction() request document: \n{}-----------\n",showRequest(request));
+        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
 
         Procedure timedProc = Timer.start();
 
@@ -770,7 +790,7 @@ public class BES {
                         trouble = true;
                     }
                 } else {
-                    String reqId = request.getRootElement().getAttributeValue("reqID");
+                    String reqId = request.getRootElement().getAttributeValue(BesApi.REQUEST_ID);
                     Document errDoc = getMissingBesResponseErrorDoc(reqId);
                     besError = new BESError(errDoc);
 
@@ -830,14 +850,9 @@ public class BES {
 
 
         log.debug("besTransaction() - Started.");
-        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
-        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
 
         boolean besTrouble = false;
-
-
         OPeNDAPClient oc = getClient();
-
         if(oc==null){
             String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
                     "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
@@ -845,6 +860,10 @@ public class BES {
             throw new IOException(msg);
 
         }
+        tweakRequestId(request,oc);
+        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
+        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
+
 
 
         Procedure timedProc = Timer.start();
@@ -912,7 +931,7 @@ public class BES {
         Element admin     = new Element("Administrator",BES_NS);
 
         errorResponse.addNamespaceDeclaration(BES_NS);
-        errorResponse.setAttribute("reqID", reqId);
+        errorResponse.setAttribute(BesApi.REQUEST_ID, reqId);
 
         type.setText("1");
         message.setText("BES returned an empty error document! That's a bad thing!");
@@ -1107,12 +1126,10 @@ public class BES {
         // Add it to the client pool
         try {
             _clientsMapLock.lock();
-            String clientId;
-            if(getNickName()==null)
-                clientId = "besC-" + totalClients;
-            else
-                clientId = getNickName()+":" + totalClients;
-
+            String clientId = (getNickName()==null?getPrefix():getNickName());
+            if(clientId.isEmpty())
+                clientId = "besC";
+            clientId += "-" + totalClients;
             besClient.setID(clientId);
             _clients.put(clientId, besClient);
             totalClients++;

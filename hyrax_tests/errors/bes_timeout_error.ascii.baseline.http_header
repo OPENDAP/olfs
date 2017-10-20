@@ -1,7 +1,1 @@
-HTTP/1.1 504 Gateway Timeout
-Server: Apache-Coyote/1.1
-Content-Description: DAP2 Error Object
-Content-Type: text/plain
-Transfer-Encoding: chunked
-Date: Tue, 16 May 2017 21:21:16 GMT
-
+HTTP/1.1 504
