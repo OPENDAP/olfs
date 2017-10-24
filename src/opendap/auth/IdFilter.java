@@ -451,7 +451,7 @@ public class IdFilter implements Filter {
                     while(attrNames.hasMoreElements()){
                         String attrName = attrNames.nextElement().toString();
                         String attrValue = session.getAttribute(attrName).toString();
-                        out.println("<dt><b>"+attrName+"</b></dt><dd>"+attrValue+"</dd>");
+                        out.println("<dt><b>"+attrName+"</b></dt><dd><pre>"+attrValue+"</pre></dd>");
 
 
                     }

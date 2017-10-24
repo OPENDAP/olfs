@@ -40,6 +40,7 @@ import java.util.Map;
 public class UserProfile {
 
     protected Date   _objectCreationTime;
+    protected String _jsonStr;
     protected JsonObject _jsonInit;
     protected HashSet<String> _groups;
     protected HashSet<String> _roles;
@@ -57,17 +58,25 @@ public class UserProfile {
         _idp  = null;
     }
 
-    public UserProfile(JsonObject json){
+    /**
+     *  Parse the json to extract the user id, first and last names,
+     * and email address. We store these in the session. These four
+     * parameters are mandatory, and will always exist in the user
+     * profile.
+     * @param jsonStr
+     */
+    public UserProfile(String jsonStr){
         this();
+        JsonParser jparse = new JsonParser();
+        _jsonInit = jparse.parse(jsonStr).getAsJsonObject();
+        _jsonStr = jsonStr;
 
-        Gson gson = new Gson();
-        String  jsonString = gson.toJson(json);
-
-        _jsonInit      = gson.fromJson(jsonString, JsonObject.class);
     }
 
-
     public String getAttribute(String attrName){
+        JsonElement val =  _jsonInit.get(attrName);
+        if(val==null)
+            return null;
         return _jsonInit.get(attrName).toString();
     }
 
@@ -181,14 +190,29 @@ public class UserProfile {
  **/
 
     public String toString(){
-        StringBuilder sb = new StringBuilder("UserProfile:");
-
+        StringBuilder sb = new StringBuilder(getClass().getName());
+        sb.append("\n");
+        sb.append("UID: " + getUID()).append("\n");
+        sb.append(keyValStr("first_name")).append("\n");
+        sb.append(keyValStr("last_name")).append("\n");
+        sb.append(keyValStr("registered_date")).append("\n");
+        sb.append(keyValStr("email_address")).append("\n");
+        sb.append(keyValStr("country")).append("\n");
+        sb.append(keyValStr("study_area")).append("\n");
+        sb.append(keyValStr("Other")).append("\n");
+        sb.append(keyValStr("affiliation")).append("\n");
+        sb.append(keyValStr("authorized_date")).append("\n");
+        sb.append(keyValStr("allow_auth_app_emails")).append("\n");
+        sb.append(keyValStr("agreed_to_meris_eula")).append("\n");
+        sb.append(keyValStr("agreed_to_sentinel_eula")).append("\n");
+        sb.append(keyValStr("user_authorized_apps")).append("\n");
+        sb.append(keyValStr("user_groups")).append("\n");
+        /*
 
         Gson gson = new Gson();
-        String  jsonString = gson.toJson(_jsonInit);
-        JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
 
-        
+        JsonObject externalRepresentation = gson.fromJson(_jsonInit, JsonObject.class);
+
         if(externalRepresentation.isJsonArray()) {
             JsonArray jsonArray = externalRepresentation.getAsJsonArray();
             for(JsonElement jsonElement: jsonArray){
@@ -216,17 +240,22 @@ public class UserProfile {
 
             }
         }
-
-        // String userProfileJsonStr = externalRepresentation.getAsString();
-
-        
-        // externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonArray.class));
-        // externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonArray.class));
-
-
-        //sb.append("UserProfile:").append(userProfileJsonStr);
+        */
         return sb.toString();
 
+
+    }
+
+
+    public static void main(String args[]){
+        String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+
+        UserProfile up = new UserProfile(ursUserProfile);
+        System.out.println(up.toString());
+
+    }
+    private String keyValStr(String attributeName){
+        return attributeName + ": " + getAttribute(attributeName);
 
     }
 
