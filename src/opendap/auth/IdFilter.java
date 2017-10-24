@@ -26,7 +26,8 @@
 
 package opendap.auth;
 
-import org.apache.http.client.CredentialsProvider;
+import opendap.PathBuilder;
+import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +62,14 @@ public class IdFilter implements Filter {
 
         _log = LoggerFactory.getLogger(this.getClass());
 
-        _idProviders = new ConcurrentHashMap<String, IdProvider>();
+        _idProviders = new ConcurrentHashMap<>();
 
         String configFileName = filterConfig.getInitParameter("config");
 
-
+        if(configFileName==null)
+            configFileName = getClass().getSimpleName()+".xml";
+        
+        configFileName = PathBuilder.pathConcat(ServletUtil.getConfigPath(filterConfig.getServletContext()),  configFileName);
         try {
             Element config = opendap.xml.Util.getDocumentRoot(configFileName);
 

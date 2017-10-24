@@ -26,14 +26,13 @@
 
 package opendap.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 //import org.json.simple.JSONObject;
 
 // import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Created by ndp on 9/25/14.
@@ -182,21 +181,50 @@ public class UserProfile {
  **/
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("UserProfile:");
 
 
         Gson gson = new Gson();
         String  jsonString = gson.toJson(_jsonInit);
         JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
 
+        
+        if(externalRepresentation.isJsonArray()) {
+            JsonArray jsonArray = externalRepresentation.getAsJsonArray();
+            for(JsonElement jsonElement: jsonArray){
+                sb.append(jsonElement.getAsString());
+            }
+        }
+        else if(externalRepresentation.isJsonPrimitive()){
+
+        }
+        else if(externalRepresentation.isJsonObject()){
+            for(Map.Entry<String,JsonElement> mapE: externalRepresentation.entrySet()){
+                sb.append("\"").append(mapE.getKey()).append("\": ");
+                if(mapE.getValue().isJsonArray()){
+                    JsonArray values = mapE.getValue().getAsJsonArray();
+                    sb.append("[");
+                    for(JsonElement jse : values){
+                        if(!jse.isJsonArray())
+                            sb.append(jse.getAsString()).append(",");
+                    }
+                    sb.append("], ");
+                }
+                else {
+                    sb.append(mapE.getValue().getAsString()).append(",");
+                }
+
+            }
+        }
+
+        // String userProfileJsonStr = externalRepresentation.getAsString();
+
+        
+        // externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonArray.class));
+        // externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonArray.class));
 
 
-        externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonObject.class));
-        externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonObject.class));
-
-        sb.append("UserProfile:").append(externalRepresentation.getAsString());
-
-
+        //sb.append("UserProfile:").append(userProfileJsonStr);
         return sb.toString();
 
 

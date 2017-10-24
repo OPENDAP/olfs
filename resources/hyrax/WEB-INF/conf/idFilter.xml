@@ -27,11 +27,9 @@
 
 
 <IdFilter>
-
     <IdProvider class="opendap.auth.UrsIdP">
         <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
         <UrsClientAuthCode>aVBsRWpaak12cmR3TFVsbmJhS3hXUTpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
         <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
     </IdProvider>
-
 </IdFilter>
