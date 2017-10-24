@@ -160,9 +160,9 @@
     <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         Catalog Response Cache Updater (worker thread)
     -->
-    <listener>
+    <!-- listener>
         <listener-class>opendap.bes.caching.CatalogCacheUpdater</listener-class>
-    </listener>
+    </listener -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <servlet>
