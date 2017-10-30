@@ -30,4 +30,5 @@
     <CatalogService context="/catalog" />
     <CatalogCache>/tmp/s3CatalogCache</CatalogCache>
     <Bucket name="opendap.test" context="/test" loadCatalogOnStart="true" />
+    <Bucket name="testbed-13" context="/tb13" loadCatalogOnStart="true" />
 </S3Config>

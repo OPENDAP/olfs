@@ -114,7 +114,7 @@ public class S3CatalogServlet extends HttpServlet {
         LogUtil.logServerStartup("init()");
         _log.info("init() start.");
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this);
+        PersistentConfigurationHandler.installDefaultConfiguration(this,"s3.xml");
 
 
         ingestConfig();
