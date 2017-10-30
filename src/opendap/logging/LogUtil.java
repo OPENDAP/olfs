@@ -415,10 +415,15 @@ public class LogUtil {
 
         MDC.put("http_status", Integer.toString(httpStatus));
 
+        long  duration;
         String sTime = MDC.get("startTime");
-        long startTime = Long.valueOf(sTime);
-        long duration = endTime - startTime;
-
+        if(sTime!=null) {
+            long startTime = Long.valueOf(sTime);
+            duration = endTime - startTime;
+        }
+        else {
+            duration = -1;
+        }
         MDC.put("duration", Long.toString(duration)+" ms");
 
 

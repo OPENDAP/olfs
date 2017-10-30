@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<LocalFileCatalog xmlns="http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#" validateCatalog="false">
+
+    <!--
+
+
+    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/ECMWF_ERA-40_subset.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcw"  dapID="tcw" />
+        <field name="tcwv" dapID="tcwv" />
+        <field name="cp"   dapID="cp" />
+        <field name="msl"  dapID="msl" />
+        <field name="blh"  dapID="blh" />
+        <field name="tcc"  dapID="tcc" />
+        <field name="p10u" dapID="p10u" />
+        <field name="p10v" dapID="p10v" />
+        <field name="p2t"  dapID="p2t" />
+        <field name="p2d"  dapID="p2d" />
+        <field name="e"    dapID="e" />
+        <field name="lcc"  dapID="lcc" />
+        <field name="mcc"  dapID="mcc" />
+        <field name="hcc"  dapID="hcc" />
+        <field name="tco3" dapID="tco3" />
+        <field name="tp"   dapID="tp" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcw.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/ECMWF_ERA-40_subset.nc</DapDatasetUrl>
+        <DomainCoordinate name="time"      dapID="time"      units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude"  dapID="latitude"  units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcw" dapID="tcw" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcwv.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/ECMWF_ERA-40_subset.nc</DapDatasetUrl>
+        <DomainCoordinate name="time"      dapID="time"      units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude"  dapID="latitude"  units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcwv" dapID="tcwv" />
+    </WcsCoverage>
+
+
+    <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="u" dapID="u" />
+        <field name="v" dapID="v" />
+        <field name="DOPx" dapID="DOPx" />
+        <field name="DOPy" dapID="DOPy" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-u.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="u" dapID="u" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-v.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="v" dapID="v" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPx.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="DOPx" dapID="DOPx" />
+    </WcsCoverage>
+
+    <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPy.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/exmpl_cvrgs/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="DOPy" dapID="DOPy" />
+    </WcsCoverage>
+
+
+    <WcsCoverage fileName="SF_1in100.nc.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/SF_1in100.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="index" />
+        <DomainCoordinate name="rows" dapID="rows" units="index" />
+        <DomainCoordinate name="cols" dapID="cols" units="index" />
+        <field name="depth" dapID="depth" />
+    </WcsCoverage>
+
+-->
+    <WcsCoverage fileName="newSF_1in100.nc.xml">
+        <!-- Float64 depth[time = 108][latitude = 4800][longitude = 4800]; -->
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="108" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="latitude" size="4800" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="longitude" size="4800" units="degrees_east" />
+        <field name="depth" dapID="depth" />
+    </WcsCoverage>
+
+    <EOWcsCoverage fileName="eo_newSF_1in100.nc.xml">
+        <!-- Float64 depth[time = 108][latitude = 4800][longitude = 4800]; -->
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="108" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="longitude" dapID="longitude" size="4800" units="degrees_east" />
+        <DomainCoordinate name="latitude" dapID="latitude" size="4800" units="degrees_north" />
+        <field name="depth" dapID="depth" />
+    </EOWcsCoverage>
+
+    <EOWcsCoverage fileName="eo_newSF_1in100_reorder.nc.xml">
+        <!-- Float64 depth[time = 108][latitude = 4800][longitude = 4800]; -->
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/NETCDF_Flood/newSF_1in100_reorder.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="108" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="latitude" size="4800" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="longitude" size="4800" units="degrees_east" />
+        <field name="depth" dapID="depth" />
+    </EOWcsCoverage>
+
+    <WcsCoverage fileName="ncep_model_example.xml">
+        <!-- Float32 u-component_of_wind_isobaric[time = 112][isobaric = 31][lat = 361][lon = 720]; -->
+        <!-- Float32 v-component_of_wind_isobaric[time = 112][isobaric = 31][lat = 361][lon = 720]; -->
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="112" units="Hours since 2016-06-17T00:00:00.000Z" />
+        <DomainCoordinate name="isobaric" dapID="isobaric" size="31" units="Pa" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="720" units="degrees_east" />
+        <field name="u_component_of_wind_isobaric" dapID="u-component_of_wind_isobaric" />
+        <field name="v_component_of_wind_isobaric" dapID="v-component_of_wind_isobaric" />
+    </WcsCoverage>
+
+    <EOWcsCoverage fileName="eo_ncep_model_example.xml">
+        <!-- Float32 u-component_of_wind_isobaric[time = 112][isobaric = 31][lat = 361][lon = 720]; -->
+        <!-- Float32 v-component_of_wind_isobaric[time = 112][isobaric = 31][lat = 361][lon = 720]; -->
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/ncep/Global_0p25deg_best_hs002.nc</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" size="112" units="Hours since 2016-06-17T00:00:00.000Z" />
+        <DomainCoordinate name="isobaric" dapID="isobaric" size="31" units="Pa" />
+        <DomainCoordinate name="latitude" dapID="lat" size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon" size="720" units="degrees_east" />
+        <field name="u_component_of_wind_isobaric" dapID="u-component_of_wind_isobaric" />
+        <field name="v_component_of_wind_isobaric" dapID="v-component_of_wind_isobaric" />
+    </EOWcsCoverage>
+
+    <!--
+    <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+        <field name="chl-a" dapID="l3m_data" />
+    </EOWcsCoverage>
+
+    <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+        <field name="chl-a" dapID="l3m_data" />
+    </EOWcsCoverage>
+
+    <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002.nc4.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+        <field name="chl-a" dapID="l3m_data" />
+    </EOWcsCoverage>
+
+    <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003.nc4.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+        <field name="chl-a" dapID="l3m_data" />
+    </EOWcsCoverage>
+
+-->
+
+    <EODatasetSeries id="MODIS_L3_chl-a">
+
+        <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000_nc4_min_eo.xml">
+            <!-- Float32 l3m_data[time = 1][lat = 4320][lon = 8640]; -->
+            <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_000.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+            <field name="chl-a" dapID="l3m_data" />
+        </EOWcsCoverage>
+
+        <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001_nc4_min_eo.xml">
+            <!-- Float32 l3m_data[time = 1][lat = 4320][lon = 8640]; -->
+            <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+            <field name="chl-a" dapID="l3m_data" />
+        </EOWcsCoverage>
+
+        <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002_nc4_min_eo.xml">
+            <!-- Float32 l3m_data[time = 1][lat = 4320][lon = 8640]; -->
+            <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_002.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+            <field name="chl-a" dapID="l3m_data" />
+        </EOWcsCoverage>
+
+        <EOWcsCoverage fileName="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003_nc4_min_eo.xml">
+            <!-- Float32 l3m_data[time = 1][lat = 4320][lon = 8640]; -->
+            <DapDatasetUrl>http://localhost:8080/opendap/testbed-12/modis_L3/MODIS_AQUA_L3_CHLA_DAILY_4KM_R_003.nc4</DapDatasetUrl>
+            <DomainCoordinate name="time" dapID="time" size="1" units="Days since 2002-01-01T00:00:00.000Z" />
+            <DomainCoordinate name="latitude" dapID="lat" size="4320" units="degrees_north" />
+            <DomainCoordinate name="longitude" dapID="lon" size="8640" units="degrees_east" />
+            <field name="chl-a" dapID="l3m_data" />
+        </EOWcsCoverage>
+
+    </EODatasetSeries>
+
+</LocalFileCatalog>
+

@@ -35,6 +35,11 @@
         </encoder>
     </appender>
 
+    <!--
+       This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+       and it must defined and added to the root logger in order to catch all the stuff,
+       and in order for the Java software to be able to locate it at run time.
+   -->
     <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
         <MaxSize>512</MaxSize>
     </appender>
@@ -65,8 +70,7 @@
             <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
     </appender>
-
-
+    
     <appender name="AnonymousAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/AnonymousAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -78,7 +82,6 @@
             <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
         </encoder>
     </appender>
-
 
     <appender name="BESCommandLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/BESCommands.log</File>
@@ -92,34 +95,29 @@
         </encoder>
     </appender>
 
-
-
-
     <!-- OPeNDAP Hyrax Logging -->
-
-
 
     <logger name="opendap" level="error" >
         <appender-ref ref="stdout"/>
         <appender-ref ref="ErrorLog"/>
     </logger>
 
-
-
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
     </logger -->
 
-
     <root level="error">
+        <!--
+            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+            and it must appear here in the root level in order to catch all the stuff,
+            adn in order for the Java software to be able to locate it at run time.
+        -->
         <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>
-
 
 </configuration>

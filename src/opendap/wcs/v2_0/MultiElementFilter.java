@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -33,28 +33,25 @@ import org.jdom.filter.Filter;
 import java.util.Vector;
 
 /**
-* Created by IntelliJ IDEA.
-* User: ndp
-* Date: 10/17/12
-* Time: 7:21 PM
-* To change this template use File | Settings | File Templates.
-*/
+ *
+ *
+ */
 public class MultiElementFilter implements Filter {
 
-    private Vector<String> targetNames;
-    private Vector<Namespace> targetNamespaces;
+    private Vector<String> _targetNames;
+    private Vector<Namespace> _targetNamespaces;
 
 
     public MultiElementFilter(String name, Namespace ns){
-        targetNames = new Vector<String>();
-        targetNamespaces = new Vector<Namespace>();
+        _targetNames = new Vector<>();
+        _targetNamespaces = new Vector<>();
 
         addTargetElement(name,ns);
     }
 
     public void addTargetElement(String name, Namespace ns){
-        targetNames.add(name);
-        targetNamespaces.add(ns);
+        _targetNames.add(name);
+        _targetNamespaces.add(ns);
     }
 
     public void addTargetElement(String name){
@@ -71,57 +68,40 @@ public class MultiElementFilter implements Filter {
     public boolean matches(Object obj){
 
         if(obj instanceof Element){
-            Element candidate = (Element) obj;
 
+            Element candidate = (Element) obj;
             Namespace cNS = candidate.getNamespace();
             String cName  = candidate.getName();
 
             String targetName;
             Namespace targetNamespace;
-
-
-            for(int i=0; i<targetNames.size() ;i++){
-                targetName = targetNames.get(i);
-                targetNamespace = targetNamespaces.get(i);
-
+            for(int i = 0; i< _targetNames.size() ; i++){
+                targetName = _targetNames.get(i);
+                targetNamespace = _targetNamespaces.get(i);
                 if(cName!=null){
-
                     if(targetName == null){
-
                         if(targetNamespace==null)
                             return true;
-
                         if(cNS==null || cNS.equals(targetNamespace))
                             return true;
-
                     }
                     else {
-
                         if(cName.equals(targetName)){
-
                             if(targetNamespace==null)
                                 return true;
-
                             if(cNS.equals(targetNamespace))
                                 return true;
                         }
                     }
                 }
                 else {
-
                     if(targetNamespace==null)
                         return true;
-
                     if(cNS!=null && cNS.equals(targetNamespace))
                         return true;
-
                 }
-
             }
-
         }
         return false;
     }
-
-
 }

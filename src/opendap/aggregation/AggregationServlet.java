@@ -230,7 +230,7 @@ public class AggregationServlet extends HttpServlet {
                     granule =  granule + ".txt";
                     break;
                 case plain:
-                    // No change to the name in this case - this ResponseFormat is
+                    // No change to the name in this case - this WcsResponseFormat is
                     // used by the /file service that simply reads files and dumps
                     // them into the zip output stream.
                     break;
@@ -310,8 +310,7 @@ public class AggregationServlet extends HttpServlet {
      */
     private void writeSinglePlainGranule(String granule, OutputStream os)
             throws IOException, BadConfigurationException {
-
-
+    	
         try {
             _besApi.writeFile(granule, os);
         }
@@ -320,7 +319,6 @@ public class AggregationServlet extends HttpServlet {
             os.write(msg.getBytes(HyraxStringEncoding.getCharset()));
             _log.error("Aggregation Error in writeSinglePlainGranule(): {}", msg);
         }
-
     }
 
     /**

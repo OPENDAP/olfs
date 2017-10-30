@@ -52,6 +52,7 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION"  value="Not.A.Release"/>
+    <property name="WCS_VERSION"   value="${OLFS_VERSION}"/>
     <property name="WEBAPP_DIST"   value="olfs-${OLFS_VERSION}-webapp"/>
     <property name="SRC_DIST"      value="olfs-${OLFS_VERSION}-src"/>
     <property name="DOC_DIST"      value="olfs-${OLFS_VERSION}-doc"/>
@@ -68,7 +69,7 @@
     <property name="compile.SOURCE" value="1.7"/>
 
 
-    <property name="modern.compiler" value="modern"/>
+    <property name="modern.compiler"  value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
     <!--  build.compiler: This is a "magic" property.
@@ -197,6 +198,8 @@
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
 
+    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
+    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
     <property name="json.lib"       value="gson-2.3.1.jar"/>
@@ -222,9 +225,8 @@
     <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
 
 
-    <property name="http-components-httpclient.lib"       value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpclient-cache.lib" value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="apache-http-components-httpcore-4.3.jar"/>
+    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
 
@@ -242,11 +244,20 @@
     <property name="json.lib"      value="json-simple-1.1.1.jar"/>
 
 
-    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
-               property="fortify.present"/>
+    <!-- WCS Libs -->
+    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
+    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
-    <property name="rules.dir" value="fortify"/>
+
+
+
 
 
     <!-- Library (class)paths -->
@@ -264,7 +275,6 @@
             <include name="${commons-lang.lib}"/>
 
             <include name="${http-components-httpclient.lib}"/>
-            <include name="${http-components-httpclient-cache.lib}"/>
             <include name="${http-components-httpcore.lib}"/>
 
             <include name="${commons-io.lib}"/>
@@ -278,9 +288,19 @@
             <include name="${slf4j.lib}"/>
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
-
-            
         </fileset>
+        <fileset dir="${wcs.lib.dir}">
+            <include name="${ogc-wcs.lib}" />
+            <include name="${ogc-gml.lib}" />
+            <include name="${ogc-swe.lib}" />
+            <include name="${ogc-gmlcov.lib}" />
+            <include name="${ogc-ows.lib}" />
+            <include name="${ogc-jaxb.lib}" />
+            <include name="${jaxb-core.lib}" />
+            <include name="${jaxb-impl.lib}" />
+            <include name="${xlink.lib}" />
+        </fileset>
+
     </path>
 
 
@@ -310,13 +330,14 @@
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
     </target>
 
 
-    <!-- It would be better if this target only copied the files that have chenaged.
+    <!-- It would be better if this target only copied the files that have changed.
          jhrg 5/26/16 -->
     <target name="check"
             description="Run Unit Tests"
@@ -334,8 +355,13 @@
           <test name="opendap.coreServlet.Scrub" />
           <test name="opendap.aggregation.AggregationParamsTest" />
 
-          <test name="opendap.bes.dap4Responders.Dap4ResponderTest" />
+            <test name="opendap.bes.dap4Responders.Dap4ResponderTest" />
 
+            <!--
+            <test name="opendap.dap4.DatasetTest" />
+            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
+            -->
+            
         </junit>
     </target>
 
@@ -347,8 +373,11 @@
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="OLFS_VERSION:  ${OLFS_VERSION}"/>
+        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
+        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
+        <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
+
         <echo level="info" message=""/>
 
 
@@ -368,8 +397,8 @@
                 <!-- Exclude the Metacat code  -->
                 <exclude name="opendap/metacat/**"/>
 
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcs/**"/>
+                <!-- Exclude WCS 1.1.2 and semantics code  -->
+                <exclude name="opendap/wcs/v1_1_2/**"/>
                 <exclude name="opendap/semantics/**"/>
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
@@ -379,18 +408,23 @@
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
 
-
-                <!-- Exclude the Hyrax Admin Interface code  -->
-                <!-- <exclude name="opendap/hai/**"/>  -->
-
             </fileset>
 
         </copy>
 
 
-        <!-- Copy and filter all of the hyrax resources   -->
         <copy todir="${build.resources}" filtering="true">
+            <!-- Copy and filter all of the hyrax resources   -->
             <fileset dir="${hyraxResources.dir}"/>
+            <!-- get the WCS stuff but don't stomp on Hyrax things -->
+            <fileset dir="${wcs.resources.dir}">
+                <include name="xsl/**"/>
+                <include name="WEB-INF/**"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+                <exclude name="WEB-INF/logback.xml"/>
+            </fileset>
+
         </copy>
     </target>
 
@@ -709,14 +743,9 @@
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
-
-
-
         <echo level="info" message="Building Hyrax server war file."/>
         <echo level="info" message="build.resources: ${build.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
-
-
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
              webxml="${build.resources}/WEB-INF/web.xml"
@@ -735,7 +764,6 @@
                 <include name="${commons-codec.lib}"/>
 
                 <include name="${http-components-httpclient.lib}"/>
-                <include name="${http-components-httpclient-cache.lib}"/>
                 <include name="${http-components-httpcore.lib}"/>
 
                 <include name="${commons-io.lib}"/>
@@ -751,6 +779,18 @@
                 <include name="${logback-classic.lib}"/>
 
             </lib>
+            <lib dir="${wcs.lib.dir}">
+                <include name="${ogc-wcs.lib}"/>
+                <include name="${ogc-gml.lib}"/>
+                <include name="${ogc-swe.lib}"/>
+                <include name="${ogc-gmlcov.lib}"/>
+                <include name="${ogc-ows.lib}"/>
+                <include name="${ogc-jaxb.lib}"/>
+                <include name="${jaxb-core.lib}"/>
+                <include name="${jaxb-impl.lib}"/>
+                <include name="${xlink.lib}"/>
+            </lib>
+
             <classes dir="${build.classes}"/>
 
 
@@ -778,46 +818,6 @@
 
     </target>
 
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >   
-        </sourceanalyzer>
-    </target>
 
 
     <!-- OS-X stuff -->

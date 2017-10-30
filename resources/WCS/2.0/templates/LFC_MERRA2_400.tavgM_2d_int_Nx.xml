@@ -1,0 +1,10 @@
+
+    <WcsCoverage fileName="@COVERAGE_NAME@.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/@COVERAGE_NAME@</DapDatasetUrl>
+        <DomainCoordinate name="time"      dapID="time" size="1"   units="minutes since @DATE@ 00:30:00" />
+        <DomainCoordinate name="latitude"  dapID="lat"  size="361" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon"  size="576" units="degrees_east" />
+        <field name="PRECCU" dapID="PRECCU" />
+        <field name="PRECLS" dapID="PRECLS" />
+        <field name="PRECSN" dapID="PRECSN" />
+    </WcsCoverage>

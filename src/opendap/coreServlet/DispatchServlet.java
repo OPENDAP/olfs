@@ -131,20 +131,27 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-        httpGetDispatchHandlers = new Vector<DispatchHandler>();
-        Vector<Element> httpGetHandlerConfigs = new Vector<Element>();
-        httpPostDispatchHandlers = new Vector<DispatchHandler>();
-        Vector<Element> httpPostHandlerConfig = new Vector<Element>();
+        httpGetDispatchHandlers = new Vector<>();
+        Vector<Element> httpGetHandlerConfigs = new Vector<>();
+        httpPostDispatchHandlers = new Vector<>();
+        Vector<Element> httpPostHandlerConfig = new Vector<>();
 
 
         // init logging
         LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this);
+        String configFile = getInitParameter("ConfigFileName");
+        if (configFile == null) {
+            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
+                    "is the name of the OLFS configuration file!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
 
+        PersistentConfigurationHandler.installDefaultConfiguration(this,configFile);
 
-        loadConfig();
+        loadConfig(configFile);
 
 
         Element timer = configDoc.getRootElement().getChild("Timer");
@@ -204,26 +211,16 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * Loads the configuration file specified in the servlet parameter
-     * OLFSConfigFileName.
+     * ConfigFileName.
      *
      * @throws ServletException When the file is missing, unreadable, or fails
      *                          to parse (as an XML document).
      */
-    private void loadConfig() throws ServletException {
+    private void loadConfig(String confFileName) throws ServletException {
 
-        String filename = getInitParameter("OLFSConfigFileName");
-        if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the OLFS configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
-
-        filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
+        String filename = Scrub.fileName(ServletUtil.getConfigPath(this) + confFileName);
 
         log.debug("Loading Configuration File: " + filename);
-
-
         try {
 
             File confFile = new File(filename);
@@ -299,14 +296,21 @@ public class DispatchServlet extends HttpServlet {
 
         String msg;
 
+        Element configRoot = configDoc.getRootElement();
+        if(configRoot==null)
+            throw new ServletException("Bad configuration! No root element in configuration document");
 
-        Element httpHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild(type);
+        Element dispatchHandlersElement = configRoot.getChild("DispatchHandlers");
+        if(dispatchHandlersElement==null)
+            throw new ServletException("Bad configuration! No DispatchHandlers element!");
+
+        Element handlerElements = dispatchHandlersElement.getChild(type);
 
         log.debug("Building "+ type);
 
-        if(httpHandlerElements!=null){
+        if(handlerElements!=null){
 
-            for (Object o : httpHandlerElements.getChildren("Handler")) {
+            for (Object o : handlerElements.getChildren("Handler")) {
                 Element handlerElement = (Element) o;
                 handlerConfigs.add(handlerElement);
                 String className = handlerElement.getAttributeValue("className");
@@ -606,8 +610,7 @@ public class DispatchServlet extends HttpServlet {
             throws IOException {
 
 
-
-        ServletUtil.probeRequest(this, req);
+        // log.debug(ServletUtil.probeRequest(this, req));
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();

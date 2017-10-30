@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -27,12 +27,15 @@
 package opendap.wcs.v2_0;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
+ * Time utils for WCS. Understands both time string and units string parsing.
  * User: ndp
  * Date: Sep 5, 2010
  * Time: 8:31:16 AM
@@ -42,7 +45,7 @@ public class TimeConversion {
 
 
 
-    // @todo Implement time format conversion to build correct dap constraints. Need units for dap time variable.
+    // TODO Implement time format conversion to build correct dap constraints. Need units for dap time variable.
 
 
     /*
@@ -135,15 +138,13 @@ public class TimeConversion {
 
 
     */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, WcsException {
 
         GregorianCalendar gc = new GregorianCalendar();
         String timeUnits;
         Date epoch;
         Date now = new Date();
-
         String dateFormat = "yyyy-MM-d hh:mm:ss";
-
 
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         String epochDateStr = "1900-01-01 00:00:0.0";
@@ -153,11 +154,9 @@ public class TimeConversion {
         System.out.println("epoch:      "+epoch);
         System.out.println("epoch.getTime():      "+epoch.getTime());
 
-
         gc.setTime(epoch);
         System.out.println("    Epoch GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
 
         timeUnits =  "hours since "+epochDateStr;
         epoch = getEpoch(timeUnits);
@@ -165,11 +164,7 @@ public class TimeConversion {
         gc.setTime(epoch);
         System.out.println("    getEpoch() GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
         System.out.println("    convertDateToTimeUnits(epoch,timeUnits): " + convertDateToTimeUnits(epoch, timeUnits));
-
-
-
         try {
             System.out.println("    timeUnits: '" + timeUnits +"'");
             String timePosStr = "2002-07-18T12:00Z";
@@ -180,20 +175,9 @@ public class TimeConversion {
         } catch (WcsException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
-
-
-
-
-
         gc.setTime(now);
         System.out.println("    NOW GregorianCalendar: " + gc);
         System.out.println(showTime(gc, "        "));
-
-
-
-
-
 
         System.out.println("########################################################");
         System.out.println("Testing time units conversion...");
@@ -212,48 +196,57 @@ public class TimeConversion {
         testTimeConversion(now, timeUnits);
 
         //epoch = new Date((long)1139961600*1000);
-
         //testTimeConversion(epoch, timeUnits);
-
 
         System.out.println("########################################################");
         System.out.println("Parsing WCS (ISO-8601) Dates.");
-
-
         String wcsDate = "2002-07-18T10:00Z";
-
         testWcsTimeStringParsing(wcsDate,timeUnits);
-
-
     }
 
     public static void testWcsTimeStringParsing(String wcsDateString, String timeUnits){
-
         System.out.println("wcsDateString: "+wcsDateString);
-
         try {
             Date date = parseWCSTimePosition(wcsDateString);
             System.out.println("    parsed to: "+date);
-
             testTimeConversion(date, timeUnits);
-
-
-
-
         } catch (WcsException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+
+
+    public static Date getTime(double time, String timeUnits){
+        Date date = getEpoch(timeUnits);
+
+        double milliseconds = time;
+        if(timeUnits.toLowerCase().startsWith("days")){
+            milliseconds = time * 24 * 60 * 60 * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("hours")){
+            milliseconds = time * 60 * 60 * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("minutes")){
+            milliseconds = time * 60  * 1000;
+        }
+        else if(timeUnits.toLowerCase().startsWith("seconds")){
+            milliseconds = time  * 1000;
+        }
+        date.setTime((long)milliseconds);
+
+        return date;
 
     }
 
 
-    public static void testTimeConversion(Date date, String timeUnits){
+    public static void testTimeConversion(Date date, String timeUnits) throws WcsException{
 
         GregorianCalendar gc = new GregorianCalendar();
         Date epoch = getEpoch(timeUnits);
 
 
-        System.out.println("Testing Date: "+date);
+        System.out.println("Testing Date: " + date);
         System.out.println("    timeUnits:     " + timeUnits);
         System.out.println("    epoch is:      " + epoch);
         System.out.println("    convertDateToTimeUnits(): " + convertDateToTimeUnits(date, timeUnits));
@@ -277,7 +270,15 @@ public class TimeConversion {
      * @return  A string representation of the submitted time after conversion to the supplied time units.
      * @see TimeConversion
      */
-    public static String convertDateToTimeUnits(Date time, String timeUnits){
+    public static String convertDateToTimeUnits(Date time, String timeUnits) throws WcsException {
+
+        Logger log = LoggerFactory.getLogger("TimeConversion");
+        if(timeUnits==null){
+            String msg = "convertDateToTimeUnits() - Supplied time units string was null.";
+            log.error(msg);
+            throw new WcsException(msg,WcsException.NO_APPLICABLE_CODE,
+                    "Dap Dataset As Coverage Configuration");
+        }
 
         // Trim leading whitespace from timeUnits string
         while(timeUnits.startsWith(" ") || timeUnits.startsWith("\t"))
@@ -621,6 +622,20 @@ public class TimeConversion {
     }
 
 
+    private static String _gmlTimePeriodFormat="yyy-MM-dd'T'HH:mm:ss.S 'Z'";
+
+    /**
+     * Returns the date/time in GML Time Format: "yyy-MM-dd'T'HH:mm:ss.S 'Z'"
+     * @param date
+     * @return
+     */
+    public static String formatDateInGmlTimeFormat(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat(_gmlTimePeriodFormat);
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        if(utc!=null)
+            sdf.setTimeZone(utc);
+        return sdf.format(date);
+    }
 
 
 

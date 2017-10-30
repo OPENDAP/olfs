@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -47,81 +47,57 @@ public class GetCoverageRequest {
 
     private static final String _request = "GetCoverage";
 
-    private String coverageID = null;
-    private String format = null;
-    private String mediaType = null;
-    private HashMap<String, DimensionSubset> subsets = null;
+    private String _coverageID;
+    private String _format;
+    private String _mediaType;
+    private HashMap<String, DimensionSubset> _dimensionSubsets;
+    private TemporalDimensionSubset _temporalSubset;
+    private RangeSubset _rangeSubset;
+    private String _cfHistoryAttribute;
+
+    private String _requestUrl;
+
+    /**
+     * Request parameter
+     * kvp:
+     *    &RangeSubset=r& selects one range component.
+     *    &RangeSubset=r1,r2,r4& selects three range components
+     *    &RangeSubset=r1:r4,r7& selects 5 range components.
+     */
+
+
+    private ScaleRequest _scaleRequest;
+
+    public GetCoverageRequest(){
+        _coverageID     = null;
+        _format         = null;
+        _mediaType      = null;
+        _dimensionSubsets = new HashMap<>();
+        _requestUrl     = null;
+        _cfHistoryAttribute = null;
+
+        _scaleRequest   = null;
+        _rangeSubset    = null;
 
 
 
-
-
-
-    public void setMediaType(String mType) throws WcsException {
-
-        if(mType!=null && !mType.equalsIgnoreCase("multipart/related")){
-            throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
-                "No other value is allowed. OGC [09-110r4] section 8.4.1",
-                WcsException.INVALID_PARAMETER_VALUE,
-                "mediaType");
-        }
-
-        mediaType = mType;
-    }
-
-    public String getMediaType(){
-        return mediaType;
-    }
-
-
-    public String getCoverageID() {
-        return coverageID;
-    }
-
-
-    public void setCoverageID(String coverageID) {
-        this.coverageID = coverageID;
-    }
-
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
     }
 
 
-    public HashMap<String, DimensionSubset> getDimensionSubsets(){
-
-        HashMap<String, DimensionSubset> newDS = new HashMap<String, DimensionSubset>();
-
-
-        for(DimensionSubset ds: subsets.values()){
-
-            if(ds instanceof TemporalDimensionSubset){
-                TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
-                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts,ts.getUnits()));
-            }
-            else {
-                newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
-            }
-
-        }
-        return newDS;
-    }
-
-
-
-
-
-
-    public GetCoverageRequest(Map<String,String[]> kvp)
+    /**
+     * Creates a GetCoverageRequest from the KVP in the request URL's query string.
+     * @param requestUrl
+     * @param kvp
+     * @throws WcsException
+     * @throws InterruptedException
+     */
+    public GetCoverageRequest(String requestUrl, Map<String,String[]> kvp)
             throws WcsException, InterruptedException {
 
-        subsets = new HashMap<String, DimensionSubset>();
+        this();
         String s[];
+
+        _requestUrl = requestUrl;
 
         // Make sure the client is looking for a WCS service....
         s = kvp.get("service");
@@ -129,10 +105,10 @@ public class GetCoverageRequest {
 
         // Make sure the client can accept a supported WCS version...
         s = kvp.get("version");
-        WCS.checkVersion(s==null? null : s[0]);
+        WCS.checkVersion( s==null ? null : s[0]);
 
 
-        // Make sure the client is acutally asking for this operation
+        // Make sure the client is actually asking for this operation
         s = kvp.get("request");
         if(s == null){
             throw new WcsException("Poorly formatted request URL. Missing " +
@@ -141,13 +117,11 @@ public class GetCoverageRequest {
         }
         else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
-                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "have failed. The WCS request for the operation '"+s[0]+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
         }
-
-
 
         // Get the identifier for the coverage.
         s = kvp.get("coverageId".toLowerCase());
@@ -157,64 +131,80 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "coverageId");
         }
-        coverageID = s[0];
+        _coverageID = Util.stripQuotes(s[0]);
 
-
-        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(coverageID);
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+        CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(_coverageID);
 
         if(cvrgDscrpt==null){
-            throw new WcsException("No such coverageID: '"+coverageID+"'",
+            throw new WcsException("No such _coverageID: '"+ _coverageID +"'",
                     WcsException.INVALID_PARAMETER_VALUE,
                     "coverageId");
         }
 
-
-
-        // Get the format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
+        // Get the _format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
         // it was not specified.
         s = kvp.get("format");
-        format = s==null? null : s[0];
+        _format = s==null? null : s[0];
 
-
-
-
-        // Get the mediaType. It's not required and a null is used to indicate that
+        // Get the _mediaType. It's not required and a null is used to indicate that
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
-        // part and the second part must contain whatever response format the user specified in the format parameter.
+        // part and the second part must contain whatever response _format the user specified in the _format parameter.
         s = kvp.get("mediaType".toLowerCase());
         if(s!=null){
             setMediaType(s[0]);
         }
 
+        _scaleRequest = new ScaleRequest(kvp,cvrgDscrpt);
 
-
+        // Get the subset expressions
         s = kvp.get("subset");
         if(s!=null){
             for(String subsetStr:s){
                 DimensionSubset subset = new DimensionSubset(subsetStr);
 
 
+                /**
+                 * THis is the spot where we treat time the same as any other dimension
+                 * (because that's the way the data is)
+                 * While also handling it specially so the we can make the WCS dance.
+                 */
                 if(subset.getDimensionId().toLowerCase().contains("time")){
                     DomainCoordinate timeDomain = cvrgDscrpt.getDomainCoordinate("time");
-                    subset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
+                    if(timeDomain==null)
+                        throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage",WcsException.INVALID_PARAMETER_VALUE,"subset");
+                    _temporalSubset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
+                    subset = _temporalSubset;
                 }
-
-                subsets.put(subset.getDimensionId(), subset);
+                _dimensionSubsets.put(subset.getDimensionId(), subset);
             }
         }
-
+        // Get the range subset expressions
+        s = kvp.get("RangeSubset".toLowerCase());
+        if(s!=null) {
+            for (String rangeSubsetString : s) {
+                if(!rangeSubsetString.isEmpty())
+                    _rangeSubset = new RangeSubset(rangeSubsetString,cvrgDscrpt.getFields());
+            }
+        }
     }
 
-
-    public GetCoverageRequest(Element getCoverageRequestElem)
+    /**
+     * Creates a GetCoverageRequest from the XML submitted in a POST request.
+     * @param requestUrl
+     * @param getCoverageRequestElem
+     * @throws WcsException
+     * @throws InterruptedException
+     */
+    public GetCoverageRequest(String requestUrl, Element getCoverageRequestElem)
             throws WcsException, InterruptedException {
 
-        subsets = new HashMap<String, DimensionSubset>();
+        this();
 
         Element e;
         String s;
-
+        _requestUrl = requestUrl;
 
         // Make sure we got the correct request object.
         WCS.checkNamespace(getCoverageRequestElem,"GetCoverage",WCS.WCS_NS);
@@ -234,27 +224,30 @@ public class GetCoverageRequest {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "wcs:CoverageId");
         }
-        coverageID =e.getText();
+        _coverageID = Util.stripQuotes(e.getText());
+
+        WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
+
 
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
-        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(coverageID);
+        CoverageDescription cvrDsc = wcsCatalog.getCoverageDescription(_coverageID);
 
 
         ingestDimensionSubset(getCoverageRequestElem, cvrDsc);
 
 
-        // Get the format for the coverage output.
+        // Get the _format for the coverage output.
         Element formatElement  = getCoverageRequestElem.getChild("format",WCS.WCS_NS);
         if(formatElement!=null){
-            format = formatElement.getTextTrim();
+            _format = formatElement.getTextTrim();
         }
 
 
-        // Get the mediaType. It's not required and a null is used to indicate that
+        // Get the _mediaType. It's not required and a null is used to indicate that
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
-        // part and the second part must contain whatever response format the user specified in the format parameter.
+        // part and the second part must contain whatever response _format the user specified in the _format parameter.
         Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
         if(mediaTypeElement!=null){
             s = mediaTypeElement.getTextTrim();
@@ -263,6 +256,65 @@ public class GetCoverageRequest {
     }
 
 
+    public ScaleRequest getScaleRequest(){
+        return new ScaleRequest(_scaleRequest);
+    }
+
+
+    public RangeSubset getRangeSubset(){
+        return _rangeSubset;
+    }
+
+
+    public void setMediaType(String mType) throws WcsException {
+
+        if(mType!=null && !mType.equalsIgnoreCase("multipart/related")){
+            throw new WcsException("Optional _mediaType MUST be set to'multipart/related' " +
+                "No other value is allowed. OGC [09-110r4] section 8.4.1",
+                WcsException.INVALID_PARAMETER_VALUE,
+                "_mediaType");
+        }
+
+        _mediaType = mType;
+    }
+
+
+    public String getMediaType(){
+        return _mediaType;
+    }
+
+
+    public String getCoverageID() {
+        return _coverageID;
+    }
+
+    public String getFormat() {
+        return _format;
+    }
+
+    public void setFormat(String format) {
+        this._format = format;
+    }
+
+
+    public HashMap<String, DimensionSubset> getDimensionSubsets(){
+
+        HashMap<String, DimensionSubset> newDS = new HashMap<>();
+
+
+        for(DimensionSubset ds: _dimensionSubsets.values()){
+
+            if(ds instanceof TemporalDimensionSubset){
+                TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
+                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts));
+            }
+            else {
+                newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
+            }
+
+        }
+        return newDS;
+    }
 
 
     public void ingestDimensionSubset(Element getCoverageRequestElem, CoverageDescription cvrDsc) throws WcsException {
@@ -281,10 +333,12 @@ public class GetCoverageRequest {
 
             if(ds.getDimensionId().toLowerCase().contains("time")){
                 DomainCoordinate timeDomain = cvrDsc.getDomainCoordinate("time");
+                if(timeDomain==null)
+                    throw new WcsException("There is no DomainCoordinate for 'time' in this Coverage.",WcsException.INVALID_PARAMETER_VALUE,"Dimension*");
                 ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
             }
 
-            subsets.put(ds.getDimensionId(), ds);
+            _dimensionSubsets.put(ds.getDimensionId(), ds);
         }
 
     }
@@ -340,23 +394,23 @@ public class GetCoverageRequest {
         requestElement.setAttribute("version",WCS.CURRENT_VERSION);
 
         Element e = new Element("CoverageId",WCS.WCS_NS);
-        e.setText(coverageID);
+        e.setText(_coverageID);
         requestElement.addContent(e);
 
-        for(DimensionSubset ds: subsets.values()){
+        for(DimensionSubset ds: _dimensionSubsets.values()){
             requestElement.addContent(ds.getDimensionSubsetElement());
         }
 
-        if(format !=null){
+        if(_format !=null){
             Element formatElement = new Element("format",WCS.WCS_NS);
-            formatElement.setText(format);
+            formatElement.setText(_format);
             requestElement.addContent(formatElement);
         }
 
 
-        if(mediaType!=null){
+        if(_mediaType !=null){
             Element mediaTypeElement = new Element("mediaType",WCS.WCS_NS);
-            mediaTypeElement.setText(mediaType);
+            mediaTypeElement.setText(_mediaType);
             requestElement.addContent(mediaTypeElement);
         }
 
@@ -367,8 +421,23 @@ public class GetCoverageRequest {
 
 
 
+    public String getRequestUrl(){
+        return _requestUrl;
+    }
+
+    public TemporalDimensionSubset getTemporalSubset(){
+        if(_temporalSubset!=null)
+            return new TemporalDimensionSubset(_temporalSubset);
+        return null;
+    }
 
 
+    public void setCfHistoryAttribute(String s){
+        _cfHistoryAttribute = s;
+    }
 
+    public String getCfHistoryAttribute(){
+        return _cfHistoryAttribute;
+    }
 
 }

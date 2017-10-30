@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,7 +25,10 @@
  */
 package opendap.wcs.v2_0.http;
 
-import org.jdom.Document;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.io.HyraxStringEncoding;
+import opendap.ppt.PPTException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -33,7 +36,6 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.rmi.server.UID;
 import java.util.Vector;
@@ -100,19 +102,15 @@ public class MultipartResponse {
      * @return Returns a new UID String
      */
     public static String newUidString() {
-        UID uid = new UID();
-
-        byte[] val = uid.toString().getBytes();
-
-        String suid = "";
         int v;
-
+        UID uid = new UID();
+        StringBuilder suid = new StringBuilder();
+        byte[] val = uid.toString().getBytes(HyraxStringEncoding.getCharset());
         for (byte aVal : val) {
             v = aVal;
-            suid += Integer.toHexString(v);
+            suid.append(Integer.toHexString(v));
         }
-
-        return suid;
+        return suid.toString();
     }
 
 
@@ -121,7 +119,7 @@ public class MultipartResponse {
      *
      * @throws java.io.IOException When things go wrong
      */
-    public void send(HttpServletResponse servResponse) throws IOException, URISyntaxException {
+    public void send(HttpServletResponse servResponse) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
         log.debug("Sending Response...");
 
         log.debug("MIME Boundary: " + mimeBoundary);
@@ -147,49 +145,9 @@ public class MultipartResponse {
 
     }
 
-    private void writeSoapPart(ServletOutputStream sos) throws IOException {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        sos.println("--" + mimeBoundary);
-        sos.println("Content-Type: text/xml; charset=UTF-8");
-        sos.println("Content-Transfer-Encoding: binary");
-        sos.println("Content-Id: " + startID);
-        sos.println();
-
-        //xmlo.output(new Document(soapEnvelope), sos);
-
-
-    }
-
-
     public void addAttachment(Attachment attachment) {
-
         attachments.add(attachment);
-
     }
-    public Attachment addAttachment(String contentType, String contentId, InputStream is) {
-
-        Attachment attachment = new Attachment(contentType, contentId, is);
-        attachments.add(attachment);
-
-        return attachment;
-    }
-
-    public Attachment addAttachment(String contentType, String contentId, String url) {
-
-        Attachment attachment = new Attachment(contentType, contentId, url);
-        attachments.add(attachment);
-        return attachment;
-    }
-
-
-    public Attachment addAttachment(String contentType, String contentId, Document doc) {
-
-        Attachment attachment = new Attachment(contentType, contentId, doc);
-        attachments.add(attachment);
-        return attachment;
-    }
-
 
     private void closeMimeDoc(ServletOutputStream sos) throws IOException {
         sos.println("--" + mimeBoundary + "--");

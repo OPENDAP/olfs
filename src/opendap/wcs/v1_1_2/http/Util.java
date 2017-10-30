@@ -26,7 +26,6 @@
 
 package opendap.wcs.v1_1_2.http;
 
-import opendap.coreServlet.ReqInfo;
 import opendap.dap.Request;
 
 import javax.servlet.http.HttpServletRequest;

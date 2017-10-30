@@ -168,13 +168,27 @@
         </init-param>
 
         <init-param>
-            <param-name>OLFSConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>olfs.xml</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup>
 
     </servlet>
+
+    <!-- - - - - - - - - WCS Servlet - - - - - - - - - -->
+    <servlet>
+        <servlet-name>wcs</servlet-name>
+        <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
+        <init-param>
+            <param-name>WCSConfigFileName</param-name>
+            <param-value>wcs_service.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+
     <servlet>
         <servlet-name>w10n</servlet-name>
         <servlet-class>opendap.w10n.W10nServlet</servlet-class>
@@ -190,7 +204,12 @@
     <servlet>
         <servlet-name>adminInterface</servlet-name>
         <servlet-class>opendap.hai.DispatchServlet</servlet-class>
+        <!-- init-param>
+            <param-name>DeveloperMode</param-name>
+            <param-value>true</param-value>
+        </init-param -->
         <!-- Most people don't use the HAI, so don't load it by default -->
+        <!-- load-on-startup>1</load-on-startup -->
     </servlet>
 
     <servlet>
@@ -199,7 +218,7 @@
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
 
         <init-param>
-            <param-name>ViewersConfigFileName</param-name>
+            <param-name>ConfigFileName</param-name>
             <param-value>viewers.xml</param-value>
         </init-param>
 
@@ -277,7 +296,12 @@
         <url-pattern>/w10n/*</url-pattern>
     </servlet-mapping>
 
-  <!-- ==================== Default Session Configuration ================= -->
+    <servlet-mapping>
+        <servlet-name>wcs</servlet-name>
+        <url-pattern>/wcs/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->
 
@@ -323,6 +347,10 @@
         <location>/error/error502.jsp</location>
     </error-page>
     <error-page>
+        <error-code>504</error-code>
+        <location>/error/error504.jsp</location>
+    </error-page>
+    <error-page>
         <exception-type>java.lang.Throwable</exception-type>
         <location>/error/error500.jsp</location>
     </error-page>
@@ -359,7 +387,7 @@
         <user-data-constraint>
             <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-            <!-- transport-guarantee>NONE</transport-guarantee  -->
+            <!-- transport-guarantee>NONE</transport-guarantee -->
         </user-data-constraint>
     </security-constraint>
 

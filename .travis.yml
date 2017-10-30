@@ -6,12 +6,10 @@ sudo: false
 
 language: java
 
-# I don't think travis-ci has openjdk8 yet (6.11.15 jhrg)
 jdk:
-  - oraclejdk8
-  - oraclejdk7
+  - openjdk8
   - openjdk7
-  
+
 # whitelist
 branches:
   only:
@@ -22,6 +20,7 @@ notifications:
   email:
     - ndp@opendap.org
     - jgallagher@opendap.org
+    - ukari@opendap.org
     
 # Use this to prepare the system to install prerequisites or dependencies
 #
@@ -40,6 +39,7 @@ notifications:
 #
 script:
   - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+  - ant check
   
 # after_script:
 env:

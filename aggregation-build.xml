@@ -159,6 +159,9 @@
     <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
 
+    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
+
     <property name="xalan.lib"         value="xalan.jar"/>
     <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
@@ -168,7 +171,7 @@
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
     <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
+    <property name="servlet-api.lib"      value="servlet-api-3.0.jar"/>
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
                property="fortify.present"/>
@@ -189,6 +192,10 @@
             <include name="${commons-logging.lib}"/>
             <include name="${commons-codec.lib}"/>
             <include name="${commons-lang.lib}"/>
+
+            <include name="${http-components-httpclient.lib}"/>
+            <include name="${http-components-httpcore.lib}"/>
+
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
@@ -327,6 +334,10 @@
                 <include name="${commons-httpclient.lib}"/>
                 <include name="${commons-logging.lib}"/>
                 <include name="${commons-codec.lib}"/>
+
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
                 <include name="${saxon-jdom.lib}"/>
@@ -386,6 +397,10 @@
                 <include name="${commons-httpclient.lib}"/>
                 <include name="${commons-logging.lib}"/>
                 <include name="${commons-codec.lib}"/>
+
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
                 <include name="${saxon-jdom.lib}"/>

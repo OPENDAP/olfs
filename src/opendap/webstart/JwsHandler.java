@@ -44,7 +44,7 @@ public abstract class JwsHandler implements Service {
 
     public abstract String getServiceId();
 
-    public abstract boolean datasetCanBeViewed(Document ddx);
+    public abstract boolean datasetCanBeViewed(String datasetId, Document ddx);
 
     public abstract String getJnlpForDataset(String datasetUrl);
 

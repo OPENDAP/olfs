@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<wcs:CoverageDescription
+        gml:id="MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4"
+        xmlns="http://www.opengis.net/gml/3.2"
+        xmlns:ows="http://www.opengis.net/ows/2.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+        xmlns:swe="http://www.opengis.net/swe/2.0"
+        xmlns:wcs="http://www.opengis.net/wcs/2.0"
+        xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0"
+        xmlns:eop="http://www.opengis.net/eop/2.0"
+        xmlns:om="http://www.opengis.net/om/2.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/wcs/wcseo/1.0 http://schemas.opengis.net/wcs/wcseo/1.0/wcsEOAll.xsd"
+>
+
+    <gml:boundedBy>
+        <gml:Envelope axisLabels="latitude longitude" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+                      uomLabels="deg deg">
+            <gml:lowerCorner>-90.0 -180.00</gml:lowerCorner>
+            <gml:upperCorner>90.0 180.0</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <wcs:CoverageId>MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4</wcs:CoverageId>
+    <gmlcov:metadata>
+        <gmlcov:Extension>
+            <wcseo:EOMetadata>
+                <eop:EarthObservation gml:id="eop_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                    <om:phenomenonTime>
+                        <gml:TimePeriod gml:id="tp_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                            <gml:beginPosition>2002-07-04T00:00:00Z</gml:beginPosition>
+                            <gml:endPosition>2002-07-04T23:59:59Z</gml:endPosition>
+                        </gml:TimePeriod>
+                    </om:phenomenonTime>
+                    <om:resultTime>
+                        <gml:TimeInstant gml:id="archiving_date_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                            <gml:timePosition>2002-08-05T00:00:00Z</gml:timePosition>
+                        </gml:TimeInstant>
+                    </om:resultTime>
+                    <om:procedure>
+                        <eop:EarthObservationEquipment gml:id="eoe_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+                            <eop:platform>
+                                <eop:Platform>
+                                    <eop:shortName>PHR</eop:shortName>
+                                    <eop:serialIdentifier>1A</eop:serialIdentifier>
+                                </eop:Platform>
+                            </eop:platform>
+                            <eop:instrument>
+                                <eop:Instrument>
+                                    <eop:shortName>PHR</eop:shortName>
+                                </eop:Instrument>
+                            </eop:instrument>
+                            <eop:sensor>
+                                <eop:Sensor>
+                                    <eop:sensorType>OPTICAL</eop:sensorType>
+                                    <eop:operationalMode codeSpace="urn:eop:PHR:sensorMode">PX</eop:operationalMode>
+                                    <eop:resolution uom="m">0.7</eop:resolution>
+                                </eop:Sensor>
+                            </eop:sensor>
+                            <eop:acquisitionParameters>
+                                <eop:Acquisition>
+                                    <eop:orbitNumber>12</eop:orbitNumber>
+                                    <eop:lastOrbitNumber>12</eop:lastOrbitNumber>
+                                    <eop:orbitDirection>ASCENDING</eop:orbitDirection>
+                                    <eop:wrsLongitudeGrid codeSpace="EPSG">12</eop:wrsLongitudeGrid>
+                                    <eop:wrsLatitudeGrid codeSpace="EPSG">12</eop:wrsLatitudeGrid>
+                                    <eop:instrumentAzimuthAngle uom="deg">-14.0</eop:instrumentAzimuthAngle>
+                                    <eop:pitch uom="deg">0</eop:pitch>
+                                    <eop:roll uom="deg">0</eop:roll>
+                                    <eop:yaw uom="deg">0</eop:yaw>
+                                </eop:Acquisition>
+                            </eop:acquisitionParameters>
+                        </eop:EarthObservationEquipment>
+                    </om:procedure>
+                    <om:observedProperty xlink:href="#phenom1"/>
+                    <om:featureOfInterest>
+                        <eop:Footprint gml:id="footprint_someEOCoverage1">
+                            <eop:multiExtentOf>
+                                <gml:MultiSurface gml:id="multisurface_someEOCoverage1" srsName="EPSG:4326">
+                                    <gml:surfaceMember>
+                                        <gml:Polygon gml:id="polygon_someEOCoverage1">
+                                            <gml:exterior>
+                                                <gml:LinearRing>
+                                                    <gml:posList>43.516667 2.1025 43.381667 2.861667 42.862778 2.65
+                                                        42.996389 1.896944 43.516667 2.1025
+                                                    </gml:posList>
+                                                </gml:LinearRing>
+                                            </gml:exterior>
+                                        </gml:Polygon>
+                                    </gml:surfaceMember>
+                                </gml:MultiSurface>
+                            </eop:multiExtentOf>
+                            <eop:centerOf>
+                                <gml:Point gml:id="someEOCoverage1_p" srsName="EPSG:4326">
+                                    <gml:pos>43.190833 2.374167</gml:pos>
+                                </gml:Point>
+                            </eop:centerOf>
+                        </eop:Footprint>
+                    </om:featureOfInterest>
+                    <om:result>
+                        <eop:EarthObservationResult gml:id="someEOCoverage1_eor">
+                            <eop:browse>
+                                <eop:BrowseInformation>
+                                    <eop:type>QUICKLOOK</eop:type>
+                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
+                                    </eop:referenceSystemIdentifier>
+                                    <eop:fileName>
+                                        <ows:ServiceReference xlink:href="http://etc">
+                                            <ows:RequestMessage/>
+                                        </ows:ServiceReference>
+                                    </eop:fileName>
+                                </eop:BrowseInformation>
+                            </eop:browse>
+                            <eop:mask>
+                                <eop:MaskInformation>
+                                    <eop:type>CLOUD</eop:type>
+                                    <eop:format>VECTOR</eop:format>
+                                    <eop:referenceSystemIdentifier codeSpace="EPSG">epsg:4326
+                                    </eop:referenceSystemIdentifier>
+                                    <eop:fileName>
+                                        <ows:ServiceReference xlink:href="http://etc">
+                                            <ows:RequestMessage/>
+                                        </ows:ServiceReference>
+                                    </eop:fileName>
+                                </eop:MaskInformation>
+                            </eop:mask>
+                            <eop:parameter>
+                                <eop:ParameterInformation/>
+                            </eop:parameter>
+                        </eop:EarthObservationResult>
+                    </om:result>
+                    <eop:metaDataProperty>
+                        <eop:EarthObservationMetaData>
+                            <eop:identifier>someEOCoverage1</eop:identifier>
+                            <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+                            <eop:productType>TBD</eop:productType>
+                            <eop:status>ARCHIVED</eop:status>
+                            <eop:downlinkedTo>
+                                <eop:DownlinkInformation>
+                                    <eop:acquisitionStation codeSpace="urn:eop:PHR:stationCode">TLS
+                                    </eop:acquisitionStation>
+                                </eop:DownlinkInformation>
+                            </eop:downlinkedTo>
+                            <eop:archivedIn>
+                                <eop:ArchivingInformation>
+                                    <eop:archivingCenter codeSpace="urn:eop:PHR:stationCode">TLS</eop:archivingCenter>
+                                    <eop:archivingDate>2001-08-22T11:02:47.999</eop:archivingDate>
+                                </eop:ArchivingInformation>
+                            </eop:archivedIn>
+                            <eop:processing>
+                                <eop:ProcessingInformation/>
+                            </eop:processing>
+                        </eop:EarthObservationMetaData>
+                    </eop:metaDataProperty>
+                </eop:EarthObservation>
+            </wcseo:EOMetadata>
+        </gmlcov:Extension>
+    </gmlcov:metadata>
+
+
+    <gml:domainSet>
+        <gml:RectifiedGrid dimension="2" gml:id="grid_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4">
+            <gml:limits>
+                <gml:GridEnvelope>
+                    <gml:low>0 0</gml:low>
+                    <gml:high>4319 8639</gml:high>
+                </gml:GridEnvelope>
+            </gml:limits>
+            <gml:axisLabels>latitude longitude</gml:axisLabels>
+            <gml:origin>
+                <gml:Point gml:id="grid_origin_MODIS_AQUA_L3_CHLA_DAILY_4KM_R_001.nc4" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                    <gml:pos>90.0 -180.0</gml:pos>
+                </gml:Point>
+            </gml:origin>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-0.0417 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0417</gml:offsetVector>
+        </gml:RectifiedGrid>
+    </gml:domainSet>
+
+
+    <gmlcov:rangeType>
+        <swe:DataRecord>
+            <swe:field name="chlorophyll">
+                <swe:Quantity definition="urn:nasa:modis:def:independantVariable:chlorophyll">
+                    <swe:description>Optically measured chlorophyll at or near the ocean's surface</swe:description>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>0.0 100.0</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </gmlcov:rangeType>
+    <wcs:ServiceParameters>
+        <wcs:CoverageSubtype>RectifiedDataset</wcs:CoverageSubtype>
+        <wcs:CoverageSubtypeParent>
+            <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
+        </wcs:CoverageSubtypeParent>
+        <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+    </wcs:ServiceParameters>
+</wcs:CoverageDescription>
+

@@ -4,7 +4,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -117,9 +117,7 @@
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
     <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
-    
-    
-    
+    <logger name="opendap.coreServlet.PersistentConfigurationHandler"  level="all"/>
     
     <logger name="opendap.bes" level="error">
         <appender-ref ref="stdout"/>

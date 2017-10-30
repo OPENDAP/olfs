@@ -280,7 +280,7 @@ public class Util {
         return s.toString();
     }
 
-
+    public static String WHITE_SPACE_REGEX_STRING = "\\s+";
 
 
     public static String dropSuffixFrom(String s, Pattern suffixPattern){

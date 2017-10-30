@@ -1,3 +1,30 @@
+Version 1.17.0  (16 October 2017)
+
+- Added WCS service.
+  - Works using templates associated by regex.
+
+- Made the OLFS authentication aware in its http
+  activities by having it utilize the ~/.netrc credentials 
+  source or one of the same format specified in the configuration. 
+
+- Fixed bug in the generation of the "viewers" pages.
+
+Version 1.16.4  (09 August 2017)
+
+- Repaired broken RDF responses.
+
+- Updated dependecy Jars.
+
+- Enabled ThreddsCatalogUtil to authenticate against Earthdata Login
+
+- Merged eo-wcs features into master
+
+Version 1.16.3 (05 Jun 2017)
+
+- Server timeout conditions now return HTTP status 504 (and not 418).
+
+- Bug fixes in the DAP4 Data Request Form pages.
+
 Version 1.16.2 (10 Jan 2017)
 
 - Improved logging, including log rotation.

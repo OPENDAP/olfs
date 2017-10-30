@@ -1,2 +1,4 @@
-url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.das?DODS_URL&date_time("1998/160:17:45:00","1998/165:17:45:00")
+# In test URL below, parameters are encoded to be allowed by Tomcat instances fixed for CVE-2016-6816.
+# url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.das?DODS_URL&date_time("1998/160:17:45:00","1998/165:17:45:00")
+url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.das?DODS_URL%26date_time%28%221998%2F160%3A17%3A45%3A00%22%2C%221998%2F165%3A17%3A45%3A00%22%29
 -s

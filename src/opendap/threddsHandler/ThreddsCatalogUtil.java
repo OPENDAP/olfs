@@ -28,15 +28,18 @@ package opendap.threddsHandler;
 
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -55,17 +58,51 @@ public class ThreddsCatalogUtil {
 
 	private XMLOutputter xmlo = null;
 	
-	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtil.class);
+	private Logger log;
 
+	private CredentialsProvider credsProvider;
 	/**
-	 * Constructor.
+	 * Constructor. It will look in ~/.netrc for authentication credentials.
+	 *  If another source is needed use the other constructor.
 	 * 
 	 */
-	public ThreddsCatalogUtil() {
-		xmlo = new XMLOutputter(Format.getPrettyFormat());
-	}
-	
+    public ThreddsCatalogUtil() {
+        log = LoggerFactory.getLogger(this.getClass());
+
+        xmlo = new XMLOutputter(Format.getPrettyFormat());
+        credsProvider = null;
+        try {
+            credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
+        } catch (IOException e) {
+            String msg = "Unable to load authentication credentials from defult location. " +
+                    "Try specifying the credentials location if credentials are required.";
+            log.warn(msg);
+        }
+    }
+
 	/**
+	 *
+	 * @param credentialsFilename Name of a .netrc formatted file with authentication credentials
+	 *                            for various servers.
+	 *
+	 */
+	public ThreddsCatalogUtil(String credentialsFilename) {
+        log = LoggerFactory.getLogger(this.getClass());
+
+        xmlo = new XMLOutputter(Format.getPrettyFormat());
+        credsProvider = null;
+        try {
+            credsProvider = opendap.http.Util.getNetRCCredentialsProvider(credentialsFilename, true);
+        } catch (IOException e) {
+            String msg = "Unable to load authentication credentials from  " +
+					credentialsFilename +
+					" Message: " +e.getMessage();
+			log.warn(msg);
+        }
+    }
+
+
+    /**
 	 * Implements a modified depth-first traversal of a thredds catalog. The
 	 * catalog is treated as a tree-like structure, but since it is really a
 	 * directed graph, catalog URLs are cached and the same URL is neither
@@ -92,7 +129,7 @@ public class ThreddsCatalogUtil {
 	    	childURLs.push(catalogURL);
 		}
 		
-		private void recur(String catalogURL) {
+		private void recur(String catalogURL) throws IOException, JDOMException {
             try {
 			    Vector<String> URLs = getCatalogRefURLs(catalogURL, false);
                 if (URLs != null) {
@@ -121,9 +158,13 @@ public class ThreddsCatalogUtil {
 			}
 			catch (EmptyStackException e) {
 				return null;
-			}
-			
-		}
+			} catch (JDOMException e) {
+                return null;
+            } catch (IOException e) {
+                return null;
+            }
+
+        }
 	}
 
 	public static enum SERVICE {
@@ -216,17 +257,41 @@ public class ThreddsCatalogUtil {
 			}
 		}
 	}
-	
-	
-	public static void main(String[] args) throws Exception {
 
+
+
+
+    public static void main(String[] args) throws Exception {
+        
 		try {
+
+			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+
+			// Get one DMR document and print it.
+			Document dmr = opendap.xml.Util.getDocument("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml",
+					opendap.http.Util.getNetRCCredentialsProvider());
+			tcc.log.debug(tcc.xmlo.outputString(dmr));
+
+			// Get all the DMR URLs in the collection
+			Vector<String> urls =tcc.getDMRUrls("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/catalog.xml",true);
+
+			// Print the URLS
+			if(urls!=null) {
+				for (String url : urls) {
+					tcc.log.debug(url);
+				}
+			}
+
+			// Print all the DMR docs in the sub-collection (one month)
+			tcc.printDMRDocuments(System.out,"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml",false);
+
+
 			//Options options = createCmdLineOptions();
 
 			//CommandLineParser parser = new PosixParser();
 			// CommandLine cmd = parser.parse(options, args);
 
-			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
+			// ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
 
 			// tcc.testGetCatalogURLs("http://test.opendap.org:8090/opendap/data/catalog.xml");
 
@@ -245,12 +310,21 @@ public class ThreddsCatalogUtil {
 
 
 
+            // Vector<String> urls =tcc.getDataAccessURLs("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/catalog.xml",SERVICE.OPeNDAP,true);
 
-            Vector<String> urls = tcc.getDDXUrls("http://localhost:8080/opendap/catalog.xml",true);
+            // Vector<String> urls =tcc.getDMRUrls("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml",true);
 
-            for(String url: urls){
-                System.out.println(url);
-            }
+
+
+
+            //Vector<String> urls = tcc.getDDXUrls("http://localhost:8080/opendap/catalog.xml",true);
+
+
+
+
+            // tcc.test_apache_client("https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/catalog.xml");
+
+
 
 
             // tcc.crawlTest(System.out,"http://localhost:8080/opendap/catalog.xml",cmd.hasOption("r"));
@@ -266,17 +340,14 @@ public class ThreddsCatalogUtil {
 	private static Options createCmdLineOptions() {
 
 		Options options = new Options();
-
-		options
-				.addOption(
-						"e",
-						false,
-						"encode the command line arguments, cannot be used in conjunction with -d (decode).");
-		options
-				.addOption(
-						"d",
-						false,
-						"decode the command line arguments, cannot be used in conjunction with -e (encode).");
+        options.addOption(
+		        "u",  "user",
+				true,
+                "");
+		options.addOption(
+		        "d",
+				false,
+				"decode the command line arguments, cannot be used in conjunction with -e (encode).");
 		options.addOption("t", false,
 				"runs internal tests and produces output on stdout.");
 
@@ -288,7 +359,7 @@ public class ThreddsCatalogUtil {
 	}
 	
 	public void crawlTest(PrintStream ps, String catalogURLString,
-			boolean recurse)  throws InterruptedException {
+			boolean recurse) throws InterruptedException, IOException, JDOMException {
 		Vector<String> datasetURLs;
 		Vector<String> catalogURLs;
 
@@ -331,7 +402,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	public void printDDXDocuments(PrintStream ps, String catalogUrlString,
-			boolean recurse)  throws InterruptedException {
+			boolean recurse) throws InterruptedException, IOException, JDOMException {
 
 		Vector<Document> ddxDocs = getDDXDocuments(catalogUrlString, recurse);
 
@@ -348,13 +419,13 @@ public class ThreddsCatalogUtil {
 	}
 
 	public Vector<Element> getDDXRootElements(String catalogUrlString,
-			boolean recurse)  throws InterruptedException {
+			boolean recurse) throws InterruptedException, IOException, JDOMException {
 
-		Vector<Element> ddxRootElements = new Vector<Element>();
+		Vector<Element> ddxRootElements = new Vector<>();
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
 
 		for (String url : ddxUrls) {
-			ddxRootElements.add(getDocumentRoot(url));
+			ddxRootElements.add(opendap.xml.Util.getDocumentRoot(url,credsProvider));
 		}
 
 		return ddxRootElements;
@@ -362,37 +433,110 @@ public class ThreddsCatalogUtil {
 	}
 
 	public Vector<Document> getDDXDocuments(String catalogUrlString,
-			boolean recurse)  throws InterruptedException {
+			boolean recurse) throws InterruptedException, IOException, JDOMException {
 
-		Vector<Document> ddxDocs = new Vector<Document>();
+		Vector<Document> ddxDocs = new Vector<>();
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
 
 		for (String url : ddxUrls) {
-			ddxDocs.add(getDocument(url));
+            Document doc = opendap.xml.Util.getDocument(url,credsProvider);
+            if(doc!=null)
+                ddxDocs.add(opendap.xml.Util.getDocument(url,credsProvider));
 		}
 
 		return ddxDocs;
 
 	}
 
-	public Vector<String> getDDXUrls(String catalogUrlString, boolean recurse)  throws InterruptedException {
+    public Vector<String> getDDXUrls(String catalogUrlString, boolean recurse) throws InterruptedException, IOException, JDOMException {
 
         Vector<String> dataAccessUrls = getDataAccessURLs(catalogUrlString, SERVICE.OPeNDAP, recurse);;
         Vector<String> ddxUrls = new Vector<>();
 
-		String url;
+        String url;
 
-		for (int i = 0; i < dataAccessUrls.size(); i++) {
-			url = dataAccessUrls.get(i);
-			log.debug("Found DAP dataset URL: " + url);
+        for (int i = 0; i < dataAccessUrls.size(); i++) {
+            url = dataAccessUrls.get(i);
+            log.debug("Found DAP dataset URL: " + url);
             ddxUrls.add(url + ".ddx");
-		}
+        }
 
-		return ddxUrls;
+        return ddxUrls;
 
-	}
+    }
 
-	/**
+
+    public Vector<Element> getDMRRootElements(String catalogUrlString,
+                                              boolean recurse) throws InterruptedException, IOException, JDOMException {
+
+        Vector<Element> dmrRootElements = new Vector<>();
+        Vector<String> dmrUrls = getDMRUrls(catalogUrlString, recurse);
+
+        for (String url : dmrUrls) {
+            dmrRootElements.add(opendap.xml.Util.getDocumentRoot(url,credsProvider));
+        }
+
+        return dmrRootElements;
+
+    }
+
+
+    public Vector<Document> getDMRDocuments(String catalogUrlString,
+                                            boolean recurse)
+            throws InterruptedException, IOException, JDOMException {
+
+        Vector<Document> dmrDocs = new Vector<>();
+        Vector<String> dmrUrls = getDMRUrls(catalogUrlString, recurse);
+
+        for (String url : dmrUrls) {
+            Document doc = opendap.xml.Util.getDocument(url,credsProvider);
+            if(doc!=null)
+                dmrDocs.add(opendap.xml.Util.getDocument(url,credsProvider));
+        }
+
+        return dmrDocs;
+
+    }
+
+
+    public Vector<String> getDMRUrls(String catalogUrlString, boolean recurse) throws InterruptedException, IOException, JDOMException {
+
+        Vector<String> dataAccessUrls = getDataAccessURLs(catalogUrlString, SERVICE.OPeNDAP, recurse);;
+        Vector<String> dmrUrls = new Vector<>();
+
+        String url;
+
+        for (int i = 0; i < dataAccessUrls.size(); i++) {
+            url = dataAccessUrls.get(i);
+            log.debug("Found DAP dataset URL: " + url);
+            dmrUrls.add(url + ".dmr.xml");
+        }
+
+        return dmrUrls;
+
+    }
+
+    public void printDMRDocuments(PrintStream ps, String catalogUrlString,
+                                  boolean recurse) throws InterruptedException, IOException, JDOMException {
+
+        Vector<Document> dmrDocs = getDMRDocuments(catalogUrlString, recurse);
+
+        for (Document doc : dmrDocs) {
+            try {
+                xmlo.output(doc, ps);
+            }
+            catch (IOException e) {
+                log.error(e.getMessage());
+            }
+            ps.println("\n");
+        }
+
+    }
+
+
+
+
+    /**
 	 * Returns all of the THREDDS catalog URLs in the passed catalog element.
 	 * 
 	 * @param catalogUrlString
@@ -408,7 +552,7 @@ public class ThreddsCatalogUtil {
 	 *         THREDDS catalog document.
 	 */
 	private Vector<String> getCatalogRefURLs(String catalogUrlString,
-			Element catalog, boolean recurse)  throws InterruptedException {
+			Element catalog, boolean recurse) throws InterruptedException, IOException, JDOMException {
 
 		Vector<String> catalogURLs = new Vector<String>();
 
@@ -460,11 +604,11 @@ public class ThreddsCatalogUtil {
      *         will be empty.
      */
     public Vector<String> getCatalogRefURLs(String catalogUrlString,
-            boolean recurse) throws InterruptedException {
+            boolean recurse) throws InterruptedException, IOException, JDOMException {
 
         Vector<String> catalogURLs = new Vector<String>();
 
-        Element catalog = getDocumentRoot(catalogUrlString);
+        Element catalog = opendap.xml.Util.getDocumentRoot(catalogUrlString,credsProvider);
         if (catalog != null)
             catalogURLs = getCatalogRefURLs(catalogUrlString, catalog, recurse);
 
@@ -543,8 +687,8 @@ public class ThreddsCatalogUtil {
 		if (protocol.equalsIgnoreCase("file")) {
 			log.debug("Protocol is FILE.");
 
-		} else if (protocol.equalsIgnoreCase("http")) {
-			log.debug("Protcol is HTTP.");
+		} else if (protocol.startsWith("http")) {    // calling .startsWith() catches https and http
+			log.debug("Protcol is HTTP(S).");
 
 			String host = url.getHost();
 			/* String path = url.getPath(); */
@@ -571,7 +715,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private Vector<String> getDataAccessURLs(String catalogUrlString,
-			Element catalog, SERVICE service, boolean recurse)  throws InterruptedException {
+			Element catalog, SERVICE service, boolean recurse) throws InterruptedException, IOException, JDOMException {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -680,78 +824,16 @@ public class ThreddsCatalogUtil {
 	 */
 
 	public Vector<String> getDataAccessURLs(String catalogUrlString,
-			SERVICE service, boolean recurse)  throws InterruptedException {
+			SERVICE service, boolean recurse) throws InterruptedException, IOException, JDOMException {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
-		Element catalog = getDocumentRoot(catalogUrlString);
+		Element catalog = opendap.xml.Util.getDocumentRoot(catalogUrlString, credsProvider);
 		if (catalog != null)
 			serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service,
 					recurse);
 
 		return serviceURLs;
-	}
-
-	/**
-	 * Returns the root Element of the XML document located at the URL contained
-	 * in the passed parameter <code>docUrlString</code>
-	 * 
-	 * @param docUrlString
-	 *            The URL of the document to retrieve
-	 * @return The Document
-	 */
-	private Element getDocumentRoot(String docUrlString)  throws InterruptedException {
-
-		Element docRoot = null;
-
-		Document doc = getDocument(docUrlString);
-		if (doc != null) {
-			docRoot = doc.getRootElement();
-		}
-		return docRoot;
-	}
-
-	/**
-	 * Returns the Document object for the XML document located at the URL
-	 * contained in the passed parameter String <code>docUrlString</code>.
-	 * 
-	 * @note This is the point in the class where a response is (possibly)
-	 * cached.
-	 * 
-	 * @param docUrlString
-	 *            The URL of the document to retrieve.
-	 * @return The Document
-	 */
-	private Document getDocument(String docUrlString)  throws InterruptedException {
-
-		Document doc = null;
-		try {
-
-			URL docUrl = new URL(docUrlString);
-			SAXBuilder sb = new SAXBuilder();
-
-			log.debug("Retrieving XML Document: " + docUrlString);
-			log.debug("Document URL INFO: \n" + getUrlInfo(docUrl));
-
-			doc = sb.build(docUrl);
-			log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-		}
-		catch (MalformedURLException e) {
-			log.error("Problem with XML Document URL: " + docUrlString
-					+ " Caught a MalformedURLException.  Message: "
-					+ e.getMessage());
-		}
-		catch (IOException e) {
-			log.error("Problem retrieving XML Document: " + docUrlString
-					+ " Caught a IOException.  Message: " + e.getMessage());
-		}
-		catch (JDOMException e) {
-			log.error("Problem parsing XML Document: " + docUrlString
-					+ " Caught a JDOMException.  Message: " + e.getMessage());
-		}
-
-		return doc;
-
 	}
 
 	private String getCatalogURL(String catalogUrlString, String href)
@@ -936,4 +1018,15 @@ public class ThreddsCatalogUtil {
 
 		return accessURLs;
 	}
+
+	public XMLOutputter getXmlo() {
+		return xmlo;
+	}
+
+	public void setXmlo(XMLOutputter xmlo) {
+		this.xmlo = xmlo;
+	}
+
+   
+
 }

@@ -1,0 +1,12 @@
+
+    <WcsCoverage fileName="@COVERAGE_NAME@.xml">
+        <DapDatasetUrl>http://localhost:8080/opendap/testbed-13/GPM_3IMERGDF/@COVERAGE_NAME@</DapDatasetUrl>
+        <DomainCoordinate name="latitude"  dapID="lat"  size="1800" units="degrees_north" />
+        <DomainCoordinate name="longitude" dapID="lon"  size="3600" units="degrees_east" />
+        <field name="precipitationCal"     dapID="precipitationCal" />
+        <field name="precipitationCal_cnt" dapID="precipitationCal_cnt" />
+        <field name="HQprecipitation"      dapID="HQprecipitation" />
+        <field name="HQprecipitation_cnt"  dapID="HQprecipitation_cnt" />
+        <field name="randomError_cnt"      dapID="randomError_cnt" />
+        <field name="randomError"          dapID="randomError" />
+    </WcsCoverage>

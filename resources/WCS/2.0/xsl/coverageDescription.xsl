@@ -4,7 +4,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -35,7 +35,8 @@
                 xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
                 xmlns:swe="http://www.opengis.net/swe/2.0"
         >
-    <xsl:param name="ServicePrefix" />
+    <xsl:param name="WcsService" />
+    <xsl:param name="DocsService" />
     <xsl:param name="UpdateIsRunning"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
@@ -53,7 +54,7 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$DocsService"/>/css/contents.css</xsl:attribute>
                 </xsl:element>
                 <title>OPeNDAP: Web Coverage Service</title>
             </head>
@@ -66,7 +67,7 @@
 
                 <table border="0" width="90%">
                     <tr>
-                        <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.gif')}" /></td>
                         <td align="center">
                             <div  class="xlarge">Web Coverage Service</div>
                         </td>
@@ -88,7 +89,7 @@
                 </xsl:if>
                 <h2>
                     <span align="left" class="small">wcs:</span>Coverage Description
-                    <a href="{$ServicePrefix}?service=WCS&amp;version=2.0.1&amp;request=DescribeCoverage&amp;coverageId={wcs:CoverageId}"><span class="small">XML</span></a>
+                    <a href="{$WcsService}?service=WCS&amp;version=2.0.1&amp;request=DescribeCoverage&amp;coverageId={wcs:CoverageId}"><span class="small">XML</span></a>
                 </h2>
 
 
@@ -121,14 +122,14 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <hr size="1" noshade="noshade"/>
-                <div class="small" align="right">
+                <!-- div class="small" align="right">
                     OPeNDAP WCS Service development sponsored by <a href='http://www.ioos.gov/'>IOOS</a>
-                </div>
+                </div -->
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
                 <h3>WCS-<xsl:value-of select="$WcsServiceVersion"/>
-                    <span class="small"> (OPeNDAP WCS service implementation version
+                    <span class="small"> (Hyrax-WCS  version
                         <xsl:value-of select="$WcsSoftwareVersion"/>)</span>
                     <br />
                     <span class="uuid">
@@ -178,7 +179,20 @@
 
 
     <xsl:template match="gml:boundedBy">
+            <xsl:apply-templates/>
+    </xsl:template>
+
+    <!--
+    <gml:Envelope axisLabels="lat long" srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"
+                  uomLabels="deg deg">
+    -->
+    <xsl:template match="gml:Envelope | gml:EnvelopeWithTimePeriod">
         <h2>Bounding Box <span class="small">(gml:boundedBy)</span></h2>
+        <dd><span class="medium_bold">SRS: <xsl:value-of select="@srsName" /></span></dd>
+        <dd><span class="medium_bold">SRS Dimensions: <xsl:value-of select="@srsDimensions" /></span></dd>
+        <dd><span class="medium_bold">Axis Labels: <xsl:value-of select="@axisLabels" /></span></dd>
+        <dd><span class="medium_bold">Units Of Measure: <xsl:value-of select="@uomLabels" /></span></dd>
+
         <div class="medium">
             <xsl:apply-templates/>
         </div>
@@ -198,12 +212,6 @@
 
     <xsl:template match="gml:coverageFunction">
         <em>gml:coverageFunction - </em>
-        <xsl:apply-templates/>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="gmlcov:metadata">
-        <em>gml:coverageMetadata - </em>
         <xsl:apply-templates/>
         <br/>
     </xsl:template>
@@ -326,7 +334,7 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$DocsService"/>/css/contents.css</xsl:attribute>
                 </xsl:element>
                 <title>OPeNDAP: Web Coverage Service Exception</title>
             </head>
@@ -339,7 +347,7 @@
 
                 <table border="0" width="90%">
                     <tr>
-                        <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.gif')}" /></td>
                         <td align="center">
                             <div  class="xlarge">Web Coverage Service Exception</div>
                         </td>

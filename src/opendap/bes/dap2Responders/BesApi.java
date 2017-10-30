@@ -89,6 +89,7 @@ public class BesApi {
     public static final String W10N_FLATTEN   = "w10nFlatten";
     public static final String W10N_TRAVERSE   = "w10nTraverse";
 
+    public static final String REQUEST_ID      = "reqID";
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
@@ -1263,9 +1264,16 @@ public class BesApi {
                     besTransaction(dataSource, getCatalogRequest, response);
                     // Get the root element.
                     Element root = response.getRootElement();
+                    if(root==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No root element");
 
+                    Element showCatalog  = root.getChild("showCatalog", BES_NS);
+                    if(showCatalog==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No showCatalog element");
                     // Find the top level dataset Element
-                    Element topDataset = root.getChild("showCatalog", BES_NS).getChild("dataset", BES_NS);
+                    Element topDataset = showCatalog.getChild("dataset", BES_NS);
+                    if(topDataset==null)
+                        throw new IOException("BES Catalog response for "+dataSource+" was emtpy! No dataset element.");
 
                     topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
@@ -1471,11 +1479,8 @@ public class BesApi {
     public void besTransaction(String dataSource,  Document request, OutputStream os)
             throws BadConfigurationException, IOException, PPTException, BESError {
 
-
-
         log.debug("besTransaction() started.");
         log.debug("besTransaction() request document: \n-----------\n"+ getDocumentAsString(request)+"-----------\n");
-
 
         BES bes = BESManager.getBES(dataSource);
         int bes_timeout_seconds = bes.getTimeout()/1000;
@@ -1659,8 +1664,12 @@ public class BesApi {
                         XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
+        if(req==null)
+            throw new BadConfigurationException("Request document is corrupt! No root element!");
 
         Element getReq = req.getChild("get",BES_NS);
+        if(getReq==null)
+            throw new BadConfigurationException("Request document is corrupt! No 'get' element!");
 
         Element e = new Element("contentStartId",BES_NS);
         e.setText(contentID);
@@ -2234,10 +2243,7 @@ public class BesApi {
 
 
         Element e, request = new Element("request", BES_NS);
-
-        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
-
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
 
 
         if(xdap_accept!=null)
@@ -2297,11 +2303,7 @@ public class BesApi {
 
         Element e, request = new Element("request", BES_NS);
 
-
-        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
-
-
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
 
         /**----------------------------------------------------------------------
          * Added this bit for the cloudy dap experiment - ndp 1/19/17
@@ -2355,11 +2357,7 @@ public class BesApi {
 
 
         Element request = new Element("request", BES_NS);
-
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
-
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2415,9 +2413,7 @@ public class BesApi {
 
 
         Element e, request = new Element("request", BES_NS);
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
         e = new Element(type,BES_NS);
@@ -2580,10 +2576,9 @@ public class BesApi {
 
     }
 
-
-
-
-
+    private String getRequestIdBase(){
+        return "[thread:"+Thread.currentThread().getName()+"-"+ Thread.currentThread().getId()+"]";
+    }
 
 
 

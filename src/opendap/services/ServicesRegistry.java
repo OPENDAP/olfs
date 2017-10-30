@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServicesRegistry {
 
-    private static Logger log = LoggerFactory.getLogger(ServicesRegistry.class);
+    private static Logger _log = LoggerFactory.getLogger(ServicesRegistry.class);
 
     private static ConcurrentHashMap<String, Service> services;
     private static ConcurrentHashMap<String, WebServiceHandler> _webServiceHandlers;
@@ -58,10 +59,13 @@ public class ServicesRegistry {
     public static int addService(Service service){
         if(service instanceof WebServiceHandler){
             _webServiceHandlers.put(service.getServiceId(), (WebServiceHandler) service);
+            _log.debug("Added WebService Handler '{}'",service.getName());
+
 
         }
         else if(service instanceof JwsHandler){
             _jwsHandlers.put(service.getServiceId(), (JwsHandler) service);
+            _log.debug("Added Java Webstart Handler '{}'",service.getName());
 
         }
         services.put(service.getServiceId(),service);
@@ -101,6 +105,16 @@ public class ServicesRegistry {
         return _webServiceHandlers.get(id);
     }
 
+
+    public static Vector<WebServiceHandler> getWebServicesLike(String serviceType){
+        Vector<WebServiceHandler> stuffWeLike =  new Vector<>();
+        for(WebServiceHandler wsh: _webServiceHandlers.values()){
+            if(wsh.getServiceId().contains(serviceType)){
+                stuffWeLike.add(wsh);
+            }
+        }
+        return stuffWeLike;
+    }
 
 
 }

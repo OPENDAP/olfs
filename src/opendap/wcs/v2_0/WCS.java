@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -28,8 +28,11 @@ package opendap.wcs.v2_0;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * User: ndp
@@ -79,15 +82,45 @@ public class WCS {
     public static final String    SWE_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/sweCommon/2.0/";
 
 
+    public static final String    WCSEO_NAMESPACE_STRING = "http://www.opengis.net/wcs/wcseo/1.0";
+    public static final Namespace WCSEO_NS = Namespace.getNamespace("wcseo",WCSEO_NAMESPACE_STRING);
+    public static final String    WCSEO_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcseo/1.0/";
+
+    public static final String    EOP_NAMESPACE_STRING = "http://www.opengis.net/eop/2.0";
+    public static final Namespace EOP_NS = Namespace.getNamespace("wcs",EOP_NAMESPACE_STRING);
+    public static final String    EOP_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/eop/2.0/";
+
+    public static final String    OM_NAMESPACE_STRING = "http://www.opengis.net/om/2.0";
+    public static final Namespace OM_NS = Namespace.getNamespace("wcs",OM_NAMESPACE_STRING);
+    public static final String    OM_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/om/2.0/";
+
+    public static final String    CIS_NAMESPACE_STRING = "http://www.opengis.net/cis/1.1";
+    public static final Namespace CIS_NS = Namespace.getNamespace("cis",CIS_NAMESPACE_STRING);
+    //public static final String    CIS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/om/2.0/";
 
 
     public static final String    XLINK_NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
     public static final Namespace XLINK_NS = Namespace.getNamespace("xlink",XLINK_NAMESPACE_STRING);
     public static final String    XLINK_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/xlink/1.0.0/";
 
-    public static final int GET_CAPABILITIES   = 0;
-    public static final int DESCRIBE_COVERAGE  = 1;
-    public static final int GET_COVERAGE       = 2;
+
+    public enum REQUEST {
+        GET_CAPABILITIES("GetCapabilities"),
+        DESCRIBE_COVERAGE("DescribeCoverage"),
+        GET_COVERAGE("GetCoverage"),
+        DESCRIBE_EO_COVERAGE_SET("DescribeEOCoverageSet");
+
+        private final String name;
+
+        REQUEST(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString(){
+            return name;
+        }
+    }
 
 
 
@@ -160,7 +193,7 @@ public class WCS {
     }
 
 
-
+               /*
 
 
     public static void checkCoverageDescription(Element cd) throws WcsException{
@@ -179,12 +212,12 @@ public class WCS {
 
 
     }
+    */
 
-
+               /*
     public static void checkBoundedBy(Element e) throws WcsException{
         checkNamespace(e,"boundedBy",GML_NS);
     }
-
 
     public static void checkCoverageId(Element e) throws WcsException{
         checkNamespace(e,"CoverageId",WCS_NS);
@@ -205,8 +238,9 @@ public class WCS {
 
     }
 
+        */
 
-
+        /*
 
     public static void checkDomainSet(Element e) throws WcsException{
 
@@ -215,15 +249,19 @@ public class WCS {
         checkTemporalDomain(e.getChild("TemporalDomain",WCS.WCS_NS));
 
     }
+    */
+        /*
     public static void checkSpatialDomain(Element e) throws WcsException{
 
         checkNamespace(e,"SpatialDomain",WCS.WCS_NS);
 
-        new BoundingBox(e.getChild("BoundingBox",WCS.OWS_NS));
+        new NewBoundingBox(e.getChild("BoundingBox",WCS.OWS_NS));
 
 
 
     }
+    */
+        /*
 
 
     public static void checkTemporalDomain(Element e) throws WcsException{
@@ -234,7 +272,7 @@ public class WCS {
         boolean hasContent = false;
         Iterator tpositions = e.getChildren("timePosition",WCS.GML_NS).iterator();
         Iterator tperiods = e.getChildren("TimePeriod",WCS.WCS_NS).iterator();
-        
+
         while(tpositions.hasNext()){
             hasContent = true;
             checkTimePosition((Element)tpositions.next());
@@ -254,7 +292,7 @@ public class WCS {
 
     public static void checkTimePosition(Element e) throws WcsException{
         checkNamespace(e,"timePosition",WCS.GML_NS);
-        //@todo Check the content of gml:timePosition
+        //TODO Check the content of gml:timePosition
 
 
     }
@@ -274,13 +312,14 @@ public class WCS {
             throw new WcsException("wcs:TimePeriod MUST have a wcs:EndPosition element ",
                     WcsException.MISSING_PARAMETER_VALUE,"wcs:EndPosition");
 
-        //@todo Check the content of wcs:BeginPosition and wcs:EndPosition
+        //TODO Check the content of wcs:BeginPosition and wcs:EndPosition
     }
 
 
+  */
 
 
-
+        /*
 
 
 
@@ -406,6 +445,101 @@ public class WCS {
 
 
     }
+
+      */
+        
+    public static NewBoundingBox getSubsetBoundingBox(
+            HashMap<String, DimensionSubset> dimensionSubsets,
+            TemporalDimensionSubset temporalSubset,
+            NewBoundingBox coverageBoundingBox)
+            throws WcsException {
+
+        Logger log = LoggerFactory.getLogger("WCS");
+
+        LinkedHashMap<String, CoordinateDimension> cvrgDims = coverageBoundingBox.getDimensions();
+
+        LinkedHashMap<String, CoordinateDimension> subsetBBDims = new LinkedHashMap<>();
+        double min, max;
+
+        Date startTime=null, endTime=null;
+
+        for(CoordinateDimension cDim : cvrgDims.values()) {
+
+            String dimName = cDim.getName();
+
+            DimensionSubset dimSubset = dimensionSubsets.get(dimName);
+
+            if(dimSubset==null){
+                // no subset on this dim? then we take the extents of the dimension in the coverage.
+                min = cDim.getMin();
+                max = cDim.getMax();
+                CoordinateDimension newDim = new CoordinateDimension(dimName,min,max);
+                subsetBBDims.put(dimName,newDim);
+            }
+            else {
+                if(dimSubset instanceof TemporalDimensionSubset){
+                    log.warn("getSubsetBoundingBox() - Found TemporalDimensionSubset in the dimensionsSubsets list.");
+                }
+                else {
+                    if (dimSubset.isTrimSubset()) {
+                        min = Double.parseDouble(dimSubset.getTrimLow());
+                        max = Double.parseDouble(dimSubset.getTrimHigh());
+                    } else {
+                        // looks like a slice
+                        min = Double.parseDouble(dimSubset.getSlicePoint());
+                        max = min;
+
+                    }
+                    CoordinateDimension newDim = new CoordinateDimension(dimName, min, max);
+                    subsetBBDims.put(dimName, newDim);
+                }
+            }
+
+        }
+
+        if(temporalSubset!=null) {
+            if (temporalSubset.isTrimSubset()) {
+                if (temporalSubset.isValueSubset()) {
+                    startTime = temporalSubset.getStartTime();
+                    endTime   = temporalSubset.getEndTime();
+                }
+                else { // It's an array index subset - oh. crap.
+                    log.warn("Array subsetting not of time is not fully supported.");
+                    startTime = coverageBoundingBox.getStartTime();
+                    endTime = coverageBoundingBox.getEndTime();
+
+                }
+            }
+            else { // It's a slice point.
+                if (temporalSubset.isValueSubset()) {
+                    startTime = temporalSubset.getSlicePointTime();
+                    endTime = temporalSubset.getSlicePointTime();
+                }
+                else { //it's an array index subset. oh. crap.
+                    log.warn("Array subsetting not of time is not fully supported.");
+                    startTime = coverageBoundingBox.getStartTime();
+                    endTime = coverageBoundingBox.getEndTime();
+
+                }
+            }
+        }
+        else if(coverageBoundingBox.hasTimePeriod()){
+            startTime = coverageBoundingBox.getStartTime();
+            endTime = coverageBoundingBox.getEndTime();
+        }
+        else {
+            log.warn("getSubsetBoundingBox() - Neither the Coverage BoundingBox nor the specified subset contain " +
+                    "information about Time bounds. SKIPPING time stuff...");
+        }
+
+        NewBoundingBox nbb = new NewBoundingBox(subsetBBDims,startTime,endTime,null);
+
+        return nbb;
+
+    }
+
+
+
 
 
 

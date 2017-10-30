@@ -233,6 +233,8 @@ public class BesCatalog implements Catalog {
 
 
             Element topDataset =  catalogElement.getChild(THREDDS.DATASET, THREDDS.NS);
+            if(topDataset==null)
+                throw new IOException("BES Catalog response is lacking the expected top level 'Dataset' element.");
 
 
             topDataset.setAttribute(THREDDS.NAME,getCatalogKey());

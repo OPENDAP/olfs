@@ -34,8 +34,12 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -735,18 +739,68 @@ public class ReqInfo {
         String servletPath = req.getServletPath();
 
 
+        //String preq = ServletUtil.probeRequest(null,req);
 
+        //System.out.println(preq);
         String reqURI = req.getRequestURI();
 
         String serviceName = contextPath + servletPath;
 
+        boolean stringsMatch =  reqURI.equals(serviceName);
 
-        if (reqURI.equals(serviceName) && !reqURI.endsWith("/")) {
+        if (stringsMatch && !reqURI.endsWith("/")) {
             return true;
         }
         return false;
 
     }
-}
+
+    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
+
+    public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
+
+        StringBuilder cf_history_entry = new StringBuilder();
+
+        // Add the date
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(CF_History_Entry_Date_Format);
+        sdf.setTimeZone(new SimpleTimeZone(0,"GMT"));
+        cf_history_entry.append(sdf.format(now,new StringBuffer(),new FieldPosition(0)));
+        cf_history_entry.append(" ");
+
+
+        // Add the Hyrax Version
+        cf_history_entry.append("Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
+        cf_history_entry.append(" ");
+
+        // Add the complete request URL
+        cf_history_entry.append(getRequestUrlPath(request));
+        cf_history_entry.append("?");
+        cf_history_entry.append(ReqInfo.getConstraintExpression(request));
+        cf_history_entry.append("\n");
+
+        return cf_history_entry.toString();
+    }
+
+
+
+
+    public static String getRequestUrlPath(HttpServletRequest req) {
+        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
+        String requestUrl = req.getRequestURL().toString();
+
+
+        if(forwardRequestUri != null){
+            String server = req.getServerName();
+            int port = req.getServerPort();
+            String scheme = req.getScheme();
+            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
+        }
+
+        return requestUrl;
+    }
+
+
+}                                                          
 
 

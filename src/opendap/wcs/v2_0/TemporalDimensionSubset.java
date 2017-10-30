@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -33,11 +33,21 @@ import java.util.Date;
  * This class extends DimensionSubset concept to correctly handle time strings.
  *
 */
-public class TemporalDimensionSubset extends DimensionSubset {
+public class TemporalDimensionSubset  extends DimensionSubset { // implements Cloneable {
 
 
     private String _units;
 
+
+    public TemporalDimensionSubset(DimensionSubset ds) {
+        super(ds);
+        _units = null;
+    }
+
+    public TemporalDimensionSubset(TemporalDimensionSubset tds) {
+        super(tds);
+        _units = tds._units;
+    }
 
     public TemporalDimensionSubset(DimensionSubset ds, String units) {
         super(ds);
@@ -63,7 +73,15 @@ public class TemporalDimensionSubset extends DimensionSubset {
      * @throws WcsException
      */
     @Override
-    public String getDapGridValueConstraint() throws WcsException {
+    public String getDap2GridValueConstraint() throws WcsException {
+
+        if(_domainCoordinate == null){
+            StringBuilder msg = new StringBuilder("The TemporalDimensionSubset '").append(getDimensionId()).append("' ");
+            msg.append("Has not been associated with a DomainCoordinate instance.");
+            throw new WcsException(msg.toString(),WcsException.INVALID_PARAMETER_VALUE,"DimensionSubset");
+        }
+        String dapVarName = _domainCoordinate.getDapID();
+
         StringBuilder subsetClause = new StringBuilder();
 
         if (isValueSubset()) {
@@ -88,7 +106,7 @@ public class TemporalDimensionSubset extends DimensionSubset {
                             .append("\"")
                             .append(beginPosition)
                             .append("<=")
-                            .append(getDimensionId())
+                            .append(dapVarName)
                             .append("<=")
                             .append(endPosition)
                             .append("\"");
@@ -140,5 +158,16 @@ public class TemporalDimensionSubset extends DimensionSubset {
 
 
 
+    public Date getStartTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getTrimLow());
 
-}
+    }
+    public Date getEndTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getTrimHigh());
+    }
+
+    public Date getSlicePointTime() throws WcsException {
+        return TimeConversion.parseWCSTimePosition(getSlicePoint());
+    }
+
+    }

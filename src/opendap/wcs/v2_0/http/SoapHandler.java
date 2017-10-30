@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2017 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -25,9 +25,12 @@
  */
 package opendap.wcs.v2_0.http;
 
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.DispatchServlet;
 import opendap.namespaces.NS;
 import opendap.namespaces.SOAP;
+import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -39,12 +42,9 @@ import java.util.List;
 
 /**
  *
+ *  This class extends the XmlRequestHandler to deal with the
+ *  SOAP wrapper and all that truck.
  *
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 7, 2009
- * Time: 9:00:41 AM
- * To change this template use File | Settings | File Templates.
  */
 public class SoapHandler extends XmlRequestHandler {
 
@@ -70,13 +70,18 @@ public class SoapHandler extends XmlRequestHandler {
         soapRequestDocument = super.parseWcsRequest(sis,encoding);
 
         soapEnvelope = soapRequestDocument.getRootElement();
+        if(soapEnvelope==null)
+            throw new WcsException("Root element located in request document! ",
+                    WcsException.INVALID_PARAMETER_VALUE);
 
         if(NS.checkNamespace(soapEnvelope,"Envelope", SOAP.NS)){
             soapBody = soapEnvelope.getChild("Body", SOAP.NS);
-            List soapContents = soapBody.getChildren();
+            if(soapBody==null)
+                throw new WcsException("SOAP Envelope is missing SOAP Body element.",
+                        WcsException.INVALID_PARAMETER_VALUE);
 
+            List<Element> soapContents = soapBody.getChildren();
             log.debug("Got " + soapContents.size() + " child elements of SOAP body.");
-
 
             if(soapContents.size()!=1){
                 String msg = "SOAP message body contains "+soapContents.size()+" items. Only one item is allowed.";
@@ -85,8 +90,7 @@ public class SoapHandler extends XmlRequestHandler {
                         WcsException.INVALID_PARAMETER_VALUE,
                         "WCS Request Document");
             }
-
-            Element wcsRequest = (Element) soapContents.get(0);
+            Element wcsRequest = soapContents.get(0);
             wcsRequest.detach();
             return new Document(wcsRequest);
         }
@@ -97,8 +101,6 @@ public class SoapHandler extends XmlRequestHandler {
                     WcsException.INVALID_PARAMETER_VALUE,
                     "WCS Request Document");
         }
-
-
     }
 
 
@@ -120,9 +122,9 @@ public class SoapHandler extends XmlRequestHandler {
 
 
     @Override
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
-        CoverageRequestProcessor.sendCoverageResponse(req, response, true );
+        GetCoverageRequestProcessor.sendCoverageResponse(req, response, true );
 
     }
 

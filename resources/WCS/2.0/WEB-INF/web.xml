@@ -5,7 +5,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2017 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -48,6 +48,10 @@
         <servlet-name>wcs</servlet-name>
 
         <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
+        <init-param>
+            <param-name>WCSConfigFileName</param-name>
+            <param-value>wcs_service.xml</param-value>
+        </init-param>
 
         <load-on-startup>1</load-on-startup> 
 
@@ -76,6 +80,12 @@
     <session-config>
         <session-timeout>20</session-timeout>
     </session-config>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+    </welcome-file-list>
 
 
 
