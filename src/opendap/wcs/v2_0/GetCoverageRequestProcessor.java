@@ -643,7 +643,7 @@ public class GetCoverageRequestProcessor {
             switch (rFormat.type()) {
                 case dap2:
                     besCmd =
-                            besApi.getDap2RequestDocument(
+                            besApi.getDap2RequestDocumentAsync(
                                     opendap.bes.dap2Responders.BesApi.DAP2_DATA,
                                     besDatatsetId,
                                     dap2ce,
