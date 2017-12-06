@@ -222,8 +222,8 @@
     <property name="jackson.annotations" value="jackson-annotations-2.4.1.jar" />
 
 
-    <property name="owasp-encoder"     value="encoder-1.2.1.jar"
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar"
+    <property name="owasp-encoder"     value="encoder-1.2.1.jar" />
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar" />
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
                property="fortify.present"/>
@@ -605,46 +605,6 @@
 
     <!-- *******************************************************  -->
 
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >
-        </sourceanalyzer>
-    </target>
 
 
 
