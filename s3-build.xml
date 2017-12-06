@@ -222,9 +222,8 @@
     <property name="jackson.annotations" value="jackson-annotations-2.4.1.jar" />
 
 
-
-
-
+    <property name="owasp-encoder"     value="encoder-1.2.1.jar"
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar"
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
                property="fortify.present"/>
@@ -239,6 +238,9 @@
         <fileset dir="${lib.dir}">
             <include name="${servlet-api.lib}"/>
             <include name="${catalina.lib}"/>
+
+            <include name="${owasp-encoder}"/>
+            <include name="${owasp-encoder-jsp}"/>
 
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
@@ -474,6 +476,9 @@
 
 
             <lib dir="${lib.dir}">
+
+                <include name="${owasp-encoder}"/>
+                <include name="${owasp-encoder-jsp}"/>
 
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
