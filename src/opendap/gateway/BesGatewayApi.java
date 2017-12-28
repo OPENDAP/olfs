@@ -383,17 +383,23 @@ public class BesGatewayApi extends BesApi {
 
             response.detachRootElement();
             response.setRootElement(catalogElement);
-
+            return;
 
         } catch (Exception e) {
-            log.warn("Unable to HEAD the remote resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Unable to HEAD the remote resource: ").append(dataSourceUrl);
+            sb.append(" Error Msg: ").append(e.getMessage());
+            log.error(sb.toString());
+            throw new IOException(sb.toString());
         }
 
-
-        Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
-
-        response.detachRootElement();
-        response.setRootElement(catalogElement);
+        // I don't know how this bullshit (below) got in here, but it pretty much borks all the stuff downstream
+        // If the resource can't be accessed it's an error. I commented this out and added the appropriate
+        // exception immediately above - ndp 12/28/17
+        //
+        //Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
+        //response.detachRootElement();
+        //response.setRootElement(catalogElement);
 
 
     }
