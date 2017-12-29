@@ -75,47 +75,29 @@ public class BesGatewayApi extends BesApi {
         _servicePrefix = servicePrefix;
     }
 
-
-    /**
-     * This child class of opendap.bes.BesXmlAPI provides an implementation of the
-     * getRequestDocument method that utilizes the BES wcs_gateway_module.
-     * @param type The type of thing being requested. For example a DDX would be
-     * opendap.bes.BesXmlAPI.DDX
-     * @param remoteDataSourceUrl See opendap.bes.BesXmlAPI.DDX
-     * @param ce See opendap.bes.BesXmlAPI
-     * @param xdap_accept See opendap.bes.BesXmlAPI
-     * @param xmlBase See opendap.bes.BesXmlAPI
-     * @param formURL See opendap.bes.BesXmlAPI
-     * @param returnAs See opendap.bes.BesXmlAPI
-     * @param errorContext See opendap.bes.BesXmlAPI
-     * @return The request Document
-     * @throws opendap.bes.BadConfigurationException When the bad things happen.
-     *
-     *
-     *
-     *
-     *
-     *     public  Document getRequestDocument(String type,
-                                                String dataSource,
-                                                String ce,
-                                                String xdap_accept,
-                                                int maxResponseSize,
-                                                String xmlBase,
-                                                String formURL,
-                                                String returnAs,
-                                                String errorContext)
-                throws BadConfigurationException {
-
-     *
-     *
-     *
-     *
-     * @see opendap.bes.dap2Responders.BesApi
-     */
+        /**
+         * This child class of opendap.bes.BesApi provides an implementation of the
+         * getRequestDocument method that utilizes the BES wcs_gateway_module.
+         * @param type The type of thing being requested. For example a DDX would be
+         * opendap.bes.dap2Responders.BesApi.DDX
+         * @param remoteDataSourceUrl See opendap.bes.dap2Responders.BesApi
+         * @param ce See opendap.bes.dap2Responders.BesApi
+         * @param async See opendap.bes.dap2Responders.BesApi
+         * @param xdap_accept See opendap.bes.dap2Responders.BesApi
+         * @param xmlBase See opendap.bes.dap2Responders.BesApi
+         * @param formURL See opendap.bes.dap2Responders.BesApi
+         * @param returnAs See opendap.bes.dap2Responders.BesApi
+         * @param errorContext See opendap.bes.dap2Responders.BesApi
+         * @return The request Document
+         * @throws opendap.bes.BadConfigurationException When the bad things happen.
+         * @see opendap.bes.dap2Responders.BesApi
+         */
     @Override
     public Document getDap2RequestDocument(String type,
                                            String remoteDataSourceUrl,
                                            String ce,
+                                           String async,
+                                           String storeResult,
                                            String xdap_accept,
                                            int maxResponseSize,
                                            String xmlBase,
@@ -132,14 +114,11 @@ public class BesGatewayApi extends BesApi {
                 Thread.currentThread().getId()+":gateway_request]";
         request.setAttribute("reqID",reqID);
 
-
         if(xdap_accept!=null)
             request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
         else
             request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
-
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
         if(xmlBase!=null)
@@ -148,75 +127,43 @@ public class BesGatewayApi extends BesApi {
         if(maxResponseSize>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
-
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
-
         Element def = defineElement("d1","default");
         e = (containerElement("gatewayContainer"));
-
         if(ce!=null && !ce.equals(""))
             e.addContent(constraintElement(ce));
-
         def.addContent(e);
-
         request.addContent(def);
-
-        e = getElement(type,"d1",formURL,returnAs);
-
+        e = getElement(type,"d1",formURL,returnAs,async,storeResult);
         request.addContent(e);
 
         log.debug("Built request for BES gateway_module.");
-
-
         return new Document(request);
-
     }
 
     private String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
-
-
         String relativeURL = ReqInfo.getLocalUrl(req);
-
         return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(_regexToMatchLastDotSuffixString));
-
-
     }
 
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
-
-
-
-        //String requestSuffix = ReqInfo.getSuffix(relativeURL);
-
-
-
         // Strip leading slash(es)
         while(relativeURL.startsWith("/") && !relativeURL.equals("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-
-
         String dataSourceUrl = relativeURL;
-
 
         // Strip the path off.
         if(pathPrefix!=null && dataSourceUrl.startsWith(pathPrefix))
             dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
 
-
         if(!dataSourceUrl.equals("")){
             dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
         }
-
-
         dataSourceUrl = HexAsciiEncoder.hexToString(dataSourceUrl);
-
-//        URL url = new URL(dataSourceUrl);
-        //log.debug(urlInfo(url));
-
+        // URL url = new URL(dataSourceUrl);
+        // log.debug(urlInfo(url));
         return dataSourceUrl;
-
-
     }
 
 
@@ -268,36 +215,27 @@ public class BesGatewayApi extends BesApi {
     }
 
     /*
-
     @Override
     public boolean getInfo(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
             JDOMException {
-
-
         String besDataSourceId = getBesDataSourceID(dataSource);
-
         return super.getInfo(besDataSourceId, response);
-
     }
-    */
 
 
     String stripPrefix(String dataSource){
-
-
         while(dataSource.startsWith("/") && !dataSource.equals("/"))
             dataSource = dataSource.substring(1,dataSource.length());
 
-
         if(dataSource.startsWith(_servicePrefix))
             return dataSource.substring(_servicePrefix.length(),dataSource.length());
-
         return dataSource;
 
     }
+    */
 
 
     /**
@@ -313,15 +251,10 @@ public class BesGatewayApi extends BesApi {
      */
     @Override
     public String getBesDataSourceID(String relativeUrl, Pattern suffixMatchPattern, boolean checkWithBes){
-
         log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
-
-
         if(Util.matchesSuffixPattern(relativeUrl,suffixMatchPattern)){
             try {
-
                 String remoteDatasourceUrl = getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern);
-
                 log.debug("getBesDataSourceID() - besDataSourceId: {}", remoteDatasourceUrl);
                 return remoteDatasourceUrl;
             }
@@ -329,24 +262,19 @@ public class BesGatewayApi extends BesApi {
                 log.debug("getBesDataSourceID() - Failed to extract target dataset URL from relative URL '{}'", relativeUrl);
             }
         }
-
         return null;
-
-
     }
 
 
     @Override
     public void getBesCatalog(String dataSourceUrl, Document response) throws IOException {
-
-
-        // Go get the HEAD for the catalog:
+        // Go get the HEAD for the catalog
+        // FIXME: This DOES NOT utilize the whitelist in the BES and this should to be MOVED to the BES
         HttpClient httpClient = new HttpClient();
         HeadMethod headReq = new HeadMethod(dataSourceUrl);
 
         try {
             int statusCode = httpClient.executeMethod(headReq);
-
             if (statusCode != HttpStatus.SC_OK) {
                 log.error("Unable to HEAD remote resource: " + dataSourceUrl);
                 String msg = "OLFS: Unable to access requested resource: " + dataSourceUrl;
@@ -355,7 +283,6 @@ public class BesGatewayApi extends BesApi {
 
             Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
             Date lastModified = new Date();
-
             if (lastModifiedHeader != null) {
                 String lmtString = lastModifiedHeader.getValue();
                 SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
@@ -363,24 +290,21 @@ public class BesGatewayApi extends BesApi {
                     lastModified = format.parse(lmtString);
                 } catch (ParseException e) {
                     log.warn("Failed to parse last modified time. LMT String: {}, resource URL: {}", lmtString, dataSourceUrl);
+                    lastModified = new Date();
                 }
             }
-
             int size = -1;
             Header contentLengthHeader = headReq.getResponseHeader("Content-Length");
-
             if (contentLengthHeader != null) {
                 String sizeStr = contentLengthHeader.getValue();
                 try {
                     size = Integer.parseInt(sizeStr);
                 } catch (NumberFormatException nfe) {
                     log.warn("Received invalid content length from datasource: {}: ", dataSourceUrl);
+                    size=0;
                 }
             }
-
             Element catalogElement = getShowCatalogResponseDocForDatasetUrl(dataSourceUrl, size, lastModified);
-
-
             response.detachRootElement();
             response.setRootElement(catalogElement);
             return;
@@ -392,7 +316,6 @@ public class BesGatewayApi extends BesApi {
             log.error(sb.toString());
             throw new IOException(sb.toString());
         }
-
         // I don't know how this bullshit (below) got in here, but it pretty much borks all the stuff downstream
         // If the resource can't be accessed it's an error. I commented this out and added the appropriate
         // exception immediately above - ndp 12/28/17
@@ -400,20 +323,15 @@ public class BesGatewayApi extends BesApi {
         //Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
         //response.detachRootElement();
         //response.setRootElement(catalogElement);
-
-
     }
 
 
 
-    public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified){
-
-
+    public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified) throws IOException {
 
         Element root = new Element("response",BES.BES_NS);
         root.addNamespaceDeclaration(BES.BES_NS);
         root.setAttribute("reqID","BesGatewayApi_Construct");
-
 
         Element showCatalog = new Element("showCatalog",BES.BES_NS);
         root.addContent(showCatalog);
@@ -422,27 +340,20 @@ public class BesGatewayApi extends BesApi {
 
             Element dataset = new Element("dataset",BES.BES_NS);
             showCatalog.addContent(dataset);
-
             dataset.setAttribute("name",dataSourceURL);
             dataset.setAttribute("size",""+size);
 
             SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
-
             dataset.setAttribute("lastModified",sdf.format(lastModified));
-
-
             dataset.setAttribute("node","false");
-
-
 
             Element serviceRef = new Element("serviceRef",BES.BES_NS);
             serviceRef.setText("dap");
-
             dataset.addContent(serviceRef);
-
         }
-
-
+        else {
+            throw new IOException("Gateway target URL is unusable (either null or zero length)");
+        }
         return root;
     }
 
