@@ -26,6 +26,7 @@
 
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -101,7 +102,9 @@ public class XmlDSR extends Dap4Responder {
 
         String context = request.getContextPath()+"/";
         String relativeUrl = ReqInfo.getLocalUrl(request);
+
         String baseUrl = Util.dropSuffixFrom(relativeUrl, normDSR.getRequestSuffixMatchPattern());
+        baseUrl = PathBuilder.pathConcat(context,baseUrl);
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
         Document serviceDescription = new Document();

@@ -101,10 +101,11 @@ public class HtmlDSR extends Dap4Responder {
 
         String context = request.getContextPath()+"/";
         String relativeUrl = ReqInfo.getLocalUrl(request);
+
         String baseUrl = Util.dropSuffixFrom(relativeUrl, normDSR.getRequestSuffixMatchPattern());
+        baseUrl = PathBuilder.pathConcat(context,baseUrl);
 
         Document responseDoc = new Document();
-
         HashMap<String,String> piMap = new HashMap<>( 2 );
         piMap.put( "type", "text/xsl" );
         piMap.put( "href", context+"xsl/datasetServices.xsl" );

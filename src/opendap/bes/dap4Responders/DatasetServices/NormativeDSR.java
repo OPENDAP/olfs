@@ -26,6 +26,7 @@
 
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.PathBuilder;
 import opendap.bes.BESManager;
 import opendap.bes.BesGroup;
 import opendap.bes.dap2Responders.BesApi;
@@ -111,7 +112,9 @@ public class NormativeDSR extends Dap4Responder {
 
         String context = request.getContextPath()+"/";
         String relativeUrl = ReqInfo.getLocalUrl(request);
+
         String baseUrl = Util.dropSuffixFrom(relativeUrl, getRequestSuffixMatchPattern());
+        baseUrl = PathBuilder.pathConcat(context,baseUrl);
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
