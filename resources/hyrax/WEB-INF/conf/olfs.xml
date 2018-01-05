@@ -109,6 +109,7 @@
 
             <Handler className="opendap.gateway.DispatchHandler">
                 <prefix>gateway</prefix>
+                <UseDAP2ResourceUrlResponse />
             </Handler>
 
 
