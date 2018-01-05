@@ -32,7 +32,9 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.DSR;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
@@ -97,8 +99,6 @@ public class NormativeDSR extends Dap4Responder {
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
-
-
     }
 
 
@@ -106,23 +106,16 @@ public class NormativeDSR extends Dap4Responder {
     public boolean isMetadataResponder(){ return true; }
 
 
-
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-        String datasetUrl = request.getRequestURL().toString();
-
-        String datasetResourceID = getResourceId(datasetUrl,false);
-
-        log.debug("datasetResourceID: {} datasetURL: {}",datasetResourceID,datasetUrl);
-
         String context = request.getContextPath()+"/";
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String baseUrl = Util.dropSuffixFrom(relativeUrl, getRequestSuffixMatchPattern());
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),datasetUrl);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
         Document serviceDescription = new Document();
-
         HashMap<String,String> piMap = new HashMap<>( 2 );
         piMap.put( "type", "text/xsl" );
         piMap.put( "href", context+"xsl/datasetServices.xsl" );
@@ -131,23 +124,17 @@ public class NormativeDSR extends Dap4Responder {
         serviceDescription.addContent( pi );
 
         Element datasetServices;
-
-        datasetServices = getDatasetServicesElement(datasetResourceID);
-
+        datasetServices = getDatasetServicesElement(baseUrl);
         serviceDescription.setRootElement(datasetServices);
 
         MediaType responseMediaType = getNormativeMediaType();
-
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
-
         response.setContentType(responseMediaType.getMimeType());
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
         xmlo.output(serviceDescription,response.getOutputStream());
-
         log.debug("Sent {}",getServiceTitle());
 
     }
@@ -163,25 +150,20 @@ public class NormativeDSR extends Dap4Responder {
         //datasetServices.addContent(getSimpleHyraxVersion());
         datasetServices.addContent(getSimpleServerSoftwareVersionElement());
 
-
         if(allServices!=null){
             for(Dap4Responder service : allServices ){
                  datasetServices.addContent(service.getServiceElement(datasetUrl));
             }
         }
-
         datasetServices.addContent(getServerSideFunctions(datasetUrl));
-
         return datasetServices;
-
     }
 
     private Element getComplexServerSoftwareVersionElement(){
         BesApi besApi = getBesApi();
-
         Element serverVersion = new Element("ServerSoftwareVersion",DAP.DAPv40_DatasetServices_NS);
-
         Element hyraxVersion;
+
         try {
             hyraxVersion = besApi.getCombinedVersionDocument().getRootElement();
             hyraxVersion.detach();
@@ -210,13 +192,10 @@ public class NormativeDSR extends Dap4Responder {
     private Vector<Element> getDapVersionElements(String resourceId) {
 
         Vector<Element> dapVersions = new Vector<>();
-
         BesGroup besGroup = BESManager.getBesGroup(resourceId);
-
         TreeSet<String> besDapVersions = besGroup.getCommonDapVersions();
 
         Element versionElement;
-
         Iterator<String> i = besDapVersions.descendingIterator();
         while(i.hasNext()){
             String version = i.next();
@@ -225,13 +204,11 @@ public class NormativeDSR extends Dap4Responder {
             dapVersions.add(versionElement);
 
         }
-
         return dapVersions;
 
     }
 
     private Vector<String> getDapVersions(List serviceVersionList ){
-
         Vector<String> dapVersions = new Vector<>();
 
         for(Object o_serviceVersion : serviceVersionList){
@@ -244,7 +221,6 @@ public class NormativeDSR extends Dap4Responder {
                 }
             }
         }
-
         return dapVersions;
 
     }
@@ -255,17 +231,13 @@ public class NormativeDSR extends Dap4Responder {
 
     private  Vector<Element> getServerSideFunctions(String datasetUrl){
 
-
         Vector<Element> extensions = new Vector<>();
-
         Element function;
-
         function = getFunctionElement("geogrid",
                 "http://services.opendap.org/dap4/server-side-function/geogrid",
                 "Allows a DAP Grid variable to be sub-sampled using georeferenced values.",
                 "http://docs.opendap.org/index.php/Server_Side_Processing_Functions#geogrid");
         extensions.add(function);
-
 
         function = getFunctionElement("grid",
                 "http://services.opendap.org/dap4/server-side-function/grid",
@@ -273,13 +245,11 @@ public class NormativeDSR extends Dap4Responder {
                 "http://docs.opendap.org/index.php/Server_Side_Processing_Functions#grid");
         extensions.add(function);
 
-
         function = getFunctionElement("linear_scale",
                 "http://services.opendap.org/dap4/server-side-function/linear_scale",
                 "Applies a linear scale transform to the named variable.",
                 "http://docs.opendap.org/index.php/Server_Side_Processing_Functions#linear_scale");
         extensions.add(function);
-
 
         function = getFunctionElement("version",
                 "http://services.opendap.org/dap4/server-side-function/version",
@@ -287,14 +257,11 @@ public class NormativeDSR extends Dap4Responder {
                 "http://docs.opendap.org/index.php/Server_Side_Processing_Functions#version");
         extensions.add(function);
 
-
         function = getExtensionElement("async",
                 "http://services.opendap.org/dap4/extension/asynchronousTransactions",
                 "This server supports asynchronous transactions..",
                 "http://docs.opendap.org/index.php/DAP4:_Asynchronous_Request-Response_Proposal_v3");
         extensions.add(function);
-
-
 
         return extensions;
 

@@ -75,78 +75,29 @@ public class BesGatewayApi extends BesApi {
         _servicePrefix = servicePrefix;
     }
 
-        /**
-         * This child class of opendap.bes.BesApi provides an implementation of the
-         * getRequestDocument method that utilizes the BES wcs_gateway_module.
-         * @param type The type of thing being requested. For example a DDX would be
-         * opendap.bes.dap2Responders.BesApi.DDX
-         * @param remoteDataSourceUrl See opendap.bes.dap2Responders.BesApi
-         * @param ce See opendap.bes.dap2Responders.BesApi
-         * @param async See opendap.bes.dap2Responders.BesApi
-         * @param xdap_accept See opendap.bes.dap2Responders.BesApi
-         * @param xmlBase See opendap.bes.dap2Responders.BesApi
-         * @param formURL See opendap.bes.dap2Responders.BesApi
-         * @param returnAs See opendap.bes.dap2Responders.BesApi
-         * @param errorContext See opendap.bes.dap2Responders.BesApi
-         * @return The request Document
-         * @throws opendap.bes.BadConfigurationException When the bad things happen.
-         * @see opendap.bes.dap2Responders.BesApi
-         */
+    /**
+     * This method defines which "space" (aka catalog) the BES will use to service the request. Here
+     * we override the parent class which uses the "space" called "catalog" to use the "space" called "gateway".
+     * This is what causes the BES to invoke the gateway handler
+     * @return
+     */
     @Override
-    public Document getDap2RequestDocument(String type,
-                                           String remoteDataSourceUrl,
-                                           String ce,
-                                           String async,
-                                           String storeResult,
-                                           String xdap_accept,
-                                           int maxResponseSize,
-                                           String xmlBase,
-                                           String formURL,
-                                           String returnAs,
-                                           String errorContext)
-                throws BadConfigurationException {
-
-
-        log.debug("Building request for BES gateway_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
-        Element e, request = new Element("request", BES.BES_NS);
-
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":gateway_request]";
-        request.setAttribute("reqID",reqID);
-
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
-        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-        if(xmlBase!=null)
-            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
-
-        if(maxResponseSize>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
-
-        request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
-        Element def = defineElement("d1","default");
-        e = (containerElement("gatewayContainer"));
-        if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
-        def.addContent(e);
-        request.addContent(def);
-        e = getElement(type,"d1",formURL,returnAs,async,storeResult);
-        request.addContent(e);
-
-        log.debug("Built request for BES gateway_module.");
-        return new Document(request);
+    protected String getBesSpaceName(){
+        return "gateway";
     }
 
-    private String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
-        String relativeURL = ReqInfo.getLocalUrl(req);
-        return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(_regexToMatchLastDotSuffixString));
+    /**
+     * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
+     * the BES commands readable and consistent we typically associate it with the "space" name.
+     * @return The name of the BES "container" which will be built into teh request document.
+     */
+    @Override
+    protected String getBesContainerName(){
+        return "gatewayContainer";
     }
 
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
+
         // Strip leading slash(es)
         while(relativeURL.startsWith("/") && !relativeURL.equals("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -167,83 +118,13 @@ public class BesGatewayApi extends BesApi {
     }
 
 
-    /**
-     *  Returns the DDX request document for the passed dataSource
-     *  using the passed constraint expression.
-     * @param dataSource The data set whose DDX is being requested
-     * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the dap that should be used to build the
-     * response.
-     * @param xmlBase The request URL.
-     * @param contentID contentID of the first MIME part.
-     * @param mimeBoundary The MIME boundary to use in the response..
-     * @return The DDX request document.
-     * @throws BadConfigurationException When no BES can be found to
-     * service the request.
-     */
-    public Document getDap4DataRequest(String dataSource,
-                                       String ce,
-                                       String xdap_accept,
-                                       int maxResponseSize,
-                                       String xmlBase,
-                                       String contentID,
-                                       String mimeBoundary)
-            throws BadConfigurationException {
-
-        Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, xdap_accept, maxResponseSize, xmlBase, null, null, XML_ERRORS);
-
-        Element req = reqDoc.getRootElement();
-        if(req==null)
-            throw new BadConfigurationException("Request document is corrupt! Missing root element!");
-
-        Element getReq = req.getChild("get",BES.BES_NS);
-        if(getReq==null)
-            throw new BadConfigurationException("Request document is corrupt! Missing 'get' element!");
-
-        Element e = new Element("contentStartId",BES.BES_NS);
-        e.setText(contentID);
-        getReq.addContent(e);
-
-
-        e = new Element("mimeBoundary",BES.BES_NS);
-        e.setText(mimeBoundary);
-        getReq.addContent(e);
-
-
-        return reqDoc;
-
-    }
-
-    /*
-    @Override
-    public boolean getInfo(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
-        String besDataSourceId = getBesDataSourceID(dataSource);
-        return super.getInfo(besDataSourceId, response);
-    }
-
-
-    String stripPrefix(String dataSource){
-        while(dataSource.startsWith("/") && !dataSource.equals("/"))
-            dataSource = dataSource.substring(1,dataSource.length());
-
-        if(dataSource.startsWith(_servicePrefix))
-            return dataSource.substring(_servicePrefix.length(),dataSource.length());
-        return dataSource;
-
-    }
-    */
-
 
     /**
      * Because the gateway doesn't support a catalog we ignore the checkWithBes parameter
      * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
      * the URL - the question mark and everything after it.)
      * @param suffixMatchPattern This parameter provides the method with a suffix regex to use in evaluating what part,
-     * if any, of the relative URL must be removed to construct the besDataSourceId/
+     * if any, of the relative URL must be removed to construct the besDataSourceId.
      * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
      * besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
      * doesn't have catalog services this parameter is ignored.
@@ -337,7 +218,6 @@ public class BesGatewayApi extends BesApi {
         root.addContent(showCatalog);
 
         if(dataSourceURL!=null && dataSourceURL.length()>0){
-
             Element dataset = new Element("dataset",BES.BES_NS);
             showCatalog.addContent(dataset);
             dataset.setAttribute("name",dataSourceURL);

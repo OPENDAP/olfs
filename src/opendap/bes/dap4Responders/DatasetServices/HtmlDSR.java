@@ -31,6 +31,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.TextHtml;
@@ -71,9 +72,7 @@ public class HtmlDSR extends Dap4Responder {
 
     public HtmlDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, NormativeDSR dsr) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
         log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-services");
@@ -100,13 +99,9 @@ public class HtmlDSR extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-        String requestedResource = request.getRequestURL().toString();
-
-        //String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
-        String baseUrl = getResourceId(requestedResource, false);
-
         String context = request.getContextPath()+"/";
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String baseUrl = Util.dropSuffixFrom(relativeUrl, normDSR.getRequestSuffixMatchPattern());
 
         Document responseDoc = new Document();
 
@@ -116,44 +111,33 @@ public class HtmlDSR extends Dap4Responder {
         ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
 
         responseDoc.addContent(pi);
-
         Element datasetServices;
-
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
         datasetServices = normDSR.getDatasetServicesElement(baseUrl);
-
         responseDoc.setRootElement(datasetServices);
 
         String currentDir = System.getProperty("user.dir");
         log.debug("Cached working directory: "+currentDir);
 
         String xslDir = new PathBuilder(_systemPath).pathAppend("xsl").toString();
-
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
-
 
         try {
             String xsltDocName = "datasetServices.xsl";
             Transformer transformer = new Transformer(xsltDocName);
-
             ServletOutputStream os = response.getOutputStream();
 
             MediaType responseMediaType = getNormativeMediaType();
-
             // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
             RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
-
             response.setContentType(responseMediaType.getMimeType());
             response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
             // Transform the DSR into an HTML page.
             transformer.transform(new JDOMSource(responseDoc), os);
-
-
             log.debug("Sent {}", getServiceTitle());
         }
         finally {

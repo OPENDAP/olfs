@@ -51,41 +51,31 @@ import java.util.Vector;
  */
 public class DispatchHandler extends BesDapDispatcher {
 
-
     private Logger log;
     private boolean _initialized;
     private String _prefix = "gateway/";
-
-    // private Element _config;
-
-    private Vector<String> trustedHosts;
-
-
     private BesGatewayApi _besApi;
-
-
     private GatewayForm _gatewayForm;
 
-
     public DispatchHandler() {
-
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        trustedHosts = new Vector<String>();
         _initialized = false;
         _besApi = null;
-
-
     }
 
     @Override
     public void init(HttpServlet servlet, Element config) throws Exception {
+
+        if(_initialized)
+            return;
 
         ingestPrefix(config);
 
         _besApi = new BesGatewayApi(_prefix);
         init(servlet, config, _besApi);
         _gatewayForm  =  new GatewayForm(getSystemPath(), _prefix);
+        _initialized=true;
     }
 
     @Override
@@ -94,17 +84,11 @@ public class DispatchHandler extends BesDapDispatcher {
                                    boolean sendResponse)
             throws Exception {
 
-
         String relativeURL = ReqInfo.getLocalUrl(request);
-
-
         log.debug("relativeURL:    "+relativeURL);
-
-
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
-
 
         boolean isMyRequest = false;
         boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
@@ -123,75 +107,26 @@ public class DispatchHandler extends BesDapDispatcher {
                         log.debug("Sent redirect to service prefix: "+_prefix);
                     }
                     else if(itsJustThePrefix){
-
                         _gatewayForm.respondToHttpGetRequest(request,response);
                         log.info("Sent Gateway Access Form");
-
                     }
                     else {
-                        if(!super.requestDispatch(request,response, true)  && !response.isCommitted()){
-                            response.sendError(HttpServletResponse.SC_NOT_FOUND,"Unable to locate requested resource.");
-                            log.info("Sent 404 Response.");
+                        if(!super.requestDispatch(request,response, true)){
+                            if( !response.isCommitted()) {
+                                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                                log.info("Sent 404 Response.");
+                            }
+                            else {
+                                log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
+                            }
                         }
                         else
                             log.info("Sent DAP Gateway Response.");
                     }
                 }
-
             }
         }
-
         return isMyRequest;
-    }
-
-
-    private void ingestTrustedHosts(Element config) throws URISyntaxException, MalformedURLException {
-
-        if(config==null)
-            return;
-
-        String msg;
-        Element hostElem;
-        URL url;
-        URI uri;
-        List hosts = config.getChildren("trustedHost");
-
-        if(hosts.isEmpty()){
-            msg = "Configuration Warning: The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " did not provide 1 or more <wcsHost> " +
-                    "child elements to limit the WCS services that " +
-                    "may be accessed. This not recomended.";
-
-            log.warn(msg);
-        }
-        else {
-
-            for (Object o : hosts) {
-                hostElem = (Element) o;
-                String host = hostElem.getTextTrim();
-
-                url = new URL(host);
-                log.debug(Util.urlInfo(url));
-
-
-                uri = new URI(host);
-                log.debug(Util.uriInfo(uri));
-
-                log.info("Adding " + url + " to allowed hosts list.");
-                trustedHosts.add(host);
-            }
-
-        }
-    }
-
-    private boolean isTrustedHost(String url){
-
-        for(String trustedHost : trustedHosts){
-            if(url.startsWith(trustedHost))
-                return true;
-        }
-        return false;
     }
 
 
@@ -227,14 +162,6 @@ public class DispatchHandler extends BesDapDispatcher {
 
     }
 
-    String stripPrefix(String dataSource){
-
-        if(dataSource.startsWith(_prefix))
-            return dataSource.substring(_prefix.length(),dataSource.length());
-
-        return dataSource;
-
-    }
 
 
 
