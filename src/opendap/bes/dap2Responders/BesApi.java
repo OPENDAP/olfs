@@ -115,6 +115,22 @@ public class BesApi {
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
 
 
+    /**
+     * This specifies that the default BES "space" name is "catalog".
+     * In more common parlance it's "the catalog called catalog" the utilizes
+     * the BES.Catalog.catalog.RootDirectory filesystem as the catalog.
+     */
+    public static final String DEFAULT_BES_SPACE = "catalog";
+
+    /**
+     * This specifes the sdeafult BES "container" name. While this name could
+     * pretty much be "foo" or some nonsensical string for the sake of BES
+     * command readability a value should be chosen that relates to the BES "space"
+     * name that is being used.
+     */
+    public static final String DEFAULT_BES_CONTAINER = "catalogContainer";
+
+
     public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
 
     /**
@@ -2281,8 +2297,6 @@ public class BesApi {
 
     }
 
-    public static final String DEFAULT_CATALOG   = "catalog";
-    public static final String DEFAULT_CONTAINER = "catalogContainer";
 
     /**
      * This method defines which "space" (aka catalog) the BES will use to service a request.
@@ -2291,7 +2305,7 @@ public class BesApi {
      *
      * @return The name os the BES "space" (aka catalog) which will be used to service the request.
      */
-    protected String getBesSpaceName(){ return DEFAULT_CATALOG; }
+    protected String getBesSpaceName(){ return DEFAULT_BES_SPACE; }
 
     /**
      * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
@@ -2299,7 +2313,7 @@ public class BesApi {
      * @return The name of the BES "container" which will be built into teh request document.
      */
     protected String getBesContainerName(){
-        return DEFAULT_CONTAINER;
+        return DEFAULT_BES_CONTAINER;
     }
 
 
