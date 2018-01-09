@@ -82,7 +82,7 @@ public class PathBuilder  {
             result = path1;
         }
         else {
-            while (path2.startsWith("/") && path2.length() > 0) {
+            while (path2.startsWith("/")) {
                 path2 = path2.substring(1);
             }
             if (path1.endsWith("/")) {

@@ -157,8 +157,8 @@ public class BesGatewayApi extends BesApi {
         try {
             int statusCode = httpClient.executeMethod(headReq);
             if (statusCode != HttpStatus.SC_OK) {
-                log.error("Unable to HEAD remote resource: " + dataSourceUrl);
-                String msg = "OLFS: Unable to access requested resource: " + dataSourceUrl;
+                String msg = "Remote Service Returned HTTP-Status: "+statusCode;
+                log.error(msg);
                 throw new OPeNDAPException(statusCode,msg);
             }
 
