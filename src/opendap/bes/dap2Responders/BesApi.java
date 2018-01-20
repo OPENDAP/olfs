@@ -118,6 +118,22 @@ public class BesApi {
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
 
 
+    /**
+     * This specifies that the default BES "space" name is "catalog".
+     * In more common parlance it's "the catalog called catalog" the utilizes
+     * the BES.Catalog.catalog.RootDirectory filesystem as the catalog.
+     */
+    public static final String DEFAULT_BES_SPACE = "catalog";
+
+    /**
+     * This specifes the sdeafult BES "container" name. While this name could
+     * pretty much be "foo" or some nonsensical string for the sake of BES
+     * command readability a value should be chosen that relates to the BES "space"
+     * name that is being used.
+     */
+    public static final String DEFAULT_BES_CONTAINER = "catalogContainer";
+
+
     public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
 
     /**
@@ -2262,10 +2278,10 @@ public class BesApi {
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
 
-        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));
+        request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
         Element def = defineElement("d1","default");
-        e = (containerElement("catalogContainer"));
+        e = (containerElement(getBesContainerName()));
 
         if(ce!=null && !ce.equals(""))
             e.addContent(constraintElement(ce));
@@ -2282,6 +2298,25 @@ public class BesApi {
 
 
 
+    }
+
+
+    /**
+     * This method defines which "space" (aka catalog) the BES will use to service a request.
+     * THis method in order to simplify the implementations of the the BesAPI (child classes thereof)
+     * that need only  modify the catalog name to achieve their goals.
+     *
+     * @return The name os the BES "space" (aka catalog) which will be used to service the request.
+     */
+    protected String getBesSpaceName(){ return DEFAULT_BES_SPACE; }
+
+    /**
+     * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
+     * the BES commands readable and consistent we typically associate it with the "space" name.
+     * @return The name of the BES "container" which will be built into teh request document.
+     */
+    protected String getBesContainerName(){
+        return DEFAULT_BES_CONTAINER;
     }
 
 
@@ -2325,10 +2360,10 @@ public class BesApi {
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
 
-        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));
+        request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
         Element def = defineElement("d1","default");
-        e = (containerElement("catalogContainer"));
+        e = (containerElement(getBesContainerName()));
 
         if(qp.getCe()!=null && !qp.getCe().equals(""))
             e.addContent(dap4ConstraintElement(qp.getCe()));
@@ -2362,8 +2397,6 @@ public class BesApi {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
         //request.addContent(w10nRequestElement(besDataSource,queryString,mediaType,maxResponseSize));
-
-
 
         request.addContent(showPathInfoRequestElement(besDataSource));
 

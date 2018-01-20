@@ -183,7 +183,6 @@ public class Util {
         ps.println("</ul>");
 
         ps.println("<h3>Runtime Info:</h3>");
-
         Runtime rt = Runtime.getRuntime();
         ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)<br>");
         ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)<br>");
@@ -201,7 +200,6 @@ public class Util {
 
     public static String urlInfo(URL url){
         String msg = "\n";
-
         msg += "URL: "+url.toString()+"\n";
         msg += "  protocol:      "+url.getProtocol()+"\n";
         msg += "  host:          "+url.getHost()+"\n";
@@ -219,15 +217,12 @@ public class Util {
         } catch (URISyntaxException e) {
             msg += "  URI:            error: Could not express the URL as URI because: "+e.getMessage()+"\n";
         }
-
         return msg;
     }
 
     public static String uriInfo(URI uri){
 
         String msg = "\n";
-
-
         msg += "URI: "+uri.toString()+"\n";
         msg += "  Authority:              "+uri.getAuthority()+"\n";
         msg += "  Host:                   "+uri.getHost()+"\n";
@@ -261,8 +256,6 @@ public class Util {
 
     public static String checkRegex(Matcher m, boolean isMatched){
         StringBuilder s = new StringBuilder();
-
-
         s.append("\n---------------------------------------------------\n");
         s.append("checkRegex():\n");
         s.append("  Matcher.find():        ").append(isMatched).append("\n");
@@ -275,7 +268,6 @@ public class Util {
             s.append("  Matcher.start():       ").append(m.start()).append("\n");
             s.append("  Matcher.end():         ").append(m.end()).append("\n");
         }
-
         s.append("\n");
         return s.toString();
     }
@@ -284,18 +276,12 @@ public class Util {
 
 
     public static String dropSuffixFrom(String s, Pattern suffixPattern){
-
         Logger log =  LoggerFactory.getLogger(Util.class);
         log.debug("dropSuffixFrom() - regex: '{}'   inputString: '{}'",suffixPattern.pattern(),s);
-
-
-        Matcher suffixMatcher = suffixPattern.matcher(s);
-
-        boolean suffixMatched = false;
-
         String result = s;
 
-
+        Matcher suffixMatcher = suffixPattern.matcher(s);
+        boolean suffixMatched = false;
         while(!suffixMatcher.hitEnd()){
             suffixMatched = suffixMatcher.find();
             log.debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
@@ -304,20 +290,14 @@ public class Util {
             int start =  suffixMatcher.start();
             result =  s.substring(0, start);
         }
-
         log.debug("dropSuffixFrom() - returning '{}'",result);
-
         return result;
     }
 
 
     public static boolean matchesSuffixPattern(String s, Pattern suffixPattern){
-
         Matcher suffixMatcher = suffixPattern.matcher(s);
-
         boolean suffixMatched = false;
-
-
         while(!suffixMatcher.hitEnd()){
             suffixMatched = suffixMatcher.find();
             LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
@@ -325,12 +305,7 @@ public class Util {
         if(suffixMatched){
             return true;
         }
-
-
         return false;
-
-
-
     }
 
 
