@@ -100,8 +100,8 @@
                             <th align="left">Dataset</th>
                             <th align="center">Size</th>
                             <th align="center">Last Modified</th>
-                            <th align="center">DAP2 Links</th>
-                            <th align="center">DAP4 Links</th>
+                            <th align="center">DAP2</th>
+                            <th align="center">DAP4</th>
                         </tr>
 
 
@@ -298,14 +298,14 @@
                         <!--xsl:with-param name="inheritedMetadata" select="$inheritedMetadata[boolean($inheritedMetadata)]" / -->
                     </xsl:call-template>
                     <td align="center">
-                        <a style="padding-right: 10px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dds</xsl:attribute>dds</a>
-                        <a style="padding-right: 10px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.das</xsl:attribute>das</a>
-                        <a style="padding-right: 10px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.html</xsl:attribute>request form</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dds</xsl:attribute>dds</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.das</xsl:attribute>das</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.html</xsl:attribute>html</a>
 
                     </td>
                     <td align="center">
-                        <a style="padding-right: 10px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.xml</xsl:attribute>dmr</a>
-                        <a style="padding-right: 10px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.html</xsl:attribute>request form</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.xml</xsl:attribute>dmr</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.html</xsl:attribute>html</a>
 
                     </td>
                 </tr>
