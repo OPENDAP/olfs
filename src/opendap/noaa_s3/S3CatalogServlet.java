@@ -442,14 +442,8 @@ public class S3CatalogServlet extends HttpServlet {
 
         long lmt = s3i.getLastModified();
         if(lmt!=-1 && newIndex){
-            try {
-                S3CatalogManager.theManager().putIndex(s3i);
-                _log.debug("getCatalogLastModified() - Cached (in memory) S3Index for '{}'", requestUrl);
-            } catch (JDOMException  | IOException e) {
-                String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems." +
-                        " Caught "+e.getClass().getName()+" message: "+e.getMessage();
-                _log.error(msg);
-            }
+            S3CatalogManager.theManager().putIndex(s3i);
+            _log.debug("getCatalogLastModified() - Cached (in memory) S3Index for '{}'", requestUrl);
         }
         _log.debug("getCatalogLastModified() - END ({})",lmt);
         return lmt;
@@ -504,20 +498,14 @@ public class S3CatalogServlet extends HttpServlet {
             xmlo.output(threddsDoc,response.getOutputStream());
 
             if(newIndex) {
-                try {
-                    S3CatalogManager.theManager().putIndex(s3i);
-                    _log.debug("directoryDispatch() - Cached S3Index for '{}'",requestUrl);
-                } catch (JDOMException | IOException e) {
-                    String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. " +
-                            "Caught "+e.getClass().getName()+" message: "+e.getMessage();
-                    _log.error(msg);
-                }
+                S3CatalogManager.theManager().putIndex(s3i);
+                _log.debug("directoryDispatch() - Cached S3Index for '{}'",requestUrl);
             }
             handled = true;
         } catch (IOException e) {
-            _log.error("Unable to access s3 object: {} Msg: {}",s3i.getResourceUrl(),e.getMessage());
+            _log.error("IOException - Unable to access s3 object: {} Msg: {}",s3i.getResourceUrl(),e.getMessage());
         } catch (JDOMException e) {
-            _log.error("Unable to parse s3 Index: {} Msg: {}", s3i.getResourceUrl(), e.getMessage());
+            _log.error("JDOMException - Unable to parse s3 Index: {} Msg: {}", s3i.getResourceUrl(), e.getMessage());
         }
         _log.debug("directoryDispatch() - END ({})", handled);
         return handled;
