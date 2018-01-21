@@ -48,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,19 +68,11 @@ public class S3CatalogServlet extends HttpServlet {
      * @serial
      */
     private AtomicInteger reqNumber;
-
-
     private org.slf4j.Logger _log;
     private boolean _initialized;
-
     //private String systemPath;
     private AtomicInteger _reqNumber;
-
-
     private Document _configDoc;
-
-
-
     private S3DapDispatchHandler _s3DapDispatcher;
 
     public static final String defaultDapServiceContext = "/dap";
@@ -88,62 +81,38 @@ public class S3CatalogServlet extends HttpServlet {
 
 
     public S3CatalogServlet() {
-
         _initialized = false;
         _reqNumber = new AtomicInteger(0);
         //_servletContext = null;
     }
 
-
-
     @Override
     public void init() throws ServletException {
 
         if(_initialized) return;
-
         super.init();
         initLogging();
-
         RequestCache.openThreadCache();
-
         reqNumber = new AtomicInteger(0);
-
-
 
         // init logging
         LogUtil.logServerStartup("init()");
         _log.info("init() start.");
-
         PersistentConfigurationHandler.installDefaultConfiguration(this,"s3.xml");
-
-
         ingestConfig();
-
-
-        //###############################################################################################
-        // This bit should be read from the configuration too - just like in opendap.coreServlet.DispatchServlet
-
         _s3DapDispatcher = new S3DapDispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
-
         try {
-            Element besConfiguration = getDefaultBesManagerConfig();
+            Element besConfiguration = getBesManagerConfig();
             BESManager besManager = new BESManager();
             besManager.init(besConfiguration);
-            _s3DapDispatcher.init(this, getDefaultDapDispatchConfig() );
+            _s3DapDispatcher.init(this, getDapDispatConfig() );
 
         } catch (Exception e) {
             _log.error("Failed to initialize {}", _s3DapDispatcher.getClass().getName());
             throw new ServletException(e);
         }
-
-        //###############################################################################################
-
-
-
         RequestCache.closeThreadCache();
         _log.info("init() complete.");
-
-
         _initialized = true;
     }
 
@@ -152,9 +121,7 @@ public class S3CatalogServlet extends HttpServlet {
     private void ingestConfig() throws ServletException {
 
         loadConfig();
-
         String servletContextPath = getServletContext().getContextPath();
-
         Element s3Config = _configDoc.getRootElement();
 
         //=================================================================================
@@ -323,14 +290,6 @@ public class S3CatalogServlet extends HttpServlet {
 
     }
 
-
-
-
-
-
-
-
-
     /**
      * Starts the logging process.
      */
@@ -340,67 +299,50 @@ public class S3CatalogServlet extends HttpServlet {
 
     }
 
+    private Element getDapDispatConfig(){
+        Element dapDispatchConfig = _configDoc.getRootElement().getChild("DapDispatch");
 
-
-    Element getDefaultDapDispatchConfig() {
-        Element config = new Element("config");
-
-        // config.addContent(new Element("AllowDirectDataSourceAccess"));
-        config.addContent(new Element("UseDAP2ResourceUrlResponse"));
-
-        return config;
+        if(dapDispatchConfig == null) {
+            dapDispatchConfig = new Element("config");
+            // config.addContent(new Element("AllowDirectDataSourceAccess"));
+            dapDispatchConfig.addContent(new Element("UseDAP2ResourceUrlResponse"));
+        }
+        return dapDispatchConfig;
     }
 
 
-    Element getDefaultBesManagerConfig() {
+    private Element getBesManagerConfig() {
+        Element besManagerConfig = _configDoc.getRootElement().getChild("BESManager");
+        if(besManagerConfig==null){
+            Element e;
+            besManagerConfig = new Element("BESManager");
 
-        Element e;
-        Element handler = new Element("Handler");
-        handler.setAttribute("className","opendap.bes.BESManager");
+            Element bes = new Element("BES");
+            besManagerConfig.addContent(bes);
 
-        Element bes = new Element("BES");
-        handler.addContent(bes);
+            e = new Element("prefix");
+            e.setText("/");
+            bes.addContent(e);
 
-        e = new Element("prefix");
-        e.setText("/");
-        bes.addContent(e);
+            e = new Element("host");
+            e.setText("localhost");
+            bes.addContent(e);
 
+            e = new Element("port");
+            e.setText("10022");
+            bes.addContent(e);
 
-        e = new Element("host");
-        e.setText("localhost");
-        bes.addContent(e);
+            e = new Element("maxResponseSize");
+            e.setText("0");
+            bes.addContent(e);
 
-
-        //e = new Element("adminPort");
-        //e.setText("11022");
-        //bes.addContent(e);
-
-
-        e = new Element("port");
-        e.setText("10022");
-        bes.addContent(e);
-
-
-        e = new Element("maxResponseSize");
-        e.setText("0");
-        bes.addContent(e);
-
-
-        e = new Element("ClientPool");
-        e.setAttribute("maximum","10");
-        e.setAttribute("maxCmds","2000");
-        bes.addContent(e);
-
-
-
-        return handler;
+            e = new Element("ClientPool");
+            e.setAttribute("maximum","10");
+            e.setAttribute("maxCmds","2000");
+            bes.addContent(e);
+        }
+        return besManagerConfig;
     }
-
-
-
-
-
-
 
     private boolean redirectToCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String relativeUrl =ReqInfo.getLocalUrl(req);
@@ -415,7 +357,6 @@ public class S3CatalogServlet extends HttpServlet {
 
         return false;
     }
-
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
@@ -480,12 +421,9 @@ public class S3CatalogServlet extends HttpServlet {
     public long getLastModified(HttpServletRequest req) {
 
         Procedure tKey = Timer.start();
-
-
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
-        long lmt = -1;
-
+        long lmt = new Date().getTime();
 
         String requestURI = req.getRequestURI();
         String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
@@ -499,19 +437,14 @@ public class S3CatalogServlet extends HttpServlet {
             LogUtil.logServerAccessStart(req, "S3_DAP_ACCESS", "LastModified", Long.toString(reqno));
             lmt = _s3DapDispatcher.getLastModified(req);
         }
-
         Timer.stop(tKey);
         return lmt;
-
-
-
     }
 
 
 
     public void destroy() {
         _log.info("Destroy complete.");
-
     }
 
 
@@ -522,17 +455,13 @@ public class S3CatalogServlet extends HttpServlet {
         String requestUrl = req.getRequestURL().toString();
         String relativeURL = ReqInfo.getLocalUrl(req);
         String indexId = getS3IndexId(req);
-
-
         S3Index s3i;
         boolean newIndex = false;
 
         s3i = S3CatalogManager.theManager().getIndex(indexId);
-
         if(s3i == null) {
             String bucketName = S3CatalogManager.theManager().getBucketName(relativeURL);
             String bucketContext = S3CatalogManager.theManager().getBucketContext(relativeURL);
-
             s3i = new S3Index(req, bucketContext, bucketName);
             newIndex = true;
             _log.debug("getCatalogLastModified() - Making new S3Index for '{}'",requestUrl);
@@ -542,7 +471,6 @@ public class S3CatalogServlet extends HttpServlet {
         }
 
         long lmt = s3i.getLastModified();
-
         if(lmt!=-1 && newIndex){
             try {
                 S3CatalogManager.theManager().putIndex(s3i);
@@ -550,20 +478,13 @@ public class S3CatalogServlet extends HttpServlet {
             } catch (JDOMException e) {
                 String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
                 _log.error(msg);
-
             } catch (IOException e) {
                 String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
                 _log.error(msg);
             }
         }
-
-
         _log.debug("getCatalogLastModified() - END ({})",lmt);
-
-
         return lmt;
-
-
     }
 
 
@@ -583,10 +504,7 @@ public class S3CatalogServlet extends HttpServlet {
                                      HttpServletResponse response)  {
 
         _log.debug("directoryDispatch() - BEGIN");
-
         boolean handled = false;
-
-
         String requestUrl = request.getRequestURL().toString();
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String indexId = getS3IndexId(request);
@@ -594,9 +512,7 @@ public class S3CatalogServlet extends HttpServlet {
         String bucketContext = S3CatalogManager.theManager().getBucketContext(relativeUrl);
         String bucketName = S3CatalogManager.theManager().getBucketName(relativeUrl);
 
-        S3Index s3i;
-
-        s3i = S3CatalogManager.theManager().getIndex(indexId);
+        S3Index s3i = S3CatalogManager.theManager().getIndex(indexId);
         boolean newIndex = false;
         if(s3i == null) {
             s3i = new S3Index(request,bucketContext, bucketName);
@@ -605,18 +521,12 @@ public class S3CatalogServlet extends HttpServlet {
         }
         else {
             _log.debug("directoryDispatch() - Retrieved cached S3Index for '{}'",requestUrl);
-
         }
-
-
         try {
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
             Element catalog = s3i.getThreddsCatalog();
-
             Document threddsDoc = new Document();
-
 
             HashMap<String,String> piMap = new HashMap<String,String>( 2 );
             piMap.put( "type", "text/xsl" );
@@ -624,14 +534,9 @@ public class S3CatalogServlet extends HttpServlet {
             ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
 
             threddsDoc.addContent(pi);
-
             threddsDoc.setRootElement(catalog);
-
-
             response.setContentType("text/xml");
-
             xmlo.output(threddsDoc,response.getOutputStream());
-
 
             if(newIndex) {
                 try {
@@ -640,25 +545,19 @@ public class S3CatalogServlet extends HttpServlet {
                 } catch (JDOMException e) {
                     String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
                     _log.error(msg);
-
                 } catch (IOException e) {
                     String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
                     _log.error(msg);
                 }
             }
-
             handled = true;
-
         } catch (IOException e) {
             _log.error("Unable to access s3 object: {} Msg: {}",s3i.getResourceUrl(),e.getMessage());
         } catch (JDOMException e) {
             _log.error("Unable to parse s3 Index: {} Msg: {}", s3i.getResourceUrl(), e.getMessage());
         }
-
         _log.debug("directoryDispatch() - END ({})", handled);
-
         return handled;
-
     }
 
 
