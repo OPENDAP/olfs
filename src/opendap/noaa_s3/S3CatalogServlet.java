@@ -35,7 +35,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.ProcessingInstruction;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -43,11 +42,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,7 +62,6 @@ public class S3CatalogServlet extends HttpServlet {
      *
      * @serial
      */
-    private AtomicInteger reqNumber;
     private org.slf4j.Logger _log;
     private boolean _initialized;
     //private String systemPath;
@@ -75,9 +69,9 @@ public class S3CatalogServlet extends HttpServlet {
     private Document _configDoc;
     private S3DapDispatchHandler _s3DapDispatcher;
 
-    public static final String defaultDapServiceContext = "/dap";
-    public static final String defaultCatalogServiceContext = "/catalog";
-    public static final String defaultCacheDir = "/tmp/S3";
+    private static final String defaultDapServiceContext = "/dap";
+    private static final String defaultCatalogServiceContext = "/catalog";
+    private static final String defaultCacheDir = "/tmp/S3";
 
 
     public S3CatalogServlet() {
@@ -93,7 +87,6 @@ public class S3CatalogServlet extends HttpServlet {
         super.init();
         initLogging();
         RequestCache.openThreadCache();
-        reqNumber = new AtomicInteger(0);
 
         // init logging
         LogUtil.logServerStartup("init()");
@@ -139,7 +132,6 @@ public class S3CatalogServlet extends HttpServlet {
         else {
             dapServiceContext = defaultDapServiceContext;
             _log.warn("ingestConfig() - DapService element is missing. Using default DAP service context.");
-
         }
         S3CatalogManager.theManager().setDapServiceContext(servletContextPath + dapServiceContext);
         _log.info("ingestConfig() - DapService context is set to '{}'",S3CatalogManager.theManager().getDapServiceContext());
@@ -165,7 +157,6 @@ public class S3CatalogServlet extends HttpServlet {
         S3CatalogManager.theManager().setCatalogServiceContext(servletContextPath + catalogServiceContext);
         _log.info("ingestConfig() - CatalogService context is set to '{}'",S3CatalogManager.theManager().getCatalogServiceContext());
 
-
         //=================================================================================
         //   Cache Directory Config
         //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -181,12 +172,9 @@ public class S3CatalogServlet extends HttpServlet {
         else {
             cacheDir = defaultCacheDir;
             _log.warn("ingestConfig() - CatalogCache element is missing. Using default Catalog cache directory.");
-
         }
         _log.info("ingestConfig() - Catalog cache directory is set to '{}'",cacheDir);
         S3CatalogManager.theManager().setS3CatalogCacheDir(cacheDir);
-
-
 
         //=================================================================================
         //   Bucket Config
@@ -194,15 +182,13 @@ public class S3CatalogServlet extends HttpServlet {
         boolean hasBuckets = false;
         for(Object o :s3Config.getChildren("Bucket")){
             Element bucket = (Element) o;
-
             String name = bucket.getAttributeValue("name");
             String context = bucket.getAttributeValue("context");
-            String loadOnStart = bucket.getAttributeValue("loadCatalogOnStart");
+            String loadCatalogOnStart = bucket.getAttributeValue("loadCatalogOnStart");
 
             if(name==null){
                 _log.error("ingestConfig() - ERROR: Bucket element is missing the required 'name' attribute. SKIPPING...");
             }
-
             if(context==null){
                 context = name;
                 _log.warn("ingestConfig() - Bucket element is missing the optional 'context' attribute. Using bucket name '{}' as context name.",name);
@@ -211,8 +197,7 @@ public class S3CatalogServlet extends HttpServlet {
             _log.info("ingestConfig() - Adding bucket '{}' under context '{}'",name,context);
             S3CatalogManager.theManager().addBucket(context,name);
 
-            if(loadOnStart!=null && loadOnStart.equalsIgnoreCase("true")){
-
+            if(loadCatalogOnStart!=null && loadCatalogOnStart.equalsIgnoreCase("true")){
                 try {
                     _log.info("Loading Catalog Index Files For AWS S3 Bucket '{}'.",name);
                     S3CatalogManager.theManager().ingestIndex(context,name);
@@ -220,7 +205,6 @@ public class S3CatalogServlet extends HttpServlet {
                     String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' msg: "+e.getMessage();
                     throw new ServletException(msg,e);
                 }
-
                 try {
                     _log.info("Loading Catalog File References From Index Of AWS S3 Bucket '{}'.",name);
                     S3CatalogManager.theManager().ingestIndexedFiles(context, name);
@@ -228,21 +212,13 @@ public class S3CatalogServlet extends HttpServlet {
                     String msg = "ERROR! Failed to ingest Index of bucket '"+name+"' msg: "+e.getMessage();
                     throw new ServletException(msg,e);
                 }
-
-
-
             }
             hasBuckets = true;
         }
-
         if(!hasBuckets) {
             String msg = "ERROR! The S3 service configuration contains no buckets! I can haz BUCKETS?!?! ";
             throw new ServletException(msg);
         }
-
-
-
-
     }
 
 
@@ -267,15 +243,11 @@ public class S3CatalogServlet extends HttpServlet {
             System.err.println(msg);
             throw new ServletException(msg);
         }
-
         filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
 
         _log.debug("Loading Configuration File: " + filename);
-
-
         try {
             _configDoc = opendap.xml.Util.getDocument(filename);
-
         } catch (IOException e) {
             String msg = "OLFS configuration file \"" + filename + "\" is not readable. msg: "+e.getMessage();
             _log.error(msg);
@@ -285,9 +257,7 @@ public class S3CatalogServlet extends HttpServlet {
             _log.error(msg);
             throw new ServletException(msg, e);
         }
-
         _log.debug("Configuration loaded and parsed.");
-
     }
 
     /**
@@ -303,9 +273,18 @@ public class S3CatalogServlet extends HttpServlet {
         Element dapDispatchConfig = _configDoc.getRootElement().getChild("DapDispatch");
 
         if(dapDispatchConfig == null) {
-            dapDispatchConfig = new Element("config");
+            _log.warn("getDapDispatConfig() - DapDispatch element not found in configuration file. Using defaults.");
+            dapDispatchConfig = new Element("DapDispatch");
             // config.addContent(new Element("AllowDirectDataSourceAccess"));
             dapDispatchConfig.addContent(new Element("UseDAP2ResourceUrlResponse"));
+        }
+        else {
+            _log.debug("getDapDispatConfig() - Found DapDispatch element in configuration file.");
+        }
+        if(_log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            _log.debug("getDapDispatConfig() - Using DapDispatch config:\n{}",xmlo.outputString(dapDispatchConfig));
+
         }
         return dapDispatchConfig;
     }
@@ -314,6 +293,7 @@ public class S3CatalogServlet extends HttpServlet {
     private Element getBesManagerConfig() {
         Element besManagerConfig = _configDoc.getRootElement().getChild("BESManager");
         if(besManagerConfig==null){
+            _log.warn("getBesManagerConfig() - BESManager element not found in configuration file. Using defaults.");
             Element e;
             besManagerConfig = new Element("BESManager");
 
@@ -341,6 +321,14 @@ public class S3CatalogServlet extends HttpServlet {
             e.setAttribute("maxCmds","2000");
             bes.addContent(e);
         }
+        else {
+            _log.debug("getBesManagerConfig() - Found BESManager element in configuration file.");
+        }
+        if(_log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            _log.debug("getBesManagerConfig() - Using BESManager config:\n{}",xmlo.outputString(besManagerConfig));
+
+        }
         return besManagerConfig;
     }
 
@@ -352,45 +340,34 @@ public class S3CatalogServlet extends HttpServlet {
             res.sendRedirect(Scrub.urlContent(redirectTo));
             _log.debug("redirectToCatalog() Redirected request for node to THREDDS catalog: {}", redirectTo);
             return true;
-
         }
-
         return false;
     }
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
-
         Procedure tKey = Timer.start();
         int status = HttpServletResponse.SC_OK;
-
         try {
             LogUtil.logServerAccessStart(request, "S3_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
-
             if (!redirectToCatalog(request, response)) {  // Do we send the catalog redirect?
-
-
                 String requestURI = request.getRequestURI();
                 String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
                 String dapServiceContext = S3CatalogManager.theManager().getDapServiceContext();
-
                 if (requestURI.startsWith(catalogServiceContext)) {
                     if (!directoryDispatch(request, response)) {  // Is it a catalog request?
                         // We don't know how to cope, looks like it's time to 404!
                         status = HttpServletResponse.SC_NOT_FOUND;
                         response.sendError(status, "Unable to locate requested catalog.");
                         _log.info("Sent 404 Response.");
-
                     }
                 } else if (requestURI.startsWith(dapServiceContext)) {
-
                     if (!_s3DapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
 
                         // We don't know how to cope, looks like it's time to 404!
                         status = HttpServletResponse.SC_NOT_FOUND;
                         response.sendError(status, "Unable to locate requested DAP dataset.");
                         _log.info("Sent 404 Response.");
-
                     }
                 }
                 else {   // It's not a catalog request, and it's not a dap request, so:
@@ -399,10 +376,7 @@ public class S3CatalogServlet extends HttpServlet {
                     response.sendError(status, "Unable to locate requested resource.");
                     _log.info("Sent 404 Response.");
                 }
-
-
             }
-
         } catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, this, response);
@@ -413,9 +387,7 @@ public class S3CatalogServlet extends HttpServlet {
             RequestCache.closeThreadCache();
             LogUtil.logServerAccessEnd(status, "S3_ACCESS");
             Timer.stop(tKey);
-
         }
-
     }
 
     public long getLastModified(HttpServletRequest req) {
@@ -448,9 +420,7 @@ public class S3CatalogServlet extends HttpServlet {
     }
 
 
-
-
-    public long getCatalogLastModified(HttpServletRequest req){
+    private long getCatalogLastModified(HttpServletRequest req){
 
         String requestUrl = req.getRequestURL().toString();
         String relativeURL = ReqInfo.getLocalUrl(req);
@@ -475,11 +445,9 @@ public class S3CatalogServlet extends HttpServlet {
             try {
                 S3CatalogManager.theManager().putIndex(s3i);
                 _log.debug("getCatalogLastModified() - Cached (in memory) S3Index for '{}'", requestUrl);
-            } catch (JDOMException e) {
-                String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
-                _log.error(msg);
-            } catch (IOException e) {
-                String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
+            } catch (JDOMException  | IOException e) {
+                String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems." +
+                        " Caught "+e.getClass().getName()+" message: "+e.getMessage();
                 _log.error(msg);
             }
         }
@@ -498,11 +466,9 @@ public class S3CatalogServlet extends HttpServlet {
      * @param response     .
      * @return true if the request was serviced as a directory request, false
      *         otherwise.
-     * @throws Exception .
      */
     private boolean directoryDispatch(HttpServletRequest request,
                                      HttpServletResponse response)  {
-
         _log.debug("directoryDispatch() - BEGIN");
         boolean handled = false;
         String requestUrl = request.getRequestURL().toString();
@@ -523,12 +489,11 @@ public class S3CatalogServlet extends HttpServlet {
             _log.debug("directoryDispatch() - Retrieved cached S3Index for '{}'",requestUrl);
         }
         try {
-
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             Element catalog = s3i.getThreddsCatalog();
             Document threddsDoc = new Document();
 
-            HashMap<String,String> piMap = new HashMap<String,String>( 2 );
+            HashMap<String,String> piMap = new HashMap<>( 2 );
             piMap.put( "type", "text/xsl" );
             piMap.put( "href", getServletContext().getContextPath() +"/xsl/threddsPresentation.xsl" );
             ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
@@ -542,11 +507,9 @@ public class S3CatalogServlet extends HttpServlet {
                 try {
                     S3CatalogManager.theManager().putIndex(s3i);
                     _log.debug("directoryDispatch() - Cached S3Index for '{}'",requestUrl);
-                } catch (JDOMException e) {
-                    String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
-                    _log.error(msg);
-                } catch (IOException e) {
-                    String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. message: "+e.getMessage();
+                } catch (JDOMException | IOException e) {
+                    String msg = "ERROR! Failed to add new index '"+s3i+"' to  collection. This may cause problems. " +
+                            "Caught "+e.getClass().getName()+" message: "+e.getMessage();
                     _log.error(msg);
                 }
             }
@@ -563,15 +526,10 @@ public class S3CatalogServlet extends HttpServlet {
 
 
     private  String getS3IndexId(HttpServletRequest request){
-
         StringBuilder sb = new StringBuilder();
-
         String collectionName = getCollectionName(request);
-
         sb.append(collectionName).append(S3Index.getCatalogIndexString());
-
         return sb.toString();
-
     }
 
 
@@ -579,9 +537,7 @@ public class S3CatalogServlet extends HttpServlet {
     private  String getCollectionName(HttpServletRequest request){
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-
         String collectionName  = Scrub.urlContent(relativeUrl);
-
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
         }
@@ -591,7 +547,6 @@ public class S3CatalogServlet extends HttpServlet {
         else if(collectionName.endsWith("/catalog.xml")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.xml"));
         }
-
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
@@ -599,9 +554,6 @@ public class S3CatalogServlet extends HttpServlet {
             collectionName = collectionName.substring(1);
 
         _log.debug("getCollectionName() returning  "+collectionName);
-
         return collectionName;
     }
-
-
 }
