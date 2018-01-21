@@ -345,7 +345,8 @@ public class S3CatalogServlet extends HttpServlet {
     Element getDefaultDapDispatchConfig() {
         Element config = new Element("config");
 
-        config.addContent(new Element("AllowDirectDataSourceAccess"));
+        // config.addContent(new Element("AllowDirectDataSourceAccess"));
+        config.addContent(new Element("UseDAP2ResourceUrlResponse"));
 
         return config;
     }
