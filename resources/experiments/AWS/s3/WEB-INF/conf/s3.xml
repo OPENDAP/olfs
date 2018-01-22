@@ -31,4 +31,22 @@
     <CatalogCache>/tmp/s3CatalogCache</CatalogCache>
     <Bucket name="opendap.test" context="/test" loadCatalogOnStart="true" />
     <Bucket name="testbed-13" context="/tb13" loadCatalogOnStart="true" />
+    
+    <DapDispatch>
+        <!-- AllowDirectDataSourceAccess / -->
+        <UseDAP2ResourceUrlResponse />
+    </DapDispatch>
+
+    <BESManager>
+        <BES>
+            <prefix>/</prefix>
+            <host>localhost</host>
+            <port>10022</port>
+            <!-- <timeOut>300</timeOut> -->
+            <!-- <adminPort>11002</adminPort> -->
+            <maxResponseSize>0</maxResponseSize>
+            <ClientPool maximum="200" maxCmds="2000" />
+        </BES>
+    </BESManager>
+
 </S3Config>

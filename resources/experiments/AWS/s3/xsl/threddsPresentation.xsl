@@ -100,6 +100,8 @@
                             <th align="left">Dataset</th>
                             <th align="center">Size</th>
                             <th align="center">Last Modified</th>
+                            <th align="center">DAP2</th>
+                            <th align="center">DAP4</th>
                         </tr>
 
 
@@ -284,7 +286,7 @@
                             <dt>@urlPath</dt><dd><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/></dd>
                         </dl -->
 
-                        <a><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/></xsl:attribute>
+                        <a><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.html</xsl:attribute>
                             <xsl:value-of select="@name"/>
                         </a>
 
@@ -295,6 +297,17 @@
                         <xsl:with-param name="metadata" select="thredds:metadata" />
                         <!--xsl:with-param name="inheritedMetadata" select="$inheritedMetadata[boolean($inheritedMetadata)]" / -->
                     </xsl:call-template>
+                    <td align="center">
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dds</xsl:attribute>dds</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.das</xsl:attribute>das</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.html</xsl:attribute>html</a>
+
+                    </td>
+                    <td align="center">
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.xml</xsl:attribute>dmr</a>
+                        <a style="padding-right: 7px;"><xsl:attribute name="href"><xsl:value-of select="$dapServiceBase"/><xsl:value-of select="thredds:access[./@serviceName='dap']/@urlPath"/>.dmr.html</xsl:attribute>html</a>
+
+                    </td>
                 </tr>
                 <xsl:apply-templates>
                     <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
@@ -307,12 +320,18 @@
     </xsl:template>
 
     <xsl:template name="NoSizeNoTime" >
-            <td align="center">
-                --
-            </td>
-            <td align="center">
-                --
-            </td>
+        <td align="center">
+            --
+        </td>
+        <td align="center">
+            --
+        </td>
+        <td align="center">
+            --
+        </td>
+        <td align="center">
+            --
+        </td>
     </xsl:template>
 
 
