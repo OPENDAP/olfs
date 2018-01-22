@@ -56,12 +56,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class S3CatalogServlet extends HttpServlet {
 
-    /**
-     * ************************************************************************
-     * A thread safe hit counter
-     *
-     * @serial
-     */
     private org.slf4j.Logger _log;
     private boolean _initialized;
     //private String systemPath;
