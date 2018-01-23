@@ -1,0 +1,14 @@
+netcdf test {
+dimensions:
+	COADSX = 180 ;
+variables:
+	double COADSX(COADSX) ;
+		COADSX:units = "degrees_east" ;
+		COADSX:modulo = " " ;
+		COADSX:point_spacing = "even" ;
+
+// global attributes:
+		:history = "FERRET V4.30 (debug/no GUI) 15-Aug-96\n",
+			"removed date-time GMT Hyrax-“aws-dmr++” http://localhost:8080/s3/dap/test/data/nc/coads_climatology.nc.nc4?COADSX" ;
+		:DODS_EXTRA.Unlimited_Dimension = "TIME" ;
+}

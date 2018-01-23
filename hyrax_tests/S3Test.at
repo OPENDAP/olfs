@@ -1,0 +1,59 @@
+# Process with autom4te to create an -*- Autotest -*- test suite.
+# Like so: autom4te --language=autotest -I '.' -o S3Test S3Test.at
+# Then just run the tests ./S3Test
+
+AT_INIT([aws s3 tests])
+
+# replace 'besstandalone' with the name or names of the programs you're
+# using as test drivers (curl, ...)
+AT_TESTED([curl])
+
+m4_include([curl_test_macros.m4])
+
+
+####################################################
+# TestName: nc/coads_climatology_s3
+# BaseUrl:  http://localhost:8080/s3/dap/test/data/nc/coads_climatology.nc
+# DAP2 CE:  ?COADSX
+# DAP4 CE:  ?COADSX
+#
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.dds)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.das)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.html)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.info)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.ascii)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.html)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc/coads_climatology_s3.dods)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.dmr)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.dmr.html)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.dmr.xml)
+AT_CURL_RESPONSE_TEST(nc/coads_climatology_s3.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc/coads_climatology_s3.dap)
+# NetCDF 3 and 4
+AT_CURL_NETCDF_HEADER_AND_RESPONSE_TEST(nc/coads_climatology_s3.nc)
+AT_CURL_NETCDF_HEADER_AND_RESPONSE_TEST(nc/coads_climatology_s3.nc4)
+
+####################################################
+# TestName: nc/fnoc1.nc
+# BaseUrl:  http://localhost:8080/s3/dap/test/data/nc/fnoc1.nc
+# DAP2 CE:  ?u
+# DAP4 CE:  ?u
+#
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.dds)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.das)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.html)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.info)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.ascii)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.html)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.info)
+AT_CURL_DAP2_DATA_RESPONSE_TEST(nc/fnoc1.nc.dods)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.dmr)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.dmr.html)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.dmr.xml)
+AT_CURL_RESPONSE_TEST(nc/fnoc1.nc.dap.csv)
+AT_CURL_DAP4_DATA_RESPONSE_TEST(nc/fnoc1.nc.dap)
+# NetCDF 3 and 4
+AT_CURL_NETCDF_HEADER_AND_RESPONSE_TEST(nc/fnoc1.nc.nc)
+AT_CURL_NETCDF_HEADER_AND_RESPONSE_TEST(nc/fnoc1.nc.nc4)
+
