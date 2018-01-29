@@ -71,8 +71,8 @@ public class ServerCapabilities {
      */
     public static Vector<String> getSupportedFormatNames(URL dapServer){
         Vector<String> supportedFormatNames = new Vector<>();
-        supportedFormatNames.addAll(Collections.list(_responseFormats.keys())); // Confines use of ConcurrenthashMap to Map Interface and is compatible with Java-7 jre
-        // supportedFormatNames.addAll(_responseFormats.keySet()); // Utilizes Java-8 call that borks Java 7
+        supportedFormatNames.addAll(Collections.list(_responseFormats.keys())); // Confines use of ConcurrentHashMap to Map Interface and is compatible with Java-7 jre
+        // supportedFormatNames.addAll(_responseFormats.keySet()); // Utilizes Java-8 call that borks this when run on Java 7 JRE
         return supportedFormatNames;
     }
 
