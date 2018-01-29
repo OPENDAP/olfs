@@ -65,13 +65,13 @@ public class ServerCapabilities {
 
 
     /**
-     * Returns teh names of the supported formats as the appear in the OperationsMetadata for GetCoverage.
+     * Returns the names of the supported formats as the appear in the OperationsMetadata for GetCoverage.
      * @return
      * @param dapServer
      */
     public static Vector<String> getSupportedFormatNames(URL dapServer){
         Vector<String> supportedFormatNames = new Vector<>();
-        supportedFormatNames.addAll(Collections.list(_responseFormats.keys()));
+        supportedFormatNames.addAll(Collections.list(_responseFormats.keys())); // Confines use of ConcurrenthashMap to Map Interface and is compatible with Java-7 jre
         // supportedFormatNames.addAll(_responseFormats.keySet()); // Utilizes Java-8 call that borks Java 7
         return supportedFormatNames;
     }
