@@ -29,6 +29,8 @@ import opendap.wcs.v2_0.formats.*;
 import org.jdom.Element;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,7 +71,8 @@ public class ServerCapabilities {
      */
     public static Vector<String> getSupportedFormatNames(URL dapServer){
         Vector<String> supportedFormatNames = new Vector<>();
-        supportedFormatNames.addAll(_responseFormats.keySet());
+        supportedFormatNames.addAll(Collections.list(_responseFormats.keys()));
+        // supportedFormatNames.addAll(_responseFormats.keySet()); // Utilizes Java-8 call that borks Java 7
         return supportedFormatNames;
     }
 
