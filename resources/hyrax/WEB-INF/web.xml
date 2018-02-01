@@ -148,10 +148,41 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <filter>
+        <filter-name>IdP</filter-name>
+        <filter-class>opendap.auth.IdFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>/etc/olfs/idFilter.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>login_banner</param-name>
+            <param-value>BANNER</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>IdP</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Catalog Response Cache Updater (worker thread)
--->
+
+    <filter>
+        <filter-name>PEP</filter-name>
+        <filter-class>opendap.auth.PEPFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>/etc/olfs/PEPFilter.xml</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>PEP</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        Catalog Response Cache Updater (worker thread)
+    -->
     <listener>
         <listener-class>opendap.bes.caching.CatalogCacheUpdater</listener-class>
     </listener>

@@ -26,9 +26,7 @@
 
 package opendap.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 //import org.json.simple.JSONObject;
 
 // import java.util.ArrayList;
@@ -183,20 +181,17 @@ public class UserProfile {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-
-
         Gson gson = new Gson();
         String  jsonString = gson.toJson(_jsonInit);
-        JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
+        com.google.gson.JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
 
+        JsonArray myGroups = gson.fromJson(gson.toJson(_groups),JsonArray.class);
+        externalRepresentation.add("groups",myGroups);
 
+        JsonArray myRoles = gson.fromJson(gson.toJson(_roles),JsonArray.class);
+        externalRepresentation.add("roles",myRoles);
 
-        externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonObject.class));
-        externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonObject.class));
-
-        sb.append("UserProfile:").append(externalRepresentation.getAsString());
-
-
+        sb.append("UserProfile:").append(externalRepresentation.toString());
         return sb.toString();
 
 

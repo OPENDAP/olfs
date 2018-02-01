@@ -42,6 +42,7 @@ public class GuestProfile extends UserProfile{
         setAttribute("affiliation", "unknown");
 
         addGroup("guest");
+        addRole("guest");
     }
 
 }
