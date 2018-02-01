@@ -37,7 +37,6 @@
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
 
 
-
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
     <!-- relative to the project "Basedir" directory,  -->
@@ -51,12 +50,12 @@
          tag information from CVS.
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
-    <property name="OLFS_VERSION"  value="Not.A.Release"/>
-    <property name="WCS_VERSION"   value="${OLFS_VERSION}"/>
-    <property name="WEBAPP_DIST"   value="olfs-${OLFS_VERSION}-webapp"/>
-    <property name="SRC_DIST"      value="olfs-${OLFS_VERSION}-src"/>
-    <property name="DOC_DIST"      value="olfs-${OLFS_VERSION}-doc"/>
-    <property name="OLFS_LIB"      value="olfs-${OLFS_VERSION}"/>
+    <property name="OLFS_VERSION" value="Not.A.Release"/>
+    <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
+    <property name="WEBAPP_DIST" value="olfs-${OLFS_VERSION}-webapp"/>
+    <property name="SRC_DIST" value="olfs-${OLFS_VERSION}-src"/>
+    <property name="DOC_DIST" value="olfs-${OLFS_VERSION}-doc"/>
+    <property name="OLFS_LIB" value="olfs-${OLFS_VERSION}"/>
 
 
     <!-- Compiler Settings -->
@@ -69,7 +68,7 @@
     <property name="compile.SOURCE" value="1.7"/>
 
 
-    <property name="modern.compiler"  value="modern"/>
+    <property name="modern.compiler" value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
     <!--  build.compiler: This is a "magic" property.
@@ -82,7 +81,6 @@
     http://ant.apache.org/manual/index.html
     -->
     <property name="build.compiler" value="${modern.compiler}"/>
-
 
 
     <!-- build.sysclasspath
@@ -112,7 +110,6 @@
     http://ant.apache.org/manual/sysclasspath.html
     -->
     <property name="build.sysclasspath" value="ignore"/>
-
 
 
     <!-- ********************************************* -->
@@ -172,18 +169,15 @@
     <!-- ................................................................. -->
 
 
-
     <!-- Project directories -->
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
     <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
-    <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
+    <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
 
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
-
-
 
 
     <!-- Build Directories -->
@@ -202,61 +196,60 @@
     <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
-    <property name="json.lib"       value="gson-2.3.1.jar"/>
+    <property name="json.lib" value="gson-2.3.1.jar"/>
 
 
-    <property name="junit.lib"       value="junit-4.4.jar"/>
-    <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib"  value="urlrewrite-3.2.0.jar"/>
+    <property name="junit.lib" value="junit-4.4.jar"/>
+    <property name="jdom.lib" value="jdom-1.1.1.jar"/>
+    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
 
 
-    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
-    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
-    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+    <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib" value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/>
 
-    <property name="owlim.lib"            value="owlim-lite-4.3.jar"/>
-    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
+    <property name="owlim.lib" value="owlim-lite-4.3.jar"/>
+    <property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/>
 
-    <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
+    <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
-    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
-    <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
+    <property name="commons-lang.lib" value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-logging.lib" value="apache-commons-logging-1.1.3.jar"/>
+    <property name="commons-io.lib" value="apache-commons-io-2.4.jar"/>
 
 
-    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
+    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-
-    <property name="xalan.lib"         value="xalan.jar"/>
-    <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
+    <property name="xalan.lib" value="xalan.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
-    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
-    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+    <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-3.0.jar"/>
+    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
-    <property name="json.lib"      value="json-simple-1.1.1.jar"/>
+    <property name="json.lib" value="json-simple-1.1.1.jar"/>
 
 
     <!-- WCS Libs -->
-    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
-    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
-    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
-    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
-    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
-    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
-    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
+    <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib" value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
+    <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="owasp-encoder"     value="encoder-1.2.1.jar" />
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar" />
+    <property name="owasp-encoder" value="encoder-1.2.1.jar"/>
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar"/>
 
     <!-- Library (class)paths -->
     <path id="olfs.compile.classpath">
@@ -290,19 +283,18 @@
             <include name="${logback-classic.lib}"/>
         </fileset>
         <fileset dir="${wcs.lib.dir}">
-            <include name="${ogc-wcs.lib}" />
-            <include name="${ogc-gml.lib}" />
-            <include name="${ogc-swe.lib}" />
-            <include name="${ogc-gmlcov.lib}" />
-            <include name="${ogc-ows.lib}" />
-            <include name="${ogc-jaxb.lib}" />
-            <include name="${jaxb-core.lib}" />
-            <include name="${jaxb-impl.lib}" />
-            <include name="${xlink.lib}" />
+            <include name="${ogc-wcs.lib}"/>
+            <include name="${ogc-gml.lib}"/>
+            <include name="${ogc-swe.lib}"/>
+            <include name="${ogc-gmlcov.lib}"/>
+            <include name="${ogc-ows.lib}"/>
+            <include name="${ogc-jaxb.lib}"/>
+            <include name="${jaxb-core.lib}"/>
+            <include name="${jaxb-impl.lib}"/>
+            <include name="${xlink.lib}"/>
         </fileset>
 
     </path>
-
 
 
     <target name="all" depends="clean,clients,check,server"
@@ -342,33 +334,32 @@
     <target name="check"
             description="Run Unit Tests"
             depends="compile"
-            >
+    >
 
-        <junit  showoutput="yes"
-                haltonfailure="yes"
-                printsummary="yes"
-                >
+        <junit showoutput="yes"
+               haltonfailure="yes"
+               printsummary="yes"
+        >
 
-          <formatter type="plain" usefile="false"/>
-          <classpath refid="olfs.compile.classpath"/>
+            <formatter type="plain" usefile="false"/>
+            <classpath refid="olfs.compile.classpath"/>
 
-          <test name="opendap.coreServlet.Scrub" />
-          <test name="opendap.aggregation.AggregationParamsTest" />
-
-            <test name="opendap.bes.dap4Responders.Dap4ResponderTest" />
+            <test name="opendap.coreServlet.Scrub"/>
+            <test name="opendap.aggregation.AggregationParamsTest"/>
+            <test name="opendap.bes.dap4Responders.Dap4ResponderTest"/>
 
             <!--
             <test name="opendap.dap4.DatasetTest" />
             <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
             -->
-            
+
         </junit>
     </target>
 
 
-    <target  name="PreProcessSourceCode"
-             depends="clean,init"
-             description="Moves selected source code from the development tree into
+    <target name="PreProcessSourceCode"
+            depends="clean,init"
+            description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
@@ -392,7 +383,7 @@
                 <exclude name="opendap/experiments/**"/>
 
                 <!-- Exclude the auth code  -->
-                <exclude name="opendap/auth/**"/>
+                <!-- exclude name="opendap/auth/**"/ -->
 
                 <!-- Exclude the Metacat code  -->
                 <exclude name="opendap/metacat/**"/>
@@ -433,7 +424,7 @@
             name="compile"
             depends="PreProcessSourceCode"
             description="Compiles the OLFS."
-            >
+    >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
@@ -459,20 +450,15 @@
     </target>
 
 
-
-
-
     <target
             name="olfs-experiments"
             depends="init"
             description="Compiles the experimental code."
-            >
+    >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
-
-
 
 
         <javac compiler="${build.compiler}"
@@ -495,7 +481,7 @@
     <target name="olfs-lib" depends="clean,compile">
 
         <jar destfile="${build.lib}/${OLFS_LIB}.jar">
-            <fileset dir="${build.classes}" />
+            <fileset dir="${build.classes}"/>
         </jar>
 
     </target>
@@ -506,7 +492,7 @@
             depends="clean,PreProcessSourceCode,IsJavaDocUpToDate"
             description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
-            >
+    >
 
         <javadoc destdir="${build.docs}/javadoc"
                  Author="true"
@@ -514,7 +500,7 @@
                  Version="true"
                  failonerror="true"
                  additionalparam="-Xdoclint:none"
-                >
+        >
             <classpath refid="olfs.compile.classpath"/>
 
             <packageset dir="${build.src}" defaultexcludes="yes"/>
@@ -528,11 +514,11 @@
     <target name="doc-dist"
             depends="clean,javaDoc"
             description="Builds documentation distribution"
-            >
+    >
 
         <tar destfile="${build.dist}/${DOC_DIST}.tgz"
              compression="gzip"
-                >
+        >
             <zipfileset dir="${build.docs}" prefix="${DOC_DIST}"/>
         </tar>
 
@@ -542,15 +528,15 @@
     <target name="src-dist"
             depends="clean,PreProcessSourceCode"
             description="Builds source distribution"
-            >
+    >
 
         <tar destfile="${build.dist}/${SRC_DIST}.tgz"
              compression="gzip"
-                >
+        >
 
             <zipfileset dir="${build.src}" prefix="${SRC_DIST}/src"/>
 
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="doc/**" />
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="doc/**"/>
 
             <zipfileset dir="." prefix="${SRC_DIST}" includes="lib/**"/>
 
@@ -578,7 +564,7 @@
 
         <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
              compression="gzip"
-                >
+        >
             <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
                 <include name="olfs.war"/>
                 <include name="README"/>
@@ -594,13 +580,13 @@
     <target name="DISTRO"
             depends="clean,src-dist,doc-dist,server-dist,check"
             description="Builds complete distribution"
-            >
+    >
 
     </target>
 
     <target name="IsJavaDocUpToDate"
             description="Checks to see if the JavaDoc is out of date."
-            >
+    >
         <uptodate property="JavaDocIsUpToDate"
                   targetfile="${build.docs}/opendap/index.html">
             <srcfiles dir="${src.dir}">
@@ -614,7 +600,7 @@
     <target name="BESclient"
             depends="olfs-lib"
             description="Build and package the back end client."
-            >
+    >
 
         <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
 
@@ -629,8 +615,8 @@
     </target>
 
     <target name="hexEncoderApp"
-        depends="clean,compile"
-        description="Builds executable jar file of the hex encoder">
+            depends="clean,compile"
+            description="Builds executable jar file of the hex encoder">
 
 
         <mkdir dir="${build.dist}/hexEncoder"/>
@@ -648,16 +634,16 @@
 
         <tar destfile="${build.dist}/hexEncoder.tgz"
              compression="gzip"
-                >
-            <zipfileset dir="${build.dist}/hexEncoder"  />
+        >
+            <zipfileset dir="${build.dist}/hexEncoder"/>
 
         </tar>
 
     </target>
 
     <target name="NcmlDispatchHandler"
-        depends="clean,compile"
-        description="Builds jar file for the NcML Dispatch Handler">
+            depends="clean,compile"
+            description="Builds jar file for the NcML Dispatch Handler">
 
 
         <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
@@ -669,8 +655,8 @@
     </target>
 
     <target name="GatewayDispatchHandler"
-        depends="clean,compile"
-        description="Builds jar file for the Gateway Dispatch Handler">
+            depends="clean,compile"
+            description="Builds jar file for the Gateway Dispatch Handler">
 
 
         <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
@@ -685,8 +671,8 @@
     </target>
 
     <target name="validatorApp"
-        depends="clean,compile"
-        description="Builds executable jar file of the hex encoder">
+            depends="clean,compile"
+            description="Builds executable jar file of the hex encoder">
 
         <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
         <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
@@ -711,8 +697,8 @@
     </target>
 
     <target name="XSLTransformer"
-        depends="clean,compile"
-        description="Builds executable jar file of a simple XSL Transformer application">
+            depends="clean,compile"
+            description="Builds executable jar file of a simple XSL Transformer application">
 
         <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
         <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
@@ -742,14 +728,14 @@
             name="server"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
-            >
+    >
         <echo level="info" message="Building Hyrax server war file."/>
         <echo level="info" message="build.resources: ${build.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
              webxml="${build.resources}/WEB-INF/web.xml"
-                >
+        >
 
             <lib dir="${lib.dir}">
                 <include name="${owasp-encoder}"/>
@@ -804,7 +790,7 @@
 
 
             <zipfileset dir="${doc.dir}" prefix="docs">
-                <exclude name="src.distribution.readme" />
+                <exclude name="src.distribution.readme"/>
             </zipfileset>
 
 
@@ -822,7 +808,6 @@
     </target>
 
 
-
     <!-- OS-X stuff -->
 
     <property name="osx.resources" location="${resources.dir}/osx"/>
@@ -834,34 +819,34 @@
 
 
     <target name="osx-package"
-        depends="server"
-        description="Builds OSX package installer for the OLFS">
+            depends="server"
+            description="Builds OSX package installer for the OLFS">
 
         <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
-        
+
         <copy file="${build.dist}/olfs.war" tofile="${build.osx}${CATALINA_HOME}/webapps/olfs.war"/>
 
         <copy todir="${build.dir}/osx-resources" filtering="true">
-          <fileset dir="${osx.resources}" />
+            <fileset dir="${osx.resources}"/>
         </copy>
-        
+
         <chmod file="${build.dir}/osx-resources/InstallationCheck" perm="755"/>
 
         <exec executable="${packagemaker}">
             <arg value="--root"/>
             <arg value="${build.osx}"/>
-            <arg value="--id" />
+            <arg value="--id"/>
             <arg value="org.opendap.olfs-${OLFS_VERSION}"/>
-            <arg value="--title" />
+            <arg value="--title"/>
             <arg value="OPeNDAP olfs-${OLFS_VERSION}"/>
-            <arg value="--version" />
+            <arg value="--version"/>
             <arg value="${OLFS_VERSION}"/>
-            <arg value="--out" />
+            <arg value="--out"/>
             <arg value="${build.dist}/olfs-${OLFS_VERSION}.pkg"/>
-            <arg value="--resources" />
+            <arg value="--resources"/>
             <arg value="${build.dir}/osx-resources"/>
         </exec>
-        
+
 
     </target>
 
