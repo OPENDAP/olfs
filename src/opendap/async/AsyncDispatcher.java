@@ -33,6 +33,8 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.NotFound;
+import opendap.wcs.v2_0.http.HttpGetHandler;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -729,9 +731,8 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public HttpSession getSession() { return r.getSession(); }
 
-        @Override
         public String changeSessionId() {
-            return r.changeSessionId();
+            return ((Dap4RequestToDap2Request) r).changeSessionId();
         }
 
         public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
@@ -770,9 +771,8 @@ public class AsyncDispatcher extends BesDapDispatcher {
             return r.getPart(s);
         }
 
-        @Override
-        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
-            return r.upgrade(aClass);
+        public <T extends HttpGetHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+            return ((Dap4RequestToDap2Request) r).upgrade(aClass);
         }
 
         public Object getAttribute(String s) { return r.getAttribute(s); }
@@ -785,9 +785,8 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         public int getContentLength() { return r.getContentLength(); }
 
-        @Override
         public long getContentLengthLong() {
-            return r.getContentLengthLong();
+            return ((Dap4RequestToDap2Request) r).getContentLengthLong();
         }
 
         public String getContentType() { return r.getContentType(); }
