@@ -157,7 +157,7 @@
         </init-param>
         <init-param>
             <param-name>login_banner</param-name>
-            <param-value>BANNER</param-value>
+            <param-value>Welcome To Hyrax!</param-value>
         </init-param>
     </filter>
     <filter-mapping>

@@ -307,22 +307,26 @@ public class IdFilter implements Filter {
 		PrintWriter out = response.getWriter();
 		out.println("<html><head><title></title></head>");
 		out.println("<body><h1>"+_loginBanner+"</h1>");
-		out.println("<br/>");
-        out.println("<p>request.getRemoteUser(): " + request.getRemoteUser() + "</p>");
-        out.println("<p>request.getUserPrincipal(): " + request.getUserPrincipal() + "</p>");
-        if(request.getUserPrincipal() !=null){
-            out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
+        out.println("<hr/>");
 
+        if(request.getRemoteUser()!=null || request.getUserPrincipal()!=null) {
+            out.println("<p>request.getRemoteUser(): " + (request.getRemoteUser()==null?"not set":request.getRemoteUser()) + "</p>");
+            if (request.getUserPrincipal() != null) {
+                out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
+
+            }
+            out.println("<hr/>");
         }
+
         //Create the body, depending upon whether the user has authenticated
         // or not.
         if(session != null){
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
-                String first_name = userProfile.getAttribute("first_name");
-                String last_name =  userProfile.getAttribute("last_name");
+                String first_name = userProfile.getAttribute("first_name").replaceAll("\"","");
+                String last_name =  userProfile.getAttribute("last_name").replaceAll("\"","");
 
-    		    out.println("<p>Welcome " + first_name + " " + last_name + "</p>");
+    		    out.println("<p>Greetings " + first_name + " " + last_name + ", this is your profile.</p>");
     		    out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
                 out.println("<h3>Profile</h3>");
                 Enumeration attrNames = session.getAttributeNames();
