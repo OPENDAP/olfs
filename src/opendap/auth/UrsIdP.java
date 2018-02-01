@@ -57,7 +57,7 @@ public class UrsIdP extends IdProvider{
         super();
         _log = LoggerFactory.getLogger(this.getClass());
         setId(DEFAULT_ID);
-        setDescription("The NASA EOSDIS User Registration System");
+        setDescription("The NASA Earthdata Login (formerly known as URS)");
     }
 
 
