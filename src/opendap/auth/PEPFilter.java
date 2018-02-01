@@ -137,7 +137,7 @@ public class PEPFilter implements Filter {
                 hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             }
             else {
-                OPeNDAPException.setCachedErrorMessage("I'm sorry "+userId+", but I'm afraid I can't do that.");
+                OPeNDAPException.setCachedErrorMessage("I'm Sorry "+userId+", But I'm Afraid You Can't Do That.");
                 hsRes.sendError(HttpServletResponse.SC_FORBIDDEN);
 
             }
