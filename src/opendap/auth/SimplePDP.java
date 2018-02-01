@@ -43,19 +43,12 @@ import java.util.Vector;
 public class SimplePDP extends PolicyDecisionPoint {
 
     private Logger _log;
-
-
     private Vector<Policy> _policies;
-
-
 
     public SimplePDP(){
         _log = LoggerFactory.getLogger(this.getClass());
-
-        _policies = new Vector<Policy>();
+        _policies = new Vector<>();
     }
-
-
 
     private Policy policyFactory(Element policyDef) throws ConfigurationException {
 
@@ -66,39 +59,24 @@ public class SimplePDP extends PolicyDecisionPoint {
             _log.error("policyFactory(): {}",msg);
             throw new ConfigurationException(msg);
         }
-
         try {
-
             _log.debug("Building Policy: " + policyImplementation);
             Class classDefinition = Class.forName(policyImplementation);
             Policy policy = (Policy) classDefinition.newInstance();
-
             policy.init(policyDef);
-
             return policy;
-
 
         } catch (Exception e) {
             msg = "Unable to manufacture a new "+policyImplementation+" instance.  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
             _log.error("policyFactory(): {}",msg);
             throw new ConfigurationException(msg, e);
-
         }
-
-
-
-
     }
 
     public void init(String configFileName) throws IOException, JDOMException, ConfigurationException {
-
         File configFile = new File(configFileName);
-
         Element config = opendap.xml.Util.getDocumentRoot(configFile);
-
         init(config);
-
-
     }
 
 
@@ -116,25 +94,19 @@ public class SimplePDP extends PolicyDecisionPoint {
         }
 
         Iterator pItr = config.getChildren("Policy").iterator();
-
         while(pItr.hasNext()){
             Element policy = (Element) pItr.next();
             Policy p = policyFactory(policy);
             addPolicy(p);
         }
-
         Element memberships = config.getChild("Memberships");
-
         MembershipsManager.init(memberships);
-
-
    }
 
     @Override
     public boolean addPolicy(Policy policy) {
 
         _log.debug("addPolicy() - Adding Policy {}",policy.toString());
-
         return _policies.add(policy);
     }
 
@@ -149,32 +121,22 @@ public class SimplePDP extends PolicyDecisionPoint {
     public boolean evaluate(String userId, String resourceId, String queryString, String httpMethod) {
         _log.debug("evaluate() - { userId: \""+userId+"\", resourceId:\""+resourceId +"\", queryString:\""+queryString+"\", httpMethod:\""+httpMethod+"\"}");
 
-
         HashSet<String> userRoles = MembershipsManager.getUserRoles(userId);
 
         if(userRoles.isEmpty()){
             userRoles.add("");
         }
-
         for(String userInRole: userRoles){
             for(Policy policy: _policies){
                 _log.debug("evaluate() - Evaluating Policy {}",policy.toString());
-
                 if(policy.evaluate(userInRole,resourceId,queryString, httpMethod)) {
                     _log.debug("evaluate() - END <**MATCH**>");
                     return true;
                 }
             }
         }
-
-
-
         _log.debug("evaluate() - END [NO MATCH])");
         return false;
     }
-
-
-
-
 
 }

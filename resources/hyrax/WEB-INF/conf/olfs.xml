@@ -64,10 +64,10 @@
         </BES>
     </BESManager>
 
-    <!-- AuthenticationControls>
-        <login>loginPath?login_param=foo</login>
-        <logout>logoutPath?logout_param=foo</logout>
-    </AuthenticationControls -->
+    <AuthenticationControls>
+        <login>/opendap/login</login>
+        <logout>/opendap/logout</logout>
+    </AuthenticationControls>
 
 
     <!-- CatalogCache>

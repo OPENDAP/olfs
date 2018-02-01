@@ -284,7 +284,6 @@ public class PDPService extends HttpServlet {
         if (_requireSecureTransport) {
             if (!req.isSecure()) {
                 _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
-
                 resp.sendError(403);
             } else {
                 _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
@@ -293,13 +292,7 @@ public class PDPService extends HttpServlet {
             _log.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
 
         }
-
         super.service(req, resp);
-
-
     }
-
-
-
 
 }
