@@ -155,7 +155,7 @@ public class PersistentConfigurationHandler {
 
         File[] files = fromDir.listFiles();
         if(files==null){
-            LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - Unable to locate directory {}. Not content will be copied. THIS IS BAD.",fromDirName);
+            LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - Unable to locate directory {}. No content will be copied. THIS IS BAD.",fromDirName);
             return;
         }
         for (int i=0; i<files.length; i++) {
