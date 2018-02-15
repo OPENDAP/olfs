@@ -26,8 +26,8 @@
 
 package opendap.auth;
 
-import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,27 +51,46 @@ public class IdFilter implements Filter {
     private ConcurrentHashMap<String,IdProvider> _idProviders;
     private String _loginBanner;
 
+    private boolean _is_initialized;
+    private FilterConfig _filterConfig;
 
     public void init(FilterConfig filterConfig) throws ServletException {
-
-        _log = LoggerFactory.getLogger(this.getClass());
-        _idProviders = new ConcurrentHashMap<String, IdProvider>();
-
-        String configFileName = filterConfig.getInitParameter("config");
+        _filterConfig = filterConfig;
+        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
+        _idProviders = new ConcurrentHashMap<>();
+        _is_initialized = false;
+        _loginBanner = null;
         try {
-            Element config = opendap.xml.Util.getDocumentRoot(configFileName);
-            for (Object o : config.getChildren("IdProvider")) {
-                Element idpConfig = (Element) o;
-                IdProvider idp = idpFactory(idpConfig);
-                _idProviders.put(idp.getId(), idp);
-            }
-        } catch (Exception e) {
-            throw new ServletException(e);
+            init();
         }
-        _loginBanner =  filterConfig.getInitParameter("login_banner");
+        catch (IOException | JDOMException | ConfigurationException se){
+            _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
+                    "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
+        }
+    }
+
+    public void init() throws IOException, JDOMException, ConfigurationException {
+
+        if(_is_initialized)
+            return;
+        _log.info("init() - Initializing IdFilter...");
+
+        Element config;
+        String configFileName = _filterConfig.getInitParameter("config");
+        config = opendap.xml.Util.getDocumentRoot(configFileName);
+        for (Object o : config.getChildren("IdProvider")) {
+            Element idpConfig = (Element) o;
+            IdProvider idp = idpFactory(idpConfig);
+            _idProviders.put(idp.getId(), idp);
+        }
+
+        _loginBanner = _filterConfig.getInitParameter("login_banner");
         if(_loginBanner==null){
             _loginBanner = "Welcome to The Burrow.";
         }
+        _log.info("init() - Login Banner: {}",_loginBanner);
+        _is_initialized = true;
+        _log.info("init() - IdFilter HAS BEEN INITIALIZED!");
     }
 
 
@@ -79,25 +98,25 @@ public class IdFilter implements Filter {
         String msg;
         if(config==null) {
             msg = "Configuration MAY NOT be null!.";
-            _log.error("idpFactory():  {}",msg);
+            _log.error("idpFactory() -  {}",msg);
             throw new ConfigurationException(msg);
         }
         String idpClassName = config.getAttributeValue("class");
 
         if(idpClassName==null) {
             msg = "IdProvider definition must contain a \"class\" attribute whose value is the class name of the IdProvider implementation to be created.";
-            _log.error("idpFactory(): {}",msg);
+            _log.error("idpFactory() - {}",msg);
             throw new ConfigurationException(msg);
         }
         try {
-            _log.debug("idpFactory(): Building PolicyDecisionPoint: " + idpClassName);
+            _log.debug("idpFactory(): Building Identity Provider: " + idpClassName);
             Class classDefinition = Class.forName(idpClassName);
             IdProvider idp = (IdProvider) classDefinition.newInstance();
             idp.init(config);
             return idp;
         } catch (Exception e) {
             msg = "Unable to manufacture an instance of "+idpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error("pdpFactory(): {}"+msg);
+            _log.error("idpFactory() - {}"+msg);
             throw new ConfigurationException(msg, e);
 
         }
@@ -106,6 +125,18 @@ public class IdFilter implements Filter {
 
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
+        if(!_is_initialized) {
+            try {
+                init();
+            }
+            catch (IOException | JDOMException | ConfigurationException e){
+                String msg = "doFilter() - IdFilter INITIALIZATION HAS FAILED! " +
+                        "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
+                _log.error(msg);
+                throw new ServletException(msg,e);
+            }
+        }
 
         HttpServletRequest  hsReq = (HttpServletRequest)  request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
@@ -145,19 +176,19 @@ public class IdFilter implements Filter {
                     if(originalResourceRequestUrl.equals(loginContext))
                         session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
                     try {
-                        /**
-                         * Run the login gizwhat. This may involve simply collecting credentials from the user and
-                         * forwarding them on to the IdP, or it may involve a complex dance of redirection in which
-                         * the user drives their browser through an elaborate auth like OAuth2 so they can come back
-                         * to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
-                         * complete.
-                         */
+                        //
+                        // Run the login gizwhat. This may involve simply collecting credentials from the user and
+                        // forwarding them on to the IdP, or it may involve a complex dance of redirection in which
+                        // the user drives their browser through an elaborate auth like OAuth2 so they can come back
+                        // to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
+                        // complete.
+                        //
                         idProvider.doLogin(hsReq,hsRes);
-                        /**
-                         * We return here and don't do the filter chain because the "doLogin" method will, when
-                         * completed send a 302 redirect to the client. Thus we want the process to stop here until
-                         * login is completed
-                         */
+                        //
+                        // We return here and don't do the filter chain because the "doLogin" method will, when
+                        // completed send a 302 redirect to the client. Thus we want the process to stop here until
+                        // login is completed
+                        //
                         return;
 
                     } catch (Exception e) {
@@ -167,12 +198,12 @@ public class IdFilter implements Filter {
                 }
             }
         }
-        /**
-         * We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
-         * "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
-         * the presence of the user_profile attribute in the session) we need to spoof the API to show our
-         * authenticated user.
-         */
+        //
+        // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
+        // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
+        // the presence of the user_profile attribute in the session) we need to spoof the API to show our
+        // authenticated user.
+        //
         UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
         if(up != null) {
             AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
@@ -219,7 +250,8 @@ public class IdFilter implements Filter {
         }
         _log.info("doLogout() - Punting with session.invalidate()");
         // This is essentially a "punt" since things aren't as expected.
-        session.invalidate();
+        if(session!=null)
+            session.invalidate();
         response.sendRedirect(request.getContextPath());
         _log.info("doLogout() - END");
     }
@@ -256,9 +288,9 @@ public class IdFilter implements Filter {
         session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
         session.setAttribute(USER_PROFILE, new GuestProfile());
 
-        /**
-         * Finally, redirect the user back to the their original requested resource.
-         */
+        //
+        // Finally, redirect the user back to the their original requested resource.
+        //
         response.sendRedirect(redirectUrl);
 	}
 

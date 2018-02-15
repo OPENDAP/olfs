@@ -28,6 +28,7 @@ package opendap.auth;
 
 import opendap.coreServlet.OPeNDAPException;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,27 +49,43 @@ public class PEPFilter implements Filter {
     private boolean _everyOneMustHaveUid;
     private String _unauthorizedMsg = "We don't know who you are! Login and let us know, and then maybe you can have what you want.";
 
+    private boolean _is_initialized;
+    private FilterConfig _filterConfig;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
-        _log = LoggerFactory.getLogger(filterConfig.getFilterName());
+        _filterConfig = filterConfig;
+        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
         _everyOneMustHaveUid = false;
-        String msg;
-        String configFile = filterConfig.getInitParameter("config");
-        Element config;
+        _is_initialized = false;
+
         try {
-            config = opendap.xml.Util.getDocumentRoot(configFile);
-            Element e = config.getChild("PolicyDecisionPoint");
-            _pdp = pdpFactory(e);
-            e = config.getChild("EveryOneMustHaveId");
-            if(e !=null){
-                _everyOneMustHaveUid = true;
-            }
-        } catch (Exception e) {
-            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error(msg);
-            throw new ServletException(msg, e);
+            init();
         }
+        catch (IOException | JDOMException | ConfigurationException se){
+            _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE PEPFilter! " +
+                    "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
+
+        }
+
+    }
+    public void init() throws IOException, JDOMException, ConfigurationException {
+
+        if(_is_initialized)
+            return;
+        _log.info("init() - Initializing PEPFilter...");
+
+        String configFile = _filterConfig.getInitParameter("config");
+        Element config;
+        config = opendap.xml.Util.getDocumentRoot(configFile);
+        Element e = config.getChild("PolicyDecisionPoint");
+        _pdp = pdpFactory(e);
+        e = config.getChild("EveryOneMustHaveId");
+        if(e !=null){
+            _everyOneMustHaveUid = true;
+        }
+        _is_initialized = true;
+        _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
     }
 
 
@@ -104,6 +121,19 @@ public class PEPFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
+        if(!_is_initialized) {
+            try {
+                init();
+            }
+            catch (IOException | JDOMException | ConfigurationException e){
+                String msg = "doFilter() - PEPFilter INITIALIZATION HAS FAILED! " +
+                        "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
+                _log.error(msg);
+                throw new ServletException(msg,e);
+            }
+        }
+
 
         HttpServletRequest  hsReq = (HttpServletRequest)  request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
