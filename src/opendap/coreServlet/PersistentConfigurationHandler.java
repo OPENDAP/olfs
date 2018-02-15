@@ -145,7 +145,9 @@ public class PersistentConfigurationHandler {
         if (!toDir.exists()) {
             if(!toDir.mkdirs()){
                 String msg = "FAILED to create target directory '"+toDir.getAbsolutePath()+
-                              "' Unable to copy content from '"+fromDir.getAbsolutePath()+"'";
+                              "' Unable to copy content from '"+fromDir.getAbsolutePath()+"' user.name: " +
+                        System.getProperty("user.name");
+
                 LoggerFactory.getLogger(PersistentConfigurationHandler.class).error("copyDirTree() - {}",msg);
                 throw new IOException(msg);
             }
