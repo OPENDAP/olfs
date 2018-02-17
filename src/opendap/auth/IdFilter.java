@@ -54,6 +54,10 @@ public class IdFilter implements Filter {
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
 
+    private String login_endpoint;
+    private String logout_endpoint;
+    private String guest_endpoint;
+
     public void init(FilterConfig filterConfig) throws ServletException {
         _filterConfig = filterConfig;
         _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
@@ -67,6 +71,11 @@ public class IdFilter implements Filter {
             _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
         }
+
+        String context = filterConfig.getServletContext().getContextPath();
+        login_endpoint = context + "/login";
+        logout_endpoint = context + "/logout";
+        guest_endpoint = context + "/guest";
     }
 
     public void init() throws IOException, JDOMException, ConfigurationException {
@@ -143,26 +152,23 @@ public class IdFilter implements Filter {
         String requestURI = hsReq.getRequestURI();
         String contextPath =  hsReq.getContextPath();
 
+        String requestUrl = hsReq.getRequestURL().toString();
+
         // Get session, make new as needed.
         HttpSession session = hsReq.getSession(true);
-        // Cache the original  request URI in the session if it's not there already
-        String originalResourceRequestUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
-        if(originalResourceRequestUrl==null){
-            originalResourceRequestUrl = hsReq.getRequestURL().toString();
-            session.setAttribute(ORIGINAL_REQUEST_URL,originalResourceRequestUrl);
-        }
+
         // Intercept login/logout requests
-        if( requestURI.equals(contextPath+"/logout") )
+        if( requestURI.equals(logout_endpoint) )
         {
             doLogout(hsReq, hsRes);
             return;
         }
-        else if( requestURI.equals(contextPath+"/login") )
+        else if( requestURI.equals(login_endpoint) )
         {
             doLandingPage(hsReq, hsRes);
             return;
         }
-        else if( requestURI.equals(contextPath+"/guest") )
+        else if( requestURI.equals(guest_endpoint) )
         {
             doGuest(hsReq, hsRes);
             return;
@@ -171,9 +177,9 @@ public class IdFilter implements Filter {
         {
             // Check IdProviders to see is this request is a login context.
             for(IdProvider idProvider: _idProviders.values()){
-                String loginContext =  contextPath+"/login"+ idProvider.getLoginContext();
+                String loginContext =  login_endpoint + idProvider.getLoginContext();
                 if( requestURI.equals(loginContext)) {
-                    if(originalResourceRequestUrl.equals(loginContext))
+                    if(requestUrl.equals(loginContext))
                         session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
                     try {
                         //
@@ -210,6 +216,10 @@ public class IdFilter implements Filter {
             authReq.setUid(up.getUID());
             hsReq = authReq;
         }
+        // Cache the  request URL in the session. We dos this here because we know by now that the request was
+        // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
+        session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
+
         filterChain.doFilter(hsReq, hsRes);
     }
 
@@ -228,6 +238,7 @@ public class IdFilter implements Filter {
 
         _log.info("doLogout() - BEGIN");
         _log.info("doLogout() - Retrieving session...");
+        String redirectUrl  = request.getContextPath();;
         HttpSession session = request.getSession(false);
         if (session != null) {
             _log.info("doLogout() - Got session...");
@@ -247,12 +258,17 @@ public class IdFilter implements Filter {
                 _log.info("doLogout() - Missing UserProfile object....");
 
             }
+            redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+
         }
+        _log.info("doLogout() - redirectUrl: {}", redirectUrl);
+
         _log.info("doLogout() - Punting with session.invalidate()");
         // This is essentially a "punt" since things aren't as expected.
         if(session!=null)
             session.invalidate();
-        response.sendRedirect(request.getContextPath());
+
+        response.sendRedirect(redirectUrl);
         _log.info("doLogout() - END");
     }
 
