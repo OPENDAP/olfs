@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -51,13 +52,16 @@ public class PEPFilter implements Filter {
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
+    private String _defaultLogingEndpoint;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         _filterConfig = filterConfig;
         _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
         _everyOneMustHaveUid = false;
+        _defaultLogingEndpoint=null;
         _is_initialized = false;
+
 
         try {
             init();
@@ -83,6 +87,18 @@ public class PEPFilter implements Filter {
         e = config.getChild("EveryOneMustHaveId");
         if(e !=null){
             _everyOneMustHaveUid = true;
+        }
+        e = config.getChild("UseDefaultLoginEndpoint");
+        if(e !=null){
+            String href = e.getAttributeValue("href");
+            if(href!=null){
+                _defaultLogingEndpoint = PathBuilder.pathConcat(_filterConfig.getServletContext().getContextPath(),href);
+                _log.info("init() - Using Default Login Endpoint: {}",_defaultLogingEndpoint);
+            }
+            else {
+                _log.error("init() - The configuration parameter UseDefaultLoginEndpoint is missing the " +
+                        "required href attribute! UseDefaultLoginEndpoint is DISABLED.");
+            }
         }
         _is_initialized = true;
         _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
@@ -153,23 +169,36 @@ public class PEPFilter implements Filter {
 
         // So - Do they have to be authenticated?
         if(userId == null  && _everyOneMustHaveUid) {
-            OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
-            hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            if(_defaultLogingEndpoint!=null) {
+                hsRes.sendRedirect(_defaultLogingEndpoint);
+            }
+            else {
+                OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            }
             return;
         }
         // Are they allowed access?
         if(requestIsGranted(userId, hsReq)){
+            // Yup, so we just move along...
             filterChain.doFilter(hsReq, hsRes);
         }
         else {
+            // Access was denied, so...
             if(userId == null) {
-                OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
-                hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                // If they aren't logged in then we tell them to do that
+                if(_defaultLogingEndpoint!=null) {
+                    hsRes.sendRedirect(_defaultLogingEndpoint);
+                }
+                else {
+                    OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                    hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                }
             }
             else {
+                // If they are logged in then we tell them NO.
                 OPeNDAPException.setCachedErrorMessage("I'm Sorry "+userId+", But I'm Afraid You Can't Do That.");
                 hsRes.sendError(HttpServletResponse.SC_FORBIDDEN);
-
             }
         }
     }

@@ -49,7 +49,8 @@
     </PolicyDecisionPoint -->
 
 
-
+    <!-- EveryOneMustHaveId / -->
+    <UseDefaultLoginEndpoint href="/login/urs"/>
 
     <!-- You can use an in memory local PDP -->
     <PolicyDecisionPoint class="opendap.auth.SimplePDP">

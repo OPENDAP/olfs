@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -54,9 +55,8 @@ public class IdFilter implements Filter {
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
 
-    private String login_endpoint;
-    private String logout_endpoint;
-    private String guest_endpoint;
+    private String _guest_endpoint;
+    private boolean _enableGuestProfile;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         _filterConfig = filterConfig;
@@ -72,10 +72,6 @@ public class IdFilter implements Filter {
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
         }
 
-        String context = filterConfig.getServletContext().getContextPath();
-        login_endpoint = context + "/login";
-        logout_endpoint = context + "/logout";
-        guest_endpoint = context + "/guest";
     }
 
     public void init() throws IOException, JDOMException, ConfigurationException {
@@ -84,20 +80,40 @@ public class IdFilter implements Filter {
             return;
         _log.info("init() - Initializing IdFilter...");
 
+        String context = _filterConfig.getServletContext().getContextPath();
+
+        // Load Config File
         Element config;
         String configFileName = _filterConfig.getInitParameter("config");
         config = opendap.xml.Util.getDocumentRoot(configFileName);
+
+        // Init the Login Banner
+        Element e = config.getChild("LoginBanner");
+        if(e!=null){
+            _loginBanner = e.getTextTrim();
+        }
+        if(_loginBanner==null){
+            _loginBanner = "Welcome to The Burrow.";
+        }
+        _log.info("init() - Login Banner: {}",_loginBanner);
+
+        e = config.getChild("EnableGuestProfile");
+        if(e!=null){
+            _enableGuestProfile = true;
+            _guest_endpoint = PathBuilder.pathConcat(context, "guest");
+        }
+        _log.info("init() - Guest Profile {}", _enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
+
+        // Set up authentication controls. If the configuration element is missing that's fine
+        // because we know that it will still configure the login/logout endpoint values.
+        AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),context);
+
+        // Load ID Providers (Might be several)
         for (Object o : config.getChildren("IdProvider")) {
             Element idpConfig = (Element) o;
             IdProvider idp = idpFactory(idpConfig);
             _idProviders.put(idp.getId(), idp);
         }
-
-        _loginBanner = _filterConfig.getInitParameter("login_banner");
-        if(_loginBanner==null){
-            _loginBanner = "Welcome to The Burrow.";
-        }
-        _log.info("init() - Login Banner: {}",_loginBanner);
         _is_initialized = true;
         _log.info("init() - IdFilter HAS BEEN INITIALIZED!");
     }
@@ -152,32 +168,34 @@ public class IdFilter implements Filter {
         String requestURI = hsReq.getRequestURI();
         String contextPath =  hsReq.getContextPath();
 
-        String requestUrl = hsReq.getRequestURL().toString();
+        String query = hsReq.getQueryString();
+        String requestUrl = hsReq.getRequestURL().toString() + ((query!=null)?("?"+ query):"");
+
 
         // Get session, make new as needed.
         HttpSession session = hsReq.getSession(true);
 
         // Intercept login/logout requests
-        if( requestURI.equals(logout_endpoint) )
+        if( requestURI.equals(AuthenticationControls.getLogoutEndpoint()) )
         {
             doLogout(hsReq, hsRes);
             return;
         }
-        else if( requestURI.equals(login_endpoint) )
+        else if( AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint()) )
         {
             doLandingPage(hsReq, hsRes);
             return;
         }
-        else if( requestURI.equals(guest_endpoint) )
+        else if( _enableGuestProfile && requestURI.equals(_guest_endpoint) )
         {
-            doGuest(hsReq, hsRes);
+            doGuestLogin(hsReq, hsRes);
             return;
         }
         else
         {
-            // Check IdProviders to see is this request is a login context.
+            // Check IdProviders to see is this request is a valid login context.
             for(IdProvider idProvider: _idProviders.values()){
-                String loginContext =  login_endpoint + idProvider.getLoginContext();
+                String loginContext = PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), idProvider.getLoginContext());
                 if( requestURI.equals(loginContext)) {
                     if(requestUrl.equals(loginContext))
                         session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
@@ -242,6 +260,8 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             _log.info("doLogout() - Got session...");
+            String href = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            redirectUrl = href!=null?href:redirectUrl;
 
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if (up != null) {
@@ -249,20 +269,16 @@ public class IdFilter implements Filter {
                 IdProvider idProvider = up.getIdP();
                 if (idProvider != null) {
                     _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getId());
+                    // Redirect to ORIGINAL_REQUEST_URL is done by idProvider
                     idProvider.doLogout(request, response);
                     _log.info("doLogout() - END");
                     return;
                 }
-
             } else {
                 _log.info("doLogout() - Missing UserProfile object....");
-
             }
-            redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
-
         }
         _log.info("doLogout() - redirectUrl: {}", redirectUrl);
-
         _log.info("doLogout() - Punting with session.invalidate()");
         // This is essentially a "punt" since things aren't as expected.
         if(session!=null)
@@ -289,16 +305,13 @@ public class IdFilter implements Filter {
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.
      */
-	private void doGuest(HttpServletRequest request, HttpServletResponse response) throws IOException
+	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession(false);
-        String redirectUrl = null;
+        String redirectUrl = request.getContextPath();
         if(session != null) {
             redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
             session.invalidate();
-        }
-        if(redirectUrl == null){
-            redirectUrl = request.getContextPath();
         }
         session = request.getSession(true);
         session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
@@ -340,10 +353,12 @@ public class IdFilter implements Filter {
             noProfile.append("</a><br/><br/></li>");
         }
         noProfile.append("</ul>");
-        noProfile.append("<i>Or you may:</i><br />");
-        noProfile.append("<ul>");
-        noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
-        noProfile.append("</ul>");
+        if(_enableGuestProfile) {
+            noProfile.append("<i>Or you may:</i><br />");
+            noProfile.append("<ul>");
+            noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
+            noProfile.append("</ul>");
+        }
         _log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -375,7 +390,7 @@ public class IdFilter implements Filter {
                 String last_name =  userProfile.getAttribute("last_name").replaceAll("\"","");
 
     		    out.println("<p>Greetings " + first_name + " " + last_name + ", this is your profile.</p>");
-    		    out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
+    		    out.println("<p><a href=\"" + AuthenticationControls.getLogoutEndpoint() + "\"> - - LogOut - - </a></p>");
                 out.println("<h3>Profile</h3>");
                 Enumeration attrNames = session.getAttributeNames();
                 if(attrNames.hasMoreElements()){

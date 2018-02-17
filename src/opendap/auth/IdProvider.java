@@ -98,13 +98,15 @@ public abstract class  IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
         if( session != null )
         {
+            String href = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
         }
-
-        response.sendRedirect(request.getContextPath());
+        response.sendRedirect(redirectUrl);
     }
 
 }

@@ -28,7 +28,7 @@ package opendap.coreServlet;
 
 
 import opendap.bes.BESManager;
-import opendap.http.AuthenticationControls;
+import opendap.auth.AuthenticationControls;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -36,8 +36,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,7 +48,6 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -191,21 +188,9 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-    private void initAuthenticationControls() throws ServletException {
-
+    private void initAuthenticationControls()  {
         Element authControlElem = configDoc.getRootElement().getChild(AuthenticationControls.CONFIG_ELEMENT);
-
-
-        try {
-            if(authControlElem !=  null){
-                AuthenticationControls.init(authControlElem);
-            }
-        }
-        catch(Exception e){
-            throw new ServletException(e);
-        }
-
-
+        AuthenticationControls.init(authControlElem,getServletContext().getContextPath());
     }
 
 

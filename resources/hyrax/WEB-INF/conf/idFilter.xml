@@ -27,6 +27,9 @@
 
 
 <IdFilter>
+    <LoginBanner>Welcome To Hyrax!</LoginBanner>
+    <EnableAuthenticationControls />
+    <!-- EnableGuestProfile / -->
 
     <IdProvider class="opendap.auth.UrsIdP">
         <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
