@@ -28,6 +28,7 @@ package opendap.auth;
 
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 
@@ -53,16 +55,20 @@ public class PEPFilter implements Filter {
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
     private String _defaultLogingEndpoint;
+    private String _configParameterName;
+
+    public PEPFilter() {
+        _everyOneMustHaveUid = false;
+        _defaultLogingEndpoint=null;
+        _is_initialized = false;
+        _configParameterName = "config";
+    }
+
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         _filterConfig = filterConfig;
         _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
-        _everyOneMustHaveUid = false;
-        _defaultLogingEndpoint=null;
-        _is_initialized = false;
-
-
         try {
             init();
         }
@@ -79,7 +85,16 @@ public class PEPFilter implements Filter {
             return;
         _log.info("init() - Initializing PEPFilter...");
 
-        String configFile = _filterConfig.getInitParameter("config");
+        String configFileName = _filterConfig.getInitParameter(_configParameterName);
+        if(configFileName==null){
+            String msg = "init() - OUCH! The web.xml configuration for "+getClass().getName()+
+            " must contain an init-parameter named \""+_configParameterName+"\"";
+            _log.error(msg);
+            throw new ConfigurationException(msg);
+        }
+
+        String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
+        File configFile = new File(configDirName,configFileName);
         Element config;
         config = opendap.xml.Util.getDocumentRoot(configFile);
         Element e = config.getChild("PolicyDecisionPoint");

@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.PathBuilder;
+import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
@@ -54,16 +56,21 @@ public class IdFilter implements Filter {
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
+    private String _configParameterName;
 
     private String _guest_endpoint;
     private boolean _enableGuestProfile;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
-        _filterConfig = filterConfig;
-        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
+    public IdFilter(){
         _idProviders = new ConcurrentHashMap<>();
         _is_initialized = false;
         _loginBanner = null;
+        _configParameterName="config";
+    }
+
+    public void init(FilterConfig filterConfig) throws ServletException {
+        _filterConfig = filterConfig;
+        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
         try {
             init();
         }
@@ -82,10 +89,20 @@ public class IdFilter implements Filter {
 
         String context = _filterConfig.getServletContext().getContextPath();
 
+        String configFileName = _filterConfig.getInitParameter(_configParameterName);
+        if(configFileName==null){
+            String msg = "init() - OUCH! The web.xml configuration for "+getClass().getName()+
+                    " must contain an init-parameter named \""+_configParameterName+"\"";
+            _log.error(msg);
+            throw new ConfigurationException(msg);
+        }
+
+        String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
+        File configFile = new File(configDirName,configFileName);
+
         // Load Config File
         Element config;
-        String configFileName = _filterConfig.getInitParameter("config");
-        config = opendap.xml.Util.getDocumentRoot(configFileName);
+        config = opendap.xml.Util.getDocumentRoot(configFile);
 
         // Init the Login Banner
         Element e = config.getChild("LoginBanner");

@@ -153,7 +153,7 @@
         <filter-class>opendap.auth.IdFilter</filter-class>
         <init-param>
             <param-name>config</param-name>
-            <param-value>/etc/olfs/idFilter.xml</param-value>
+            <param-value>idFilter.xml</param-value>
         </init-param>
     </filter>
     <filter-mapping>
@@ -167,7 +167,7 @@
         <filter-class>opendap.auth.PEPFilter</filter-class>
         <init-param>
             <param-name>config</param-name>
-            <param-value>/etc/olfs/PEPFilter.xml</param-value>
+            <param-value>PEPFilter.xml</param-value>
         </init-param>
     </filter>
     <filter-mapping>
