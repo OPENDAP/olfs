@@ -40,8 +40,8 @@ public class MembershipsManager {
     private static ConcurrentHashMap<String, HashSet<String>> _groups;
     private static ConcurrentHashMap<String, HashSet<String>> _roles;
     static {
-        _groups = new ConcurrentHashMap<String, HashSet<String>>();
-        _roles = new ConcurrentHashMap<String, HashSet<String>>();
+        _groups = new ConcurrentHashMap<>();
+        _roles = new ConcurrentHashMap<>();
     }
 
 
