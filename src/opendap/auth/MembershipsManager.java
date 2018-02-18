@@ -44,28 +44,17 @@ public class MembershipsManager {
         _roles = new ConcurrentHashMap<>();
     }
 
-
     public static void init(Element config) throws ConfigurationException {
 
-
-
-        Iterator grpsIt = config.getChildren("group").iterator();
-
-        while (grpsIt.hasNext()) {
-            Element groupElem = (Element) grpsIt.next();
+        for (Object o : config.getChildren("group")) {
+            Element groupElem = (Element) o;
             addGroup(groupElem);
         }
 
-
-
-        Iterator rlsIt = config.getChildren("role").iterator();
-
-        while (rlsIt.hasNext()) {
-            Element roleElem = (Element) rlsIt.next();
+        for (Object o : config.getChildren("role")) {
+            Element roleElem = (Element) o;
             addRole(roleElem);
         }
-
-
     }
 
     public static void addGroup(Element groupElem) throws ConfigurationException {
@@ -75,29 +64,21 @@ public class MembershipsManager {
         }
 
         Iterator uItr = groupElem.getChildren("user").iterator();
-
-
         if(uItr.hasNext()){
             HashSet<String> members = _groups.get(gid);
             if (members == null) {
-                members = new HashSet<String>();
+                members = new HashSet<>();
                 _groups.put(gid, members);
             }
 
             while (uItr.hasNext()) {
-
                 Element user = (Element) uItr.next();
-
                 String uid = user.getAttributeValue("id");
                 if (uid == null) {
                     throw new ConfigurationException("init(): Every <user> must have an \"id\" attribute.");
                 }
-
-
                 if (!members.contains(uid))
                     members.add(uid);
-
-
             }
 
         }
@@ -111,33 +92,22 @@ public class MembershipsManager {
         }
 
         Iterator uItr = roleElem.getChildren("group").iterator();
-
-
         if(uItr.hasNext()){
             HashSet<String> members = _roles.get(rid);
             if (members == null) {
-                members = new HashSet<String>();
+                members = new HashSet<>();
                 _roles.put(rid, members);
             }
-
             while (uItr.hasNext()) {
-
                 Element user = (Element) uItr.next();
-
                 String gid = user.getAttributeValue("id");
                 if (gid == null) {
                     throw new ConfigurationException("init(): Every <group> must have an \"id\" attribute.");
                 }
-
-
                 if (!members.contains(gid))
                     members.add(gid);
-
-
             }
-
         }
-
     }
 
 
@@ -154,24 +124,21 @@ public class MembershipsManager {
 
     public static HashSet<String> getUserGroups(String uid){
 
-        HashSet<String> groupMemberships = new HashSet<String>();
+        HashSet<String> groupMemberships = new HashSet<>();
         for(String gid: _groups.keySet()){
             HashSet<String> members = _groups.get(gid);
             if(members.contains(uid)){
                 groupMemberships.add(gid);
             }
         }
-
          return groupMemberships;
-
     }
 
     public static HashSet<String> getUserRoles(String uid){
 
         HashSet<String> userGroups = getUserGroups(uid);
 
-
-        HashSet<String> roles = new HashSet<String>();
+        HashSet<String> roles = new HashSet<>();
         for(String rid: _roles.keySet()){
             HashSet<String> members = _roles.get(rid);
 
@@ -182,15 +149,7 @@ public class MembershipsManager {
                 }
             }
         }
-
          return roles;
-
     }
-
-
-
-
-
-
 
 }
