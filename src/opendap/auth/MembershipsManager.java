@@ -31,13 +31,14 @@ import org.jdom.Element;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * Created by ndp on 10/1/14.
  */
 public class MembershipsManager {
 
-    private static ConcurrentHashMap<String, HashSet<String>> _groups;
+    private static ConcurrentHashMap<String, Group> _groups;
     private static ConcurrentHashMap<String, HashSet<String>> _roles;
     static {
         _groups = new ConcurrentHashMap<>();
@@ -65,20 +66,38 @@ public class MembershipsManager {
 
         Iterator uItr = groupElem.getChildren("user").iterator();
         if(uItr.hasNext()){
-            HashSet<String> members = _groups.get(gid);
-            if (members == null) {
-                members = new HashSet<>();
-                _groups.put(gid, members);
+            Group group = _groups.get(gid);
+            if (group == null) {
+                group = new Group(gid);
+                _groups.put(gid, group);
             }
 
             while (uItr.hasNext()) {
                 Element user = (Element) uItr.next();
                 String uid = user.getAttributeValue("id");
-                if (uid == null) {
-                    throw new ConfigurationException("init(): Every <user> must have an \"id\" attribute.");
+                String uidPatternStr = user.getAttributeValue("idPattern");
+                if ((uid==null && uidPatternStr == null) || (uid!=null && uidPatternStr!=null)) {
+                    throw new ConfigurationException("init(): Every <user> MUST have either an \"id\" attribute " +
+                            "or an \"idPattern\" attribute, but NOT both.");
                 }
-                if (!members.contains(uid))
-                    members.add(uid);
+
+                String authContext = user.getAttributeValue("authContext");
+                String authContextPatternStr = user.getAttributeValue("authContextPattern");
+                if (authContext == null) {
+                    throw new ConfigurationException("init(): Every <user> must have an \"authContext\" attribute.");
+                }
+                if ((authContext==null && authContextPatternStr == null) || (authContext!=null && authContextPatternStr!=null)) {
+                    throw new ConfigurationException("init(): Every <user> MUST have either an \"authContext\" attribute " +
+                            "or an \"authContextPattern\" attribute, but NOT both.");
+                }
+
+                if(uid!=null){
+                    uidPatternStr = Pattern.quote(uid);
+                }
+                if(authContext!=null){
+                    authContextPatternStr = Pattern.quote(authContext);
+                }
+                group.addUserPattern(uidPatternStr,authContextPatternStr);
             }
 
         }
@@ -111,32 +130,21 @@ public class MembershipsManager {
     }
 
 
-    public static HashSet<String> addGroup(String id, HashSet<String> members){
-        return _groups.put(id,members);
-    }
 
-    public static HashSet<String> addRole(String id, HashSet<String> members){
-        return _roles.put(id,members);
-    }
-
-
-
-
-    public static HashSet<String> getUserGroups(String uid){
+    public static HashSet<String> getUserGroups(String uid, String authContext){
 
         HashSet<String> groupMemberships = new HashSet<>();
-        for(String gid: _groups.keySet()){
-            HashSet<String> members = _groups.get(gid);
-            if(members.contains(uid)){
-                groupMemberships.add(gid);
+        for(Group group: _groups.values()){
+            if(group.isMember(uid, authContext)){
+                groupMemberships.add(group._name);
             }
         }
-         return groupMemberships;
+        return groupMemberships;
     }
 
-    public static HashSet<String> getUserRoles(String uid){
+    public static HashSet<String> getUserRoles(String uid, String authContext){
 
-        HashSet<String> userGroups = getUserGroups(uid);
+        HashSet<String> userGroups = getUserGroups(uid,authContext);
 
         HashSet<String> roles = new HashSet<>();
         for(String rid: _roles.keySet()){

@@ -194,7 +194,7 @@ public class PEPFilter implements Filter {
             return;
         }
         // Are they allowed access?
-        if(requestIsGranted(userId, hsReq)){
+        if(requestIsGranted(userId, authContext, hsReq)){
             // Yup, so we just move along...
             filterChain.doFilter(hsReq, hsRes);
         }
@@ -224,7 +224,7 @@ public class PEPFilter implements Filter {
     }
 
 
-    public boolean requestIsGranted(String userId, HttpServletRequest request){
+    public boolean requestIsGranted(String userId, String authContext,  HttpServletRequest request){
 
         if(userId == null){
             userId = "";
@@ -235,7 +235,7 @@ public class PEPFilter implements Filter {
             queryString = "";
         }
         String action       = request.getMethod();
-        return _pdp.evaluate(userId,resourceId,queryString,action);
+        return _pdp.evaluate(userId, authContext, resourceId,queryString,action);
     }
 
 }

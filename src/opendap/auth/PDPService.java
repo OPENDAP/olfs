@@ -211,6 +211,9 @@ public class PDPService extends HttpServlet {
                 String uid         = request.getParameter("uid");
                 if(uid == null) uid = "";
 
+                String authContext  = request.getParameter("authContext");
+                if(authContext == null) authContext = "";
+
                 String resourceId  = request.getParameter("resourceId");
                 if(resourceId == null) resourceId = "";
 
@@ -225,13 +228,14 @@ public class PDPService extends HttpServlet {
 
                 quadTuple.append("{ ");
                 quadTuple.append("uid:\"").append(uid).append("\", ");
+                quadTuple.append("authContext:\"").append(authContext).append("\", ");
                 quadTuple.append("resourceId:\"").append(resourceId).append("\", ");
                 quadTuple.append("query:\"").append(query).append("\", ");
                 quadTuple.append("action:\"").append(action).append("\"");
                 quadTuple.append(" }");
                 _log.debug("doGet() - {}", quadTuple);
 
-                if(_myPDP.evaluate(uid,resourceId,query,action)){
+                if(_myPDP.evaluate(uid,authContext,resourceId,query,action)){
                     status = HttpServletResponse.SC_OK;
                     response.setStatus(status);
                     ServletOutputStream sos = response.getOutputStream();

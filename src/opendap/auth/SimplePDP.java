@@ -118,10 +118,10 @@ public class SimplePDP extends PolicyDecisionPoint {
 
 
     @Override
-    public boolean evaluate(String userId, String resourceId, String queryString, String httpMethod) {
+    public boolean evaluate(String userId, String authContext, String resourceId, String queryString, String httpMethod) {
         _log.debug("evaluate() - { userId: \""+userId+"\", resourceId:\""+resourceId +"\", queryString:\""+queryString+"\", httpMethod:\""+httpMethod+"\"}");
 
-        HashSet<String> userRoles = MembershipsManager.getUserRoles(userId);
+        HashSet<String> userRoles = MembershipsManager.getUserRoles(userId,authContext);
 
         if(userRoles.isEmpty()){
             userRoles.add("");

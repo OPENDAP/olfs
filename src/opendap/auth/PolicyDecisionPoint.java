@@ -43,7 +43,7 @@ public abstract class PolicyDecisionPoint {
 
     public abstract boolean removePolicy(Policy policy);
 
-    public abstract boolean evaluate(String userId, String resourceId, String queryString, String actionId);
+    public abstract boolean evaluate(String userId, String authContext, String resourceId, String queryString, String actionId);
 
     public static PolicyDecisionPoint pdpFactory(Element config) throws ConfigurationException {
 
