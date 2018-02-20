@@ -62,17 +62,18 @@ public class RegexPolicy implements Policy {
 
     @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder(getClass().getName()).append(" {");
-        sb.append("rolePattern: \"").append(_rolePattern.pattern()).append("\"; ");
-        sb.append("resourcePattern: \"").append(_resourcePattern.pattern()).append("\"; ");
-        sb.append("queryStringPattern: \"").append(_queryStringPattern.pattern()).append("\"; ");
-
-        sb.append("allowedActions: \"");
-        for(HTTP_METHOD method: _allowedActions)
-            sb.append(method).append(" ");
-        sb.append("\";}");
+        StringBuilder sb = new StringBuilder(getClass().getName()).append("={");
+        sb.append("rolePattern: \"").append(_rolePattern.pattern()).append("\", ");
+        sb.append("resourcePattern: \"").append(_resourcePattern.pattern()).append("\", ");
+        sb.append("queryStringPattern: \"").append(_queryStringPattern.pattern()).append("\", ");
+        sb.append("allowedActions: [");
+        boolean first = true;
+        for(HTTP_METHOD method: _allowedActions) {
+            sb.append(first?"\"":",\"").append(method).append("\"");
+            first = false;
+        }
+        sb.append("]}");
         return sb.toString();
-
     }
 
 

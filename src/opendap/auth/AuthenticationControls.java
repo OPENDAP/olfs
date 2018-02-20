@@ -46,9 +46,6 @@ public class AuthenticationControls {
     private static Logger _log;
     private static boolean _initialized ;
 
-
-    private BesApi _besApi;
-
     private static String _loginPath;
     private static String _logoutPath;
     private static String _defaultLoginPath;

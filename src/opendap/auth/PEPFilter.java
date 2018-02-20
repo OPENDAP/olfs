@@ -91,7 +91,7 @@ public class PEPFilter implements Filter {
             configFileName = _defaultConfigFileName;
             String msg = "init() - The web.xml configuration for "+getClass().getName()+
                     " does not contain an init-parameter named \""+_configParameterName+"\" " +
-                    "Using to DEFAULT name: "+configFileName;
+                    "Using the DEFAULT name: "+configFileName;
             _log.warn(msg);
         }
 
