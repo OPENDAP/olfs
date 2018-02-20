@@ -58,7 +58,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
                 <h1>
                     <xsl:value-of select="wcs:Service/wcs:label"/>
                 </h1>

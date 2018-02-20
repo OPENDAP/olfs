@@ -71,7 +71,7 @@
                 <table width="100%" border="0">
                     <tr>
                         <td>
-                            <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.gif"/>
+                            <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
                             <div class="large">DAP4 Data Access Form</div>

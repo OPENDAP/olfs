@@ -55,7 +55,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
                 <h1>
                     WCS - Coverage Offering: <xsl:value-of select="wcs:label"/>
                 </h1>
