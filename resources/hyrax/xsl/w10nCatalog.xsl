@@ -86,7 +86,7 @@
 
                 <table width="100%" >
                     <tr>
-                        <td width="206px"><img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/></td>
+                        <td width="206px"><img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/></td>
                         <td align="center" class="xxlarge">w10n Service</td>
                     </tr>
                 </table>

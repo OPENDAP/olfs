@@ -68,7 +68,7 @@
                 <!--                      PAGE BANNER                       -->
                 <!--                                                        -->
                 <!--                                                        -->
-                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.gif"/>
+                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
 
                 <h1><xsl:value-of select="@name"/></h1>
                 <!-- ****************************************************** -->
