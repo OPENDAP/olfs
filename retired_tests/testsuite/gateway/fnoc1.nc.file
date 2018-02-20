@@ -6,7 +6,7 @@
 </head>
 
 <body>
-<img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.gif"/>
+<img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
 <h1>Hyrax : Access Denied (403) </h1>
 <hr align="left" size="1" noshade="noshade" />
 <div class="large">The requested URL directly references a data source. </div>
