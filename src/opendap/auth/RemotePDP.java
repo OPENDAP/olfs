@@ -112,7 +112,7 @@ public class RemotePDP extends PolicyDecisionPoint {
     }
 
     @Override
-    public boolean evaluate(String userId, String resourceId, String queryString, String actionId) {
+    public boolean evaluate(String userId, String authContext, String resourceId, String queryString, String actionId) {
 
 
         boolean result = false;
@@ -123,6 +123,7 @@ public class RemotePDP extends PolicyDecisionPoint {
             StringBuilder requestUrl = new StringBuilder();
             requestUrl.append(_pdpServiceEndpoint);
             requestUrl.append("?uid=").append(userId);
+            requestUrl.append("?authContext=").append(authContext);
             requestUrl.append("&resourceId=").append(resourceId);
             requestUrl.append("&query=").append(queryString);
             requestUrl.append("&action=").append(actionId);

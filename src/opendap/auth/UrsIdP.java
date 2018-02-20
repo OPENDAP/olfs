@@ -44,7 +44,7 @@ import java.util.Map;
  */
 public class UrsIdP extends IdProvider{
 
-    public static final String DEFAULT_ID="urs";
+    public static final String DEFAULT_AUTH_CONTEXT="urs";
 
     private Logger _log;
 
@@ -56,7 +56,7 @@ public class UrsIdP extends IdProvider{
     public UrsIdP(){
         super();
         _log = LoggerFactory.getLogger(this.getClass());
-        setId(DEFAULT_ID);
+        setAuthContext(DEFAULT_AUTH_CONTEXT);
         setDescription("The NASA Earthdata Login (formerly known as URS)");
     }
 

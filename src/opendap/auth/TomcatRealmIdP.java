@@ -39,7 +39,7 @@ import javax.servlet.http.HttpSession;
 public class TomcatRealmIdP extends IdProvider {
 
 
-    public static final String DEFAULT_ID="realm";
+    public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
     private Logger _log;
@@ -49,7 +49,7 @@ public class TomcatRealmIdP extends IdProvider {
         super();
         _log = LoggerFactory.getLogger(this.getClass());
 
-        setId(DEFAULT_ID);
+        setAuthContext(DEFAULT_AUTHENICATION_CONTEXT);
         setDescription("Tomcat Realm Authentication");
     }
 

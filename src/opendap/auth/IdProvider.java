@@ -39,25 +39,25 @@ import java.io.IOException;
 public abstract class  IdProvider {
 
 
-    protected String _id;
+    protected String _authContext;
     protected String _description;
 
 
     public IdProvider(){
-        _id = "IdProvider";
+        _authContext = "IdProvider";
         _description = "Abstract Identification Service Provider";
 
     }
 
     public String getLoginContext(){
-        return "/" + _id;
+        return "/" + _authContext;
     }
 
 
 
 
-    public  String getId(){ return _id; }
-    public  void  setId(String id){ _id = id; }
+    public  String getAuthContext(){ return _authContext; }
+    public  void setAuthContext(String authContext){ _authContext = authContext; }
 
     public  String getDescription(){ return _description; }
     public  void setDescription(String d){ _description = d; }
@@ -70,7 +70,7 @@ public abstract class  IdProvider {
 
         Element e = config.getChild("id");
         if(e!=null){
-            setId(e.getTextTrim());
+            setAuthContext(e.getTextTrim());
         }
 
         e = config.getChild("description");

@@ -38,22 +38,15 @@ import java.util.HashSet;
 public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
 
     private String _uid;
-    private HashSet<String> _groups;
 
     public AuthenticatedHttpRequest(HttpServletRequest request) {
         super(request);
-        _groups = new HashSet<String>();
     }
 
     public void setUid(String uid){
         _uid = uid;
-
     }
 
-    public boolean addRole(String role){
-        return _groups.add(role);
-
-    }
 
     @Override
     public String getRemoteUser(){

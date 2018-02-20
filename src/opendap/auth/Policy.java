@@ -33,10 +33,10 @@ import org.jdom.Element;
  */
 public interface Policy {
 
-    public void init(Element config) throws ConfigurationException;
+    void init(Element config) throws ConfigurationException;
 
 
-    public boolean evaluate(String roleId, String ResourceId, String queryString, String httpMethod);
+    boolean evaluate(String roleId, String ResourceId, String queryString, String httpMethod);
 
     enum HTTP_METHOD {
         GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT

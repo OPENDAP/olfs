@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
@@ -55,13 +56,13 @@ public class PEPFilter implements Filter {
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
     private String _defaultLogingEndpoint;
-    private String _configParameterName;
+    private static String _configParameterName = "config";
+    private static String _defaultConfigFileName = "PEPFilter.xml";
 
     public PEPFilter() {
         _everyOneMustHaveUid = false;
         _defaultLogingEndpoint=null;
         _is_initialized = false;
-        _configParameterName = "config";
     }
 
 
@@ -87,18 +88,21 @@ public class PEPFilter implements Filter {
 
         String configFileName = _filterConfig.getInitParameter(_configParameterName);
         if(configFileName==null){
-            String msg = "init() - OUCH! The web.xml configuration for "+getClass().getName()+
-            " must contain an init-parameter named \""+_configParameterName+"\"";
-            _log.error(msg);
-            throw new ConfigurationException(msg);
+            configFileName = _defaultConfigFileName;
+            String msg = "init() - The web.xml configuration for "+getClass().getName()+
+                    " does not contain an init-parameter named \""+_configParameterName+"\" " +
+                    "Using to DEFAULT name: "+configFileName;
+            _log.warn(msg);
         }
 
         String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
         File configFile = new File(configDirName,configFileName);
         Element config;
         config = opendap.xml.Util.getDocumentRoot(configFile);
+
         Element e = config.getChild("PolicyDecisionPoint");
         _pdp = pdpFactory(e);
+
         e = config.getChild("EveryOneMustHaveId");
         if(e !=null){
             _everyOneMustHaveUid = true;
@@ -161,6 +165,7 @@ public class PEPFilter implements Filter {
                 String msg = "doFilter() - PEPFilter INITIALIZATION HAS FAILED! " +
                         "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
                 _log.error(msg);
+                OPeNDAPException.setCachedErrorMessage(msg);
                 throw new ServletException(msg,e);
             }
         }
@@ -171,15 +176,28 @@ public class PEPFilter implements Filter {
 
         // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
         String userId = null;
-        String remoteUser = hsReq.getRemoteUser();
-        if(remoteUser == null) {
-            Principal userPrinciple = hsReq.getUserPrincipal();
-            if (userPrinciple != null) {
-                userId = userPrinciple.getName();
+        String authContext = null;
+        HttpSession session = hsReq.getSession(false);
+        if(session!=null){
+            UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            if(userProfile!=null){
+                userId = userProfile.getUID();
+                IdProvider ipd = userProfile.getIdP();
+                authContext = ipd.getAuthContext();
             }
         }
-        else {
-            userId = remoteUser;
+
+        if(userId==null) {
+            String remoteUser = hsReq.getRemoteUser();
+            if (remoteUser == null) {
+                Principal userPrinciple = hsReq.getUserPrincipal();
+                if (userPrinciple != null) {
+                    userId = userPrinciple.getName();
+                }
+            } else {
+                userId = remoteUser;
+            }
+            // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
         }
 
         // So - Do they have to be authenticated?

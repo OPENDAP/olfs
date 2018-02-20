@@ -51,8 +51,8 @@ public class UserProfile {
     public UserProfile() {
         _objectCreationTime = new Date();
         _jsonInit = new JsonObject();
-        _groups = new HashSet<String>();
-        _roles = new HashSet<String>();
+        _groups = new HashSet<>();
+        _roles = new HashSet<>();
         _idp  = null;
     }
 
@@ -62,7 +62,7 @@ public class UserProfile {
         Gson gson = new Gson();
         String  jsonString = gson.toJson(json);
 
-        _jsonInit      = gson.fromJson(jsonString, JsonObject.class);
+        _jsonInit = gson.fromJson(jsonString, JsonObject.class);
     }
 
 

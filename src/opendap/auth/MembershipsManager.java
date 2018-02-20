@@ -30,6 +30,7 @@ import org.jdom.Element;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -58,53 +59,56 @@ public class MembershipsManager {
         }
     }
 
-    public static void addGroup(Element groupElem) throws ConfigurationException {
+    private static void addGroup(Element groupElem) throws ConfigurationException {
         String gid = groupElem.getAttributeValue("id");
         if (gid == null) {
-            throw new ConfigurationException("init(): Every <group> must have an \"id\" attribute.");
+            throw new ConfigurationException("init() - Every <group> MUST have an \"id\" attribute.");
         }
 
-        Iterator uItr = groupElem.getChildren("user").iterator();
-        if(uItr.hasNext()){
-            Group group = _groups.get(gid);
-            if (group == null) {
-                group = new Group(gid);
-                _groups.put(gid, group);
-            }
-
-            while (uItr.hasNext()) {
-                Element user = (Element) uItr.next();
-                String uid = user.getAttributeValue("id");
-                String uidPatternStr = user.getAttributeValue("idPattern");
-                if ((uid==null && uidPatternStr == null) || (uid!=null && uidPatternStr!=null)) {
-                    throw new ConfigurationException("init(): Every <user> MUST have either an \"id\" attribute " +
-                            "or an \"idPattern\" attribute, but NOT both.");
-                }
-
-                String authContext = user.getAttributeValue("authContext");
-                String authContextPatternStr = user.getAttributeValue("authContextPattern");
-                if (authContext == null) {
-                    throw new ConfigurationException("init(): Every <user> must have an \"authContext\" attribute.");
-                }
-                if ((authContext==null && authContextPatternStr == null) || (authContext!=null && authContextPatternStr!=null)) {
-                    throw new ConfigurationException("init(): Every <user> MUST have either an \"authContext\" attribute " +
-                            "or an \"authContextPattern\" attribute, but NOT both.");
-                }
-
-                if(uid!=null){
-                    uidPatternStr = Pattern.quote(uid);
-                }
-                if(authContext!=null){
-                    authContextPatternStr = Pattern.quote(authContext);
-                }
-                group.addUserPattern(uidPatternStr,authContextPatternStr);
-            }
-
+        Group group = _groups.get(gid);
+        if (group == null) {
+            group = new Group(gid);
+            _groups.put(gid, group);
         }
+
+        Iterator userItr = groupElem.getChildren("user").iterator();
+        if(!userItr.hasNext()){
+            throw new ConfigurationException("init() - Every <group> MUST have at least one <user> element.");
+        }
+
+        while (userItr.hasNext()) {
+            Element user = (Element) userItr.next();
+            String uid = user.getAttributeValue("id");
+            String uidPatternStr = user.getAttributeValue("idPattern");
+            if ((uid==null && uidPatternStr == null) || (uid!=null && uidPatternStr!=null)) {
+                throw new ConfigurationException("init(): Every <user> MUST have either an \"id\" attribute " +
+                        "or an \"idPattern\" attribute, but NOT both.");
+            }
+            if(uid!=null){
+                // We turn the uid string into a literal pattern to prevent it from actually being
+                // interpreted as a pattern...
+                uidPatternStr = Pattern.quote(uid);
+            }
+
+            String authContext = user.getAttributeValue("authContext");
+            String authContextPatternStr = user.getAttributeValue("authContextPattern");
+            if ((authContext==null && authContextPatternStr == null) || (authContext!=null && authContextPatternStr!=null)) {
+                throw new ConfigurationException("init(): Every <user> MUST have either an \"authContext\" attribute " +
+                        "or an \"authContextPattern\" attribute, but NOT both.");
+            }
+
+            if(authContext!=null){
+                // We turn the authContext string into a literal pattern to prevent it from actually being
+                // interpreted as a pattern...
+                authContextPatternStr = Pattern.quote(authContext);
+            }
+            group.addUserPattern(uidPatternStr,authContextPatternStr);
+        }
+
 
 
     }
-    public static void addRole(Element roleElem) throws ConfigurationException {
+    private static void addRole(Element roleElem) throws ConfigurationException {
         String rid = roleElem.getAttributeValue("id");
         if (rid == null) {
             throw new ConfigurationException("init(): Every <role> must have an \"id\" attribute.");
@@ -131,12 +135,11 @@ public class MembershipsManager {
 
 
 
-    public static HashSet<String> getUserGroups(String uid, String authContext){
-
-        HashSet<String> groupMemberships = new HashSet<>();
+    private static Vector<String> getUserGroups(String uid, String authContext){
+        Vector<String> groupMemberships = new Vector<>();
         for(Group group: _groups.values()){
             if(group.isMember(uid, authContext)){
-                groupMemberships.add(group._name);
+                groupMemberships.add(group.name());
             }
         }
         return groupMemberships;
@@ -144,20 +147,19 @@ public class MembershipsManager {
 
     public static HashSet<String> getUserRoles(String uid, String authContext){
 
-        HashSet<String> userGroups = getUserGroups(uid,authContext);
+        HashSet<String> userRoles = new HashSet<>();
 
-        HashSet<String> roles = new HashSet<>();
-        for(String rid: _roles.keySet()){
-            HashSet<String> members = _roles.get(rid);
-
+        Vector<String> userGroups = getUserGroups(uid,authContext);
+        for(String roleId: _roles.keySet()){
+            HashSet<String> members = _roles.get(roleId);
             for(String gid: userGroups) {
                 if (members.contains(gid)) {
-                    roles.add(rid);
+                    userRoles.add(roleId);
                     break;
                 }
             }
         }
-         return roles;
+         return userRoles;
     }
 
 }

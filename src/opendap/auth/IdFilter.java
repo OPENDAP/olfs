@@ -56,7 +56,9 @@ public class IdFilter implements Filter {
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
-    private String _configParameterName;
+
+    private static final String _configParameterName = "config";
+    private static final String _defaultConfigFileName = "idFilter.xml";
 
     private String _guest_endpoint;
     private boolean _enableGuestProfile;
@@ -65,7 +67,6 @@ public class IdFilter implements Filter {
         _idProviders = new ConcurrentHashMap<>();
         _is_initialized = false;
         _loginBanner = null;
-        _configParameterName="config";
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -91,10 +92,11 @@ public class IdFilter implements Filter {
 
         String configFileName = _filterConfig.getInitParameter(_configParameterName);
         if(configFileName==null){
-            String msg = "init() - OUCH! The web.xml configuration for "+getClass().getName()+
-                    " must contain an init-parameter named \""+_configParameterName+"\"";
-            _log.error(msg);
-            throw new ConfigurationException(msg);
+            configFileName = _defaultConfigFileName;
+            String msg = "init() - The web.xml configuration for "+getClass().getName()+
+                    " does not contain an init-parameter named \""+_configParameterName+"\" " +
+                    "Using to DEFAULT name: "+configFileName;
+            _log.warn(msg);
         }
 
         String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
@@ -129,7 +131,7 @@ public class IdFilter implements Filter {
         for (Object o : config.getChildren("IdProvider")) {
             Element idpConfig = (Element) o;
             IdProvider idp = idpFactory(idpConfig);
-            _idProviders.put(idp.getId(), idp);
+            _idProviders.put(idp.getAuthContext(), idp);
         }
         _is_initialized = true;
         _log.info("init() - IdFilter HAS BEEN INITIALIZED!");
@@ -233,7 +235,7 @@ public class IdFilter implements Filter {
                         return;
 
                     } catch (Exception e) {
-                        _log.error("doFilter() - {} Login Interaction FAILED! Message: {}",idProvider.getId(), e.getMessage());
+                        _log.error("doFilter() - {} Login Interaction FAILED! Message: {}",idProvider.getAuthContext(), e.getMessage());
                         throw new IOException(e);
                     }
                 }
@@ -242,7 +244,7 @@ public class IdFilter implements Filter {
         //
         // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
         // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
-        // the presence of the user_profile attribute in the session) we need to spoof the API to show our
+        // the presence of the USER_PROFILE attribute in the session) we need to spoof the API to show our
         // authenticated user.
         //
         UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
@@ -251,7 +253,7 @@ public class IdFilter implements Filter {
             authReq.setUid(up.getUID());
             hsReq = authReq;
         }
-        // Cache the  request URL in the session. We dos this here because we know by now that the request was
+        // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
         session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
 
@@ -285,7 +287,7 @@ public class IdFilter implements Filter {
                 _log.info("doLogout() - Logging out user '{}'", up.getUID());
                 IdProvider idProvider = up.getIdP();
                 if (idProvider != null) {
-                    _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getId());
+                    _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getAuthContext());
                     // Redirect to ORIGINAL_REQUEST_URL is done by idProvider
                     idProvider.doLogout(request, response);
                     _log.info("doLogout() - END");

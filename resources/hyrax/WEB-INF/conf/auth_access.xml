@@ -69,7 +69,7 @@
             </group>
 
             <group id="urs_users" >
-                <user id="*" loginContext="urs" />
+                <user idPattern="^(?!\s*$).+" loginContext="urs" />
             </group>
 
 

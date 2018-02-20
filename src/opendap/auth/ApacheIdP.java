@@ -41,7 +41,8 @@ import java.io.IOException;
 public class ApacheIdP extends IdProvider {
 
 
-    public static final String DEFAULT_ID="apache";
+    public static final String DEFAULT_AUTHENTICATION_CONTEXT="apache";
+
     /**
      * Default service point for the mod_shib Logout
      */
@@ -72,7 +73,7 @@ public class ApacheIdP extends IdProvider {
         super();
         _log = LoggerFactory.getLogger(this.getClass());
 
-        setId(DEFAULT_ID);
+        setAuthContext(DEFAULT_AUTHENTICATION_CONTEXT);
         setDescription("Apache Identity Provider");
 
         _loginLocation = DEFAULT_LOGIN_LOCATION;
