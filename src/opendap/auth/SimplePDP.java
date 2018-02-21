@@ -100,7 +100,7 @@ public class SimplePDP extends PolicyDecisionPoint {
             addPolicy(p);
         }
         Element memberships = config.getChild("Memberships");
-        MembershipsManager.init(memberships);
+        MembershipRulesManager.init(memberships);
    }
 
     @Override
@@ -132,7 +132,7 @@ public class SimplePDP extends PolicyDecisionPoint {
                 "queryString: \""+queryString+"\", " +
                 "httpMethod:\""+httpMethod+"\"}");
 
-        HashSet<String> userRoles = MembershipsManager.getUserRoles(userId,authContext);
+        HashSet<String> userRoles = MembershipRulesManager.getUserRoles(userId,authContext);
 
         if(userRoles.isEmpty()){
             userRoles.add("");

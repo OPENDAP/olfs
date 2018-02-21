@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 /**
  * Created by ndp on 10/1/14.
  */
-public class MembershipsManager {
+public class MembershipRulesManager {
 
     private static ConcurrentHashMap<String, Group> _groups;
     private static ConcurrentHashMap<String, HashSet<String>> _roles;

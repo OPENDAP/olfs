@@ -41,7 +41,7 @@
     <!-- EveryOneMustHaveId / -->
 
     <IdProvider class="opendap.auth.UrsIdP">
-        <id>urs</id>
+        <authContext>urs</authContext>
         <isDefault />
         <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
         <UrsClientAuthCode>aVBsRWpaak12cmR3TFVsbmJhS3hXUTpKSEdqa2hmZzY3OA==</UrsClientAuthCode>

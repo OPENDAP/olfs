@@ -107,20 +107,6 @@ public class PEPFilter implements Filter {
             _everyOneMustHaveUid = true;
         }
 
-        /*
-        e = config.getChild("UseDefaultLoginEndpoint");
-        if(e !=null){
-            String href = e.getAttributeValue("href");
-            if(href!=null){
-                _defaultLogingEndpoint = PathBuilder.pathConcat(_filterConfig.getServletContext().getContextPath(),href);
-                _log.info("init() - Using Default Login Endpoint: {}",_defaultLogingEndpoint);
-            }
-            else {
-                _log.error("init() - The configuration parameter UseDefaultLoginEndpoint is missing the " +
-                        "required href attribute! UseDefaultLoginEndpoint is DISABLED.");
-            }
-        }
-        */
         _is_initialized = true;
         _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
     }

@@ -74,7 +74,7 @@ public abstract class  IdProvider {
         if(config == null){
             throw new ConfigurationException("init(): Configuration element may not be null.");
         }
-        Element e = config.getChild("id");
+        Element e = config.getChild("authContext");
         if(e!=null){
             setAuthContext(e.getTextTrim());
         }
