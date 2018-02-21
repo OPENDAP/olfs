@@ -51,22 +51,19 @@ public class IdFilter implements Filter {
     public static final String ORIGINAL_REQUEST_URL = "original_request_url";
     public static final String USER_PROFILE         = "user_profile";
     public static final String IDENTITY_PROVIDER    = "identity_provider";
-    private ConcurrentHashMap<String,IdProvider> _idProviders;
-    private String _loginBanner;
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
 
     private static final String _configParameterName = "config";
-    private static final String _defaultConfigFileName = "idFilter.xml";
+    private static final String _defaultConfigFileName = "user-access.xml";
+
 
     private String _guest_endpoint;
     private boolean _enableGuestProfile;
 
     public IdFilter(){
-        _idProviders = new ConcurrentHashMap<>();
         _is_initialized = false;
-        _loginBanner = null;
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -106,17 +103,8 @@ public class IdFilter implements Filter {
         Element config;
         config = opendap.xml.Util.getDocumentRoot(configFile);
 
-        // Init the Login Banner
-        Element e = config.getChild("LoginBanner");
-        if(e!=null){
-            _loginBanner = e.getTextTrim();
-        }
-        if(_loginBanner==null){
-            _loginBanner = "Welcome to The Burrow.";
-        }
-        _log.info("init() - Login Banner: {}",_loginBanner);
 
-        e = config.getChild("EnableGuestProfile");
+        Element e = config.getChild("EnableGuestProfile");
         if(e!=null){
             _enableGuestProfile = true;
             _guest_endpoint = PathBuilder.pathConcat(context, "guest");
@@ -127,44 +115,17 @@ public class IdFilter implements Filter {
         // because we know that it will still configure the login/logout endpoint values.
         AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),context);
 
+        IdPManager.setServiceContext(context);
         // Load ID Providers (Might be several)
         for (Object o : config.getChildren("IdProvider")) {
             Element idpConfig = (Element) o;
-            IdProvider idp = idpFactory(idpConfig);
-            _idProviders.put(idp.getAuthContext(), idp);
+            IdPManager.addProvider(idpConfig);
         }
         _is_initialized = true;
         _log.info("init() - IdFilter HAS BEEN INITIALIZED!");
     }
 
 
-    public IdProvider idpFactory(Element config) throws ConfigurationException {
-        String msg;
-        if(config==null) {
-            msg = "Configuration MAY NOT be null!.";
-            _log.error("idpFactory() -  {}",msg);
-            throw new ConfigurationException(msg);
-        }
-        String idpClassName = config.getAttributeValue("class");
-
-        if(idpClassName==null) {
-            msg = "IdProvider definition must contain a \"class\" attribute whose value is the class name of the IdProvider implementation to be created.";
-            _log.error("idpFactory() - {}",msg);
-            throw new ConfigurationException(msg);
-        }
-        try {
-            _log.debug("idpFactory(): Building Identity Provider: " + idpClassName);
-            Class classDefinition = Class.forName(idpClassName);
-            IdProvider idp = (IdProvider) classDefinition.newInstance();
-            idp.init(config);
-            return idp;
-        } catch (Exception e) {
-            msg = "Unable to manufacture an instance of "+idpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error("idpFactory() - {}"+msg);
-            throw new ConfigurationException(msg, e);
-
-        }
-    }
 
 
 
@@ -212,11 +173,12 @@ public class IdFilter implements Filter {
         }
         else
         {
-            // Check IdProviders to see is this request is a valid login context.
-            for(IdProvider idProvider: _idProviders.values()){
-                String loginContext = PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), idProvider.getLoginContext());
-                if( requestURI.equals(loginContext)) {
-                    if(requestUrl.equals(loginContext))
+            // Check IdProviders to see if this request is a valid login context.
+            for(IdProvider idProvider: IdPManager.getProviders()){
+                String loginEndpoint = idProvider.getLoginEndpoint();
+                if(requestURI.equals(loginEndpoint)) {
+                    String returnToUrl =  (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+                    if(returnToUrl!=null && returnToUrl.equals(loginEndpoint))
                         session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
                     try {
                         //
@@ -364,10 +326,10 @@ public class IdFilter implements Filter {
 
         noProfile.append("<ul>");
 
-        for(IdProvider idProvider: _idProviders.values()) {
-            String contextPath = request.getContextPath();
-            String loginContext = contextPath + "/login" + idProvider.getLoginContext();
-            noProfile.append("<li><a href=\"").append(loginContext).append("\">");
+        for(IdProvider idProvider: IdPManager.getProviders()) {
+            String loginEndpoint = idProvider.getLoginEndpoint();
+            loginEndpoint = PathBuilder.pathConcat(loginEndpoint,idProvider.getAuthContext());
+            noProfile.append("<li><a href=\"").append(loginEndpoint).append("\">");
             noProfile.append(idProvider.getDescription());
             noProfile.append("</a><br/><br/></li>");
         }
@@ -388,7 +350,7 @@ public class IdFilter implements Filter {
         // Generate the html page header
 		PrintWriter out = response.getWriter();
 		out.println("<html><head><title></title></head>");
-		out.println("<body><h1>"+_loginBanner+"</h1>");
+		out.println("<body><h1>"+AuthenticationControls.getLoginBanner()+"</h1>");
         out.println("<hr/>");
 
         if(request.getRemoteUser()!=null || request.getUserPrincipal()!=null) {
