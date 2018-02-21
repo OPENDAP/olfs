@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,13 +26,18 @@
 
 package opendap.auth;
 
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 
@@ -43,94 +48,69 @@ import java.security.Principal;
 public class PEPFilter implements Filter {
 
     private Logger _log;
-
-
     private PolicyDecisionPoint _pdp;
-
     private boolean _everyOneMustHaveUid;
+    private String _unauthorizedMsg = "We don't know who you are! Login and let us know, and then maybe you can have what you want.";
 
+    private boolean _is_initialized;
+    private FilterConfig _filterConfig;
+    //private String _defaultLogingEndpoint;
+    private static String _configParameterName = "config";
+    private static String _defaultConfigFileName = "user-access.xml";
+
+    public PEPFilter() {
+        _everyOneMustHaveUid = false;
+        //_defaultLogingEndpoint=null;
+        _is_initialized = false;
+    }
 
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        _filterConfig = filterConfig;
+        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
+        try {
+            init();
+        }
+        catch (IOException | JDOMException | ConfigurationException se){
+            _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE PEPFilter! " +
+                    "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
 
-        _log = LoggerFactory.getLogger(filterConfig.getFilterName());
+        }
 
-        _everyOneMustHaveUid = false;
+    }
+    public void init() throws IOException, JDOMException, ConfigurationException {
 
-        String msg;
+        if(_is_initialized)
+            return;
+        _log.info("init() - Initializing PEPFilter...");
 
-        String configFile = filterConfig.getInitParameter("config");
+        String configFileName = _filterConfig.getInitParameter(_configParameterName);
+        if(configFileName==null){
+            configFileName = _defaultConfigFileName;
+            String msg = "init() - The web.xml configuration for "+getClass().getName()+
+                    " does not contain an init-parameter named \""+_configParameterName+"\" " +
+                    "Using the DEFAULT name: "+configFileName;
+            _log.warn(msg);
+        }
 
+        String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
+        File configFile = new File(configDirName,configFileName);
         Element config;
+        config = opendap.xml.Util.getDocumentRoot(configFile);
 
-        try {
-            config = opendap.xml.Util.getDocumentRoot(configFile);
+        Element e = config.getChild("PolicyDecisionPoint");
+        _pdp = PolicyDecisionPoint.pdpFactory(e);
 
-
-
-            Element e = config.getChild("PolicyDecisionPoint");
-
-            _pdp = pdpFactory(e);
-
-
-            e = config.getChild("EveryOneMustHaveId");
-            if(e !=null){
-                _everyOneMustHaveUid = true;
-            }
-
-
-        } catch (Exception e) {
-            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error(msg);
-            throw new ServletException(msg, e);
-
+        e = config.getChild("EveryOneMustHaveId");
+        if(e !=null){
+            _everyOneMustHaveUid = true;
         }
 
-
-
+        _is_initialized = true;
+        _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
     }
 
-
-    public PolicyDecisionPoint pdpFactory(Element config) throws ConfigurationException {
-        String msg;
-
-
-        if(config==null) {
-            msg = "Configuration MAY NOT be null!.";
-            _log.error("pdpFactory():  {}",msg);
-            throw new ConfigurationException(msg);
-        }
-
-
-        String pdpClassName = config.getAttributeValue("class");
-
-        if(pdpClassName==null) {
-            msg = "PolicyDecisionPoint definition must contain a \"class\" attribute whose value is the class name of the PolicyDecisionPoint implementation to be created.";
-            _log.error("pdpFactory(): {}",msg);
-            throw new ConfigurationException(msg);
-        }
-
-        try {
-
-            _log.debug("pdpFactory(): Building PolicyDecisionPoint: " + pdpClassName);
-            Class classDefinition = Class.forName(pdpClassName);
-            PolicyDecisionPoint pdp = (PolicyDecisionPoint) classDefinition.newInstance();
-
-            pdp.init(config);
-
-            return pdp;
-
-
-        } catch (Exception e) {
-            msg = "Unable to manufacture an instance of "+pdpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error("pdpFactory(): {}"+msg);
-            throw new ConfigurationException(msg, e);
-
-        }
-
-
-    }
 
 
 
@@ -140,45 +120,83 @@ public class PEPFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
+        if(!_is_initialized) {
+            try {
+                init();
+            }
+            catch (IOException | JDOMException | ConfigurationException e){
+                String msg = "doFilter() - PEPFilter INITIALIZATION HAS FAILED! " +
+                        "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
+                _log.error(msg);
+                OPeNDAPException.setCachedErrorMessage(msg);
+                throw new ServletException(msg,e);
+            }
+        }
+
 
         HttpServletRequest  hsReq = (HttpServletRequest)  request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
 
-
         // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
         String userId = null;
-        String remoteUser = hsReq.getRemoteUser();
-        if(remoteUser == null) {
-            Principal userPrinciple = hsReq.getUserPrincipal();
-            if (userPrinciple != null) {
-                userId = userPrinciple.getName();
+        String authContext = null;
+        HttpSession session = hsReq.getSession(false);
+        if(session!=null){
+            UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            if(userProfile!=null){
+                userId = userProfile.getUID();
+                IdProvider ipd = userProfile.getIdP();
+                authContext = ipd.getAuthContext();
             }
-
-        }
-        else {
-            userId = remoteUser;
         }
 
-
+        if(userId==null) {
+            String remoteUser = hsReq.getRemoteUser();
+            if (remoteUser == null) {
+                Principal userPrinciple = hsReq.getUserPrincipal();
+                if (userPrinciple != null) {
+                    userId = userPrinciple.getName();
+                }
+            } else {
+                userId = remoteUser;
+            }
+            // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
+        }
 
         // So - Do they have to be authenticated?
         if(userId == null  && _everyOneMustHaveUid) {
-            hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            if(IdPManager.hasDefaultProvider()) {
+                hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
+            }
+            else {
+                OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            }
             return;
         }
-
-
         // Are they allowed access?
-        if(requestIsGranted(userId, hsReq)){
+        if(requestIsGranted(userId, authContext, hsReq)){
+            // Yup, so we just move along...
             filterChain.doFilter(hsReq, hsRes);
         }
         else {
-            if(userId == null)
-                hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            else
+            // Access was denied, so...
+            if(userId == null) {
+                // If they aren't logged in then we tell them to do that
+                if(IdPManager.hasDefaultProvider()) {
+                    hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
+                }
+                else {
+                    OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                    hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+            }
+            else {
+                // If they are logged in then we tell them NO.
+                OPeNDAPException.setCachedErrorMessage("I'm Sorry "+userId+", But I'm Afraid You Can't Do That.");
                 hsRes.sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
         }
-
     }
 
     @Override
@@ -187,30 +205,18 @@ public class PEPFilter implements Filter {
     }
 
 
-
-
-    public boolean requestIsGranted(String userId, HttpServletRequest request){
-
+    public boolean requestIsGranted(String userId, String authContext,  HttpServletRequest request){
 
         if(userId == null){
             userId = "";
         }
-
         String resourceId   = request.getRequestURI();
         String queryString  = request.getQueryString();
         if(queryString == null){
             queryString = "";
         }
         String action       = request.getMethod();
-
-
-
-
-        return _pdp.evaluate(userId,resourceId,queryString,action);
-
-
+        return _pdp.evaluate(userId, authContext, resourceId,queryString,action);
     }
-
-
 
 }

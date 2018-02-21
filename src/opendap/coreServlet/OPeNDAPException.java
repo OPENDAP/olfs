@@ -597,4 +597,10 @@ public class OPeNDAPException extends Exception {
         return Encode.forHtml(msg);
     }
 
+    public static void setCachedErrorMessage(String s){
+        _errorMessageCache.put(Thread.currentThread(),s);
+    }
+
+
+
 }

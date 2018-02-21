@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -29,7 +29,6 @@ package opendap.auth;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.security.Principal;
-import java.util.HashSet;
 
 /**
  * Created by ndp on 10/7/14.
@@ -38,22 +37,15 @@ import java.util.HashSet;
 public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
 
     private String _uid;
-    private HashSet<String> _groups;
 
     public AuthenticatedHttpRequest(HttpServletRequest request) {
         super(request);
-        _groups = new HashSet<String>();
     }
 
     public void setUid(String uid){
         _uid = uid;
-
     }
 
-    public boolean addRole(String role){
-        return _groups.add(role);
-
-    }
 
     @Override
     public String getRemoteUser(){

@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import javax.servlet.http.HttpSession;
 public class TomcatRealmIdP extends IdProvider {
 
 
-    public static final String DEFAULT_ID="realm";
+    public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
     private Logger _log;
@@ -49,11 +50,9 @@ public class TomcatRealmIdP extends IdProvider {
         super();
         _log = LoggerFactory.getLogger(this.getClass());
 
-        setId(DEFAULT_ID);
+        setAuthContext(DEFAULT_AUTHENICATION_CONTEXT);
         setDescription("Tomcat Realm Authentication");
     }
-
-
 
 
     /**
@@ -96,5 +95,19 @@ public class TomcatRealmIdP extends IdProvider {
 
 
         return true;
+    }
+
+    @Override
+    public String getLoginEndpoint(){
+        String loginEndpoint = PathBuilder.pathConcat(_serviceContext,AuthenticationControls.getLoginEndpoint());
+        loginEndpoint = PathBuilder.pathConcat(loginEndpoint,_authContext);
+        return loginEndpoint;
+    }
+
+
+    @Override
+    public String getLogoutEndpoint() {
+        String logoutEndpoint = PathBuilder.pathConcat(_serviceContext,AuthenticationControls.getLogoutEndpoint());
+        return logoutEndpoint;
     }
 }

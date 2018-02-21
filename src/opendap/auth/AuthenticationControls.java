@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2015 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -23,17 +23,16 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-package opendap.http;
+package opendap.auth;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.PathBuilder;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.IDN;
 import java.security.Principal;
 
 /**
@@ -41,27 +40,36 @@ import java.security.Principal;
  */
 public class AuthenticationControls {
 
-    public static final String CONFIG_ELEMENT = "AuthenticationControls";
+    public static final String CONFIG_ELEMENT = "EnableAuthenticationControls";
 
     private static Logger _log;
     private static boolean _initialized ;
 
-
-    private BesApi _besApi;
-
     private static String _loginPath;
     private static String _logoutPath;
+    private static String _defaultLoginPath;
+    private static String _defaultLogoutPath;
+
+    private static String _loginBanner;
 
     static {
         _log = LoggerFactory.getLogger(AuthenticationControls.class);
         _loginPath = null;
         _logoutPath = null;
         _initialized = false;
+        _defaultLoginPath = "/login";
+        _defaultLogoutPath = "/logout";
+        _loginBanner = "Welcome To The Burrow!";
     }
 
     private AuthenticationControls() {
-
     }
+
+
+    public static boolean isIntitialized(){
+        return _initialized;
+    }
+
 
 
     /**
@@ -80,68 +88,94 @@ public class AuthenticationControls {
      * @throws Exception When the bad things happen.
      * @see opendap.coreServlet.DispatchServlet
      */
-    public static void init(Element config) throws Exception {
+    public static void init(Element config, String contextPath) {
 
-       if(_initialized)
+       if(_initialized) {
+           _log.warn("init() - AuthenticationControls have ALREADY been initialized. " +
+                   "This subsequent attempt at initialization and the concomitant configuration have been ignored!");
            return;
-
-
+       }
 
         if (config != null) {
             if(config.getName().equals(CONFIG_ELEMENT)) {
 
-
+                _loginPath = _defaultLoginPath;
                 Element e = config.getChild("login");
                 if (e != null) {
                     _loginPath = e.getTextTrim();
                 }
+                _loginPath = PathBuilder.pathConcat(contextPath,_loginPath);
+                _log.info("init() - Login Path: {}",_loginPath);
+
+                _logoutPath = _defaultLogoutPath;
                 e = config.getChild("logout");
                 if (e != null) {
                     _logoutPath = e.getTextTrim();
                 }
+                _logoutPath = PathBuilder.pathConcat(contextPath,_logoutPath);
+                _log.info("init() - Logout Path: {}",_logoutPath);
+
+
+                // Init the Login Banner
+                e = config.getChild("LoginBanner");
+                if(e!=null){
+                    _loginBanner = e.getTextTrim();
+                }
+                _log.info("init() - Login Banner: {}",_loginBanner);
+
                 _initialized = true;
             }
-
+        }
+        else {
+           // Despite The AuthenticationControls not being initialized we still need these values to be valid.
+            _loginPath = PathBuilder.pathConcat(contextPath,_defaultLoginPath);
+            _logoutPath = PathBuilder.pathConcat(contextPath,_defaultLogoutPath);
         }
 
     }
 
-    public static String getLoginPath() {
+    public static String getLoginBanner(){
+        return _loginBanner;
+    }
+
+    public static String getLogoutEndpoint(){
         return _logoutPath;
     }
 
-    public static String getLogoutPath() {
+    public static String getLoginEndpoint() {
         return _loginPath;
     }
 
+
     public static void setLoginParameters(Transformer transformer, HttpServletRequest request) throws SaxonApiException {
 
-        Logger log = _log;
-        String userId = null;
-        Principal userPrinciple = request.getUserPrincipal();
-        if (request.getRemoteUser() != null) {
-            userId = request.getRemoteUser();
+        if(_initialized) {
+            String userId = null;
+            Principal userPrinciple = request.getUserPrincipal();
+            if (request.getRemoteUser() != null) {
+                userId = request.getRemoteUser();
 
-        } else if (userPrinciple != null) {
-            userId = userPrinciple.getName();
+            } else if (userPrinciple != null) {
+                userId = userPrinciple.getName();
+            }
+
+            _log.debug("xsltDir() - UserId: {}", userId);
+            if (userId != null) {
+                transformer.setParameter("userId", userId);
+            }
+            _log.debug("xsltDir() - _loginPath: {}", _loginPath);
+            if (_loginPath != null) {
+                transformer.setParameter("loginLink", _loginPath);
+            }
+            _log.debug("xsltDir() - _logoutPath: {}", _logoutPath);
+            if (_logoutPath != null) {
+                transformer.setParameter("logoutLink", _logoutPath);
+            }
         }
-
-        log.debug("xsltDir() - UserId: {}", userId);
-        if (userId != null) {
-            transformer.setParameter("userId", userId);
+        else {
+            _log.debug("setLoginParameters() - AuthenticationControls have not been initialized. " +
+                    "No Parameters Will Be Set.");
         }
-
-
-        log.debug("xsltDir() - _loginPath: {}", _loginPath);
-        if (_loginPath != null) {
-            transformer.setParameter("loginLink", _loginPath);
-        }
-
-        log.debug("xsltDir() - _logoutPath: {}", _logoutPath);
-        if (_logoutPath != null) {
-            transformer.setParameter("logoutLink", _logoutPath);
-        }
-
 
     }
 }

@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -27,13 +27,15 @@
 package opendap.auth;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-//import org.json.simple.JSONObject;
 
-// import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+
+//import org.json.simple.JSONObject;
+// import java.util.ArrayList;
 
 /**
  * Created by ndp on 9/25/14.
@@ -53,8 +55,8 @@ public class UserProfile {
     public UserProfile() {
         _objectCreationTime = new Date();
         _jsonInit = new JsonObject();
-        _groups = new HashSet<String>();
-        _roles = new HashSet<String>();
+        _groups = new HashSet<>();
+        _roles = new HashSet<>();
         _idp  = null;
     }
 
@@ -64,7 +66,7 @@ public class UserProfile {
         Gson gson = new Gson();
         String  jsonString = gson.toJson(json);
 
-        _jsonInit      = gson.fromJson(jsonString, JsonObject.class);
+        _jsonInit = gson.fromJson(jsonString, JsonObject.class);
     }
 
 
@@ -183,20 +185,17 @@ public class UserProfile {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-
-
         Gson gson = new Gson();
         String  jsonString = gson.toJson(_jsonInit);
-        JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
+        com.google.gson.JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
 
+        JsonArray myGroups = gson.fromJson(gson.toJson(_groups),JsonArray.class);
+        externalRepresentation.add("groups",myGroups);
 
+        JsonArray myRoles = gson.fromJson(gson.toJson(_roles),JsonArray.class);
+        externalRepresentation.add("roles",myRoles);
 
-        externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonObject.class));
-        externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonObject.class));
-
-        sb.append("UserProfile:").append(externalRepresentation.getAsString());
-
-
+        sb.append("UserProfile:").append(externalRepresentation.toString());
         return sb.toString();
 
 

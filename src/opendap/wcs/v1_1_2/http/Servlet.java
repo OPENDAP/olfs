@@ -255,7 +255,7 @@ public class Servlet extends HttpServlet {
             f.mkdirs();
         }
 
-        File semaphore = new File(serviceContentPath+".INIT");
+        File semaphore = new File(serviceContentPath+"wcs_service.xml");
         if(!semaphore.exists()){
             String initialContentDir = resourcePath + "initialContent/";
             log.info("Attempting to copy initial content for WCS from "+initialContentDir+" to "+serviceContentPath);

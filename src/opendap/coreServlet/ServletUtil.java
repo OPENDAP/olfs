@@ -92,58 +92,41 @@ public class ServletUtil {
         String configDirName = System.getenv(envVarName);
 
 
+        // Was the environment variable set?
         if (configDirName == null) {
+            // Nope... Check to see if the default location is available
             log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
             configDirName = defaultConfigDir;
             if (pathIsGood(configDirName)) {
+                // It's good so we'll use it.
                 log.info("Using config location: " + configDirName);
                 return configDirName;
             }
         } else {
-
+            // Ah Ha! The environment variable was set. Let's check it out...
             if (!configDirName.endsWith("/")) {
                 configDirName += "/";
             }
             if (pathIsGood(configDirName)) {
+                // It's good so we'll use it.
                 log.info("Using config location: " + configDirName);
                 return configDirName;
             }
         }
-
+        // Neither the default location or the environment defined location worked out so we fall back to the
+        // default configuration location in the web application deployment directory.
         configDirName = sc.getRealPath(webappConfDir);
-
         log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}", configDirName);
-
         String configPath="FAILED_To_Determine_Config_Path!";
 
         File cf = new File(configDirName);
         try {
             configPath = cf.getCanonicalPath() + "/";
-            // @TODO Understand (again) why the backslash replacement happens below and investigate if ask for a path separator from some java api the way to go.
+            // @TODO Understand (again) why the backslash replacement happens below and investigate if asking for a path separator from some java api the way to go.
             configPath = configPath.replace('\\', '/');
         } catch (IOException e) {
             log.error("Failed to produce a config path! Error: " + e.getMessage());
         }
-
-
-        /**
-         * OLD WAY - used a path relative application's deployment dir which sux for rpm installed Tomcat
-         *
-        String contentPath="FAILED_To_Determine_Content_Path!";
-        String tmpContentPath = "../../content" + sc.getContextPath() + "/";
-        String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
-
-        File cf = new File( filename );
-        try{
-          contentPath = cf.getCanonicalPath() +"/";
-          contentPath = contentPath.replace('\\','/');
-        } catch (IOException e) {
-            log.error("Failed to produce a content path! Error: "+e.getMessage());
-         }
-        log.debug("content path: '"+contentPath+"'");
-
-        */
-
 
         return configPath;
     }

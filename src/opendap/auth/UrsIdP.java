@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,7 +26,9 @@
 
 package opendap.auth;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import opendap.PathBuilder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ import java.util.Map;
  */
 public class UrsIdP extends IdProvider{
 
-    public static final String DEFAULT_ID="urs";
+    public static final String DEFAULT_AUTH_CONTEXT="urs";
 
     private Logger _log;
 
@@ -56,16 +58,16 @@ public class UrsIdP extends IdProvider{
     public UrsIdP(){
         super();
         _log = LoggerFactory.getLogger(this.getClass());
-        setId(DEFAULT_ID);
-        setDescription("The NASA EOSDIS User Registration System");
+        setAuthContext(DEFAULT_AUTH_CONTEXT);
+        setDescription("The NASA Earthdata Login (formerly known as URS)");
     }
 
 
 
 
     @Override
-    public void init(Element config) throws ConfigurationException {
-        super.init(config);
+    public void init(Element config, String serviceContext) throws ConfigurationException {
+        super.init(config, serviceContext);
 
         Element e;
         String eName;
@@ -280,6 +282,17 @@ public class UrsIdP extends IdProvider{
 
 	}
 
+    @Override
+    public String getLoginEndpoint(){
+        String loginEndpoint = PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(),_authContext);
+        return loginEndpoint;
+    }
+
+
+    @Override
+    public String getLogoutEndpoint() {
+        return AuthenticationControls.getLogoutEndpoint();
+    }
 
 
 

@@ -29,7 +29,7 @@ package opendap.bes;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.http.AuthenticationControls;
+import opendap.auth.AuthenticationControls;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
 import java.util.Date;
 
 
@@ -89,9 +88,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         _besApi = new BesApi();
 
 
-        Element loginControls = config.getChild("AuthenticationControls");
-
-        AuthenticationControls.init(loginControls);
+        // Moved this step to opendap.coreServlet.DispatchServlet
+        // Element loginControls = config.getChild("AuthenticationControls");
+        // AuthenticationControls.init(loginControls,s.getServletContext().getContextPath());
 
         initialized = true;
     }

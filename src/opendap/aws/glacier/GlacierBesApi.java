@@ -74,7 +74,6 @@ public class GlacierBesApi extends BesApi {
     }
 
 
-    @Override
     public boolean writeDDS(String dataSource, String constraintExpression, String xdap_accept, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
@@ -111,7 +110,6 @@ public class GlacierBesApi extends BesApi {
 
     }
 
-    @Override
     public boolean writeDAS(String dataSource, String constraintExpression, String xdap_accept, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
@@ -151,7 +149,6 @@ public class GlacierBesApi extends BesApi {
     public static final String XML_BASE_TAG = "#XML_BASE#";
 
 
-    @Override
     public boolean writeDDX(String dataSource, String constraintExpression, String xdap_accept,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
@@ -183,7 +180,7 @@ public class GlacierBesApi extends BesApi {
 
                 error.setMessage(errMsg);
                 error.setContext("Glacier Service");
-                error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                error.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
                 err.write(error.toString().getBytes());
 
@@ -197,7 +194,7 @@ public class GlacierBesApi extends BesApi {
 
             error.setMessage(errMsg);
             error.setContext("Glacier Service");
-            error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
+            error.setHttpStatusCode(HttpServletResponse.SC_NOT_FOUND);
 
             err.write(error.toString().getBytes());
         }
@@ -207,8 +204,7 @@ public class GlacierBesApi extends BesApi {
 
     }
 
-    @Override
-     public boolean writeDMR(String dataSource, QueryParameters qp,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public boolean writeDMR(String dataSource, QueryParameters qp,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
          dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
@@ -239,7 +235,7 @@ public class GlacierBesApi extends BesApi {
 
                  error.setMessage(errMsg);
                  error.setContext("Glacier Service");
-                 error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                 error.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
                  err.write(error.toString().getBytes());
 
@@ -253,7 +249,7 @@ public class GlacierBesApi extends BesApi {
 
              error.setMessage(errMsg);
              error.setContext("Glacier Service");
-             error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
+             error.setHttpStatusCode(HttpServletResponse.SC_NOT_FOUND);
 
              err.write(error.toString().getBytes());
          }
@@ -264,7 +260,6 @@ public class GlacierBesApi extends BesApi {
      }
 
 
-    @Override
     public boolean writeDap2DataRequestForm(String dataSource, String xdap_accept, String url, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
 
 

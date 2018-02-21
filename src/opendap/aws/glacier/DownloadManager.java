@@ -584,7 +584,7 @@ public class DownloadManager {
 
             ServletContext sc = arg0.getServletContext();
 
-            String contentPath = ServletUtil.getContentPath(sc);
+            String contentPath = ServletUtil.getContextPath(sc);
             _log.debug("contentPath: " + contentPath);
 
             String serviceContentPath = contentPath;
