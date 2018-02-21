@@ -3,7 +3,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2014 OPeNDAP, Inc.
+  ~ // Copyright (c) 2018 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -24,29 +24,36 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 
-<AuthenticationAndAccess>
-
-    <EnableAuthenticationControlsUI>
+<UserAuthenticationAndAccess>
+    <!--
+        If your particular authentication scheme utilizes a logout or login location
+        you can have Hyrax display links to those locations as part of the generated
+        web pages by uncommenting the "AuthenticationControls" element and editing
+        the logout and/or login locations to match your service instance.
+    -->
+    <EnableAuthenticationControls>
         <LoginBanner>Welcome To Hyrax!</LoginBanner>
-    </EnableAuthenticationControlsUI>
+        <!-- login>login</login -->
+        <!-- logout>logout</logout -->
+    </EnableAuthenticationControls>
 
     <!-- EnableGuestProfile / -->
-
-    <!-- uncomment this if all access requires a login -->
     <!-- EveryOneMustHaveId / -->
 
-
-    <IdProvider class="opendap.auth.UrsIdP" loginContext="urs" isDefault="true">
+    <IdProvider class="opendap.auth.UrsIdP">
+        <id>urs</id>
+        <isDefault />
         <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
         <UrsClientAuthCode>aVBsRWpaak12cmR3TFVsbmJhS3hXUTpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
         <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
     </IdProvider>
 
-    <!-- You can use an in memory local PDP -->
+
+    <!-- You can use a local in-memory PDP -->
     <PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*</role>
-            <resource>.*(/|\.(css|png|jpg|ico|gif|xsl|jsp)|/contents.html|/catalog.html|/catalog.xml)$</resource>
+            <resource>.*(/|\.(css|png|jpg|ico|gif|xsl|jsp)|/contents.html|/catalog.html|/catalog.xml|logout|login)$</resource>
             <queryString>.*$</queryString>
             <allowedAction>GET</allowedAction>
         </Policy>
@@ -57,52 +64,35 @@
             <allowedAction>GET</allowedAction>
         </Policy>
         <Policy class="opendap.auth.RegexPolicy">
-            <role>manager</role>
+            <role>users</role>
             <resource>.*$</resource>
             <queryString>.*$</queryString>
             <allowedAction>GET</allowedAction>
             <allowedAction>POST</allowedAction>
         </Policy>
         <Memberships>
-            <group id="guest" >
-                <user id="GUEST" />
+            <group id="guest_user" >
+                <user id="GUEST" authContext="guest" />
             </group>
 
             <group id="urs_users" >
-                <user idPattern="^(?!\s*$).+" loginContext="urs" />
+                <user idPattern="^(?!\s*$).+" authContext="urs" />
             </group>
 
 
-            <group id="users" >
-                <user id="ndp_opendap" />
-                <user id="jhrg" />
-            </group>
-
-            <group id="cmip" >
-                <user id="ndp_opendap" />
-            </group>
-
-            <group id="managers" >
-                <user id="root" />
-                <user id="ndp_opendap" />
-                <user id="jhrg" />
-            </group>
-
-            <role id="manager">
-                <group id="managers" />
-                <group id="cmip" />
+            <role id="users">
+                <group id="urs_users" />
             </role>
 
             <role id="guest">
-                <group id="guest" />
+                <group id="guest_user" />
             </role>
 
         </Memberships>
 
     </PolicyDecisionPoint>
 
-
-    <!-- This PDP definition allows everyone access to everything -->
+    <!-- This local in-memory PDP definition allows everyone access to everything -->
     <!-- PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*$</role>
@@ -115,16 +105,10 @@
         </Memberships>
     </PolicyDecisionPoint -->
 
-
-
-
-    <!-- You can use a RemotePDP -->
+    <!-- You also can use a RemotePDP -->
     <!-- PolicyDecisionPoint class="opendap.auth.RemotePDP">
         <PDPServiceEndpoint>http://localhost:8080/pdp</PDPServiceEndpoint>
     </PolicyDecisionPoint -->
 
-
-
-
-</AuthenticationAndAccess>
+</UserAuthenticationAndAccess>
 

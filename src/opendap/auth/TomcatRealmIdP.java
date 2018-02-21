@@ -26,6 +26,8 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
+import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +54,6 @@ public class TomcatRealmIdP extends IdProvider {
         setAuthContext(DEFAULT_AUTHENICATION_CONTEXT);
         setDescription("Tomcat Realm Authentication");
     }
-
-
 
 
     /**
@@ -96,5 +96,19 @@ public class TomcatRealmIdP extends IdProvider {
 
 
         return true;
+    }
+
+    @Override
+    public String getLoginEndpoint(){
+        String loginEndpoint = PathBuilder.pathConcat(_serviceContext,AuthenticationControls.getLoginEndpoint());
+        loginEndpoint = PathBuilder.pathConcat(loginEndpoint,_authContext);
+        return loginEndpoint;
+    }
+
+
+    @Override
+    public String getLogoutEndpoint() {
+        String logoutEndpoint = PathBuilder.pathConcat(_serviceContext,AuthenticationControls.getLogoutEndpoint());
+        return logoutEndpoint;
     }
 }

@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import com.google.gson.*;
+import opendap.PathBuilder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +65,8 @@ public class UrsIdP extends IdProvider{
 
 
     @Override
-    public void init(Element config) throws ConfigurationException {
-        super.init(config);
+    public void init(Element config, String serviceContext) throws ConfigurationException {
+        super.init(config, serviceContext);
 
         Element e;
         String eName;
@@ -280,6 +281,17 @@ public class UrsIdP extends IdProvider{
 
 	}
 
+    @Override
+    public String getLoginEndpoint(){
+        String loginEndpoint = PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(),_authContext);
+        return loginEndpoint;
+    }
+
+
+    @Override
+    public String getLogoutEndpoint() {
+        return AuthenticationControls.getLogoutEndpoint();
+    }
 
 
 

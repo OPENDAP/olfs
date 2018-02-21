@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,17 +54,9 @@ public class ApacheIdP extends IdProvider {
      */
     public static final String DEFAULT_LOGIN_LOCATION = "/Login";
 
+    private String _loginEndpoint;
+    private String _logoutEndpoint;
 
-    /**
-     * Service point for the mod_shib Login
-     */
-    protected String _loginLocation;
-
-
-    /**
-     * Service point for the mod_shib Login
-     */
-    protected String _logoutLocation;
 
 
     private Logger _log;
@@ -76,38 +69,29 @@ public class ApacheIdP extends IdProvider {
         setAuthContext(DEFAULT_AUTHENTICATION_CONTEXT);
         setDescription("Apache Identity Provider");
 
-        _loginLocation = DEFAULT_LOGIN_LOCATION;
-        _logoutLocation = DEFAULT_LOGOUT_LOCATION;
+        _loginEndpoint = DEFAULT_LOGIN_LOCATION;
+        _logoutEndpoint = DEFAULT_LOGOUT_LOCATION;
+
     }
 
 
 
     @Override
-    public void init(Element config) throws ConfigurationException {
-
-        super.init(config);
+    public void init(Element config, String serviceContext) throws ConfigurationException {
+        super.init(config,serviceContext);
 
         Element e = config.getChild("login");
         if(e!=null){
-            setLoginLocation(e.getTextTrim());
+            _loginEndpoint= e.getTextTrim();
         }
-
 
         e = config.getChild("logout");
         if(e!=null){
-            setLogoutLocation(e.getTextTrim());
+            _logoutEndpoint = e.getTextTrim();
         }
-
-
     }
 
 
-
-
-    public void setLogoutLocation(String logoutLocation){  _logoutLocation =  logoutLocation; }
-    public String getLogoutLocation(){ return _logoutLocation; }
-    public void setLoginLocation(String loginLocation){  _loginLocation =  loginLocation; }
-    public String getLoginLocation(){ return _loginLocation; }
 
 
     /**
@@ -187,13 +171,29 @@ public class ApacheIdP extends IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        String redirectUrl = getServiceContext();
         HttpSession session = request.getSession(false);
         if( session != null )
         {
+            String returnToUrl =  (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            if(returnToUrl!=null)
+                redirectUrl =returnToUrl;
             session.invalidate();
         }
 
-        response.sendRedirect(getLogoutLocation());
+        response.sendRedirect(redirectUrl);
     }
+
+    @Override
+    public String getLoginEndpoint(){
+        return _loginEndpoint;
+    }
+
+
+    @Override
+    public String getLogoutEndpoint() {
+        return _logoutEndpoint;
+    }
+
 
 }

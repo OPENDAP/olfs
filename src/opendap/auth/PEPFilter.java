@@ -55,13 +55,13 @@ public class PEPFilter implements Filter {
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
-    private String _defaultLogingEndpoint;
+    //private String _defaultLogingEndpoint;
     private static String _configParameterName = "config";
-    private static String _defaultConfigFileName = "PEPFilter.xml";
+    private static String _defaultConfigFileName = "user-access.xml";
 
     public PEPFilter() {
         _everyOneMustHaveUid = false;
-        _defaultLogingEndpoint=null;
+        //_defaultLogingEndpoint=null;
         _is_initialized = false;
     }
 
@@ -101,12 +101,14 @@ public class PEPFilter implements Filter {
         config = opendap.xml.Util.getDocumentRoot(configFile);
 
         Element e = config.getChild("PolicyDecisionPoint");
-        _pdp = pdpFactory(e);
+        _pdp = PolicyDecisionPoint.pdpFactory(e);
 
         e = config.getChild("EveryOneMustHaveId");
         if(e !=null){
             _everyOneMustHaveUid = true;
         }
+
+        /*
         e = config.getChild("UseDefaultLoginEndpoint");
         if(e !=null){
             String href = e.getAttributeValue("href");
@@ -119,36 +121,12 @@ public class PEPFilter implements Filter {
                         "required href attribute! UseDefaultLoginEndpoint is DISABLED.");
             }
         }
+        */
         _is_initialized = true;
         _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
     }
 
 
-    public PolicyDecisionPoint pdpFactory(Element config) throws ConfigurationException {
-        String msg;
-        if(config==null) {
-            msg = "Configuration MAY NOT be null!.";
-            _log.error("pdpFactory():  {}",msg);
-            throw new ConfigurationException(msg);
-        }
-        String pdpClassName = config.getAttributeValue("class");
-        if(pdpClassName==null) {
-            msg = "PolicyDecisionPoint definition must contain a \"class\" attribute whose value is the class name of the PolicyDecisionPoint implementation to be created.";
-            _log.error("pdpFactory(): {}",msg);
-            throw new ConfigurationException(msg);
-        }
-        try {
-            _log.debug("pdpFactory(): Building PolicyDecisionPoint: " + pdpClassName);
-            Class classDefinition = Class.forName(pdpClassName);
-            PolicyDecisionPoint pdp = (PolicyDecisionPoint) classDefinition.newInstance();
-            pdp.init(config);
-            return pdp;
-        } catch (Exception e) {
-            msg = "Unable to manufacture an instance of "+pdpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error("pdpFactory(): {}"+msg);
-            throw new ConfigurationException(msg, e);
-        }
-    }
 
 
 
@@ -202,8 +180,8 @@ public class PEPFilter implements Filter {
 
         // So - Do they have to be authenticated?
         if(userId == null  && _everyOneMustHaveUid) {
-            if(_defaultLogingEndpoint!=null) {
-                hsRes.sendRedirect(_defaultLogingEndpoint);
+            if(IdPManager.hasDefaultProvider()) {
+                hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
             }
             else {
                 OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
@@ -220,8 +198,8 @@ public class PEPFilter implements Filter {
             // Access was denied, so...
             if(userId == null) {
                 // If they aren't logged in then we tell them to do that
-                if(_defaultLogingEndpoint!=null) {
-                    hsRes.sendRedirect(_defaultLogingEndpoint);
+                if(IdPManager.hasDefaultProvider()) {
+                    hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
                 }
                 else {
                     OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);

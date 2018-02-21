@@ -40,21 +40,20 @@ public abstract class  IdProvider {
 
 
     protected String _authContext;
-    protected String _description;
+    private String _description;
+    protected String _serviceContext;
+
+    private boolean _isDefaultProvider;
 
 
     public IdProvider(){
-        _authContext = "IdProvider";
+        _authContext = null;
         _description = "Abstract Identification Service Provider";
-
+        _isDefaultProvider = false;
+        _serviceContext = null;
     }
 
-    public String getLoginContext(){
-        return "/" + _authContext;
-    }
-
-
-
+    public boolean isDefault(){ return _isDefaultProvider; }
 
     public  String getAuthContext(){ return _authContext; }
     public  void setAuthContext(String authContext){ _authContext = authContext; }
@@ -62,12 +61,19 @@ public abstract class  IdProvider {
     public  String getDescription(){ return _description; }
     public  void setDescription(String d){ _description = d; }
 
+    public String getServiceContext(){ return _serviceContext;}
+    public void setServiceContext(String sc){ _serviceContext = sc;}
 
-    public void init(Element config) throws ConfigurationException{
+
+    public abstract String getLoginEndpoint();
+
+    public abstract String getLogoutEndpoint();
+
+    public void init(Element config, String serviceContext) throws ConfigurationException{
+
         if(config == null){
             throw new ConfigurationException("init(): Configuration element may not be null.");
         }
-
         Element e = config.getChild("id");
         if(e!=null){
             setAuthContext(e.getTextTrim());
@@ -78,6 +84,12 @@ public abstract class  IdProvider {
             setDescription(e.getTextTrim());
         }
 
+        e = config.getChild("isDefault");
+        if(e!=null){
+            _isDefaultProvider = true;
+        }
+
+        _serviceContext = serviceContext;
     }
 
     /**

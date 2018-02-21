@@ -151,10 +151,6 @@
     <filter>
         <filter-name>IdP</filter-name>
         <filter-class>opendap.auth.IdFilter</filter-class>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>idFilter.xml</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>IdP</filter-name>
@@ -165,10 +161,6 @@
     <filter>
         <filter-name>PEP</filter-name>
         <filter-class>opendap.auth.PEPFilter</filter-class>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>PEPFilter.xml</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>PEP</filter-name>

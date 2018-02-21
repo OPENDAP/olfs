@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2015 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -51,6 +51,8 @@ public class AuthenticationControls {
     private static String _defaultLoginPath;
     private static String _defaultLogoutPath;
 
+    private static String _loginBanner;
+
     static {
         _log = LoggerFactory.getLogger(AuthenticationControls.class);
         _loginPath = null;
@@ -58,6 +60,7 @@ public class AuthenticationControls {
         _initialized = false;
         _defaultLoginPath = "/login";
         _defaultLogoutPath = "/logout";
+        _loginBanner = "Welcome To The Burrow!";
     }
 
     private AuthenticationControls() {
@@ -103,6 +106,7 @@ public class AuthenticationControls {
                     _loginPath = e.getTextTrim();
                 }
                 _loginPath = PathBuilder.pathConcat(contextPath,_loginPath);
+                _log.info("init() - Login Path: {}",_loginPath);
 
                 _logoutPath = _defaultLogoutPath;
                 e = config.getChild("logout");
@@ -110,6 +114,15 @@ public class AuthenticationControls {
                     _logoutPath = e.getTextTrim();
                 }
                 _logoutPath = PathBuilder.pathConcat(contextPath,_logoutPath);
+                _log.info("init() - Logout Path: {}",_logoutPath);
+
+
+                // Init the Login Banner
+                e = config.getChild("LoginBanner");
+                if(e!=null){
+                    _loginBanner = e.getTextTrim();
+                }
+                _log.info("init() - Login Banner: {}",_loginBanner);
 
                 _initialized = true;
             }
@@ -120,6 +133,10 @@ public class AuthenticationControls {
             _logoutPath = PathBuilder.pathConcat(contextPath,_defaultLogoutPath);
         }
 
+    }
+
+    public static String getLoginBanner(){
+        return _loginBanner;
     }
 
     public static String getLogoutEndpoint(){
