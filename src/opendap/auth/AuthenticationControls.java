@@ -27,7 +27,6 @@ package opendap.auth;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.PathBuilder;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.slf4j.Logger;

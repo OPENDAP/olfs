@@ -1,7 +1,6 @@
 package opendap.auth;
 
 import java.util.Vector;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  *

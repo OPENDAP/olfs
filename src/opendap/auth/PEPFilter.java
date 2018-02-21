@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 
 package opendap.auth;
 
-import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;

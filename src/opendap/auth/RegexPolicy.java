@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -30,7 +30,6 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;

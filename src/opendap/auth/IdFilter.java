@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class IdFilter implements Filter {

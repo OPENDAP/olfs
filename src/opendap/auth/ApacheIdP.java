@@ -26,7 +26,6 @@
 
 package opendap.auth;
 
-import opendap.PathBuilder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

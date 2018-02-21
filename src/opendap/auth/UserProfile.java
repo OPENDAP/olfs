@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,12 +26,16 @@
 
 package opendap.auth;
 
-import com.google.gson.*;
-//import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
-// import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+
+//import org.json.simple.JSONObject;
+// import java.util.ArrayList;
 
 /**
  * Created by ndp on 9/25/14.

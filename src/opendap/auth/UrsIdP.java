@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,7 +26,8 @@
 
 package opendap.auth;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import opendap.PathBuilder;
 import org.jdom.Element;
 import org.slf4j.Logger;
