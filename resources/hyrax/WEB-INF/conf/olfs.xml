@@ -64,18 +64,6 @@
         </BES>
     </BESManager>
 
-    <!--
-      If your particular authentication scheme (usually brokered by Apache httpd) utilizes
-      a particular logout or login location you have Hyrax display links to those locations
-      as part of the generated web pages by uncommenting the "AuthenticationControls" element and
-      editing the logout and/or login locations to match your service instance.
-      -->
-    <!-- EnableAuthenticationControls>
-        <login>/opendap/login</login>
-        <logout>/opendap/logout</logout>
-    </EnableAuthenticationControls -->
-
-
     <!-- CatalogCache>
         <maxEntries>10000</maxEntries>
         <updateIntervalSeconds>10000</updateIntervalSeconds>
