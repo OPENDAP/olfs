@@ -566,14 +566,14 @@
              compression="gzip"
         >
             <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
-                <include name="olfs.war"/>
+                <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
 
         </tar>
 
         <delete file="${build.dist}/README"/>
-        <delete file="${build.dist}/olfs.war"/>
+        <delete file="${build.dist}/opendap.war"/>
 
     </target>
 
@@ -823,8 +823,7 @@
             description="Builds OSX package installer for the OLFS">
 
         <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
-
-        <copy file="${build.dist}/olfs.war" tofile="${build.osx}${CATALINA_HOME}/webapps/olfs.war"/>
+        <copy file="${build.dist}/opendap.war" tofile="${build.osx}${CATALINA_HOME}/webapps/opendap.war"/>
 
         <copy todir="${build.dir}/osx-resources" filtering="true">
             <fileset dir="${osx.resources}"/>
