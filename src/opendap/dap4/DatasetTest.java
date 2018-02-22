@@ -52,9 +52,9 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Dataset Tests
- * 
- * JUnit 4 parameterization providing for 
- * injecting test Dataset(s) 
+ * <p>
+ * JUnit 4 parameterization providing for
+ * injecting test Dataset(s)
  */
 @RunWith(Parameterized.class)
 public class DatasetTest {
@@ -77,9 +77,9 @@ public class DatasetTest {
         Unmarshaller um = jc.createUnmarshaller();
         if (dmrUrl.startsWith("http")) {
             Element dmrElement = opendap.xml.Util.getDocumentRoot(dmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
-            if(dmrElement==null)
-                throw new IOException("Failed to get DMR document root for "+dmrUrl);
-            
+            if (dmrElement == null)
+                throw new IOException("Failed to get DMR document root for " + dmrUrl);
+
             XMLOutputter xmlo = new XMLOutputter();
             dmrXml = xmlo.outputString(dmrElement);
         } else {
@@ -89,7 +89,7 @@ public class DatasetTest {
             Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmrUrl);
             dmrXml = new String(Files.readAllBytes(file), HyraxStringEncoding.getCharset());
         }
-        InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
+        InputStream is = new ByteArrayInputStream(dmrXml.getBytes(HyraxStringEncoding.getCharset()));
         XMLInputFactory factory = XMLInputFactory.newInstance();
         XMLStreamReader xsr = factory.createXMLStreamReader(is);
         XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
@@ -101,7 +101,6 @@ public class DatasetTest {
             _datasetIsNotNull = true;
         }
     }
-
 
     ////////////////////////
     // Unit tests
@@ -123,10 +122,9 @@ public class DatasetTest {
         int timeSize = Integer.parseInt(time.getSize());
         int latSize = Integer.parseInt(lat.getSize());
         int lonSize = Integer.parseInt(lon.getSize());
+
         assertTrue(timeSize == 1 && latSize == 361 && lonSize == 576);
-
     }
-
 
     ////////////////////////
     //  Diagnostics
@@ -150,15 +148,14 @@ public class DatasetTest {
         assertTrue(dataset.getValueOfGlobalAttributeWithNameLike("DataResolution") != null);
     }
 
-
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // run as many tests as needed - each corresponding to one DMR dataset (i.e. one test)
                 {"dmrDataset_01.xml"},
-                {"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
-                {"http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
+                // {"http://test.opendap.org/opendap/wcs/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
+                {"http://test.opendap.org/opendap/wcs/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
         });
     }
-    
+
 }

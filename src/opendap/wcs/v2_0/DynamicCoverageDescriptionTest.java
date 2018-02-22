@@ -130,10 +130,9 @@ public class DynamicCoverageDescriptionTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // run as many tests as needed - each URL corresponding to one DMR dataset (i.e. one test)
-
                 {"dmrDataset_01.xml"},
-                {"https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
-                {"http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
+                // {"http://test.opendap.org/opendap/wcs/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml"},
+                {"http://test.opendap.org/opendap/wcs/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml"},
         });
     }
 

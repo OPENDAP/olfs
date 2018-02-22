@@ -97,7 +97,8 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         ingestDmr(dmr);
 
-        // If it all went south we just make an empt one as null fighting punt.
+        // If it all went south we just make an
+        // empty one as null fighting punt.
         if (_myCD == null) {
             _myCD = new Element("CoverageDescription", WCS.WCS_NS);
             Element coverageId = new Element("CoverageId", WCS.WCS_NS);

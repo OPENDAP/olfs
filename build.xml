@@ -361,7 +361,7 @@
             <test name="opendap.dap4.DatasetTest" />
             <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
             -->
-            
+
         </junit>
     </target>
 
