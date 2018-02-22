@@ -266,6 +266,9 @@ public class UrsIdP extends IdProvider{
 
         String redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
 
+        if(redirectUrl==null){
+            redirectUrl = _serviceContext;
+        }
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
         response.sendRedirect(redirectUrl);

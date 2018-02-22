@@ -364,22 +364,39 @@ public class IdFilter implements Filter {
         if(session != null){
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
+                IdProvider userIdP = userProfile.getIdP();
                 String first_name = userProfile.getAttribute("first_name").replaceAll("\"","");
                 String last_name =  userProfile.getAttribute("last_name").replaceAll("\"","");
 
     		    out.println("<p>Greetings " + first_name + " " + last_name + ", this is your profile.</p>");
-    		    out.println("<p><a href=\"" + AuthenticationControls.getLogoutEndpoint() + "\"> - - LogOut - - </a></p>");
-                out.println("<h3>Profile</h3>");
+    		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
+    		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
+                out.println("<h3>"+first_name+"'s Profile</h3>");
+
+                String origUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+
+                out.println("<dl>");
+                if(origUrl!=null){
+                    out.println("<dt><b>"+ORIGINAL_REQUEST_URL+"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                }
+                out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
+                out.println("</dl>");
+
+                out.println("<hr />");
+                out.println("<pre>");
+                out.print("<b>All_Session_Attributes</b>: [ ");
+
                 Enumeration attrNames = session.getAttributeNames();
                 if(attrNames.hasMoreElements()){
-                    out.println("<dl>");
                     while(attrNames.hasMoreElements()){
                         String attrName = attrNames.nextElement().toString();
-                        String attrValue = session.getAttribute(attrName).toString();
-                        out.println("<dt><b>"+attrName+"</b></dt><dd><pre>"+attrValue+"</pre></dd>");
+                        // String attrValue = session.getAttribute(attrName).toString();
+                        out.print("\""+attrName+"\"");
+                        out.print((attrNames.hasMoreElements()?", ":""));
                     }
-                    out.println("</dl>");
                 }
+                out.println(" ]</pre>");
+                out.println("<hr />");
             }
             else if(request.getUserPrincipal() !=null){
                 out.println("<p>Welcome " + request.getUserPrincipal().getName() + "</p>");

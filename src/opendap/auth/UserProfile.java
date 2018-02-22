@@ -201,7 +201,7 @@ public class UserProfile {
         StringBuilder sb = new StringBuilder(getClass().getName());
         sb.append("\n");
         for(Map.Entry<String,JsonElement> e: _jsonInit.entrySet()) {
-            sb.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+            sb.append("  ").append(e.getKey()).append(": ").append(e.getValue()).append("\n");
         }
         return sb.toString();
     }
@@ -211,7 +211,7 @@ public class UserProfile {
         Gson gson = new Gson();
         String jsonString = gson.toJson(_jsonInit);
         com.google.gson.JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);
-        ;
+
 
         JsonArray myGroups = gson.fromJson(gson.toJson(_groups), JsonArray.class);
         externalRepresentation.add("groups", myGroups);
