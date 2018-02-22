@@ -182,7 +182,7 @@ public class JwsTest {
 
         s = doc.addStyle("logo", regular);
         StyleConstants.setAlignment(s, StyleConstants.ALIGN_CENTER);
-        ImageIcon logo = createImageIcon("images/logo.gif",
+        ImageIcon logo = createImageIcon("images/logo.png",
                 "OPeNDAP Logo");
         if (logo != null) {
             StyleConstants.setIcon(s, logo);

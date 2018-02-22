@@ -105,7 +105,7 @@
 
             <table width="100%">
                 <tr>
-                    <td width="30%" align="left"><img alt="Logo" src='{$docsService}/images/logo.gif' /></td>
+                    <td width="30%" align="left"><img alt="Logo" src='{$docsService}/images/logo.png' /></td>
                     <td>Dataset Viewers</td>
                 </tr>
             </table>

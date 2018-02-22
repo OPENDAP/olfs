@@ -66,7 +66,7 @@
                 }
             </style>
             <body>
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+                <img alt="Insitution Logo" src='{$docsService}/images/logo.png'/>
 
 
 

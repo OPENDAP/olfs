@@ -1,3 +1,1019 @@
+2017-10-12  ndp-opendap  <ndp@opendap.org>
+
+	Smal production rules changes
+
+2017-10-11  ndp-opendap  <ndp@opendap.org>
+
+	minor
+
+	Fixed bug in TemporalDimensionSubset in which the DAP variable name ws not being used to construct the DAP request.
+
+	Reformat
+
+	Stopped the uopdateSequence attribute in the Capabilities document from constantly changing so we can test. We can reneable this when the tests get better?
+
+	Fixed bug in the assignmet of _max
+
+	Reformat
+
+	Added siple regression tests for WCS operating on coads_climatology.nc
+
+2017-10-10  ndp-opendap  <ndp@opendap.org>
+
+	Added wcs stuff to debug output
+
+	Shutting off broken tests on master until they get fixed.
+
+	Added new JUnit tests to production and they are failing.
+
+	Droped unused var
+
+	Patched some potential null de-refs and character encoding issues.
+
+2017-10-10  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #23 from OPENDAP/wcs-tests
+	Wcs tests
+
+2017-10-10  ndp-opendap  <ndp@opendap.org>
+
+	added fixme
+
+	Merge branch 'master' into wcs-tests
+
+	COmments
+
+2017-10-06  ndp-opendap  <ndp@opendap.org>
+
+	Formatting
+
+	Undid use of 'transient' needs more thought. TEsting atomicity issue in WCS
+
+2017-10-05  ndp-opendap  <ndp@opendap.org>
+
+	Made transient those things that cannot be written.
+
+	Nullville
+
+	lifecycle mods
+
+	Small change to manage object lifecycle.
+
+	Formatting
+
+	trigger scan
+
+	dropping unused cod
+
+	Cleaned up loop iteration and variable scope.
+
+2017-10-04  ndp-opendap  <ndp@opendap.org>
+
+	Fixed default encoding issue.
+
+2017-10-04  udayopen  <ukari@opendap.org>
+
+	Unit Tests for Dynamic Coverage Description
+
+2017-10-04  ndp-opendap  <ndp@opendap.org>
+
+	Nullville, The Ressurection.
+
+	Nullville Revisited.
+
+	Nullville
+
+	Nullville
+
+	Nullville
+
+2017-10-03  ndp-opendap  <ndp@opendap.org>
+
+	Nullville
+
+2017-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #21 from OPENDAP/wcs-release
+	Wcs release
+
+2017-10-03  ndp-opendap  <ndp@opendap.org>
+
+	Documenation. Formatting.
+
+2017-10-02  ndp-opendap  <ndp@opendap.org>
+
+	Moved disk caching code out of the way (not deleted but unused). Now service is truly dynamic: BES and HTTP(S) responses are pulled into memory and used from there. RequestCache is now employed for DMR Element and CoverageDescription objects.
+
+	Comments and version display changes.
+
+	Dropped unused code block.
+
+2017-09-30  udayopen  <ukari@opendap.org>
+
+	DMR XML dataset 01 for opendap.dap4.DatasetTest
+
+	Retire Unused WCS 2.0 classes
+
+	Read DMR XML from file system
+
+2017-09-30  udayopen  <ideaesb@gmail.com>
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+2017-09-30  ideaesb  <ideaesb@gmail.com>
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+2017-09-29  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #22 from OPENDAP/fix-ds-defs
+	Fix ds defs
+
+2017-09-29  ndp-opendap  <ndp@opendap.org>
+
+	Changed DynamicService defintion so that the user must supply either an 'href' attribute or a 'pathMatch' attribute but never both.
+	- A 'pathMatch' attribute tells the DynamicService to use the BES and to
+	generate links for this WCS service when the dataset path matches the
+	regular expression contained in the value of the 'pathMatch' attribute.
+	- An 'href' attribute tells the DynamicService to utilize a remote Hyrax
+	instance to supply the DAP metadata and data responses required by the
+	WCS.
+
+	Changed DynamicService defintion so that the user must supply either an 'href' attribute or a 'pathMatch' attribute but never both.
+	- A 'pathMatch' attribute tells the DynamicService to use the BES and to
+	generate links for this WCS service when the dataset path matches the
+	regular expression contained in the value of the 'pathMatch' attribute.
+	- An 'href' attribute tells the DynamicService to utilize a remote Hyrax
+	instance to supply the DAP metadata and data responses required by the
+	WCS.
+
+	formatting
+
+	formatting
+
+	Rescued viewer.xml entry for WcsService
+
+2017-09-29  ideaesb  <ideaesb@gmail.com>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-28  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-28  ndp-opendap  <ndp@opendap.org>
+
+	More unintended changes dropped
+
+	Dropped unused commented out code from old impl.
+
+	Fixed some mistaken changes.
+
+	build script update
+
+	Production rules, generified default WCS ServiceProvider content.
+
+	Production rules, generified default WCS ServiceProvider content.
+
+	More configuration twekd
+
+	more configuration tuning
+
+	More service adjustments
+
+	sync
+
+	Production rules sync...
+
+	Dumped whitespace.
+
+	Changed Hyrax production rules to build with integrated WCS support.
+
+	Fixed logging that was leaking debug output into the error log.
+
+	Added FIXME regarding controlling cache size.
+
+2017-09-28  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-27  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+	DatasetTest.java
+
+	DynamicCoverageDescriptionTest
+
+	put CDCTest in correct package...ughgit status
+
+	Empty DynamicCoverageDescriptionTest
+
+	test checkin
+
+2017-09-27  ndp-opendap  <ndp@opendap.org>
+
+	REworked the WCS service definitions so that WCS is configured using the entries in our friend wcs_service.xml, simplifying configuration and thus making at least me happy.
+
+	Dropping unintended change.
+
+	Dumped 1 space indentation for 4 spaces because that's how it is at OPeNDAP
+
+	PRoto service def
+
+2017-09-26  udayopen  <ukari@opendap.org>
+
+	test commit
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Worked on default configuration taht gets sent with a release. Provided a working example of the configuration that should correctly serve our friend coads_climatology.nc via WCS.
+
+	Added a DummyCatalog to allow support if not catalog definitions in the wcs_service.xml file. Dropped ConcurrentHashMap for the probably much less expensive CopyOnWriteArrayList, goven that it is only written to at start up and all that.
+
+2017-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #20 from OPENDAP/testbed-13
+	Testbed 13
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into testbed-13
+
+2017-09-26  James Gallagher  <jgallagher@opendap.org>
+
+	Remove oracle jdks from travis build matrix
+
+2017-09-26  udayopen  <ukari@opendap.org>
+
+	Merge pull request #19 from OPENDAP/wcs-junit-13
+	Wcs junit 13
+
+2017-09-26  James Gallagher  <jgallagher@opendap.org>
+
+	Added unit tests to travi.yml
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Fixes in comments
+
+2017-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #18 from OPENDAP/wcs-bes
+	Wcs bes
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Removed successful BES initialization as a startup requirement for WCS. Added checks to prevent running without a BESManager from causing null-pointer issues.
+
+	Removed successful BES initialization as a startup requirement for WCS. Added checks to prevent running without a BESManager from causing null-pointer issues.
+
+	Made BESManager init() a thread-safe endeavour
+
+	Added support for conditional BES initialization
+
+	Hooked up various response types in WCS for both http and bes generated responses
+
+2017-09-25  ndp-opendap  <ndp@opendap.org>
+
+	WCs service making direct calls to BES, take 1
+
+2017-09-25  udayopen  <ukari@opendap.org>
+
+	unit tests added to Dataset
+
+2017-09-25  ndp-opendap  <ndp@opendap.org>
+
+	Running but broken WCS with hyrax integration.
+
+2017-09-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #17 from OPENDAP/wcs-mc2
+	Wcs mc2
+
+2017-09-22  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into wcs-mc2
+
+	copyright
+
+	making service def broader
+
+	config changes, sync
+
+	config changes, sync
+
+	config changes, sync
+
+	config changes, sync
+
+	sync
+
+	Fixing small issues, dropped deprecated calss.
+
+	Changed class name for naming scheme consistency
+
+	Changed class name for naming scheme consistency
+
+	Documentation. Small problem repairs
+
+	Renamed ServiceManager to WcsServiceManager for readability
+
+2017-09-22  ideaesb  <ideaesb@gmail.com>
+
+	Adding tests
+
+2017-09-22  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused import
+
+	Multi catalog WCS, first pass
+
+2017-09-22  ideaesb  <ideaesb@gmail.com>
+
+	Adding tests
+
+2017-09-21  James Gallagher  <jgallagher@opendap.org>
+
+	Added an empty coverity model file
+
+2017-09-21  ndp-opendap  <ndp@opendap.org>
+
+	copyright
+
+2017-09-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused variable.
+
+	Optimized imports
+
+2017-09-20  udayopen  <ukari@opendap.org>
+
+	opendap.dap4.DatasetTest added
+
+2017-09-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused member variable.
+
+	Added authentication stack to both LocalFileCatalog and to DynamicServiceCatalog so that they may get things from places that require auth. woot.
+
+	Added a stripQuotes method to the names of Fields and Coverages that are submitted by the user to DescribeCoverage and GetCoverage requests.
+
+	Added a stripQuotes method to the names of Fields and Coverages that are submitted by the user to DescribeCoverage and GetCoverage requests.
+
+	Fixed problem with DAP constraint production in the GetCoverageRequestProcessor
+
+2017-09-19  ndp-opendap  <ndp@opendap.org>
+
+	dropped lon:lat dataset
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	Fix dependency issue
+
+	AWS Sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	Added GPM collection to download
+
+	Added QC for DomainCoordinates and SRS axisLabels to configurtion ingest.
+
+	Download scripts for collections
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Fixed SRS and DOmainCoordinate ingest to detect bad configuration
+
+	Dropped unused test
+
+2017-09-18  James Gallagher  <jgallagher@opendap.org>
+
+	more comment hacking
+
+	Comment hack
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	comments
+
+2017-09-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Resolved conflicts
+
+	Resolved conflicts
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+2017-09-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #16 from OPENDAP/dcd13
+	Dcd13
+
+	Merge pull request #15 from OPENDAP/qcvars
+	Qcvars
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Added FIXME remarks for authentication
+
+	if the var name is not an ncname then I check for a supplied default name to use before falling back to scrubbing the variable name.
+
+	More authentication related changes.
+
+	More authentication related changes.
+
+	seperation of concerns work - consolidated HTTP calls so that we can more easily utilize authentication when required.
+
+2017-09-17  ndp-opendap  <ndp@opendap.org>
+
+	Minor edits.
+
+	Small edits
+
+	Small edits
+
+	Added NCNAME conversion for field names. Reogranized calls and changed method names to reflect methods actual semantics.
+
+	Add BoundedBy fall back to an Envelope without time of time can't be sorted
+
+2017-09-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #14 from OPENDAP/envelopewithtime
+	Generation of EnvelopeWithTimePeriod has been rebuilt.
+
+2017-09-16  ndp-opendap  <ndp@opendap.org>
+
+	woot - EnvelopeAndTimePeriod generation working correctly.
+
+	Error handle, formatting
+
+	Error handle, formatting
+
+	clean-up
+
+	MAssive overhaul to fix problems in how the semantics of the DAP/CF/WCS were being intermingled making it very hard to discern what was happening.
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Reorged code so it's easier to find stuff and to perform an intial read through.
+
+	Small edits
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	docs
+
+2017-09-15  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Repaired WCS-2.0 prduction rules
+
+2017-09-15  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+	Conflicts: src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+
+	Spelling in a comment
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Added failure checking and default values to swe:Field generation.
+
+	Second crack at coordinating multiple DynamicService instance
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Added support for multiple WCS services in the OLFS. Using a regex they will advertise themselves where they find a match. THis support the DynamicService paradigm in the Wcs implmentation.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	revert Variable to Dim only...Dimensions scoped for Variable Groups, and dataset as a whole
+
+	look for all instances of Dimensions in Dataset, not just root
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	small change
+
+	comments etc
+
+	First cut at default backed and automated domainCoordinate processing.
+
+	First cut at default backed and automated domainCoordinate processing.
+
+	First cut at default backed and automated domainCoordinate processing.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	tightened usesCfConventions in opendap.dap4.Dataset
+
+	tightened usesCfConventions in opendap.dap4.Dataset
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	More cleanup, dropped uneeded try{} block.
+
+	More cleanup, dropped uneeded try{} block.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	fleshed out findVariableWithCfStandardName in class opendap.wcs.v2_0.DynamicCoverageDescription
+
+	fleshed out method findVariableWithCfStandardName in opendap.wcs.v2_0.DynamicCoverageDescription    /**      * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a      * value of an attribute named standard_name.  This method will lookl for this whether or not      * the underlying DMR Dataset is CF compliant      *      * @param opendap.dap4.Dataset dataset - a JAXB representation of the DMR response      * @param String standard_name      * @return opendap.dap4.Variable      * @throws WcsException throw any exception is handling the dataset      */     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {         if(!dataset.usesCfConventions())             _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}",this.getDapDatasetUrl());
+	        // proceed to look for it anyway, returning null if not found
+	        try {
+	          for (Variable v: dataset.getVariables()) {
+	            if (Objects.equals(standard_name, v.getAttributeValue("standard_name"))) {
+	              _log.debug("Found variable with standard name ", standard_name, v.getName());
+	              return v;
+	            }
+	          }
+	        }
+	        catch (Exception e)
+	        {
+	          throw new WcsException("Failed to process DMR dataset "+dataset.getName() + ", when looking for standard_name " + standard_name +
+	              " , msg: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+	        }
+	        return null;
+	    }
+
+	fleshed out findVariableWithCfStandardName in class opendap.wcs.v2_0.DynamicCoverageDescription
+
+	findVariableWithCfStandardName
+
+2017-09-14  Nathan Potter  <ndp@opendap.org>
+
+	fix getSizeOfDomainCoordinateVariable() and started utilizing it.
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Found issue in the code that checks for the conventions attribute
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	Fix method getVariable in opendap.dap4.Variable to return null if variable not found
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	modddys
+
+	Added getSizeOfDomainCoordinate()
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	HYRAX-493, and also return first match, not last :wq Merge branch 'dcd13' of https://github.com/OPENDAP/olfs into dcd13
+
+	HYRAX-493, and also return first match, not last
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	DynamicService installed. Fails to run due to other issues
+
+	mereged and modularized
+
+	Template style configuration step 3
+
+2017-09-13  udayopen  <ukari@opendap.org>
+
+	HYRAX 493, 494, 496, 498, 499
+
+2017-09-13  ndp-opendap  <ndp@opendap.org>
+
+	DynamicService coverage defaults step 2
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Template style configuration step 1
+
+2017-09-13  udayopen  <ukari@opendap.org>
+
+	HYRAX 493, 494, 496, 498, 499
+
+2017-09-13  ndp-opendap  <ndp@opendap.org>
+
+	added ingestDomainCoorindates() method
+
+	Merge branch 'testbed-13' into dcd13
+
+2017-09-12  ndp-opendap  <ndp@opendap.org>
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+2017-09-12  udayopen  <ukari@opendap.org>
+
+	HYRAX-492: Compute Domain Coordinates from DMR
+
+2017-09-12  ndp-opendap  <ndp@opendap.org>
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+2017-09-12  udayopen  <ukari@opendap.org>
+
+	HYRAX 485, 486: compute DataRecord.Field
+
+	HYRAX-486: Add dimension matching logic to select DMR dataset variables to be included in Coverage Description
+
+	Add dimension matching logic to select DMR dataset variables to be included in Coverage Description
+
+2017-09-11  ndp-opendap  <ndp@opendap.org>
+
+	Move string centric Util class from wcs.v2_0 to dap4 package to preserve build independence. Mpved WCS libs to resources/WCS/2.0/lib
+
+2017-09-11  udayopen  <ukari@opendap.org>
+
+	fixed bug: com.sun.javafx.util.Utils dependency in Dataset as noted by James
+
+2017-09-11  ndp-opendap  <ndp@opendap.org>
+
+	Sync
+
+	Sync
+
+	Firxed Dataset.getVars()
+
+	Minor Readablity update.
+
+2017-09-11  udayopen  <ukari@opendap.org>
+
+	HYRAX-485: Adding swe:Field List
+
+2017-09-10  udayopen  <ukari@opendap.org>
+
+	HYRAX-484 Compute Rectified Grid Origins and Offsets
+
+	HYRAX-483 Compute Grid Envelope
+
+2017-09-09  udayopen  <ukari@opendap.org>
+
+	HYRAX-481: Compute Envelope With Time Period
+
+2017-09-09  ndp-opendap  <ndp@opendap.org>
+
+	Dropped Fields list from CD
+
+	Dropped Fields list from CD
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added getVars() to Dataset
+
+	Added getVars() to Dataset
+
+	Process order adjuestment.
+
+	I felt that passing the envelope into the hardwired() method was an error. I moved the code that adds the envelope to the CD up out of the hardwired function to just below where the CD is instantiated. If you would continue this pattern we will slowly empty the hardwired() method as the dynamic CD creation is implmented. Thanks. N
+
+2017-09-09  udayopen  <ukari@opendap.org>
+
+	HYRAX-481: Compute Envelope With Time Period
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Adding configuration information for default SRS.
+
+	Hardwired version gets data.
+
+	bugs and hardwiring
+
+	Reorg of code in DynamicCoverageDescription.
+
+	sync
+
+2017-09-08  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Formatting modified:   src/opendap/dap4/Dataset.java modified:   src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Comments
+
+2017-09-08  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+	# Conflicts:
+	#	src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	#	src/opendap/wcs/v2_0/WcsMarshaller.java
+
+	Spelling in a comment modified:   src/opendap/dap4/Dataset.java
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Fixed tortured list iteration with simpler for() syntax. Added default constuctors to the various invloved class to ensure that getter mathods never return null.
+
+	Transfered WcsMarshaller functionality inthe DynamicCoverageDescription. Removed all calls to System.exit(). Removed all calls to System.out and System.err and replaced all instrumentation with logging framework. Made Exception handling meaningful in the context of the server.
+
+	Added calls to set Field Id but to no avial, commented them out and left them in place.
+
+	Fixed API probelms in CoverageDescription so that setters and getters are available for key member variables. Also added simpler constructores for DomainCoordinate and Field
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Fixed UOM
+
+	Moved test DMR targets from authentcated NASA to test.o.o
+
+	Added ant target to run DynamicCoverageDescription.
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Added WcsMarshaller target to wcs2-build.xml in order to facilitate easy running of said class.
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+	Conflicts:
+	src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	src/opendap/wcs/v2_0/WcsMarshaller.java
+
+	Formatting and FIXME/TODO comments
+	modified:   src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	modified:   src/opendap/wcs/v2_0/WcsMarshaller.java
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repaired inconsistent/broken time envelope
+
+	Updated main() to utilize non-deprecated constructor
+
+	Dropped broken Saxon transform from code
+
+	Fixed auth issues for main()
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repairing naming issue
+
+	Fixed naming issue
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Formatting WcsMarshaller.java
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repairing production rules for WCS
+
+	Added null check for WcsMarshaller content
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Added null check for WcsMarshaller content
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Hooked up WcsMarshaller to DynamicServiceCatalog in DynamicCoverage. Added comments
+
+2017-09-06  James Gallagher  <jgallagher@opendap.org>
+
+	Formatting for WcsMarshaller and CoverageDescription in WCS/v2_0
+
+2017-09-06  ndp-opendap  <ndp@opendap.org>
+
+	Small edits
+
+	Small edits
+
+	Small edits
+
+	Merged dap4dmr
+
+2017-08-30  ndp-opendap  <ndp@opendap.org>
+
+	Cheking in a none developer mode web.xml
+
+	Updating HAI for use in a developer mode.
+
+2017-08-28  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Added files to gitignore
+
+2017-08-25  ndp-opendap  <ndp@opendap.org>
+
+	Added WCS service and links to Hyrax generated THREDDS catalogs.
+
+	Hooked-up default behavior for WCS Web Service in Hyrax.
+
+2017-08-22  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into DynamicServiceWcsCatalog
+
+2017-08-21  ndp-opendap  <ndp@opendap.org>
+
+	Sync for buildout
+
+	Sync
+
+2017-08-20  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into DynamicServiceWcsCatalog
+
+	changes
+
+	Implemented RangeSubset field lists by range concept.
+
+	Added simple range subsetting
+
+	First pass at DynamicService implementation. GetCapabilities and DescribeCoverage work. GetCoverage needs a more fully functional CoverageDescription object to funtion.
+
+2017-08-15  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into testbed-13
+
+2017-08-10  Nathan Potter  <ndp@opendap.org>
+
+	More bug oatchy
+
+	Repaired broken bits in ViewersServlet
+
+2017-08-09  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.16.4
+
+2017-08-08  Nathan Potter  <ndp@opendap.org>
+
+	Updated libs for wcs2-build.xml
+
+	Increads default response side and added instrumetation.
+
+2017-08-08  ndp-opendap  <ndp@opendap.org>
+
+	patch
+
+	pathed
+
+	seperate result LFC files
+
+	oops. fixed it.
+
+	Adding new collection processing for daily precip and temperature - seperate coverages
+
+2017-08-04  ndp-opendap  <ndp@opendap.org>
+
+	Scripts for ingesting new MERRA2 content complete. Now this needs to be run on our servce and hand integrated into the exisiting service.
+
+	Adding new merra2 collection ingest scripts for MERRA2_200.statD_2d_slv_Nx
 2017-07-25  ndp-opendap  <ndp@opendap.org>
 
 	Repaired a typo (or maybe a random deletion) that corrupted the name of a crucila XSL file.

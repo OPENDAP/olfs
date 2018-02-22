@@ -92,7 +92,7 @@
 <!--                                                        -->
 <table width='95%'>
     <tr>
-        <td><img alt="OPeNDAP Logo" src='<%=contextPath%>/docs/images/logo.gif'/></td>
+        <td><img alt="OPeNDAP Logo" src='<%=contextPath%>/docs/images/logo.png'/></td>
         <td>
             <div style='v-align:center;font-size:large;'><a href="<%= contextPath%>/admin/index.html">Hyrax Admin Interface</a></div>
         </td>

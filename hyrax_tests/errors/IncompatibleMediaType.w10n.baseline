@@ -35,7 +35,7 @@
             <p align="left">The specific error message associated with your request was:</p>
             <blockquote>
                 <p>
-                    <strong>You have requested an unsupported output media type of 'ascii'</strong>
+                    <strong>You have requested an unsupported output media type of &#39;ascii&#39;</strong>
                 </p>
             </blockquote>
             

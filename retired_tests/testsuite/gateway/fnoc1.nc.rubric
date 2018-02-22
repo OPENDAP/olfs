@@ -11,7 +11,7 @@
                 }
             </style>
    <body>
-      <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.gif"/>
+      <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
       <h1>NetCDF Attribute Convention for Dataset Discovery Report</h1>
         The Unidata Attribute Convention for Data Discovery provides recommendations for netCDF attributes that
         can be added to netCDF files to facilitate discovery of those files using standard metadata searches.

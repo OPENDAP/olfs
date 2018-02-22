@@ -35,6 +35,7 @@ import opendap.namespaces.DAP4;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -571,10 +572,8 @@ public class OPeNDAPException extends Exception {
      * @throws Exception
      */
     public void sendAsHtmlErrorPage(HttpServletResponse response) throws Exception {
-
-
+        
         int httpStatus = getHttpStatusCode();
-
 
         // Because the error messages are utilized by the associated JSP page they must be made available
         // for the JSP to retrieve. The RequestCache  for this thread gets destroyed when the doGet/doPost
@@ -586,7 +585,6 @@ public class OPeNDAPException extends Exception {
 
         // Invokes the appropriate JSP page.
         response.sendError(httpStatus);
-
     }
 
 
@@ -595,7 +593,8 @@ public class OPeNDAPException extends Exception {
      * @return  The (any?) error message associated with the current thread.
      */
     public static String getAndClearCachedErrorMessage(){
-        return _errorMessageCache.remove(Thread.currentThread());
+        String msg = _errorMessageCache.remove(Thread.currentThread());
+        return Encode.forHtml(msg);
     }
 
 }

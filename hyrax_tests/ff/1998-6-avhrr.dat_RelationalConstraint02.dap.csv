@@ -1,2 +1,4 @@
-url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dap.csv?dap4.ce=GSO_AVHRR|160<day_num<170
+# In test URL below, parameters are encoded to be allowed by Tomcat instances fixed for CVE-2016-6816.
+# url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dap.csv?dap4.ce=GSO_AVHRR|160<day_num<170
+url = http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dap.csv?dap4.ce%3DGSO_AVHRR%7C160%3Cday_num%3C170
 -s

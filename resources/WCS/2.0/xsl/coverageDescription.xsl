@@ -67,7 +67,7 @@
 
                 <table border="0" width="90%">
                     <tr>
-                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.gif')}" /></td>
+                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.png')}" /></td>
                         <td align="center">
                             <div  class="xlarge">Web Coverage Service</div>
                         </td>
@@ -347,7 +347,7 @@
 
                 <table border="0" width="90%">
                     <tr>
-                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.gif')}" /></td>
+                        <td><img alt="Institution Logo" src="{concat($DocsService,'/images/logo.png')}" /></td>
                         <td align="center">
                             <div  class="xlarge">Web Coverage Service Exception</div>
                         </td>

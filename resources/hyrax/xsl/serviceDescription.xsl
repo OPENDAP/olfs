@@ -56,7 +56,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
                 <h1>
                     Dataset: <xsl:value-of select="@xml:base"/>
                 </h1>

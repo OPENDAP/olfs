@@ -39,13 +39,13 @@
 
         // Event handlers for the disposition button.
 
-        // The ascii_button handler sends data to a new window. The user can then
+        // The dap2AsciiData_button handler sends data to a new window. The user can then
         // save the data to a file.
 
         /*
                 <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
-                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
-                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
+                <input type="button" value="Xml Data" onclick="dap2XmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="dap2NetcdfData_button()"/>
 
         */
 
@@ -80,7 +80,7 @@
             window.open(url, "Dataset Information");
         }
 
-        function dataRequestForm_button() {
+        function dap2DataRequestForm_button() {
             datasetID = getDatasetID();
             url = datasetID + ".html";
             window.open(url, "Data Request Form");
@@ -93,19 +93,14 @@
             window.open(url, "DAP2 Binary Data");
         }
 
-        function ascii_button() {
+        function dap2AsciiData_button() {
             datasetID = getDatasetID();
             url = datasetID + ".asc";
             window.open(url, "ASCII Data");
         }
 
 
-        function dataDDX_button() {
-            datasetID = getDatasetID();
-            url = datasetID + ".dap";
-            window.open(url, "DAP4 Data DDX");
-        }
-        function xmlData_button() {
+        function dap2XmlData_button() {
             datasetID = getDatasetID();
             url = datasetID + ".xdods";
             window.open(url, "XML Data Response");
@@ -118,11 +113,66 @@
         }
 
 
-        function netcdfFileOut_button() {
+        function dap2NetcdfData_button() {
             datasetID = getDatasetID();
             url = datasetID + ".nc";
             window.open(url, "NetCDF File Out Response");
         }
+
+
+
+
+        function dap4DataRequestForm_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dmr.html";
+            window.open(url, "Data Request Form");
+        }
+
+
+        function dmr_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dmr.xml";
+            window.open(url, "DMR");
+        }
+
+        function dmrRdf_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dmr.rdf";
+            window.open(url, "DMR as RDF");
+        }
+
+        function dsr_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dsr.html";
+            window.open(url, "DSR");
+        }
+
+        function dap4NetcdfData_button() {
+            datasetID = getDatasetID();
+            url = datasetID + "dap.nc";
+            window.open(url, "DAP4 NetCDF File Out Response");
+        }
+
+        function dap4Data_button() {
+            datasetID = getDatasetID();
+            url = datasetID + "dap";
+            window.open(url, "DAP4 Data Response");
+        }
+
+
+        function dap4AsciiData_button() {
+            datasetID = getDatasetID();
+            url = datasetID + "dap.csv";
+            window.open(url, "DAP4 ASCII Data Response");
+        }
+
+        function dap4AsciiData_button() {
+            datasetID = getDatasetID();
+            url = datasetID + "dap.csv";
+            window.open(url, "DAP4 ASCII Data Response");
+        }
+
+
 
 
 
@@ -165,7 +215,7 @@
 <body>
 <p></p>
 
-<img alt="OPeNDAP Logo" src='<CONTEXT_PATH /><SERVLET_NAME />/images/logo.gif'/>
+<img alt="OPeNDAP Logo" src='<CONTEXT_PATH /><SERVLET_NAME />/images/logo.png'/>
 <h1>Gateway Service</h1>
 <hr/>
 <form action="">
@@ -203,46 +253,66 @@
             </td>
 
         </tr>
+    </table>
+    <hr />
+    <table>
+        <!-- ################################ DAP2 UI ################################ -->
         <tr>
-            <td align="right">
-                <input type="button" value="Data Request Form" onclick="dataRequestForm_button()"/>
+            <td align="right"><span class="medium" style="padding-right: 10px;">DAP2 Responses</span></td>
+            <td>                <input type="button" value="DAP2 Data Request Form" onclick="dap2DataRequestForm_button()"/>
 
             </td>
+        </tr>
+        <tr>
+            <td align="right"><span class="small" style="align-items: right;">Metadata</span></td>
+            <td >
+                <input type="button" value="DDS" onclick="dds_button()"/>
+                <input type="button" value="DAS" onclick="das_button()"/>
+                <input type="button" value="INFO" onclick="info_button()"/>
+                <input type="button" value="DDX" onclick="ddx_button()"/>
+                <input type="button" value="RDF" onclick="rdf_button()"/>
+            </td>
+
+        </tr>
+        <tr>
+            <td align="right"><span class="small" style="align-items: right;">Data</span></td>
             <td>
+                <input type="button" value="DAP2 Binary Data" onclick="dap2data_button()"/>
+                <input type="button" value="Ascii Data" onclick="dap2AsciiData_button()"/>
+                <input type="button" value="Xml Data" onclick="dap2XmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="dap2NetcdfData_button()"/>
             </td>
-
         </tr>
     </table>
     <hr />
     <table>
+        <!-- ################################ DAP4 UI ################################ -->
         <tr>
-            <td align="right"><span class="medium">DAP Responses</span></td>
-            <td>
+            <td align="right"><span class="medium" style="padding-right: 10px;">DAP4 Responses</span></td>
+            <td>                <input type="button" value="DAP4 Data Request Form" onclick="dap4DataRequestForm_button()"/>
+
             </td>
         </tr>
         <tr>
-            <td align="right"></td>
-            <td>
-                <input type="button" value="DDX" onclick="ddx_button()"/>
-                <input type="button" value="RDF" onclick="rdf_button()"/>
-                <input type="button" value="DDS" onclick="dds_button()"/>
-                <input type="button" value="DAS" onclick="das_button()"/>
-                <input type="button" value="INFO" onclick="info_button()"/>
+            <td align="right"><span class="small" style="align-items: right;">Metadata</span></td>
+            <td >
+                <input type="button" value="DMR" onclick="dmr_button()"/>
+                <input type="button" value="DSR" onclick="dsr_button()"/>
+                <input type="button" value="RDF" onclick="dmrRdf_button()"/>
             </td>
 
         </tr>
         <tr>
-            <td align="right"></td>
+            <td align="right"><span class="small" style="align-items: right;">Data</span></td>
             <td>
-                <input type="button" value="DAP2 Binary Data" onclick="dap2data_button()"/>
-                <input type="button" value="Ascii Data" onclick="ascii_button()"/>
-                <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
-                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
-                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
+                <input type="button" value="DAP4 Binary Data" onclick="dap4Data_button()"/>
+                <input type="button" value="Ascii Data" onclick="dap4AsciiData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="dap4NetcdfData_button()"/>
             </td>
-
         </tr>
     </table>
+    <hr />
+    <h3>OPeNDAP Hyrax (@HyraxVersion@)</h3>
 </form>
 </body>
 </html>

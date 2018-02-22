@@ -170,7 +170,7 @@
                     <table width="100%">
                         <tr>
                             <td width="30%" align="left">
-                                <img alt="Logo" src='{$docsService}/images/logo.gif'/>
+                                <img alt="Logo" src='{$docsService}/images/logo.png'/>
                             </td>
                             <td class="dark" align="left">Hyrax - THREDDS Dataset Detail</td>
                         </tr>
