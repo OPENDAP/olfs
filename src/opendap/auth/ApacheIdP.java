@@ -106,7 +106,7 @@ public class ApacheIdP extends IdProvider {
          * Redirect the user back to the their original requested resource.
          */
         HttpSession session = request.getSession(false);
-        String redirectUrl = request.getContextPath();
+        String redirectUrl = null;
 
         String uid = request.getRemoteUser();
 
@@ -121,15 +121,12 @@ public class ApacheIdP extends IdProvider {
 
             _log.error("doLogin() - OUCH! {}",msg.toString());
             throw new ConfigurationException(msg.toString());
-
         }
         else {
             // We have a user - so let's make sure they have a profile,
             // and then we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
 
             _log.info("doLogin() - User has uid: {}", uid);
-
-
             /*
 
             // Do they have a profile?
@@ -143,21 +140,13 @@ public class ApacheIdP extends IdProvider {
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
             */
-
             redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
-
-            if(redirectUrl==null){
-                // Unset? Punt...
-                redirectUrl = request.getContextPath();
-            }
-
         }
-
+        if(redirectUrl==null){
+            redirectUrl = request.getContextPath();
+        }
         _log.info("doLogin(): redirecting to {}",redirectUrl);
-
         response.sendRedirect(redirectUrl);
-
-
         return true;
     }
 

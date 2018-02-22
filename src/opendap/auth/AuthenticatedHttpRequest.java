@@ -62,10 +62,10 @@ public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
         };
     }
 
-    @Override
-    public boolean isUserInRole(String roleName){
-        return false;
-    }
+   // @Override
+    //public boolean isUserInRole(String roleName){
+    //    return false;
+   // }
 
 
 
