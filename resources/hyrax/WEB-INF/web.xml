@@ -148,7 +148,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- Uncomment this bit to turn on access control. -->
+    <!-- Uncomment this bit to turn on access control.
     <filter>
         <filter-name>IdP</filter-name>
         <filter-class>opendap.auth.IdFilter</filter-class>
@@ -168,7 +168,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- -->
+    -->
 
 
     <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
