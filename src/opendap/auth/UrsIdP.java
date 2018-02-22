@@ -254,15 +254,7 @@ public class UrsIdP extends IdProvider{
 
         _log.info("URS User Profile: {}",contents);
 
-        /**
-         * Parse the json to extract the user id, first and last names,
-         * and email address. We store these in the session. These four
-         * parameters are mandatory, and will always exist in the user
-         * profile.
-         */
-        json = jparse.parse(contents).getAsJsonObject();
-
-        UserProfile userProfile = new UserProfile(json);
+        UserProfile userProfile = new UserProfile(contents);
 
         userProfile.setIdP(this);
 

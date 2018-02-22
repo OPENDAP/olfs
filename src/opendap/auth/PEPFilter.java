@@ -55,8 +55,8 @@ public class PEPFilter implements Filter {
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
     //private String _defaultLogingEndpoint;
-    private static String _configParameterName = "config";
-    private static String _defaultConfigFileName = "user-access.xml";
+    private static final String _configParameterName = "config";
+    private static final String _defaultConfigFileName = "user-access.xml";
 
     public PEPFilter() {
         _everyOneMustHaveUid = false;

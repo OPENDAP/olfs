@@ -326,9 +326,7 @@ public class IdFilter implements Filter {
         noProfile.append("<ul>");
 
         for(IdProvider idProvider: IdPManager.getProviders()) {
-            String loginEndpoint = idProvider.getLoginEndpoint();
-            loginEndpoint = PathBuilder.pathConcat(loginEndpoint,idProvider.getAuthContext());
-            noProfile.append("<li><a href=\"").append(loginEndpoint).append("\">");
+            noProfile.append("<li><a href=\"").append(idProvider.getLoginEndpoint()).append("\">");
             noProfile.append(idProvider.getDescription());
             noProfile.append("</a><br/><br/></li>");
         }
@@ -378,7 +376,7 @@ public class IdFilter implements Filter {
                     while(attrNames.hasMoreElements()){
                         String attrName = attrNames.nextElement().toString();
                         String attrValue = session.getAttribute(attrName).toString();
-                        out.println("<dt><b>"+attrName+"</b></dt><dd>"+attrValue+"</dd>");
+                        out.println("<dt><b>"+attrName+"</b></dt><dd><pre>"+attrValue+"</pre></dd>");
                     }
                     out.println("</dl>");
                 }
