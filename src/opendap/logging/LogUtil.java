@@ -154,7 +154,7 @@ public class LogUtil {
             t.printStackTrace();
         }
 
-        System.out.print("+++LogUtil.initLogging() - Instantiating Logger...");
+        System.out.print("+++LogUtil.initLogging() - Insiantiating Logger...");
 
         try {
             log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);

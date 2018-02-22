@@ -140,13 +140,13 @@ public class CatalogServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, null, response);
+                OPeNDAPException.anyExceptionHandler(t, response);
             } catch (Throwable t2) {
                 _log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, "GLACIER_CATALOG_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "GLACIER_CATALOG_ACCESS");
         }
 
     }

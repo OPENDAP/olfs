@@ -133,13 +133,13 @@ public class DomainCoordinate {//implements Cloneable  {
 
 
         if(!problems.isEmpty()) {
-            StringBuilder sb = new StringBuilder("DomainCoordinate() - Configuration Failed To Ingest: \n");
+            StringBuilder sb = new StringBuilder("DomainCoodinate() - Configuration Failed To Ingest: \n");
             _log.error(sb.toString());
             XMLOutputter xmlo =  new XMLOutputter(Format.getPrettyFormat());
             sb.append(xmlo.outputString(dc)).append("\n");
             _log.error("DomainCoordinate() - " + xmlo.outputString(dc));
             for(String msg: problems){
-                _log.error("DomainCoorinate() - {}",msg);
+                _log.error("DomainCoodinate() - {}",msg);
                 sb.append(msg).append("\n");
             }
             throw new ConfigurationException(sb.toString());
