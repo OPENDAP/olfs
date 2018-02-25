@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2015 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -211,6 +211,9 @@ public class PDPService extends HttpServlet {
                 String uid         = request.getParameter("uid");
                 if(uid == null) uid = "";
 
+                String authContext  = request.getParameter("authContext");
+                if(authContext == null) authContext = "";
+
                 String resourceId  = request.getParameter("resourceId");
                 if(resourceId == null) resourceId = "";
 
@@ -225,13 +228,14 @@ public class PDPService extends HttpServlet {
 
                 quadTuple.append("{ ");
                 quadTuple.append("uid:\"").append(uid).append("\", ");
+                quadTuple.append("authContext:\"").append(authContext).append("\", ");
                 quadTuple.append("resourceId:\"").append(resourceId).append("\", ");
                 quadTuple.append("query:\"").append(query).append("\", ");
                 quadTuple.append("action:\"").append(action).append("\"");
                 quadTuple.append(" }");
                 _log.debug("doGet() - {}", quadTuple);
 
-                if(_myPDP.evaluate(uid,resourceId,query,action)){
+                if(_myPDP.evaluate(uid,authContext,resourceId,query,action)){
                     status = HttpServletResponse.SC_OK;
                     response.setStatus(status);
                     ServletOutputStream sos = response.getOutputStream();
@@ -284,7 +288,6 @@ public class PDPService extends HttpServlet {
         if (_requireSecureTransport) {
             if (!req.isSecure()) {
                 _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
-
                 resp.sendError(403);
             } else {
                 _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
@@ -293,13 +296,7 @@ public class PDPService extends HttpServlet {
             _log.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
 
         }
-
         super.service(req, resp);
-
-
     }
-
-
-
 
 }
