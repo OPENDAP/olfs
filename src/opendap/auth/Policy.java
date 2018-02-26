@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -33,10 +33,10 @@ import org.jdom.Element;
  */
 public interface Policy {
 
-    public void init(Element config) throws ConfigurationException;
+    void init(Element config) throws ConfigurationException;
 
 
-    public boolean evaluate(String roleId, String ResourceId, String queryString, String httpMethod);
+    boolean evaluate(String roleId, String ResourceId, String queryString, String httpMethod);
 
     enum HTTP_METHOD {
         GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT

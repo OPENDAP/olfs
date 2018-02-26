@@ -66,7 +66,7 @@
 
                 <table width="100%" border="0">
                     <tr>
-                        <td><img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/></td>
+                        <td><img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/></td>
                         <td>
                             <div class="xlarge" style="text-align:middle">Asynchronous Response</div>
                         </td>

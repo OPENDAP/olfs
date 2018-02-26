@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -39,38 +39,44 @@ import java.io.IOException;
 public abstract class  IdProvider {
 
 
-    protected String _id;
-    protected String _description;
+    protected String _authContext;
+    private String _description;
+    protected String _serviceContext;
+
+    private boolean _isDefaultProvider;
 
 
     public IdProvider(){
-        _id = "IdProvider";
+        _authContext = null;
         _description = "Abstract Identification Service Provider";
-
+        _isDefaultProvider = false;
+        _serviceContext = null;
     }
 
-    public String getLoginContext(){
-        return "/" + _id;
-    }
+    public boolean isDefault(){ return _isDefaultProvider; }
 
-
-
-
-    public  String getId(){ return _id; }
-    public  void  setId(String id){ _id = id; }
+    public  String getAuthContext(){ return _authContext; }
+    public  void setAuthContext(String authContext){ _authContext = authContext; }
 
     public  String getDescription(){ return _description; }
     public  void setDescription(String d){ _description = d; }
 
+    public String getServiceContext(){ return _serviceContext;}
+    public void setServiceContext(String sc){ _serviceContext = sc;}
 
-    public void init(Element config) throws ConfigurationException{
+
+    public abstract String getLoginEndpoint();
+
+    public abstract String getLogoutEndpoint();
+
+    public void init(Element config, String serviceContext) throws ConfigurationException{
+
         if(config == null){
             throw new ConfigurationException("init(): Configuration element may not be null.");
         }
-
-        Element e = config.getChild("id");
+        Element e = config.getChild("authContext");
         if(e!=null){
-            setId(e.getTextTrim());
+            setAuthContext(e.getTextTrim());
         }
 
         e = config.getChild("description");
@@ -78,6 +84,12 @@ public abstract class  IdProvider {
             setDescription(e.getTextTrim());
         }
 
+        e = config.getChild("isDefault");
+        if(e!=null){
+            _isDefaultProvider = true;
+        }
+
+        _serviceContext = serviceContext;
     }
 
     /**
@@ -98,13 +110,15 @@ public abstract class  IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
         if( session != null )
         {
+            String href = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
         }
-
-        response.sendRedirect(request.getContextPath());
+        response.sendRedirect(redirectUrl);
     }
 
 }

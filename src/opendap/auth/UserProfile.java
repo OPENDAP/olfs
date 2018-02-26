@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2014 OPeNDAP, Inc.
+ * // Copyright (c) 2018 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,14 +26,13 @@
 
 package opendap.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 //import org.json.simple.JSONObject;
 
+import java.util.*;
+
+//import org.json.simple.JSONObject;
 // import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
 
 /**
  * Created by ndp on 9/25/14.
@@ -41,6 +40,7 @@ import java.util.HashSet;
 public class UserProfile {
 
     protected Date   _objectCreationTime;
+    protected String _jsonStr;
     protected JsonObject _jsonInit;
     protected HashSet<String> _groups;
     protected HashSet<String> _roles;
@@ -53,27 +53,43 @@ public class UserProfile {
     public UserProfile() {
         _objectCreationTime = new Date();
         _jsonInit = new JsonObject();
-        _groups = new HashSet<String>();
-        _roles = new HashSet<String>();
+        _groups = new HashSet<>();
+        _roles = new HashSet<>();
         _idp  = null;
     }
 
-    public UserProfile(JsonObject json){
+    /**
+     *  Parse the json to extract the user id, first and last names,
+     * and email address. We store these in the session. These four
+     * parameters are mandatory, and will always exist in the user
+     * profile.
+     * @param jsonStr
+     */
+    public UserProfile(String jsonStr){
         this();
+        JsonParser jparse = new JsonParser();
+        _jsonInit = jparse.parse(jsonStr).getAsJsonObject();
+        _jsonStr = jsonStr;
 
-        Gson gson = new Gson();
-        String  jsonString = gson.toJson(json);
-
-        _jsonInit      = gson.fromJson(jsonString, JsonObject.class);
     }
 
-
     public String getAttribute(String attrName){
+        JsonElement val =  _jsonInit.get(attrName);
+        if(val==null)
+            return null;
         return _jsonInit.get(attrName).toString();
     }
 
     public void setAttribute(String attrName, String value){
          _jsonInit.add(attrName, new JsonPrimitive(value));
+    }
+
+    public Vector<String> getAttributeNames(){
+        Vector<String> keys = new Vector<>();
+        for(Map.Entry<String,JsonElement> e: _jsonInit.entrySet()){
+            keys.add(e.getKey());
+        }
+        return keys;
     }
 
     public String getUID() {
@@ -182,23 +198,40 @@ public class UserProfile {
  **/
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-
-
-        Gson gson = new Gson();
-        String  jsonString = gson.toJson(_jsonInit);
-        JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);;
-
-
-
-        externalRepresentation.add("groups",gson.fromJson(gson.toJson(_groups), JsonObject.class));
-        externalRepresentation.add("roles",gson.fromJson(gson.toJson(_roles), JsonObject.class));
-
-        sb.append("UserProfile:").append(externalRepresentation.getAsString());
-
-
+        StringBuilder sb = new StringBuilder(getClass().getName());
+        sb.append("\n");
+        for(Map.Entry<String,JsonElement> e: _jsonInit.entrySet()) {
+            sb.append("  ").append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+        }
         return sb.toString();
+    }
 
+    public String OLDtoString() {
+        StringBuilder sb = new StringBuilder();
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(_jsonInit);
+        com.google.gson.JsonObject externalRepresentation = gson.fromJson(jsonString, JsonObject.class);
+
+
+        JsonArray myGroups = gson.fromJson(gson.toJson(_groups), JsonArray.class);
+        externalRepresentation.add("groups", myGroups);
+
+        JsonArray myRoles = gson.fromJson(gson.toJson(_roles), JsonArray.class);
+        externalRepresentation.add("roles", myRoles);
+
+        sb.append("UserProfile:").append(externalRepresentation.toString());
+        return sb.toString();
+    }
+
+
+    public static void main(String args[]){
+        String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+
+        UserProfile up = new UserProfile(ursUserProfile);
+        System.out.println(up.toString());
+        System.out.println("");
+        System.out.println("");
+        System.out.println(up.OLDtoString());
 
     }
 

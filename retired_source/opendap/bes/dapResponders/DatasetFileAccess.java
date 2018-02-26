@@ -325,7 +325,7 @@ public class DatasetFileAccess extends BesDapResponder {
         pw.println("</head>");
         pw.println("");
         pw.println("<body>");
-        pw.println("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.gif\"/>");
+        pw.println("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>");
 
         pw.println("<h1>Hyrax : Access Denied (403) </h1>");
         pw.println("<hr align=\"left\" size=\"1\" noshade=\"noshade\" />");

@@ -120,7 +120,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
                 <h1>Contents of
                     <xsl:value-of select="$catalogName"/>
                 </h1>
