@@ -380,7 +380,16 @@ public class IdFilter implements Filter {
                     out.println("<dt><b>"+ORIGINAL_REQUEST_URL+"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
                 out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
+
+                OAuthAccessToken oaToken = (OAuthAccessToken) session.getAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN);
+
+                if(oaToken != null){
+                    out.println("<dt><b>"+OAuthAccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
+
+                }
                 out.println("</dl>");
+
+
 
                 out.println("<hr />");
                 out.println("<pre>");

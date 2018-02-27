@@ -238,7 +238,6 @@ public class UrsIdP extends IdProvider{
 
         OAuthAccessToken oat = new OAuthAccessToken(json);
 
-
         /**
          * Now that we have an access token, we can retrieve the user profile. This
          * is returned as a JSON document.
@@ -259,6 +258,7 @@ public class UrsIdP extends IdProvider{
         userProfile.setIdP(this);
 
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+        session.setAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN, oat);
 
         /**
          * Finally, redirect the user back to the their original requested resource.
