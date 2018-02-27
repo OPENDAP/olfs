@@ -99,7 +99,7 @@ public abstract class  IdProvider {
      * @return True if login is complete and user profile has been added to session object. False otherwise.
      * @throws Exception
      */
-    public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 
     /**

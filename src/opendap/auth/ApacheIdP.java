@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.coreServlet.OPeNDAPException;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +101,7 @@ public class ApacheIdP extends IdProvider {
      * @throws Exception
      */
     @Override
-    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         /**
          * Redirect the user back to the their original requested resource.
@@ -120,6 +121,7 @@ public class ApacheIdP extends IdProvider {
                     );
 
             _log.error("doLogin() - OUCH! {}",msg.toString());
+            OPeNDAPException.setCachedErrorMessage(msg.toString());
             throw new ConfigurationException(msg.toString());
         }
         else {

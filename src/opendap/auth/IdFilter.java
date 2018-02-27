@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.PathBuilder;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -71,14 +72,14 @@ public class IdFilter implements Filter {
         try {
             init();
         }
-        catch (IOException | JDOMException | ConfigurationException se){
+        catch (IOException | JDOMException se){
             _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
         }
 
     }
 
-    public void init() throws IOException, JDOMException, ConfigurationException {
+    public void init() throws IOException, JDOMException {
 
         if(_is_initialized)
             return;
@@ -134,10 +135,11 @@ public class IdFilter implements Filter {
             try {
                 init();
             }
-            catch (IOException | JDOMException | ConfigurationException e){
+            catch (IOException | JDOMException e){
                 String msg = "doFilter() - IdFilter INITIALIZATION HAS FAILED! " +
                         "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
                 _log.error(msg);
+                OPeNDAPException.setCachedErrorMessage(msg);
                 throw new ServletException(msg,e);
             }
         }
@@ -195,9 +197,14 @@ public class IdFilter implements Filter {
                         //
                         return;
 
-                    } catch (Exception e) {
-                        _log.error("doFilter() - {} Login Interaction FAILED! Message: {}",idProvider.getAuthContext(), e.getMessage());
-                        throw new IOException(e);
+                    } catch (IOException e) {
+                        String msg = "Your Login Transaction FAILED!   " +
+                                     "Authentication Context: '"+idProvider.getAuthContext()+
+                                     "'   Message: "+ e.getMessage();
+                        _log.error("doFilter() - " + msg);
+                        OPeNDAPException.setCachedErrorMessage(msg);
+                        ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                        return;
                     }
                 }
             }
@@ -264,7 +271,13 @@ public class IdFilter implements Filter {
         if(session!=null)
             session.invalidate();
 
-        response.sendRedirect(redirectUrl);
+        try {
+            response.sendRedirect(redirectUrl);
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
         _log.info("doLogout() - END");
     }
 
@@ -300,7 +313,13 @@ public class IdFilter implements Filter {
         //
         // Finally, redirect the user back to the their original requested resource.
         //
-        response.sendRedirect(redirectUrl);
+        try {
+            response.sendRedirect(redirectUrl);
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
 	}
 
 
@@ -345,7 +364,14 @@ public class IdFilter implements Filter {
         _log.debug("doLandingPage() - Writing page contents.");
 
         // Generate the html page header
-		PrintWriter out = response.getWriter();
+        PrintWriter out;
+        try {
+            out = response.getWriter();
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
 		out.println("<html><head><title></title></head>");
 		out.println("<body><h1>"+AuthenticationControls.getLoginBanner()+"</h1>");
         out.println("<hr/>");

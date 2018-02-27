@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Created by ndp on 10/7/14.
@@ -62,7 +63,7 @@ public class TomcatRealmIdP extends IdProvider {
      * @throws Exception
      */
     @Override
-    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         /**
          * Redirect the user back to the their original requested resource.
          */
