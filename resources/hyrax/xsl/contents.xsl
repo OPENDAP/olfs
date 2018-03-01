@@ -214,7 +214,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+                <h3>OPeNDAP Hyrax (<a style="color: white;" href="{$dapService}/version"><xsl:value-of select="$HyraxVersion"/></a>)
 
                     <xsl:if test="bes:dataset/@name='/'">
                         <span class="uuid">

@@ -144,7 +144,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+                <h3>OPeNDAP Hyrax (<a style="color: white;" href="{$serviceContext}/version"><xsl:value-of select="$HyraxVersion"/></a>)
                     <br/>
                     <a href="{$docsService}/">Documentation</a>
                 </h3>
