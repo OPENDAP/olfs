@@ -85,37 +85,44 @@ public class ServletUtil {
     public static String getConfigPath(ServletContext sc) {
 
         //*
-        String envVarName = "OLFS_CONFIG_DIR";
-        String defaultConfigDir = "/etc/olfs/";
-        String webappConfDir = "WEB-INF/conf";
+        String envVarName        = "OLFS_CONFIG_DIR";
+        String etcOlfsConfigDir  = "/etc/olfs/";
+        String usrShareConfigDir = "/usr/share/olfs/";
+        String webappConfDir     = "WEB-INF/conf";
 
-        String configDirName = System.getenv(envVarName);
+        String envDirName = System.getenv(envVarName);
 
-
-        // Was the environment variable set?
-        if (configDirName == null) {
-            // Nope... Check to see if the default location is available
-            log.debug("The environment variable " + envVarName + " was not set. Trying default config location: " + defaultConfigDir);
-            configDirName = defaultConfigDir;
-            if (pathIsGood(configDirName)) {
-                // It's good so we'll use it.
-                log.info("Using config location: " + configDirName);
-                return configDirName;
-            }
-        } else {
+        if(envDirName!=null){
             // Ah Ha! The environment variable was set. Let's check it out...
-            if (!configDirName.endsWith("/")) {
-                configDirName += "/";
+            if (!envDirName.endsWith("/")) {
+                envDirName += "/";
             }
-            if (pathIsGood(configDirName)) {
+            if (pathIsGood(envDirName)) {
                 // It's good so we'll use it.
-                log.info("Using config location: " + configDirName);
-                return configDirName;
+                log.info("Using config location: " + envDirName);
+                return envDirName;
             }
         }
-        // Neither the default location or the environment defined location worked out so we fall back to the
+        // Nope... Check to see if the /etc/olfs location is available
+        log.debug("The environment variable {} was not set. Trying location: {}",envVarName, etcOlfsConfigDir);
+        if (pathIsGood(etcOlfsConfigDir)) {
+            // It's good so we'll use it.
+            log.info("Using config location: " + etcOlfsConfigDir);
+            return etcOlfsConfigDir;
+        }
+
+        // Nope... Check to see if the /usr/share/olfs location is available
+        log.debug("The location {} was not available. Trying location: {}",etcOlfsConfigDir,usrShareConfigDir);
+        if (pathIsGood(usrShareConfigDir)) {
+            // It's good so we'll use it.
+            log.info("Using config location: " + usrShareConfigDir);
+            return usrShareConfigDir;
+        }
+
+        // And NOPE.
+        // The default locations and the environment defined location did not work out so we fall back to the
         // default configuration location in the web application deployment directory.
-        configDirName = sc.getRealPath(webappConfDir);
+        String configDirName = sc.getRealPath(webappConfDir);
         log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}", configDirName);
         String configPath="FAILED_To_Determine_Config_Path!";
 
@@ -132,8 +139,29 @@ public class ServletUtil {
     }
 
     private static boolean pathIsGood(String path){
-        File confDirPath = new File(path);
-        return  confDirPath.exists() || confDirPath.canRead();
+        File pathDir = new File(path);
+        if(pathDir.exists()){
+            if(pathDir.isDirectory()){
+                if(pathDir.canRead()){
+                    if(pathDir.canWrite()){
+                        return true;
+                    }
+                    else {
+                        log.info("The directory {} cannot be written to by the user {}", path,System.getProperty("user.name"));
+                    }
+                }
+                else {
+                    log.info("The directory {} cannot be read to by the user {}", path,System.getProperty("user.name"));
+                }
+            }
+            else {
+                log.info("The path {} is not a directory.",path);
+            }
+        }
+        else {
+            log.info("The path {} does not exist.",path);
+        }
+        return   false;
     }
 
 
