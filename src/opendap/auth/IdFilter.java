@@ -340,7 +340,8 @@ public class IdFilter implements Filter {
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
 
-        noProfile.append("<i>You may login using one of these identity providers:</i>");
+
+        noProfile.append("<b><i>You may login using one of these identity providers:</i></b>");
 
         noProfile.append("<ul>");
 
@@ -356,6 +357,16 @@ public class IdFilter implements Filter {
             noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
             noProfile.append("</ul>");
         }
+        if(session!=null){
+            String origUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            noProfile.append("<dl>");
+            if(origUrl!=null){
+                noProfile.append("<dt><b>").append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
+            }
+            noProfile.append("</dl>");
+        }
+
+
         _log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");

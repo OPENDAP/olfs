@@ -268,7 +268,6 @@ public class PDPService extends HttpServlet {
             LogUtil.logServerAccessEnd(status, _accessLogName);
             RequestCache.closeThreadCache();
         }
-
     }
 
 
