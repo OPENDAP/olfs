@@ -148,6 +148,7 @@ public class IdFilter implements Filter {
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
         String contextPath =  hsReq.getContextPath();
+        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
 
         String query = hsReq.getQueryString();
         String requestUrl = hsReq.getRequestURL().toString() + ((query!=null)?("?"+ query):"");
@@ -223,7 +224,9 @@ public class IdFilter implements Filter {
         }
         // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
-        session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
+
+        if(!requestURI.startsWith(docsPath))
+            session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
 
         filterChain.doFilter(hsReq, hsRes);
     }
