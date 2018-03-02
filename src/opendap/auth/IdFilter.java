@@ -48,9 +48,9 @@ public class IdFilter implements Filter {
 
     private Logger _log;
 
-    public static final String ORIGINAL_REQUEST_URL = "original_request_url";
-    public static final String USER_PROFILE         = "user_profile";
-    public static final String IDENTITY_PROVIDER    = "identity_provider";
+    public static final String RETURN_TO_URL      = "return_to_url";
+    public static final String USER_PROFILE       = "user_profile";
+    public static final String IDENTITY_PROVIDER  = "identity_provider";
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
@@ -148,7 +148,6 @@ public class IdFilter implements Filter {
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
         String contextPath =  hsReq.getContextPath();
-        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
 
         String query = hsReq.getQueryString();
         String requestUrl = hsReq.getRequestURL().toString() + ((query!=null)?("?"+ query):"");
@@ -179,9 +178,9 @@ public class IdFilter implements Filter {
             for(IdProvider idProvider: IdPManager.getProviders()){
                 String loginEndpoint = idProvider.getLoginEndpoint();
                 if(requestURI.equals(loginEndpoint)) {
-                    String returnToUrl =  (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+                    String returnToUrl =  (String) session.getAttribute(RETURN_TO_URL);
                     if(returnToUrl!=null && returnToUrl.equals(loginEndpoint))
-                        session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
+                        session.setAttribute(RETURN_TO_URL,contextPath);
                     try {
                         //
                         // Run the login gizwhat. This may involve simply collecting credentials from the user and
@@ -225,14 +224,39 @@ public class IdFilter implements Filter {
         // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
 
-        if(!requestURI.startsWith(docsPath))
-            session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
+        cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
 
         filterChain.doFilter(hsReq, hsRes);
     }
 
     public void destroy() {
         _log = null;
+    }
+
+
+    /**
+     * Here we make sure that request is really for something that the user would like to return to before we cache
+     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
+     * @param session
+     * @param requestUrl
+     * @param requestURI
+     * @param contextPath
+     */
+    private void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
+
+        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
+        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
+        String jsPath = PathBuilder.pathConcat(contextPath,"js");
+        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
+
+        if(requestURI.startsWith(docsPath) ||
+                requestURI.startsWith(xslPath) ||
+                requestURI.startsWith(jsPath)  ||
+                requestURI.startsWith(webStartPath)
+                ){
+            return;
+        }
+        session.setAttribute(RETURN_TO_URL,requestUrl);
     }
 
 
@@ -250,7 +274,7 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             _log.info("doLogout() - Got session...");
-            String href = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            String href = (String) session.getAttribute(RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
 
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
@@ -259,7 +283,7 @@ public class IdFilter implements Filter {
                 IdProvider idProvider = up.getIdP();
                 if (idProvider != null) {
                     _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getAuthContext());
-                    // Redirect to ORIGINAL_REQUEST_URL is done by idProvider
+                    // Redirect to RETURN_TO_URL is done by idProvider
                     idProvider.doLogout(request, response);
                     _log.info("doLogout() - END");
                     return;
@@ -306,11 +330,11 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         String redirectUrl = request.getContextPath();
         if(session != null) {
-            redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
             session.invalidate();
         }
         session = request.getSession(true);
-        session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
+        session.setAttribute(RETURN_TO_URL, redirectUrl);
         session.setAttribute(USER_PROFILE, new GuestProfile());
 
         //
@@ -361,7 +385,7 @@ public class IdFilter implements Filter {
             noProfile.append("</ul>");
         }
         if(session!=null){
-            String origUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            String origUrl = (String) session.getAttribute(RETURN_TO_URL);
             noProfile.append("<dl>");
             if(origUrl!=null){
                 noProfile.append("<dt><b>").append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
@@ -413,11 +437,11 @@ public class IdFilter implements Filter {
     		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
                 out.println("<h3>"+first_name+"'s Profile</h3>");
 
-                String origUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+                String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
                 out.println("<dl>");
                 if(origUrl!=null){
-                    out.println("<dt><b>"+ORIGINAL_REQUEST_URL+"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                    out.println("<dt><b>"+ RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
                 out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
 

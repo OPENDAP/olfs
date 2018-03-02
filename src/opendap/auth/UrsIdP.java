@@ -264,7 +264,7 @@ public class UrsIdP extends IdProvider{
          * Finally, redirect the user back to the their original requested resource.
          */
 
-        String redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+        String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
 
         if(redirectUrl==null){
             redirectUrl = _serviceContext;

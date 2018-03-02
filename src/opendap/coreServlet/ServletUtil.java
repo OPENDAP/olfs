@@ -76,11 +76,11 @@ public class ServletUtil {
      *   </ui>
      *
      * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
-     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
-     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
+     * content in this directory be modified before the upgrade can work.) Thus this directory is also referred to
+     * as the "persistent content path" or "persistent content directory" in other parts of the documentation.
      *
      * @param sc  The ServletContext for this servlet that is running.
-     * @return  A String containing the content path (aka the peristent content path) for the web application.
+     * @return  A String containing the content path (aka the persistent content path) for the web application.
      */
     public static String getConfigPath(ServletContext sc) {
 

@@ -126,7 +126,7 @@ public class ApacheIdP extends IdProvider {
         }
         else {
             // We have a user - so let's make sure they have a profile,
-            // and then we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
+            // and then we just try to bounce them back to IdFilter.RETURN_TO_URL
 
             _log.info("doLogin() - User has uid: {}", uid);
             /*
@@ -142,7 +142,7 @@ public class ApacheIdP extends IdProvider {
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
             */
-            redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){
             redirectUrl = request.getContextPath();
@@ -165,7 +165,7 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            String returnToUrl =  (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(returnToUrl!=null)
                 redirectUrl =returnToUrl;
             session.invalidate();

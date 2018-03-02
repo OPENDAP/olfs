@@ -114,7 +114,7 @@ public abstract class  IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            String href = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
         }
