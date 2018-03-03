@@ -31,7 +31,7 @@ check-local: atconfig atlocal $(HYRAX_TEST_SUITE)
 	@echo "Run tests with an empty cache"
 	$(SHELL) '$(HYRAX_TEST_SUITE)' $(HYRAX_TEST_SUITE_FLAGS)
 	-rm -rf dap_cache/*
-	
+
 clean-local:
 	test ! -f '$(HYRAX_TEST_SUITE)' || $(SHELL) '$(HYRAX_TEST_SUITE)' --clean
 	-rm -f $(HYRAX_TEST_SUITE) $(srcdir)/package.m4

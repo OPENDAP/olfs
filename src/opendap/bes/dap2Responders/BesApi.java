@@ -2399,7 +2399,7 @@ public class BesApi {
 
     public Element showPathInfoRequestElement(String resource) {
         Element e;
-        Element spi = new Element("showPathInfo",BES_NS);
+        Element spi = new Element("showW10nPathInfo",BES_NS);
 
         spi.setAttribute("node", resource);
 

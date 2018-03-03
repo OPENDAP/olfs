@@ -15,6 +15,29 @@ AT_ARG_OPTION_ARG([baselines],
 
 # Usage: _AT_TEST_*(<bescmd source>, <baseline file>, <xpass/xfail> [default is xpass])
 
+dnl Given a filename, remove any date-time string of the form "yyyy-mm-dd hh:mm:ss" 
+dnl in that file and put "removed date-time" in its place. This hack keeps the baselines
+dnl more or less true to form without the obvious issue of baselines being broken 
+dnl one second after they are written.
+dnl  
+dnl Note that the macro depends on the baseline being a file.
+dnl
+dnl jhrg 6/3/16
+ 
+m4_define([REMOVE_DATE_TIME], [dnl
+    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\} [[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\( GMT\)*\( Hyrax-[[-0-9a-zA-Z.]]*\)*@removed date-time@g' < $1 > $1.sed
+    dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
+    mv $1.sed $1
+])
+
+dnl The above macro modified to edit the '<h3>OPeNDAP Hyrax (Not.A.Release)' issue
+dnl so that whatever appears in the parens is moot.
+
+m4_define([PATCH_HYRAX_RELEASE], [dnl
+    sed 's@OPeNDAP Hyrax (\(.*\)).*@OPeNDAP Hyrax (Not.A.Release)@g' < $1 > $1.sed
+    mv $1.sed $1
+])
+
 #######################################################################################
 #
 #   CURL TESTS
@@ -36,9 +59,11 @@ m4_define([_AT_CURL_TEST], [dnl
         [
         AT_CHECK([curl -K $input], [0], [stdout])
         AT_CHECK([mv stdout $baseline.tmp])
+	PATCH_HYRAX_RELEASE([$baseline.tmp])
         ],
         [
         AT_CHECK([curl -K $input], [0], [stdout])
+	PATCH_HYRAX_RELEASE([stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
         ])
