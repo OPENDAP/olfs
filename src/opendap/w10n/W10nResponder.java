@@ -218,19 +218,19 @@ public class W10nResponder {
         if(besResponse==null)
             throw new IOException("BES failed to include a root element in the PathInfoDocument.");
 
-        Element showPathInfo =  besResponse.getChild("showPathInfo", BES.BES_NS);
-        if(showPathInfo==null)
-            throw new IOException("BES failed to include a 'showPathInfo' element in the PathInfoDocument.");
+        Element showW10nPathInfo =  besResponse.getChild("showW10nPathInfo", BES.BES_NS);
+        if(showW10nPathInfo==null)
+            throw new IOException("BES failed to include a 'showW10nPathInfo' element in the PathInfoDocument.");
 
-        Element pathInfo =  showPathInfo.getChild("PathInfo", BES.BES_NS);
-        if(pathInfo==null)
-            throw new IOException("BES failed to include a 'PathInfo' element in the PathInfoDocument.");
+        Element w10nPathInfo =  showW10nPathInfo.getChild("W10nPathInfo", BES.BES_NS);
+        if(w10nPathInfo==null)
+            throw new IOException("BES failed to include a 'W10nPathInfo' element in the PathInfoDocument.");
 
-        Element vpE =  pathInfo.getChild("validPath", BES.BES_NS);
+        Element vpE =  w10nPathInfo.getChild("validPath", BES.BES_NS);
         if(vpE==null)
             throw new IOException("BES failed to include a 'validPath' element in the PathInfoDocument.");
 
-        Element remE =  pathInfo.getChild("remainder", BES.BES_NS);
+        Element remE =  w10nPathInfo.getChild("remainder", BES.BES_NS);
         if(remE==null)
             throw new IOException("BES failed to include a 'remainder' element in the PathInfoDocument.");
 
