@@ -225,7 +225,7 @@
                     <br/>
                     <a href='{$docsService}/'>Documentation</a>
                 </h3>
-
+                <xsl:call-template name="DataCatalog"/>
             </body>
     </xsl:template>
 
@@ -409,6 +409,42 @@
     </xsl:template>
 
 
+
+    <xsl:template name="DataCatalog">
+        <xsl:element name="script" >
+            <xsl:attribute name="type">application/ld+json</xsl:attribute>
+            {
+                "@context": "http://schema.org",
+                "@type": "DataCatalog",
+                "name": "OPeNDAP Hyrax Data Server",
+                "url": "https://www.opendap.org",
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "@PublisherName@",
+                    "address": {
+                    "@type": "@PostalAddress@",
+                    "addressCountry": "@Country@",
+                    "addressLocality": "@Street,City@",
+                    "addressRegion": "@State@",
+                    "postalCode": "@PostalCode@"
+                },
+                "fileFormat": [
+                "application/geo+json",
+                "application/json",
+                "text/csv"
+                ],
+                "isAccessibleForFree": "True",
+                "dataset": [ <xsl:for-each select="bes:dataset/bes:dataset[bes:serviceRef='dap']">
+                    {
+                        "@type": "Dataset",
+                        "name": "<xsl:value-of select="@name"/>",
+                        "sameAs": "<xsl:value-of select="@name"/>.html"
+                    }<xsl:if test="position()!=last()" >,</xsl:if>
+                </xsl:for-each>
+                ]
+            }
+        </xsl:element>
+    </xsl:template>
 
 
 </xsl:stylesheet>
