@@ -36,6 +36,7 @@
     <xsl:param name="dapService" />
     <xsl:param name="docsService" />
     <xsl:param name="viewersService" />
+    <xsl:param name="collectionURL" />
     <xsl:param name="allowDirectDataSourceAccess" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
@@ -422,23 +423,27 @@
                     "@type": "Organization",
                     "name": "@PublisherName@",
                     "address": {
-                    "@type": "@PostalAddress@",
-                    "addressCountry": "@Country@",
-                    "addressLocality": "@Street,City@",
-                    "addressRegion": "@State@",
-                    "postalCode": "@PostalCode@"
+                        "@type": "@PostalAddress@",
+                        "addressCountry": "@Country@",
+                        "addressLocality": "@Street,City@",
+                        "addressRegion": "@State@",
+                        "postalCode": "@PostalCode@"
+                    },
+                    "telephone": "@PublisherPhoneNumber@",
+                    "email": "@PublisherEmail@",
+                    "sameAs": "@OrganizationLandingPageURL@"
                 },
                 "fileFormat": [
-                "application/geo+json",
-                "application/json",
-                "text/csv"
+                    "application/geo+json",
+                    "application/json",
+                    "text/csv"
                 ],
                 "isAccessibleForFree": "True",
                 "dataset": [ <xsl:for-each select="bes:dataset/bes:dataset[bes:serviceRef='dap']">
                     {
                         "@type": "Dataset",
                         "name": "<xsl:value-of select="@name"/>",
-                        "sameAs": "<xsl:value-of select="@name"/>.html"
+                        "sameAs": "<xsl:value-of select="$collectionURL"/><xsl:value-of select="@name"/>.html"
                     }<xsl:if test="position()!=last()" >,</xsl:if>
                 </xsl:for-each>
                 ]

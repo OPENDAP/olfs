@@ -26,6 +26,7 @@
 
 package opendap.bes;
 
+import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
@@ -246,28 +247,29 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         Request oreq = new Request(null,request);
 
         String collectionName  = getCollectionName(oreq);
+        String collectionURL = PathBuilder.pathConcat(ReqInfo.getServiceUrl(request),collectionName);
 
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Document showCatalogDoc = new Document();
-
         _besApi.getBesCatalog(collectionName, showCatalogDoc);
 
-        log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+        if(log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+        }
 
         JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
-
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
 
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
             xsltDoc = systemPath + "/xsl/contents.xsl";
 
         Transformer transformer = new Transformer(xsltDoc);
-
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
+        transformer.setParameter("collectionURL",collectionURL);
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
 
