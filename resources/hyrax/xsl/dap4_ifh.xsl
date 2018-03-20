@@ -793,7 +793,7 @@
             ~ // This file is part of the "Hyrax Data Server" project.
             ~ //
             ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
+            ~ // Copyright (c) 2018 OPeNDAP, Inc.
             ~ // Author: Nathan David Potter &lt;ndp@opendap.org&gt;
             ~ //
             ~ // This library is free software; you can redistribute it and/or

@@ -226,7 +226,7 @@
                     <br/>
                     <a href='{$docsService}/'>Documentation</a>
                 </h3>
-                <xsl:call-template name="DataCatalog"/>
+                <xsl:call-template name="json-ld-DataCatalog"/>
             </body>
     </xsl:template>
 
@@ -411,19 +411,19 @@
 
 
 
-    <xsl:template name="DataCatalog">
+    <xsl:template name="json-ld-DataCatalog">
         <xsl:element name="script" >
             <xsl:attribute name="type">application/ld+json</xsl:attribute>
             {
                 "@context": "http://schema.org",
                 "@type": "DataCatalog",
-                "name": "OPeNDAP Hyrax Data Server",
+                "name": "Hyrax Data Server (OPeNDAP)",
                 "url": "https://www.opendap.org",
                 "publisher": {
                     "@type": "Organization",
                     "name": "@PublisherName@",
                     "address": {
-                        "@type": "@PostalAddress@",
+                        "@type": "PostalAddress",
                         "addressCountry": "@Country@",
                         "addressLocality": "@Street,City@",
                         "addressRegion": "@State@",
