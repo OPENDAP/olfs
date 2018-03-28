@@ -226,7 +226,9 @@ public class Dap2IFH extends Dap4Responder {
                 sb.append(attributesToProperties(variable,indent));
                 first = false;
             }
+            sb.append("\n");
             sb.append(indent).append("]");
+            sb.append("\n");
         }
         return sb.toString();
     }
