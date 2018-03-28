@@ -27,19 +27,15 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
     <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
-    
+
     <xsl:param name="serviceContext"/>
+    <xsl:param name="docsService"/>
     <xsl:param name="HyraxVersion"/>
-    
-    <xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable>
+    <xsl:param name="JsonLD"/>
+
     <xsl:variable name="datasetUrl"><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:variable>
-    
-    
-    <xsl:key name="DimensionNames" match="dap:Dimension" use="@name"/>
-    
-    
-    
-    
+
+
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
         <xhtml>
@@ -125,9 +121,13 @@
                     <a href="{$docsService}/">Documentation</a>
                 </h3>
                 
+                <xsl:element name="script">
+                    <xsl:attribute name="type">application/ld+json</xsl:attribute>
+                    <xsl:value-of select="$JsonLD" />
+                </xsl:element>
             </body>
             <script>CollapsibleLists.apply(true);</script>
-            
+
         </xhtml>
         
     </xsl:template>
@@ -807,6 +807,7 @@
             <xsl:call-template name="DimSlicing">
                 <xsl:with-param name="myJSVarName" select="$myJSVarName"/>
             </xsl:call-template>
+            <xsl:call-template name="AttributesPresentation"/>
         </xsl:for-each>
 
     </xsl:template>

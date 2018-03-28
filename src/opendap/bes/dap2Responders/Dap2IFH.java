@@ -29,7 +29,6 @@ package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
 import opendap.bes.Version;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
@@ -38,8 +37,14 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
+import org.jdom.Attribute;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.filter.ElementFilter;
+import org.jdom.filter.Filter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
@@ -48,6 +53,8 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Vector;
 
 
 public class Dap2IFH extends Dap4Responder {
@@ -93,6 +100,8 @@ public class Dap2IFH extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
+        String collectionName = ReqInfo.getCollectionName(request);
+
         QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
 
@@ -127,11 +136,10 @@ public class Dap2IFH extends Dap4Responder {
         _log.debug(xmlo.outputString(ddx));
 
         OutputStream os = response.getOutputStream();
-
-
-
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
-        // dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
+        ddx.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
+
+        String jsonLD = getDatasetJsonLD(collectionName,ddx);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
@@ -155,6 +163,7 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+            transformer.setParameter("JsonLD", jsonLD);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
@@ -167,9 +176,143 @@ public class Dap2IFH extends Dap4Responder {
             _log.debug("Restoring working directory to " + currentDir);
             System.setProperty("user.dir", currentDir);
         }
+    }
+
+
+    public String getDatasetJsonLD(String collectionName, Document ddx){
+
+        String indent = indent_inc;
+        Element dataset = ddx.getRootElement();
+
+        StringBuilder sb = new StringBuilder("\n");
+        sb.append(indent).append("\"@context\": \"http://schema.org\",\n");
+        sb.append(indent).append("\"@type\": \"Dataset\",\n");
+
+        String name  = dataset.getAttributeValue("name");
+        sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
+
+
+        Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
+        if(xmlBase==null){
+            _log.error("Unable to locate xml:base attribute for Dataset {}", name);
+        }
+        else {
+            sb.append(indent).append("\"url\": \"").append(xmlBase.getValue()).append("\",\n");
+        }
+        sb.append(indent).append("\"includedInDataCatalog\": { \n");
+        sb.append(indent).append(indent_inc).append("\"@type\": \"DataCatalog\", \n");
+        sb.append(indent).append(indent_inc).append("\"name\": \"Hyrax Data Server\", \n");
+        sb.append(indent).append(indent_inc).append("\"sameAs\": \"").append(collectionName).append("\"\n");
+        sb.append(indent).append("},\n");
+
+        // Top Level Attributes
+        sb.append(attributesToProperties(dataset, indent));
+        sb.append(",\n");
+
+        List<Element> children = dataset.getChildren();
+        Vector<Element> variables = new Vector<>();
+        for(Element child : children){
+            if(!child.getName().equals("Attribute") && !child.getName().equals("blob")){
+                // It's not an Attribute so it must be a variable!
+                variables.add(child);
+            }
+        }
+        if(!variables.isEmpty()){
+            sb.append(indent).append("\"variableMeasured\": [\n");
+            boolean first = true;
+            for(Element variable : variables){
+                if(!first)
+                    sb.append(",\n");
+                sb.append(attributesToProperties(variable,indent));
+                first = false;
+            }
+            sb.append(indent).append("]");
+        }
+        return sb.toString();
+    }
+
+
+    Filter attributeFilter = new ElementFilter("Attribute", DAP.DAPv32_NS);
+    private String indent_inc = "  ";
+
+    public String attributesToProperties(Element variable, String indent){
+        String myIndent = indent + indent_inc;
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(indent).append("{\n");
+        sb.append(myIndent).append("\"@type\": \"PropertyValue\",\n");
+        sb.append(myIndent).append("\"name\": \"").append(variable.getAttributeValue("name")).append("\",\n");
+        sb.append(myIndent).append("\"valueReference\": [ \n");
+
+        if(variable.getName().equals("Grid")){
+            // It's a Grid so we look at the Grid array to determine the GRid metadata content.
+            Element gridArray =  variable.getChild("Array",DAP.DAPv32_NS);
+            List<Element> attributes = gridArray.getContent(attributeFilter);
+            sb.append(attributesToProperties(attributes, myIndent));
+        }
+        else if(variable.getName().equals("Sequence") || variable.getName().equals("Structure") ){
+            // It's a Container type... Wut do?
+            _log.error("attributesToProperties() - We don't have a good mapping for container types to JSON-LD markup.");
+        }
+        else {
+            // It's an atomic variable!
+            List<Element> attributes = variable.getContent(attributeFilter);
+            sb.append(attributesToProperties(attributes, myIndent));
+        }
+
+        sb.append("\n");
+        sb.append(myIndent).append("]\n");
+        sb.append(indent).append("}");
+
+
+        return sb.toString();
+
+    }
+
+
+    public String attributesToProperties(List<Element> attributes, String indent){
+
+        StringBuilder sb = new StringBuilder();
+        String myIndent = indent + indent_inc;
+
+        boolean first = true;
+        for(Element attribute : attributes){
+            if(!first)
+                sb.append(",\n");
+            if(attribute.getChild("Attribute",DAP.DAPv32_NS)!=null){
+                // It's an AttrTable so dig...
+                List<Element> myAttributes = attribute.getContent(attributeFilter);
+                sb.append(attributesToProperties(myAttributes,myIndent));
+            }
+            else {
+                // Not an AttrTable so it must have values...
+                sb.append(attributeToPropertyValue(attribute,myIndent));
+            }
+            first = false;
+        }
+
+        return sb.toString();
+    }
 
 
 
+    public String attributeToPropertyValue(Element attribute, String indent){
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent).append("{\n");
+        sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
+        sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
+
+        List<Element> values = attribute.getChildren("value",DAP.DAPv32_NS);
+        boolean first = true;
+        for(Element value : values){
+            if(!first)
+                sb.append(",\n");
+            sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
+            first = false;
+        }
+        sb.append("\n");
+        sb.append(indent).append("}");
+        return sb.toString();
     }
 
 
