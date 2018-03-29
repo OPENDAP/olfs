@@ -589,10 +589,8 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             else {
                 this.setProjected(false);
             }
-
         }
-
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 

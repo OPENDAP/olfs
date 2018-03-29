@@ -182,7 +182,7 @@ function dap4_url(base_url) {
 
             var dapVar = this.dap_vars[i];
 
-            var varProj = dapVar.getCE();
+            var varProj = dapVar.getDap4CE();
             if (varProj.length > 0) {
                 if (ce.length > 0)
                     ce += ";";
@@ -345,8 +345,8 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 }
             }
             return true;
-        }
-        /* - - ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+        };
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     }
     /* END ARRAY TYPE ---------------------------------------------------------------*/
@@ -578,9 +578,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             else {
                 this.projected = false;
             }
-
         }
-
     };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
@@ -593,7 +591,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
      * and (if it's a container) its children.
      * 
      */
-    this.getCE = function () {
+    this.getDap4CE = function () {
 
         ce = "";
 
@@ -616,8 +614,8 @@ function dap_var(name, js_var_name, isArray, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     * 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     *
      * dap_var.get_projection()
      *
      * Get the projection sub-expression for this variable.
