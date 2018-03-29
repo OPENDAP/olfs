@@ -254,9 +254,9 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
 
     /* DAP ARRAY TYPE -------------------------------------------------------------------
-     * If this is DAP Array type then add the array 
+     * If this is DAP Array type then add the array
      * manipulation machinery to this instance
-     * 
+     *
      */
     if (isArray) {
         if (DEBUG.enabled()) alert(js_var_name + " is an array");
@@ -265,35 +265,35 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         this.dimTextBoxes = new Array(); // Holds the names of the dimensions textbox fields
 
 
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-         * 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         *
          * dap_var.addDimension()
-         * 
+         *
          * Add a dimension to a DAP Array object.
-         * 
+         *
          * dimTextBox - The UI element which specifies the dimesions
          *              projection/hyperslab
          * size - The size of the dimension.
-         *         
+         *
          */
         this.addDimension = function (dimTextBox, size) {
             if (DEBUG.enabled()) alert(this.js_var_name + " adding dimension " + this.num_dims + " size: " + size);
             this.dimTextBoxes[this.num_dims] = dimTextBox;
             this.dims[this.num_dims] = size;
             this.num_dims++;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         * 
+         *
          * dap_var.display_indices()
-         * 
-         * Add the array indices to the UI text widgets associated with 
-         * this DAP array object. The text widgets are names 
-         * <var_name>_0, <var_name>_1, ... <var_name>_n for an array 
+         *
+         * Add the array indices to the UI text widgets associated with
+         * this DAP array object. The text widgets are names
+         * <var_name>_0, <var_name>_1, ... <var_name>_n for an array
          * with size N+1.
-         * 
+         *
          */
         this.display_indices = function () {
             if (DEBUG.enabled()) alert(this.name + " display_indices()\nnum_dims: " + this.num_dims);
@@ -306,34 +306,34 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                     tBox.value = s;
                 }
             }
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         * 
+         *
          * dap_var.erase_indices()
-         * 
-         * Clears hyperslab index information from a DAP array 
+         *
+         * Clears hyperslab index information from a DAP array
          * object UI.
-         * 
+         *
          */
         this.erase_indices = function () {
             for (var i = 0; i < this.num_dims; ++i) {
                 var tboxName = this.dimTextBoxes[i];
                 tboxName.value = "";
             }
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         * 
+         *
          * dap_var.isDefaultArrayProjection()
-         * 
-         * Returns true if the default array projection (hyperslab) 
+         *
+         * Returns true if the default array projection (hyperslab)
          * is specified for this array variable.
-         * 
+         *
          */
         this.isDefaultArrayProjection = function () {
             for (var i = 0; i < this.num_dims; ++i) {
@@ -346,41 +346,41 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
             return true;
         }
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+        /* - - ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     }
     /* END ARRAY TYPE ---------------------------------------------------------------*/
 
 
     /* CONTAINER TYPE -------------------------------------------------------------
-     * If this is a container type then add the container 
+     * If this is a container type then add the container
      * manipulation machinery to this instance
      */
     if (this.isContainer) {
         this.numChildren = 0;        // Holds the number of child variables
         this.children = new Array(); // Holds the chid variables
 
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-         * 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         *
          * dap_var.addChildVar()
-         * 
+         *
          * Adds a child variable to the container.
-         * 
+         *
          */
         this.addChildVar = function (childVar) {
             this.children[this.numChildren] = childVar;
             this.numChildren++;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-         * 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         *
          * dap_var.descendantArraysAreCustomHyperSlabbed()
-         * 
+         *
          * Returns true if there is a descendant array of this container
          * that is projected with a custom (non-default) hyperslab
-         *  
+         *
          */
         this.descendantArraysAreCustomHyperSlabbed = function () {
             for (var i = 0; i < this.numChildren; i++) {
@@ -396,17 +396,17 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
             return false;
 
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         * 
+         *
          * dap_var.getDescendantsProjection()
-         * 
+         *
          * Returns the cumulative projection string of this containers
          * descendants.
-         * 
+         *
          */
         this.getDescendantsProjection = function () {
             var p = "";
@@ -420,17 +420,17 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 }
             }
             return p;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-         * 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         *
          * dap_var.hasProjectedChildren()
-         * 
-         * Returns true if this variable is a container that has 
+         *
+         * Returns true if this variable is a container that has
          * projected children, false otherwise.
-         * 
+         *
          */
         this.hasProjectedChildren = function () {
 
@@ -447,7 +447,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
 
             return foundProjectedChild;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -455,19 +455,21 @@ function dap_var(name, js_var_name, isArray, isContainer) {
     /* END CONTAINER TYPE -----------------------------------------------------*/
 
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     * 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     *
      * dap_var.handle_projection_change()
-     * 
+     *
      * This method handles a change in state trigger by the UI
-     * dectating a state change of the projection checkBox 
+     * dectating a state change of the projection checkBox
      * associated with this variable.
-     * 
-     * 
+     *
+     *
      */
     this.handle_projection_change = function (check_box) {
 
-        if (DEBUG.enabled()) alert(this.name + " Handling projection change.\nisContainer(): " + this.isContainer + "\nisArray(): " + this.isArray);
+        if (DEBUG.enabled()) alert(this.name + " Handling projection change.\n" +
+            "isContainer(): " + this.isContainer + "\n" +
+            "isArray(): " + this.isArray + "\n");
 
         this.setProjected(check_box.checked);
 
@@ -475,26 +477,26 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         if (DEBUG.enabled()) showProjection();
         this.updateChecked();
         DAP4_URL.update_url();
-    }
+    };
 
     /*
-     * 
+     *
      */
     this.isProjected = function () {
         return this.projected;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      *
      * dap_var.setProjected()
-     * 
-     * Sets the projection atate for this variable. If this  
+     *
+     * Sets the projection state for this variable. If this
      * variable is a container then all of its children state
-     * are also set. If it is an array then the default 
+     * are also set. If it is an array then the default
      * hyper slab state is set for each dimension.
-     *  
+     *
      */
     this.setProjected = function (isProj) {
 
@@ -519,16 +521,16 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 childVar.setProjected(isProj);
             }
         }
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      *
      * dap_var.updateProjection()
-     * 
-     * Updates the projection for the children of containers - 
-     * when all the children of a container are projected then the 
+     *
+     * Updates the projection for the children of containers -
+     * when all the children of a container are projected then the
      * parent conationer is projected.
      */
     this.updateProjection = function () {
@@ -540,16 +542,16 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             if (DEBUG.enabled()) alert("Updating proj starting at " + this.name);
             this.updateProjWorker();
         }
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * 
+     *
      * dap_var.updateProjWorker()
-     * 
+     *
      * Recursive worker method for dap_var.updateProjection()
-     * 
+     *
      */
     this.updateProjWorker = function () {
 
@@ -579,12 +581,12 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
         }
 
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * 
+     *
      * dap_var.getArrayCE()
      * 
      * Returns the constraint expression clause associated with this 
@@ -617,9 +619,9 @@ function dap_var(name, js_var_name, isArray, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      * 
      * dap_var.get_projection()
-     * 
+     *
      * Get the projection sub-expression for this variable.
-     * 
+     *
      */
     this.get_projection = function () {
         var p = "";
@@ -653,31 +655,31 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         }
 
         return p;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * 
+     *
      * dap_var.addSelectionClause()
-     * 
+     *
      * Adds a selection clause for the variable
-     * 
+     *
      */
     this.addSelectionClause = function (relOpWidget, rValueWidget) {
         var sClause = new SelectionClause(relOpWidget, rValueWidget);
         this.selectionClauses[this.numSelectionClauses] = sClause;
         this.numSelectionClauses++;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * 
+     *
      * dap_var.get_selection()
-     * 
-     * Get the selection clauses for this variable. 
-     * 
+     *
+     * Get the selection clauses for this variable.
+     *
      */
     this.get_selection = function () {
         var s = "";
@@ -707,7 +709,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
         }
         return s;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 

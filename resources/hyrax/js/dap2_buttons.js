@@ -292,7 +292,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             this.dimTextBoxes[this.num_dims] = dimTextBox;
             this.dims[this.num_dims] = size;
             this.num_dims++;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -317,7 +317,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                     tBox.value = s;
                 }
             }
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -334,7 +334,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 var tboxName = this.dimTextBoxes[i];
                 tboxName.value = "";
             }
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -356,7 +356,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 }
             }
             return true;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
     }
@@ -381,7 +381,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         this.addChildVar = function (childVar) {
             this.children[this.numChildren] = childVar;
             this.numChildren++;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -407,7 +407,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
             return false;
 
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -431,7 +431,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 }
             }
             return p;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -458,7 +458,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
 
             return foundProjectedChild;
-        }
+        };
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -488,14 +488,14 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         if (DEBUG.enabled()) showProjection();
         this.updateChecked();
         DAP2_URL.update_url();
-    }
+    };
 
     /*
      *
      */
     this.isProjected = function () {
         return this.projected;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -532,7 +532,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                 childVar.setProjected(isProj);
             }
         }
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -553,9 +553,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         else {
             this.updateProjWorker();
         }
-
-
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -637,7 +635,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         }
 
         return p;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -652,7 +650,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         var sClause = new SelectionClause(relOpWidget, rValueWidget);
         this.selectionClauses[this.numSelectionClauses] = sClause;
         this.numSelectionClauses++;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
@@ -691,7 +689,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
         }
         return s;
-    }
+    };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
