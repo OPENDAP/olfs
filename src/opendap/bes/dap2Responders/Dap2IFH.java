@@ -100,7 +100,7 @@ public class Dap2IFH extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
-        String collectionName = ReqInfo.getCollectionName(request);
+        String collectionUrl = ReqInfo.getCollectionUrl(request);
 
         QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
@@ -139,7 +139,7 @@ public class Dap2IFH extends Dap4Responder {
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
         ddx.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
-        String jsonLD = getDatasetJsonLD(collectionName,ddx);
+        String jsonLD = getDatasetJsonLD(collectionUrl,ddx);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
@@ -179,7 +179,7 @@ public class Dap2IFH extends Dap4Responder {
     }
 
 
-    public String getDatasetJsonLD(String collectionName, Document ddx){
+    public String getDatasetJsonLD(String collectionUrl, Document ddx){
 
         String indent = indent_inc;
         Element dataset = ddx.getRootElement();
@@ -202,7 +202,8 @@ public class Dap2IFH extends Dap4Responder {
         sb.append(indent).append("\"includedInDataCatalog\": { \n");
         sb.append(indent).append(indent_inc).append("\"@type\": \"DataCatalog\", \n");
         sb.append(indent).append(indent_inc).append("\"name\": \"Hyrax Data Server\", \n");
-        sb.append(indent).append(indent_inc).append("\"sameAs\": \"").append(collectionName).append("\"\n");
+        sb.append(indent).append(indent_inc).append("\"sameAs\": \"");
+        sb.append(PathBuilder.pathConcat(collectionUrl,"contents.html")).append("\n");
         sb.append(indent).append("},\n");
 
         // Top Level Attributes
