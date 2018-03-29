@@ -584,10 +584,10 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             }
             else if (noChildrenProjected) {
                 if (DEBUG.enabled()) alert(this.name + "  noChildrenProjected:" + noChildrenProjected);
-                this.setProjected(false);
+                this.projected = false;
             }
             else {
-                this.setProjected(false);
+                this.projected = false;
             }
         }
     };

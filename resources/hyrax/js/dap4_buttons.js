@@ -776,11 +776,8 @@ function showProjection() {
     for (var i = 0; i < DAP4_URL.num_dap_vars; i++) {
         var dapVar = DAP4_URL.dap_vars[i];
         msg += dapVar.name + ": " + dapVar.projected + "\n";
-
         if (dapVar.hasProjectedChildren()) {
-
             msg += "Projected Children: \n" + dapVar.get_projection();
-
         }
     }
     alert(msg);
