@@ -713,13 +713,13 @@ function dap_var(name, js_var_name, isArray, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     * 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     *
      * dap_var.updateChecked()
-     * 
-     * Updates the check boxes in the UI to reflect the current 
+     *
+     * Updates the check boxes in the UI to reflect the current
      * projection
-     * 
+     *
      */
     this.updateChecked = function () {
 
@@ -734,12 +734,12 @@ function dap_var(name, js_var_name, isArray, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     * 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     *
      * dap_var.updatedCheckedWorker()
-     * 
+     *
      * A recursive helper method for updateChecked()
-     * 
+     *
      */
     this.updatedCheckedWorker = function () {
 
@@ -766,7 +766,6 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 }
 
