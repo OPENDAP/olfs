@@ -274,13 +274,6 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="isMap">
-            <xsl:choose>
-                <xsl:when test="self::dap:Map">true</xsl:when>
-                <xsl:otherwise>false</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
         <xsl:variable name="myType">
             <xsl:choose>
                 <xsl:when test="self::dap:Array | self::dap:Map"><xsl:value-of select="name(*[not(self::dap:Attribute) and not(self::dap:dimension)])"/></xsl:when>
@@ -296,13 +289,12 @@
                 "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
                 "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
                 "isArray:       <xsl:value-of select="$isArray"/>\n" +
-                "isMap:         <xsl:value-of select="$isMap"/>\n" +
                 "myType:        <xsl:value-of select="$myType"/>\n" +
                 "parentContainer:        <xsl:value-of select="$parentContainer"/>\n"
             );
 
 
-            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isMap"/>,<xsl:value-of select="$isContainer"/>);
+            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
             <xsl:if test="parent::dap:Dataset">
                 DAP2_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
@@ -692,7 +684,7 @@
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",false,false,false);
+            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",false,false);
 
             <xsl:if test="parent::dap:Dataset">
                 DAP2_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
@@ -769,7 +761,7 @@
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",true,false,false);
+            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",true,false);
 
 
             <xsl:if test="parent::dap:Dataset">

@@ -1,4 +1,3 @@
-
 function ascii_button() {
     var url = new String(document.forms[0].url.value);
 
@@ -68,6 +67,7 @@ function program_button() {
 }
 
 var help = 0;
+
 // Our friend, the help window.
 
 function help_button() {
@@ -75,7 +75,7 @@ function help_button() {
     // already visible. I think Netscape handles this but I know it will
     // write the contents over and over again. This preents that, too.
     // 10/8/99 jhrg
-    if (help && ! help.closed)
+    if (help && !help.closed)
         return;
 
     // Resize on Netscape 4 is hosed. When enabled, if a user resizes then
@@ -115,18 +115,17 @@ function describe_projection() {
 
 
 /* Auto resize a text input field */
-function autoResize(e){
-    var ele=e.target; //get the input field
+function autoResize(e) {
+    var ele = e.target; //get the input field
 
-    if(DEBUG.enabled()) alert(  "autoresize: \n"+ "\nsize: "+ele.size+ "\nvalue: "+ele.value+ "\nvalue.length: "+ele.value.length);
+    if (DEBUG.enabled()) alert("autoresize: \n" + "\nsize: " + ele.size + "\nvalue: " + ele.value + "\nvalue.length: " + ele.value.length);
 
-    if(ele.size <= ele.value.length ){
+    if (ele.size <= ele.value.length) {
         ele.size = ele.value.length * 1.4;
     }
 
 
 }
-
 
 
 /**************************************************************
@@ -136,12 +135,10 @@ function autoResize(e){
  */
 function debug_obj(checkBox) {
     this.myCheckBox = checkBox;
-    this.enabled = function(){
+    this.enabled = function () {
         return this.myCheckBox.checked;
     }
 }
-
-
 
 
 /***********************************************************************
@@ -160,9 +157,9 @@ function dap2_url(base_url) {
     /*
      * Add the current projection and selection to the URL
      */
-    this.update_url = function() {
+    this.update_url = function () {
 
-        if(DEBUG.enabled()) alert("Updating Data Request URL");
+        if (DEBUG.enabled()) alert("Updating Data Request URL");
 
         this.build_constraint();
         var url_text = this.url;
@@ -178,15 +175,15 @@ function dap2_url(base_url) {
      * Scan all the form elements and pick out the various pieces of constraint
      * information. Set the dap_url state to reflect the new information.
      */
-    this.build_constraint = function (){
+    this.build_constraint = function () {
         var p = "";
         var s = "";
-        for (var i = 0; i < this.num_dap_vars;++ i) {
+        for (var i = 0; i < this.num_dap_vars; ++i) {
 
             var dapVar = this.dap_vars[i];
 
             var varProj = dapVar.get_projection();
-            if(varProj.length > 0){
+            if (varProj.length > 0) {
                 if (p.length > 0)
                     p += ",";
                 p += varProj;
@@ -207,14 +204,14 @@ function dap2_url(base_url) {
      * Add the variable to the array of dap_vars. The var_index is the
      * number of *this particular* variable in the dataset, zero-based.
      */
-    this.add_dap_var = function(dap_var) {
-        this.dap_vars[ this.num_dap_vars] = dap_var;
+    this.add_dap_var = function (dap_var) {
+        this.dap_vars[this.num_dap_vars] = dap_var;
         this.num_dap_vars++;
     }
 
 }
-/***********************************************************************/
 
+/***********************************************************************/
 
 
 /***********************************************************************
@@ -223,23 +220,21 @@ function dap2_url(base_url) {
  * selectionOperator: the operator for this selection clause (<, <=, ==, !=, >=, >)
  * selectionValue: the right side value for the clause.
  */
-function SelectionClause(relOpWidget, rValueWidget){
+function SelectionClause(relOpWidget, rValueWidget) {
     this.relOpWidget = relOpWidget;
     this.rValueWidget = rValueWidget;
 
-    this.relOp = function() {
+    this.relOp = function () {
         return relOpWidget[relOpWidget.selectedIndex].value;
     }
 
-    this.rValue = function(){
+    this.rValue = function () {
         return rValueWidget.value;
     }
 
 }
+
 /***********************************************************************/
-
-
-
 
 
 /***********************************************************************
@@ -251,12 +246,11 @@ function SelectionClause(relOpWidget, rValueWidget){
  * isArray: true if this is an array, false otherwise.
  * isContainer: true if this is a container type, false otherwise.
  */
-function dap_var(name, js_var_name, isArray, isMap, isContainer) {
+function dap_var(name, js_var_name, isArray, isContainer) {
     // Common members
     this.name = name;
     this.js_var_name = js_var_name;
     this.isArray = isArray;
-    this.isMap = isMap;
     this.isContainer = isContainer;
 
     this.projected = false;
@@ -264,11 +258,10 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
     this.numSelectionClauses = 0;        // Holds the number of child variables
     this.selectionClauses = new Array(); // Holds the chid variables
 
-    if(DEBUG.enabled()) alert("dap_var()\n name:        " + name + "\n " +
-          "js_var_name: " + js_var_name + "\n " +
+    if (DEBUG.enabled()) alert("dap_var()\n name:        " + name + "\n " +
+        "js_var_name: " + js_var_name + "\n " +
         "isArray: " + isArray + "\n " +
-        "isMap: " + isMap + "\n " +
-        "isContainer: " + isContainer +"\n " );
+        "isContainer: " + isContainer + "\n ");
 
 
     /* DAP ARRAY TYPE -------------------------------------------------------------------
@@ -276,8 +269,8 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * manipulation machinery to this instance
      *
      */
-    if(isArray) {
-        if(DEBUG.enabled()) alert(js_var_name+ " is an array");
+    if (isArray) {
+        if (DEBUG.enabled()) alert(js_var_name + " is an array");
         this.num_dims = 0;       // Holds the number of dimensions
         this.dims = new Array(); // Holds the length of the dimensions
         this.dimTextBoxes = new Array(); // Holds the names of the dimensions textbox fields
@@ -294,14 +287,13 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * size - The size of the dimension.
          *
          */
-        this.addDimension = function(dimTextBox, size) {
-            if(DEBUG.enabled()) alert(this.js_var_name+ " adding dimension "+this.num_dims+" size: "+size);
-            this.dimTextBoxes[ this.num_dims] = dimTextBox;
-            this.dims[ this.num_dims] = size;
+        this.addDimension = function (dimTextBox, size) {
+            if (DEBUG.enabled()) alert(this.js_var_name + " adding dimension " + this.num_dims + " size: " + size);
+            this.dimTextBoxes[this.num_dims] = dimTextBox;
+            this.dims[this.num_dims] = size;
             this.num_dims++;
         }
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -314,12 +306,12 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * with size N+1.
          *
          */
-        this.display_indices =  function () {
-            if(DEBUG.enabled()) alert(this.name + " display_indices()\nnum_dims: "+this.num_dims);
+        this.display_indices = function () {
+            if (DEBUG.enabled()) alert(this.name + " display_indices()\nnum_dims: " + this.num_dims);
             for (var i = 0; i < this.num_dims; ++i) {
                 var tBox = this.dimTextBoxes[i];
                 // Check the text box - if it already has content don't overwrite it
-                if(tBox.value.length==0){
+                if (tBox.value.length == 0) {
                     var end_index = this.dims[i] - 1;
                     var s = "0:1:" + end_index.toString();
                     tBox.value = s;
@@ -327,7 +319,6 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
             }
         }
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -338,14 +329,13 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * object UI.
          *
          */
-        this.erase_indices =  function() {
-            for (var i = 0; i < this.num_dims;++ i) {
+        this.erase_indices = function () {
+            for (var i = 0; i < this.num_dims; ++i) {
                 var tboxName = this.dimTextBoxes[i];
                 tboxName.value = "";
             }
         }
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -356,12 +346,12 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * is specified for this array variable.
          *
          */
-        this.isDefaultArrayProjection = function(){
+        this.isDefaultArrayProjection = function () {
             for (var i = 0; i < this.num_dims; ++i) {
                 var tBox = this.dimTextBoxes[i];
                 var end_index = this.dims[i] - 1;
                 var defaultProj = "0:1:" + end_index.toString();
-                if(tBox.value!=defaultProj){
+                if (tBox.value != defaultProj) {
                     return false;
                 }
             }
@@ -371,8 +361,6 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
 
     }
     /* END ARRAY TYPE ---------------------------------------------------------------*/
-
-
 
 
     /* CONTAINER TYPE -------------------------------------------------------------
@@ -390,8 +378,8 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * Adds a child variable to the container.
          *
          */
-        this.addChildVar =  function (childVar) {
-            this.children[ this.numChildren] = childVar;
+        this.addChildVar = function (childVar) {
+            this.children[this.numChildren] = childVar;
             this.numChildren++;
         }
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
@@ -405,14 +393,14 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * that is projected with a custom (non-default) hyperslab
          *
          */
-        this.descendantArraysAreCustomHyperSlabbed =  function(){
-            for (var i = 0; i<this.numChildren; i++) {
+        this.descendantArraysAreCustomHyperSlabbed = function () {
+            for (var i = 0; i < this.numChildren; i++) {
                 var childVar = this.children[i];
-                if(childVar.isArray && !childVar.isDefaultArrayProjection()){
+                if (childVar.isArray && !childVar.isDefaultArrayProjection()) {
                     return true;
                 }
 
-                if(childVar.isContainer){
+                if (childVar.isContainer) {
                     return childVar.descendantArraysAreCustomHyperSlabbed();
                 }
 
@@ -423,7 +411,6 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
          *
          * dap_var.getDescendantsProjection()
@@ -432,12 +419,12 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * descendants.
          *
          */
-        this.getDescendantsProjection = function(){
+        this.getDescendantsProjection = function () {
             var p = "";
             for (var i = 0; i < this.numChildren; i++) {
                 var descendantsProjection = this.children[i].get_projection();
-                if(descendantsProjection != "") {
-                    if(p != ""){
+                if (descendantsProjection != "") {
+                    if (p != "") {
                         p += ",";
                     }
                     p += descendantsProjection;
@@ -456,12 +443,12 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
          * projected children, false otherwise.
          *
          */
-        this.hasProjectedChildren = function(){
+        this.hasProjectedChildren = function () {
 
             var foundProjectedChild = false;
-            for (var i = 0; i<this.numChildren && !foundProjectedChild; i++) {
+            for (var i = 0; i < this.numChildren && !foundProjectedChild; i++) {
 
-                if(this.children[i].isContainer){
+                if (this.children[i].isContainer) {
                     foundProjectedChild = this.children[i].hasProjectedChildren();
                 }
                 else {
@@ -475,13 +462,8 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-
-
-
-
     }
     /* END CONTAINER TYPE -----------------------------------------------------*/
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -494,17 +476,16 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      *
      *
      */
-    this.handle_projection_change = function(check_box) {
+    this.handle_projection_change = function (check_box) {
 
-        if(DEBUG.enabled()) alert(this.name + " Handling projection change.\n" +
-            "isContainer(): "+this.isContainer +"\n" +
-            "isArray(): "+this.isArray + "\n" +
-            "isMap(): "+this.isMap );
+        if (DEBUG.enabled()) alert(this.name + " Handling projection change.\n" +
+            "isContainer(): " + this.isContainer + "\n" +
+            "isArray(): " + this.isArray + "\n");
 
         this.setProjected(check_box.checked);
 
         this.updateProjection();
-        if(DEBUG.enabled()) showProjection();
+        if (DEBUG.enabled()) showProjection();
         this.updateChecked();
         DAP2_URL.update_url();
     }
@@ -512,11 +493,10 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
     /*
      *
      */
-    this.isProjected = function(){
+    this.isProjected = function () {
         return this.projected;
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -529,38 +509,31 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * hyper slab state is set for each dimension.
      *
      */
-    this.setProjected = function(isProj) {
+    this.setProjected = function (isProj) {
 
-        if(DEBUG.enabled()) alert("setting proj on "+this.name+ " to "+isProj);
+        if (DEBUG.enabled()) alert("setting proj on " + this.name + " to " + isProj);
         this.projected = isProj;
 
-        if(this.isArray) {
-            if(isProj){
-                if(DEBUG.enabled()) alert(this.name + " displaying indices...");
+        if (this.isArray) {
+            if (isProj) {
+                if (DEBUG.enabled()) alert(this.name + " displaying indices...");
                 this.display_indices();
             }
             else {
-                if(DEBUG.enabled()) alert(this.name + " hiding indices...");
+                if (DEBUG.enabled()) alert(this.name + " hiding indices...");
                 this.erase_indices();
             }
         }
 
-        if(this.isContainer) {
-            if(DEBUG.enabled()) alert("setting proj on children of container "+this.name);
+        if (this.isContainer) {
+            if (DEBUG.enabled()) alert("setting proj on children of container " + this.name);
             for (var i = 0; i < this.numChildren; i++) {
-                var childVar =  this.children[i];
+                var childVar = this.children[i];
                 childVar.setProjected(isProj);
             }
         }
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
-
-
-
-
-
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -571,20 +544,19 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * when all the children of a container are projected then the
      * parent conationer is projected.
      */
-    this.updateProjection = function (){
+    this.updateProjection = function () {
 
-        if(!this.parentContainer){
-            if(DEBUG.enabled()) alert("Updating proj starting at "+this.name + " parentContainer: " + this.parentContainer );
+        if (!this.parentContainer) {
+            if (DEBUG.enabled()) alert("Updating proj starting at " + this.name + " parentContainer: " + this.parentContainer);
             this.updateProjWorker();
         }
-        else{
+        else {
             this.updateProjWorker();
         }
 
 
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -594,26 +566,26 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * Recursive worker method for dap_var.updateProjection()
      *
      */
-    this.updateProjWorker = function(){
+    this.updateProjWorker = function () {
 
-        if(this.isContainer) {
+        if (this.isContainer) {
             var currentProj = this.projected;
 
             var allChildrenProjected = true;
-            var noChildrenProjected  = true;
+            var noChildrenProjected = true;
             for (var i = 0; i < this.numChildren; i++) {
-                var childVar =  this.children[i];
-                if(childVar.isContainer)
+                var childVar = this.children[i];
+                if (childVar.isContainer)
                     childVar.updateProjWorker();
                 allChildrenProjected = allChildrenProjected && childVar.projected;
-                noChildrenProjected  = noChildrenProjected  && !childVar.projected;
+                noChildrenProjected = noChildrenProjected && !childVar.projected;
             }
-            if(allChildrenProjected){
-                if(DEBUG.enabled()) alert(this.name+"  allChildrenProjected: "+ allChildrenProjected);
+            if (allChildrenProjected) {
+                if (DEBUG.enabled()) alert(this.name + "  allChildrenProjected: " + allChildrenProjected);
                 this.setProjected(true);
             }
-            else if(noChildrenProjected) {
-                if(DEBUG.enabled()) alert(this.name+"  noChildrenProjected:"+noChildrenProjected);
+            else if (noChildrenProjected) {
+                if (DEBUG.enabled()) alert(this.name + "  noChildrenProjected:" + noChildrenProjected);
                 this.setProjected(false);
             }
             else {
@@ -626,8 +598,6 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 
-
-
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      *
      * dap_var.get_projection()
@@ -635,21 +605,21 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * Get the projection sub-expression for this variable.
      *
      */
-    this.get_projection = function() {
+    this.get_projection = function () {
         var p = "";
 
-        if(this.isProjected()){
+        if (this.isProjected()) {
             if (this.isArray) {
                 p = this.name;
                 // ***
-                for (var i = 0; i < this.num_dims;++ i) {
+                for (var i = 0; i < this.num_dims; ++i) {
                     p += "[" + this.dimTextBoxes[i].value + "]";
                 }
             } else {
 
-                if(this.isContainer){
+                if (this.isContainer) {
 
-                    if(this.descendantArraysAreCustomHyperSlabbed()){
+                    if (this.descendantArraysAreCustomHyperSlabbed()) {
                         p = this.getDescendantsProjection();
                     }
                     else {
@@ -662,14 +632,13 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
             }
 
         }
-        else if(this.isContainer && this.hasProjectedChildren()){
+        else if (this.isContainer && this.hasProjectedChildren()) {
             p = this.getDescendantsProjection();
         }
 
         return p;
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -679,13 +648,12 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * Adds a selection clause for the variable
      *
      */
-    this.addSelectionClause =  function (relOpWidget, rValueWidget){
+    this.addSelectionClause = function (relOpWidget, rValueWidget) {
         var sClause = new SelectionClause(relOpWidget, rValueWidget);
         this.selectionClauses[this.numSelectionClauses] = sClause;
         this.numSelectionClauses++;
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -695,30 +663,30 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * Get the selection clauses for this variable.
      *
      */
-    this.get_selection = function() {
+    this.get_selection = function () {
         var s = "";
 
-        if(this.isContainer){
-            for (var i = 0; i<this.numChildren; i++) {
+        if (this.isContainer) {
+            for (var i = 0; i < this.numChildren; i++) {
                 childSelections = this.children[i].get_selection();
-                if(childSelections.length>0){
-                    if(s.length>0){
-                        s+="&";
+                if (childSelections.length > 0) {
+                    if (s.length > 0) {
+                        s += "&";
                     }
                     s += childSelections;
                 }
             }
         }
         else {
-            for(var i=0; i< this.numSelectionClauses ; i++){
-                var relOp  = this.selectionClauses[i].relOp();
+            for (var i = 0; i < this.numSelectionClauses; i++) {
+                var relOp = this.selectionClauses[i].relOp();
                 var rValue = this.selectionClauses[i].rValue();
 
-                if(rValue.length>0){
-                    if(s.length>0)
-                        s+="&";
+                if (rValue.length > 0) {
+                    if (s.length > 0)
+                        s += "&";
                     s = this.name + relOp + rValue;
-                    if(DEBUG.enabled()) alert(this.name + "Selection Clause:\n"+s);
+                    if (DEBUG.enabled()) alert(this.name + "Selection Clause:\n" + s);
                 }
             }
         }
@@ -735,13 +703,13 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * projection
      *
      */
-    this.updateChecked = function(){
+    this.updateChecked = function () {
 
-        if(!this.parentContainer){
-            if(DEBUG.enabled()) alert("Updating checkbox states starting at "+this.name + " parentContainer: " + this.parentContainer );
+        if (!this.parentContainer) {
+            if (DEBUG.enabled()) alert("Updating checkbox states starting at " + this.name + " parentContainer: " + this.parentContainer);
             this.updatedCheckedWorker();
         }
-        else{
+        else {
             this.updatedCheckedWorker();
         }
     }
@@ -755,24 +723,24 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
      * A recursive helper method for updateChecked()
      *
      */
-    this.updatedCheckedWorker = function(){
+    this.updatedCheckedWorker = function () {
 
         var myCheckBox = document.getElementById(this.checkBox);
 
-        if(this.isProjected()){
-            myCheckBox.checked=true;
-            if(this.isContainer){
-                myCheckBox.indeterminate=false ;
+        if (this.isProjected()) {
+            myCheckBox.checked = true;
+            if (this.isContainer) {
+                myCheckBox.indeterminate = false;
             }
         }
         else {
-            myCheckBox.checked=false;
-            if(this.isContainer){
-                myCheckBox.indeterminate = this.hasProjectedChildren() ;
+            myCheckBox.checked = false;
+            if (this.isContainer) {
+                myCheckBox.indeterminate = this.hasProjectedChildren();
             }
         }
 
-        if(this.isContainer){
+        if (this.isContainer) {
             for (var i = 0; i < this.numChildren; i++) {
                 this.children[i].updatedCheckedWorker();
             }
@@ -782,21 +750,17 @@ function dap_var(name, js_var_name, isArray, isMap, isContainer) {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 }
+
 /***********************************************************************/
 
 
+function showProjection() {
 
-
-
-
-
-function showProjection(){
-
-    var msg="Projection Report:\n";
-    for(var i=0; i<DAP2_URL.num_dap_vars ;i++){
+    var msg = "Projection Report:\n";
+    for (var i = 0; i < DAP2_URL.num_dap_vars; i++) {
         var dapVar = DAP2_URL.dap_vars[i];
-        msg += dapVar.name + ": "+  dapVar.projected + "\n";
-        if(dapVar.isContainer){
+        msg += dapVar.name + ": " + dapVar.projected + "\n";
+        if (dapVar.isContainer) {
             msg += "Projected Children: \n" + dapVar.get_projection();
         }
     }
