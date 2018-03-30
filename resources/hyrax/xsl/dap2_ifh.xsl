@@ -152,7 +152,6 @@
                 CollapsibleLists.apply(true);
             </xsl:element>
 
-
         </xhtml>
 
     </xsl:template>
@@ -321,11 +320,8 @@
 
             <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
             <xsl:if test="$parentContainer">
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
-                <xsl:comment>Added by VariableHeader because test="$parentContainer" is true.</xsl:comment>
                 <xsl:value-of select="$parentContainer"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
                 <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$parentContainer"/>;
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
             </xsl:if>
         </xsl:element>
 
@@ -370,7 +366,7 @@
 
         <xsl:for-each select="dap:dimension">
             <xsl:variable name="dimSize">
-                <xsl:call-template name="DimSize"/>
+                <xsl:value-of select="@size"/>
             </xsl:variable>
             <span class="medium">[
                 <xsl:if test="@name">
@@ -390,7 +386,7 @@
 
         <xsl:for-each select="dap:dimension">
             <xsl:variable name="dimSize">
-                <xsl:call-template name="DimSize"/>
+                <xsl:value-of select="@size"/>
             </xsl:variable>
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
@@ -405,16 +401,6 @@
     </xsl:template>
 
 
-    <xsl:template name="DimSize">
-        <xsl:choose>
-            <xsl:when test="@size">
-                <xsl:value-of select="@size"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="key('DimensionNames', @name)/@size"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
 
 
     <!-- ###################################################################
