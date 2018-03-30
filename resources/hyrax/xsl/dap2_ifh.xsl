@@ -557,9 +557,14 @@
             <xsl:otherwise>
                 <li>
                     <div class="small">
-                        <span class="bold"><xsl:value-of select="@name"/></span>
-                        <xsl:apply-templates />
-                    </div>  
+                        <span class="bold"><xsl:value-of select="@name"/>:
+                        </span>
+                        <span class="em">
+                            <xsl:for-each select="dap:value">
+                                <xsl:value-of select="."/>
+                            </xsl:for-each>
+                        </span>
+                    </div>
                 </li>
 
             </xsl:otherwise>
@@ -583,9 +588,14 @@
     <!--            Actions Buttons Row           -->
     <xsl:template name="dataRequestButtonsRow">
         <tr>
-            <td align="right"><div class="medium_bold"><a href="opendap_form_help.html#disposition" target="help">Actions</a> </div>
+            <td align="right">
+                <div class="medium_bold">
+                    <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition" target="help">
+                        Actions
+                    </a>
+                </div>
             </td>
-            <td >
+            <td>
                 <div style="width:100%;margin-left:10px;">
                     <input type="button" value="Get ASCII" onclick="ascii_button()"/>
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
@@ -597,7 +607,7 @@
         </tr>
 
     </xsl:template>
-  
+
 
     <!-- ######################################## -->
     <!--            Datarequest URL Row           -->
@@ -605,59 +615,73 @@
         <xsl:param name="datasetUrl"/>
         <tr>
             <td align="right">
-                <div class="medium_bold"><a href="opendap_form_help.html#data_url" target="help">Data URL</a> </div>
+                <div class="medium_bold">
+                    <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url" target="help">
+                        Data URL
+                    </a>
+                </div>
             </td>
             <td>
-                <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"></input>
+                <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"> </input>
             </td>
-        </tr>       
+        </tr>
     </xsl:template>
-    
-    
+
+
     <!-- ######################################## -->
     <!--            Global Attributes Row         -->
     <xsl:template name="globalAttributesRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
-                <div class="medium_bold" ><a href="opendap_form_help.html#global_attr" target="help">Global Attributes</a> </div>
+                <div class="medium_bold">
+                    <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr" target="help">
+                        Global Attributes
+                    </a>
+                </div>
             </td>
             <td width="100%">
                 <div style="width:100%;margin-left:10px;">
                     <xsl:apply-templates select="dap:Attribute"/>
                 </div>
             </td>
-        </tr>               
+        </tr>
     </xsl:template>
-    
+
     <!-- ######################################## -->
-    <!--            HR Row                        -->    
+    <!--            HR Row                        -->
     <xsl:template name="hrRow">
         <tr>
-            <td ><hr size="1" noshade="noshade" width="80%"/></td>
-            <td ><hr size="1" noshade="noshade" width="100%"/></td>
-        </tr>               
+            <td>
+                <hr size="1" noshade="noshade" width="80%"/>
+            </td>
+            <td>
+                <hr size="1" noshade="noshade" width="100%"/>
+            </td>
+        </tr>
     </xsl:template>
-    
-    
-    
-    
+
+
     <!-- ######################################## -->
-    <!--            Variables Row                 -->    
+    <!--            Variables Row                 -->
     <xsl:template name="VariablesRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
-                <div class="medium_bold"><a href="opendap_form_help.html#dataset_variables" target="help">Variables</a> </div>
+                <div class="medium_bold">
+                    <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
+                       target="help">Variables
+                    </a>
+                </div>
             </td>
-           
-            <td >
+
+            <td>
                 <div style="margin-left:25px;">
-                    <xsl:apply-templates select="./*[not(self::dap:Attribute)]"/>    
-                </div>                
+                    <xsl:apply-templates select="./*[not(self::dap:Attribute)]"/>
+                </div>
             </td>
-        </tr>               
+        </tr>
     </xsl:template>
-    
-    
+
+
     
 
 
@@ -666,30 +690,30 @@
 
     <xsl:template name="copyright">
         <xsl:comment>
-  ~ /////////////////////////////////////////////////////////////////////////////
-  ~ // This file is part of the "Hyrax Data Server" project.
-  ~ //
-  ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
-  ~ // Author: Nathan David Potter  &lt;ndp@opendap.org&gt;
-  ~ //
-  ~ // This library is free software; you can redistribute it and/or
-  ~ // modify it under the terms of the GNU Lesser General Public
-  ~ // License as published by the Free Software Foundation; either
-  ~ // version 2.1 of the License, or (at your option) any later version.
-  ~ //
-  ~ // This library is distributed in the hope that it will be useful,
-  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  ~ // Lesser General Public License for more details.
-  ~ //
-  ~ // You should have received a copy of the GNU Lesser General Public
-  ~ // License along with this library; if not, write to the Free Software
-  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  ~ //
-  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-  ~ /////////////////////////////////////////////////////////////////////////////           
-</xsl:comment>
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter &lt;ndp@opendap.org&gt;
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
+        </xsl:comment>
     </xsl:template>
 
 
