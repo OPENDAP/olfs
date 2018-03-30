@@ -61,11 +61,10 @@
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP2_URL = new dap2_url("<xsl:value-of select="$datasetUrl"/>");
                 </xsl:element>
-
                 <title>Interface From Hell <xsl:value-of select="@name"/></title>
             </head>
             <body>
-                
+
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->
                 <!--                                                        -->
@@ -89,13 +88,13 @@
 
                 </h1>
                 <hr size="1" noshade="noshade"/>
-                
+
                 <!-- ****************************************************** -->
                 <!--                       PAGE BODY                        -->
                 <!--                                                        -->
                 <!--                                                        -->
                 <form action="">
-                    <input type="checkbox" id="debug_checkbox" />DEBUG
+                    <input type="checkbox" id="debug_checkbox"/>DEBUG
                     <script type="text/javascript">
                         DEBUG = new debug_obj(debug_checkbox);
                     </script>
@@ -125,9 +124,10 @@
                     <tr>
                         <td> </td>
                         <td>
-                            <div class="small" align="right"> Hyrax development sponsored by <a
-                                href="http://www.nsf.gov/">NSF</a> , <a href="http://www.nasa.gov/"
-                                >NASA</a> , and <a href="http://www.noaa.gov/">NOAA</a>
+                            <div class="small" align="right">Hyrax development sponsored by
+                                <a href="http://www.nsf.gov/">NSF</a>,
+                                <a href="http://www.nasa.gov/">NASA</a>, and
+                                <a href="http://www.noaa.gov/">NOAA</a>
                             </div>
                         </td>
                     </tr>
@@ -140,12 +140,18 @@
                     <a href="{$docsService}/">Documentation</a>
                 </h3>
 
-                <xsl:element name="script">
-                    <xsl:attribute name="type">application/ld+json</xsl:attribute>
-                    <xsl:value-of select="$JsonLD" />
-                </xsl:element>
+                <xsl:if test="$JsonLD">
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">application/ld+json</xsl:attribute>
+                        <xsl:value-of select="$JsonLD" />
+                    </xsl:element>
+                </xsl:if>
             </body>
-            <script>CollapsibleLists.apply(true);</script>
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                CollapsibleLists.apply(true);
+            </xsl:element>
+
 
         </xhtml>
 
@@ -190,82 +196,68 @@
                     <xsl:call-template name="VariableWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
-                </li>                
+                </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="VariableWorker"/>
             </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template name="VariableWorker">
         <xsl:param name="parentContainer"/>
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
-        <xsl:call-template name="AttributesPresentation"/>                                 
+        <xsl:call-template name="AttributesPresentation"/>
     </xsl:template>
-    
+
 
     <!-- ######################################## -->
     <!--            CONTAINER TYPES               -->
-    <xsl:template match="dap:Structure  | dap:Sequence"  name="ContainerTypes">
+
+    <xsl:template match="dap:Structure | dap:Sequence" name="ContainerTypes">
         <xsl:param name="parentContainer"/>
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
-                    <xsl:call-template name="ContainerWorker">
+                    <xsl:call-template name="ContainerTypeWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="ContainerWorker">
-                    <xsl:with-param name="parentContainer"><xsl:call-template name="computeVarName"/></xsl:with-param>
+                <xsl:call-template name="ContainerTypeWorker">
                 </xsl:call-template>
         </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="ContainerWorker">
+    <xsl:template name="ContainerTypeWorker">
         <xsl:param name="parentContainer"/>
 
-        <xsl:call-template name="VariableHeader"><xsl:with-param name="parentContainer" select="$parentContainer"/></xsl:call-template>
-        <xsl:call-template name="AttributesPresentation"/>                                 
+        <xsl:call-template name="VariableHeader">
+            <xsl:with-param name="parentContainer" select="$parentContainer"/>
+        </xsl:call-template>
+        <xsl:call-template name="AttributesPresentation"/>
         <div class="tightView">
             <ul class="collapsibleList">
                 <li>
                     <div class="small_bold" style="color:#527CC1;">members</div>
                     <ul>
                         <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
-                            <xsl:with-param name="parentContainer"><xsl:call-template name="computeVarName"/></xsl:with-param>
-                        </xsl:apply-templates>    
+                            <xsl:with-param name="parentContainer">
+                                <xsl:call-template name="computeVarName"/>
+                            </xsl:with-param>
+                        </xsl:apply-templates>
                     </ul>
                 </li>
-            </ul>   
-        </div>        
+            </ul>
+        </div>
     </xsl:template>
-    
 
-    
 
-    <!-- ###################################################################
-     -
-     -    isContainerType
-     -
-     -
-    -->   
-    <xsl:template  name="isContainerType" >
-        <xsl:choose>
-            <xsl:when test="self::dap:Structure | self::dap:Grid | self::dap:Sequence">true</xsl:when>
-            <xsl:otherwise>false</xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>   
-    <!-- ################################################################### -->
-    
-    
-    
-    
+
     <!-- ###################################################################
      -
      -    Add Basic Variable controls
@@ -356,7 +348,7 @@
             <xsl:with-param name="myJSVarName" select="$myJSVarName"/>
         </xsl:call-template>
 
-        <xsl:if test="$isArray='false' and  not(self::dap:Structure) and parent::dap:Sequence">
+        <xsl:if test="$isArray='false' and not(self::dap:Structure) and parent::dap:Sequence">
             <xsl:call-template name="selectionOperator">
                 <xsl:with-param name="myJSVarName" select="$myJSVarName"/>
                 <xsl:with-param name="index" select="'0'"/>
@@ -467,9 +459,21 @@
     </xsl:template>
 
 
-    
-    
-  
+
+
+    <!-- ###################################################################
+    -
+    -    isContainerType
+    -
+    -
+    -->
+    <xsl:template name="isContainerType">
+        <xsl:choose>
+            <xsl:when test="self::dap:Structure | self::dap:Sequence | self::dap:Grid ">true</xsl:when>
+            <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <!-- ################################################################### -->
 
 
     <!-- ###################################################################
@@ -487,7 +491,7 @@
             <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and not(parent::dap:Map)">
                 <xsl:value-of select="$separator"/>
             </xsl:if>
-            <xsl:value-of select="@name"/>
+            <xsl:value-of select="translate(@name,' ','_')"/>
         </xsl:if>
     </xsl:template>
     <!-- ################################################################### -->

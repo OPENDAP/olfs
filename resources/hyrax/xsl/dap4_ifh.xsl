@@ -32,6 +32,7 @@
     <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
     <xsl:param name="HyraxVersion"/>
+    <xsl:param name="JsonLD"/>
 
 
     <!-- xsl:variable name="datasetUrl">http://ec2-54-242-224-73.compute-1.amazonaws.com:8080/opendap/hyrax/data/nc/fnoc1.nc</xsl:variable -->
@@ -132,14 +133,8 @@
                         <td> </td>
                         <td>
                             <div class="small" align="right">Hyrax development sponsored by
-                                <a
-                                        href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/"
-                                >NASA
-                                </a>
-                                , and
+                                <a href="http://www.nsf.gov/">NSF</a>,
+                                <a href="http://www.nasa.gov/">NASA</a>, and
                                 <a href="http://www.noaa.gov/">NOAA</a>
                             </div>
                         </td>
@@ -153,8 +148,17 @@
                     <a href="{$docsService}/">Documentation</a>
                 </h3>
 
+                <xsl:if test="$JsonLD">
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">application/ld+json</xsl:attribute>
+                        <xsl:value-of select="$JsonLD" />
+                    </xsl:element>
+                </xsl:if>
             </body>
-            <script>CollapsibleLists.apply(true);</script>
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                CollapsibleLists.apply(true);
+            </xsl:element>
 
         </xhtml>
 
@@ -245,7 +249,7 @@
             <xsl:otherwise>
                 <xsl:call-template name="ContainerTypeWorker">
                 </xsl:call-template>
-            </xsl:otherwise>
+        </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -486,6 +490,7 @@
      -
      -
     -->
+    <!--
     <xsl:template name="AttributeHeader">
         <xsl:param name="container"/>
 
@@ -523,14 +528,15 @@
 
 
     </xsl:template>
+    -->
     <!-- ################################################################### -->
 
 
     <!-- ###################################################################
-     -
-     -    isContainerType
-     -
-     -
+    -
+    -    isContainerType
+    -
+    -
     -->
     <xsl:template name="isContainerType">
         <xsl:choose>
@@ -633,7 +639,6 @@
                                 <xsl:value-of select="."/>
                             </xsl:for-each>
                         </span>
-
                     </div>
                 </li>
 
