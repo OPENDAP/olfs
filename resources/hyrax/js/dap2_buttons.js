@@ -161,7 +161,7 @@ function dap2_url(base_url) {
 
         if (DEBUG.enabled()) alert("Updating Data Request URL");
 
-        this.build_constraint();
+        this.build_DAP2_constraint();
         var url_text = this.url;
         // Only add the projection & selection (and ?) if there really are
         // constraints!
@@ -175,7 +175,7 @@ function dap2_url(base_url) {
      * Scan all the form elements and pick out the various pieces of constraint
      * information. Set the dap_url state to reflect the new information.
      */
-    this.build_constraint = function () {
+    this.build_DAP2_constraint = function () {
         var p = "";
         var s = "";
         for (var i = 0; i < this.num_dap_vars; ++i) {
@@ -551,7 +551,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             this.updateProjWorker();
         }
         else {
-            this.updateProjWorker();
+            this.parentContainer.updateProjection();
         }
     };
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/

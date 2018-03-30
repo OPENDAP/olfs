@@ -142,7 +142,7 @@ function dods_url(base_url) {
     this.num_dods_vars = 0;
     this.dods_vars = new Array();
         
-    this.build_constraint = build_constraint;
+    this.build_DAP2_constraint = build_constraint;
     this.add_dods_var = add_dods_var;
     this.update_url = update_url;
 }
@@ -150,7 +150,7 @@ function dods_url(base_url) {
 // Method of dods_url
 // Add the projection and selection to the displayed URL.
 function update_url() {
-    this.build_constraint();
+    this.build_DAP2_constraint();
     var url_text = this.url;
     // Only add the projection & selection (and ?) if there really are
     // constraints! 
