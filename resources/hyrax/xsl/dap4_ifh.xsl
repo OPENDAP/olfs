@@ -34,7 +34,6 @@
     <xsl:param name="HyraxVersion"/>
 
 
-    <!-- xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable> -->
     <!-- xsl:variable name="datasetUrl">http://ec2-54-242-224-73.compute-1.amazonaws.com:8080/opendap/hyrax/data/nc/fnoc1.nc</xsl:variable -->
     <xsl:variable name="datasetUrl">
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
@@ -49,18 +48,24 @@
             <head>
                 <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
-                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js">
-                    <xsl:value-of select="' '"/>
-                </script>
-                <script type="text/javascript" src="{$serviceContext}/js/dap4_buttons.js">
-                    <xsl:value-of select="' '"/>
-                </script>
-                <script type="text/javascript">
-                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
-                </script>
 
-                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/>
-                </title>
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
+                    <xsl:value-of select="' '"/>
+                </xsl:element>
+
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/dap4_buttons.js</xsl:attribute>
+                    <xsl:value-of select="' '"/>
+                </xsl:element>
+
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
+                </xsl:element>
+                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>
             </head>
             <body>
 
@@ -124,7 +129,7 @@
                 <hr size="1" noshade="noshade"/>
                 <table width="100%" border="0">
                     <tr>
-                        <td></td>
+                        <td> </td>
                         <td>
                             <div class="small" align="right">Hyrax development sponsored by
                                 <a
@@ -144,8 +149,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-                    <br/>
+                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>) <br/>
                     <a href="{$docsService}/">Documentation</a>
                 </h3>
 
@@ -315,8 +319,8 @@
             </xsl:choose>
         </xsl:variable>
 
-
-        <script type="text/javascript">
+        <xsl:element name="script">
+            <xsl:attribute name="type">text/javascript</xsl:attribute>
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
@@ -329,8 +333,7 @@
                 <xsl:value-of select="$container"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
                 <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$container"/>;
             </xsl:if>
-
-        </script>
+        </xsl:element>
 
         <div style="color: black;margin-left:-20px;margin-top:10px">
             <input type="checkbox" id="{$checkBoxName}"
@@ -372,6 +375,7 @@
     <xsl:template name="DimHeader">
 
         <xsl:for-each select="dap:Dim">
+
             <xsl:variable name="dimName">
                 <xsl:choose>
                     <xsl:when test="starts-with(@name,'/')">
@@ -382,6 +386,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
+
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
@@ -409,10 +414,11 @@
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
                    onChange="DAP4_URL.update_url()"/>
-            <script type="text/javascript">
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
                 <xsl:value-of select="$myJSVarName"/>.addDimension(<xsl:value-of select="$dimTag"/>,<xsl:value-of
                     select="$dimSize"/>);
-            </script>
+            </xsl:element>
         </xsl:for-each>
     </xsl:template>
 
@@ -465,10 +471,11 @@
         <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
                onChange="DAP4_URL.update_url()"/>
 
-        <script type="text/javascript">
+        <xsl:element name="script">
+            <xsl:attribute name="type">text/javascript</xsl:attribute>
             <xsl:value-of select="$myJSVarName"/>.addSelectionClause(<xsl:value-of select="$relOpWidget"/>,<xsl:value-of
                 select="$rValueWidget"/>);
-        </script>
+        </xsl:element>
 
     </xsl:template>
 
@@ -605,12 +612,12 @@
                 <ul class="collapsibleList">
                     <li>
                         <div class="tightView">
-                            <div class="small_bold">
-                                <xsl:value-of select="@name"/>
-                            </div>
-                            <ul>
-                                <xsl:apply-templates/>
-                            </ul>
+                        <div class="small_bold">
+                            <xsl:value-of select="@name"/>
+                        </div>
+                        <ul>
+                            <xsl:apply-templates/>
+                        </ul>
                         </div>
                     </li>
                 </ul>
