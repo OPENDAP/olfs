@@ -706,7 +706,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
             this.updatedCheckedWorker();
         }
         else {
-            this.updatedCheckedWorker();
+            this.parentContainer.updateChecked();
         }
     }
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
@@ -756,7 +756,7 @@ function showProjection() {
     for (var i = 0; i < DAP2_URL.num_dap_vars; i++) {
         var dapVar = DAP2_URL.dap_vars[i];
         msg += dapVar.name + ": " + dapVar.projected + "\n";
-        if (dapVar.isContainer) {
+        if (dapVar.hasProjectedChildren()) {
             msg += "Projected Children: \n" + dapVar.get_projection();
         }
     }
