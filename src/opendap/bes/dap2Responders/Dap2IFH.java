@@ -185,7 +185,10 @@ public class Dap2IFH extends Dap4Responder {
         Element dataset = ddx.getRootElement();
 
         StringBuilder sb = new StringBuilder("\n");
-        sb.append(indent).append("\"@context\": \"http://schema.org\",\n");
+        sb.append("{\n");
+        sb.append(indent).append("\"@context\": {\n");
+        sb.append(indent).append(indent_inc).append("\"@vocab\": \"http://schema.org\"\n");
+        sb.append(indent).append("},\n");
         sb.append(indent).append("\"@type\": \"Dataset\",\n");
 
         String name  = dataset.getAttributeValue("name");
@@ -203,10 +206,11 @@ public class Dap2IFH extends Dap4Responder {
         sb.append(indent).append(indent_inc).append("\"@type\": \"DataCatalog\", \n");
         sb.append(indent).append(indent_inc).append("\"name\": \"Hyrax Data Server\", \n");
         sb.append(indent).append(indent_inc).append("\"sameAs\": \"");
-        sb.append(PathBuilder.pathConcat(collectionUrl,"contents.html")).append("\n");
+        sb.append(PathBuilder.pathConcat(collectionUrl,"contents.html\"")).append("\n");
         sb.append(indent).append("},\n");
 
         // Top Level Attributes
+        sb.append(indent).append("\"datasetProperties\": ");
         sb.append(attributesToProperties(dataset, indent));
         sb.append(",\n");
 
@@ -228,8 +232,8 @@ public class Dap2IFH extends Dap4Responder {
                 first = false;
             }
             sb.append("\n");
-            sb.append(indent).append("]");
-            sb.append("\n");
+            sb.append(indent).append("]\n");
+            sb.append("}\n");
         }
         return sb.toString();
     }
@@ -255,10 +259,21 @@ public class Dap2IFH extends Dap4Responder {
         }
         else if(variable.getName().equals("Sequence") || variable.getName().equals("Structure") ){
             // It's a Container type... Wut do?
+            List<Element> attributes = variable.getContent(attributeFilter);
+            sb.append(attributesToProperties(attributes, myIndent));
+            boolean first = true;
+            List<Element> children = variable.getChildren();
+            for(Element child : children){
+                if(!first)
+                    sb.append(",\n");
+                sb.append(attributesToProperties(child, myIndent));
+                first = false;
+            }
+
             _log.error("attributesToProperties() - We don't have a good mapping for container types to JSON-LD markup.");
         }
         else {
-            // It's an atomic variable!
+            // It's an atomic variable or an Array!
             List<Element> attributes = variable.getContent(attributeFilter);
             sb.append(attributesToProperties(attributes, myIndent));
         }
