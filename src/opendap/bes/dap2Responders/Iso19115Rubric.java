@@ -115,18 +115,11 @@ public class Iso19115Rubric extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-
-        String xdap_accept = "3.2";
-
-
-
         Document ddx = new Document();
-
 
         besApi.getDDXDocument(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 xmlBase,
                 ddx);
 

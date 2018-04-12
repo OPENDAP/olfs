@@ -99,14 +99,11 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "DAP2 Dataset Information Page");
 
-
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, os);
+        besApi.writeDap2HtmlInfoPage(resourceID, os);
 
 
         os.flush();

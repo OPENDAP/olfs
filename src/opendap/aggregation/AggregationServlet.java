@@ -378,7 +378,6 @@ public class AggregationServlet extends HttpServlet {
                                              ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-        String xdap_accept = "3.2";
 
         String cf_history_entry = granule + "?" + ce;
 
@@ -386,17 +385,17 @@ public class AggregationServlet extends HttpServlet {
             case netcdf3:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
-                _besApi.writeDap2DataAsNetcdf3(granule,  ce, cf_history_entry, xdap_accept, maxResponseSize, os);
+                _besApi.writeDap2DataAsNetcdf3(granule,  ce, cf_history_entry, maxResponseSize, os);
                 break;
             case netcdf4:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
-                _besApi.writeDap2DataAsNetcdf4(granule, ce, cf_history_entry, xdap_accept, maxResponseSize, os);
+                _besApi.writeDap2DataAsNetcdf4(granule, ce, cf_history_entry, maxResponseSize, os);
                 break;
             case ascii:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextPlain());
-                _besApi.writeDap2DataAsAscii(granule, ce, xdap_accept, maxResponseSize, os);
+                _besApi.writeDap2DataAsAscii(granule, ce, maxResponseSize, os);
                 break;
             default:
             	break;

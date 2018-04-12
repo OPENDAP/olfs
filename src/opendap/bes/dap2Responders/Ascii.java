@@ -112,7 +112,6 @@ public class Ascii extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
 
 
@@ -122,7 +121,7 @@ public class Ascii extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent DAP ASCII data response.");

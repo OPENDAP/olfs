@@ -116,12 +116,8 @@ public class RDF extends Dap4Responder {
 
         // response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-
-        String xdap_accept = "3.2";
-
         Document ddx = new Document();
-
-        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);
+        besApi.getDDXDocument(resourceID, constraintExpression, xmlBase, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 

@@ -105,14 +105,10 @@ public class DDX extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = "3.2"; //request.getHeader("XDAP-Accept");
-
-
 
         OutputStream os = response.getOutputStream();
 
-
-        besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os);
+        besApi.writeDDX(resourceID,constraintExpression,xmlBase,os);
 
         os.flush();
         log.info("Sent DAP DDX.");

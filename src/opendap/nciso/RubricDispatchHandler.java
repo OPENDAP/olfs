@@ -229,18 +229,10 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         ServletOutputStream os = response.getOutputStream();
 
-        // Doing this insures that the DDX that
-        String xdap_accept = "3.2";
-
-
-
         Document ddx = new Document();
-
-
         _besApi.getDDXDocument(
                 dataSourceId,
                 constraintExpression,
-                xdap_accept,
                 xmlBase,
                 ddx);
 

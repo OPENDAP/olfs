@@ -779,14 +779,7 @@ public class W10nResponder {
                              HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-
-
-
         _log.debug("sendNetCDF_3() - Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
-
-
-
-        String xdap_accept = "3.2";
 
         String resourceID = w10nRequest.getRequestedResourceId();
 
@@ -809,20 +802,14 @@ public class W10nResponder {
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
         OutputStream os = response.getOutputStream();
-
-
 
         _besApi.writeDap2DataAsNetcdf3(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                xdap_accept,
                 maxResponseSize,
                 os);
-
-
 
         os.flush();
         _log.debug("sendNetCDF_3() - Sent NetCDF-3 for {}",w10nRequest.getValidResourcePath());
@@ -851,16 +838,7 @@ public class W10nResponder {
                 throws IOException, PPTException, BadConfigurationException, BESError {
 
 
-
-
-
         _log.debug("sendNetCDF_4() - Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
-
-
-
-        String xdap_accept = "3.2";
-
-
 
         OutputStream os = response.getOutputStream();
 
@@ -871,8 +849,6 @@ public class W10nResponder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-
-
 
         String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
@@ -887,23 +863,15 @@ public class W10nResponder {
         response.setHeader("Content-Disposition", contentDisposition);
 
 
-
         _besApi.writeDap2DataAsNetcdf4(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                xdap_accept,
                 maxResponseSize,
                 os);
 
-
-
-
         os.flush();
         _log.debug("sendNetCDF_4() - Sent NetCDF-4 for dataset: {}", w10nRequest.getValidResourcePath());
-
-
-
     }
 
 
@@ -942,10 +910,6 @@ public class W10nResponder {
         response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
         _log.debug("sendDap2DataAsW10nJson() - JSON file downloadFileName: " + downloadFileName);
 
-
-
-
-
         Gson gson = new Gson();
 
         String w10nMetaObject = "\"w10n\":"+ gson.toJson(
@@ -964,7 +928,6 @@ public class W10nResponder {
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
-                "3.2",
                 maxResponseSize,
                 os);
 
@@ -1010,7 +973,7 @@ public class W10nResponder {
 
         response.setHeader("Content-Description", "DAP2 Data Response");
 
-        _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, os);
+        _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, maxResponseSize, os);
 
         os.flush();
 
@@ -1152,7 +1115,6 @@ public class W10nResponder {
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
                 w10nRequest.traverse(),
-                "3.2",
                 maxResponseSize,
                 os);
 
@@ -1179,7 +1141,7 @@ public class W10nResponder {
 
         Document besResponse = new Document();
 
-        _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(),  besResponse);
+        _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), w10nRequest.getXmlBase(),  besResponse);
 
 
         boolean isNode = true;

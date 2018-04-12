@@ -126,25 +126,14 @@ public class Netcdf4 extends Dap4Responder {
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
-        String xdap_accept = "3.2";
-
         User user = new User(request);
-
-
 
         OutputStream os = response.getOutputStream();
 
-
-
-        besApi.writeDap2DataAsNetcdf4(resourceID, constraintExpression, cf_history_entry, xdap_accept, user.getMaxResponseSize(), os);
-
+        besApi.writeDap2DataAsNetcdf4(resourceID, constraintExpression, cf_history_entry, user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
 
 

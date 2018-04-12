@@ -108,18 +108,13 @@ public class GmlJpeg2000 extends Dap4Responder {
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
-
-        String xdap_accept = "3.2";
         User user = new User(request);
-
 
         OutputStream os = response.getOutputStream();
 
         besApi.writeDap2DataAsGmlJpeg2000(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 user.getMaxResponseSize(),
                 os);
 

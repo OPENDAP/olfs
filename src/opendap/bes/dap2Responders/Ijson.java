@@ -110,19 +110,13 @@ public class Ijson extends Dap4Responder {
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
-
-        String xdap_accept = "3.2";
         User user = new User(request);
 
-
         OutputStream os = response.getOutputStream();
-
 
         besApi.writeDap2DataAsIjsn(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 user.getMaxResponseSize(),
                 os);
 

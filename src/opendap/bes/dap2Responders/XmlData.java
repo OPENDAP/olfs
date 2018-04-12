@@ -85,9 +85,6 @@ public class XmlData extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
@@ -95,11 +92,8 @@ public class XmlData extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
-
-
         log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + resourceID +
                     "    CE: '" + constraintExpression + "'");
-
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -113,28 +107,18 @@ public class XmlData extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-
         User user = new User(request);
 
-
         OutputStream os = response.getOutputStream();
-
 
         besApi.writeDap2DataAsXml(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 user.getMaxResponseSize(),
                 xmlBase,
                 os);
 
-
         os.flush();
         log.info("Sent XML Data response.");
-
-
     }
 }
