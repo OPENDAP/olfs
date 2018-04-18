@@ -209,10 +209,6 @@ public class Dap2IFH extends Dap4Responder {
         sb.append(PathBuilder.pathConcat(collectionUrl,"contents.html\"")).append("\n");
         sb.append(indent).append("},\n");
 
-        // Top Level Attributes
-        sb.append(indent).append("\"datasetProperties\": ");
-        sb.append(attributesToProperties(dataset, indent));
-        sb.append(",\n");
 
         List<Element> children = dataset.getChildren();
         Vector<Element> variables = new Vector<>();
@@ -224,7 +220,11 @@ public class Dap2IFH extends Dap4Responder {
         }
         if(!variables.isEmpty()){
             sb.append(indent).append("\"variableMeasured\": [\n");
-            boolean first = true;
+            // Top Level Attributes
+            String topLevelAttributes = attributesToProperties(dataset, indent);
+            sb.append(topLevelAttributes);
+
+            boolean first = topLevelAttributes.isEmpty();
             for(Element variable : variables){
                 if(!first)
                     sb.append(",\n");
@@ -295,20 +295,24 @@ public class Dap2IFH extends Dap4Responder {
 
         boolean first = true;
         for(Element attribute : attributes){
-            if(!first)
-                sb.append(",\n");
             if(attribute.getChild("Attribute",DAP.DAPv32_NS)!=null){
+                if(!first)
+                    sb.append(",\n");
                 // It's an AttrTable so dig...
                 List<Element> myAttributes = attribute.getContent(attributeFilter);
                 sb.append(attributesToProperties(myAttributes,myIndent));
             }
             else {
                 // Not an AttrTable so it must have values...
-                sb.append(attributeToPropertyValue(attribute,myIndent));
+                String pValue = attributeToPropertyValue(attribute,myIndent);
+                if(!pValue.isEmpty()){
+                    if(!first)
+                        sb.append(",\n");
+                    sb.append(pValue);
+                }
             }
             first = false;
         }
-
         return sb.toString();
     }
 
@@ -316,20 +320,22 @@ public class Dap2IFH extends Dap4Responder {
 
     public String attributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
-        sb.append(indent).append("{\n");
-        sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-        sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
-
         List<Element> values = attribute.getChildren("value",DAP.DAPv32_NS);
-        boolean first = true;
-        for(Element value : values){
-            if(!first)
-                sb.append(",\n");
-            sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
-            first = false;
+        if(!values.isEmpty()){
+            sb.append(indent).append("{\n");
+            sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
+
+            boolean first = true;
+            for(Element value : values){
+                if(!first)
+                    sb.append(",\n");
+                sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
+                first = false;
+            }
+            sb.append("\n");
+            sb.append(indent).append("}");
         }
-        sb.append("\n");
-        sb.append(indent).append("}");
         return sb.toString();
     }
 
