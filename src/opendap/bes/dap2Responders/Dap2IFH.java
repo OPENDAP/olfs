@@ -326,19 +326,31 @@ public class Dap2IFH extends Dap4Responder {
         StringBuilder sb = new StringBuilder();
         List<Element> values = attribute.getChildren("value",DAP.DAPv32_NS);
 
-        boolean first = true;
-        for(Element value : values){
-            if(!first)
-                sb.append(",\n");
+        if(!values.isEmpty()){
 
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
             sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
-            sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
-            sb.append("\n");
+
+            if(values.size()==1){
+                Element value = values.get(0);
+                sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
+            }
+            else {
+                sb.append(indent).append(indent_inc).append("\"value\": [ ");
+                boolean first = true;
+                for(Element value : values){
+                    if(!first)
+                        sb.append(", ");
+                    sb.append("\"").append(value.getTextTrim()).append("\"");
+                    first = false;
+                }
+                sb.append(" ]");
+            }
             sb.append(indent).append("}");
-            first = false;
         }
+
+
         return sb.toString();
     }
 
