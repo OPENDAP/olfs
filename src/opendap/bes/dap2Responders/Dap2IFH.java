@@ -196,12 +196,15 @@ public class Dap2IFH extends Dap4Responder {
 
 
         Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
+        String datasetUrl;
         if(xmlBase==null){
             _log.error("Unable to locate xml:base attribute for Dataset {}", name);
+            datasetUrl = PathBuilder.pathConcat(collectionUrl,name);
         }
         else {
-            sb.append(indent).append("\"url\": \"").append(xmlBase.getValue()).append("\",\n");
+            datasetUrl = xmlBase.getValue();
         }
+        sb.append(indent).append("\"url\": \"").append(datasetUrl).append("\",\n");
         sb.append(indent).append("\"includedInDataCatalog\": { \n");
         sb.append(indent).append(indent_inc).append("\"@type\": \"DataCatalog\", \n");
         sb.append(indent).append(indent_inc).append("\"name\": \"Hyrax Data Server\", \n");
@@ -221,14 +224,14 @@ public class Dap2IFH extends Dap4Responder {
         if(!variables.isEmpty()){
             sb.append(indent).append("\"variableMeasured\": [\n");
             // Top Level Attributes
-            String topLevelAttributes = attributesToProperties(dataset, indent);
+            String topLevelAttributes = attributesToProperties(dataset, datasetUrl, indent);
             sb.append(topLevelAttributes);
 
             boolean first = topLevelAttributes.isEmpty();
             for(Element variable : variables){
                 if(!first)
                     sb.append(",\n");
-                sb.append(attributesToProperties(variable,indent));
+                sb.append(attributesToProperties(variable,variable.getAttributeValue("name"), indent));
                 first = false;
             }
             sb.append("\n");
@@ -239,16 +242,17 @@ public class Dap2IFH extends Dap4Responder {
     }
 
 
+
     Filter attributeFilter = new ElementFilter("Attribute", DAP.DAPv32_NS);
     private String indent_inc = "  ";
 
-    public String attributesToProperties(Element variable, String indent){
+    public String attributesToProperties(Element variable, String name, String indent){
         String myIndent = indent + indent_inc;
         StringBuilder sb = new StringBuilder();
 
         sb.append(indent).append("{\n");
         sb.append(myIndent).append("\"@type\": \"PropertyValue\",\n");
-        sb.append(myIndent).append("\"name\": \"").append(variable.getAttributeValue("name")).append("\",\n");
+        sb.append(myIndent).append("\"name\": \"").append(name).append("\",\n");
         sb.append(myIndent).append("\"valueReference\": [ \n");
 
         if(variable.getName().equals("Grid")){
@@ -266,7 +270,7 @@ public class Dap2IFH extends Dap4Responder {
             for(Element child : children){
                 if(!first)
                     sb.append(",\n");
-                sb.append(attributesToProperties(child, myIndent));
+                sb.append(attributesToProperties(child, child.getAttributeValue("name"), myIndent));
                 first = false;
             }
 
