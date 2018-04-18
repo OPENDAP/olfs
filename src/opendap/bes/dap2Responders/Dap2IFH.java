@@ -337,7 +337,7 @@ public class Dap2IFH extends Dap4Responder {
 
             sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
             first = false;
-            
+
             sb.append("\n");
             sb.append(indent).append("}");
         }
