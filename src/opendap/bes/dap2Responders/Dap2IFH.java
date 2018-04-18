@@ -334,16 +334,16 @@ public class Dap2IFH extends Dap4Responder {
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
             sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
-
             sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
-            first = false;
-
             sb.append("\n");
             sb.append(indent).append("}");
+            first = false;
         }
         return sb.toString();
     }
 
+
+    /*
     public String attributeToPropertyValue_OLD(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
         List<Element> values = attribute.getChildren("value",DAP.DAPv32_NS);
@@ -365,6 +365,8 @@ public class Dap2IFH extends Dap4Responder {
         }
         return sb.toString();
     }
+
+*/
 
 
 
