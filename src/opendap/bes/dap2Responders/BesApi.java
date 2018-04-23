@@ -706,15 +706,39 @@ public class BesApi {
      * @throws PPTException              .
      */
     public void writeDap4DataAsJson(String dataSource,
-                                       QueryParameters qp,
-                                       int maxResponseSize,
-                                       OutputStream os)
+                                    QueryParameters qp,
+                                    int maxResponseSize,
+                                    OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
-            dataSource,
-            getDap4DataAsJsonRequest(dataSource, qp, maxResponseSize),
-            os);
+                dataSource,
+                getDap4DataAsJsonRequest(dataSource, qp, maxResponseSize),
+                os);
+    }
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param qp The DAP4 query string parameters
+     * @param os         The Stream to which to write the response.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public void writeDap4DataAsCovJson(String dataSource,
+                                    QueryParameters qp,
+                                    int maxResponseSize,
+                                    OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        besTransaction(
+                dataSource,
+                getDap4DataAsCovJsonRequest(dataSource, qp, maxResponseSize),
+                os);
     }
 
     /**
@@ -2143,6 +2167,27 @@ public class BesApi {
             throws BadConfigurationException {
 
         return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, JSON, XML_ERRORS);
+
+
+    }
+
+    /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param qp The DAP4 query string parameters associated wih the request.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap4DataAsCovJsonRequest(String dataSource,
+                                             QueryParameters qp,
+                                             int maxResponseSize
+    )
+            throws BadConfigurationException {
+
+        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, COV_JSON, XML_ERRORS);
 
 
     }
