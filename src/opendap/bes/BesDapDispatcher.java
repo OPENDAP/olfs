@@ -246,11 +246,9 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add( new Netcdf4(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
         _responders.add( new XmlData(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
 
-
         // DAP2 GeoTIFF Response
         Dap4Responder geoTiff = new GeoTiff(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(geoTiff);
-
 
         // DAP2 JPEG2000 Response
         Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
@@ -264,6 +262,9 @@ public class BesDapDispatcher implements DispatchHandler {
         Dap4Responder ijsn = new Ijson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(ijsn);
 
+        // DAP2 Cov-JSON Response
+        Dap4Responder cjson = new CovJson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
+        _responders.add(cjson);
 
         // DAP2 Metadata responses
         Dap4Responder d4r = new DDX(_systemPath, besApi);
