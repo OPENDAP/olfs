@@ -148,11 +148,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
-                browseRemoteCatalog(orq, response, query);
+                // browseRemoteCatalog(response, query);
                 // response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                //throw new BadRequest("Remote Catalog Browsing is not supported.");
+                throw new BadRequest("Remote Catalog Browsing is not supported.");
             } else if (query != null && query.startsWith("browseDataset=")) {
-                browseRemoteDataset(orq, response, query);
+                // browseRemoteDataset(response, query);
                 throw new BadRequest("Remote Dataset Browsing is not supported.");
             }
 
@@ -380,7 +380,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
                 _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
                 _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
-                //_datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
                 _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
 
                 _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);

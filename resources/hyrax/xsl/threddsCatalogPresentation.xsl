@@ -46,7 +46,7 @@
 
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 
-    <xsl:variable name="indentIncrement" select="10"/>
+    <xsl:variable name="indentIncrement" select="3"/>
 
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -57,11 +57,8 @@
                 <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
                 <!-- script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
-                    <xsl:value-of select="' '"/>
-                </xsl:element>
+                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+
                 <title>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                 </title>
@@ -250,11 +247,9 @@
     <xsl:template match="thredds:catalogRef">
         <xsl:param name="indent" />
 
-        <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
-
         <xsl:if test="not($remoteHost)">
             <tr>
-                <td style="align: left; padding-left: {$myIndent}px;" >
+                <td style="align: left; padding-left: {$indent}px;" >
 
                     <!-- If the href ends in .xml, change it to .html
                          so the link in the presentation points to
@@ -263,17 +258,17 @@
                     <xsl:choose>
 
                         <!-- Does it point towards a remote catalog?. -->
-                        <!-- -->
+                        <!--
                         <xsl:when test="starts-with(@xlink:href,'http://')">
                             <a>
                             <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
-                            <xsl:choose>
-                                <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
-                                <xsl:otherwise>Link</xsl:otherwise>
-                            </xsl:choose>
+                                <xsl:choose>
+                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
+                                    <xsl:otherwise>Link</xsl:otherwise>
+                                </xsl:choose>
                             </a>
                         </xsl:when>
-                        <!-- -->
+                        -->
 
                         <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
                         <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
@@ -293,11 +288,11 @@
         </xsl:if>
 
 
-        <!-- -->
+        <!--
 
         <xsl:if test="$remoteHost">
             <tr>
-                <td style="align: left; padding-left: {$myIndent}px;" >
+                <td align="left" >
 
                     <ul class="small">
                         <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
@@ -306,6 +301,7 @@
                     </ul>
 
 
+                    <xsl:value-of select="$indent"/>
                     <a>
                     <xsl:choose>
                         <xsl:when test="starts-with(@xlink:href,'http://')">
@@ -325,7 +321,7 @@
             </tr>
         </xsl:if>
 
-        <!-- -->
+        -->
 
     </xsl:template>
 
@@ -477,8 +473,6 @@
             <xsl:value-of select="count(preceding::*)"/>
         </xsl:variable>
 
-        <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
-
         <!--
         <h3>count(preceding::*): <xsl:value-of select="count(preceding::*)"/></h3>
         <h3>position():  <xsl:value-of select="position()"/></h3>
@@ -488,7 +482,7 @@
         <xsl:choose>
             <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
                 <tr>
-                    <td  class="dark" style="align: left; padding-left: {$myIndent}px;">
+                    <td  class="dark" style="align: left; padding-left: {$indent}px;">
                         <a>
                             <xsl:if test="$remoteCatalog">
                                 <xsl:attribute name="href">?browseDataset=<xsl:value-of select="$datasetPositionInDocument"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
@@ -510,7 +504,7 @@
                     <xsl:call-template name="NoSizeNoTime" />
                 </tr>
                 <xsl:apply-templates>
-                    <xsl:with-param name="indent" select="$myIndent"/>
+                    <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
                     <!--
                       -   Note that the followiing parameter uses an XPath that
                       -   accumulates inherited thredds:metadata elements as it descends the
@@ -523,7 +517,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <tr>
-                    <td class="dark" tyle="align: left; padding-left: {$myIndent}px;">
+                    <td class="dark" tyle="align: left; padding-left: {$indent}px;">
 
                         <a>
                             <xsl:if test="$remoteCatalog">
@@ -546,7 +540,7 @@
                     </xsl:call-template>
                 </tr>
                 <xsl:apply-templates>
-                    <xsl:with-param name="indent" select="$myIndent" />
+                    <xsl:with-param name="indent" select="$indent + $indentIncrement" />
                 </xsl:apply-templates>                
 
 
