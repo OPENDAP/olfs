@@ -542,8 +542,6 @@
     <xsl:template name="doServiceLinks">
         <xsl:param name="inheritedMetadata"/>
 
-
-
         <xsl:choose>
             <xsl:when test="
                 thredds:serviceName |
@@ -674,6 +672,9 @@
                         <div class="small">Compound Services: <xsl:value-of select="./@name" /></div>
                     </td>
                 </tr>
+                <xsl:apply-templates mode="ServiceLinks" >
+                    <xsl:with-param name="urlPath" select="$urlPath"/>
+                </xsl:apply-templates>
 
 
             </xsl:when>
@@ -747,9 +748,6 @@
                                     </xsl:if>
 
                                 </xsl:when>
-
-
-
 
                                 <!--
 
