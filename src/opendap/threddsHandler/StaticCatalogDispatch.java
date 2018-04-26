@@ -289,7 +289,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 // Build the catalog document as an XdmNode.
                 XdmNode catDoc = _datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
-                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getContextPath());
                 _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
                 _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
                 _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);

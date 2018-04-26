@@ -80,6 +80,10 @@ public class Request {
 
     }
 
+    public String getContextPath(){
+        return _request.getContextPath();
+    }
+
 
     public String getDocsServiceLocalID(){
 

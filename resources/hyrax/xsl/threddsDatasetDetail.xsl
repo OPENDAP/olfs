@@ -122,7 +122,11 @@
 
                     <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                     <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
-                    <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
+                        <xsl:value-of select="' '"/>
+                    </xsl:element>
 
                     <title>THREDDS Dataset: <xsl:value-of select="@name"/></title>
 
@@ -197,7 +201,29 @@
 
                         <xsl:if test="/thredds:catalog/thredds:service">
                             <div class="small" align="left">
+                                <div class="tightView" style="padding-left: 15px;">
+                                    <ul class="collapsibleList">
+                                        <li>
+                                            <span class="small_bold" style="color: black;">Catalog Services</span>
+                                            <ul>
 
+                                                <table>
+                                                    <tr>
+                                                        <th class="small"><u>Service Name</u></th>
+                                                        <th class="small"><u>Service Type</u></th>
+                                                        <th class="small"><u>Service Base</u></th>
+                                                    </tr>
+
+                                                    <xsl:apply-templates select="/thredds:catalog/thredds:service" mode="banner">
+                                                        <xsl:with-param name="indent" select="0"/>
+                                                    </xsl:apply-templates>
+                                                </table>
+
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+<!--
                                 <div class="tightView" style="padding-left: 15px;">
                                     <ul class="collapsibleList">
                                         <li>
@@ -220,6 +246,7 @@
                                         </li>
                                     </ul>
                                 </div>
+-->
                             </div>
                         </xsl:if>
 
