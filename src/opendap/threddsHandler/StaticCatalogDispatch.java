@@ -153,7 +153,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 //throw new BadRequest("Remote Catalog Browsing is not supported.");
             } else if (query != null && query.startsWith("browseDataset=")) {
                 browseRemoteDataset(orq, response, query);
-                throw new BadRequest("Remote Dataset Browsing is not supported.");
+                // throw new BadRequest("Remote Dataset Browsing is not supported.");
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
