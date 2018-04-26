@@ -37,11 +37,14 @@
     <xsl:param name="docsService"/>
     <xsl:param name="targetDataset" />
     <xsl:param name="remoteCatalog" />
+    <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteHost" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
 
+
+    <xsl:variable name="debug" select="true()"/>
 
     <xsl:variable name="indentIncrement" select="10"/>
 
@@ -290,19 +293,19 @@
                     <!--                                                        -->
 
 
-
-
-                    <xsl:call-template name="doServiceLinks">
-                        <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
-                    </xsl:call-template>
-
-
-
+                    <xsl:choose>
+                        <xsl:when test="thredds:access | @urlPath">
+                            <xsl:call-template name="doServiceLinks">
+                                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:when test="thredds:catalogRef ">
+                            <xsl:apply-templates select="thredds:catalogRef" mode="ServiceLinks"/>
+                        </xsl:when>
+                        <xsl:otherwise>No Access, No Child Catalogs.</xsl:otherwise>
+                    </xsl:choose>
 
                     <h2>MetaData Summary:</h2>
-
-
-
 
                     <xsl:variable name="docTest" select="thredds:documentation |
                                         thredds:metadata/thredds:documentation |
@@ -557,40 +560,48 @@
             </xsl:otherwise>
         </xsl:choose>
 
+        <hr/>
+        <xsl:comment>
+            Inherited Metadata:
+        </xsl:comment>
+        <xsl:copy-of select="$inheritedMetadata" />
+        <hr/>
         <table>
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</div-->
+            <xsl:if test="$debug"><tr> <td>- - - - - - - - - - - - - - - - - - - START</td> </tr></xsl:if>
+
+            <xsl:if test="$debug"><tr> <td class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</td> </tr></xsl:if>
             <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks">
                 <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
 
 
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:metadata/thredds:serviceName </div-->
+            <xsl:if test="$debug"><tr> <td class="small">- - - - - - - - - - - - - - - - - - - thredds:metadata/thredds:serviceName</td> </tr></xsl:if>
             <xsl:apply-templates select="key('service-by-name', thredds:metadata/thredds:serviceName)"
                                  mode="ServiceLinks">
                 <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
 
 
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - @serviceName</div-->
+            <xsl:if test="$debug"><tr> <td class="small">- - - - - - - - - - - - - - - - - - - @serviceName</td> </tr></xsl:if>
             <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks">
                 <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
 
-
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</div-->
+<!--
+            <xsl:if test="$debug"><tr> <td class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</td> </tr></xsl:if>
             <xsl:apply-templates
                     select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)"
                     mode="ServiceLinks">
                 <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
+-->
 
-
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:access/@serviceName</div-->
-
+            <xsl:if test="$debug"><tr> <td class="small">- - - - - - - - - - - - - - - - - - - thredds:access/@serviceName</td> </tr></xsl:if>
             <xsl:apply-templates select="thredds:access" mode="ServiceLinks">
                 <xsl:with-param name="currentDataset" select="."/>
                 <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
             </xsl:apply-templates>
+            <xsl:if test="$debug"><tr> <td>- - - - - - - - - - - - - - - - - - - DONE</td> </tr></xsl:if>
         </table>
         <hr/>
 
@@ -669,14 +680,12 @@
             <xsl:when test="./@serviceType[.='Compound']">
                 <tr>
                     <td colspan="2">
-                        <div class="small">Compound Services: <xsl:value-of select="./@name" /></div>
+                        <div class="small">Compound Service: <xsl:value-of select="./@name" /></div>
                     </td>
                 </tr>
                 <xsl:apply-templates mode="ServiceLinks" >
                     <xsl:with-param name="urlPath" select="$urlPath"/>
                 </xsl:apply-templates>
-
-
             </xsl:when>
 
             <xsl:otherwise>
@@ -1454,6 +1463,86 @@
     </xsl:template>
 
 
+
+    <xsl:template match="thredds:catalogRef" mode="ServiceLinks">
+        <xsl:param name="indent" />
+
+        <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
+
+        <xsl:if test="not($remoteHost)">
+            <tr>
+                <td style="align: left; padding-left: {$myIndent}px;" >
+
+                    <!-- If the href ends in .xml, change it to .html
+                         so the link in the presentation points to
+                         another HTML page. -->
+
+                    <xsl:choose>
+
+                        <!-- Does it point towards a remote catalog?. -->
+                        <!-- -->
+                        <xsl:when test="starts-with(@xlink:href,'http://')">
+                            <a>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                                <xsl:choose>
+                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
+                                    <xsl:otherwise>Link</xsl:otherwise>
+                                </xsl:choose>
+                            </a>
+                        </xsl:when>
+                        <!-- -->
+
+                        <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
+                        <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
+                            <!--Then replace that with '.html'   -->
+                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:when>
+
+                        <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
+                        <xsl:otherwise>
+                            <a href="{./@xlink:href}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
+                </td>
+            </tr>
+        </xsl:if>
+
+
+        <!-- -->
+
+        <xsl:if test="$remoteHost">
+            <tr>
+                <td style="align: left; padding-left: {$myIndent}px;" >
+
+
+                    <a>
+                        <xsl:choose>
+                            <xsl:when test="starts-with(@xlink:href,'http://')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@xlink:href,'/')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteHost"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteRelativeURL"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:value-of select="./@xlink:title"/>/
+                    </a>
+                    <ul class="small">
+                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
+                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
+                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
+                    </ul>
+
+                </td>
+            </tr>
+        </xsl:if>
+
+        <!-- -->
+
+    </xsl:template>
 
 
 

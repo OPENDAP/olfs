@@ -245,12 +245,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throw new IOException("Not a browseDataset request!");
         }
 
-
         query = query.substring("browseDataset=".length(), query.length());
 
         String targetDataset = query.substring(0, query.indexOf('&'));
 
         String remoteCatalog = query.substring(query.indexOf('&') + 1, query.length());
+        String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
 
         if (!remoteCatalog.startsWith(http)) {
@@ -293,6 +293,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
                 _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
                 _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
 
 
@@ -458,6 +459,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
                     return;
                 }
+
 
                 String targetDataset = query.substring("dataset=".length(), query.length());
 
