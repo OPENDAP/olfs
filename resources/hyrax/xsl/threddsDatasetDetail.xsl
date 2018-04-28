@@ -686,6 +686,7 @@
                         <div class="small">Compound Service: <xsl:value-of select="./@name" /></div>
                     </td>
                 </tr>
+                <tr><td><hr/></td><td><hr/></td></tr>
                 <xsl:apply-templates mode="ServiceLinks" >
                     <xsl:with-param name="urlPath" select="$urlPath"/>
                 </xsl:apply-templates>
@@ -822,23 +823,43 @@
 
                     </td>
                 </tr>
+                <tr><td><hr/></td><td><hr/></td></tr>
 
             </xsl:otherwise>
         </xsl:choose>
 
     </xsl:template>
 
-    
-    <xsl:template name="BrokerLinks">
-        <xsl:param name="resourceUrl" />
 
-        <xsl:if test="$debug"><tr> <td class="small">BrokerLinks() - - - - - - - - - - - - - - - - - - - BEGIN</td> </tr></xsl:if>
-        <xsl:if test="$debug"><tr> <td class="small">BrokerLinks() - - - - - - - - -- - - - - - - - - -  resourceUrl(): <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>
-        <xsl:if test="$debug"><tr> <td class="small">BrokerLinks() - - - - - - - - -- - - - - - - - - -  encoded(): <xsl:element name="script">
-            <xsl:attribute name="type">text/javascript</xsl:attribute>
-            document.write(convertToHex("<xsl:value-of select="$resourceUrl"/>"));
-        </xsl:element></td></tr></xsl:if>
-            <!-- Make the link -->
+    <xsl:template name="BrokerLinks">
+        <xsl:param name="resourceUrl"/>
+
+        <tr><td><hr/></td><td><hr/></td></tr>
+
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - - - - - - - - - - - - - - - - - BEGIN</td>
+            </tr>
+        </xsl:if>
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - - - - - - -- - - - - - - - - - resourceUrl():
+                    <xsl:value-of select="$resourceUrl"/>
+                </td>
+            </tr>
+        </xsl:if>
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - - - - - - -- - - - - - - - - - encoded():
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                        document.write(convertToHex("<xsl:value-of select="$resourceUrl"/>"));
+                    </xsl:element>
+                </td>
+            </tr>
+        </xsl:if>
+
+        <!-- Make the link -->
         <tr>
             <td align="right" style="margin-left: 10px;">
                 <span class="medium_bold">Hyrax Broker</span>
@@ -846,181 +867,199 @@
             <td class="small_bold" align="right" style="margin-left: 10px;">
 
                 <table>
+                    <!-- - - - - - - - - - Data Request Forms - - - - - - - - - - -->
                     <tr>
-                    <td class="small" align="right">data request forms</td>
-                    <td class="small_bold" align="left" style="margin-left: 10px;">
+                        <td class="small" align="right">data request forms</td>
+                        <td class="small_bold" align="left" style="margin-left: 10px;">
 
-                        <!-- Make link object -->
-                        <a id="{$resourceUrl}-D4IFH"
-                           class="medium-bold"
-                           style="padding-right: 3px;"
-                           title="Broker: DAP4 Data Request Form"
-                           href="TBD">dap4-form
-                        </a>
-                        <!-- Set the href value -->
-                        <xsl:element name="script">
-                            <xsl:attribute name="type">text/javascript</xsl:attribute>
-                            ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                select="$resourceUrl"/>") + ".dmr.html";
-                            document.getElementById("<xsl:value-of select="$resourceUrl"/>-D4IFH").setAttribute("href", ifhLink);
-                        </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-D4IFH"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 Data Request Form"
+                               href="TBD">dap4-form
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dmr.html";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D4IFH").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
 
-                        <!-- Make link object -->
-                        <a id="{$resourceUrl}-D2IFH"
-                           class="medium-bold"
-                           style="padding-right: 3px;"
-                           title="Broker: DAP2 Data Request Form"
-                           href="TBD">dap2-form
-                        </a>
-                        <!-- Set the href value -->
-                        <xsl:element name="script">
-                            <xsl:attribute name="type">text/javascript</xsl:attribute>
-                            ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                select="$resourceUrl"/>") + ".html";
-                            document.getElementById("<xsl:value-of select="$resourceUrl"/>-D2IFH").setAttribute("href",
-                            ifhLink);
-                        </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-D2IFH"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 Data Request Form"
+                               href="TBD">dap2-form
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".html";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D2IFH").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
-                    </td>
+                        </td>
                     </tr>
 
+                    <!-- - - - - - - - - - Metadata Responses - - - - - - - - - - -->
                     <tr>
                         <td class="small" align="right">metadata responses</td>
                         <td class="small_bold" align="left" style="margin-left: 10px;">
 
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DMR"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 DMR response"
+                               href="TBD">dmr
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dmr.xml";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DMR").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-DMR"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP4 DMR response"
-                   href="TBD">dmr
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".dmr.xml";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DMR").setAttribute("href", ifhLink);
-                </xsl:element>
-
-
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-DDS"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP2 DDS response"
-                   href="TBD">dds
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".dds";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDS").setAttribute("href", ifhLink);
-                </xsl:element>
-
-
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-DAS"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP2 DAS response"
-                   href="TBD">das
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".das";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAS").setAttribute("href", ifhLink);
-                </xsl:element>
-
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-DDX"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP2 DDX response"
-                   href="TBD">ddx
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".das";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDX").setAttribute("href", ifhLink);
-                </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DDS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DDS response"
+                               href="TBD">dds
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dds";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
 
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DAS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DAS response"
+                               href="TBD">das
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".das";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DDX"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DDX response"
+                               href="TBD">ddx
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".das";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDX").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
 
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-INFO"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP2 INFO response"
-                   href="TBD">info
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".info";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-INFO").setAttribute("href", ifhLink);
-                </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-INFO"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 INFO response"
+                               href="TBD">info
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".info";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-INFO").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
-                <!-- Make link object -->
-                <a id="{$resourceUrl}-RDF"
-                   class="medium-bold"
-                   style="padding-right: 3px;"
-                   title="Broker: DAP2 RDF response"
-                   href="TBD">rdf
-                </a>
-                <!-- Set the href value -->
-                <xsl:element name="script">
-                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                        select="$resourceUrl"/>") + ".rdf";
-                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-RDF").setAttribute("href", ifhLink);
-                </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-RDF"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 RDF response"
+                               href="TBD">rdf
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".rdf";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-RDF").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
-                </td>
-            </tr>
+                        </td>
+                    </tr>
+                    <!-- - - - - - - - - - Data Responses - - - - - - - - - - -->
                     <tr>
                         <td class="small" align="right">data responses</td>
                         <td class="small_bold" align="left" style="margin-left: 10px;">
 
-                    <!-- Make link object -->
-                    <a id="{$resourceUrl}-DAP"
-                       class="medium-bold"
-                       style="padding-right: 3px;"
-                       title="Broker: DAP4 Data (.dap) response"
-                       href="TBD">dap4
-                    </a>
-                    <!-- Set the href value -->
-                    <xsl:element name="script">
-                        <xsl:attribute name="type">text/javascript</xsl:attribute>
-                        ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                            select="$resourceUrl"/>") + ".dap";
-                        document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAP").setAttribute("href", ifhLink);
-                    </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DAP"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 Data (.dap) response"
+                               href="TBD">dap4
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dap";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAP").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
 
-                    <!-- Make link object -->
-                    <a id="{$resourceUrl}-DODS"
-                       class="medium-bold"
-                       style="padding-right: 3px;"
-                       title="Broker: DAP2 Data (.dods) response"
-                       href="TBD">dods
-                    </a>
-                    <!-- Set the href value -->
-                    <xsl:element name="script">
-                        <xsl:attribute name="type">text/javascript</xsl:attribute>
-                        ifhLink="<xsl:value-of select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                            select="$resourceUrl"/>") + ".dods";
-                        document.getElementById("<xsl:value-of select="$resourceUrl"/>-DODS").setAttribute("href", ifhLink);
-                    </xsl:element>
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DODS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 Data (.dods) response"
+                               href="TBD">dods
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dods";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DODS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
 
                         </td>
                     </tr>
@@ -1028,7 +1067,11 @@
             </td>
         </tr>
 
-        <xsl:if test="$debug"><tr> <td class="small">BrokerLinks() - - - - - - - - - - - - - - - - - - - END</td> </tr></xsl:if>
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - - - - - - - - - - - - - - - - - END</td>
+            </tr>
+        </xsl:if>
     </xsl:template>
 
 
