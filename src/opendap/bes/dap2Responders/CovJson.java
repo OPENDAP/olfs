@@ -41,12 +41,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 
 /**
- * Responder that transmits JSON encoded DAP2 data to the client.
+ * Responder that transmits CovJSON encoded DAP2 data to the client.
  */
 public class CovJson extends Dap4Responder {
 
     private Logger log;
-    private static String defaultRequestSuffix = ".cjson";
+    private static String defaultRequestSuffix = ".covjson";
 
     public CovJson(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);

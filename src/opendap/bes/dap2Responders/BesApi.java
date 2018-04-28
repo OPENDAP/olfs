@@ -999,7 +999,7 @@ public class BesApi {
 
 
     /**
-     * Writes the DAP2 JSON data response for the dataSource to the passed
+     * Writes the DAP2 CovJSON data response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -2234,7 +2234,7 @@ public class BesApi {
             throws BadConfigurationException {
 
         return getDap4RequestDocument(DAP4_DMR, dataSource, qp, maxResponseSize, null, null, JSON, XML_ERRORS);
-        
+
 
     }
 

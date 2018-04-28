@@ -263,8 +263,8 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add(ijsn);
 
         // DAP2 Cov-JSON Response
-        Dap4Responder cjson = new CovJson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
-        _responders.add(cjson);
+        Dap4Responder covjson = new CovJson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
+        _responders.add(covjson);
 
         // DAP2 Metadata responses
         Dap4Responder d4r = new DDX(_systemPath, besApi);
