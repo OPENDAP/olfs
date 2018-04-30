@@ -34,6 +34,8 @@
 
         >
     <xsl:import href="version.xsl"/>
+    <xsl:import href="threddsMetadataDetail.xsl" />
+
     <xsl:param name="serviceContext"/>
     <xsl:param name="dapService"/>
     <xsl:param name="docsService"/>
@@ -110,50 +112,65 @@
                 <h1>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
-                        <xsl:if test="thredds:service">
-
-                            <div class="tightView" style="padding-left: 15px;">
-                                <ul class="collapsibleList">
-                                    <li>
-                                            <span class="small_bold" style="color: black;">Catalog Services</span>
-                                            <ul>
-
-                                                <table>
-                                                    <tr>
-                                                        <th class="small"><u>Service Name</u></th>
-                                                        <th class="small"><u>Service Type</u></th>
-                                                        <th class="small"><u>Service Base</u></th>
-                                                    </tr>
-
-                                                    <xsl:apply-templates select="thredds:service" mode="banner">
-                                                        <xsl:with-param name="indent" select="0"/>
-                                                    </xsl:apply-templates>
-                                                </table>
-
-                                            </ul>
-                                    </li>
-                                </ul>
-                            </div>
+                        <xsl:if test="$remoteCatalog">
+                            <span style="color: white;">Remote Catalog:
+                                <a style="color: white;" href="{$remoteCatalog}"><xsl:value-of select="$remoteCatalog"/></a>
+                            </span>
                         </xsl:if>
-
                     </div>
                 </h1>
 
-                <xsl:if test="$remoteCatalog">
-                    <h3>Remote Catalog:
-                        <xsl:value-of select="$remoteCatalog"/>
-                    </h3>
-                </xsl:if>
+                <div class="small" align="left">
+                    <xsl:if test="thredds:service">
 
-                <hr size="1" noshade="noshade"/>
+                        <div class="tightView" style="padding-left: 15px;">
+                            <ul class="collapsibleList">
+                                <li>
+                                        <span class="small_bold" style="color: black;">Services</span>
+                                        <ul>
+
+                                            <table>
+                                                <tr>
+                                                    <th class="small"><u>Service Name</u></th>
+                                                    <th class="small"><u>Service Type</u></th>
+                                                    <th class="small"><u>Service Base</u></th>
+                                                </tr>
+
+                                                <xsl:apply-templates select="thredds:service" mode="banner">
+                                                    <xsl:with-param name="indent" select="0"/>
+                                                </xsl:apply-templates>
+                                            </table>
+                                        </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </xsl:if>
+                </div>
+                <div class="small" align="left" >
+                    <div class="tightView" style="padding-left: 15px;">
+                        <ul class="collapsibleList">
+                            <li>
+                                <span class="small_bold" style="color: black;">Metadata</span>
+                                <ul>
+                                    <xsl:apply-templates select="thredds:dataset" mode="metadataDetail" >
+                                        <xsl:with-param name="indent" select="0"/>
+                                        <xsl:with-param name="currentDataset" select="thredds:dataset" />
+                                    </xsl:apply-templates>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
 
                 <!-- ****************************************************** -->
                 <!--                       PAGE BODY                        -->
                 <!--                                                        -->
                 <!--                                                        -->
+                <hr size="1" noshade="noshade"/>
                 <pre>
-
-
                     <table border="0" width="100%">
                         <tr>
                             <th align="left">Dataset</th>
@@ -170,7 +187,6 @@
                     </table>
 
                 </pre>
-
 
                 <!-- ****************************************************** -->
                 <!--                              FOOTER                    -->
@@ -298,14 +314,6 @@
         <xsl:if test="$remoteHost">
             <tr>
                 <td style="align: left; padding-left: {$myIndent}px;" >
-
-                    <ul class="small">
-                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
-                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
-                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
-                    </ul>
-
-
                     <a>
                     <xsl:choose>
                         <xsl:when test="starts-with(@xlink:href,'http://')">
@@ -320,6 +328,11 @@
                     </xsl:choose>
                     <xsl:value-of select="./@xlink:title"/>/
                     </a>
+                    <ul class="small">
+                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
+                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
+                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
+                    </ul>
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />
             </tr>
