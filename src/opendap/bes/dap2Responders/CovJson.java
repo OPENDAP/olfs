@@ -68,26 +68,22 @@ public class CovJson extends Dap4Responder {
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
     }
 
-
     public boolean isDataResponder(){ return true; }
     public boolean isMetadataResponder(){ return false; }
-
 
     @Override
     public boolean matches(String relativeUrl, boolean checkWithBes){
         return super.matches(relativeUrl,checkWithBes);
     }
 
-
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        // String xmlBase = getXmlBase(request);
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -110,23 +106,11 @@ public class CovJson extends Dap4Responder {
 
         User user = new User(request);
 
-
         OutputStream os = response.getOutputStream();
 
-        besApi.writeDap2DataAsCovJson(
-                resourceID,
-                constraintExpression,
-                "3.2",
-                user.getMaxResponseSize(),
-                os);
+        besApi.writeDap2DataAsCovJson(resourceID, constraintExpression, "3.2", user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
-
-
 }
