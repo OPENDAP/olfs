@@ -49,6 +49,7 @@
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 
     <xsl:variable name="indentIncrement" select="10"/>
+    <xsl:variable name="debug" select="false()"/>
 
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -328,11 +329,14 @@
                     </xsl:choose>
                     <xsl:value-of select="./@xlink:title"/>/
                     </a>
-                    <ul class="small">
-                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
-                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
-                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
-                    </ul>
+
+                    <xsl:if test="$debug" >
+                        <ul class="small">
+                            <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
+                            <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
+                            <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
+                        </ul>
+                    </xsl:if>
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />
             </tr>

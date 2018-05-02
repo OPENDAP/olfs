@@ -235,6 +235,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
         String http = "http://";
+        String https = "https://";
 
         // Sanitize the incoming query.
         query = Scrub.completeURL(query);
@@ -252,14 +253,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
         String remoteCatalog = query.substring(query.indexOf('&') + 1, query.length());
         String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
+        String remoteHost;
 
-        if (!remoteCatalog.startsWith(http)) {
-            _log.error("Catalog Must be remote: " + remoteCatalog);
-           throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
+        if (remoteCatalog.startsWith(https)) {
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
         }
-
-
-        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        else if(remoteCatalog.startsWith(http)){
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        }
+        else {
+            String msg = "Catalog must be remote: " + remoteCatalog;
+            _log.error(msg);
+            throw new BadRequest(msg);
+        }
 
         _log.debug("targetDataset: " + targetDataset);
         _log.debug("remoteCatalog: " + remoteCatalog);
@@ -335,20 +341,29 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
         String http = "http://";
+        String https = "https://";
 
 
         // Sanitize the incoming query.
         query = query.substring("browseCatalog=".length(), query.length());
         String remoteCatalog = Scrub.completeURL(query);
 
-        if (!remoteCatalog.startsWith(http)) {
-            _log.error("Catalog Must be remote: " + Scrub.completeURL(remoteCatalog));
-            throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
+        String remoteHost;
+
+        if (remoteCatalog.startsWith(https)) {
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
+        }
+        else if(remoteCatalog.startsWith(http)){
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        }
+        else {
+            String msg = "Catalog Must be remote: " + Scrub.completeURL(remoteCatalog);
+            _log.error(msg);
+            throw new BadRequest(msg);
         }
 
         // Build URL for remote system:
 
-        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
         String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
 
