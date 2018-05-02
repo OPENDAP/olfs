@@ -111,7 +111,7 @@
                 <img alt="Logo" src='{$docsService}/images/logo.png'/>
                 <h1>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
-                    <div class="small" align="left">
+                    <div class="small" align="left" style="padding-bottom: 2px;">
                         <xsl:if test="$remoteCatalog">
                             <span style="color: white;">Remote Catalog:
                                 <a style="color: white;" href="{$remoteCatalog}"><xsl:value-of select="$remoteCatalog"/></a>
