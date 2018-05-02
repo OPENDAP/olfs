@@ -82,7 +82,7 @@ public class BesApi {
     public static final String GEOTIFF    = "geotiff";
     public static final String GMLJP2     = "jpeg2000";
     public static final String JSON       = "json";
-    public static final String COV_JSON   = "covjson";
+    public static final String COVJSON   = "covjson";
     public static final String IJSON      = "ijson";
     public static final String W10N       = "w10n";
     public static final String W10N_META      = "w10nMeta";
@@ -2045,7 +2045,7 @@ public class BesApi {
                                              int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, COV_JSON, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, COVJSON, XML_ERRORS);
 
     }
     /**
@@ -2187,7 +2187,7 @@ public class BesApi {
     )
             throws BadConfigurationException {
 
-        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, COV_JSON, XML_ERRORS);
+        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, COVJSON, XML_ERRORS);
 
 
     }
