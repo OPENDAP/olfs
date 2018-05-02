@@ -280,7 +280,7 @@
 
                         <!-- Does it point towards a remote catalog?. -->
                         <!-- -->
-                        <xsl:when test="starts-with(@xlink:href,'http://')">
+                        <xsl:when test="starts-with(@xlink:href,'http://') or starts-with(@xlink:href,'https://')">
                             <a>
                             <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
                             <xsl:choose>
