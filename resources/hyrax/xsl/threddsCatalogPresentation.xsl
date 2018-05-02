@@ -491,7 +491,7 @@
 
 
         <xsl:variable name="datasetPositionInDocument">
-            <xsl:value-of select="count(preceding::*)"/>
+            <xsl:value-of select="count(preceding::*) + count(ancestor::*)"/>
         </xsl:variable>
 
         <xsl:variable name="myIndent" select="$indent+$indentIncrement" />

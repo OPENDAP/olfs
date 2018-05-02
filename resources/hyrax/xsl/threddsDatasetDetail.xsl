@@ -58,6 +58,7 @@
 
     <xsl:template match="thredds:catalog">
         <html>
+            <xsl:if test="$debug">Target Dataset: <xsl:value-of select="$targetDataset"/><br/></xsl:if>
             <xsl:apply-templates />
         </html>
     </xsl:template>
@@ -66,9 +67,10 @@
         <xsl:param name="inheritedMetadata" />
 
         <xsl:variable name="datasetPositionInDocument">
-            <xsl:value-of select="count(preceding::*)"/>
+            <xsl:value-of select="count(preceding::*) + count(ancestor::*)"/>
         </xsl:variable>
 
+        <xsl:if test="$debug">Processing Dataset: <xsl:value-of select="$datasetPositionInDocument"/><br/></xsl:if>
         <xsl:choose>
 
             <!-- Is this the dataset that we are supposed to summary? -->
@@ -98,7 +100,7 @@
         <xsl:otherwise >
             <xsl:apply-templates>
                 <!--
-                  -   Note that the followiing parameter uses an XPath that
+                  -   Note that the following parameter uses an XPath that
                   -   accumulates inherited thredds:metadata elements as it descends the
                   -   hierarchy.
                   -->
@@ -337,6 +339,26 @@
 
                     <h2>MetaData Summary:</h2>
 
+                    <xsl:variable name="sizeTest" select="thredds:dataSize" />
+                    <xsl:if test="$sizeTest" >
+                        <xsl:apply-templates select="$sizeTest" mode="sizeDetail">
+                            <xsl:with-param name="indent" select="0"/>
+                        </xsl:apply-templates>
+                    </xsl:if>
+
+
+                    <xsl:variable name="dateTest" select="thredds:date |
+                                    thredds:metadata/thredds:date |
+                                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
+
+                    <xsl:if test="$dateTest" >
+                        <xsl:apply-templates select="$dateTest" mode="dateDetail">
+                            <xsl:with-param name="indent" select="0"/>
+                        </xsl:apply-templates>
+                    </xsl:if>
+
+
+
                     <xsl:variable name="docTest" select="thredds:documentation |
                                         thredds:metadata/thredds:documentation |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:documentation" />
@@ -352,19 +374,6 @@
                     </xsl:if>
 
 
-                    <xsl:variable name="dateTest" select="thredds:date |
-                                        thredds:metadata/thredds:date |
-                                        $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
-                    <xsl:if test="$dateTest" >
-                        <p>
-                            <div class="medium_bold">Date: </div>
-                            <span class="small">
-                                <xsl:apply-templates select="$dateTest" mode="dateDetail">
-                                    <xsl:with-param name="indent" select="$indentIncrement"/>
-                                </xsl:apply-templates>
-                            </span>
-                        </p>
-                    </xsl:if>
 
 
                     <xsl:variable name="timeCoverageTest" select="thredds:timeCoverage |

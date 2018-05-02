@@ -638,8 +638,28 @@
     <xsl:template match="thredds:date" mode="dateDetail">
         <xsl:param name="indent" />
 
-        <span style="padding-left: {$indent};"><xsl:value-of select="."/> <em> (<xsl:value-of select="@type"/>) </em></span><br/>
+        <span class="small" style="padding-left: {$indent};">
+            date:
+            <xsl:value-of select="."/>
+            <em> (<xsl:value-of select="@type"/>) </em>
+        </span>
+        <br/>
     </xsl:template>
+
+    <xsl:template match="thredds:dataSize" mode="sizeDetail">
+        <xsl:param name="indent" />
+
+        <span class="small" style="padding-left: {$indent};">
+            size:
+            <xsl:value-of select="."/>
+            <em> (<xsl:value-of select="@units"/>) </em>
+        </span>
+        <br/>
+    </xsl:template>
+
+
+
+
 
 
 </xsl:stylesheet>
