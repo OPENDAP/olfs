@@ -48,7 +48,6 @@ import org.jdom.filter.Filter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -354,7 +353,7 @@ public class Dap2IFH extends Dap4Responder {
 
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("name"))).append("\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"").append(jsonEncodeString(attribute.getAttributeValue("name"))).append("\", \n");
             //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
 
             boolean jsEncode = true;
