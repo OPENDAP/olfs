@@ -48,6 +48,7 @@ import org.jdom.filter.Filter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -224,15 +225,17 @@ public class Dap2IFH extends Dap4Responder {
         if(!variables.isEmpty()){
             sb.append(indent).append("\"variableMeasured\": [\n");
             // Top Level Attributes
-            String topLevelAttributes = attributesToProperties(dataset, datasetUrl, indent);
+            String topLevelAttributes = attributesToProperties(dataset, datasetUrl, indent, true);
             sb.append(topLevelAttributes);
 
             boolean first = topLevelAttributes.isEmpty();
+            int mark = sb.length();
             for(Element variable : variables){
                 if(!first)
                     sb.append(",\n");
-                sb.append(attributesToProperties(variable,variable.getAttributeValue("name"), indent));
-                first = false;
+                sb.append(attributesToProperties(variable,variable.getAttributeValue("name"), indent, first));
+                if(sb.length()>mark)
+                    first = false;
             }
             sb.append("\n");
             sb.append(indent).append("]\n");
@@ -246,7 +249,7 @@ public class Dap2IFH extends Dap4Responder {
     Filter attributeFilter = new ElementFilter("Attribute", DAP.DAPv32_NS);
     private String indent_inc = "  ";
 
-    public String attributesToProperties(Element variable, String name, String indent){
+    public String attributesToProperties(Element variable, String name, String indent, boolean first){
         String myIndent = indent + indent_inc;
         StringBuilder sb = new StringBuilder();
 
@@ -265,13 +268,15 @@ public class Dap2IFH extends Dap4Responder {
             // It's a Container type... Wut do?
             List<Element> attributes = variable.getContent(attributeFilter);
             sb.append(attributesToProperties(attributes, myIndent));
-            boolean first = true;
+            //boolean first = true;
             List<Element> children = variable.getChildren();
+            int mark = sb.length();
             for(Element child : children){
                 if(!first)
                     sb.append(",\n");
-                sb.append(attributesToProperties(child, child.getAttributeValue("name"), myIndent));
-                first = false;
+                sb.append(attributesToProperties(child, child.getAttributeValue("name"), myIndent, first));
+                if(sb.length()>mark)
+                    first = false;
             }
 
             _log.error("attributesToProperties() - We don't have a good mapping for container types to JSON-LD markup.");
@@ -298,6 +303,7 @@ public class Dap2IFH extends Dap4Responder {
         String myIndent = indent + indent_inc;
 
         boolean first = true;
+        int mark = sb.length();
         for(Element attribute : attributes){
             if(attribute.getChild("Attribute",DAP.DAPv32_NS)!=null){
                 if(!first)
@@ -315,9 +321,27 @@ public class Dap2IFH extends Dap4Responder {
                     sb.append(pValue);
                 }
             }
-            first = false;
+            if(sb.length()>mark)
+                first = false;
         }
         return sb.toString();
+    }
+
+
+    /**
+     * Minmal JSON text encoder. This method escapes:
+     * <ul>
+     *     <li>The \ (backslash)</li>
+     *     <li>The " (double-quote)</li>
+     * </ul>
+     * @param value The string to encode.
+     * @return The encoded value
+     */
+    private String jsonEncodeString(String value){
+        String str = value.trim();
+        str = str.replace("\\","\\\\");
+        str = str.replace("\"","\\\"");
+        return str;
     }
 
 
@@ -330,11 +354,27 @@ public class Dap2IFH extends Dap4Responder {
 
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("name"))).append("\", \n");
+            //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
+
+            boolean jsEncode = true;
+            if(attribute.getAttributeValue("type").toLowerCase().contains("int") |
+                    attribute.getAttributeValue("type").toLowerCase().contains("float") |
+                    attribute.getAttributeValue("type").equalsIgnoreCase("byte")
+                    ){
+                jsEncode=false;
+            }
 
             if(values.size()==1){
                 Element value = values.get(0);
-                sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
+                sb.append(indent).append(indent_inc).append("\"value\": \"");
+                if(jsEncode) {
+                    sb.append(jsonEncodeString(value.getTextTrim()));
+                }
+                else {
+                    sb.append(value.getTextTrim());
+                }
+                sb.append("\"");
             }
             else {
                 sb.append(indent).append(indent_inc).append("\"value\": [ ");
@@ -342,7 +382,15 @@ public class Dap2IFH extends Dap4Responder {
                 for(Element value : values){
                     if(!first)
                         sb.append(", ");
-                    sb.append("\"").append(value.getTextTrim()).append("\"");
+                    sb.append("\"");
+
+                    if(jsEncode) {
+                        sb.append(jsonEncodeString(value.getTextTrim()));
+                    }
+                    else {
+                        sb.append(value.getTextTrim());
+                    }
+                    sb.append("\"");
                     first = false;
                 }
                 sb.append(" ]");
