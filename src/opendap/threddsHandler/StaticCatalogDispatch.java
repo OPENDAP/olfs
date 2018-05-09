@@ -315,7 +315,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
             } catch (SaxonApiException sapie) {
-                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Could not ingest remote resource as a THREDDS Catalog. msg: "+sapie.getMessage());
             } finally {
                 _datasetToHtmlTransform.clearAllParameters();
 
@@ -415,7 +415,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
             } catch (SaxonApiException sapie) {
-                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Could not ingest remote resource as a THREDDS Catalog. msg: "+sapie.getMessage());
             } finally {
                 // Clean up the transform before releasing it.
                 _catalogToHtmlTransform.clearAllParameters();
