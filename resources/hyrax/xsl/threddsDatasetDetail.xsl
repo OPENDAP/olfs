@@ -641,9 +641,6 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="urlPath"><xsl:value-of select="@urlPath"/></xsl:variable>
-        <hr size="1" noshade="noshade" color="black"/>
-
         <table>
             <xsl:if test="$debug">
                 <tr>
@@ -656,14 +653,10 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     </td>
                 </tr>
-
-                    <tr>
-                        <td class="small" style="align: right;">urlPath:</td>
-                        <td class="small" style="align: left;">
-                            <xsl:value-of select="$urlPath"/>
-                            <xsl:copy-of select="$urlPath" />
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="small" style="align: right;">@urlPath:</td>
+                    <td class="small" style="align: left;"><xsl:value-of select="@urlPath"/></td>
+                </tr>
             </xsl:if>
 
             <xsl:call-template  name="DoBrokerLinks">
@@ -680,7 +673,7 @@
 
             <xsl:if test="boolean(@urlPath)">
                 <xsl:apply-templates select="$myServices" mode="ServiceLinks">
-                    <xsl:with-param name="urlPath" select="$urlPath"/>
+                    <xsl:with-param name="urlPath" select="@urlPath"/>
                 </xsl:apply-templates>
             </xsl:if>
 
