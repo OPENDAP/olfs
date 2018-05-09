@@ -266,54 +266,94 @@
 
                     </h1>
 
-                    <div>
-                        <span class="small_italic">ID:</span>
-                        <span class="medium_bold">
-                            <xsl:value-of select="@ID"/>
-                        </span>
-                    </div>
+                    <xsl:variable name="sizeTest" select="thredds:dataSize" />
+                    <xsl:variable name="dateTest" select="thredds:date |
+                                    thredds:metadata/thredds:date |
+                                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
 
-                    <div>
-                        <span class="small_italic">name:</span>
-                        <span class="medium_bold">
-                            <xsl:value-of select="@name"/>
-                        </span>
-                    </div>
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="small_italic">ID:</span>
+                            </td>
+                            <td>
+                                <span class="medium_bold" style="padding-left: 5px;">
+                                    <xsl:value-of select="@ID"/>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="small_italic">name:</span>
+                            </td>
+                            <td>
+                                <span class="medium_bold" style="padding-left: 5px;">
+                                    <xsl:value-of select="@name"/>
+                                </span>
+                            </td>
+                        </tr>
+                        <xsl:if test="$sizeTest" >
+                            <tr>
+                                <td class="small_italic">size:</td>
+                                <td class="small_bold" style="padding-left: 5px;">
+                                    <xsl:apply-templates select="$sizeTest" mode="sizeDetail">
+                                        <xsl:with-param name="indent" select="0"/>
+                                    </xsl:apply-templates>
+                                </td>
+                            </tr>
+                        </xsl:if>
 
-                    <div style="padding-bottom: 5px;">
-                        <xsl:choose>
-                            <xsl:when test="$remoteCatalog" >
-                                <span class="small_italic">Remote Catalog:</span>
-                                <span id="catalog_linky_poo" class="small_bold"> </span>
-                                <xsl:element name="script">
-                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                    var catalog_link = document.createElement('a');
-                                    var linkText = document.createTextNode("<xsl:value-of select="$remoteCatalog"/>");
-                                    catalog_link.appendChild(linkText);
-                                    catalog_link.title = "<xsl:value-of select="$remoteCatalog"/>";
-                                    catalog_link.href = "<xsl:value-of select="$remoteCatalog"/>";
-                                    catalog_link.class = "small_bold"
-                                    document.getElementById("catalog_linky_poo").appendChild(catalog_link);
-                                </xsl:element>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <span class="small_italic">Catalog:</span>
-                                <span id="catalog_linky_poo" class="small_bold"> </span>
-                                <xsl:element name="script">
-                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                    var catalog = location.href.split("?");
-                                    var catalog_link = document.createElement('a');
-                                    var linkText = document.createTextNode(catalog[0]);
-                                    catalog_link.appendChild(linkText);
-                                    catalog_link.title = catalog[0];
-                                    catalog_link.href = catalog[0];
-                                    catalog_link.class = "small_bold"
-                                    document.getElementById("catalog_linky_poo").appendChild(catalog_link);
-                                </xsl:element>
 
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </div>
+
+
+                        <xsl:if test="$dateTest" >
+                            <tr>
+                                <td class="small_italic">date:</td>
+                                <td class="small_bold" style="padding-left: 5px;">
+                                    <xsl:apply-templates select="$dateTest" mode="dateDetail">
+                                        <xsl:with-param name="indent" select="0"/>
+                                    </xsl:apply-templates>
+                                </td>
+                            </tr>
+                        </xsl:if>
+
+
+                    <tr>
+
+                            <xsl:choose>
+                                <xsl:when test="$remoteCatalog" >
+                                    <td class="small_italic">Remote<br/>Catalog:</td>
+                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;padding-left: 5px;"> </td>
+                                    <xsl:element name="script">
+                                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                        var catalog_link = document.createElement('a');
+                                        var linkText = document.createTextNode("<xsl:value-of select="$remoteCatalog"/>");
+                                        catalog_link.appendChild(linkText);
+                                        catalog_link.title = "<xsl:value-of select="$remoteCatalog"/>";
+                                        catalog_link.href = "<xsl:value-of select="$remoteCatalog"/>";
+                                        catalog_link.class = "small_bold"
+                                        document.getElementById("catalog_linky_poo").appendChild(catalog_link);
+                                    </xsl:element>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <td class="small_italic">Catalog:</td>
+                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;"> </td>
+                                    <xsl:element name="script">
+                                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                        var catalog = location.href.split("?");
+                                        var catalog_link = document.createElement('a');
+                                        var linkText = document.createTextNode(catalog[0]);
+                                        catalog_link.appendChild(linkText);
+                                        catalog_link.title = catalog[0];
+                                        catalog_link.href = catalog[0];
+                                        catalog_link.class = "small_bold"
+                                        document.getElementById("catalog_linky_poo").appendChild(catalog_link);
+                                    </xsl:element>
+
+                                </xsl:otherwise>
+                            </xsl:choose>
+                    </tr>
+                    </table>
 
                     <hr size="1" noshade="noshade"/>
 
@@ -339,26 +379,6 @@
                     </xsl:choose>
 
                     <h2>MetaData Summary:</h2>
-
-                    <xsl:variable name="sizeTest" select="thredds:dataSize" />
-                    <xsl:if test="$sizeTest" >
-                        <xsl:apply-templates select="$sizeTest" mode="sizeDetail">
-                            <xsl:with-param name="indent" select="0"/>
-                        </xsl:apply-templates>
-                    </xsl:if>
-
-
-                    <xsl:variable name="dateTest" select="thredds:date |
-                                    thredds:metadata/thredds:date |
-                                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
-
-                    <xsl:if test="$dateTest" >
-                        <xsl:apply-templates select="$dateTest" mode="dateDetail">
-                            <xsl:with-param name="indent" select="0"/>
-                        </xsl:apply-templates>
-                    </xsl:if>
-
-
 
                     <xsl:variable name="docTest" select="thredds:documentation |
                                         thredds:metadata/thredds:documentation |
@@ -561,9 +581,9 @@
 
         <xsl:if test="lower-case(@serviceType)='compound'" >
             <tr>
-                <td><hr size="1" noshade="noshade" color="black"/></td>
-                <td><hr size="1" noshade="noshade" color="black"/></td>
-                <td><hr size="1" noshade="noshade" color="black"/></td>
+                <td><hr size="1" noshade="noshade" /></td>
+                <td><hr size="1" noshade="noshade" /></td>
+                <td><hr size="1" noshade="noshade" /></td>
             </tr>
         </xsl:if>
 
@@ -678,7 +698,7 @@
             </xsl:if>
 
         </table>
-        <hr size="1" noshade="noshade" color="black"/>
+        <hr size="1" noshade="noshade" />
 
 
     </xsl:template>
