@@ -33,19 +33,19 @@
     <xsl:param name="HyraxVersion"/>
     <xsl:param name="JsonLD"/>
 
+    <xsl:variable name="debug" select="false()"/>
 
-    <!-- xsl:variable name="datasetUrl">http://ec2-54-242-224-73.compute-1.amazonaws.com:8080/opendap/hyrax/data/nc/fnoc1.nc</xsl:variable -->
     <xsl:variable name="datasetUrl">
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
     <xsl:key name="DimensionNames" match="dap:Dimension" use="@name"/>
 
-
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
         <xhtml>
             <head>
+                <link rel="stylesheet" href="{$docsService}/css/collapse.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
 
@@ -157,6 +157,7 @@
             <xsl:element name="script">
                 <xsl:attribute name="type">text/javascript</xsl:attribute>
                 CollapsibleLists.apply(true);
+                initCollapsibles("<xsl:value-of select="$docsService"/>");
             </xsl:element>
 
         </xhtml>
@@ -267,18 +268,24 @@
         </xsl:if>
 
         <div class="tightView">
-            <ul class="collapsibleList">
-                <li>
-                    <div class="small_bold" style="color:#527CC1;">members</div>
-                    <ul>
-                        <xsl:apply-templates select="./*[not(self::dap:Attribute | self::dap:Dimension)]">
-                            <xsl:with-param name="container">
-                                <xsl:call-template name="computeVarName"/>
-                            </xsl:with-param>
-                        </xsl:apply-templates>
-                    </ul>
-                </li>
-            </ul>
+            <!-- This makes the collapsible view once it's initialized by initCollapsibles() -->
+            <button type="button" class="collapsible" onclick="doNothing()">
+                <img style="padding-right: 3px;" alt="click-to-open" src="{$docsService}/images/button-closed.png" />member variables
+            </button>
+            <div class="content">
+                <ul>
+                    <xsl:choose>
+                        <xsl:when test="true()">
+                            <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
+                                <xsl:with-param name="container">
+                                    <xsl:call-template name="computeVarName"/>
+                                </xsl:with-param>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:otherwise><li>no members shown</li></xsl:otherwise>
+                    </xsl:choose>
+                </ul>
+            </div>
         </div>
     </xsl:template>
 
@@ -322,8 +329,18 @@
             </xsl:choose>
         </xsl:variable>
 
+
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
+            if(DEBUG.enabled()) alert(
+            "myFQN:         <xsl:value-of select="$myFQN"/>\n" +
+            "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n" +
+            "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
+            "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
+            "isArray:       <xsl:value-of select="$isArray"/>\n" +
+            "(parent) container: <xsl:value-of select="$container"/>\n"
+            );
+
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 

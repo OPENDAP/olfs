@@ -604,7 +604,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         var filterExpression = this.get_selection();
 
         if (filterExpression.length > 0) {
-            ce += " | " + fiterExpression;
+            ce += " | " + filterExpression;
         }
 
         return ce;

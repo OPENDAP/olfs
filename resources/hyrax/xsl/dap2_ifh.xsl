@@ -33,11 +33,11 @@
     <xsl:param name="HyraxVersion"/>
     <xsl:param name="JsonLD"/>
 
+    <xsl:variable name="debug" select="false()"/>
+
     <xsl:variable name="datasetUrl">
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
-
-    <xsl:variable name="debug" select="false()"/>
 
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
