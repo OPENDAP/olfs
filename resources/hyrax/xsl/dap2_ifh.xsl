@@ -37,11 +37,13 @@
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
+    <xsl:variable name="debug" select="false()"/>
 
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
         <xhtml>
             <head>
+                <link rel="stylesheet" href="{$docsService}/css/collapse.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
 
@@ -75,7 +77,7 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">DAP4 Data Access Form</div>
+                            <div class="large">DAP2 Data Access Form</div>
                         </td>
                     </tr>
                 </table>
@@ -107,9 +109,10 @@
                         </xsl:call-template>
 
                         <xsl:call-template name="hrRow"/>
-                        <xsl:call-template name="globalAttributesRow"/>
 
+                        <xsl:call-template name="globalAttributesRow"/>
                         <xsl:call-template name="hrRow"/>
+
                         <xsl:call-template name="VariablesRow"/>
 
                     </table>
@@ -150,6 +153,7 @@
             <xsl:element name="script">
                 <xsl:attribute name="type">text/javascript</xsl:attribute>
                 CollapsibleLists.apply(true);
+                initCollapsibles("<xsl:value-of select="$docsService"/>");
             </xsl:element>
 
         </xhtml>
@@ -240,18 +244,23 @@
         </xsl:call-template>
         <xsl:call-template name="AttributesPresentation"/>
         <div class="tightView">
-            <ul class="collapsibleList">
-                <li>
-                    <div class="small_bold" style="color:#527CC1;">members</div>
-                    <ul>
-                        <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
-                            <xsl:with-param name="parentContainer">
-                                <xsl:call-template name="computeVarName"/>
-                            </xsl:with-param>
-                        </xsl:apply-templates>
-                    </ul>
-                </li>
-            </ul>
+            <button type="button" class="collapsible" onclick="doNothing()">
+                <img style="padding-right: 3px;" alt="click-to-open" src="{$docsService}/images/button-closed.png" />member variables
+            </button>
+            <div class="content">
+                <ul>
+                    <xsl:choose>
+                        <xsl:when test="true()">
+                            <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
+                                <xsl:with-param name="parentContainer">
+                                    <xsl:call-template name="computeVarName"/>
+                                </xsl:with-param>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:otherwise><li>no members shown</li></xsl:otherwise>
+                    </xsl:choose>
+                </ul>
+            </div>
         </div>
     </xsl:template>
 
@@ -641,12 +650,8 @@
     <!--            HR Row                        -->
     <xsl:template name="hrRow">
         <tr>
-            <td>
-                <hr size="1" noshade="noshade" width="80%"/>
-            </td>
-            <td>
-                <hr size="1" noshade="noshade" width="100%"/>
-            </td>
+            <td><hr size="1" noshade="noshade" width="95%"/></td>
+            <td><hr size="1" noshade="noshade" width="100%"/></td>
         </tr>
     </xsl:template>
 
