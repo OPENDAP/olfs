@@ -96,11 +96,6 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <form action="">
-                    <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
-
 
                     <table width="100%" border="0">
                         <xsl:call-template name="dataRequestButtonsRow"/>
@@ -117,24 +112,29 @@
 
                     </table>
 
+                    <!-- ****************************************************** -->
+                    <!--                              FOOTER                    -->
+                    <!--                                                        -->
+                    <!--                                                        -->
+                    <hr size="1" noshade="noshade"/>
+                    <table width="100%" border="0">
+                        <tr>
+                            <td class="small">
+                                <input  type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG = new debug_obj(debug_checkbox);
+                                </script>
+                            </td>
+                            <td>
+                                <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </form>
-                <!-- ****************************************************** -->
-                <!--                              FOOTER                    -->
-                <!--                                                        -->
-                <!--                                                        -->
-                <hr size="1" noshade="noshade"/>
-                <table width="100%" border="0">
-                    <tr>
-                        <td> </td>
-                        <td>
-                            <div class="small" align="right">Hyrax development sponsored by
-                                <a href="http://www.nsf.gov/">NSF</a>,
-                                <a href="http://www.nasa.gov/">NASA</a>, and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
 
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
