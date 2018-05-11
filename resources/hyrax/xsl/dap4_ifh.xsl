@@ -64,7 +64,9 @@
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
+                    DEBUG = new debug_obj();
                 </xsl:element>
+
                 <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>
             </head>
             <body>
@@ -127,7 +129,7 @@
                             <td class="small">
                                 <input  type="checkbox" id="debug_checkbox"/>debug
                                 <script type="text/javascript">
-                                    DEBUG = new debug_obj(debug_checkbox);
+                                    DEBUG.setCheckBox(debug_checkbox);
                                 </script>
                             </td>
                             <td>

@@ -62,7 +62,9 @@
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP2_URL = new dap2_url("<xsl:value-of select="$datasetUrl"/>");
+                    DEBUG = new debug_obj();
                 </xsl:element>
+
                 <title>Interface From Hell <xsl:value-of select="@name"/></title>
             </head>
             <body>
@@ -122,7 +124,7 @@
                             <td class="small">
                                 <input  type="checkbox" id="debug_checkbox"/>debug
                                 <script type="text/javascript">
-                                    DEBUG = new debug_obj(debug_checkbox);
+                                    DEBUG.setCheckBox(debug_checkbox);
                                 </script>
                             </td>
                             <td>
@@ -434,7 +436,7 @@
             <xsl:value-of select="@name"/>
         </span>
         <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP2_URL.update_url()">
-            <option value="==" selected="">==</option>
+            <option value="=" selected="">=</option>
             <option value="!=">!=</option>
             <option value="&lt;">&lt;</option>
             <option value="&lt;=">&lt;=</option>

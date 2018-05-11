@@ -133,10 +133,15 @@ function autoResize(e) {
  * The DEBUG object
  *
  */
-function debug_obj(checkBox) {
-    this.myCheckBox = checkBox;
+function debug_obj() {
     this.enabled = function () {
-        return this.myCheckBox.checked;
+        if(this.myCheckBox)
+            return this.myCheckBox.checked;
+        else
+            return false;
+    }
+    this.setCheckBox = function(checkBox){
+        this.myCheckBox = checkBox;
     }
 }
 
