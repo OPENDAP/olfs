@@ -158,7 +158,7 @@ function dap4_url(base_url) {
      */
     this.update_url = function () {
 
-        if (DEBUG.enabled()) alert("Updating Data Request URL");
+        var msg = "Updated Data Request URL.\nold url: "+this.url+"\n";
 
         this.build_DAP4_constraint();
         var url_text = this.url;
@@ -168,6 +168,9 @@ function dap4_url(base_url) {
             url_text += "?dap4.ce=" + this.constraintExpression;
 
         document.forms[0].url.value = url_text;
+        msg = msg + "new url: "+this.url;
+
+        if (DEBUG.enabled()) alert(msg);
     }
 
 
@@ -604,7 +607,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         var filterExpression = this.get_selection();
 
         if (filterExpression.length > 0) {
-            ce += " | " + filterExpression;
+            ce += "|" + filterExpression;
         }
 
         return ce;

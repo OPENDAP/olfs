@@ -434,7 +434,7 @@
             <xsl:value-of select="@name"/>
         </span>
         <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP2_URL.update_url()">
-            <option value="=" selected="">=</option>
+            <option value="==" selected="">==</option>
             <option value="!=">!=</option>
             <option value="&lt;">&lt;</option>
             <option value="&lt;=">&lt;=</option>
