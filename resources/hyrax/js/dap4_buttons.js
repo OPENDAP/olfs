@@ -222,7 +222,8 @@ function dap4_url(base_url) {
  * selectionOperator: the operator for this selection clause (<, <=, ==, !=, >=, >)
  * selectionValue: the right side value for the clause.
  */
-function SelectionClause(relOpWidget, rValueWidget) {
+function SelectionClause(selectionId, relOpWidget, rValueWidget) {
+    this.selectionId = selectionId;
     this.relOpWidget = relOpWidget;
     this.rValueWidget = rValueWidget;
 
@@ -672,8 +673,8 @@ function dap_var(name, js_var_name, isArray, isContainer) {
      * Adds a selection clause for the variable
      *
      */
-    this.addSelectionClause = function (relOpWidget, rValueWidget) {
-        var sClause = new SelectionClause(relOpWidget, rValueWidget);
+    this.addSelectionClause = function (selectionId, relOpWidget, rValueWidget) {
+        var sClause = new SelectionClause(selectionId, relOpWidget, rValueWidget);
         this.selectionClauses[this.numSelectionClauses] = sClause;
         this.numSelectionClauses++;
     };
@@ -703,6 +704,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         }
         else {
             for (var i = 0; i < this.numSelectionClauses; i++) {
+                var selection = document.getElementById(this.selectionClauses[i].selectionId);
                 var relOp = this.selectionClauses[i].relOp();
                 var rValue = this.selectionClauses[i].rValue();
 
@@ -710,7 +712,19 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                     if (s.length > 0)
                         s += "&";
                     s = this.name + relOp + rValue;
+
+                    selection.style.backgroundColor = "#90BBFF";
+                    selection.style.fontStyle = "bold";
+                    selection.style.border = "solid";
+                    selection.style.borderWidth = "1px";
+
                     if (DEBUG.enabled()) alert(this.name + "Selection Clause:\n" + s);
+                }
+                else {
+                    selection.style.backgroundColor = "white";
+                    selection.style.border = "none";
+
+
                 }
             }
         }

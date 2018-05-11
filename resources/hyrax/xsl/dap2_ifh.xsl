@@ -249,7 +249,7 @@
             <button type="button" class="collapsible" onclick="doNothing()">
                 <img style="padding-right: 3px;" alt="click-to-open" src="{$docsService}/images/button-closed.png" />member variables
             </button>
-            <div class="content">
+            <div class="content" style="border-color: #90BBFF;border-style: none;border-width: 1px;">
                 <ul>
                     <xsl:choose>
                         <xsl:when test="true()">
@@ -431,25 +431,27 @@
             <xsl:value-of select="$myJSVarName"/>_rValueWidget_<xsl:value-of select="$index"/>
         </xsl:variable>
 
+        <xsl:variable name="selectionId" select="concat($myJSVarName,'_selection')" />
 
-        <span class="medium" style="margin-left: 10px;">
+
+        <div class="medium" style="margin-left: 10px;padding: 1px;" id="{$selectionId}">
             <xsl:value-of select="@name"/>
-        </span>
-        <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP2_URL.update_url()">
-            <option value="=" selected="">=</option>
-            <option value="!=">!=</option>
-            <option value="&lt;">&lt;</option>
-            <option value="&lt;=">&lt;=</option>
-            <option value=">">&gt;</option>
-            <option value=">=">&gt;=</option>
-            <option value="-">--</option>
-        </select>
-        <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
-               onChange="DAP2_URL.update_url()"/>
+            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP2_URL.update_url()">
+                <option value="=" selected="">=</option>
+                <option value="!=">!=</option>
+                <option value="&lt;">&lt;</option>
+                <option value="&lt;=">&lt;=</option>
+                <option value=">">&gt;</option>
+                <option value=">=">&gt;=</option>
+                <option value="-">--</option>
+            </select>
+            <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
+                   onChange="DAP2_URL.update_url()"/>
+        </div>
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            <xsl:value-of select="$myJSVarName"/>.addSelectionClause(<xsl:value-of select="$relOpWidget"/>,<xsl:value-of
+            <xsl:value-of select="$myJSVarName"/>.addSelectionClause("<xsl:value-of select="$selectionId"/>", <xsl:value-of select="$relOpWidget"/>,<xsl:value-of
                 select="$rValueWidget"/>);
         </xsl:element>
 
