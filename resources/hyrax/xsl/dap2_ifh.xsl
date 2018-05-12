@@ -49,6 +49,11 @@
 
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    DOCS_SERVICE="<xsl:value-of select="$docsService"/>";
+                </xsl:element>
+
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
                     <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
                     <xsl:value-of select="' '"/>
                 </xsl:element>
@@ -64,6 +69,7 @@
                     DAP2_URL = new dap2_url("<xsl:value-of select="$datasetUrl"/>");
                     DEBUG = new debug_obj();
                 </xsl:element>
+
 
                 <title>Interface From Hell <xsl:value-of select="@name"/></title>
             </head>
@@ -434,7 +440,7 @@
         <xsl:variable name="selectionId" select="concat($myJSVarName,'_selection')" />
 
 
-        <div class="medium" style="margin-left: 10px;padding: 1px;" id="{$selectionId}">
+        <div class="medium" style="margin-left: 10px;padding: 1px;" >
             <xsl:value-of select="@name"/>
             <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP2_URL.update_url()">
                 <option value="=" selected="">=</option>
@@ -447,6 +453,7 @@
             </select>
             <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
                    onChange="DAP2_URL.update_url()"/>
+            <img style="width: 30px;" src="{$docsService}/images/filter-inactive.png" id="{$selectionId}" />
         </div>
 
         <xsl:element name="script">

@@ -690,18 +690,19 @@ function dap_var(name, js_var_name, isArray, isContainer) {
                         s += "&";
                     s = this.name + relOp + rValue;
 
+                    //selection.style.backgroundColor = "#90BBFF";
+                    //selection.style.fontStyle = "bold";
+                    //selection.style.border = "solid";
+                    //selection.style.borderWidth = "1px";
 
-                    selection.style.backgroundColor = "#90BBFF";
-                    selection.style.fontStyle = "bold";
-                    selection.style.border = "solid";
-                    selection.style.borderWidth = "1px";
-
+                    selection.src = DOCS_SERVICE+"/images/filter-active.png";
 
                     if (DEBUG.enabled()) alert(this.name + "Selection Clause:\n" + s);
                 }
                 else {
-                    selection.style.backgroundColor = "white";
-                    selection.style.border = "none";
+                    //selection.style.backgroundColor = "white";
+                    //selection.style.border = "none";
+                    selection.src = DOCS_SERVICE+"/images/filter-inactive.png";
 
                 }
 
