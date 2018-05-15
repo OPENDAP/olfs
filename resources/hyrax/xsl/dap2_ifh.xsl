@@ -107,10 +107,7 @@
 
                     <table width="100%" border="0">
                         <xsl:call-template name="dataRequestButtonsRow"/>
-                        <xsl:call-template name="dataUrlRow">
-                            <xsl:with-param name="datasetUrl" select="$datasetUrl"/>
-                        </xsl:call-template>
-
+                        <xsl:call-template name="dataUrlRow" />
                         <xsl:call-template name="hrRow"/>
 
                         <xsl:call-template name="globalAttributesRow"/>
@@ -622,7 +619,6 @@
     <!-- ######################################## -->
     <!--            Datarequest URL Row           -->
     <xsl:template name="dataUrlRow">
-        <xsl:param name="datasetUrl"/>
         <tr>
             <td align="right">
                 <div class="medium_bold">
