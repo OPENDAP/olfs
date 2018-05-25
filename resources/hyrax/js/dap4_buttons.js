@@ -9,7 +9,7 @@ function csv_button() {
         var csv_url = url_parts[0] + ".dap.csv?";
     }
 
-    window.open(csv_url, "CSV_Data");
+    window.open(encodeURI(csv_url), "CSV_Data");
 }
 
 /* The netcdf_button handler loads the data to the current window. Since it
@@ -27,7 +27,7 @@ function netcdf_button(ext) {
         var binary_url = url_parts[0] + ".dap." + ext + "?";
     }
 
-    window.location = binary_url;
+    window.location = encodeURI(binary_url);
 }
 
 /* The binary_button handler loads the data to the current window. Since it
@@ -45,25 +45,7 @@ function binary_button(ext) {
         var binary_url = url_parts[0] + "." + ext + "?";
     }
 
-    window.location = binary_url;
-}
-
-/* Route the URL to Matlab, IDL, .... Users must add an entry into their mime
-types file (aka list of Netscape helper applications) so that the URL will
-be fedd into Matlab which must, in addition, be running loaddap.
-
-Note that reflection_cgi is a global JavaScript variable set at the
-begining of this `file'.
-
-DEPRECATED */
-
-function program_button() {
-    var program_url = new String(document.forms[0].url.value);
-
-    /* Build a call to the reflector CGI. */
-    var CGI = reflection_cgi + "?" + "url=" + program_url + "&disposition=matlab";
-
-    window.location = CGI;
+    window.location = encodeURI(binary_url);
 }
 
 var help = 0;
