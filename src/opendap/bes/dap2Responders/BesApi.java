@@ -88,6 +88,7 @@ public class BesApi {
     public static final String W10N_CALLBACK  = "w10nCallback";
     public static final String W10N_FLATTEN   = "w10nFlatten";
     public static final String W10N_TRAVERSE   = "w10nTraverse";
+    public static final String SHOW_BES_KEY    = "showBesKey";
 
     public static final String REQUEST_ID      = "reqID";
 
@@ -2605,6 +2606,26 @@ public class BesApi {
 
 
 
+    public  Document getShowBesKeyRequestDocument(String besKey)
+            throws BadConfigurationException {
+
+        Element request = new Element("request", BES_NS);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
+        request.addContent(showBesKeyRequestElement(besKey));
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        log.debug("getShowBesPathInfoRequestDocument() - Document\n {}",xmlo.outputString(request));
+
+        return new Document(request);
+
+    }
+    public Element showBesKeyRequestElement(String besKey) {
+        Element spi = new Element(SHOW_BES_KEY,BES_NS);
+        spi.setAttribute("key", besKey);
+        return spi;
+    }
 
 
 
