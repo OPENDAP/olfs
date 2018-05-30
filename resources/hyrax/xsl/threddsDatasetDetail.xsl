@@ -41,6 +41,7 @@
     <xsl:param name="remoteCatalog" />
     <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteHost" />
+    <xsl:param name="typeMatch" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
@@ -193,6 +194,9 @@
                         </tr>
                     </table>
 
+                    <xsl:if test="$debug">
+                        <span class="small"> typeMatch: <xsl:copy-of select="$typeMatch"/> </span>
+                    </xsl:if>
                     <h1>
                         <div>
                             <xsl:choose>
@@ -211,7 +215,6 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </div>
-
                         <xsl:if test="/thredds:catalog/thredds:service">
                             <div class="small" align="left">
                                 <div class="tightView" style="padding-left: 15px;">
@@ -962,19 +965,34 @@
 
         <xsl:variable name="resourceUrl">
             <xsl:choose>
-
+                <!-- Priority is given to a DAP4 service because it:
+                      - Requires a single request to get the data and the metadata
+                      - The result is compact and easy to range GET
+                -->
                 <xsl:when test="$dap4">
+                    <xsl:if test="$debug">DAP4:</xsl:if>
                     <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap4/@base"/><xsl:value-of select="$urlPath"/>
                 </xsl:when>
 
-                <xsl:when test="$httpServer">
+                <!-- If we can deal with the native data type then we broker that, and we test this by
+                seeing if an HTTP acces is available and if the name matches the BES typeMatch -->
+                <xsl:when test="$httpServer and matches($urlPath,$typeMatch)">
+                    <xsl:if test="$debug">MATCH:</xsl:if>
                     <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/>
                 </xsl:when>
 
+                <!-- Otherwise we'll use DAP2 if we can get it -->
                 <xsl:when test="$dap2">
+                    <xsl:if test="$debug">DAP2:</xsl:if>
                     <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap2/@base"/><xsl:value-of select="$urlPath"/>
                 </xsl:when>
-                <xsl:otherwise/>
+
+                <!-- HTTP services only make sense if we know if the data type can be ingested. -->
+                <!-- xsl:when test="$httpServer">
+                    HTTP: <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/>
+                </xsl:when -->
+
+                <xsl:otherwise>http://google.com/</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <xsl:if test="$debug"><tr> <td class="small">thredds:service() DoBrokerLinks - resourceUrl: <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>

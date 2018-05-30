@@ -44,6 +44,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -231,7 +233,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private void browseRemoteDataset(Request oRequest,
                                      HttpServletResponse response,
-                                     String query) throws IOException, SaxonApiException, BadRequest, BadGateway {
+                                     String query) throws IOException, BadRequest, BadGateway, JDOMException, BadConfigurationException, PPTException, BESError {
 
 
         String http = "http://";
@@ -284,9 +286,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
 
         InputStream catDocIs = null;
+        String typeMatch = _besApi.getBesCombinedTypeMatch();
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //_log.debug("browseRemoteDataset() - BES Combined TypeMatch: {}",typeMatch);
 
         _datasetToHtmlTransformLock.lock();
-
         try {
             try {
                 catDocIs = request.getResponseBodyAsStream();
@@ -299,8 +303,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
                 _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
                 _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
-                _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
+                _datasetToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
+                _datasetToHtmlTransform.setParameter("typeMatch", typeMatch);
 
 
                 // Set up the Http headers.
@@ -337,7 +342,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
-                                     String query) throws OPeNDAPException, IOException, SaxonApiException {
+                                     String query) throws OPeNDAPException, IOException, JDOMException {
 
 
         String http = "http://";
@@ -384,6 +389,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
         InputStream catDocIs = null;
 
+        String typeMatch = _besApi.getBesCombinedTypeMatch();
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //_log.debug("browseRemoteDataset() - BES Combined TypeMatch: {}",typeMatch);
 
         _catalogToHtmlTransformLock.lock();
         try {
@@ -402,6 +410,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
                 _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _catalogToHtmlTransform.setParameter("typeMatch", typeMatch);
 
 
                 // Set up the Http headers.
