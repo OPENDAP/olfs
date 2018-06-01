@@ -196,6 +196,7 @@ public class LocalFileCatalog implements Catalog {
 
     }
 
+    @Override
     public void destroy() {
 
         ReentrantReadWriteLock.WriteLock lock = _catalogLock.writeLock();
@@ -216,6 +217,7 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public boolean usesMemoryCache() {
         return _useMemoryCache;
     }
@@ -308,6 +310,7 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public boolean needsRefresh() {
 
         Lock lock = _catalogLock.readLock();
@@ -331,6 +334,7 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public void writeRawCatalogXML(OutputStream os) throws Exception {
 
         Lock lock = _catalogLock.readLock();
@@ -383,6 +387,7 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+    @Override
     public void writeCatalogXML(OutputStream os) throws Exception {
 
         Lock lock = _catalogLock.readLock();
@@ -455,6 +460,7 @@ public class LocalFileCatalog implements Catalog {
      * @throws JDOMException When things can't be parsed.
      */
     //@todo Consider optimizing this to cache the document after parsing.
+    @Override
     public Document getRawCatalogDocument() throws IOException, JDOMException {
 
         InputStream is = null;
@@ -493,10 +499,11 @@ public class LocalFileCatalog implements Catalog {
      * @throws JDOMException When things can't be parsed.
      */
     //@todo Consider optimizing this to cache the document after parsing.
+    @Override
     public Document getCatalogDocument() throws IOException, JDOMException, SaxonApiException {
 
         InputStream is = null;
-        Document catDoc = null;
+        Document catDoc;
 
         Lock lock = _catalogLock.readLock();
         try {
@@ -548,6 +555,7 @@ public class LocalFileCatalog implements Catalog {
      * @throws SaxonApiException When things can't be parsed.
      */
     //@todo Consider optimizing this to cache the document after parsing.
+    @Override
     public XdmNode getRawCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
         XdmNode catalog;
@@ -594,6 +602,7 @@ public class LocalFileCatalog implements Catalog {
      * @throws SaxonApiException When things can't be parsed.
      */
     //@todo Consider optimizing this to cache the document after parsing.
+    @Override
     public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
         XdmNode catalog;
@@ -647,6 +656,7 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public String getName() {
 
         Lock lock = _catalogLock.readLock();
@@ -660,8 +670,9 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public String getCatalogKey() {
-        
+
         Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
@@ -674,7 +685,8 @@ public class LocalFileCatalog implements Catalog {
         }
 
     }
-    
+
+    @Override
     public String getPathPrefix() {
         Lock lock = _catalogLock.readLock();
         try {
@@ -686,6 +698,7 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+    @Override
     public String getUrlPrefix() {
         Lock lock = _catalogLock.readLock();
         try {
@@ -697,6 +710,7 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+    @Override
     public String getFileName() {
         Lock lock = _catalogLock.readLock();
         try {
@@ -709,6 +723,7 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
+    @Override
     public long getLastModified() {
         Lock lock = _catalogLock.readLock();
         try {
@@ -722,6 +737,7 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+    @Override
     public String getIngestTransformFilename() {
         return _transformOnIngestFilename;
     }
