@@ -804,7 +804,7 @@
             <xsl:otherwise>
                 <xsl:variable name="resourceUrl" ><xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="./@base"/><xsl:value-of select="$urlPath"/></xsl:variable>
 
-                <xsl:if test="$debug"><tr> <td class="small">thredds:service() - - - - - - - - - - - - - - - - resourceUrl: <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>
+                <xsl:if test="$debug"><tr> <td class="small">thredds:service() - - - - - - - - - - - resourceUrl:</td><td> <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>
 
                 <tr>
                     <td align="right">
@@ -1013,7 +1013,8 @@
         <xsl:if test="$debug"> <tr> <td class="small">BrokerLinks() - resourceUrl():</td><td class="small"><xsl:value-of select="$resourceUrl"/> </td> </tr> </xsl:if>
         <xsl:if test="$debug">
             <tr>
-                <td class="small">BrokerLinks() - - - encoded():
+                <td class="small">BrokerLinks() - - - encoded():</td>
+                <td class="small">
                     <xsl:element name="script">
                         <xsl:attribute name="type">text/javascript</xsl:attribute>
                         document.write(convertToHex("<xsl:value-of select="$resourceUrl"/>"));
