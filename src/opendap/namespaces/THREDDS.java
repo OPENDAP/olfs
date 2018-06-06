@@ -53,6 +53,7 @@ public class THREDDS {
     public static final String TYPE = "type";
 
     public static final String ACCESS = "access";
+    public static final String URL_PATH = "urlPath";
     public static final String METADATA = "metadata";
 
     public static final String DATASET = "dataset";
