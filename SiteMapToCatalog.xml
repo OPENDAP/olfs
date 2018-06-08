@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+
+<!-- Build file for OPeNDAP core software -->
+
+<project
+        name="SiteMapToCatalog - Converts 3 column site map to thredds catalog a replicate null data tree."
+        default="all" basedir=".">
+
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tag: Used for doing distribution builds.
+         This property should be set from the command
+         line by the distribution build script using
+         tag information from CVS.
+    -->
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="compile.TARGET" value="1.7"/>
+    <property name="compile.SOURCE" value="1.7"/>
+
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+    <!-- ********************************************* -->
+
+    <!-- Target to create the build directories -->
+    <!-- prior to a compile target. We also mark -->
+    <!-- the start time of the build for the log. -->
+
+    <target name="noop" description="Do Nothing Target">
+        <echo level="info" message="no-op target in ${ant.file}"/>
+    </target>
+
+
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:          ${ant.project.name}"/>
+        <echo level="info" message="Project File:          ${ant.file}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:           ${src.dir}"/>
+        <echo level="info" message="    doc.dir:           ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:           ${lib.dir}"/>
+        <echo level="info" message="    resources.dir:     ${resources.dir}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:         ${build.dir}"/>
+        <echo level="info" message="    build.classes:     ${build.classes}"/>
+        <echo level="info" message="    build.doc:         ${build.docs}"/>
+        <echo level="info" message="    build.resources:   ${build.resources}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Distribution Targets: "/>
+        <echo level="info" message=""/>
+
+    </target>
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+
+
+    <!-- Project directories -->
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
+    <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
+
+    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+
+
+    <!-- Build Directories -->
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.docs" location="${build.dir}/docs"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
+    <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
+    <property name="build.resources" location="${build.dir}/resources"/>
+    <property name="build.webapp" location="${build.dir}/webapp"/>
+
+
+    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
+    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
+
+    <!-- Libraries -->
+    <property name="json.lib" value="gson-2.3.1.jar"/>
+
+
+    <property name="junit.lib" value="junit-4.4.jar"/>
+    <property name="jdom.lib" value="jdom-1.1.1.jar"/>
+    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
+
+
+    <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib" value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/>
+
+    <property name="owlim.lib" value="owlim-lite-4.3.jar"/>
+    <property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/>
+
+    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
+    <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-lang.lib" value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-logging.lib" value="apache-commons-logging-1.1.3.jar"/>
+    <property name="commons-io.lib" value="apache-commons-io-2.4.jar"/>
+
+
+    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
+
+
+    <property name="xalan.lib" value="xalan.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
+    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+
+    <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
+    <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
+
+    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
+
+    <property name="json.lib" value="json-simple-1.1.1.jar"/>
+
+
+    <!-- WCS Libs -->
+    <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib" value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
+    <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
+
+    <property name="owasp-encoder" value="encoder-1.2.1.jar"/>
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar"/>
+
+    <!-- Library (class)paths -->
+    <path id="compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset dir="${lib.dir}">
+            <include name="${servlet-api.lib}"/>
+            <include name="${owasp-encoder}"/>
+            <include name="${owasp-encoder-jsp}"/>
+            <include name="${json.lib}"/>
+            <include name="${jdom.lib}"/>
+            <include name="${junit.lib}"/>
+            <include name="${commons-cli.lib}"/>
+            <include name="${commons-httpclient.lib}"/>
+            <include name="${commons-logging.lib}"/>
+            <include name="${commons-codec.lib}"/>
+            <include name="${commons-lang.lib}"/>
+
+            <include name="${http-components-httpclient.lib}"/>
+            <include name="${http-components-httpcore.lib}"/>
+
+            <include name="${commons-io.lib}"/>
+
+            <include name="${saxon-jdom.lib}"/>
+            <include name="${saxon-s9api.lib}"/>
+            <include name="${saxon.lib}"/>
+
+            <include name="${catalina.lib}"/>
+
+            <include name="${slf4j.lib}"/>
+            <include name="${logback-core.lib}"/>
+            <include name="${logback-classic.lib}"/>
+        </fileset>
+        <fileset dir="${wcs.lib.dir}">
+            <include name="${ogc-wcs.lib}"/>
+            <include name="${ogc-gml.lib}"/>
+            <include name="${ogc-swe.lib}"/>
+            <include name="${ogc-gmlcov.lib}"/>
+            <include name="${ogc-ows.lib}"/>
+            <include name="${ogc-jaxb.lib}"/>
+            <include name="${jaxb-core.lib}"/>
+            <include name="${jaxb-impl.lib}"/>
+            <include name="${xlink.lib}"/>
+        </fileset>
+
+    </path>
+
+
+    <target name="all" depends="clean,compile,smtc"
+            description="Builds lots of stuff."/>
+
+
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.docs}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+    </target>
+
+
+
+    <target name="PreProcessSourceCode"
+            depends="clean,init"
+            description="Moves selected source code from the development tree into
+             the build/src directory. The code text is filtered to update version numbers.">
+
+        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=""/>
+        <copy todir="${build.src}" filtering="true">
+            <fileset dir="${src.dir}">
+                <!-- include all the java files -->
+                <include name="opendap/threddsHandler/SimpleSiteMapCatalogFactory.java"/>
+                <include name="opendap/namespaces/THREDDS.java"/>
+                <include name="opendap/PathBuilder.java"/>
+                <include name="opendap/namespaces/XLINK.java"/>
+            </fileset>
+
+        </copy>
+        <copy todir="${build.resources}" filtering="true">
+            <!-- Copy and filter all of the hyrax resources   -->
+            <fileset dir="${hyraxResources.dir}"/>
+            <!-- get the WCS stuff but don't stomp on Hyrax things -->
+            <fileset dir="${wcs.resources.dir}">
+                <include name="xsl/**"/>
+                <include name="WEB-INF/**"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+                <exclude name="WEB-INF/logback.xml"/>
+            </fileset>
+
+        </copy>
+    </target>
+
+
+    <target
+            name="compile"
+            depends="PreProcessSourceCode"
+            description="Compiles the OLFS."
+    >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="java.home (ant):       ${java.home}"/>
+        <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
+        <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
+        <echo level="info" message=""/>
+
+        <javac compiler="${build.compiler}"
+               target="${compile.TARGET}"
+               source="${compile.SOURCE}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="compile.classpath"/>
+
+            <src path="${build.src}"/>
+
+        </javac>
+
+    </target>
+
+
+    <property name="appName" value="smtc"/>
+
+    <target name="smtcApp"
+            depends="clean,compile"
+            description="Builds executable jar file of the hex encoder">
+
+        <mkdir dir="${build.dist}/${appName}"/>
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${appName}/${commons-cli.lib}"/>
+
+        <jar destfile="${build.dist}/${appName}/${appName}.jar"
+             manifest="resources/${appName}/${appName}.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/threddsHandler/SimpleSiteMapCatalogFactory"/>
+            </fileset>
+        </jar>
+
+        <tar destfile="${build.dist}/${appName}.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}/${appName}"/>
+        </tar>
+
+    </target>
+
+
+    <property name="siteMapFileName"   value="/tmp/siteMap.txt"/>
+    <property name="outputDirName"     value="/tmp/hic_ingest"/>
+    <property name="hyraxServiceBase"  value="/opendap/hyrax/"/>
+
+    <target  name="smtc" depends="compile">
+
+        <java classname="opendap.threddsHandler.SimpleSiteMapCatalogFactory"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+        >
+            <classpath refid="compile.classpath" />
+
+            <arg line="--verbose" />
+            <arg line="--siteMapFileName=${siteMapFileName}" />
+            <arg line="--outputDirName=${outputDirName}" />
+            <arg line="--hyraxServiceBase=${hyraxServiceBase}" />
+        </java>
+
+    </target>
+
+
+</project>
+
+
+
+
+
+
+
+
+
+

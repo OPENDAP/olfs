@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.LinkedHashMap;
+import org.apache.commons.cli.*;
 
 public class SimpleSiteMapCatalogFactory {
 
@@ -22,6 +23,12 @@ public class SimpleSiteMapCatalogFactory {
 
     private String _hyraxServiceBase;
 
+    final static String usage  = SimpleSiteMapCatalogFactory.class.getName()+" -s <siteMapFileName> -b <hyraxServiceBase> <outputDirectory> ";
+
+    private static String siteMapFileName  = "/Users/ndp/OPeNDAP/hyrax/bes/bin/siteMap.txt";
+    private static String hyraxServiceBase = "/opendap/hyrax/";
+    private static String outputDirName = "/tmp/hic-ingest";
+    // private static String services   = "/Users/ndp/OPeNDAP/hyrax/services.xml";
 
 
     SimpleSiteMapCatalogFactory(String siteMapFileName, String hyraxServiceBase) throws IOException {
@@ -318,6 +325,8 @@ public class SimpleSiteMapCatalogFactory {
 
 
 
+    private static Options options =  null;
+
     private void process_line(String line) throws IOException {
 
         String fields[] = line.split("(?=\\s)");
@@ -374,11 +383,69 @@ public class SimpleSiteMapCatalogFactory {
     }
 
 
+    private static CommandLine parseCommandline(String[] args) throws ParseException {
+        CommandLineParser parser = new PosixParser();
+        options = new Options();
+        options.addOption("b", "hyraxServiceBase", true, "The hyrax service base. [default: '/opendap/hyrax/']");
+        options.addOption("o", "outputDirName", true, "The to which to write the catalog. [default: '/tmp/hic_ingest']");
+        options.addOption("s", "siteMapFileName", true, "Name of the file into which to write the site map. [default: 'siteMap.txt']");
+        options.addOption("h", "help", false, "Usage information.");
+        options.addOption("v", "verbose", false, "Verbose mode [Always On].");
+
+        CommandLine line = parser.parse(options, args);
+        if (line.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(usage, options);
+            return null;
+        }
+        return line;
+    }
+
+
+    private  static boolean processCommandline(String[] args) throws Exception {
+
+        CommandLine line = parseCommandline(args);
+
+        if(line==null)
+            return false;
+
+        StringBuilder errorMessage = new StringBuilder();
+        String s;
+
+        // boolean verbose = line.hasOption("verbose");
+
+        s = line.getOptionValue("siteMapFileName");
+        if(s!=null){
+            siteMapFileName = s;
+        }
+
+        s = line.getOptionValue("hyraxServiceBase");
+        if(s!=null){
+            hyraxServiceBase = s;
+        }
+
+        s = line.getOptionValue("outputDirName");
+        if(s!=null){
+            outputDirName = s;
+        }
+
+        if(errorMessage.length()!=0){
+            System.err.println(errorMessage);
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(usage, options);
+            return false;
+        }
+
+
+        return true;
+
+    }
+
+
     public static void main(String args[]) throws Exception {
 
-        String siteMapFileName  = "/Users/ndp/OPeNDAP/hyrax/bes/bin/siteMap.txt";
-        String services         = "/Users/ndp/OPeNDAP/hyrax/services.xml";
-        String hyraxServiceBase = "/opendap/hyrax/";
+
+        processCommandline(args);
 
         SimpleSiteMapCatalogFactory ssmcFactory =  new SimpleSiteMapCatalogFactory(siteMapFileName, hyraxServiceBase);
 
@@ -387,7 +454,7 @@ public class SimpleSiteMapCatalogFactory {
         System.out.println("################################################################################");
         System.out.println(ssmcFactory._rootNode.dump(""));
 
-        ssmcFactory.writeCombined("/tmp/hic-ingest");
+        ssmcFactory.writeCombined(outputDirName);
     }
 
 
