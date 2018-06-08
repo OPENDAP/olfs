@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.LinkedHashMap;
 import org.apache.commons.cli.*;
 
-public class SimpleSiteMapCatalogFactory {
+public class SiteMapToCatalog {
 
     private  Logger _log;
     private String _siteMapFileName;
@@ -23,7 +23,7 @@ public class SimpleSiteMapCatalogFactory {
 
     private String _hyraxServiceBase;
 
-    final static String usage  = SimpleSiteMapCatalogFactory.class.getName()+" -s <siteMapFileName> -b <hyraxServiceBase> <outputDirectory> ";
+    final static String usage  = SiteMapToCatalog.class.getName()+" -s <siteMapFileName> -b <hyraxServiceBase> <outputDirectory> ";
 
     private static String siteMapFileName  = "/Users/ndp/OPeNDAP/hyrax/bes/bin/siteMap.txt";
     private static String hyraxServiceBase = "/opendap/hyrax/";
@@ -31,7 +31,7 @@ public class SimpleSiteMapCatalogFactory {
     // private static String services   = "/Users/ndp/OPeNDAP/hyrax/services.xml";
 
 
-    SimpleSiteMapCatalogFactory(String siteMapFileName, String hyraxServiceBase) throws IOException {
+    public SiteMapToCatalog(String siteMapFileName, String hyraxServiceBase) throws IOException {
         _log = LoggerFactory.getLogger(this.getClass());
         _siteMapFileName = siteMapFileName;
         _siteMapFile = new File(_siteMapFileName);
@@ -44,7 +44,7 @@ public class SimpleSiteMapCatalogFactory {
     }
 
 
-    class SiteMapNode extends SiteMapItem {
+    public class SiteMapNode extends SiteMapItem {
         boolean _isRootNode;
         LinkedHashMap<String, SiteMapItem> _children;
         String _indentIncrement = "  ";
@@ -125,7 +125,7 @@ public class SimpleSiteMapCatalogFactory {
     }
 
 
-    class SiteMapItem {
+    public class SiteMapItem {
         String _name;
         SiteMapNode _parentNode;
 
@@ -447,7 +447,7 @@ public class SimpleSiteMapCatalogFactory {
 
         processCommandline(args);
 
-        SimpleSiteMapCatalogFactory ssmcFactory =  new SimpleSiteMapCatalogFactory(siteMapFileName, hyraxServiceBase);
+        SiteMapToCatalog ssmcFactory =  new SiteMapToCatalog(siteMapFileName, hyraxServiceBase);
 
         ssmcFactory.ingestSiteMap();
 

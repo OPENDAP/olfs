@@ -313,7 +313,7 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="opendap/threddsHandler/SimpleSiteMapCatalogFactory.java"/>
+                <include name="opendap/threddsHandler/SiteMapToCatalog.java"/>
                 <include name="opendap/namespaces/THREDDS.java"/>
                 <include name="opendap/PathBuilder.java"/>
                 <include name="opendap/namespaces/XLINK.java"/>
@@ -396,7 +396,7 @@
 
     <target  name="smtc" depends="compile">
 
-        <java classname="opendap.threddsHandler.SimpleSiteMapCatalogFactory"
+        <java classname="opendap.threddsHandler.SiteMapToCatalog"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
