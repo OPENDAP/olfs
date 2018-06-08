@@ -49,15 +49,18 @@ public class SimpleSiteMapCatalogFactory {
             _children = new LinkedHashMap<>();
         }
 
-        SiteMapNode(String name, SiteMapNode parentNode) {
+        SiteMapNode(SiteMapNode parentNode, String name) {
             super(name,parentNode);
             _isRootNode = false;
             _children = new LinkedHashMap<>();
         }
 
+
+        @Override
         boolean isNode(){ return true;}
 
-        String getNodeName(){
+        @Override
+        String getFullNodeName(){
             StringBuilder sb = new StringBuilder(_name);
             SiteMapNode cNode = _parentNode;
             while(cNode!=null && !cNode._isRootNode){
@@ -68,8 +71,9 @@ public class SimpleSiteMapCatalogFactory {
             return sb.toString();
         }
 
+        @Override
         public String dump(String indent ){
-            StringBuilder sb = new StringBuilder(indent).append(getNodeName()).append("\n");
+            StringBuilder sb = new StringBuilder(indent).append(getFullNodeName()).append("\n");
             for(SiteMapItem cn : _children.values()) {
                 sb.append(cn.dump(indent+ _indentIncrement));
             }
@@ -99,8 +103,8 @@ public class SimpleSiteMapCatalogFactory {
             catalog.addContent(service);
 
             Element topLevelDataset = new Element(THREDDS.DATASET,THREDDS.NS);
-            topLevelDataset.setAttribute("name",getNodeName());
-            topLevelDataset.setAttribute("ID",_hyraxServiceBase+ getNodeName());
+            topLevelDataset.setAttribute("name", getFullNodeName());
+            topLevelDataset.setAttribute("ID",_hyraxServiceBase+ getFullNodeName());
             catalog.addContent(topLevelDataset);
 
             for(SiteMapItem smi : _children.values()) {
@@ -126,7 +130,7 @@ public class SimpleSiteMapCatalogFactory {
             _parentNode = parentNode;
         }
 
-        SiteMapItem(String name, SiteMapNode parentNode, long size, String lastModified){
+        SiteMapItem(SiteMapNode parentNode, String name, long size, String lastModified){
             _name = name;
             _parentNode = parentNode;
             _size = size;
@@ -134,7 +138,7 @@ public class SimpleSiteMapCatalogFactory {
         }
 
         boolean isNode(){ return false;}
-        String getNodeName(){
+        String getFullNodeName(){
             StringBuilder sb = new StringBuilder(_name);
             SiteMapNode cNode = _parentNode;
             while(!cNode._isRootNode){
@@ -145,7 +149,7 @@ public class SimpleSiteMapCatalogFactory {
             return sb.toString();
         }
         String dump(String indent){
-           return indent + getNodeName()+"\n";
+           return indent + getFullNodeName()+"\n";
         }
 
     }
@@ -159,7 +163,7 @@ public class SimpleSiteMapCatalogFactory {
         catalogRef.setAttribute("href",smi._name+"/catalog.xml", XLINK.NS);
         catalogRef.setAttribute("title",smi._name, XLINK.NS);
         catalogRef.setAttribute("type","simple", XLINK.NS);
-        catalogRef.setAttribute("ID",smi.getNodeName());
+        catalogRef.setAttribute("ID",smi.getFullNodeName());
         return catalogRef;
     }
 
@@ -176,7 +180,7 @@ public class SimpleSiteMapCatalogFactory {
     public static Element getDataset(SiteMapItem smi, String hyraxServicePrefix){
         Element dataset = new Element(THREDDS.DATASET,THREDDS.NS);
         dataset.setAttribute("name",smi._name);
-        dataset.setAttribute("ID", PathBuilder.pathConcat(hyraxServicePrefix,smi.getNodeName()));
+        dataset.setAttribute("ID", PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName()));
 
         Element dataSize = new Element(THREDDS.DATASIZE,THREDDS.NS);
         dataSize.setAttribute("units","bytes");
@@ -190,15 +194,13 @@ public class SimpleSiteMapCatalogFactory {
 
         Element access = new Element(THREDDS.ACCESS,THREDDS.NS);
         access.setAttribute(THREDDS.SERVICE_NAME,"dap");
-        access.setAttribute(THREDDS.URL_PATH,smi.getNodeName());
+        access.setAttribute(THREDDS.URL_PATH,smi.getFullNodeName());
         dataset.addContent(access);
 
         access = new Element(THREDDS.ACCESS,THREDDS.NS);
         access.setAttribute(THREDDS.SERVICE_NAME,"file");
-        access.setAttribute(THREDDS.URL_PATH,smi.getNodeName());
+        access.setAttribute(THREDDS.URL_PATH,smi.getFullNodeName());
         dataset.addContent(access);
-
-
 
         return dataset;
     }
@@ -211,7 +213,7 @@ public class SimpleSiteMapCatalogFactory {
         try (BufferedReader br = new BufferedReader(new FileReader(_siteMapFile))) {
             String line;
             while ((line = br.readLine()) != null) {
-                _log.debug("ingestSiteMap() Processing: {}",line);
+                _log.debug("ingestSiteMap() Processing Line: {}",line);
                 // process the line.
                 process_line(line);
             }
@@ -219,55 +221,101 @@ public class SimpleSiteMapCatalogFactory {
 
     }
 
-    public  void writeCatalog(String outputDir) throws IOException {
 
-        // Check to be sure we can write
-        File topDir = new File(outputDir);
+    private File qcTargetDir(String dirName) throws IOException {
+        File dir = new File(dirName);
+        if(dir.exists()) {
 
-        if(topDir.exists()) {
-
-            if (!topDir.canWrite()) {
-                throw new IOException(this.getClass().getName() + ".writeCatalog() ERROR! Unable to write to target Catalog directory `" + outputDir + "'");
+            if (!dir.canWrite()) {
+                throw new IOException(this.getClass().getName() + ".writeCatalogTree() ERROR! Unable to write to target Catalog directory `" + dirName + "'");
             }
         }
         else {
-            if(!topDir.mkdirs()){
-                throw new IOException(this.getClass().getName() + ".writeCatalog() ERROR! Unable to create to target Catalog directory `" + outputDir + "'");
+            if(!dir.mkdirs()){
+                throw new IOException(this.getClass().getName() + ".writeCatalogTree() ERROR! Unable to create to target Catalog directory `" + dirName + "'");
             }
         }
+        return dir;
+    }
+
+    public  void writeCatalogTree(String catalogDirName) throws IOException {
+
+        File catalogDir = qcTargetDir(catalogDirName);
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Element rootCatalog =  _rootNode.getThreddsCatalog();
 
-        File rootCatFile = new File(topDir,"catalog.xml");
-        _log.debug("writeCatalog() Writing root catalog file '{}'",rootCatFile.getAbsolutePath());
+        File rootCatFile = new File(catalogDir,"catalog.xml");
+        _log.debug("writeCatalogTree() Writing root catalog file '{}'",rootCatFile.getAbsolutePath());
         BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(rootCatFile));
         xmlo.output(rootCatalog,os);
-        _log.debug("writeCatalog() Root Catalog: \n{}",xmlo.outputString(rootCatalog));
+        _log.debug("writeCatalogTree() Root Catalog: \n{}",xmlo.outputString(rootCatalog));
 
 
         for(String nodeKey: _catalogNodes.keySet()){
-            //_log.debug("writeCatalog() ################################################################################");
-            _log.debug("writeCatalog() catalog node: {}",nodeKey);
+            //_log.debug("writeCatalogTree() ################################################################################");
+            _log.debug("writeCatalogTree() catalog node: {}",nodeKey);
 
             SiteMapNode smn = _catalogNodes.get(nodeKey);
-            File dir = new File(topDir,nodeKey);
-            _log.debug("writeCatalog() Creating directory '{}'",dir.getAbsolutePath());
+            File dir = new File(catalogDir,nodeKey);
+            _log.debug("writeCatalogTree() Creating directory '{}'",dir.getAbsolutePath());
             dir.mkdirs();
 
             File catalog = new File(dir,"catalog.xml");
-            _log.debug("writeCatalog() Writing catalog file '{}'",catalog.getAbsolutePath());
+            _log.debug("writeCatalogTree() Writing catalog file '{}'",catalog.getAbsolutePath());
 
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(catalog));
             Element threddsCatalog = smn.getThreddsCatalog();
             xmlo.output(threddsCatalog,bos);
 
-            _log.debug("writeCatalog() Catalog: \n{}",xmlo.outputString(threddsCatalog));
+            _log.debug("writeCatalogTree() Catalog: \n{}",xmlo.outputString(threddsCatalog));
         }
 
 
     }
+
+    public  void writeDataTree(String dataDirName) throws IOException {
+        _log.debug("BUILDING NULL DATA TREE");
+        File dataDir = qcTargetDir(dataDirName);
+        writeDataTreeNode(dataDir,_rootNode);
+
+    }
+    public  void writeDataTreeNode(File dataDir, SiteMapNode dataTreeNode) throws IOException {
+
+        _log.debug("Processing node: {}",dataTreeNode.getFullNodeName());
+
+        for(SiteMapItem smi :dataTreeNode._children.values()){
+            if(smi instanceof SiteMapNode){
+                File nodeDir = new File(dataDir,smi._name);
+                nodeDir.mkdirs();
+                writeDataTreeNode(nodeDir, (SiteMapNode)smi);
+            }
+            else {
+                // it's a leaf!
+
+                File dataset = new File(dataDir,smi._name);
+                _log.debug("Processing dataset leaf: {}",dataset);
+                if(!dataset.createNewFile()){
+                    _log.debug("Dataset file {} already exists.",dataset);
+                }
+            }
+        }
+
+    }
+
+
+    public void writeCombined(String outputDirName) throws IOException {
+
+        // Check to be sure we can write
+        String catalogDirName = PathBuilder.pathConcat(outputDirName,"catalog_tree");
+        String dataDirName = PathBuilder.pathConcat(outputDirName,"data_tree");
+
+        writeCatalogTree(catalogDirName);
+        writeDataTree(dataDirName);
+    }
+
+
 
 
     private void process_line(String line) throws IOException {
@@ -290,32 +338,35 @@ public class SimpleSiteMapCatalogFactory {
         String nodes[] = url.split("/");
         int lastNodeIndex= nodes.length - 1;
         int nodeIndex=0;
-        StringBuilder nodeName = new StringBuilder();
+        StringBuilder fullNodeName = new StringBuilder();
         SiteMapNode currentNode = _rootNode;
-        for(String node:nodes){
-            if(nodeName.length()>0)
-                nodeName.append("/");
-            nodeName.append(node);
+        for(String nodeStr:nodes){
+            if(fullNodeName.length()>0)
+                fullNodeName.append("/");
+            fullNodeName.append(nodeStr);
 
-            _log.debug("process_url() Processing node: {} nodeName: {}",node, nodeName);
+            _log.debug("process_url() Processing node: '{}'   nodeName: '{}'",nodeStr, fullNodeName);
             if(nodeIndex!=lastNodeIndex){
-                SiteMapNode cNode = _catalogNodes.get(nodeName);
+                _log.debug("process_url() This is a node. '{}'", fullNodeName);
+                SiteMapNode cNode = _catalogNodes.get(fullNodeName.toString());
                 if(cNode!=null){
                     currentNode = cNode;
                 }
                 else {
-                    SiteMapNode thisNode = new SiteMapNode(node, currentNode);
-                    currentNode._children.put(node,thisNode);
-                    _catalogNodes.put(nodeName.toString(),thisNode);
+                    _log.debug("process_url() Making new node. '{}'",nodeStr, fullNodeName);
+                    SiteMapNode thisNode = new SiteMapNode(currentNode, nodeStr);
+                    currentNode._children.put(nodeStr,thisNode);
+                    _catalogNodes.put(fullNodeName.toString(),thisNode);
                     currentNode = thisNode;
                 }
             }
             else {
-                SiteMapItem dataset = currentNode._children.get(node);
+                _log.debug("process_url() This is last node, is leaf. '{}'",nodeStr, fullNodeName);
+                SiteMapItem dataset = currentNode._children.get(nodeStr);
                 if(dataset==null){
-                    dataset = new SiteMapItem(node,currentNode, size, lastModified);
+                    dataset = new SiteMapItem(currentNode, nodeStr, size, lastModified);
                 }
-                currentNode._children.put(node,dataset);
+                currentNode._children.put(nodeStr,dataset);
             }
             nodeIndex++;
         }
@@ -336,7 +387,7 @@ public class SimpleSiteMapCatalogFactory {
         System.out.println("################################################################################");
         System.out.println(ssmcFactory._rootNode.dump(""));
 
-        ssmcFactory.writeCatalog("/tmp/catalog");
+        ssmcFactory.writeCombined("/tmp/hic-ingest");
     }
 
 
