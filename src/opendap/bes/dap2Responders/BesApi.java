@@ -2585,10 +2585,11 @@ public class BesApi {
                     // A: Because this check is only for things the BES views as data. Regular (non data)
                     //    files are handled by the "FileDispatchHandler"
                     if (!dsi.isDataset()) {
+                        log.debug("getBesDataSourceID() The thing that was requested is not a Dataset.");
                         besDataSourceId = null;
                     }
                 } catch (Exception e) {
-                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
+                    log.debug("getBesDataSourceID() failed with an Exception. Msg: '{}'", e.getMessage());
                 }
 
             }

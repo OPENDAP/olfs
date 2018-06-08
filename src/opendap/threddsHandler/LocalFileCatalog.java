@@ -179,9 +179,9 @@ public class LocalFileCatalog implements Catalog {
         _name = ce.getAttributeValue("name");
 
         if (_name == null) {
-            msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
-            log.error(msg);
-            throw new Exception(msg);
+            msg = "THREDDS WARNING: <catalog> element missing \"name\" attribute.";
+            log.warn(msg);
+            _name = urlPrefix;
         }
 
 
