@@ -259,6 +259,9 @@ public class SiteMapToCatalog {
         if (smNode._parentNode != null) {
             cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\"../index.html\">Parent Dir</a></span></pre>\n");
         }
+        else {
+            cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\".\">Eject</a></span></pre>\n");
+        }
         cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
         cat.append("<pre>\n");
 
