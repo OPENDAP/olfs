@@ -33,7 +33,7 @@ public class SiteMapToCatalog {
 
     private static String indentIncrement  = "  ";
 
-    private static String siteMapFileName  = "/Users/ndp/OPeNDAP/hyrax/bes/bin/siteMap.txt";
+    private static String siteMapFileName  = "/tmp/siteMap.txt";
     private static String hyraxServiceBase = "/opendap/hyrax/";
     private static String gatewayServiceBase = "/opendap/gateway/";
     private static String outputDirName = "/tmp/hic_ingest";
@@ -255,7 +255,9 @@ public class SiteMapToCatalog {
         cat.append("<pre>\n");
 
 
-        cat.append("<table width\"100%\">\n");
+        cat.append("<table>\n");
+        cat.append("<tr><th align=\"center\">Name</th><th align=\"center\">Date</th><th align=\"center\">Size</th><th align=\"center\">Data Access</th></tr>\n");
+
         for(SiteMapItem smi : smNode._children.values()){
             if(smi.isNode()){
                 cat.append(getCatalogLink((SiteMapNode)smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
@@ -266,6 +268,7 @@ public class SiteMapToCatalog {
         }
         cat.append("</table>\n");
         cat.append("</pre>\n");
+        cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
 
         cat.append("<h3>OPeNDAP Hyrax-Protobeast</h3>");
         cat.append("</body>\n");
@@ -279,22 +282,32 @@ public class SiteMapToCatalog {
         catLink.append(indent).append("<tr>\n");
 
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td>").append("<pre>");
-        catLink.append("<a href=\"").append(smNode._name).append("\">").append(smNode._name).append("</a>");
-        catLink.append("</pre></td>\n");
+        catLink.append("<td style=\"font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
+        catLink.append("<a href=\"").append(smNode._name).append("/index.html\">").append(smNode._name).append("</a>");
+        catLink.append("</td>\n");
+
+        catLink.append("<td> </td>\n");
+        catLink.append("<td> </td>\n");
+        catLink.append("<td> </td>\n");
+
+        /*
 
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td>").append("<pre>").append("yyyy-mm-ddThh:mm:ssZ").append("</pre></td>\n");
+        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append("<pre>").append("---").append("</td>\n");
 
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td>").append("<pre>").append("---").append("</pre></td>\n");
+        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append("---").append("</td>\n");
 
+        catLink.append(indent).append("<td style=\"padding-bottom: 15px; padding-left: 10px;\">");
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td><pre>--------- --- --- ---- ----- (---)</pre></td>");
-
+        catLink.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-?)</span>\n");
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td><pre>--------- --- ---</pre></td>");
+        catLink.append("--------- --- --- ---- ----- --- | --------- --- ---");
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("</div>\n");
 
+        catLink.append(indent).append("</td>\n");
+        */
         catLink.append(indent).append("</tr>\n");
 
 
@@ -328,7 +341,8 @@ public class SiteMapToCatalog {
 
         datasetRow.append(myIndent);
 
-        datasetRow.append("<td style=\"padding-left: 10px;\">\n");
+        datasetRow.append("<td style=\"padding-left: 10px; padding-bottom: 15px\">\n");
+
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-1)</span>\n");
         datasetRow.append(getDapLinks(a1DatasetUrl,myIndent+indentIncrement+indentIncrement));
@@ -340,9 +354,12 @@ public class SiteMapToCatalog {
         datasetRow.append(getDapLinks(a2DatasetUrl,myIndent+indentIncrement+indentIncrement));
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("</div>\n");
+
         datasetRow.append(myIndent).append(indentIncrement);
-        datasetRow.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+        // datasetRow.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+
         datasetRow.append(myIndent).append("</td>\n");
+
         datasetRow.append(indent).append("</tr>\n");
 
         return datasetRow.toString();
@@ -436,33 +453,32 @@ public class SiteMapToCatalog {
 
     }
 
-    public  void writeDataTree(String dataDirName, boolean addHtmlCatalog) throws IOException {
+    public  void writeDataTree(String targetDataDirName, boolean addHtmlCatalog) throws IOException {
         _log.debug("BUILDING NULL DATA TREE");
-        File dataDir = qcTargetDir(dataDirName);
-        writeDataTreeNode(dataDir,_rootNode, addHtmlCatalog);
+        File targetDataDir = qcTargetDir(targetDataDirName);
+        writeDataTreeNode(targetDataDir,_rootNode, addHtmlCatalog);
 
     }
-    public  void writeDataTreeNode(File dataDir, SiteMapNode dataTreeNode, boolean addHtmlCatalog) throws IOException {
+    public  void writeDataTreeNode(File targetDir, SiteMapNode dataTreeNode, boolean addHtmlCatalog) throws IOException {
 
         _log.debug("Processing node: {}",dataTreeNode.getFullNodeName());
+        if(addHtmlCatalog){
+            File catalogFile = new File(targetDir,"index.html");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(catalogFile));
+            String catalogContent = getHtmlCatalogFromNode(dataTreeNode,_hyraxServiceBase,_gatewayServiceBase,_s3BucketUrl);
+            bw.write(catalogContent);
+            bw.close();
+        }
 
         for(SiteMapItem smi :dataTreeNode._children.values()){
             if(smi instanceof SiteMapNode){
-                File nodeDir = new File(dataDir,smi._name);
+                File nodeDir = new File(targetDir,smi._name);
                 nodeDir.mkdirs();
                 writeDataTreeNode(nodeDir, (SiteMapNode)smi, addHtmlCatalog);
-                if(addHtmlCatalog){
-                    File catalogFile = new File(nodeDir,"index.html");
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(catalogFile));
-                    String catalogContent = getHtmlCatalogFromNode((SiteMapNode)smi,_hyraxServiceBase,_gatewayServiceBase,_s3BucketUrl);
-                    bw.write(catalogContent);
-                    bw.close();
-                }
             }
             else {
                 // it's a leaf!
-
-                File dataset = new File(dataDir,smi._name);
+                File dataset = new File(targetDir,smi._name);
                 _log.debug("Processing dataset leaf: {}",dataset);
                 if(!dataset.createNewFile()){
                     _log.debug("Dataset file {} already exists.",dataset);
