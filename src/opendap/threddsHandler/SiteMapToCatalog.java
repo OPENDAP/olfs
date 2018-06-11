@@ -256,16 +256,25 @@ public class SiteMapToCatalog {
         cat.append("<body>\n");
         cat.append("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>\n");
         cat.append("<h1>Contents of ").append(smNode.getFullNodeName()).append("</h1>\n");
+        if (smNode._parentNode != null) {
+            cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\"../index.html\">Parent Dir</a></span></pre>\n");
+        }
         cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
         cat.append("<pre>\n");
 
-
+        String hr = "<hr size=\"1\" width=\"95%\" noshade=\"noshade\"/>";
         cat.append("<table>\n");
-        cat.append("<tr><th align=\"center\">Name</th><th align=\"center\">Date</th><th align=\"center\">Size (bytes)</th><th align=\"center\">Data Access</th></tr>\n");
+        cat.append("<tr>\n");
+        cat.append("<th align=\"center\">Name").append(hr).append("</th>\n");
+        cat.append("<th align=\"center\">Date").append(hr).append("</th>\n");
+        cat.append("<th align=\"center\">Size (bytes)").append(hr).append("</th>\n");
+        cat.append("<th align=\"center\">Data Access").append(hr).append("</th>\n");
+        cat.append("</tr>\n");
+
 
         for(SiteMapItem smi : smNode._children.values()){
             if(smi.isNode()){
-                cat.append(getCatalogLink((SiteMapNode)smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
+                cat.append(getCatalogLink((SiteMapNode)smi,indentIncrement));
             }
             else {
                 cat.append(getDatasetHtmlRow(smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
@@ -281,7 +290,7 @@ public class SiteMapToCatalog {
         return cat.toString();
     }
 
-    public static String getCatalogLink(SiteMapNode smNode, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl, String indent){
+    public static String getCatalogLink(SiteMapNode smNode, String indent){
         StringBuilder catLink = new StringBuilder();
 
         catLink.append(indent).append("<tr>\n");
