@@ -295,24 +295,6 @@ public class SiteMapToCatalog {
         catLink.append("<td style=\"text-align: right; padding-bottom: 15px; padding-left: 10px;\">").append(smNode._size).append("</td>\n");
         catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\"> --- </td>\n");
 
-        /*
-
-        catLink.append(indent).append(indentIncrement);
-        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append("<pre>").append("---").append("</td>\n");
-
-        catLink.append(indent).append(indentIncrement);
-        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append("---").append("</td>\n");
-
-        catLink.append(indent).append("<td style=\"padding-bottom: 15px; padding-left: 10px;\">");
-        catLink.append(indent).append(indentIncrement);
-        catLink.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-?)</span>\n");
-        catLink.append(indent).append(indentIncrement);
-        catLink.append("--------- --- --- ---- ----- --- | --------- --- ---");
-        catLink.append(indent).append(indentIncrement);
-        catLink.append("</div>\n");
-
-        catLink.append(indent).append("</td>\n");
-        */
         catLink.append(indent).append("</tr>\n");
 
 
@@ -349,13 +331,13 @@ public class SiteMapToCatalog {
         datasetRow.append("<td style=\"padding-left: 10px; padding-bottom: 15px\">\n");
 
         datasetRow.append(myIndent).append(indentIncrement);
-        datasetRow.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-1)</span>\n");
+        datasetRow.append("<div ><span class=\"small_bold\">(Arch-1)</span>\n");
         datasetRow.append(getDapLinks(a1DatasetUrl,myIndent+indentIncrement+indentIncrement));
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("</div>\n");
 
         datasetRow.append(myIndent).append(indentIncrement);
-        datasetRow.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-2)</span>\n");
+        datasetRow.append("<div ><span class=\"small_bold\">(Arch-2)</span>\n");
         datasetRow.append(getDapLinks(a2DatasetUrl,myIndent+indentIncrement+indentIncrement));
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("</div>\n");
