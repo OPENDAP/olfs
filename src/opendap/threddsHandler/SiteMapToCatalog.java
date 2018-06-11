@@ -1,6 +1,7 @@
 package opendap.threddsHandler;
 
 import opendap.PathBuilder;
+import opendap.gateway.HexAsciiEncoder;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 import org.jdom.Element;
@@ -17,21 +18,30 @@ public class SiteMapToCatalog {
 
     private  Logger _log;
     private String _siteMapFileName;
-    File _siteMapFile;
+    private File _siteMapFile;
+
+
+
     private LinkedHashMap<String, SiteMapNode> _catalogNodes;
     private SiteMapNode _rootNode;
 
     private String _hyraxServiceBase;
+    private String _gatewayServiceBase;
+    private String _s3BucketUrl;
 
     final static String usage  = SiteMapToCatalog.class.getName()+" -s <siteMapFileName> -b <hyraxServiceBase> <outputDirectory> ";
 
+    private static String indentIncrement  = "  ";
+
     private static String siteMapFileName  = "/Users/ndp/OPeNDAP/hyrax/bes/bin/siteMap.txt";
     private static String hyraxServiceBase = "/opendap/hyrax/";
-    private static String outputDirName = "/tmp/hic-ingest";
+    private static String gatewayServiceBase = "/opendap/gateway/";
+    private static String outputDirName = "/tmp/hic_ingest";
+    private static String s3BucketUrl  = "https://s3.amazonaws.com/somewhereovertherainbow/";
     // private static String services   = "/Users/ndp/OPeNDAP/hyrax/services.xml";
 
 
-    public SiteMapToCatalog(String siteMapFileName, String hyraxServiceBase) throws IOException {
+    public SiteMapToCatalog(String siteMapFileName, String hyraxServiceBase, String gatewayServiceBase, String s3BucketUrl) throws IOException {
         _log = LoggerFactory.getLogger(this.getClass());
         _siteMapFileName = siteMapFileName;
         _siteMapFile = new File(_siteMapFileName);
@@ -41,6 +51,8 @@ public class SiteMapToCatalog {
         _hyraxServiceBase = hyraxServiceBase;
         _catalogNodes = new LinkedHashMap<>();
         _rootNode = new SiteMapNode();
+        _gatewayServiceBase = gatewayServiceBase;
+        _s3BucketUrl = s3BucketUrl;
     }
 
 
@@ -109,6 +121,12 @@ public class SiteMapToCatalog {
             service.setAttribute("base",_hyraxServiceBase);
             catalog.addContent(service);
 
+            service = new Element(THREDDS.SERVICE,THREDDS.NS);
+            service.setAttribute("name","arch1");
+            service.setAttribute("type","OPeNDAP");
+            service.setAttribute("base",_gatewayServiceBase);
+            catalog.addContent(service);
+
             Element topLevelDataset = new Element(THREDDS.DATASET,THREDDS.NS);
             topLevelDataset.setAttribute("name", getFullNodeName());
             topLevelDataset.setAttribute("ID",_hyraxServiceBase+ getFullNodeName());
@@ -118,7 +136,7 @@ public class SiteMapToCatalog {
                 if(smi.isNode())
                     topLevelDataset.addContent(getCatalogRef(smi));
                 else
-                    topLevelDataset.addContent(getDataset(smi, _hyraxServiceBase));
+                    topLevelDataset.addContent(getDataset(smi, _hyraxServiceBase, _gatewayServiceBase, _s3BucketUrl));
             }
             return catalog;
         }
@@ -184,7 +202,7 @@ public class SiteMapToCatalog {
      * @param smi
      * @return
      */
-    public static Element getDataset(SiteMapItem smi, String hyraxServicePrefix){
+    public static Element getDataset(SiteMapItem smi, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl){
         Element dataset = new Element(THREDDS.DATASET,THREDDS.NS);
         dataset.setAttribute("name",smi._name);
         dataset.setAttribute("ID", PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName()));
@@ -209,11 +227,147 @@ public class SiteMapToCatalog {
         access.setAttribute(THREDDS.URL_PATH,smi.getFullNodeName());
         dataset.addContent(access);
 
+        access = new Element(THREDDS.ACCESS,THREDDS.NS);
+        access.setAttribute(THREDDS.SERVICE_NAME,"arch1");
+
+        String url = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
+        String gatewayRequestBase = HexAsciiEncoder.stringToHex(url);
+        PathBuilder.pathConcat(gatewayServicePath,gatewayRequestBase);
+        access.setAttribute(THREDDS.URL_PATH,gatewayRequestBase);
+        dataset.addContent(access);
+
         return dataset;
     }
 
 
+    public static String getHtmlCatalogFromNode(SiteMapNode smNode, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl) throws IOException {
 
+        StringBuilder cat = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        cat.append("<html>\n");
+        cat.append("<head>\n");
+        cat.append("<link rel=\"stylesheet\" href=\"/opendap/docs/css/contents.css\" type=\"text/css\"/>\n");
+        cat.append("<title>OPeNDAP Hyrax: Contents of ").append(smNode.getFullNodeName()).append("</title>\n");
+        cat.append("</head>\n");
+        cat.append("<body>\n");
+        cat.append("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>\n");
+        cat.append("<h1>Contents of ").append(smNode.getFullNodeName()).append("</h1>\n");
+        cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+        cat.append("<pre>\n");
+
+
+        cat.append("<table width\"100%\">\n");
+        for(SiteMapItem smi : smNode._children.values()){
+            if(smi.isNode()){
+                cat.append(getCatalogLink((SiteMapNode)smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
+            }
+            else {
+                cat.append(getDatasetHtmlRow(smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
+            }
+        }
+        cat.append("</table>\n");
+        cat.append("</pre>\n");
+
+        cat.append("<h3>OPeNDAP Hyrax-Protobeast</h3>");
+        cat.append("</body>\n");
+        cat.append("</html>\n");
+        return cat.toString();
+    }
+
+    public static String getCatalogLink(SiteMapNode smNode, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl, String indent){
+        StringBuilder catLink = new StringBuilder();
+
+        catLink.append(indent).append("<tr>\n");
+
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("<td>").append("<pre>");
+        catLink.append("<a href=\"").append(smNode._name).append("\">").append(smNode._name).append("</a>");
+        catLink.append("</pre></td>\n");
+
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("<td>").append("<pre>").append("yyyy-mm-ddThh:mm:ssZ").append("</pre></td>\n");
+
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("<td>").append("<pre>").append("---").append("</pre></td>\n");
+
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("<td><pre>--------- --- --- ---- ----- (---)</pre></td>");
+
+        catLink.append(indent).append(indentIncrement);
+        catLink.append("<td><pre>--------- --- ---</pre></td>");
+
+        catLink.append(indent).append("</tr>\n");
+
+
+        return catLink.toString();
+    }
+
+    public static String getDatasetHtmlRow(SiteMapItem smi, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl, String indent) throws IOException {
+
+        if(smi.isNode())
+            throw new IOException("Passed SiteMapItem "+smi.getFullNodeName()+" is a node (a.k.a. a catalog) and not a dataset.");
+
+        StringBuilder datasetRow = new StringBuilder();
+
+        String s3ObjectUrl = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
+        String a1DatasetUrl=PathBuilder.pathConcat(gatewayServicePath,HexAsciiEncoder.stringToHex(s3ObjectUrl));
+        String a2DatasetUrl = PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName());
+
+        datasetRow.append(indent).append("<tr>\n");
+        String myIndent =  indent+indentIncrement;
+
+        datasetRow.append(myIndent);
+        datasetRow.append("<td style=\"padding-bottom: 15px;\">").append(smi._name);
+        //datasetRow.append("<span class='small'>").append("(Arch-1)").append("</span></td>\n");
+
+        datasetRow.append(myIndent);
+        datasetRow.append("<td style=\"padding-bottom: 15px; padding-left: 10px;\">").append(smi._lastModified).append("</td>\n");
+
+        datasetRow.append(indent).append(indentIncrement);
+        datasetRow.append("<td style=\"padding-bottom: 15px;padding-left: 10px;vertical-align: middle;\">").append(smi._size).append("</td>\n");
+
+
+        datasetRow.append(myIndent);
+
+        datasetRow.append("<td style=\"padding-left: 10px;\">\n");
+        datasetRow.append(myIndent).append(indentIncrement);
+        datasetRow.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-1)</span>\n");
+        datasetRow.append(getDapLinks(a1DatasetUrl,myIndent+indentIncrement+indentIncrement));
+        datasetRow.append(myIndent).append(indentIncrement);
+        datasetRow.append("</div>\n");
+
+        datasetRow.append(myIndent).append(indentIncrement);
+        datasetRow.append("<div class=\"medium\"><span class=\"small_bold\">(Arch-2)</span>\n");
+        datasetRow.append(getDapLinks(a2DatasetUrl,myIndent+indentIncrement+indentIncrement));
+        datasetRow.append(myIndent).append(indentIncrement);
+        datasetRow.append("</div>\n");
+        datasetRow.append(myIndent).append(indentIncrement);
+        datasetRow.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+        datasetRow.append(myIndent).append("</td>\n");
+        datasetRow.append(indent).append("</tr>\n");
+
+        return datasetRow.toString();
+
+    }
+
+
+    private static String getDapLinks(String datasetUrl, String indent){
+        StringBuilder links =  new StringBuilder();
+        links.append(indent).append("<span>");
+        links.append("<a href=\"").append(datasetUrl).append(".html\" >dap2_form</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".dds\" >dds</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".das\" >das</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".dods\">dods</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".ascii\">ascii</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".ifh\">ifh</a> |");
+        links.append("</span>\n");
+        links.append(indent).append("<span>");
+        links.append("<a href=\"").append(datasetUrl).append(".dmr.html\">dap4_form</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".dmr.xml\">dmr</a> ");
+        links.append("<a href=\"").append(datasetUrl).append(".dap\">dap</a> ");
+        links.append("</span>\n");
+
+        return links.toString();
+    }
 
 
     public void ingestSiteMap() throws IOException {
@@ -282,13 +436,13 @@ public class SiteMapToCatalog {
 
     }
 
-    public  void writeDataTree(String dataDirName) throws IOException {
+    public  void writeDataTree(String dataDirName, boolean addHtmlCatalog) throws IOException {
         _log.debug("BUILDING NULL DATA TREE");
         File dataDir = qcTargetDir(dataDirName);
-        writeDataTreeNode(dataDir,_rootNode);
+        writeDataTreeNode(dataDir,_rootNode, addHtmlCatalog);
 
     }
-    public  void writeDataTreeNode(File dataDir, SiteMapNode dataTreeNode) throws IOException {
+    public  void writeDataTreeNode(File dataDir, SiteMapNode dataTreeNode, boolean addHtmlCatalog) throws IOException {
 
         _log.debug("Processing node: {}",dataTreeNode.getFullNodeName());
 
@@ -296,7 +450,14 @@ public class SiteMapToCatalog {
             if(smi instanceof SiteMapNode){
                 File nodeDir = new File(dataDir,smi._name);
                 nodeDir.mkdirs();
-                writeDataTreeNode(nodeDir, (SiteMapNode)smi);
+                writeDataTreeNode(nodeDir, (SiteMapNode)smi, addHtmlCatalog);
+                if(addHtmlCatalog){
+                    File catalogFile = new File(nodeDir,"index.html");
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(catalogFile));
+                    String catalogContent = getHtmlCatalogFromNode((SiteMapNode)smi,_hyraxServiceBase,_gatewayServiceBase,_s3BucketUrl);
+                    bw.write(catalogContent);
+                    bw.close();
+                }
             }
             else {
                 // it's a leaf!
@@ -312,14 +473,14 @@ public class SiteMapToCatalog {
     }
 
 
-    public void writeCombined(String outputDirName) throws IOException {
+    public void writeCombined(String outputDirName, boolean addHtmlCatalog) throws IOException {
 
         // Check to be sure we can write
         String catalogDirName = PathBuilder.pathConcat(outputDirName,"catalog_tree");
         String dataDirName = PathBuilder.pathConcat(outputDirName,"data_tree");
 
         writeCatalogTree(catalogDirName);
-        writeDataTree(dataDirName);
+        writeDataTree(dataDirName, addHtmlCatalog);
     }
 
 
@@ -429,6 +590,11 @@ public class SiteMapToCatalog {
             outputDirName = s;
         }
 
+        s = line.getOptionValue("s3BucketUrl");
+        if(s!=null){
+            s3BucketUrl = s;
+        }
+
         if(errorMessage.length()!=0){
             System.err.println(errorMessage);
             HelpFormatter formatter = new HelpFormatter();
@@ -447,14 +613,14 @@ public class SiteMapToCatalog {
 
         processCommandline(args);
 
-        SiteMapToCatalog ssmcFactory =  new SiteMapToCatalog(siteMapFileName, hyraxServiceBase);
+        SiteMapToCatalog ssmcFactory =  new SiteMapToCatalog(siteMapFileName, hyraxServiceBase, gatewayServiceBase, s3BucketUrl);
 
         ssmcFactory.ingestSiteMap();
 
         System.out.println("################################################################################");
         System.out.println(ssmcFactory._rootNode.dump(""));
 
-        ssmcFactory.writeCombined(outputDirName);
+        ssmcFactory.writeCombined(outputDirName, true);
     }
 
 

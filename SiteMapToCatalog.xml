@@ -315,8 +315,11 @@
                 <!-- include all the java files -->
                 <include name="opendap/threddsHandler/SiteMapToCatalog.java"/>
                 <include name="opendap/namespaces/THREDDS.java"/>
-                <include name="opendap/PathBuilder.java"/>
                 <include name="opendap/namespaces/XLINK.java"/>
+                <include name="opendap/PathBuilder.java"/>
+                <include name="opendap/gateway/Encoder.java"/>
+                <include name="opendap/gateway/HexAsciiEncoder.java"/>
+                <include name="opendap/io/HyraxStringEncoding.java"/>
             </fileset>
 
         </copy>
