@@ -255,17 +255,17 @@ public class SiteMapToCatalog {
         cat.append("</head>\n");
         cat.append("<body>\n");
         cat.append("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>\n");
-        cat.append("<h1>Contents of ").append(smNode.getFullNodeName()).append("</h1>\n");
+        cat.append("<h1>\n");
+        cat.append("Contents of ").append(smNode.getFullNodeName()).append("<br/>\n");
+        cat.append("</h1>\n");
         if (smNode._parentNode != null) {
-            cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\"../index.html\">Parent Dir</a></span></pre>\n");
+            cat.append("<span class=\"small_bold\" style=\"font-family:Courier New;text-align: left;\"><a href=\"../index.html\">Parent Dir</a></span>\n");
         }
         else {
-            cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\".\">Eject</a></span></pre>\n");
+            cat.append("<span class=\"small_bold\" style=\"font-family:Courier New; text-align: left;\"><a href=\".\">Eject</a></span>\n");
         }
-        //cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+        String hr = "<hr size=\"1\" width=\"100%\" noshade=\"noshade\"/>";
         cat.append("<pre>\n");
-
-        String hr = "<hr size=\"1\" width=\"95%\" noshade=\"noshade\"/>";
         cat.append("<table>\n");
         cat.append("<tr>\n");
         cat.append("<th align=\"center\">Name").append(hr).append("</th>\n");
@@ -280,7 +280,15 @@ public class SiteMapToCatalog {
                 cat.append(getCatalogLink((SiteMapNode)smi,indentIncrement));
             }
             else {
-                cat.append(getDatasetHtmlRow(smi,hyraxServicePrefix,gatewayServicePath,s3BucketUrl,indentIncrement));
+                String s3ObjectUrl  = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
+                String a1DatasetUrl = PathBuilder.pathConcat(gatewayServicePath,HexAsciiEncoder.stringToHex(s3ObjectUrl));
+                String a2DatasetUrl = PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName());
+                String a0DatasetUrl = a2DatasetUrl.replace("Arch-2","Arch-0");
+
+                if(a2DatasetUrl.equals(a0DatasetUrl))
+                    a0DatasetUrl = null;
+
+                cat.append(getDatasetHtmlRow(smi,a0DatasetUrl, a1DatasetUrl,a2DatasetUrl,s3ObjectUrl,indentIncrement));
             }
         }
         cat.append("</table>\n");
@@ -297,7 +305,6 @@ public class SiteMapToCatalog {
         StringBuilder catLink = new StringBuilder();
 
         catLink.append(indent).append("<tr>\n");
-
         catLink.append(indent).append(indentIncrement);
         catLink.append("<td style=\"text-align: center; font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
         catLink.append("<a href=\"").append(smNode._name).append("/index.html\">").append(smNode._name).append("</a>");
@@ -306,44 +313,41 @@ public class SiteMapToCatalog {
         catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append(smNode._lastModified).append("</td>\n");
         catLink.append("<td style=\"text-align: right; padding-bottom: 15px; padding-left: 10px;\">").append(smNode._size).append("</td>\n");
         catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\"> --- </td>\n");
-
         catLink.append(indent).append("</tr>\n");
-
 
         return catLink.toString();
     }
 
-    public static String getDatasetHtmlRow(SiteMapItem smi, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl, String indent) throws IOException {
+    public static String getDatasetHtmlRow(SiteMapItem smi, String a0DatasetUrl, String a1DatasetUrl, String a2DatasetUrl, String s3ObjectUrl, String indent) throws IOException {
 
         if(smi.isNode())
             throw new IOException("Passed SiteMapItem "+smi.getFullNodeName()+" is a node (a.k.a. a catalog) and not a dataset.");
 
+        String myIndent =  indent+indentIncrement;
         StringBuilder datasetRow = new StringBuilder();
 
-        String s3ObjectUrl = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
-        String a1DatasetUrl=PathBuilder.pathConcat(gatewayServicePath,HexAsciiEncoder.stringToHex(s3ObjectUrl));
-        String a2DatasetUrl = PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName());
-
         datasetRow.append(indent).append("<tr>\n");
-        String myIndent =  indent+indentIncrement;
 
         datasetRow.append(myIndent);
-        datasetRow.append("<td style=\"text-align: center;padding-left: 10px; padding-bottom: 15px;\">").append(smi._name);
-        //datasetRow.append("<span class='small'>").append("(Arch-1)").append("</span></td>\n");
+        datasetRow.append("<td style=\"text-align: left;vertical-align: top; padding-top: 3px; padding-left: 10px; font-weight: bold;\">").append(smi._name);
+        datasetRow.append(myIndent);
+        datasetRow.append("<td style=\"text-align: center;vertical-align: top; padding-top: 3px; padding-left: 10px;\">").append(smi._lastModified).append("</td>\n");
+        datasetRow.append(indent);
+        datasetRow.append("<td style=\"text-align: right;vertical-align: top; padding-top: 3px; padding-left: 10px;\">").append(smi._size).append("</td>\n");
 
         datasetRow.append(myIndent);
-        datasetRow.append("<td style=\"text-align: center;padding-bottom: 15px; padding-left: 10px;\">").append(smi._lastModified).append("</td>\n");
+        datasetRow.append("<td style=\"padding-left: 10px;vertical-align: top; padding-bottom: 5px;\">\n");
 
-        datasetRow.append(indent).append(indentIncrement);
-        datasetRow.append("<td style=\"text-align: right;padding-bottom: 15px;padding-left: 10px;vertical-align: middle;\">").append(smi._size).append("</td>\n");
-
-
-        datasetRow.append(myIndent);
-
-        datasetRow.append("<td style=\"padding-left: 10px; padding-bottom: 15px\">\n");
+        if(a0DatasetUrl!=null) {
+            datasetRow.append(myIndent).append(indentIncrement);
+            datasetRow.append("<div ><span class=\"small_bold\">(Arch-0)</span>\n");
+            datasetRow.append(getDapLinks(a0DatasetUrl, myIndent + indentIncrement + indentIncrement));
+            datasetRow.append(myIndent).append(indentIncrement);
+            datasetRow.append("</div>\n");
+        }
 
         datasetRow.append(myIndent).append(indentIncrement);
-        datasetRow.append("<div ><span class=\"small_bold\">(Arch-1)</span>\n");
+        datasetRow.append("<div ><span class=\"small_bold\">(<a href=\"").append(s3ObjectUrl).append("\">Arch-1</a>)</span>\n");
         datasetRow.append(myIndent).append(indentIncrement).append(indentIncrement);
         datasetRow.append("<!-- S3 URL: ").append(s3ObjectUrl).append(" -->\n");
         datasetRow.append(getDapLinks(a1DatasetUrl,myIndent+indentIncrement+indentIncrement));
