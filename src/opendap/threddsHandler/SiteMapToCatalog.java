@@ -262,7 +262,7 @@ public class SiteMapToCatalog {
         else {
             cat.append("<pre><span class=\"medium_bold\" style=\"text-align: left;\"><a href=\".\">Eject</a></span></pre>\n");
         }
-        cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
+        //cat.append("<hr size=\"1\" noshade=\"noshade\"/>\n");
         cat.append("<pre>\n");
 
         String hr = "<hr size=\"1\" width=\"95%\" noshade=\"noshade\"/>";
@@ -344,6 +344,8 @@ public class SiteMapToCatalog {
 
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("<div ><span class=\"small_bold\">(Arch-1)</span>\n");
+        datasetRow.append(myIndent).append(indentIncrement).append(indentIncrement);
+        datasetRow.append("<!-- S3 URL: ").append(s3ObjectUrl).append(" -->\n");
         datasetRow.append(getDapLinks(a1DatasetUrl,myIndent+indentIncrement+indentIncrement));
         datasetRow.append(myIndent).append(indentIncrement);
         datasetRow.append("</div>\n");
