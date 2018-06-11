@@ -74,6 +74,11 @@ public class SiteMapToCatalog {
             _children = new LinkedHashMap<>();
         }
 
+        SiteMapNode(SiteMapNode parentNode, String name, long size, String lastModified){
+            super(parentNode,name,size,lastModified);
+            _isRootNode = false;
+            _children = new LinkedHashMap<>();
+        }
 
         @Override
         boolean isNode(){ return true;}
@@ -256,7 +261,7 @@ public class SiteMapToCatalog {
 
 
         cat.append("<table>\n");
-        cat.append("<tr><th align=\"center\">Name</th><th align=\"center\">Date</th><th align=\"center\">Size</th><th align=\"center\">Data Access</th></tr>\n");
+        cat.append("<tr><th align=\"center\">Name</th><th align=\"center\">Date</th><th align=\"center\">Size (bytes)</th><th align=\"center\">Data Access</th></tr>\n");
 
         for(SiteMapItem smi : smNode._children.values()){
             if(smi.isNode()){
@@ -282,13 +287,13 @@ public class SiteMapToCatalog {
         catLink.append(indent).append("<tr>\n");
 
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td style=\"font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
+        catLink.append("<td style=\"text-align: center; font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
         catLink.append("<a href=\"").append(smNode._name).append("/index.html\">").append(smNode._name).append("</a>");
         catLink.append("</td>\n");
 
-        catLink.append("<td> </td>\n");
-        catLink.append("<td> </td>\n");
-        catLink.append("<td> </td>\n");
+        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\">").append(smNode._lastModified).append("</td>\n");
+        catLink.append("<td style=\"text-align: right; padding-bottom: 15px; padding-left: 10px;\">").append(smNode._size).append("</td>\n");
+        catLink.append("<td style=\"text-align: center; padding-bottom: 15px; padding-left: 10px;\"> --- </td>\n");
 
         /*
 
@@ -329,14 +334,14 @@ public class SiteMapToCatalog {
         String myIndent =  indent+indentIncrement;
 
         datasetRow.append(myIndent);
-        datasetRow.append("<td style=\"padding-bottom: 15px;\">").append(smi._name);
+        datasetRow.append("<td style=\"text-align: center;padding-left: 10px; padding-bottom: 15px;\">").append(smi._name);
         //datasetRow.append("<span class='small'>").append("(Arch-1)").append("</span></td>\n");
 
         datasetRow.append(myIndent);
-        datasetRow.append("<td style=\"padding-bottom: 15px; padding-left: 10px;\">").append(smi._lastModified).append("</td>\n");
+        datasetRow.append("<td style=\"text-align: center;padding-bottom: 15px; padding-left: 10px;\">").append(smi._lastModified).append("</td>\n");
 
         datasetRow.append(indent).append(indentIncrement);
-        datasetRow.append("<td style=\"padding-bottom: 15px;padding-left: 10px;vertical-align: middle;\">").append(smi._size).append("</td>\n");
+        datasetRow.append("<td style=\"text-align: right;padding-bottom: 15px;padding-left: 10px;vertical-align: middle;\">").append(smi._size).append("</td>\n");
 
 
         datasetRow.append(myIndent);
@@ -540,7 +545,7 @@ public class SiteMapToCatalog {
                 }
                 else {
                     _log.debug("process_url() Making new node. '{}'",nodeStr, fullNodeName);
-                    SiteMapNode thisNode = new SiteMapNode(currentNode, nodeStr);
+                    SiteMapNode thisNode = new SiteMapNode(currentNode, nodeStr, size, lastModified);
                     currentNode._children.put(nodeStr,thisNode);
                     _catalogNodes.put(fullNodeName.toString(),thisNode);
                     currentNode = thisNode;
