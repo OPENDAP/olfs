@@ -313,6 +313,10 @@
                         <meta itemprop="name" content="{../@name}.rdf" />
                         <meta itemprop="encodingFormat" content="application/rdf+xml" />
                         <a itemprop="contentUrl" href="{encode-for-uri(../@name)}.rdf">rdf</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.cjson" />
+                        <meta itemprop="encodingFormat" content="application/json" />
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}.cjson">cov-json</a>&NBSP;</td>
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
                         <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                             <meta itemprop="name" content="{../@name}" />
