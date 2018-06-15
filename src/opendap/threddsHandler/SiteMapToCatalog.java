@@ -187,7 +187,7 @@ public class SiteMapToCatalog {
     /**
      * <thredds:catalogRef name="agg" xlink:href="agg/catalog.xml" xlink:title="agg" xlink:type="simple" ID="/opendap/hyrax/data/ncml/agg/"/>
      */
-    public static Element getCatalogRef(SiteMapItem smi){
+    public Element getCatalogRef(SiteMapItem smi){
         Element catalogRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
         catalogRef.setAttribute("name",smi._name);
         catalogRef.setAttribute("href",smi._name+"/catalog.xml", XLINK.NS);
@@ -207,7 +207,7 @@ public class SiteMapToCatalog {
      * @param smi
      * @return
      */
-    public static Element getDataset(SiteMapItem smi, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl){
+    public Element getDataset(SiteMapItem smi, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl){
         Element dataset = new Element(THREDDS.DATASET,THREDDS.NS);
         dataset.setAttribute("name",smi._name);
         dataset.setAttribute("ID", PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName()));
@@ -245,7 +245,7 @@ public class SiteMapToCatalog {
     }
 
 
-    public static String getHtmlCatalogFromNode(SiteMapNode smNode, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl) throws IOException {
+    public String getHtmlCatalogFromNode(SiteMapNode smNode, String hyraxServicePrefix, String gatewayServicePath, String s3BucketUrl) throws IOException {
 
         StringBuilder cat = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         cat.append("<html>\n");
@@ -277,11 +277,14 @@ public class SiteMapToCatalog {
 
         for(SiteMapItem smi : smNode._children.values()){
             if(smi.isNode()){
+                _log.debug("Adding catalog link for: {}",smi.getFullNodeName());
                 cat.append(getCatalogLink((SiteMapNode)smi,indentIncrement));
             }
             else {
+                _log.debug("Adding dataset row for: {}",smi.getFullNodeName());
                 String s3ObjectUrl  = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
-                String a1DatasetUrl = PathBuilder.pathConcat(gatewayServicePath,HexAsciiEncoder.stringToHex(s3ObjectUrl));
+                String encodedS3Url = HexAsciiEncoder.stringToHex(s3ObjectUrl);
+                String a1DatasetUrl = PathBuilder.pathConcat(gatewayServicePath,encodedS3Url);
                 String a2DatasetUrl = PathBuilder.pathConcat(hyraxServicePrefix,smi.getFullNodeName());
                 String a0DatasetUrl = a2DatasetUrl.replace("Arch-2","Arch-0");
 
@@ -301,12 +304,12 @@ public class SiteMapToCatalog {
         return cat.toString();
     }
 
-    public static String getCatalogLink(SiteMapNode smNode, String indent){
+    public String getCatalogLink(SiteMapNode smNode, String indent){
         StringBuilder catLink = new StringBuilder();
 
         catLink.append(indent).append("<tr>\n");
         catLink.append(indent).append(indentIncrement);
-        catLink.append("<td style=\"text-align: center; font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
+        catLink.append("<td style=\"text-align: left; font-weight: bold; padding-bottom: 15px; padding-left: 10px;\">");
         catLink.append("<a href=\"").append(smNode._name).append("/index.html\">").append(smNode._name).append("</a>");
         catLink.append("</td>\n");
 
@@ -318,7 +321,7 @@ public class SiteMapToCatalog {
         return catLink.toString();
     }
 
-    public static String getDatasetHtmlRow(SiteMapItem smi, String a0DatasetUrl, String a1DatasetUrl, String a2DatasetUrl, String s3ObjectUrl, String indent) throws IOException {
+    public String getDatasetHtmlRow(SiteMapItem smi, String a0DatasetUrl, String a1DatasetUrl, String a2DatasetUrl, String s3ObjectUrl, String indent) throws IOException {
 
         if(smi.isNode())
             throw new IOException("Passed SiteMapItem "+smi.getFullNodeName()+" is a node (a.k.a. a catalog) and not a dataset.");
@@ -372,21 +375,24 @@ public class SiteMapToCatalog {
     }
 
 
-    private static String getDapLinks(String datasetUrl, String indent){
+    private String getDapLinks(String datasetUrl, String indent){
+        String ci = indent+indentIncrement;
         StringBuilder links =  new StringBuilder();
-        links.append(indent).append("<span>");
-        links.append("<a href=\"").append(datasetUrl).append(".html\" >dap2_form</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".dds\" >dds</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".das\" >das</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".dods\">dods</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".ascii\">ascii</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".ifh\">ifh</a> |");
-        links.append("</span>\n");
-        links.append(indent).append("<span>");
-        links.append("<a href=\"").append(datasetUrl).append(".dmr.html\">dap4_form</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".dmr.xml\">dmr</a> ");
-        links.append("<a href=\"").append(datasetUrl).append(".dap\">dap</a> ");
-        links.append("</span>\n");
+        _log.debug("getDapLinks() - Making DAP service links for {}",datasetUrl);
+        links.append(indent).append("<span>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".html\" >dap2_form</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".dds\" >dds</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".das\" >das</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".dods\">dods</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".ascii\">ascii</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".ifh\">ifh</a>\n|\n");
+        links.append(indent).append("</span>\n");
+        links.append(indent).append("<span>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".dmr.html\">dap4_form</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".dmr.xml\">dmr</a>\n");
+        links.append(ci).append("<a href=\"").append(datasetUrl).append(".dap\">dap</a>\n");
+        links.append(indent).append("</span>\n");
+        _log.debug("getDapLinks() - Links: \n{}",links.toString());
 
         return links.toString();
     }
@@ -459,7 +465,7 @@ public class SiteMapToCatalog {
     }
 
     public  void writeDataTree(String targetDataDirName, boolean addHtmlCatalog) throws IOException {
-        _log.debug("BUILDING NULL DATA TREE");
+        _log.debug("writeDataTree() - Building null data tree. Writing to: {}  addHtmlCatalog: {}",targetDataDirName,addHtmlCatalog);
         File targetDataDir = qcTargetDir(targetDataDirName);
         writeDataTreeNode(targetDataDir,_rootNode, addHtmlCatalog);
 
@@ -511,8 +517,8 @@ public class SiteMapToCatalog {
 
     private void process_line(String line) throws IOException {
 
+        // This regex: (?=\s) matches all white space to correctly split the line
         String fields[] = line.split("(?=\\s)");
-
 
         if(fields.length < 3)
             throw new IOException("SiteMap file appears to be corrupt! The current line does not have enough fields. line: "+line);
@@ -531,6 +537,7 @@ public class SiteMapToCatalog {
         int nodeIndex=0;
         StringBuilder fullNodeName = new StringBuilder();
         SiteMapNode currentNode = _rootNode;
+
         for(String nodeStr:nodes){
             if(fullNodeName.length()>0)
                 fullNodeName.append("/");
