@@ -25,7 +25,7 @@ function ascii_button() {
         var ascii_url = url_parts[0] + ".ascii?";
     }
 
-    window.open(ascii_url, "ASCII_Data");
+    window.open(encodeURI(ascii_url), "ASCII_Data");
 }
 
 /* The netcdf_button handler loads the data to the current window. Since it 
@@ -44,7 +44,7 @@ function netcdf_button(ext) {
         var binary_url = url_parts[0] + "." + ext + "?";
     }
 
-    window.location = binary_url;
+    window.location = encodeURI(binary_url);
 }
 
 /* The binary_button handler loads the data to the current window. Since it 
@@ -63,26 +63,10 @@ function binary_button(ext) {
         var binary_url = url_parts[0] + "." + ext + "?";
     }
 
-    window.location = binary_url;
+    window.location = encodeURI(binary_url);
 }
 
-/* Route the URL to Matlab, IDL, .... Users must add an entry into their mime
-   types file (aka list of Netscape helper applications) so that the URL will
-   be fedd into Matlab which must, in addition, be running loaddods.
 
-   Note that reflection_cgi is a global JavaScript variable set at the 
-   begining of this `file'. 
-
-   DEPRECATED */
-
-function program_button() {
-    var program_url = new String(document.forms[0].url.value);
-
-    /* Build a call to the reflector CGI. */
-    var CGI = reflection_cgi + "?" + "url=" + program_url + "&disposition=matlab";
-
-    window.location = CGI;
-}
 
 var help = 0;			// Our friend, the help window.
 
@@ -380,16 +364,12 @@ org_opendap_bears.add_dim(3);
 </script>
 <br>
 <textarea name="bears_attr" rows="5" cols="70">
-bears.act: text string\012\011123
-bears.acs: -40
-bears.acl: 17000
-bears.acf: -2.00000000, 1.00000000, 0.00000000
-bears.acd: -1.000000000000000, 0.7500000000000000
-bears.string_length: 3
-i.attr1: 1
-i.attr2: 1, 2, 3, 4
-i.i_1.attr3_1: 17
-i.i_1.attr3_2: 19, 23, 27
+act: text string\012\011123
+acs: -40
+acl: 17000
+acf: -2.00000000, 1.00000000, 0.00000000
+acd: -1.000000000000000, 0.7500000000000000
+string_length: 3
 </textarea>
 
 
@@ -421,10 +401,6 @@ org_opendap_order.add_dim(3);
 </script>
 <br>
 <textarea name="order_attr" rows="5" cols="70">
-i.attr1: 1
-i.attr2: 1, 2, 3, 4
-i.i_1.attr3_1: 17
-i.i_1.attr3_2: 19, 23, 27
 </textarea>
 
 
@@ -456,10 +432,6 @@ org_opendap_shot.add_dim(3);
 </script>
 <br>
 <textarea name="shot_attr" rows="5" cols="70">
-i.attr1: 1
-i.attr2: 1, 2, 3, 4
-i.i_1.attr3_1: 17
-i.i_1.attr3_2: 19, 23, 27
 </textarea>
 
 
@@ -491,10 +463,6 @@ org_opendap_aloan.add_dim(3);
 </script>
 <br>
 <textarea name="aloan_attr" rows="5" cols="70">
-i.attr1: 1
-i.attr2: 1, 2, 3, 4
-i.i_1.attr3_1: 17
-i.i_1.attr3_2: 19, 23, 27
 </textarea>
 
 
@@ -526,10 +494,6 @@ org_opendap_cross.add_dim(3);
 </script>
 <br>
 <textarea name="cross_attr" rows="5" cols="70">
-i.attr1: 1
-i.attr2: 1, 2, 3, 4
-i.i_1.attr3_1: 17
-i.i_1.attr3_2: 19, 23, 27
 </textarea>
 
 
