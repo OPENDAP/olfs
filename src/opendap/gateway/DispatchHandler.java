@@ -94,38 +94,37 @@ public class DispatchHandler extends BesDapDispatcher {
         boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
         boolean itsJustThePrefix = _prefix.equals(relativeURL);
 
-        if (relativeURL != null) {
 
-            if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash ) {
-                isMyRequest = true;
+        if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash) {
+            isMyRequest = true;
 
-                if (sendResponse) {
-                    log.info("Sending Gateway Response");
+            if (sendResponse) {
+                log.info("Sending Gateway Response");
 
-                    if(itsJustThePrefixWithoutTheSlash){
-                        response.sendRedirect(_prefix);
-                        log.debug("Sent redirect to service prefix: "+_prefix);
-                    }
-                    else if(itsJustThePrefix){
-                        _gatewayForm.respondToHttpGetRequest(request,response);
-                        log.info("Sent Gateway Access Form");
-                    }
-                    else {
-                        if(!super.requestDispatch(request,response, true)){
-                            if( !response.isCommitted()) {
-                                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
-                                log.info("Sent 404 Response.");
-                            }
-                            else {
-                                log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                            }
+                if(itsJustThePrefixWithoutTheSlash ){
+                    response.sendRedirect(_prefix);
+                    log.debug("Sent redirect to service prefix: "+_prefix);
+                }
+                else if(itsJustThePrefix || relativeURL.toLowerCase().endsWith("contents.html")){
+                    _gatewayForm.respondToHttpGetRequest(request,response);
+                    log.info("Sent Gateway Access Form");
+                }
+                else {
+                    if(!super.requestDispatch(request,response, true)){
+                        if( !response.isCommitted()) {
+                            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                            log.info("Sent 404 Response.");
                         }
-                        else
-                            log.info("Sent DAP Gateway Response.");
+                        else {
+                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
+                        }
                     }
+                    else
+                        log.info("Sent DAP Gateway Response.");
                 }
             }
         }
+
         return isMyRequest;
     }
 

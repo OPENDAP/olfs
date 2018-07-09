@@ -25,7 +25,7 @@ function ascii_button() {
         var ascii_url = url_parts[0] + ".ascii?";
     }
 
-    window.open(ascii_url, "ASCII_Data");
+    window.open(encodeURI(ascii_url), "ASCII_Data");
 }
 
 /* The netcdf_button handler loads the data to the current window. Since it 
@@ -44,7 +44,7 @@ function netcdf_button(ext) {
         var binary_url = url_parts[0] + "." + ext + "?";
     }
 
-    window.location = binary_url;
+    window.location = encodeURI(binary_url);
 }
 
 /* The binary_button handler loads the data to the current window. Since it 
@@ -63,26 +63,10 @@ function binary_button(ext) {
         var binary_url = url_parts[0] + "." + ext + "?";
     }
 
-    window.location = binary_url;
+    window.location = encodeURI(binary_url);
 }
 
-/* Route the URL to Matlab, IDL, .... Users must add an entry into their mime
-   types file (aka list of Netscape helper applications) so that the URL will
-   be fedd into Matlab which must, in addition, be running loaddods.
 
-   Note that reflection_cgi is a global JavaScript variable set at the 
-   begining of this `file'. 
-
-   DEPRECATED */
-
-function program_button() {
-    var program_url = new String(document.forms[0].url.value);
-
-    /* Build a call to the reflector CGI. */
-    var CGI = reflection_cgi + "?" + "url=" + program_url + "&disposition=matlab";
-
-    window.location = CGI;
-}
 
 var help = 0;			// Our friend, the help window.
 
@@ -472,19 +456,11 @@ org_opendap_SST.add_dim(180);
 </script>
 <br>
 <textarea name="SST_attr" rows="5" cols="70">
-SST.missing_value: -9.99999979e+33
-SST._FillValue: -9.99999979e+33
-SST.long_name: SEA SURFACE TEMPERATURE
-SST.history: From coads_climatology
-SST.units: Deg C
-TIME.units: hour since 0000-01-01 00:00:00
-TIME.time_origin: 1-JAN-0000 00:00:00
-TIME.modulo:  
-COADSY.units: degrees_north
-COADSY.point_spacing: even
-COADSX.units: degrees_east
-COADSX.modulo:  
-COADSX.point_spacing: even
+missing_value: -9.99999979e+33
+_FillValue: -9.99999979e+33
+long_name: SEA SURFACE TEMPERATURE
+history: From coads_climatology
+units: Deg C
 </textarea>
 
 
@@ -522,19 +498,11 @@ org_opendap_AIRT.add_dim(180);
 </script>
 <br>
 <textarea name="AIRT_attr" rows="5" cols="70">
-AIRT.missing_value: -9.99999979e+33
-AIRT._FillValue: -9.99999979e+33
-AIRT.long_name: AIR TEMPERATURE
-AIRT.history: From coads_climatology
-AIRT.units: DEG C
-TIME.units: hour since 0000-01-01 00:00:00
-TIME.time_origin: 1-JAN-0000 00:00:00
-TIME.modulo:  
-COADSY.units: degrees_north
-COADSY.point_spacing: even
-COADSX.units: degrees_east
-COADSX.modulo:  
-COADSX.point_spacing: even
+missing_value: -9.99999979e+33
+_FillValue: -9.99999979e+33
+long_name: AIR TEMPERATURE
+history: From coads_climatology
+units: DEG C
 </textarea>
 
 
@@ -572,19 +540,11 @@ org_opendap_UWND.add_dim(180);
 </script>
 <br>
 <textarea name="UWND_attr" rows="5" cols="70">
-UWND.missing_value: -9.99999979e+33
-UWND._FillValue: -9.99999979e+33
-UWND.long_name: ZONAL WIND
-UWND.history: From coads_climatology
-UWND.units: M/S
-TIME.units: hour since 0000-01-01 00:00:00
-TIME.time_origin: 1-JAN-0000 00:00:00
-TIME.modulo:  
-COADSY.units: degrees_north
-COADSY.point_spacing: even
-COADSX.units: degrees_east
-COADSX.modulo:  
-COADSX.point_spacing: even
+missing_value: -9.99999979e+33
+_FillValue: -9.99999979e+33
+long_name: ZONAL WIND
+history: From coads_climatology
+units: M/S
 </textarea>
 
 
@@ -622,19 +582,11 @@ org_opendap_VWND.add_dim(180);
 </script>
 <br>
 <textarea name="VWND_attr" rows="5" cols="70">
-VWND.missing_value: -9.99999979e+33
-VWND._FillValue: -9.99999979e+33
-VWND.long_name: MERIDIONAL WIND
-VWND.history: From coads_climatology
-VWND.units: M/S
-TIME.units: hour since 0000-01-01 00:00:00
-TIME.time_origin: 1-JAN-0000 00:00:00
-TIME.modulo:  
-COADSY.units: degrees_north
-COADSY.point_spacing: even
-COADSX.units: degrees_east
-COADSX.modulo:  
-COADSX.point_spacing: even
+missing_value: -9.99999979e+33
+_FillValue: -9.99999979e+33
+long_name: MERIDIONAL WIND
+history: From coads_climatology
+units: M/S
 </textarea>
 
 
