@@ -7,7 +7,7 @@
       "name":  =  "Message",
       "type":  =  "String",
       "attributes":  =  "[]",
-      "data":  =  "libdap exception building response: error_code = 1004: Failed to read data: Constraint expression parse error: No such identifier in dataset: k"
+      "data":  =  "Failed to read data: Constraint expression parse error: No such identifier in dataset: k"
     },
       "name":  =  "HttpStatus",
       "type":  =  "Int32",
