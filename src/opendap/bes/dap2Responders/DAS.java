@@ -110,8 +110,6 @@ public class DAS extends Dap4Responder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-
-
         OutputStream os = response.getOutputStream();
 
         besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os);

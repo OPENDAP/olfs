@@ -32,23 +32,24 @@
 <head>
     <title>OPeNDAP Gateway Service</title>
     <link rel='stylesheet' href='<CONTEXT_PATH /><SERVLET_NAME />/css/contents.css' type='text/css' />
+    <script type="text/javascript" src="<CONTEXT_PATH />/js/StringToHex.js" > </script>
     <script type="text/javascript">
         <!--
-
         // $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
-
         // Event handlers for the disposition button.
-
         // The dap2AsciiData_button handler sends data to a new window. The user can then
         // save the data to a file.
-
         /*
                 <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
                 <input type="button" value="Xml Data" onclick="dap2XmlData_button()"/>
                 <input type="button" value="NetCDF File Out" onclick="dap2NetcdfData_button()"/>
 
         */
-
+        function getDatasetID(){
+            var id =  convertToHex(document.forms[0].url.value);
+            document.forms[0].datasetID.value  = id;
+            return id;
+        }
 
         function ddx_button() {
             datasetID = getDatasetID();
@@ -106,20 +107,11 @@
             window.open(url, "XML Data Response");
         }
 
-        function getDatasetID(){
-            var id =  convertToHex(document.forms[0].url.value);
-            document.forms[0].datasetID.value  = id;
-            return id;
-        }
-
-
         function dap2NetcdfData_button() {
             datasetID = getDatasetID();
             url = datasetID + ".nc";
             window.open(url, "NetCDF File Out Response");
         }
-
-
 
 
         function dap4DataRequestForm_button() {
@@ -170,42 +162,6 @@
             datasetID = getDatasetID();
             url = datasetID + "dap.csv";
             window.open(url, "DAP4 ASCII Data Response");
-        }
-
-
-
-
-
-        function convertToHex(num) {
-            var hex = '';
-            for (i = 0; i < num.length; i++) {
-                if (num.charCodeAt(i).toString(16).toUpperCase().length < 2) {
-                    hex += "0" + num.charCodeAt(i).toString(16).toUpperCase();
-                } else {
-                    hex += num.charCodeAt(i).toString(16).toUpperCase();
-                }
-            }
-            return hex;
-        }
-
-
-        function convertHexToASCII() {
-            if (document.XSS.hexhtml.value != '') {
-                var hexText = document.XSS.hexhtml.value;
-                var testText = hexText.substring(3, hexText.length).split("&#x");
-                var resultString = '';
-                var sub = '';
-                for (i = 0; i < testText.length; i++) {
-                    sub = testText[i].substring(testText[i].length - 3, testText[i].length - 1)
-                    if (sub.length < 2) {
-                        resultString += "%0" + sub;
-                        alert(sub, " - ", resultString);
-                    } else {
-                        resultString += "%" + sub;
-                    }
-                    document.XSS.ascii.value = unescape(resultString);
-                }
-            }
         }
 
 

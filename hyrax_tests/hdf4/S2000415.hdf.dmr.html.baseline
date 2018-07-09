@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-            ~ /////////////////////////////////////////////////////////////////////////////
-            ~ // This file is part of the "Hyrax Data Server" project.
-            ~ //
-            ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
-            ~ // Author: Nathan David Potter <ndp@opendap.org>
-            ~ //
-            ~ // This library is free software; you can redistribute it and/or
-            ~ // modify it under the terms of the GNU Lesser General Public
-            ~ // License as published by the Free Software Foundation; either
-            ~ // version 2.1 of the License, or (at your option) any later version.
-            ~ //
-            ~ // This library is distributed in the hope that it will be useful,
-            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            ~ // Lesser General Public License for more details.
-            ~ //
-            ~ // You should have received a copy of the GNU Lesser General Public
-            ~ // License along with this library; if not, write to the Free Software
-            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-            ~ //
-            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-            ~ /////////////////////////////////////////////////////////////////////////////
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter <ndp@opendap.org>
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
+      <link rel="stylesheet" href="/opendap/docs/css/collapse.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
       <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
       <script type="text/javascript" src="/opendap/js/dap4_buttons.js"> </script>
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz");
+                    DEBUG = new debug_obj();
                 </script>
       <title>DAP4 Data Request Form (beta)S2000415.HDF</title>
    </head>
@@ -51,10 +53,6 @@
       </h1>
       <hr size="1" noshade="noshade"/>
       <form action="">
-         <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
@@ -1189,7 +1187,17 @@
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lat = new dap_var("NSCAT_Rev_20_WVC_Lat", "org_opendap_NSCAT_Rev_20_WVC_Lat", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_WVC_Lat\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Lat\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Lat\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_WVC_Lat = new dap_var("NSCAT_Rev_20_WVC_Lat", "org_opendap_NSCAT_Rev_20_WVC_Lat", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lat);
@@ -1290,7 +1298,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lon = new dap_var("NSCAT_Rev_20_WVC_Lon", "org_opendap_NSCAT_Rev_20_WVC_Lon", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_WVC_Lon\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Lon\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Lon\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_WVC_Lon = new dap_var("NSCAT_Rev_20_WVC_Lon", "org_opendap_NSCAT_Rev_20_WVC_Lon", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lon);
@@ -1391,7 +1409,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Sigma0 = new dap_var("NSCAT_Rev_20_Num_Sigma0", "org_opendap_NSCAT_Rev_20_Num_Sigma0", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Sigma0\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Sigma0\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Sigma0\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Sigma0 = new dap_var("NSCAT_Rev_20_Num_Sigma0", "org_opendap_NSCAT_Rev_20_Num_Sigma0", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Sigma0);
@@ -1492,7 +1520,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_12 = new dap_var("NSCAT_Rev_20_Num_Beam_12", "org_opendap_NSCAT_Rev_20_Num_Beam_12", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Beam_12\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_12\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_12\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Beam_12 = new dap_var("NSCAT_Rev_20_Num_Beam_12", "org_opendap_NSCAT_Rev_20_Num_Beam_12", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_12);
@@ -1593,7 +1631,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Beam_34\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
@@ -1694,7 +1742,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_56 = new dap_var("NSCAT_Rev_20_Num_Beam_56", "org_opendap_NSCAT_Rev_20_Num_Beam_56", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Beam_56\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_56\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_56\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Beam_56 = new dap_var("NSCAT_Rev_20_Num_Beam_56", "org_opendap_NSCAT_Rev_20_Num_Beam_56", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_56);
@@ -1795,7 +1853,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_78 = new dap_var("NSCAT_Rev_20_Num_Beam_78", "org_opendap_NSCAT_Rev_20_Num_Beam_78", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Beam_78\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_78\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_78\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Beam_78 = new dap_var("NSCAT_Rev_20_Num_Beam_78", "org_opendap_NSCAT_Rev_20_Num_Beam_78", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_78);
@@ -1896,7 +1964,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Quality_Flag = new dap_var("NSCAT_Rev_20_WVC_Quality_Flag", "org_opendap_NSCAT_Rev_20_WVC_Quality_Flag", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_WVC_Quality_Flag\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Quality_Flag\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_WVC_Quality_Flag = new dap_var("NSCAT_Rev_20_WVC_Quality_Flag", "org_opendap_NSCAT_Rev_20_WVC_Quality_Flag", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag);
@@ -1990,7 +2068,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Mean_Wind = new dap_var("NSCAT_Rev_20_Mean_Wind", "org_opendap_NSCAT_Rev_20_Mean_Wind", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Mean_Wind\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Mean_Wind\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Mean_Wind\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Mean_Wind = new dap_var("NSCAT_Rev_20_Mean_Wind", "org_opendap_NSCAT_Rev_20_Mean_Wind", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Mean_Wind);
@@ -2091,7 +2179,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Speed = new dap_var("NSCAT_Rev_20_Wind_Speed", "org_opendap_NSCAT_Rev_20_Wind_Speed", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Wind_Speed\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Wind_Speed\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Wind_Speed\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Wind_Speed = new dap_var("NSCAT_Rev_20_Wind_Speed", "org_opendap_NSCAT_Rev_20_Wind_Speed", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Speed);
@@ -2204,7 +2302,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Dir = new dap_var("NSCAT_Rev_20_Wind_Dir", "org_opendap_NSCAT_Rev_20_Wind_Dir", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Wind_Dir\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Wind_Dir\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Wind_Dir\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Wind_Dir = new dap_var("NSCAT_Rev_20_Wind_Dir", "org_opendap_NSCAT_Rev_20_Wind_Dir", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Dir);
@@ -2317,7 +2425,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Speed = new dap_var("NSCAT_Rev_20_Error_Speed", "org_opendap_NSCAT_Rev_20_Error_Speed", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Error_Speed\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Error_Speed\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Error_Speed\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Error_Speed = new dap_var("NSCAT_Rev_20_Error_Speed", "org_opendap_NSCAT_Rev_20_Error_Speed", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Speed);
@@ -2430,7 +2548,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Dir = new dap_var("NSCAT_Rev_20_Error_Dir", "org_opendap_NSCAT_Rev_20_Error_Dir", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Error_Dir\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Error_Dir\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Error_Dir\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Error_Dir = new dap_var("NSCAT_Rev_20_Error_Dir", "org_opendap_NSCAT_Rev_20_Error_Dir", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Dir);
@@ -2543,7 +2671,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_MLE_Likelihood = new dap_var("NSCAT_Rev_20_MLE_Likelihood", "org_opendap_NSCAT_Rev_20_MLE_Likelihood", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_MLE_Likelihood\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_MLE_Likelihood\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_MLE_Likelihood\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_MLE_Likelihood = new dap_var("NSCAT_Rev_20_MLE_Likelihood", "org_opendap_NSCAT_Rev_20_MLE_Likelihood", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_MLE_Likelihood);
@@ -2649,7 +2787,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Ambigs = new dap_var("NSCAT_Rev_20_Num_Ambigs", "org_opendap_NSCAT_Rev_20_Num_Ambigs", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         NSCAT_Rev_20_Num_Ambigs\n" +
+            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Ambigs\n" +
+            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Ambigs\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_NSCAT_Rev_20_Num_Ambigs = new dap_var("NSCAT_Rev_20_Num_Ambigs", "org_opendap_NSCAT_Rev_20_Num_Ambigs", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Ambigs);
@@ -2750,7 +2898,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = new dap_var("vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", "org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
+            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
+            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = new dap_var("vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", "org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin);
@@ -2776,7 +2934,17 @@
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.addDimension(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin_dim_1,820);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
+            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
+            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time);
@@ -2802,7 +2970,17 @@
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.addDimension(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time_dim_1,458);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
+            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
+            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag);
@@ -2830,7 +3008,17 @@
                      <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.addDimension(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag_dim_1,458);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
+            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
+            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag);
@@ -2862,28 +3050,31 @@
                </td>
             </tr>
          </table>
+         <hr size="1" noshade="noshade"/>
+         <table width="100%" border="0">
+            <tr>
+               <td class="small">
+                  <input type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+               </td>
+               <td>
+                  <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                  </div>
+               </td>
+            </tr>
+         </table>
       </form>
-      <hr size="1" noshade="noshade"/>
-      <table width="100%" border="0">
-         <tr>
-            <td/>
-            <td>
-               <div class="small" align="right">Hyrax development sponsored by
-                                <a href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/">NASA
-                                </a>
-                                , and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-               </div>
-            </td>
-         </tr>
-      </table>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-                    <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
    </body>
-   <script>CollapsibleLists.apply(true);</script>
+   <script type="text/javascript">
+                CollapsibleLists.apply(true);
+                initCollapsibles("/opendap/docs");
+            </script>
 </xhtml>
