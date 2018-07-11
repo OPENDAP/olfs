@@ -28,6 +28,7 @@
 package opendap.coreServlet;
 
 
+import opendap.PathBuilder;
 import opendap.dap.Request;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
@@ -436,6 +437,12 @@ public class ReqInfo {
         return cName;
 
 
+    }
+
+    public static String getCollectionUrl(HttpServletRequest req){
+        String collectioName = getCollectionName(req);
+        String serviceUrl = getServiceUrl(req);
+        return PathBuilder.pathConcat(serviceUrl,collectioName);
     }
 
 

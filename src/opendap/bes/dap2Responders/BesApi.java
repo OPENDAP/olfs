@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2682,10 +2683,11 @@ public class BesApi {
                     // A: Because this check is only for things the BES views as data. Regular (non data)
                     //    files are handled by the "FileDispatchHandler"
                     if (!dsi.isDataset()) {
+                        log.debug("getBesDataSourceID() The thing that was requested is not a Dataset.");
                         besDataSourceId = null;
                     }
                 } catch (Exception e) {
-                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
+                    log.debug("getBesDataSourceID() failed with an Exception. Msg: '{}'", e.getMessage());
                 }
 
             }
@@ -2703,9 +2705,54 @@ public class BesApi {
 
 
 
+    public String getBesCombinedTypeMatch() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
+        return getBesCombinedTypeMatchPattern("/");
+    }
 
-    public  Document getShowBesKeyRequestDocument(String besKey)
-            throws BadConfigurationException {
+    public String getBesCombinedTypeMatchPattern(String besPrefix) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
+
+        StringBuilder combinedTypeMatch = new StringBuilder();
+        Element typeMatchKey = showBesKey(besPrefix,"BES.Catalog.catalog.TypeMatch");
+
+        List<Element> values = (List<Element>)typeMatchKey.getChildren("value",BES_NS);
+
+        for(Element value: values){
+
+            String s = value.getTextTrim();
+            log.debug("getBesCombinedTypeMatch() - Processing TypeMatch String: {}",s);
+
+            String regex = s.substring(s.indexOf(":")+1);
+            while(regex.length()>0 && regex.endsWith(";"))
+                regex = regex.substring(0,regex.length()-1);
+
+           // regex =  regex.replaceAll("\\/","\\\\/");
+
+            log.debug("getBesCombinedTypeMatch() - regex: {}",regex);
+
+            if(combinedTypeMatch.length()>0)
+                combinedTypeMatch.append("|");
+            combinedTypeMatch.append(regex);
+
+        }
+        log.debug("getBesCombinedTypeMatch() -  Combined TypeMatch Regex String: {}",combinedTypeMatch.toString());
+        return combinedTypeMatch.toString();
+    }
+
+    public Element showBesKey(String besKey) throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
+        return showBesKey("/",besKey);
+    }
+
+
+    public Element showBesKey(String besPrefix, String besKey) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
+        Document showBesKeyCmd = getShowBesKeyRequestDocument(besKey);
+        Document response = new Document();
+        besTransaction(besPrefix,showBesKeyCmd,response);
+        Element showBesKey = response.getRootElement().getChild("showBesKey",BES_NS);
+        return showBesKey;
+    }
+
+
+    public  Document getShowBesKeyRequestDocument(String besKey) {
 
         Element request = new Element("request", BES_NS);
         request.setAttribute(REQUEST_ID,getRequestIdBase());
