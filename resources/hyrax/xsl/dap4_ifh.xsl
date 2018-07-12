@@ -695,6 +695,8 @@
             <td>
                 <div style="width:100%;margin-left:10px;">
                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
+                    <!-- CoverageJSON needs a DAP4 implementation in the BES -->
+                    <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
