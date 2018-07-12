@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-            ~ /////////////////////////////////////////////////////////////////////////////
-            ~ // This file is part of the "Hyrax Data Server" project.
-            ~ //
-            ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
-            ~ // Author: Nathan David Potter <ndp@opendap.org>
-            ~ //
-            ~ // This library is free software; you can redistribute it and/or
-            ~ // modify it under the terms of the GNU Lesser General Public
-            ~ // License as published by the Free Software Foundation; either
-            ~ // version 2.1 of the License, or (at your option) any later version.
-            ~ //
-            ~ // This library is distributed in the hope that it will be useful,
-            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            ~ // Lesser General Public License for more details.
-            ~ //
-            ~ // You should have received a copy of the GNU Lesser General Public
-            ~ // License along with this library; if not, write to the Free Software
-            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-            ~ //
-            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-            ~ /////////////////////////////////////////////////////////////////////////////
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter <ndp@opendap.org>
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
+      <link rel="stylesheet" href="/opendap/docs/css/collapse.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
       <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
       <script type="text/javascript" src="/opendap/js/dap4_buttons.js"> </script>
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/ff/gsodock.dat");
+                    DEBUG = new debug_obj();
                 </script>
       <title>DAP4 Data Request Form (beta)gsodock.dat</title>
    </head>
@@ -51,10 +53,6 @@
       </h1>
       <hr size="1" noshade="noshade"/>
       <form action="">
-         <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
@@ -173,7 +171,17 @@
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <script type="text/javascript">org_opendap_URI_GSO-Dock = new dap_var("URI_GSO-Dock", "org_opendap_URI_GSO-Dock", false,true);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         URI_GSO-Dock\n" +
+            "myJSVarName:   org_opendap_URI_GSO-Dock\n" +
+            "checkBoxName:  get_org_opendap_URI_GSO-Dock\n" +
+            "isContainer:   true\n" +
+            "isArray:       false\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_URI_GSO-Dock = new dap_var("URI_GSO-Dock", "org_opendap_URI_GSO-Dock", false,true);
 
             
                 DAP4_URL.add_dap_var(org_opendap_URI_GSO-Dock);
@@ -187,28 +195,40 @@
                      </div>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <div class="tightView">
-                        <ul class="collapsibleList">
-                           <li>
-                              <div class="small_bold" style="color:#527CC1;">members</div>
-                              <ul>
-                                 <li>
-                                    <script type="text/javascript">org_opendap_URI_GSO-Dock_Depth = new dap_var("URI_GSO-Dock.Depth", "org_opendap_URI_GSO-Dock_Depth", false,false);
+                        <button type="button" class="collapsible" onclick="doNothing()">
+                           <img style="padding-right: 3px;" alt="click-to-open"
+                                src="/opendap/docs/images/button-closed.png"/>member variables
+            </button>
+                        <div class="content">
+                           <ul>
+                              <li>
+                                 <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         URI_GSO-Dock.Depth\n" +
+            "myJSVarName:   org_opendap_URI_GSO-Dock_Depth\n" +
+            "checkBoxName:  get_org_opendap_URI_GSO-Dock_Depth\n" +
+            "isContainer:   false\n" +
+            "isArray:       false\n" +
+            "(parent) container: org_opendap_URI_GSO-Dock\n"
+            );
+
+            org_opendap_URI_GSO-Dock_Depth = new dap_var("URI_GSO-Dock.Depth", "org_opendap_URI_GSO-Dock_Depth", false,false);
 
             org_opendap_URI_GSO-Dock_Depth.checkBox = "get_org_opendap_URI_GSO-Dock_Depth";
             org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Depth);
                 org_opendap_URI_GSO-Dock_Depth.parentContainer = org_opendap_URI_GSO-Dock;
             </script>
-                                    <div style="color: black;margin-left:-20px;margin-top:10px">
-                                       <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Depth"
-                                              onclick="org_opendap_URI_GSO-Dock_Depth.handle_projection_change(get_org_opendap_URI_GSO-Dock_Depth)"
-                                              onfocus="describe_projection()"/>Depth<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+                                 <div style="color: black;margin-left:-20px;margin-top:10px">
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Depth"
+                                           onclick="org_opendap_URI_GSO-Dock_Depth.handle_projection_change(get_org_opendap_URI_GSO-Dock_Depth)"
+                                           onfocus="describe_projection()"/>Depth<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
-                                    </div>
-                                    <span class="medium" style="margin-left: 10px;">Depth</span>
-                                    <select id="org_opendap_URI_GSO-Dock_Depth_relOpWidget_0"
+                                 </div>
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;"
+                                      id="org_opendap_URI_GSO-Dock_Depth_selection">Depth<select id="org_opendap_URI_GSO-Dock_Depth_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP4_URL.update_url()">
-                                       <option value="=" selected="">=</option>
+                                       <option value="==" selected="">==</option>
                                        <option value="!=">!=</option>
                                        <option value="&lt;">&lt;</option>
                                        <option value="&lt;=">&lt;=</option>
@@ -219,28 +239,41 @@
                                     <input type="text" id="org_opendap_URI_GSO-Dock_Depth_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP4_URL.update_url()"/>
-                                    <script type="text/javascript">org_opendap_URI_GSO-Dock_Depth.addSelectionClause(org_opendap_URI_GSO-Dock_Depth_relOpWidget_0,org_opendap_URI_GSO-Dock_Depth_rValueWidget_0);
+                                 </div>
+                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Depth.addSelectionClause("org_opendap_URI_GSO-Dock_Depth_selection",
+            org_opendap_URI_GSO-Dock_Depth_relOpWidget_0,
+            org_opendap_URI_GSO-Dock_Depth_rValueWidget_0);
         </script>
-                                    <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                                 </li>
-                                 <li>
-                                    <script type="text/javascript">org_opendap_URI_GSO-Dock_Air_Temp = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_URI_GSO-Dock_Air_Temp", false,false);
+                                 <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
+                              </li>
+                              <li>
+                                 <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         URI_GSO-Dock.Air_Temp\n" +
+            "myJSVarName:   org_opendap_URI_GSO-Dock_Air_Temp\n" +
+            "checkBoxName:  get_org_opendap_URI_GSO-Dock_Air_Temp\n" +
+            "isContainer:   false\n" +
+            "isArray:       false\n" +
+            "(parent) container: org_opendap_URI_GSO-Dock\n"
+            );
+
+            org_opendap_URI_GSO-Dock_Air_Temp = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_URI_GSO-Dock_Air_Temp", false,false);
 
             org_opendap_URI_GSO-Dock_Air_Temp.checkBox = "get_org_opendap_URI_GSO-Dock_Air_Temp";
             org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Air_Temp);
                 org_opendap_URI_GSO-Dock_Air_Temp.parentContainer = org_opendap_URI_GSO-Dock;
             </script>
-                                    <div style="color: black;margin-left:-20px;margin-top:10px">
-                                       <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Air_Temp"
-                                              onclick="org_opendap_URI_GSO-Dock_Air_Temp.handle_projection_change(get_org_opendap_URI_GSO-Dock_Air_Temp)"
-                                              onfocus="describe_projection()"/>Air_Temp<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+                                 <div style="color: black;margin-left:-20px;margin-top:10px">
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Air_Temp"
+                                           onclick="org_opendap_URI_GSO-Dock_Air_Temp.handle_projection_change(get_org_opendap_URI_GSO-Dock_Air_Temp)"
+                                           onfocus="describe_projection()"/>Air_Temp<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
-                                    </div>
-                                    <span class="medium" style="margin-left: 10px;">Air_Temp</span>
-                                    <select id="org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0"
+                                 </div>
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;"
+                                      id="org_opendap_URI_GSO-Dock_Air_Temp_selection">Air_Temp<select id="org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP4_URL.update_url()">
-                                       <option value="=" selected="">=</option>
+                                       <option value="==" selected="">==</option>
                                        <option value="!=">!=</option>
                                        <option value="&lt;">&lt;</option>
                                        <option value="&lt;=">&lt;=</option>
@@ -251,40 +284,45 @@
                                     <input type="text" id="org_opendap_URI_GSO-Dock_Air_Temp_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP4_URL.update_url()"/>
-                                    <script type="text/javascript">org_opendap_URI_GSO-Dock_Air_Temp.addSelectionClause(org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0,org_opendap_URI_GSO-Dock_Air_Temp_rValueWidget_0);
+                                 </div>
+                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Air_Temp.addSelectionClause("org_opendap_URI_GSO-Dock_Air_Temp_selection",
+            org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0,
+            org_opendap_URI_GSO-Dock_Air_Temp_rValueWidget_0);
         </script>
-                                    <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                                 </li>
-                              </ul>
-                           </li>
-                        </ul>
+                                 <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
+                              </li>
+                           </ul>
+                        </div>
                      </div>
                   </div>
                </td>
             </tr>
          </table>
+         <hr size="1" noshade="noshade"/>
+         <table width="100%" border="0">
+            <tr>
+               <td class="small">
+                  <input type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+               </td>
+               <td>
+                  <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                  </div>
+               </td>
+            </tr>
+         </table>
       </form>
-      <hr size="1" noshade="noshade"/>
-      <table width="100%" border="0">
-         <tr>
-            <td/>
-            <td>
-               <div class="small" align="right">Hyrax development sponsored by
-                                <a href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/">NASA
-                                </a>
-                                , and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-               </div>
-            </td>
-         </tr>
-      </table>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-                    <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
    </body>
-   <script>CollapsibleLists.apply(true);</script>
+   <script type="text/javascript">
+                CollapsibleLists.apply(true);
+                initCollapsibles("/opendap/docs");
+            </script>
 </xhtml>

@@ -75,6 +75,17 @@ HR {
 .uuid {
     font-size: 9px;color:#2A54B9
 }
+.xsmall_bold {
+    font-size: 8px;
+    font-weight: bold
+}
+.xsmall_italic {
+    font-size: 8px;
+    font-style: italic
+}
+.xsmall {
+    font-size: 8px;
+}
 .small_bold {
     font-size: 10px;
     font-weight: bold

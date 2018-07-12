@@ -1,2 +1,4 @@
-url = http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz.info?NSCAT_Rev_20_Num_Beam_34\[0:10:457\]\[0:4:23\]
+url = http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz.info
+--data-urlencode "NSCAT_Rev_20_Num_Beam_34[0:10:457][0:4:23]"
+-G
 -s

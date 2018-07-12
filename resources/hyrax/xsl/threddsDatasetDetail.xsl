@@ -26,33 +26,41 @@
   -->
 <!DOCTYPE xsl:stylesheet [
 ]>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
                 >
     <xsl:import href="version.xsl"/>
+    <xsl:import href="threddsMetadataDetail.xsl" />
+
     <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
     <xsl:param name="targetDataset" />
     <xsl:param name="remoteCatalog" />
+    <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteHost" />
+    <xsl:param name="typeMatch" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
 
+
+    <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="indentIncrement" select="10"/>
 
 
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
+    <xsl:key name="service-by-type" match="//thredds:service" use="lower-case(@serviceType)"/>
 
 
 
     <xsl:template match="thredds:catalog">
         <html>
+            <xsl:if test="$debug">Target Dataset: <xsl:value-of select="$targetDataset"/><br/></xsl:if>
             <xsl:apply-templates />
         </html>
     </xsl:template>
@@ -61,9 +69,10 @@
         <xsl:param name="inheritedMetadata" />
 
         <xsl:variable name="datasetPositionInDocument">
-            <xsl:value-of select="count(preceding::*)"/>
+            <xsl:value-of select="count(preceding::*) + count(ancestor::*)"/>
         </xsl:variable>
 
+        <xsl:if test="$debug">Processing Dataset: <xsl:value-of select="$datasetPositionInDocument"/><br/></xsl:if>
         <xsl:choose>
 
             <!-- Is this the dataset that we are supposed to summary? -->
@@ -93,7 +102,7 @@
         <xsl:otherwise >
             <xsl:apply-templates>
                 <!--
-                  -   Note that the followiing parameter uses an XPath that
+                  -   Note that the following parameter uses an XPath that
                   -   accumulates inherited thredds:metadata elements as it descends the
                   -   hierarchy.
                   -->
@@ -122,7 +131,16 @@
 
                     <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                     <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
-                    <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script>
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
+                        <xsl:value-of select="' '"/>
+                    </xsl:element>
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/StringToHex.js</xsl:attribute>
+                        <xsl:value-of select="' '"/>
+                    </xsl:element>
 
                     <title>THREDDS Dataset: <xsl:value-of select="@name"/></title>
 
@@ -176,6 +194,9 @@
                         </tr>
                     </table>
 
+                    <xsl:if test="$debug">
+                        <span class="small"> typeMatch: <xsl:copy-of select="$typeMatch"/> </span>
+                    </xsl:if>
                     <h1>
                         <div>
                             <xsl:choose>
@@ -194,10 +215,31 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </div>
-
                         <xsl:if test="/thredds:catalog/thredds:service">
                             <div class="small" align="left">
+                                <div class="tightView" style="padding-left: 15px;">
+                                    <ul class="collapsibleList">
+                                        <li>
+                                            <span class="small_bold" style="color: black;">Catalog Services</span>
+                                            <ul>
 
+                                                <table>
+                                                    <tr>
+                                                        <th class="small"><u>Service Name</u></th>
+                                                        <th class="small"><u>Service Type</u></th>
+                                                        <th class="small"><u>Service Base</u></th>
+                                                    </tr>
+
+                                                    <xsl:apply-templates select="/thredds:catalog/thredds:service" mode="banner">
+                                                        <xsl:with-param name="indent" select="0"/>
+                                                    </xsl:apply-templates>
+                                                </table>
+
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+<!--
                                 <div class="tightView" style="padding-left: 15px;">
                                     <ul class="collapsibleList">
                                         <li>
@@ -220,40 +262,101 @@
                                         </li>
                                     </ul>
                                 </div>
+-->
                             </div>
                         </xsl:if>
 
 
                     </h1>
 
-                    <div>
-                        <span class="small_italic">ID:</span>
-                        <span class="medium_bold">
-                            <xsl:value-of select="@ID"/>
-                        </span>
-                    </div>
+                    <xsl:variable name="sizeTest" select="thredds:dataSize" />
+                    <xsl:variable name="dateTest" select="thredds:date |
+                                    thredds:metadata/thredds:date |
+                                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
 
-                    <div>
-                        <span class="small_italic">name:</span>
-                        <span class="medium_bold">
-                            <xsl:value-of select="@name"/>
-                        </span>
-                    </div>
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="small_italic">ID:</span>
+                            </td>
+                            <td>
+                                <span class="medium_bold" style="padding-left: 5px;">
+                                    <xsl:value-of select="@ID"/>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="small_italic">name:</span>
+                            </td>
+                            <td>
+                                <span class="medium_bold" style="padding-left: 5px;">
+                                    <xsl:value-of select="@name"/>
+                                </span>
+                            </td>
+                        </tr>
+                        <xsl:if test="$sizeTest" >
+                            <tr>
+                                <td class="small_italic">size:</td>
+                                <td class="small_bold" style="padding-left: 5px;">
+                                    <xsl:apply-templates select="$sizeTest" mode="sizeDetail">
+                                        <xsl:with-param name="indent" select="0"/>
+                                    </xsl:apply-templates>
+                                </td>
+                            </tr>
+                        </xsl:if>
 
-                    <div style="padding-bottom: 5px;">
-                        <span class="small_italic">Catalog:</span>
-                        <span class="small_bold">
-                            <SCRIPT LANGUAGE="JavaScript">
-                                <xsl:comment>
-                                    {
-                                    catalog = location.href.split("?");
-                                    document.write(''+catalog[0]);
-                                    }
-                                </xsl:comment>
-                            </SCRIPT>
-                        </span>
 
-                    </div>
+
+
+                        <xsl:if test="$dateTest" >
+                            <tr>
+                                <td class="small_italic">date:</td>
+                                <td class="small_bold" style="padding-left: 5px;">
+                                    <xsl:apply-templates select="$dateTest" mode="dateDetail">
+                                        <xsl:with-param name="indent" select="0"/>
+                                    </xsl:apply-templates>
+                                </td>
+                            </tr>
+                        </xsl:if>
+
+
+                    <tr>
+
+                            <xsl:choose>
+                                <xsl:when test="$remoteCatalog" >
+                                    <td class="small_italic">Remote<br/>Catalog:</td>
+                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;padding-left: 5px;"> </td>
+                                    <xsl:element name="script">
+                                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                        var catalog_link = document.createElement('a');
+                                        var linkText = document.createTextNode("<xsl:value-of select="$remoteCatalog"/>");
+                                        catalog_link.appendChild(linkText);
+                                        catalog_link.title = "<xsl:value-of select="$remoteCatalog"/>";
+                                        catalog_link.href = "<xsl:value-of select="$remoteCatalog"/>";
+                                        catalog_link.class = "small_bold"
+                                        document.getElementById("catalog_linky_poo").appendChild(catalog_link);
+                                    </xsl:element>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <td class="small_italic">Catalog:</td>
+                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;"> </td>
+                                    <xsl:element name="script">
+                                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                        var catalog = location.href.split("?");
+                                        var catalog_link = document.createElement('a');
+                                        var linkText = document.createTextNode(catalog[0]);
+                                        catalog_link.appendChild(linkText);
+                                        catalog_link.title = catalog[0];
+                                        catalog_link.href = catalog[0];
+                                        catalog_link.class = "small_bold"
+                                        document.getElementById("catalog_linky_poo").appendChild(catalog_link);
+                                    </xsl:element>
+
+                                </xsl:otherwise>
+                            </xsl:choose>
+                    </tr>
+                    </table>
 
                     <hr size="1" noshade="noshade"/>
 
@@ -263,19 +366,22 @@
                     <!--                                                        -->
 
 
-
-
-                    <xsl:call-template name="doServiceLinks">
-                        <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
-                    </xsl:call-template>
-
-
-
+                    <xsl:choose>
+                        <xsl:when test="thredds:access | @urlPath">
+                            <xsl:call-template name="doServiceLinks">
+                                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:when test="thredds:dataset">
+                            <xsl:apply-templates />
+                        </xsl:when>
+                        <xsl:when test="thredds:catalogRef ">
+                            <xsl:apply-templates select="thredds:catalogRef" mode="ServiceLinks"/>
+                        </xsl:when>
+                        <xsl:otherwise>No Access, No Child Catalogs.</xsl:otherwise>
+                    </xsl:choose>
 
                     <h2>MetaData Summary:</h2>
-
-
-
 
                     <xsl:variable name="docTest" select="thredds:documentation |
                                         thredds:metadata/thredds:documentation |
@@ -292,19 +398,6 @@
                     </xsl:if>
 
 
-                    <xsl:variable name="dateTest" select="thredds:date |
-                                        thredds:metadata/thredds:date |
-                                        $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
-                    <xsl:if test="$dateTest" >
-                        <p>
-                            <div class="medium_bold">Date: </div>
-                            <span class="small">
-                                <xsl:apply-templates select="$dateTest" mode="dateDetail">
-                                    <xsl:with-param name="indent" select="$indentIncrement"/>
-                                </xsl:apply-templates>
-                            </span>
-                        </p>
-                    </xsl:if>
 
 
                     <xsl:variable name="timeCoverageTest" select="thredds:timeCoverage |
@@ -382,7 +475,7 @@
                     </xsl:if>
 
 
-                    <hr/>
+                    <hr size="1" noshade="noshade"/>
 
 
                     <h2>Metadata Detail: </h2>
@@ -485,10 +578,18 @@
                 <br/>
             </td>
             <xsl:apply-templates  mode="banner" >
-                <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
+                <xsl:with-param name="indent"><xsl:value-of select="$indent+$indentIncrement" /></xsl:with-param>
             </xsl:apply-templates>
-
         </tr>
+
+        <xsl:if test="lower-case(@serviceType)='compound'" >
+            <tr>
+                <td><hr size="1" noshade="noshade" /></td>
+                <td><hr size="1" noshade="noshade" /></td>
+                <td><hr size="1" noshade="noshade" /></td>
+            </tr>
+        </xsl:if>
+
     </xsl:template>
 
 
@@ -510,12 +611,8 @@
       -
       -
      -->
-
-
     <xsl:template name="doServiceLinks">
         <xsl:param name="inheritedMetadata"/>
-
-
 
         <xsl:choose>
             <xsl:when test="
@@ -523,56 +620,108 @@
                 thredds:metadata/thredds:serviceName |
                 @serviceName |
                 $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
-                thredds:access"
-                    >
+                thredds:access/@serviceName"
+            >
                 <h2>Access:</h2>
             </xsl:when>
             <xsl:otherwise>
-                No serviceName or access found for this dataset.
+                No serviceName could be found for this dataset.
             </xsl:otherwise>
         </xsl:choose>
 
+        <hr size="1" noshade="noshade"/>
+
+        <xsl:variable name="serviceName" select="key('service-by-name', thredds:serviceName)" />
+        <xsl:variable name="metadataServiceName" select="key('service-by-name', thredds:metadata/thredds:serviceName)" />
+        <xsl:variable name="attrServceName" select="key('service-by-name', @serviceName)" />
+        <xsl:variable name="inheritedServiceName" select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)" />
+        <xsl:variable name="access" select="key('service-by-name', thredds:access/@serviceName)" />
+        <xsl:variable name="myServices">
+            <xsl:choose>
+                <xsl:when test="$serviceName">
+                    <xsl:apply-templates mode="copy" select="$serviceName"/>
+                </xsl:when>
+
+                <xsl:when test="$metadataServiceName">
+                    <xsl:apply-templates mode="copy" select="$metadataServiceName"/>
+                </xsl:when>
+
+                <xsl:when test="$attrServceName">
+                    <xsl:apply-templates mode="copy" select="$attrServceName"/>
+                </xsl:when>
+
+                <xsl:when test="$inheritedServiceName">
+                    <xsl:apply-templates mode="copy" select="$inheritedServiceName"/>
+                </xsl:when>
+
+                <xsl:when test="$access">
+                    <xsl:apply-templates mode="copy" select="$access"/>
+                </xsl:when>
+
+                <xsl:otherwise>
+                    <tr> <td>No Services Were Found.</td> </tr>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <table>
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</div-->
-            <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks">
-                <xsl:with-param name="urlPath" select="@urlPath"/>
-            </xsl:apply-templates>
+            <xsl:if test="$debug">
+                <tr>
+                    <td class="small" style="align: right;">myServices:</td>
+                    <td class="small" style="align: left;">
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+<xsl:apply-templates select="$myServices" mode="copy" />
 
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:metadata/thredds:serviceName </div-->
-            <xsl:apply-templates select="key('service-by-name', thredds:metadata/thredds:serviceName)"
-                                 mode="ServiceLinks">
-                <xsl:with-param name="urlPath" select="@urlPath"/>
-            </xsl:apply-templates>
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    </td>
+                </tr>
+                <tr>
+                    <td class="small" style="align: right;">@urlPath:</td>
+                    <td class="small" style="align: left;"><xsl:value-of select="@urlPath"/></td>
+                </tr>
+            </xsl:if>
 
+            <xsl:call-template  name="DoBrokerLinks">
+                <xsl:with-param name="currentDataset" select="."/>
+                <xsl:with-param name="services" select="$myServices"/>
+            </xsl:call-template>
 
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - @serviceName</div-->
-            <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks">
-                <xsl:with-param name="urlPath" select="@urlPath"/>
-            </xsl:apply-templates>
+            <tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr>
 
-
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</div-->
-            <xsl:apply-templates
-                    select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)"
-                    mode="ServiceLinks">
-                <xsl:with-param name="urlPath" select="@urlPath"/>
-            </xsl:apply-templates>
-
-
-            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:access/@serviceName</div-->
-
-            <xsl:apply-templates select="thredds:access" mode="ServiceLinks">
+            <xsl:apply-templates select="./thredds:access" mode="AccessLinks">
                 <xsl:with-param name="currentDataset" select="."/>
                 <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
             </xsl:apply-templates>
+
+            <xsl:if test="boolean(@urlPath)">
+                <xsl:apply-templates select="$myServices" mode="ServiceLinks">
+                    <xsl:with-param name="urlPath" select="@urlPath"/>
+                </xsl:apply-templates>
+            </xsl:if>
+
         </table>
-        <hr/>
+        <hr size="1" noshade="noshade" />
+
 
     </xsl:template>
 
 
-    <xsl:template match="thredds:access" mode="ServiceLinks" >
+
+
+    <xsl:template match="@*|node()" mode="copy">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="copy"/>
+        </xsl:copy>
+    </xsl:template>
+
+
+
+
+
+
+
+    <xsl:template match="thredds:access" mode="AccessLinks" >
         <xsl:param name="currentDataset" />
         <xsl:param name="inheritedMetadata" />
 
@@ -623,7 +772,6 @@
             </xsl:when>
             <xsl:otherwise></xsl:otherwise>
         </xsl:choose>
-
     </xsl:template>
 
 
@@ -644,14 +792,19 @@
             <xsl:when test="./@serviceType[.='Compound']">
                 <tr>
                     <td colspan="2">
-                        <div class="small">Compound Services: <xsl:value-of select="./@name" /></div>
+                        <div class="small">Compound Service: <xsl:value-of select="./@name" /></div>
                     </td>
                 </tr>
-
-
+                <!-- tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr -->
+                <xsl:apply-templates mode="ServiceLinks" >
+                    <xsl:with-param name="urlPath" select="$urlPath"/>
+                </xsl:apply-templates>
             </xsl:when>
 
             <xsl:otherwise>
+                <xsl:variable name="resourceUrl" ><xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="./@base"/><xsl:value-of select="$urlPath"/></xsl:variable>
+
+                <xsl:if test="$debug"><tr> <td class="small">thredds:service() - - - - - - - - - - - resourceUrl:</td><td> <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>
 
                 <tr>
                     <td align="right">
@@ -684,21 +837,21 @@
                                 <xsl:when test="matches(./@serviceType, 'opendap', 'i')">
 
                                     <a style="padding-right: 3px" title="Browser accessible form for requesting data."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.html">Data Request Form</a>
+                                       href="{$resourceUrl}.html">Data Request Form</a>
 
                                     <xsl:if test="not($remoteHost)">
                                         <a style="padding-right: 3px"  title="RDF representation of the DDX."
-                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.rdf">rdf</a>
+                                           href="{$resourceUrl}.rdf">rdf</a>
                                     </xsl:if>
 
                                     <a style="padding-right: 3px" title="The DAP DDX document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.ddx">ddx</a>
+                                       href="{$resourceUrl}.ddx">ddx</a>
                                     <a style="padding-right: 3px" title="The DAP DDS document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dds">dds</a>
+                                       href="{$resourceUrl}.dds">dds</a>
                                     <a style="padding-right: 3px" title="The DAP DAS document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.das">das</a>
+                                       href="{$resourceUrl}.das">das</a>
                                     <a style="padding-right: 3px" title="Browser accessible informational page regarding this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.info">info</a>
+                                       href="{$resourceUrl}.info">info</a>
                                 </xsl:when>
 
                                 <!--
@@ -709,20 +862,17 @@
                                 <xsl:when test="matches(./@serviceType, 'dap4', 'i')">
 
                                     <a style="padding-right: 3px" title="Browser accessible form for requesting data."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.html">Data Request Form</a>
+                                       href="{$resourceUrl}.dmr.html">Data Request Form</a>
 
                                     <a style="padding-right: 3px" title="The DAP DMR document for this dataset."
-                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.xml">dmr</a>
+                                       href="{$resourceUrl}.dmr.xml">dmr</a>
 
                                     <xsl:if test="not($remoteHost)">
                                         <a style="padding-right: 3px" title="RDF representation of the DMR."
-                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dmr.rdf">rdf</a>
+                                           href="{$resourceUrl}.dmr.rdf">rdf</a>
                                     </xsl:if>
 
                                 </xsl:when>
-
-
-
 
                                 <!--
 
@@ -732,7 +882,7 @@
                                 <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i') or matches(./@serviceType, 'File', 'i')">
                                     <a
                                             title="This link provides file download access via HTTP."
-                                            href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >File Download</a>
+                                            href="{$resourceUrl}" >File Download</a>
                                 </xsl:when>
 
 
@@ -779,656 +929,412 @@
 
                     </td>
                 </tr>
+                <!-- tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr  -->
 
             </xsl:otherwise>
         </xsl:choose>
 
     </xsl:template>
 
+    <!-- ******************************************************
+     -  getBrokerUrl
+     -
+     - This template produces Broker Access link for
+     - the thredds dataset.
+     -
+     -
+     -
+     -
+    -->
+    <xsl:template name="DoBrokerLinks">
+        <xsl:param name="currentDataset" />
+        <xsl:param name="services" />
 
+        <xsl:variable name="dap4" select="$services/descendant-or-self::thredds:service[lower-case(@serviceType)='dap4']" />
+        <xsl:variable name="dap2" select="$services/descendant-or-self::thredds:service[lower-case(@serviceType)='opendap']" />
+        <xsl:variable name="httpServer" select="$services/descendant-or-self::thredds:service[lower-case(@serviceType)='httpserver']" />
+
+        <xsl:variable name="urlPath">
+            <xsl:choose>
+                <xsl:when test="$currentDataset/@urlPath"><xsl:value-of select="$currentDataset/@urlPath"/></xsl:when>
+                <xsl:when test="./thredds:access/@urlPath"><xsl:value-of select="./thredds:access[1]/@urlPath"/></xsl:when>
+                <xsl:otherwise/>
+            </xsl:choose>
+        </xsl:variable>
+
+
+        <xsl:variable name="resourceUrl">
+            <xsl:choose>
+                <!-- Priority is given to a DAP4 service because it:
+                      - Requires a single request to get the data and the metadata
+                      - The result is compact and easy to range GET
+                -->
+                <xsl:when test="$dap4">
+                    <xsl:if test="$debug">DAP4:</xsl:if>
+                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap4/@base"/><xsl:value-of select="$urlPath"/>
+                </xsl:when>
+
+                <!-- If we can deal with the native data type then we broker that, and we test this by
+                seeing if an HTTP acces is available and if the name matches the BES typeMatch -->
+                <xsl:when test="$httpServer and matches($urlPath,$typeMatch)">
+                    <xsl:if test="$debug">MATCH:</xsl:if>
+                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/>
+                </xsl:when>
+
+                <!-- Otherwise we'll use DAP2 if we can get it -->
+                <xsl:when test="$dap2">
+                    <xsl:if test="$debug">DAP2:</xsl:if>
+                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap2/@base"/><xsl:value-of select="$urlPath"/>
+                </xsl:when>
+
+                <!-- HTTP services only make sense if we know if the data type can be ingested. -->
+                <!-- xsl:when test="$httpServer">
+                    HTTP: <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/>
+                </xsl:when -->
+
+                <xsl:otherwise>http://google.com/</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$debug"><tr> <td class="small">thredds:service() DoBrokerLinks - resourceUrl: <xsl:value-of select="$resourceUrl"/></td> </tr></xsl:if>
+
+        <xsl:call-template name="BrokerLinks">
+            <xsl:with-param name="resourceUrl" select="$resourceUrl" />
+        </xsl:call-template>
+
+    </xsl:template>
+
+
+
+    <xsl:template name="BrokerLinks">
+        <xsl:param name="resourceUrl"/>
+
+
+        <xsl:if test="$debug"> <tr> <td class="small">BrokerLinks() - - - BEGIN</td> </tr> </xsl:if>
+        <xsl:if test="$debug"> <tr> <td class="small">BrokerLinks() - resourceUrl():</td><td class="small"><xsl:value-of select="$resourceUrl"/> </td> </tr> </xsl:if>
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - encoded():</td>
+                <td class="small">
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">text/javascript</xsl:attribute>
+                        document.write(convertToHex("<xsl:value-of select="$resourceUrl"/>"));
+                    </xsl:element>
+                </td>
+            </tr>
+        </xsl:if>
+
+        <!-- Make the link -->
+        <tr>
+            <td align="center" style="margin-left: 10px;word-wrap: break-word;width: 20%">
+                <div class="medium_bold">Hyrax Broker</div><div class="xsmall_italic">(If the origin server does not offer
+            a data service that you can utilize, Hyrax may broker the request and return the data in a form that
+                you find more usable).</div>
+            </td>
+            <td class="small_bold" align="left" style="margin-left: 10px;">
+
+                <table>
+                    <!-- - - - - - - - - - Data Request Forms - - - - - - - - - - -->
+                    <tr>
+                        <td class="small" align="right">data request forms</td>
+                        <td class="small_bold" align="left" style="margin-left: 10px;">
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-D4IFH"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 Data Request Form"
+                               href="TBD">dap4-form
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dmr.html";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D4IFH").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-D2IFH"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 Data Request Form"
+                               href="TBD">dap2-form
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".html";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D2IFH").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                        </td>
+                    </tr>
+
+                    <!-- - - - - - - - - - Metadata Responses - - - - - - - - - - -->
+                    <tr>
+                        <td class="small" align="right">metadata responses</td>
+                        <td class="small_bold" align="left" style="margin-left: 10px;">
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DMR"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 DMR response"
+                               href="TBD">dmr
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dmr.xml";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DMR").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DDS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DDS response"
+                               href="TBD">dds
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dds";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DAS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DAS response"
+                               href="TBD">das
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".das";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DDX"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 DDX response"
+                               href="TBD">ddx
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".das";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDX").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-INFO"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 INFO response"
+                               href="TBD">info
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".info";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-INFO").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-RDF"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 RDF response"
+                               href="TBD">rdf
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".rdf";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-RDF").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                        </td>
+                    </tr>
+                    <!-- - - - - - - - - - Data Responses - - - - - - - - - - -->
+                    <tr>
+                        <td class="small" align="right">data responses</td>
+                        <td class="small_bold" align="left" style="margin-left: 10px;">
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DAP"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP4 Data (.dap) response"
+                               href="TBD">dap4
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dap";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAP").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+
+                            <!-- Make link object -->
+                            <a id="{$resourceUrl}-DODS"
+                               class="medium-bold"
+                               style="padding-right: 3px;"
+                               title="Broker: DAP2 Data (.dods) response"
+                               href="TBD">dods
+                            </a>
+                            <!-- Set the href value -->
+                            <xsl:element name="script">
+                                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                ifhLink="<xsl:value-of
+                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                    select="$resourceUrl"/>") + ".dods";
+                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DODS").setAttribute("href",
+                                ifhLink);
+                            </xsl:element>
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <xsl:if test="true()"><tr> <td class="small" align="right">Broker Access URL:</td><td><a class="small" align="left" href="{$resourceUrl}"><xsl:value-of select="$resourceUrl"/> </a></td></tr></xsl:if>
+
+        <xsl:if test="$debug">
+            <tr>
+                <td class="small">BrokerLinks() - - - END</td>
+            </tr>
+        </xsl:if>
+    </xsl:template>
 
 
     <!-- ******************************************************
       -
      -->
-
-    <xsl:template match="*">
-   </xsl:template>
+    <xsl:template match="*"/>
 
 
 
 
-    <!-- ******************************************************
-      -  documentationDetail
-     -->
 
-    <xsl:template match="thredds:documentation" mode="documentationDetail">
+
+
+
+
+
+    <xsl:template match="thredds:catalogRef" mode="ServiceLinks">
         <xsl:param name="indent" />
 
-        <xsl:if test="@type">
-            <span style="padding-left: {$indent};">
-                <em><b><xsl:value-of select="@type"/>: </b></em><xsl:value-of select="."/>
-            </span>
-            <br/>
+        <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
+
+        <xsl:if test="not($remoteHost)">
+            <tr>
+                <td style="align: left; padding-left: {$myIndent}px;" >
+
+                    <!-- If the href ends in .xml, change it to .html
+                         so the link in the presentation points to
+                         another HTML page. -->
+
+                    <xsl:choose>
+
+                        <!-- Does it point towards a remote catalog?. -->
+                        <!-- -->
+                        <xsl:when test="starts-with(@xlink:href,'http://')">
+                            <a>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                                <xsl:choose>
+                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
+                                    <xsl:otherwise>Link</xsl:otherwise>
+                                </xsl:choose>
+                            </a>
+                        </xsl:when>
+                        <!-- -->
+
+                        <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
+                        <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
+                            <!--Then replace that with '.html'   -->
+                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:when>
+
+                        <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
+                        <xsl:otherwise>
+                            <a href="{./@xlink:href}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
+                </td>
+            </tr>
         </xsl:if>
 
-        <xsl:if test="@xlink:href">
-            <span style="padding-left: {$indent};">
-                <em><b>Linked Document: </b></em><a href="{@xlink:href}"><xsl:value-of select="@xlink:title"/></a>
-            </span>
-            <br/>
-        </xsl:if>
-    </xsl:template>
 
-    <xsl:template match="thredds:*" mode="documentationDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates mode="documentationDetail"  >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
+        <!-- -->
+
+        <xsl:if test="$remoteHost">
+            <tr>
+                <td style="align: left; padding-left: {$myIndent}px;" >
 
 
+                    <a>
+                        <xsl:choose>
+                            <xsl:when test="starts-with(@xlink:href,'http://')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@xlink:href,'/')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteHost"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteRelativeURL"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:value-of select="./@xlink:title"/>/
+                    </a>
+                    <ul class="small">
+                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
+                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
+                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
+                    </ul>
 
-    <!-- ******************************************************
-      -  dateDetail
-
-        <date type="modified">2008-12-23 23:58:40Z</date>
-    -->
-    <xsl:template match="thredds:date" mode="dateDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent};"><xsl:value-of select="."/> <em> (<xsl:value-of select="@type"/>) </em></span><br/>
-    </xsl:template>
-
-
-
-    <!-- ******************************************************
-      -  creatorDetail
-
-            <creator>
-                <name vocabulary="DIF">UCAR/UNIDATA</name>
-                <contact url="http://www.unidata.ucar.edu/" email="support@unidata.ucar.edu" />
-            </creator>
-    -->
-    <xsl:template match="thredds:creator" mode="creatorDetail">
-        <xsl:param name="indent" />
-        <xsl:call-template name="sourceType" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:call-template>
-    </xsl:template>
-
-
-    <!-- ******************************************************
-      -  publisherDetail
-
-            <publisher>
-                <name vocabulary="DIF">UCAR/UNIDATA</name>
-                <contact url="http://www.unidata.ucar.edu/" email="support@unidata.ucar.edu" />
-            </publisher>
-    -->
-
-    <xsl:template match="thredds:publisher" mode="publisherDetail">
-        <xsl:param name="indent" />
-
-        <xsl:call-template name="sourceType" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template name="sourceType" >
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b><xsl:value-of select="thredds:name" /></b>
-            <xsl:if test="@vocabulary"> (<xsl:value-of select="@vocabulary" />)</xsl:if>
-        </span>
-        <br/>
-        <span style="padding-left: {$indent+$indentIncrement}px;">
-            <em>email: <xsl:value-of select="thredds:contact/@email" /></em>
-        </span>
-
-        <span style="padding-left: {$indent+$indentIncrement}px;">
-            <em><a href="{thredds:contact/@url}"><xsl:value-of select="thredds:contact/@url" /></a></em>
-        </span>
-
-    </xsl:template>
-
-
-    <!-- ******************************************************
-      -  timeCoverageDetail
-
-            <timeCoverage>
-                <start>2008-12-29 12:00:00Z</start>
-                <end>2009-01-01 18:00:00Z</end>
-            </timeCoverage>
-            <timeCoverage>
-                <start>2008-12-29 12:00:00Z</start>
-                <duration>20.2 hours</duration>
-            </timeCoverage>
-            <timeCoverage>
-                <end>2008-12-29 12:00:00Z</end>
-                <duration>20.2 hours</duration>
-            </timeCoverage>
-    -->
-    <xsl:template match="thredds:timeCoverage" mode="timeCoverageDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates mode="timeCoverageDetail">
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:start" mode="timeCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>start: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:end" mode="timeCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>end: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:duration" mode="timeCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>duration: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <!-- ******************************************************
-      -  accessDetail
-          <xsd:element name="access">
-            <xsd:complexType>
-                <xsd:sequence>
-                    <xsd:element ref="dataSize" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="urlPath" type="xsd:token" use="required"/>
-                <xsd:attribute name="serviceName" type="xsd:string"/>
-                <xsd:attribute name="dataFormat" type="dataFormatTypes"/>
-            </xsd:complexType>
-          </xsd:element >
-    -->
-    <xsl:template match="thredds:access" mode="accessDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent}px;"><em>Access:</em></span><br/>
-
-        <span style="padding-left: {$indent+$indentIncrement}px;"><em>urlPath: </em><xsl:value-of select="@urlPath" /></span><br/>
-        <span style="padding-left: {$indent+$indentIncrement}px;"><em>serviceName: </em><xsl:value-of select="@serviceName" /></span><br/>
-        <xsl:if test="@dataFormat">
-            <span style="padding-left: {$indent+$indentIncrement}px;"><em>dataFormat: </em><xsl:value-of select="@dataFormat" /></span><br/>
+                </td>
+            </tr>
         </xsl:if>
 
-    </xsl:template>
-
-
-    <xsl:template match="thredds:dataType" mode="dataTypeDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Data type: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataSize" mode="dataSizeDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Data size: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataFormat" mode="dataFormatDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Data Format: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:serviceName" mode="serviceNameDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Service Name: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:authority" mode="authorityDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Naming Authority: </em><xsl:value-of select="."/></span><br/>
-    </xsl:template>
-
-
-
-
-
-
-
-
-    <!-- ******************************************************
-      -  propertyDetail
-
-
-             <geospatialCoverage zpositive="down">
-               <northsouth>
-                 <start>10</start>
-                 <size>80</size>
-                 <resolution>2</resolution>
-                 <units>degrees_north</units>
-               </northsouth>
-               <eastwest>
-                 <start>-130</start>
-                 <size>260</size>
-                 <resolution>2</resolution>
-                 <units>degrees_east</units>
-               </eastwest>
-               <updown>
-                 <start>0</start>
-                 <size>22</size>
-                 <resolution>0.5</resolution>
-                 <units>km</units>
-               </updown>
-              </geospatialCoverage>
-
-              <geospatialCoverage>
-                <name vocabulary="Thredds">global</name>
-              </geospatialCoverage>
-
-     -->
-    <xsl:template match="thredds:geospatialCoverage" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <div class="small">
-            <span style="padding-left: {$indent}px;">
-                <em>Geospatial Coverage Instance</em>
-            </span>
-            <br/>
-            <xsl:apply-templates mode="geospatialCoverageDetail" >
-                <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-            </xsl:apply-templates>
-            <xsl:if test="@zpositive">
-                <span style="padding-left: {$indent}px;">
-                    <b>z increases in the <xsl:value-of select="@zpositive" /> direction.</b>
-                </span>
-            </xsl:if>
-        </div>
-    </xsl:template>
-
-
-    <xsl:template match="thredds:northsouth" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b>north-south:</b>
-        </span>
-        <br/>
-        <xsl:apply-templates mode="geospatialCoverageDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:eastwest" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b>east-west:</b>
-        </span>
-        <br/>
-        <xsl:apply-templates mode="geospatialCoverageDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:updown" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b>up-down:</b>
-        </span>
-        <br/>
-        <xsl:apply-templates mode="geospatialCoverageDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:start" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            start: <em><xsl:value-of select="." /></em>
-        </span>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:size" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            size: <em><xsl:value-of select="." /></em>
-        </span>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:resolution" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            resolution: <em><xsl:value-of select="." /></em>
-        </span>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:units" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            units: <em><xsl:value-of select="." /></em>
-        </span>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="thredds:name" mode="geospatialCoverageDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b>name: </b><em><xsl:value-of select="." /> (<xsl:value-of select="@vocabulary"/> vocabulary)</em>
-        </span>
-        <br/>
-    </xsl:template>
-
-
-
-
-
-    <!-- ******************************************************
-      -  propertyDetail
-     -->
-    <xsl:template match="thredds:property" mode="propertyDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <b><xsl:value-of select="@name" /></b> = <xsl:value-of select="@value" />
-        </span>
-        <br/>
-    </xsl:template>
-
-
-
-    <!-- ******************************************************
-      -  contributorDetail
-     -->
-    <xsl:template match="thredds:contributor" mode="contributorDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-        <em>Contributor: </em><xsl:value-of select="." />, <xsl:value-of select="@role" />
-        </span>
-        <br/>
-    </xsl:template>
-
-
-
-    <!-- ******************************************************
-      -  keywordDetail
-     -->
-    <xsl:template match="thredds:keyword" mode="keywordDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;">
-            <em>keyword
-                <xsl:if test="@vocabulary" >
-                    (vocab: <xsl:value-of select="@vocabulary" />)
-                </xsl:if>
-            </em>:
-            <xsl:value-of select="." />
-        </span>
-        <br/>
+        <!-- -->
 
     </xsl:template>
-
-    <!-- ******************************************************
-      -  projectDetail
-     -->
-    <xsl:template match="thredds:project" mode="projectDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent}px;">
-            <em>project
-                <xsl:if test="@vocabulary" >
-                    (vocab: <xsl:value-of select="@vocabulary" />)
-                </xsl:if>
-            </em>:
-            <xsl:value-of select="." />
-        </span>
-        <br/>
-    </xsl:template>
-
-    <!-- ******************************************************
-      -  variablesDetail
-     -->
-    <xsl:template match="thredds:variables" mode="variablesDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent}px;">Variables[<xsl:value-of select="@vocabulary" />]:</span><br/>
-        <xsl:apply-templates  mode="variableDetail">
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-        <xsl:apply-templates  mode="variableMapDetail">
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-
-    </xsl:template>
-
-    <!-- ******************************************************
-      -  variableDetail
-     -->
-    <xsl:template match="thredds:variable" mode="variableDetail">
-        <xsl:param name="indent" />
-
-
-        <span style="padding-left: {$indent}px;">
-            <b><xsl:value-of select="@vocabulary_name" />[</b><xsl:value-of select="@name" /><b>] </b>
-
-            <xsl:if test="@units">
-               <em>units: <xsl:value-of select="@units" /></em>
-            </xsl:if>
-        </span>
-        <br/>
-
-
-
-    </xsl:template>
-
-    <xsl:template match="*" mode="variableMapDetail">
-    </xsl:template>
-
-    <!-- ******************************************************
-      -  variableMapDetail
-     -->
-    <xsl:template match="thredds:variableMap" mode="variableMapDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent}px;"><b>variableMap: </b>
-
-            <a href="{@xlink:href}">
-                <xsl:choose>
-                    <xsl:when test="@xlink:title">Title: <xsl:value-of select="@xlink:title" /></xsl:when>
-                    <xsl:otherwise>Link</xsl:otherwise>
-                </xsl:choose>
-            </a>
-        </span>
-        <br/>
-
-    </xsl:template>
-
-    <!-- ******************************************************
-      -  datasetDetail
-     -->
-    <xsl:template match="thredds:dataset" mode="datasetDetail">
-        <xsl:param name="indent" />
-            <div class="small" style="padding-left: {$indent}px;"><em>name: </em><b><xsl:value-of select="@name" /></b></div>
-            <xsl:apply-templates select="*" mode="metadataDetail">
-                <xsl:with-param name="indent" select="$indent"/>
-            </xsl:apply-templates>
-
-    </xsl:template>
-
-
-    <!-- ******************************************************
-      -  metadataDetail
-
-          <xsd:group name="threddsMetadataGroup">
-              <xsd:choice>
-                    <xsd:element name="documentation" type="documentationType"/>
-                    <xsd:element ref="metadata"  />
-                    <xsd:element ref="property" />
-
-                    <xsd:element ref="contributor"/>
-                    <xsd:element name="creator" type="sourceType"/>
-                    <xsd:element name="date" type="dateTypeFormatted" />
-                    <xsd:element name="keyword" type="controlledVocabulary" />
-                    <xsd:element name="project" type="controlledVocabulary" />
-                    <xsd:element name="publisher" type="sourceType"/>
-
-                    <xsd:element ref="geospatialCoverage"/>
-                    <xsd:element name="timeCoverage" type="timeCoverageType"/>
-                    <xsd:element ref="variables"/>
-
-                    <xsd:element name="dataType" type="dataTypes"/>
-                    <xsd:element name="dataFormat" type="dataFormatTypes"/>
-                    <xsd:element name="serviceName" type="xsd:string" />
-                    <xsd:element name="authority" type="xsd:string" />
-                   <xsd:element ref="dataSize"/>
-                </xsd:choice>
-           </xsd:group>
-     -->
-
-
-    <xsl:template match="*" mode="metadataDetail" />
-
-    <xsl:template match="thredds:metadata" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:param name="currentDataset" />
-        <xsl:apply-templates mode="metadataDetail">
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:documentation" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:if test="@type">
-            <span style="padding-left: {$indent};"><em>documentation[<b><xsl:value-of select="@type"/>]: </b></em><xsl:value-of select="."/></span>
-        </xsl:if>
-
-        <xsl:if test="@xlink:href">
-            <span style="padding-left: {$indent};"><em>documentation[<b>Linked Document</b>]: </em><a href="{@xlink:href}"><xsl:value-of select="@xlink:title"/></a></span>
-        </xsl:if>
-    </xsl:template>
-
-
-
-
-    <xsl:template match="thredds:property" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="propertyDetail">
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:contributor" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Contributer:</em></span><br/>
-        <xsl:apply-templates select="." mode="contributorDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:creator" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Creator:</em></span><br/>
-        <xsl:apply-templates select="." mode="creatorDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:date" mode="metadataDetail">
-        <xsl:param name="indent" />
-
-        <span style="padding-left: {$indent}px;"><em>Date: </em></span>
-
-        <xsl:apply-templates select="." mode="dateDetail" >
-            <xsl:with-param name="indent" select="0"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-
-    <xsl:template match="thredds:keyword" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="keywordDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:project" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="projectDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:publisher" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <span style="padding-left: {$indent}px;"><em>Publisher:</em></span><br/>
-        <xsl:apply-templates select="." mode="publisherDetail" >
-            <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
-        </xsl:apply-templates>
-
-    </xsl:template>
-
-    <xsl:template match="thredds:geospatialCoverage" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="geospatialCoverageDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:timeCoverage" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="timeCoverageDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:variables" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="variablesDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataType" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="dataTypeDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataSize" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="dataSizeDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataFormat" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="dataFormatDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:serviceName" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="serviceNameDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:authority" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="authorityDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:access" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="accessDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-    <xsl:template match="thredds:dataset" mode="metadataDetail">
-        <xsl:param name="indent" />
-        <xsl:apply-templates select="." mode="datasetDetail" >
-            <xsl:with-param name="indent" select="$indent"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
-
 
 
 

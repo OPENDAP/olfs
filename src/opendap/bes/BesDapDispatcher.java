@@ -291,6 +291,9 @@ public class BesDapDispatcher implements DispatchHandler {
             Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
             _responders.add(htmlForm);
 
+            Dap4Responder ifh = new Dap2IFH(_systemPath, besApi);
+            _responders.add(ifh);
+
             FileAccess d4fa = new FileAccess(_systemPath, null, "", besApi);
             d4fa.clearAltResponders();
             d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
