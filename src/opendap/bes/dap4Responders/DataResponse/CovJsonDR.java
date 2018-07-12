@@ -50,7 +50,7 @@ public class CovJsonDR extends Dap4Responder {
 
 
     private Logger log;
-    private static String defaultRequestSuffix = ".cjson";
+    private static String defaultRequestSuffix = ".covjson";
     // private String requestSuffix;
 
 
