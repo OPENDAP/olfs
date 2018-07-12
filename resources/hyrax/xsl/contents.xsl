@@ -65,7 +65,7 @@
 
 
     <xsl:template match="bes:showCatalog">
-        
+
         <xsl:variable name="catalogName">
             <xsl:choose>
                 <xsl:when test="bes:dataset/@name='/'" >
@@ -76,7 +76,7 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        
+
             <head>
                 <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
@@ -314,6 +314,10 @@
                         <meta itemprop="name" content="{../@name}.rdf" />
                         <meta itemprop="encodingFormat" content="application/rdf+xml" />
                         <a itemprop="contentUrl" href="{encode-for-uri(../@name)}.rdf">rdf</a>&NBSP;</td>
+                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <meta itemprop="name" content="{../@name}.covjson" />
+                        <meta itemprop="encodingFormat" content="application/covjson" />
+                        <a itemprop="contentUrl" href="{encode-for-uri(../@name)}.covjson">covjson</a>&NBSP;</td>
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
                         <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                             <meta itemprop="name" content="{../@name}" />
@@ -347,7 +351,7 @@
             <xsl:comment>viewersService: <xsl:value-of select="$viewersService"/></xsl:comment>
               <a href="{$viewersService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
         </td>
-        
+
     </xsl:template>
 
 

@@ -94,6 +94,7 @@ public class NormativeDR extends Dap4Responder {
         addAltRepResponder(new GmlJpeg2000DR  (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
         addAltRepResponder(new JsonDR         (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
         addAltRepResponder(new IjsonDR        (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
+        addAltRepResponder(new CovJsonDR      (sysPath, pathPrefix, besApi, addTypeSuffixToDownloadFilename));
 
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());

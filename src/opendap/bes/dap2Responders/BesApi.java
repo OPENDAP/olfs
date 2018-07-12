@@ -83,6 +83,7 @@ public class BesApi {
     public static final String GEOTIFF    = "geotiff";
     public static final String GMLJP2     = "jpeg2000";
     public static final String JSON       = "json";
+    public static final String COVJSON   = "covjson";
     public static final String IJSON      = "ijson";
     public static final String W10N       = "w10n";
     public static final String W10N_META      = "w10nMeta";
@@ -707,15 +708,39 @@ public class BesApi {
      * @throws PPTException              .
      */
     public void writeDap4DataAsJson(String dataSource,
-                                       QueryParameters qp,
-                                       int maxResponseSize,
-                                       OutputStream os)
+                                    QueryParameters qp,
+                                    int maxResponseSize,
+                                    OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
-            dataSource,
-            getDap4DataAsJsonRequest(dataSource, qp, maxResponseSize),
-            os);
+                dataSource,
+                getDap4DataAsJsonRequest(dataSource, qp, maxResponseSize),
+                os);
+    }
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param qp The DAP4 query string parameters
+     * @param os         The Stream to which to write the response.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public void writeDap4DataAsCovJson(String dataSource,
+                                    QueryParameters qp,
+                                    int maxResponseSize,
+                                    OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        besTransaction(
+                dataSource,
+                getDap4DataAsCovJsonRequest(dataSource, qp, maxResponseSize),
+                os);
     }
 
     /**
@@ -814,7 +839,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP4 XML data response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -842,7 +867,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP4 json metadata response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -867,7 +892,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP4 IJson metadata response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -893,7 +918,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP2 IJson data response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -921,7 +946,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP2 IJson metadata response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -948,7 +973,7 @@ public class BesApi {
     }
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP2 JSON data response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -962,13 +987,13 @@ public class BesApi {
      * @throws PPTException              .
      */
     public void writeDap2DataAsJson(String dataSource,
-                                       String constraintExpression,
-                                       String xdap_accept,
-                                       int maxResponseSize,
-                                       OutputStream os)
+                                    String constraintExpression,
+                                    String xdap_accept,
+                                    int maxResponseSize,
+                                    OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
-         besTransaction(
+        besTransaction(
                 dataSource,
                 getDap2DataAsJsonRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
                 os);
@@ -976,7 +1001,39 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the DAP2 CovJSON data response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public void writeDap2DataAsCovJson(String dataSource,
+                                    String constraintExpression,
+                                    String xdap_accept,
+                                    int maxResponseSize,
+                                    OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        besTransaction(
+                dataSource,
+                getDap2DataAsCovJsonRequest(
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        maxResponseSize),
+                        os);
+    }
+
+
+    /**
+     * Write DAP2 metadata as JSON for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -1004,7 +1061,7 @@ public class BesApi {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the w10n Json response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -1974,6 +2031,26 @@ public class BesApi {
 
     }
     /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap2DataAsCovJsonRequest(String dataSource,
+                                             String ce,
+                                             String xdap_accept,
+                                             int maxResponseSize)
+            throws BadConfigurationException {
+
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, COVJSON, XML_ERRORS);
+
+    }
+    /**
      *  Returns the JSON encoded DAP2 Metadata response (DDX) for the passed dataSource
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
@@ -2096,6 +2173,27 @@ public class BesApi {
 
     }
 
+    /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param qp The DAP4 query string parameters associated wih the request.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getDap4DataAsCovJsonRequest(String dataSource,
+                                             QueryParameters qp,
+                                             int maxResponseSize
+    )
+            throws BadConfigurationException {
+
+        return getDap4RequestDocument(DAP4_DATA, dataSource, qp, maxResponseSize, null, null, COVJSON, XML_ERRORS);
+
+
+    }
+
 
 
     /**
@@ -2138,7 +2236,7 @@ public class BesApi {
             throws BadConfigurationException {
 
         return getDap4RequestDocument(DAP4_DMR, dataSource, qp, maxResponseSize, null, null, JSON, XML_ERRORS);
-        
+
 
     }
 
