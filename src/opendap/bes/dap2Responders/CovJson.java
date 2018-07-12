@@ -46,7 +46,7 @@ import java.io.OutputStream;
 public class CovJson extends Dap4Responder {
 
     private Logger log;
-    private static String defaultRequestSuffix = ".cjson";
+    private static String defaultRequestSuffix = ".covjson";
 
     public CovJson(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
