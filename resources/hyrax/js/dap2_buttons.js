@@ -11,6 +11,19 @@ function ascii_button() {
 
     window.open(encodeURI(ascii_url), "ASCII_Data");
 }
+function covjson_button() {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var covjson_url = url_parts[0] + ".covjson?" + url_parts[1];
+    } else {
+        var covjson_url = url_parts[0] + ".covjson?";
+    }
+
+    window.open(encodeURI(covjson_url), "CoverageJSON Data");
+}
 
 /* The netcdf_button handler loads the data to the current window. Since it
 is netcdf/binary, Netscape will ask the user for a filename and save the data
