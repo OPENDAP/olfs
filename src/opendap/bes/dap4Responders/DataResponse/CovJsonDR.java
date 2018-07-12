@@ -44,16 +44,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 
 /**
- * Responder that transmits JSON encoded DAP4 data to the client.
+ * Responder that transmits CovJSON encoded DAP4 data to the client.
  */
 public class CovJsonDR extends Dap4Responder {
 
-
     private Logger log;
     private static String defaultRequestSuffix = ".covjson";
-    // private String requestSuffix;
-
-
 
     public CovJsonDR(String sysPath, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
         this(sysPath, null, defaultRequestSuffix, besApi, addFileoutTypeSuffixToDownloadFilename);
@@ -77,16 +73,10 @@ public class CovJsonDR extends Dap4Responder {
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
-
     }
-
 
     public boolean isDataResponder(){ return true; }
     public boolean isMetadataResponder(){ return false; }
-
-
-
-
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -95,7 +85,6 @@ public class CovJsonDR extends Dap4Responder {
         QueryParameters qp = new  QueryParameters(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -116,29 +105,13 @@ public class CovJsonDR extends Dap4Responder {
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
-
         User user = new User(request);
-
 
         OutputStream os = response.getOutputStream();
 
-
-        besApi.writeDap4DataAsCovJson(
-                resourceID,
-                qp,
-                user.getMaxResponseSize(),
-                os);
-
-
+        besApi.writeDap4DataAsCovJson(resourceID, qp, user.getMaxResponseSize(), os);
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
-
-
 }
