@@ -581,7 +581,7 @@ public class BesXmlAPI {
             }
             else {
                 RequestCache.put(responseCacheKey, new NoSuchDatasource((Document)response.clone()));
-                log.info("getInfo():  BES showInfo response failed, cached a NoSuchDatasource object. responseCacheKey=\""+responseCacheKey+"\"");
+                log.info("getInfo():  BES showCatalog response failed, cached a NoSuchDatasource object. responseCacheKey=\""+responseCacheKey+"\"");
             }
 
             return ret;
