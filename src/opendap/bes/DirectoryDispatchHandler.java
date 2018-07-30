@@ -251,19 +251,18 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-        Document showCatalogDoc = new Document();
-        _besApi.getBesCatalog(collectionName, showCatalogDoc);
+        Document showNodeDoc = new Document();
+        _besApi.getBesNode(collectionName, showNodeDoc);
 
         if(log.isDebugEnabled()){
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+            log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
+        JDOMSource besNode = new JDOMSource(showNodeDoc);
 
-        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-            xsltDoc = systemPath + "/xsl/contents.xsl";
+            xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
         Transformer transformer = new Transformer(xsltDoc);
         transformer.setParameter("dapService",oreq.getServiceLocalId());
@@ -277,7 +276,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         AuthenticationControls.setLoginParameters(transformer,request);
 
         // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform(besCatalog, response.getOutputStream());
+        transformer.transform(besNode, response.getOutputStream());
         // transformer.transform(besCatalog, System.out);
 
 
