@@ -379,6 +379,8 @@
                 <include name="org/opendap/**"/>
 
 
+                <exclude name="opendap/cmr/**"/>
+
                 <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
 

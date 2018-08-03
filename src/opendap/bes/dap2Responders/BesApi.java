@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
  *
  *  - override BesApi.besTransaction(*)
  */
-public class BesApi {
+public class BesApi implements Cloneable {
 
     public static final String DAP4_DATA  = "dap";
     public static final String DAP4_DMR   = "dmr";
@@ -141,6 +141,9 @@ public class BesApi {
      */
     private static String BES_ERROR = "BESError";
 
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     private boolean _initialized = false;
 

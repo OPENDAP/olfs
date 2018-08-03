@@ -117,21 +117,13 @@ public class BesDapDispatcher implements DispatchHandler {
         _besApi = besApi;
     }
 
-    public void init(HttpServlet servlet, Element config) throws Exception {
-
-        BesApi besApi = new BesApi();
-
-        init(servlet, config, besApi);
-
-
-    }
-
 
     private void ingestConfig(Element config) throws Exception {
 
         if(config!=null){
             _config = config;
 
+            /*
             Element besApiImpl = _config.getChild("BesApiImpl");
             if (besApiImpl != null) {
                 String className = besApiImpl.getTextTrim();
@@ -145,8 +137,8 @@ public class BesDapDispatcher implements DispatchHandler {
                     BesApi besApi = (BesApi) classDefinition.newInstance();
                     setBesApi(besApi);
                 }
-
             }
+            */
 
             _log.info("ingestConfig() - Using BES API implementation: "+getBesApi().getClass().getName());
 
@@ -172,27 +164,38 @@ public class BesDapDispatcher implements DispatchHandler {
             }
             _log.info("ingestConfig() - AddFileoutTypeSuffixToDownloadFilename: {}",_addFileoutTypeSuffixToDownloadFilename);
 
-
-            dv = _config.getChild("PostBodyMaxLength");
+            dv = _config.getChild("HttpPost");
             if (dv != null) {
-                try {
-                    int maxLength = Integer.parseInt(dv.getTextTrim());
-                    ReqInfo.setMaxPostBodyLength(maxLength);
-                }
-                catch(NumberFormatException e){
-                    _log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ", dv.getTextTrim());
 
+                String max = dv.getAttributeValue("max");
+                if(max!=null) {
+                    try {
+                        int maxLength = Integer.parseInt(max);
+                        ReqInfo.setMaxPostBodyLength(maxLength);
+                    } catch (NumberFormatException e) {
+                        _log.warn("HttpPost - Unable to parse the value of max! Value: {} ", max);
+
+                    }
                 }
             }
-            _log.info("ingestConfig() - PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
-
+            _log.info("ingestConfig() - HTTP POST max body length is set to: {}", ReqInfo.getPostBodyMaxLength());
         }
-
-
-
-
-
     }
+
+
+    /**
+     *  This method is where the behavior of the BesDapDispatcher is defined. In here the various Responder classes
+     *  are instantiated and loaded in to an ordered list. The types of the responders and their order defines the
+     *  behaviour of the DAP dispatch activity.
+     * @param servlet    The Servlet instance that this dispatcher is running in.
+     * @param config  The configuration element loaded from the olfs.xml file for this dispatcher
+     * @throws Exception  When the bad things happen.
+     */
+    public void init(HttpServlet servlet, Element config) throws Exception {
+        BesApi besApi = new BesApi();
+        init(servlet, config, besApi);
+    }
+
 
     /**
      *  This method is where the behavior of the BesDapDispatcher is defined. In here the various Responder classes
@@ -203,7 +206,7 @@ public class BesDapDispatcher implements DispatchHandler {
      * @param besApi    The BesApi instance to use when servicing requests.
      * @throws Exception  When the bad things happen.
      */
-    protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
+     public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
 
         if (_initialized) return;
 

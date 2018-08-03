@@ -27,6 +27,7 @@
 package opendap.gateway;
 
 import opendap.bes.BesDapDispatcher;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -66,6 +67,12 @@ public class DispatchHandler extends BesDapDispatcher {
 
     @Override
     public void init(HttpServlet servlet, Element config) throws Exception {
+        init(servlet,config,null);
+    }
+
+
+    @Override
+    public void init(HttpServlet servlet, Element config, BesApi ignored) throws Exception {
 
         if(_initialized)
             return;
@@ -73,7 +80,7 @@ public class DispatchHandler extends BesDapDispatcher {
         ingestPrefix(config);
 
         _besApi = new BesGatewayApi(_prefix);
-        init(servlet, config, _besApi);
+        super.init(servlet, config, _besApi);
         _gatewayForm  =  new GatewayForm(getSystemPath(), _prefix);
         _initialized=true;
     }
@@ -131,32 +138,32 @@ public class DispatchHandler extends BesDapDispatcher {
 
     private void ingestPrefix(Element config) throws Exception {
 
+        _prefix = "gateway";
 
         if (config != null) {
 
-            String msg;
+            Element gatewayService = config.getChild("GatewayService");
+            if (gatewayService != null) {
+                Element e = gatewayService.getChild("prefix");
+                if (e != null)
+                    _prefix = e.getTextTrim();
 
-            Element e = config.getChild("prefix");
-            if (e != null)
-                _prefix = e.getTextTrim();
-
-            if (_prefix.equals("/")) {
-                msg = "Bad Configuration. The <Handler> " +
-                        "element that declares " + this.getClass().getName() +
-                        " MUST provide 1 <prefix>  " +
-                        "child element whose value may not be equal to \"/\"";
-                log.error(msg);
-                throw new Exception(msg);
+                if (_prefix.equals("/")) {
+                    String msg = "Bad Configuration. The <Handler> " +
+                            "element that declares " + this.getClass().getName() +
+                            " MUST provide 1 <prefix>  " +
+                            "child element whose value may not be equal to \"/\"";
+                    log.error(msg);
+                    throw new Exception(msg);
+                }
             }
-
-
-            if (!_prefix.endsWith("/"))
-                _prefix += "/";
-
-            if (_prefix.startsWith("/"))
-                _prefix = _prefix.substring(1);
-
         }
+        if (!_prefix.endsWith("/"))
+            _prefix += "/";
+
+        if (_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1);
+
         log.info("Using prefix=" + _prefix);
 
     }

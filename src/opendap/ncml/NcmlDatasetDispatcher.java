@@ -26,6 +26,7 @@
 package opendap.ncml;
 
 import opendap.bes.BesDapDispatcher;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;
@@ -60,19 +61,18 @@ public class NcmlDatasetDispatcher extends BesDapDispatcher {
 
     @Override
     public void init(HttpServlet servlet,Element config) throws Exception {
+        init(servlet, config, null);
+    }
+
+    @Override
+    public void init(HttpServlet servlet,Element config, BesApi ignored) throws Exception {
 
         if(initialized)
             return;
-
         NcmlDatasetBesApi besApi = new NcmlDatasetBesApi();
-
-
         ingestConfig(config);
-
-        init(servlet, config ,besApi);
-
+        super.init(servlet, config ,besApi);
         initialized = true;
-
     }
 
 

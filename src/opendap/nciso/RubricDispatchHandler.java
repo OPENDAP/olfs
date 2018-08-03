@@ -76,20 +76,19 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
 
 
-
     public void init(HttpServlet servlet,Element config) throws Exception {
+        init(servlet,config,new BesApi());
+
+    }
+    public void init(HttpServlet servlet,Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
         _config = config;
         _systemPath = ServletUtil.getSystemPath(servlet,"");
-
         rubricRequestPatternRegexString = ".*\\.rubric";
         rubricRequestPattern = Pattern.compile(rubricRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
-
-        _besApi = new BesApi();
-
-
+        _besApi = besApi;
         initialized = true;
 
     }

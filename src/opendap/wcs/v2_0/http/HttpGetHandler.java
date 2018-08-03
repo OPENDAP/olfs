@@ -28,6 +28,7 @@ package opendap.wcs.v2_0.http;
 
 import net.sf.saxon.s9api.XdmNode;
 import opendap.PathBuilder;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -90,9 +91,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public void init(HttpServlet dispatchServlet, Element e) throws ServletException {
-
         init(dispatchServlet);
+    }
 
+    public void init(HttpServlet dispatchServlet, Element e, BesApi besApi ) throws ServletException {
+        init(dispatchServlet);
     }
 
 
