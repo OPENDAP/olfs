@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * Time: 5:17 PM
  * To change this template use File | Settings | File Templates.
  */
-public class BesGatewayApi extends BesApi {
+public class BesGatewayApi extends BesApi implements Cloneable {
 
 
     private Logger log;
@@ -73,6 +73,10 @@ public class BesGatewayApi extends BesApi {
         super();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _servicePrefix = servicePrefix;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     /**

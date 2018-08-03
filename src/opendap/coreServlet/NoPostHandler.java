@@ -26,6 +26,7 @@
 
 package opendap.coreServlet;
 
+import opendap.bes.dap2Responders.BesApi;
 import org.jdom.Element;
 
 import javax.servlet.ServletOutputStream;
@@ -42,6 +43,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class NoPostHandler implements DispatchHandler {
     public void init(HttpServlet servlet, Element config) throws Exception {
+        // Do nothing
+    }
+
+    public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
         // Do nothing
     }
 

@@ -48,16 +48,19 @@ import java.util.Date;
  * Time: 3:44 PM
  * To change this template use File | Settings | File Templates.
  */
-public class NcmlDatasetBesApi extends BesApi {
+public class NcmlDatasetBesApi extends BesApi implements Cloneable {
 
      Logger log;
 
 
-     public NcmlDatasetBesApi(){
+    public NcmlDatasetBesApi(){
+        log = LoggerFactory.getLogger(this.getClass());
+    }
 
-         log = LoggerFactory.getLogger(this.getClass());
-
-     }
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
 
     /**

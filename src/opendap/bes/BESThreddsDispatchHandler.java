@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
  */
 public class BESThreddsDispatchHandler implements DispatchHandler {
 
-    private DispatchServlet _servlet;
+    private HttpServlet _servlet;
     private String _systemPath;
 
 
@@ -78,36 +78,26 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
     public BESThreddsDispatchHandler(){
-
         _servlet = null;
-
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
-
         _initialized = false;
-
-
     }
 
 
     public void init(HttpServlet s,Element config) throws Exception{
-        if(s instanceof DispatchServlet){
-            init(((DispatchServlet)s),config);
-        }
-        else {
-            throw new Exception(getClass().getName()+" must be used in " +
-                    "conjunction with a "+DispatchServlet.class.getName());
-        }
+        init(s,config, new BesApi());
     }
 
 
-    public void init(DispatchServlet s,Element config) throws Exception{
+
+    public void init(HttpServlet s,Element config, BesApi besApi) throws Exception{
 
         if(_initialized) return;
 
         _servlet = s;
         _systemPath = ServletUtil.getSystemPath(_servlet,"");
 
-        _besApi = new BesApi();
+        _besApi = besApi;
 
         _log.info("Initialized.");
         _initialized = true;

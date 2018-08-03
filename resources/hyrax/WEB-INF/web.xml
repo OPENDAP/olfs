@@ -184,7 +184,7 @@
     <servlet>
         <servlet-name>hyrax</servlet-name>
 
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
+        <servlet-class>opendap.coreServlet.NewDispatchServlet</servlet-class>
 
         <init-param>
             <param-name>DebugOn</param-name>

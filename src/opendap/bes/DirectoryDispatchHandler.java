@@ -59,40 +59,25 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private HttpServlet dispatchServlet;
     private String systemPath;
 
-
     private BesApi _besApi;
-
-    private String _loginPath;
-    private String _logoutPath;
 
 
     public DirectoryDispatchHandler() {
-
-
-
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
-        _loginPath = null;
-        _logoutPath = null;
-
     }
 
-
-
     public void init(HttpServlet s, Element config) throws Exception {
+        init(s,config,new BesApi());
+    }
+
+    public void init(HttpServlet s, Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
         dispatchServlet = s;
         systemPath = ServletUtil.getSystemPath(s,"");
-
-        _besApi = new BesApi();
-
-
-        // Moved this step to opendap.coreServlet.DispatchServlet
-        // Element loginControls = config.getChild("AuthenticationControls");
-        // AuthenticationControls.init(loginControls,s.getServletContext().getContextPath());
-
+        _besApi = besApi;
         initialized = true;
     }
 
