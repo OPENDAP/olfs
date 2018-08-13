@@ -1441,12 +1441,12 @@ public class BesApi implements Cloneable {
                     if(root==null)
                         throw new IOException("BES showNode response for "+dataSource+" was empty! No root element");
 
-                    Element showCatalog  = root.getChild("showNode", BES_NS);
-                    if(showCatalog==null)
+                    Element showNode  = root.getChild("showNode", BES_NS);
+                    if(showNode==null)
                         throw new IOException("BES showNode response for "+dataSource+" was malformed! No showNode element");
 
                     // Find the top level node Element
-                    Element topNode = showCatalog.getChild("node", BES_NS);
+                    Element topNode = showNode.getChild("node", BES_NS);
                     if(topNode==null)
                         throw new IOException("BES showNode response for "+dataSource+" was malformed! No node element.");
 
@@ -1469,7 +1469,7 @@ public class BesApi implements Cloneable {
 
 
             } else {
-                log.info(logPrefix + "Using cached copy of BES showCatalog.  dataSource=\"" +
+                log.info(logPrefix + "Using cached copy of BES showNode.  dataSource=\"" +
                         dataSource + "\"");
 
                 if (o instanceof BESError) {
