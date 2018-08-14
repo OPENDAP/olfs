@@ -1446,11 +1446,16 @@ public class BesApi implements Cloneable {
                         throw new IOException("BES showNode response for "+dataSource+" was malformed! No showNode element");
 
                     // Find the top level node Element
-                    Element topNode = showNode.getChild("node", BES_NS);
-                    if(topNode==null)
-                        throw new IOException("BES showNode response for "+dataSource+" was malformed! No node element.");
+                    Element topElement = showNode.getChild("node", BES_NS);
+                    if(topElement==null) {
+                        topElement = showNode.getChild("item", BES_NS);
+                        if(topElement==null) {
+                            throw new IOException("BES showNode response for " + dataSource + " was malformed! " +
+                                    "No node or item element in the response.");
+                        }
+                    }
 
-                    topNode.setAttribute("prefix", getBESprefix(dataSource));
+                    topElement.setAttribute("prefix", getBESprefix(dataSource));
 
                     BesCatalogCache.putCatalogTransaction(dataSource, showNodeRequestDoc, response.clone());
                     // RequestCache.put(responseCacheKey, response.clone());
