@@ -165,19 +165,19 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         // Get the BES catalog for this node.
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        Document showCatalogDoc = new Document();
-        _besApi.getBesCatalog(besCatalogName, showCatalogDoc);
-        _log.debug(xmlo.outputString(showCatalogDoc));
+        Document showNodeDoc = new Document();
+        _besApi.getBesNode(besCatalogName, showNodeDoc);
+        _log.debug(xmlo.outputString(showNodeDoc));
 
         // Load the XSL for BESCatalog -> THREDDS catalog
-        String xsltDoc = _systemPath + "/xsl/catalog.xsl";
-        Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
+        String xsltDoc = _systemPath + "/xsl/node_catalog.xsl";
+        Transformer showNodeToThreddsCatalog = new Transformer(xsltDoc);
 
         //////////////////////////////////////////////////////////////////////
         // Configure services
 
         // Add a DAP service, because we are a DAP server above all else.
-        showCatalogToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
+        showNodeToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
 
 
         String base = null;
@@ -190,8 +190,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             NcWmsService nws = (NcWmsService) s;
             base  = nws.getBase();
             dsId = nws.getDynamicServiceId();
-            showCatalogToThreddsCatalog.setParameter("ncWmsServiceBase",base);
-            showCatalogToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
+            showNodeToThreddsCatalog.setParameter("ncWmsServiceBase",base);
+            showNodeToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
         }
         _log.debug("handleRequest() - ncWMS service base: {}",base);
 
@@ -220,17 +220,17 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             }
             if(wcsServicesElement.getContentSize()>0){
-                showCatalogToThreddsCatalog.setParameter(wcsServicesElement);
+                showNodeToThreddsCatalog.setParameter(wcsServicesElement);
             }
         }
 
         if(BesDapDispatcher.allowDirectDataSourceAccess())
-            showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
+            showNodeToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-            showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
+            showNodeToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
 
-        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
+        JDOMSource besCatalog = new JDOMSource(showNodeDoc);
 
         String threddsCatalogID = oreq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
 
@@ -248,7 +248,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             // Transform the BES  showCatalog response into a thredds catalog
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            showCatalogToThreddsCatalog.transform(besCatalog, baos);
+            showNodeToThreddsCatalog.transform(besCatalog, baos);
 
             // Parse the thredds catalog into a JDOM document.
             SAXBuilder sb = new SAXBuilder();
@@ -319,7 +319,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         }
         else {
             // Transform the BES showCatalog response intp a THREDDS catalog and send it off to the client.
-            showCatalogToThreddsCatalog.transform(besCatalog, response.getOutputStream());
+            showNodeToThreddsCatalog.transform(besCatalog, response.getOutputStream());
         }
         _log.debug("handleRequest() - THREDDS showCatalogDoc request processed.");
     }

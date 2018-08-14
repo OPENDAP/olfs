@@ -1445,17 +1445,7 @@ public class BesApi implements Cloneable {
                     if(showNode==null)
                         throw new IOException("BES showNode response for "+dataSource+" was malformed! No showNode element");
 
-                    // Find the top level node Element
-                    Element topElement = showNode.getChild("node", BES_NS);
-                    if(topElement==null) {
-                        topElement = showNode.getChild("item", BES_NS);
-                        if(topElement==null) {
-                            throw new IOException("BES showNode response for " + dataSource + " was malformed! " +
-                                    "No node or item element in the response.");
-                        }
-                    }
-
-                    topElement.setAttribute("prefix", getBESprefix(dataSource));
+                    showNode.setAttribute("prefix", getBESprefix(dataSource));
 
                     BesCatalogCache.putCatalogTransaction(dataSource, showNodeRequestDoc, response.clone());
                     // RequestCache.put(responseCacheKey, response.clone());
@@ -2630,13 +2620,8 @@ public class BesApi implements Cloneable {
 
     }
 
+
     public Document getShowNodeRequestDocument(String dataSource)
-            throws BadConfigurationException {
-
-        return getShowNodeRequestDocument(BesApi.DEFAULT_BES_CATALOG,dataSource);
-    }
-
-    public Document getShowNodeRequestDocument(String catalog, String dataSource)
             throws BadConfigurationException {
 
         Element e, request = new Element("request", BES_NS);
@@ -2649,7 +2634,6 @@ public class BesApi implements Cloneable {
         if(dataSource!=null){
             besDataSource = getBES(dataSource).trimPrefix(dataSource);
         }
-        e.setAttribute("catalog",catalog);
         e.setAttribute("node",besDataSource);
 
         request.addContent(e);
