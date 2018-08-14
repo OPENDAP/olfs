@@ -96,6 +96,49 @@ public class PathBuilder  {
 
 
 
+
+
+    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator) {
+        try {
+            return normalizePath(rawPath, leadingSeparator, trailingSeparator, "/");
+        }
+        catch (Exception e){
+
+            return "/";
+        }
+    }
+
+    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator, String separator) throws Exception {
+
+        if(separator.length()>1)
+            throw new Exception("The path separator character may only have a single character, not "+separator.length());
+        String doubleSeparator = separator+separator;
+        String path = rawPath.replace(doubleSeparator,separator);
+        if(path.isEmpty())
+            path = separator;
+
+        if(path!=separator){
+            if(leadingSeparator && !path.startsWith(separator)){
+                path = separator + path;
+            }
+            else {
+                if(path.startsWith(separator))
+                    path =  path.substring(1);
+            }
+
+            if(trailingSeparator && !path.endsWith(separator)){
+                path += separator;
+            }
+            else {
+                if(path.endsWith(separator))
+                    path =  path.substring(0,path.length()-1);
+            }
+        }
+        return path;
+    }
+
+
+
     public PathBuilder append(String s){
         _sb.append(s);
         return this;

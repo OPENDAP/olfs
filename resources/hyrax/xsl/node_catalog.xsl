@@ -98,8 +98,8 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
-                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="concat($dapService,../@name,'/',@name)" /></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="concat($dapService,$besPrefix,../@name,'/',@name)" /></xsl:otherwise>
+                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="concat($dapService,../@name,@name)" /></xsl:when>
+                        <xsl:otherwise><xsl:value-of select="concat($dapService,$besPrefix,../@name,@name)" /></xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
@@ -144,14 +144,7 @@
         </xsl:variable>
 
         <xsl:variable name="ID">
-            <xsl:choose>
-                <xsl:when test="$name='/'" >
-                    <xsl:value-of select="concat($dapService,$name)" />
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="concat($dapService, $name,'/')" />
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="concat($dapService, $name)" />
         </xsl:variable>
 
         <thredds:dataset name="{$name}" ID="{$ID}">
@@ -169,8 +162,8 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
-                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="concat(../@name,'/',@name)" /></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="concat($besPrefix,../@name,'/',@name)" /></xsl:otherwise>
+                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="concat(../@name,@name)" /></xsl:when>
+                        <xsl:otherwise><xsl:value-of select="concat($besPrefix,../@name,@name)" /></xsl:otherwise>
                     </xsl:choose>
 
                 </xsl:otherwise>

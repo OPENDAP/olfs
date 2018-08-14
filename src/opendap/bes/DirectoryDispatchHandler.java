@@ -280,12 +280,23 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
+
+       PathBuilder.normalizePath(collectionName, true, false);
+
+
+            while(!collectionName.equals("/") && collectionName.startsWith("/"))
+            collectionName = collectionName.substring(1);
+
+        if(!collectionName.equals("/"))
+            collectionName = "/" + collectionName;
+
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
+        /*
         while(!collectionName.equals("/") && collectionName.startsWith("/"))
             collectionName = collectionName.substring(1);
-
+*/
         log.debug("collectionName:  "+collectionName);
 
         return collectionName;

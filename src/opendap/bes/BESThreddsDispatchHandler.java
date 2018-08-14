@@ -27,6 +27,7 @@
 package opendap.bes;
 
 
+import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
@@ -158,8 +159,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         }
         if (!besCatalogName.endsWith("/"))
             besCatalogName += "/";
-        while (besCatalogName.startsWith("/") && besCatalogName.length()>1)
-            besCatalogName = besCatalogName.substring(1);
+
+        PathBuilder.normalizePath(besCatalogName,true,false);
         _log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
 
 
@@ -178,7 +179,6 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         // Add a DAP service, because we are a DAP server above all else.
         showNodeToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
-
 
         String base = null;
         String dsId;
