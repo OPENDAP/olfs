@@ -96,6 +96,17 @@ public class PathBuilder  {
 
 
 
+    public static String basename(String path){
+        String name = path;
+        int lastIndexOfSlash = path.lastIndexOf('/');
+        if(lastIndexOfSlash > 0) {
+            name = path.substring(lastIndexOfSlash);
+        }
+        while (name.startsWith("/") && name.length() > 1) {
+            name = name.substring(1);
+        }
+        return name;
+    }
 
 
     public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator) {
@@ -103,7 +114,6 @@ public class PathBuilder  {
             return normalizePath(rawPath, leadingSeparator, trailingSeparator, "/");
         }
         catch (Exception e){
-
             return "/";
         }
     }

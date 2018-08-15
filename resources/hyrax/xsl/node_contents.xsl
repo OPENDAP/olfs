@@ -46,11 +46,11 @@
 
     <xsl:variable name="besPrefix">
         <xsl:choose>
-            <xsl:when test="/bes:response/bes:showCatalog/bes:dataset/@prefix!='/'">
-                <xsl:value-of select="concat(/bes:response/bes:showCatalog/bes:dataset/@prefix,'/')"/>
+            <xsl:when test="/bes:response/bes:showNode/@prefix!='/'">
+                <xsl:value-of select="concat(/bes:response/bes:showNode/@prefix,'/')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
+                <xsl:value-of select="/bes:response/bes:showNode/@prefix"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>

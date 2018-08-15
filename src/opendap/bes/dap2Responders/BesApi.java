@@ -1313,6 +1313,7 @@ public class BesApi implements Cloneable {
      * @throws IOException               .
      * @throws JDOMException             .
      */
+    @Deprecated
     public void getBesCatalog(String dataSource, Document response)
             throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
 

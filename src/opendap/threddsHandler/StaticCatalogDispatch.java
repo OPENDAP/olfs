@@ -86,6 +86,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     ReentrantLock _datasetToHtmlTransformLock;
 
 
+    String _besNodeToDatasetScanCatalogTrasformFile = "/xsl/besNodeToDatasetScanCatalog.xsl";
 
     String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
 
@@ -680,39 +681,26 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
         Element e;
-        String ingestTransformFile = null;
+        String ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
         e = _config.getChild("ingestTransformFile");
         if (e != null) {
             ingestTransformFile = e.getTextTrim();
         }
-
-        String besCatalogToDatasetScanCatalogTransformFile = null;
-        e = _config.getChild("besCatalogToDatasetScanCatalogTransformFile");
-        if (e != null) {
-            besCatalogToDatasetScanCatalogTransformFile = e.getTextTrim();
-        }
-
-        _log.debug("init() - Configuration file ingest complete.");
-
-
-        if (ingestTransformFile == null) {
-
-            ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
-        }
-
         _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
-        if (besCatalogToDatasetScanCatalogTransformFile == null) {
-            besCatalogToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/besCatalogToDatasetScanCatalog.xsl");
+        String besNodeToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, _besNodeToDatasetScanCatalogTrasformFile);
+        e = _config.getChild("besNodeToDatasetScanCatalogTransformFile");
+        if (e != null) {
+            besNodeToDatasetScanCatalogTransformFile = e.getTextTrim();
         }
-        _log.debug("init() - Using BES ingest transform file: " + besCatalogToDatasetScanCatalogTransformFile);
+        _log.debug("init() - Using BES Node to DatasetScan Catalog transform file: " + besNodeToDatasetScanCatalogTransformFile);
 
-
+        _log.debug("init() - Configuration file ingest complete.");
 
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
         String contentPath = ServletUtil.getConfigPath(servlet);
-        CatalogManager.init(contentPath, ingestTransformFile, besCatalogToDatasetScanCatalogTransformFile, _besApi);
+        CatalogManager.init(contentPath, ingestTransformFile, besNodeToDatasetScanCatalogTransformFile, _besApi);
 
 
         String fileName, pathPrefix, thisUrlPrefix;
