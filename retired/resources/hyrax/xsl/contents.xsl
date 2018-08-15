@@ -31,7 +31,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
-    <xsl:import href="version.xsl" />
+    <xsl:import href="../../../../resources/hyrax/xsl/version.xsl" />
 
     <xsl:param name="dapService" />
     <xsl:param name="docsService" />
