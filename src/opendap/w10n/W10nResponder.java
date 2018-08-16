@@ -579,6 +579,7 @@ public class W10nResponder {
      * @throws JDOMException
      * @throws IOException
      */
+    @Deprecated
     private void sendBesCatalogAsJson(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws JDOMException, IOException, BESError {
 
         // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -959,6 +960,7 @@ public class W10nResponder {
      * @throws SaxonApiException
      * @throws IOException
      */
+    @Deprecated
     private void sendBesCatalogAsHtml(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws SaxonApiException, IOException {
 
 
