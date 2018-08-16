@@ -69,165 +69,166 @@
         <xsl:variable name="catalogName">
             <xsl:choose>
                 <xsl:when test="bes:node/@name='/'" >
-                    <xsl:value-of select="/bes:response/bes:showNode/bes:node/@prefix"/>
+                    <xsl:value-of select="/bes:response/bes:showNode/@prefix"/>moo
                 </xsl:when>
                 <xsl:otherwise >
-                    <xsl:value-of select="$besPrefix"/><xsl:value-of select="bes:node/@name"/>
+                    <xsl:if test="$besPrefix!='/'"><xsl:value-of select="$besPrefix"/></xsl:if>
+                    <xsl:value-of select="(bes:node | bes:item)/@name"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
 
-            <head>
-                <link rel='stylesheet' href='{$docsService}/css/contents.css'
-                      type='text/css'/>
-                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
-            </head>
-            <body>
+        <head>
+            <link rel='stylesheet' href='{$docsService}/css/contents.css'
+                  type='text/css'/>
+            <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="$catalogName"/></title>
+        </head>
+        <body>
+            <h3>catalogName: <xsl:value-of select="$catalogName"/></h3>
+            <!-- ****************************************************** -->
+            <!--                      LOGIN UI                          -->
+            <!--                                                        -->
+            <!--                                                        -->
+            <xsl:choose>
+                <xsl:when test="$userId">
 
-                <!-- ****************************************************** -->
-                <!--                      LOGIN UI                          -->
-                <!--                                                        -->
-                <!--                                                        -->
-                <xsl:choose>
-                    <xsl:when test="$userId">
+                    <div style='float: right;vertical-align:middle;font-size:small;'>
+                        <xsl:choose>
+                            <xsl:when test="$loginLink">
+                                <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <b><xsl:value-of select="$userId"/></b><br/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                    </div>
 
+
+                </xsl:when>
+                <xsl:otherwise>
+
+                    <xsl:if test="$loginLink">
                         <div style='float: right;vertical-align:middle;font-size:small;'>
-                            <xsl:choose>
-                                <xsl:when test="$loginLink">
-                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <b><xsl:value-of select="$userId"/></b><br/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                            <a style="color: green;" href="{$loginLink}">login</a>
                         </div>
-
-
-                    </xsl:when>
-                    <xsl:otherwise>
-
-                        <xsl:if test="$loginLink">
-                            <div style='float: right;vertical-align:middle;font-size:small;'>
-                                <a style="color: green;" href="{$loginLink}">login</a>
-                            </div>
-                        </xsl:if>
-
-                    </xsl:otherwise>
-                </xsl:choose>
-
-                <!-- ****************************************************** -->
-                <!--                      PAGE BANNER                       -->
-                <!--                                                        -->
-                <!--                                                        -->
-
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
-                <h1>Contents of
-                    <xsl:value-of select="$catalogName"/>
-                </h1>
-                <hr size="1" noshade="noshade"/>
-
-                <!-- ****************************************************** -->
-                <!--                       PAGE BODY                        -->
-                <!--                                                        -->
-                <!--                                                        -->
-                <pre>
-                    <table border="0" width="100%" itemscope="" itemtype="http://schema.org/DataCatalog">
-                        <caption style="display:none">
-                            <a itemprop="url" href="#">
-                                <span itemprop="name">
-                                    <xsl:value-of select="$catalogName"/>
-                                </span>
-                            </a>
-                        </caption>
-                        <tr>
-                            <th align="left">Name</th>
-                            <th align="center">Last Modified</th>
-                            <th align="center">Size</th>
-                            <th align="center">DAP Response Links</th>
-                            <th align="center">Dataset Viewers</th>
-                        </tr>
-                        <tr>
-                            <td>
-                                <!-- xsl:if test="bes:dataset/@name!='/'" >
-                                    <a href="..">Parent Directory/</a>
-                                </xsl:if -->
-                                <xsl:if test="$besPrefix!='/'" >
-                                    <xsl:if test="bes:dataset/@name='/'" >
-                                        <a href="..">Parent Directory/</a>
-                                    </xsl:if>
-                                </xsl:if>
-                            </td>
-                        </tr>
-                        <xsl:for-each select="bes:node/bes:item">
-
-                            <!-- Process a collection. -->
-                            <xsl:if test="@type='node'">
-                                <tr>
-                                    <xsl:call-template name="NodeLinks" />
-                                </tr>
-                            </xsl:if>
-
-                            <!-- Process a data set -->
-                            <xsl:if test="@type='leaf'">
-                                <tr itemprop="dataset" itemscope="" itemtype="http://schema.org/Dataset">
-                                <xsl:choose>
-                                    <xsl:when test="@isData='true'">
-                                        <xsl:call-template name="DapServiceLinks" />
-                                    </xsl:when>
-
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="FileServiceLinks" />
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                                </tr>
-                            </xsl:if>
-
-
-                        </xsl:for-each>
-                    </table>
-                </pre>
-                <!-- ****************************************************** -->
-                <!--                              FOOTER                    -->
-                <!--                                                        -->
-                <!--                                                        -->
-                <hr size="1" noshade="noshade"/>
-                <table width="100%" border="0">
-                    <tr>
-                        <td>
-                            <div class="small" align="left">
-                                THREDDS Catalog <a href="catalog.xml">XML</a>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="small" align="right">
-                                Hyrax development sponsored by
-                                <a href='http://www.nsf.gov/'>NSF</a>
-                                ,
-                                <a href='http://www.nasa.gov/'>NASA</a>
-                                , and
-                                <a href='http://www.noaa.gov/'>NOAA</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-
-                <!-- ****************************************************** -->
-                <!--         HERE IS THE HYRAX VERSION NUMBER               -->
-                <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-
-                    <xsl:if test="bes:dataset/@name='/'">
-                        <span class="uuid">
-                            ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
-                        </span>
                     </xsl:if>
 
-                    <br/>
-                    <a href='{$docsService}/'>Documentation</a>
-                </h3>
-                <xsl:call-template name="json-ld-DataCatalog"/>
-            </body>
+                </xsl:otherwise>
+            </xsl:choose>
+
+            <!-- ****************************************************** -->
+            <!--                      PAGE BANNER                       -->
+            <!--                                                        -->
+            <!--                                                        -->
+
+            <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
+            <h1>Contents of
+                <xsl:value-of select="$catalogName"/>
+            </h1>
+            <hr size="1" noshade="noshade"/>
+
+            <!-- ****************************************************** -->
+            <!--                       PAGE BODY                        -->
+            <!--                                                        -->
+            <!--                                                        -->
+            <pre>
+                <table border="0" width="100%" itemscope="" itemtype="http://schema.org/DataCatalog">
+                    <caption style="display:none">
+                        <a itemprop="url" href="#">
+                            <span itemprop="name">
+                                <xsl:value-of select="$catalogName"/>
+                            </span>
+                        </a>
+                    </caption>
+                    <tr>
+                        <th align="left">Name</th>
+                        <th align="center">Last Modified</th>
+                        <th align="center">Size</th>
+                        <th align="center">DAP Response Links</th>
+                        <th align="center">Dataset Viewers</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- xsl:if test="bes:dataset/@name!='/'" >
+                                <a href="..">Parent Directory/</a>
+                            </xsl:if -->
+                            <xsl:if test="$besPrefix!='/'" >
+                                <xsl:if test="bes:dataset/@name='/'" >
+                                    <a href="..">Parent Directory/</a>
+                                </xsl:if>
+                            </xsl:if>
+                        </td>
+                    </tr>
+                    <xsl:for-each select="bes:node/bes:item">
+
+                        <!-- Process a collection. -->
+                        <xsl:if test="@type='node'">
+                            <tr>
+                                <xsl:call-template name="NodeLinks" />
+                            </tr>
+                        </xsl:if>
+
+                        <!-- Process a data set -->
+                        <xsl:if test="@type='leaf'">
+                            <tr itemprop="dataset" itemscope="" itemtype="http://schema.org/Dataset">
+                            <xsl:choose>
+                                <xsl:when test="@isData='true'">
+                                    <xsl:call-template name="DapServiceLinks" />
+                                </xsl:when>
+
+                                <xsl:otherwise>
+                                    <xsl:call-template name="FileServiceLinks" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            </tr>
+                        </xsl:if>
+
+
+                    </xsl:for-each>
+                </table>
+            </pre>
+            <!-- ****************************************************** -->
+            <!--                              FOOTER                    -->
+            <!--                                                        -->
+            <!--                                                        -->
+            <hr size="1" noshade="noshade"/>
+            <table width="100%" border="0">
+                <tr>
+                    <td>
+                        <div class="small" align="left">
+                            THREDDS Catalog <a href="catalog.xml">XML</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="small" align="right">
+                            Hyrax development sponsored by
+                            <a href='http://www.nsf.gov/'>NSF</a>
+                            ,
+                            <a href='http://www.nasa.gov/'>NASA</a>
+                            , and
+                            <a href='http://www.noaa.gov/'>NOAA</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- ****************************************************** -->
+            <!--         HERE IS THE HYRAX VERSION NUMBER               -->
+            <!--                                                        -->
+            <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+
+                <xsl:if test="bes:dataset/@name='/'">
+                    <span class="uuid">
+                        ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
+                    </span>
+                </xsl:if>
+
+                <br/>
+                <a href='{$docsService}/'>Documentation</a>
+            </h3>
+            <xsl:call-template name="json-ld-DataCatalog"/>
+        </body>
     </xsl:template>
 
 
