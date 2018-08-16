@@ -84,7 +84,6 @@
             <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="$catalogName"/></title>
         </head>
         <body>
-            <h3>catalogName: <xsl:value-of select="$catalogName"/></h3>
             <!-- ****************************************************** -->
             <!--                      LOGIN UI                          -->
             <!--                                                        -->
