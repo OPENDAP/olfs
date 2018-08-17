@@ -310,7 +310,7 @@ public class DispatchServlet extends HttpServlet {
      *             <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
      *             <Handler className="opendap.bes.FileDispatchHandler" />
      */
-    void loadHyraxServiceHandlers(Vector<DispatchHandler> handlers, Element config ) throws Exception {
+    private void loadHyraxServiceHandlers(Vector<DispatchHandler> handlers, Element config ) throws Exception {
 
         if(config==null)
             throw new ServletException("Bad configuration! The configuration element was NULL");

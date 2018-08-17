@@ -69,7 +69,7 @@
         <xsl:variable name="catalogName">
             <xsl:choose>
                 <xsl:when test="bes:node/@name='/'" >
-                    <xsl:value-of select="/bes:response/bes:showNode/@prefix"/>moo
+                    <xsl:value-of select="/bes:response/bes:showNode/@prefix"/>
                 </xsl:when>
                 <xsl:otherwise >
                     <xsl:if test="$besPrefix!='/'"><xsl:value-of select="$besPrefix"/></xsl:if>

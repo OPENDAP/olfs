@@ -2615,6 +2615,7 @@ public class BesApi implements Cloneable {
     }
 
 
+    @Deprecated
     public Document getShowCatalogRequestDocument(String dataSource)
             throws BadConfigurationException {
         return getShowRequestDocument("showCatalog", dataSource);
@@ -2624,21 +2625,7 @@ public class BesApi implements Cloneable {
 
     public Document getShowNodeRequestDocument(String dataSource)
             throws BadConfigurationException {
-
-        Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
-        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
-
-        e = new Element("showNode",BES_NS);
-
-        String besDataSource = "/";
-        if(dataSource!=null){
-            besDataSource = getBES(dataSource).trimPrefix(dataSource);
-        }
-        e.setAttribute("node",besDataSource);
-
-        request.addContent(e);
-        return new Document(request);
+        return getShowRequestDocument("showNode", dataSource);
     }
 
 
@@ -2828,6 +2815,7 @@ public class BesApi implements Cloneable {
         StringBuilder combinedTypeMatch = new StringBuilder();
         Element typeMatchKey = showBesKey(besPrefix,"BES.Catalog.catalog.TypeMatch");
 
+        @SuppressWarnings("unchecked")
         List<Element> values = (List<Element>)typeMatchKey.getChildren("value",BES_NS);
 
         for(Element value: values){
