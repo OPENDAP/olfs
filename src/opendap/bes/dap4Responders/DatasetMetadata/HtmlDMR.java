@@ -27,6 +27,7 @@
 package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
@@ -159,6 +160,8 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+
+            AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(dmr), os);

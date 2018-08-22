@@ -59,40 +59,25 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private HttpServlet dispatchServlet;
     private String systemPath;
 
-
     private BesApi _besApi;
-
-    private String _loginPath;
-    private String _logoutPath;
 
 
     public DirectoryDispatchHandler() {
-
-
-
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
-        _loginPath = null;
-        _logoutPath = null;
-
     }
 
-
-
     public void init(HttpServlet s, Element config) throws Exception {
+        init(s,config,new BesApi());
+    }
+
+    public void init(HttpServlet s, Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
         dispatchServlet = s;
         systemPath = ServletUtil.getSystemPath(s,"");
-
-        _besApi = new BesApi();
-
-
-        // Moved this step to opendap.coreServlet.DispatchServlet
-        // Element loginControls = config.getChild("AuthenticationControls");
-        // AuthenticationControls.init(loginControls,s.getServletContext().getContextPath());
-
+        _besApi = besApi;
         initialized = true;
     }
 
@@ -251,19 +236,18 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-        Document showCatalogDoc = new Document();
-        _besApi.getBesCatalog(collectionName, showCatalogDoc);
+        Document showNodeDoc = new Document();
+        _besApi.getBesNode(collectionName, showNodeDoc);
 
         if(log.isDebugEnabled()){
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+            log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
+        JDOMSource besNode = new JDOMSource(showNodeDoc);
 
-        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-            xsltDoc = systemPath + "/xsl/contents.xsl";
+            xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
         Transformer transformer = new Transformer(xsltDoc);
         transformer.setParameter("dapService",oreq.getServiceLocalId());
@@ -277,7 +261,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         AuthenticationControls.setLoginParameters(transformer,request);
 
         // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform(besCatalog, response.getOutputStream());
+        transformer.transform(besNode, response.getOutputStream());
         // transformer.transform(besCatalog, System.out);
 
 
@@ -296,12 +280,23 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
+
+       PathBuilder.normalizePath(collectionName, true, false);
+
+
+            while(!collectionName.equals("/") && collectionName.startsWith("/"))
+            collectionName = collectionName.substring(1);
+
+        if(!collectionName.equals("/"))
+            collectionName = "/" + collectionName;
+
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
+        /*
         while(!collectionName.equals("/") && collectionName.startsWith("/"))
             collectionName = collectionName.substring(1);
-
+*/
         log.debug("collectionName:  "+collectionName);
 
         return collectionName;

@@ -61,17 +61,14 @@ public class FileDispatchHandler implements DispatchHandler {
 
     }
 
-
-
     public void init(HttpServlet servlet,Element config) throws Exception {
+        init(servlet, config, new BesApi());
+    }
 
+    public void init(HttpServlet servlet,Element config, BesApi besApi) throws Exception {
         if(initialized) return;
-
-        _besApi = new BesApi();
-
-
+        _besApi = besApi;
         initialized = true;
-
     }
 
     public boolean requestCanBeHandled(HttpServletRequest request)

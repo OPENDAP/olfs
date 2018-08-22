@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
  *
  *  - override BesApi.besTransaction(*)
  */
-public class BesApi {
+public class BesApi implements Cloneable {
 
     public static final String DAP4_DATA  = "dap";
     public static final String DAP4_DMR   = "dmr";
@@ -123,7 +123,7 @@ public class BesApi {
      * In more common parlance it's "the catalog called catalog" the utilizes
      * the BES.Catalog.catalog.RootDirectory filesystem as the catalog.
      */
-    public static final String DEFAULT_BES_SPACE = "catalog";
+    public static final String DEFAULT_BES_CATALOG = "catalog";
 
     /**
      * This specifes the sdeafult BES "container" name. While this name could
@@ -141,6 +141,9 @@ public class BesApi {
      */
     private static String BES_ERROR = "BESError";
 
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     private boolean _initialized = false;
 
@@ -1310,6 +1313,7 @@ public class BesApi {
      * @throws IOException               .
      * @throws JDOMException             .
      */
+    @Deprecated
     public void getBesCatalog(String dataSource, Document response)
             throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
 
@@ -1367,6 +1371,101 @@ public class BesApi {
 
             } else {
                 log.info(logPrefix + "Using cached copy of BES showCatalog.  dataSource=\"" +
+                        dataSource + "\"");
+
+                if (o instanceof BESError) {
+                    log.info(logPrefix + "Cache contains BESError object.  dataSource=\"" +
+                            dataSource + "\"");
+                    BESError error = (BESError) o;
+                    throw error;
+                }
+                else if(o instanceof Document){
+                    Document cachedCatalogDoc = (Document)o;
+                    Element root = cachedCatalogDoc.getRootElement();
+                    Element newRoot =  (Element) root.clone();
+                    newRoot.detach();
+                    response.setRootElement(newRoot);
+                }
+                else {
+                    throw new IOException("Cached object is of unexpected type! This is a bad thing! Object: "+o.getClass().getCanonicalName());
+                }
+            }
+        }
+        finally {
+            Timer.stop(timedProc);
+
+        }
+
+    }
+
+
+
+    /**
+     * Returns the BES catalog document for the specified dataSource.
+     *
+     * @param dataSource The data source whose information is to be retrieved
+     * @param response The document where the response (be it a catalog
+     * document or an error) will be placed.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public void getBesNode(String dataSource, Document response)
+            throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
+
+        String logPrefix = "getBesNode() - ";
+
+        Procedure timedProc = Timer.start();
+        try {
+
+            //String responseCacheKey = this.getClass().getName() + ".getBesCatalog(\"" + dataSource + "\")";
+
+            log.info(logPrefix + "Looking for cached copy of BES showNode response for dataSource \"" +
+                    dataSource + "\"");
+
+            Object o = BesCatalogCache.getCatalog(dataSource);
+            //Object o = RequestCache.get(responseCacheKey);
+
+            if (o == null) {
+                log.info(logPrefix + "No cached copy of BES showNode response for dataSource \"" +
+                        dataSource + "\" found. Acquiring now.");
+
+                Document showNodeRequestDoc = getShowNodeRequestDocument(dataSource);
+
+                try {
+                    besTransaction(dataSource, showNodeRequestDoc, response);
+                    // Get the root element.
+                    Element root = response.getRootElement();
+                    if(root==null)
+                        throw new IOException("BES showNode response for "+dataSource+" was empty! No root element");
+
+                    Element showNode  = root.getChild("showNode", BES_NS);
+                    if(showNode==null)
+                        throw new IOException("BES showNode response for "+dataSource+" was malformed! No showNode element");
+
+                    showNode.setAttribute("prefix", getBESprefix(dataSource));
+
+                    BesCatalogCache.putCatalogTransaction(dataSource, showNodeRequestDoc, response.clone());
+                    // RequestCache.put(responseCacheKey, response.clone());
+                    log.info(logPrefix + "Cached copy of BES showNode response for dataSource: \"" +
+                            dataSource + "\"");
+
+                }
+                catch (BESError be){
+                    log.info(logPrefix + "The BES returned a BESError for dataSource: \"" + dataSource +
+                            "\"  CACHING. (responseCacheKey=\"" + dataSource + "\")");
+                    BesCatalogCache.putCatalogTransaction(dataSource, showNodeRequestDoc, be);
+                    // RequestCache.put(dataSource, be);
+                    throw be;
+                }
+
+
+
+            } else {
+                log.info(logPrefix + "Using cached copy of BES showNode.  dataSource=\"" +
                         dataSource + "\"");
 
                 if (o instanceof BESError) {
@@ -2405,7 +2504,7 @@ public class BesApi {
      *
      * @return The name os the BES "space" (aka catalog) which will be used to service the request.
      */
-    protected String getBesSpaceName(){ return DEFAULT_BES_SPACE; }
+    protected String getBesSpaceName(){ return DEFAULT_BES_CATALOG; }
 
     /**
      * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
@@ -2516,10 +2615,17 @@ public class BesApi {
     }
 
 
+    @Deprecated
     public Document getShowCatalogRequestDocument(String dataSource)
             throws BadConfigurationException {
         return getShowRequestDocument("showCatalog", dataSource);
 
+    }
+
+
+    public Document getShowNodeRequestDocument(String dataSource)
+            throws BadConfigurationException {
+        return getShowRequestDocument("showNode", dataSource);
     }
 
 
@@ -2550,11 +2656,6 @@ public class BesApi {
         return new Document(request);
 
     }
-
-
-
-
-
 
     public BES getBES(String dataSource) throws BadConfigurationException {
         BES bes = BESManager.getBES(dataSource);
@@ -2714,6 +2815,7 @@ public class BesApi {
         StringBuilder combinedTypeMatch = new StringBuilder();
         Element typeMatchKey = showBesKey(besPrefix,"BES.Catalog.catalog.TypeMatch");
 
+        @SuppressWarnings("unchecked")
         List<Element> values = (List<Element>)typeMatchKey.getChildren("value",BES_NS);
 
         for(Element value: values){

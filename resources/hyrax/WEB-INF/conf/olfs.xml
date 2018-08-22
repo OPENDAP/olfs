@@ -64,6 +64,17 @@
         </BES>
     </BESManager>
 
+<!--
+    <ThreddsService  prefix="thredds" useMemoryCache="true" />
+    <GatewayService  prefix="gateway" useMemoryCache="true" />
+    <UseDAP2ResourceUrlResponse />
+    <HttpPost enabled="true" max="2000000"/>
+-->
+
+    <!-- AddFileoutTypeSuffixToDownloadFilename / -->
+    <!-- AllowDirectDataSourceAccess / -->
+    <!-- PreloadNcmlIntoBes -->
+
     <!-- CatalogCache>
         <maxEntries>10000</maxEntries>
         <updateIntervalSeconds>10000</updateIntervalSeconds>
@@ -92,10 +103,10 @@
                 <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
 
             <!-- </Handler>  -->
-                     
-                     
-            <Handler className="opendap.ncml.NcmlDatasetDispatcher" />            
-   
+
+
+            <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
+
             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
                 <prefix>thredds</prefix>
                 <useMemoryCache>true</useMemoryCache>
@@ -175,7 +186,7 @@
     </DispatchHandlers>
 
     <!--
-      This enables or disables the generation of internal timing metrics for the OLFS
+      'Timer' enables or disables the generation of internal timing metrics for the OLFS
       If commented out the timing is disabled. If you want timing metrics to be output
       to the log then uncomment the Timer and set the enabled attribute's value to "true"
       WARNING: There is some performance cost to utilizing the Timer.

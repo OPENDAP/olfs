@@ -28,6 +28,7 @@ package opendap.w10n;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.sf.saxon.s9api.SaxonApiException;
+import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
@@ -385,6 +386,53 @@ public class W10nResponder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
+        Document besNode = new Document();
+
+        _besApi.getBesNode(w10nRequest.getValidResourcePath(), besNode);
+
+
+        _log.debug("sendMetaResponseForFileOrDir() - Catalog from BES:\n"+xmlo.outputString(besNode));
+
+
+        if(mt.getName().equalsIgnoreCase(Json.NAME)){
+            _log.debug("sendMetaResponseForFileOrDir() - Sending as JSON");
+            sendBesNodeAsJson(w10nRequest, besNode, response);
+
+        }
+        else if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
+            _log.debug("sendMetaResponseForFileOrDir() - Sending as HTML");
+            sendBesNodeAsHtml(w10nRequest, besNode, response);
+        }
+        else {
+            throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
+        }
+
+
+    }
+
+
+
+    /**
+     *
+     * Transmits the w10n meta response for a catalog directory/collection or file/granule using the correct media type.
+     *
+     * @param w10nRequest The w10n request to be serviced
+     * @param response The outbound response
+     * @throws JDOMException
+     * @throws BadConfigurationException
+     * @throws PPTException
+     * @throws IOException
+     * @throws SaxonApiException
+     *//*
+    private void sendW10nMetaResponseForFileOrDir_OLD(W10nRequest w10nRequest,
+                                                  HttpServletResponse response)
+            throws OPeNDAPException, JDOMException, IOException, SaxonApiException {
+
+
+        MediaType mt = w10nRequest.getBestMediaType();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
 
 
         Document showCatalogDoc = new Document();
@@ -397,7 +445,7 @@ public class W10nResponder {
 
         if(mt.getName().equalsIgnoreCase(Json.NAME)){
             _log.debug("sendMetaResponseForFileOrDir() - Sending as JSON");
-            sendBesCatalogAsJson(showCatalogDoc, w10nRequest, response);
+            sendBesCatalogAsJson(w10nRequest, showCatalogDoc,  response);
 
         }
         else if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
@@ -410,6 +458,117 @@ public class W10nResponder {
 
 
     }
+    */
+
+
+    /**
+     * Transmits a BES showCatalog response in a w10n JSON encoding.
+     *
+     * @param node The showNode response document.
+     * @param w10nRequest  The w10n request to be service.
+     * @throws JDOMException
+     * @throws IOException
+     */
+    private void sendBesNodeAsJson(W10nRequest w10nRequest, Document node, HttpServletResponse response) throws JDOMException, IOException, BESError {
+
+        // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        // response.getOutputStream().print(xmlo.outputString(node));
+
+
+
+
+        Element root = node.getRootElement();
+        if(root==null)
+            throw new IOException("BES showNode response document is missing the root (response) element!");
+
+        Element showNodeElement = root.getChild("showNode",BES.BES_NS);
+        if(showNodeElement==null)
+            throw new IOException("BES showNode response document is missing the showNode element!");
+
+
+        boolean isNode = false;
+        Element topElement = showNodeElement.getChild("node",BES.BES_NS);
+        if(topElement==null) {
+            topElement = showNodeElement.getChild("item",BES.BES_NS);
+            if(topElement==null)
+                throw new IOException("BES showNode response document is missing the expected 'node' or 'item' element!");
+            isNode = isItemW10nNode(topElement);
+        }
+        else {
+            isNode = true;
+        }
+
+        String type = getW10nTypeStringForBesNode(topElement);
+
+        HashMap<String,Object> jsonBesCatalogResponse = getJsonForBesItemOrNodeElement(topElement);
+
+        if(isNode) {
+
+            if(topElement.getName()=="node") {
+                ArrayList<Object> nodes = new ArrayList<>();
+                ArrayList<Object> leaves = new ArrayList<>();
+
+                @SuppressWarnings("unchecked")
+                List<Element> items = (List<Element>) topElement.getChildren("item", BES.BES_NS);
+
+                for (Element item : items) {
+                    HashMap<String, Object> jsonDataset = getJsonForBesItemOrNodeElement(item);
+
+                    if (isItemW10nNode(item)) {
+                        nodes.add(jsonDataset);
+                    } else {
+                        leaves.add(jsonDataset);
+                    }
+                }
+
+                jsonBesCatalogResponse.put("nodes", nodes);
+                jsonBesCatalogResponse.put("leaves", leaves);
+                jsonBesCatalogResponse.put("w10n",
+                        getW10nMetaObject(
+                                type,
+                                w10nRequest.getW10nResourcePath(),
+                                w10nRequest.getW10nId(),
+                                _defaultMetaMediaType,
+                                _supportedMetaMediaTypes)
+                );
+            }
+            else {
+                jsonBesCatalogResponse.put("w10n",
+                        getW10nMetaObject(
+                                type,
+                                w10nRequest.getW10nResourcePath(),
+                                w10nRequest.getW10nId(),
+                                _defaultMetaMediaType,
+                                _supportedMetaMediaTypes));
+
+            }
+
+        }
+        else {
+            jsonBesCatalogResponse.put("w10n",
+                    getW10nMetaObject(
+                            type,
+                            w10nRequest.getW10nResourcePath(),
+                            w10nRequest.getW10nId(),
+                            _defaultMetaMediaType,
+                            _supportedMetaMediaTypes));
+
+        }
+
+        ServletOutputStream sos =  response.getOutputStream();
+
+        if(w10nRequest.callback()!=null){
+            sos.print(w10nRequest.callback()+"(");
+        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        sos.print(gson.toJson(jsonBesCatalogResponse));
+        if(w10nRequest.callback()!=null){
+            sos.print(")");
+        }
+        sos.println();
+
+    }
+
 
 
     /**
@@ -420,7 +579,8 @@ public class W10nResponder {
      * @throws JDOMException
      * @throws IOException
      */
-    private void sendBesCatalogAsJson(Document showCatalogDoc, W10nRequest w10nRequest, HttpServletResponse response) throws JDOMException, IOException {
+    @Deprecated
+    private void sendBesCatalogAsJson(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws JDOMException, IOException, BESError {
 
         // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         // response.getOutputStream().print(xmlo.outputString(showCatalogDoc));
@@ -436,10 +596,10 @@ public class W10nResponder {
         if(topDataset==null)
             throw new IOException("BES showCatalog response document is missing the 'dataset' element!");
 
-        String type = getW10nTypeStringForBesCatalogDataset(topDataset);
+        String type = getW10nTypeStringForBesNode(topDataset);
 
 
-        boolean isNode = isW10nNode(topDataset);
+        boolean isNode = isDatasetW10nNode(topDataset);
 
         HashMap<String,Object> jsonBesCatalogResponse = getJsonForCatalogDatasetElement(topDataset);
 
@@ -454,7 +614,7 @@ public class W10nResponder {
             for(Element childDataset: childDatasets){
                 HashMap<String,Object> jsonDataset = getJsonForCatalogDatasetElement(childDataset);
 
-                if(isW10nNode(childDataset)){
+                if(isDatasetW10nNode(childDataset)){
                     nodes.add(jsonDataset);
                 }
                 else {
@@ -510,7 +670,7 @@ public class W10nResponder {
      *
      * @return  True if the dataset is a w10n node, false otherwise.
      */
-    private boolean isW10nNode(Element dataset){
+    private boolean isDatasetW10nNode(Element dataset){
 
         boolean isNode;
 
@@ -523,6 +683,30 @@ public class W10nResponder {
 
         return isNode;
 
+    }
+
+
+    /**
+     * Determines if a bes:item object is a w10n node.  It must either have type "node", or
+     * it must be type "leaf" and the value of the isData attribute must be "true".
+     * @param item The bes:item object
+     *
+     * @return  True if the dataset is a w10n node, false otherwise.
+     */
+    private boolean isItemW10nNode(Element item){
+
+        boolean isNode = false;
+        String type = item.getAttributeValue("type");
+        if(type!=null && type.equals("node")){
+            isNode = true;
+        }
+        else {
+            // It's a leaf, but if it's data it's a node
+            String isData = item.getAttributeValue("isData");
+            if(isData!=null && isData.equals("true"))
+                isNode=true;
+        }
+        return isNode;
     }
 
 
@@ -566,6 +750,61 @@ public class W10nResponder {
 
 
 
+    }
+
+
+    /**
+     * Returns a w10n JSON object representation of a bes:item element.
+     * @param item The bes:item element
+     * @return  The JSON representation (as a HashMap<String,Object>)
+     */
+    private HashMap<String,Object> getJsonForBesItemOrNodeElement(Element item){
+
+        ArrayList<Object> attributes = new ArrayList<>();
+        HashMap<String,Object> jsonObject = new HashMap<>();
+
+        if(item.getName().equals("item")){
+
+            String itemName = item.getAttributeValue("name");
+
+            String name = PathBuilder.basename(itemName);
+            jsonObject.put("name",name);
+
+            long size = -1;
+            String s = item.getAttributeValue("size");
+            if(s!=null) {
+                size = Long.parseLong(s);
+            }
+            attributes.add(getW10nAttribute("size", size));
+
+            String  lmt = item.getAttributeValue("lastModified");
+            attributes.add(getW10nAttribute("last-modified",lmt));
+
+            jsonObject.put("attributes",attributes);
+
+        }
+        else {
+            // It must be a node.
+            Element node = item;
+            String nodeName = node.getAttributeValue("name");
+
+            String name = PathBuilder.basename(nodeName);
+            jsonObject.put("name",name);
+
+            long size = -1;
+            String s = node.getAttributeValue("count");
+            if(s!=null) {
+                size = Long.parseLong(s);
+            }
+            attributes.add(getW10nAttribute("size", size));
+
+            String  lmt = item.getAttributeValue("lastModified");
+            attributes.add(getW10nAttribute("last-modified",lmt));
+
+            jsonObject.put("attributes",attributes);
+
+        }
+        return jsonObject;
     }
 
 
@@ -672,6 +911,45 @@ public class W10nResponder {
 
     }
 
+    /**
+     * Determines the w10n "type" of a BES catalog node element.
+     * @param node A bes:node element from a BES showCatalog response.
+     * @return The w10n "type" of a BES catalog node element
+     */
+    private String getW10nTypeStringForBesNode(Element node) throws BESError {
+
+        String type;
+
+        if(node.getName().equals("node")){
+            type = "fs.dir";
+        }
+        else if(node.getName().equals("item")){
+            String nodeType = node.getAttributeValue("type");
+            if(nodeType.equals("node")){
+                type = "fs.dir";
+            }
+            else {
+                // Axiom: If an item is not a node, then it is a leaf.
+                // It's a leaf, but is it data?
+                String isData = node.getAttributeValue("isData");
+                if(isData!=null && isData.equals("true")){
+                    type  = "dap";
+                }
+                else {
+                    type = "fs.file";
+                }
+            }
+        }
+        else {
+            throw new BESError("The bes:"+node.getName()+" element contains unanticipated content. expected " +
+                    "bes:node or bes:item. Received "+node.getName());
+        }
+        return type;
+
+
+
+    }
+
 
     /**
      * Transmits a BES catalog document as a w10n meta response encoded as HTML (srsly.)
@@ -682,6 +960,7 @@ public class W10nResponder {
      * @throws SaxonApiException
      * @throws IOException
      */
+    @Deprecated
     private void sendBesCatalogAsHtml(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws SaxonApiException, IOException {
 
 
@@ -690,6 +969,40 @@ public class W10nResponder {
         JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
         String xsltDoc = _systemPath + "/xsl/w10nCatalog.xsl";
+
+
+        Transformer transformer = new Transformer(xsltDoc);
+
+        transformer.setParameter("dapService",oreq.getServiceLocalId());
+        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+        if(BesDapDispatcher.allowDirectDataSourceAccess())
+            transformer.setParameter("allowDirectDataSourceAccess","true");
+
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform(besCatalog, response.getOutputStream());
+        // transformer.transform(besCatalog, System.out);
+
+
+
+    }
+
+    /**
+     * Transmits a BES catalog document as a w10n meta response encoded as HTML (srsly.)
+     *
+     * @param w10nRequest The w10n request to be serviced.
+     * @param showNodeDoc The BES showNode response document.
+     * @param response The outgoing response.
+     * @throws SaxonApiException
+     * @throws IOException
+     */
+    private void sendBesNodeAsHtml(W10nRequest w10nRequest, Document showNodeDoc, HttpServletResponse response) throws SaxonApiException, IOException {
+
+
+        Request oreq = new Request(null,w10nRequest.getServletRequest());
+
+        JDOMSource besCatalog = new JDOMSource(showNodeDoc);
+
+        String xsltDoc = _systemPath + "/xsl/showNodeToW10nCatalog.xsl";
 
 
         Transformer transformer = new Transformer(xsltDoc);

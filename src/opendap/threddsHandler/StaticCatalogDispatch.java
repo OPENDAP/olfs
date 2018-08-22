@@ -86,6 +86,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     ReentrantLock _datasetToHtmlTransformLock;
 
 
+    String _besNodeToDatasetScanCatalogTrasformFile = "/xsl/besNodeToDatasetScanCatalog.xsl";
 
     String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
 
@@ -624,9 +625,15 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-
+    @Override
     public void init(HttpServlet servlet, Element configuration) throws Exception {
+        init(servlet,configuration,new BesApi());
+    }
 
+    @Override
+    public void init(HttpServlet servlet, Element configuration, BesApi besApi) throws Exception {
+
+        _besApi = besApi;
 
         String s;
 
@@ -635,74 +642,65 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _dispatchServlet = servlet;
         _config = configuration;
 
+        _prefix = "thredds";
+        _useMemoryCache = true;
+
+        Element threddsService = _config.getChild("ThreddsService");
+        if (threddsService != null) {
+            s = threddsService.getAttributeValue("prefix");
+            if (s != null)
+                _prefix = s;
+
+            if (_prefix.equals("/"))
+                throw new Exception("Bad Configuration. The <Handler> " +
+                        "element that declares " + this.getClass().getName() +
+                        " MUST provide 1 <prefix>  " +
+                        "child element whose value may not be equal to \"/\"");
+
+            if (!_prefix.endsWith("/"))
+                _prefix += "/";
+
+            while (_prefix.startsWith("/") && _prefix.length()>1)
+                _prefix = _prefix.substring(1, _prefix.length());
+
+            _log.debug("init() - prefix: {}", _prefix);
+
+
+            s = threddsService.getAttributeValue("useMemoryCache");
+            if (s != null){
+                if(s.equalsIgnoreCase("true")) {
+                    _useMemoryCache = true;
+                }
+                else {
+                    _useMemoryCache = false;
+                }
+            }
+            _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
+
+        }
+
 
         Element e;
-
-        e = _config.getChild("prefix");
-        if (e != null)
-            _prefix = e.getTextTrim();
-
-        if (_prefix.equals("/"))
-            throw new Exception("Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <prefix>  " +
-                    "child element whose value may not be equal to \"/\"");
-
-        if (!_prefix.endsWith("/"))
-            _prefix += "/";
-
-        while (_prefix.startsWith("/") && _prefix.length()>1)
-            _prefix = _prefix.substring(1, _prefix.length());
-
-        _log.debug("init() - prefix: {}", _prefix);
-
-
-        e = _config.getChild("useMemoryCache");
-        if (e != null) {
-            s = e.getTextTrim();
-            if (s.equalsIgnoreCase("true")) {
-                _useMemoryCache = true;
-            }
-        }
-        _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
-
-
-        String ingestTransformFile = null;
+        String ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
         e = _config.getChild("ingestTransformFile");
         if (e != null) {
             ingestTransformFile = e.getTextTrim();
         }
-
-        String besCatalogToDatasetScanCatalogTransformFile = null;
-        e = _config.getChild("besCatalogToDatasetScanCatalogTransformFile");
-        if (e != null) {
-            besCatalogToDatasetScanCatalogTransformFile = e.getTextTrim();
-        }
-
-        _log.debug("init() - Configuration file ingest complete.");
-
-        /* USe the generic one for now and if later we want to reuse this code we can pass in another on through the
-        config */
-        _besApi = new BesApi();
-
-        if (ingestTransformFile == null) {
-
-            ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
-        }
-
         _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
-        if (besCatalogToDatasetScanCatalogTransformFile == null) {
-            besCatalogToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/besCatalogToDatasetScanCatalog.xsl");
+        String besNodeToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, _besNodeToDatasetScanCatalogTrasformFile);
+        e = _config.getChild("besNodeToDatasetScanCatalogTransformFile");
+        if (e != null) {
+            besNodeToDatasetScanCatalogTransformFile = e.getTextTrim();
         }
-        _log.debug("init() - Using BES ingest transform file: " + besCatalogToDatasetScanCatalogTransformFile);
+        _log.debug("init() - Using BES Node to DatasetScan Catalog transform file: " + besNodeToDatasetScanCatalogTransformFile);
 
-
+        _log.debug("init() - Configuration file ingest complete.");
 
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
         String contentPath = ServletUtil.getConfigPath(servlet);
-        CatalogManager.init(contentPath, ingestTransformFile, besCatalogToDatasetScanCatalogTransformFile, _besApi);
+        CatalogManager.init(contentPath, ingestTransformFile, besNodeToDatasetScanCatalogTransformFile, _besApi);
 
 
         String fileName, pathPrefix, thisUrlPrefix;

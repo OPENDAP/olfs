@@ -76,15 +76,18 @@ public class VersionDispatchHandler implements DispatchHandler {
 
     }
 
+    @Override
     public void init(HttpServlet s, Element config) throws Exception {
+        init(s, config, new BesApi());
+    }
+
+    @Override
+    public void init(HttpServlet s, Element config, BesApi besApi) throws Exception {
 
         if (initialized) return;
 
-
-        _besApi = new BesApi();
-
+        _besApi = besApi;
         initialized = true;
-
         log.info("Initialized.");
     }
 

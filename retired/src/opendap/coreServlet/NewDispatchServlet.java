@@ -29,18 +29,14 @@ package opendap.coreServlet;
 
 import opendap.bes.BESManager;
 import opendap.auth.AuthenticationControls;
-import opendap.bes.VersionDispatchHandler;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
-import opendap.ncml.NcmlDatasetDispatcher;
-import opendap.threddsHandler.StaticCatalogDispatch;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,6 +46,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,7 +71,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p/>
  * <p/>
  */
-public class DispatchServlet extends HttpServlet {
+public class NewDispatchServlet extends HttpServlet {
 
 
     /**
@@ -83,18 +80,16 @@ public class DispatchServlet extends HttpServlet {
      *
      * @serial
      */
-    private AtomicInteger reqNumber;
+    private AtomicInteger _reqNumber;
 
 
 
-    private Vector<DispatchHandler> httpGetDispatchHandlers;
-    private Vector<DispatchHandler> httpPostDispatchHandlers;
+    private HyraxService _defaultHyraxService;
+    private Vector<HyraxService> _hyraxServices;
 
-    private OpendapHttpDispatchHandler odh = null;
-    // private ThreddsHandler tdh = null;
-    private org.slf4j.Logger log;
+    private org.slf4j.Logger _log;
 
-    private Document configDoc;
+    private Document _configDoc;
 
     /**
      * ************************************************************************
@@ -116,30 +111,14 @@ public class DispatchServlet extends HttpServlet {
 
         RequestCache.openThreadCache();
 
-        reqNumber = new AtomicInteger(0);
+        _reqNumber = new AtomicInteger(0);
+        _hyraxServices =  new Vector<>();
 
-        log.debug("init() start");
-
-        /*
-        String xslTransformerFactoryImpl = "com.icl.saxon.TransformerFactoryImpl";
-        String xslTransformerFactoryProperty = "javax.xml.transform.TransformerFactory";
-
-        log.info("init(): Setting System Property " +
-                xslTransformerFactoryProperty +
-                "="+xslTransformerFactoryImpl);
-        System.setProperty(xslTransformerFactoryProperty,xslTransformerFactoryImpl);
-        */
-
-
-
-        httpGetDispatchHandlers = new Vector<>();
-        Vector<Element> httpGetHandlerConfigs = new Vector<>();
-        httpPostDispatchHandlers = new Vector<>();
-        Vector<Element> httpPostHandlerConfig = new Vector<>();
+        _log.debug("init() start");
 
         // init logging
         LogUtil.logServerStartup("init()");
-        log.info("init() start.");
+        _log.info("init() start.");
 
         String configFile = getInitParameter("ConfigFileName");
         if (configFile == null) {
@@ -153,15 +132,8 @@ public class DispatchServlet extends HttpServlet {
 
         loadConfig(configFile);
 
-        Element config = configDoc.getRootElement();
+        Element config = _configDoc.getRootElement();
 
-        boolean enablePost = false;
-        Element postConfig = config.getChild("HttpPost");
-        if(postConfig!=null){
-            String enabled = postConfig.getAttributeValue("enabled");
-            if(enabled.equalsIgnoreCase("true"))
-                enablePost = true;
-        }
 
 
         Element timer = config.getChild("Timer");
@@ -172,33 +144,78 @@ public class DispatchServlet extends HttpServlet {
             }
         }
 
-        log.info("init() - Timer is {}",Timer.isEnabled()?"ENABLED":"DISABLED");
-
-
-
+        _log.info("init() - Timer is {}",Timer.isEnabled()?"ENABLED":"DISABLED");
         initBesManager();
 
         initAuthenticationControls();
 
         try {
-            loadHyraxServiceHandlers(httpGetDispatchHandlers, config);
-            if(enablePost){
-                opendap.bes.BesDapDispatcher bdd = new opendap.bes.BesDapDispatcher();
-                bdd.init(this,config);
-                httpPostDispatchHandlers.add(bdd);
+            _defaultHyraxService = new HyraxService("default");
+            _defaultHyraxService.init(this,config);
+
+            List<Element> catalogs = (List<Element>) config.getChildren("catalog");
+            for(Element catalog : catalogs){
+                String title = catalog.getAttributeValue("title");
+                String prefix = catalog.getAttributeValue("prefix");
+                String besApiClassName = catalog.getAttributeValue("besApi");
+                BesApi besApi = besApiFactory(besApiClassName);
+                if(besApi != null) {
+                    HyraxService hyraxService = new HyraxService(title);
+                    hyraxService.init(this, config, prefix, besApi);
+                    _hyraxServices.add(hyraxService);
+                }
             }
         }
         catch (Exception e){
             throw new ServletException(e);
         }
-        log.info("init() complete.");
+        _log.info("init() complete.");
         RequestCache.closeThreadCache();
+    }
+
+    private BesApi besApiFactory(String className) throws ServletException {
+        String msg;
+        if (className != null) {
+            try {
+
+                _log.debug("Building BesApi: " + className);
+                Class classDefinition = Class.forName(className);
+                BesApi besApi = (BesApi) classDefinition.newInstance();
+                return besApi;
+
+            } catch (ClassNotFoundException e) {
+                msg = "Cannot find class: " + className;
+                _log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (InstantiationException e) {
+                msg = "Cannot instantiate class: " + className;
+                _log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (IllegalAccessException e) {
+                msg = "Cannot access class: " + className;
+                _log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (ClassCastException e) {
+                msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
+                _log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (Exception e) {
+                msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+                _log.error(msg);
+                throw new ServletException(msg, e);
+
+            }
+
+        } else {
+            _log.error("besApiFactory() - FAILED to locate the required 'className' attribute in Handler element. SKIPPING.");
+        }
+        return null;
     }
 
 
 
-    private void initAuthenticationControls()  {
-        Element authControlElem = configDoc.getRootElement().getChild(AuthenticationControls.CONFIG_ELEMENT);
+        private void initAuthenticationControls()  {
+        Element authControlElem = _configDoc.getRootElement().getChild(AuthenticationControls.CONFIG_ELEMENT);
         AuthenticationControls.init(authControlElem,getServletContext().getContextPath());
     }
 
@@ -214,7 +231,7 @@ public class DispatchServlet extends HttpServlet {
 
         String filename = Scrub.fileName(ServletUtil.getConfigPath(this) + confFileName);
 
-        log.debug("Loading Configuration File: " + filename);
+        _log.debug("Loading Configuration File: " + filename);
         try {
 
             File confFile = new File(filename);
@@ -223,36 +240,36 @@ public class DispatchServlet extends HttpServlet {
             try {
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
-                configDoc = sb.build(fis);
+                _configDoc = sb.build(fis);
             }
             finally {
-            	fis.close();
+                fis.close();
             }
 
         } catch (FileNotFoundException e) {
             String msg = "OLFS configuration file \"" + filename + "\" cannot be found.";
-            log.error(msg);
+            _log.error(msg);
             throw new ServletException(msg, e);
         } catch (IOException e) {
             String msg = "OLFS configuration file \"" + filename + "\" is not readable.";
-            log.error(msg);
+            _log.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
             String msg = "OLFS configuration file \"" + filename + "\" cannot be parsed.";
-            log.error(msg);
+            _log.error(msg);
             throw new ServletException(msg, e);
         }
 
-        log.debug("Configuration loaded and parsed.");
+        _log.debug("Configuration loaded and parsed.");
 
     }
 
 
     private void initBesManager() throws ServletException {
-        Element besManagerElement = configDoc.getRootElement().getChild("BESManager");
+        Element besManagerElement = _configDoc.getRootElement().getChild("BESManager");
         if(besManagerElement ==  null){
             String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
-            log.error(msg);
+            _log.error(msg);
             throw new ServletException(msg);
 
         }
@@ -265,189 +282,6 @@ public class DispatchServlet extends HttpServlet {
         }
     }
 
-
-    /**
-     *             <Handler className="opendap.bes.VersionDispatchHandler" />
-     *
-     *             <!-- Bot Blocker
-     *                - This handler can be used to block access from specific IP addresses
-     *                - and by a range of IP addresses using a regular expression.
-     *               -->
-     *             <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-     *                 <!-- <IpAddress>127.0.0.1</IpAddress> -->
-     *                 <!-- This matches all IPv4 addresses, work yours out from here.... -->
-     *                 <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-     *                 <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-     *                 <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-     *             <!-- </Handler>  -->
-     *             <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
-     *             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
-     *                 <prefix>thredds</prefix>
-     *                 <useMemoryCache>true</useMemoryCache>
-     *             </Handler>
-     *             <Handler className="opendap.gateway.DispatchHandler">
-     *                 <prefix>gateway</prefix>
-     *                 <UseDAP2ResourceUrlResponse />
-     *             </Handler>
-     *             <Handler className="opendap.bes.BesDapDispatcher" >
-     *                 <!-- AllowDirectDataSourceAccess
-     *                   - If this element is present then the server will allow users to request
-     *                   - the data source (file) directly. For example a user could just get the
-     *                   - underlying NetCDF files located on the server without using the OPeNDAP
-     *                   - request interface.
-     *                   -->
-     *                 <!-- AllowDirectDataSourceAccess / -->
-     *                 <!--
-     *                   By default, the server will provide a DAP2-style response
-     *                   to requests for a dataset resource URL. Commenting out the
-     *                   "UseDAP2ResourceUrlResponse" element will cause the server
-     *                   to return the DAP4 DSR response when a dataset resource URL
-     *                   is requested.
-     *                 -->
-     *                 <UseDAP2ResourceUrlResponse />
-     *             </Handler>
-     *             <Handler className="opendap.bes.DirectoryDispatchHandler" />
-     *             <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
-     *             <Handler className="opendap.bes.FileDispatchHandler" />
-     */
-    private void loadHyraxServiceHandlers(Vector<DispatchHandler> handlers, Element config ) throws Exception {
-
-        if(config==null)
-            throw new ServletException("Bad configuration! The configuration element was NULL");
-
-        Element botBlocker = config.getChild("BotBlocker");
-
-        handlers.add(new opendap.bes.VersionDispatchHandler());
-        if(botBlocker != null)
-            handlers.add(new opendap.coreServlet.BotBlocker());
-        handlers.add(new opendap.ncml.NcmlDatasetDispatcher());
-        handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
-        handlers.add(new opendap.gateway.DispatchHandler());
-        handlers.add(new opendap.bes.BesDapDispatcher());
-        handlers.add(new opendap.bes.DirectoryDispatchHandler());
-        handlers.add(new opendap.bes.BESThreddsDispatchHandler());
-        handlers.add(new opendap.bes.FileDispatchHandler());
-
-        for(DispatchHandler dh:handlers){
-            dh.init(this,config);
-        }
-    }
-
-
-
-    /*
-     * Navigates the config document to instantiate an ordered list of
-     * Dispatch Handlers. Once built the list is searched for a single instance
-     * of an OpendapHttpDispatchHandler and a single instance of a
-     * ThreddsHandler. Then all of the handlers are initialized by
-     * calling their init() methods and passing into them the XML Element
-     * that defined them from the config document.
-     *
-     * @param type             A String containing the name of IsoDispatchHandler list from
-     *                         the OLFS to build from.
-     * @param dispatchHandlers A Vector in which to store the built
-     *                         IsoDispatchHandler instances
-     * @param handlerConfigs   A Vector in which to store the configuration
-     *                         Element for each IsoDispatchHandler
-     * @throws ServletException When things go poorly
-     */
-    /*
-    private void buildHandlers(String type, Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
-
-        String msg;
-
-        Element configRoot = configDoc.getRootElement();
-        if(configRoot==null)
-            throw new ServletException("Bad configuration! No root element in configuration document");
-
-        Element dispatchHandlersElement = configRoot.getChild("DispatchHandlers");
-        if(dispatchHandlersElement==null)
-            throw new ServletException("Bad configuration! No DispatchHandlers element!");
-
-        Element handlerElements = dispatchHandlersElement.getChild(type);
-
-        log.debug("Building "+ type);
-
-        if(handlerElements!=null){
-
-            for (Object o : handlerElements.getChildren("Handler")) {
-                Element handlerElement = (Element) o;
-                handlerConfigs.add(handlerElement);
-                String className = handlerElement.getAttributeValue("className");
-                if(className!=null) {
-
-                    DispatchHandler dh;
-                    try {
-
-                        log.debug("Building Handler: " + className);
-                        Class classDefinition = Class.forName(className);
-                        dh = (DispatchHandler) classDefinition.newInstance();
-
-
-                    } catch (ClassNotFoundException e) {
-                        msg = "Cannot find class: " + className;
-                        log.error(msg);
-                        throw new ServletException(msg, e);
-                    } catch (InstantiationException e) {
-                        msg = "Cannot instantiate class: " + className;
-                        log.error(msg);
-                        throw new ServletException(msg, e);
-                    } catch (IllegalAccessException e) {
-                        msg = "Cannot access class: " + className;
-                        log.error(msg);
-                        throw new ServletException(msg, e);
-                    } catch (ClassCastException e) {
-                        msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
-                        log.error(msg);
-                        throw new ServletException(msg, e);
-                    } catch (Exception e) {
-                        msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-                        log.error(msg);
-                        throw new ServletException(msg, e);
-
-                    }
-
-                    dispatchHandlers.add(dh);
-                }
-                else {
-                    log.error("buildHandlers() - FAILED to locate the required 'className' attribute in Handler element. SKIPPING.");
-                }
-            }
-        }
-
-        log.debug(type + " Built.");
-
-    }
-    */
-
-    /*
-
-    private void intitializeHandlers(Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
-
-        log.debug("Initializing Handlers.");
-        String msg;
-
-        try {
-            DispatchHandler dh;
-            Element config;
-            for (int i = 0; i < dispatchHandlers.size(); i++) {
-                dh = dispatchHandlers.get(i);
-                config = handlerConfigs.get(i);
-                dh.init(this, config);
-            }
-        }
-        catch (Exception e) {
-            msg = "Could not init() a handler! Caught " + e.getClass().getName() + " Msg: " + e.getMessage();
-            log.error(msg);
-            throw new ServletException(msg, e);
-        }
-
-
-        log.debug("Handlers Initialized.");
-
-
-    }
-*/
 
 
     /**
@@ -473,7 +307,7 @@ public class DispatchServlet extends HttpServlet {
      */
     private void initLogging() {
         LogUtil.initLogging(this);
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     }
 
@@ -530,40 +364,38 @@ public class DispatchServlet extends HttpServlet {
                     return;
                 }
 
-
-
-                int reqno = reqNumber.incrementAndGet();
+                int reqno = _reqNumber.incrementAndGet();
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
-                log.debug(Util.getMemoryReport());
+                _log.debug(Util.getMemoryReport());
 
-                log.debug(ServletUtil.showRequest(request, reqno));
-                log.debug(ServletUtil.probeRequest(this, request));
+                _log.debug(ServletUtil.showRequest(request, reqno));
+                _log.debug(ServletUtil.probeRequest(this, request));
 
 
                 if(redirectForServiceOnlyRequest(request,response))
                     return;
 
 
-                log.debug("Requested relative URL: '" + relativeUrl +
+                _log.debug("Requested relative URL: '" + relativeUrl +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
-
-
                 if (Debug.isSet("probeRequest"))
-                    log.debug(ServletUtil.probeRequest(this, request));
+                    _log.debug(ServletUtil.probeRequest(this, request));
 
-
-                DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
-                if (dh != null) {
-                    log.debug("Request being handled by: " + dh.getClass().getName());
-                    dh.handleRequest(request, response);
-
-                } else {
-                    //send404(request,response);
-                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
+                HyraxService hyraxService = null;
+                for(HyraxService service: _hyraxServices){
+                    if(hyraxService==null && service.requestCanBeHandled(request)){
+                        hyraxService = service;
+                    }
                 }
+                if(hyraxService==null)
+                    hyraxService = _defaultHyraxService;
+
+                _log.debug("doGet() - Using HyraxService '{}'",hyraxService._title);
+                hyraxService.handleRequest(request,response);
+
             }
             finally {
                 Timer.stop(timedProcedure);
@@ -576,25 +408,25 @@ public class DispatchServlet extends HttpServlet {
                 request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
             }
             catch(Throwable t2) {
-            	try {
-            		log.error("\n########################################################\n" +
-                                "Request processing failed.\n" +
-                                "Normal Exception handling failed.\n" +
-                                "This is the last error log attempt for this request.\n" +
-                                "########################################################\n", t2);
-            	}
-            	catch(Throwable t3){
+                try {
+                    _log.error("\n########################################################\n" +
+                            "Request processing failed.\n" +
+                            "Normal Exception handling failed.\n" +
+                            "This is the last error _log attempt for this request.\n" +
+                            "########################################################\n", t2);
+                }
+                catch(Throwable t3){
                     // It's boned now.. Leave it be.
-            	}
+                }
             }
         }
         finally {
             LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
             RequestCache.closeThreadCache();
-            log.info("doGet(): Response completed.\n");
+            _log.info("doGet(): Response completed.\n");
         }
 
-        log.info("doGet() - Timing Report: \n{}", Timer.report());
+        _log.info("doGet() - Timing Report: \n{}", Timer.report());
         Timer.reset();
     }
     //**************************************************************************
@@ -658,7 +490,7 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-        log.info("Sent Resource Not Found (404) - nothing left to check.");
+        _log.info("Sent Resource Not Found (404) - nothing left to check.");
         LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
 
 
@@ -673,19 +505,19 @@ public class DispatchServlet extends HttpServlet {
             throws IOException {
 
 
-        // log.debug(ServletUtil.probeRequest(this, req));
+        // _log.debug(ServletUtil.probeRequest(this, req));
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
             String newURI = reqURI+"/";
             res.sendRedirect(Scrub.urlContent(newURI));
-            log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
+            _log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
                     "context to a URL that ends in a '/' character!");
             return true;
         }
         return false;
     }
-    
+
 
     /**
      * @param request  .
@@ -704,35 +536,37 @@ public class DispatchServlet extends HttpServlet {
 
                 RequestCache.openThreadCache();
 
-                int reqno = reqNumber.incrementAndGet();
+                int reqno = _reqNumber.incrementAndGet();
 
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
 
-                log.debug(ServletUtil.showRequest(request, reqno));
+                _log.debug(ServletUtil.showRequest(request, reqno));
 
 
-                log.debug("Requested relative URL: '" + relativeUrl +
-                       "' suffix: '" + ReqInfo.getRequestSuffix(request) +
-                       "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+                _log.debug("Requested relative URL: '" + relativeUrl +
+                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
                 if (Debug.isSet("probeRequest"))
-                    log.debug(ServletUtil.probeRequest(this, request));
+                    _log.debug(ServletUtil.probeRequest(this, request));
 
 
-                DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);
-                if (dh != null) {
-                    log.debug("Request being handled by: " + dh.getClass().getName());
-                    dh.handleRequest(request, response);
 
-                } else {
-                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
+                HyraxService hyraxService = null;
+                for(HyraxService service: _hyraxServices){
+                    if(hyraxService==null && service.requestCanBeHandled(request)){
+                        hyraxService = service;
+                    }
                 }
+                if(hyraxService==null)
+                    hyraxService = _defaultHyraxService;
 
+                hyraxService.handleRequest(request,response);
 
 
             }
             finally {
-                log.info("doPost(): Response completed.\n");
+                _log.info("doPost(): Response completed.\n");
             }
 
         } catch (Throwable t) {
@@ -740,12 +574,12 @@ public class DispatchServlet extends HttpServlet {
                 request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
             }
             catch(Throwable t2) {
-            	try {
-            		log.error("BAD THINGS HAPPENED!", t2);
-            	}
-            	catch(Throwable t3){
-            		// It's boned now.. Leave it be.
-            	}
+                try {
+                    _log.error("BAD THINGS HAPPENED!", t2);
+                }
+                catch(Throwable t3){
+                    // It's boned now.. Leave it be.
+                }
             }
         }
         finally{
@@ -771,7 +605,7 @@ public class DispatchServlet extends HttpServlet {
      */
     private DispatchHandler getDispatchHandler(HttpServletRequest request, Vector<DispatchHandler> dhvec) throws Exception {
         for (DispatchHandler dh : dhvec) {
-            log.debug("Checking handler: " + dh.getClass().getName());
+            _log.debug("Checking handler: " + dh.getClass().getName());
             if (dh.requestCanBeHandled(request)) {
                 return dh;
             }
@@ -793,7 +627,7 @@ public class DispatchServlet extends HttpServlet {
 
         RequestCache.openThreadCache();
 
-        long reqno = reqNumber.incrementAndGet();
+        long reqno = _reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
 
         long lmt = -1;
@@ -808,15 +642,20 @@ public class DispatchServlet extends HttpServlet {
 
             if (!LicenseManager.isExpired(req) && !ReqInfo.isServiceOnlyRequest(req)) {
 
-                DispatchHandler dh = getDispatchHandler(req, httpGetDispatchHandlers);
-                if (dh != null) {
-                    log.debug("getLastModified() -  Request being handled by: " + dh.getClass().getName());
-                    lmt = dh.getLastModified(req);
-
+                HyraxService hyraxService = null;
+                for(HyraxService service: _hyraxServices){
+                    if(hyraxService==null && service.requestCanBeHandled(req)){
+                        hyraxService = service;
+                    }
                 }
+                if(hyraxService==null)
+                    hyraxService = _defaultHyraxService;
+
+                lmt = hyraxService.getLastModified(req);
+
             }
         } catch (Exception e) {
-            log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
+            _log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
             lmt = -1;
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "HyraxAccess");
@@ -837,14 +676,16 @@ public class DispatchServlet extends HttpServlet {
 
         LogUtil.logServerShutdown("destroy()");
 
-        if(httpGetDispatchHandlers != null){
-            for (DispatchHandler dh : httpGetDispatchHandlers) {
-                log.debug("Shutting down handler: " + dh.getClass().getName());
+        if(_hyraxServices != null){
+            for (HyraxService dh : _hyraxServices) {
+                _log.debug("Shutting down HyraxService: " + dh.getClass().getName());
                 dh.destroy();
             }
         }
-
-
+        _hyraxServices.clear();
+        _hyraxServices = null;
+        _defaultHyraxService.destroy();
+        _defaultHyraxService = null;
         super.destroy();
     }
 

@@ -49,14 +49,14 @@ public class BESResource implements ResourceInfo {
 
     public static final String BESDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private boolean exists;
-    private boolean accessible;
-    private boolean node;
-    private boolean data;
+    private boolean _exists;
+    private boolean _accessible;
+    private boolean _isNode;
+    private boolean _isData;
 
-    private String name;
-    private long size;
-    private Date lastModified;
+    private String _name;
+    private long _size;
+    private Date _lastModified;
 
     private String[] serviceRefs;
 
@@ -75,128 +75,137 @@ public class BESResource implements ResourceInfo {
         _besApi = besApi;
 
         requestedDataSource = dataSourceName;
-        exists              = false;
-        accessible          = false;
-        node                = false;
-        data                = false;
-        name                = null;
-        size                = -1;
-        lastModified        = null;
+        _exists             = false;
+        _accessible = false;
+        _isNode = false;
+        _isData = false;
+        _name                = null;
+        _size = -1;
+        _lastModified = null;
 
-        Document info = new Document();
+        Document nodeDoc = new Document();
 
         if(besApi == null){
-            exists        = false;
-            accessible    = false;
-            node          = false;
-            data          = false;
-            name          = null;
-            size          = -1;
-            lastModified  = null;
+            _exists        = false;
+            _accessible = false;
+            _isNode = false;
+            _isData = false;
+            _name          = null;
+            _size = -1;
+            _lastModified = null;
             log.error("BESResource(): Received a null value for the BesApi instance!");
-
             return;
         }
 
 
 
         try {
-            besApi.getBesCatalog(dataSourceName, info);
+            besApi.getBesNode(dataSourceName, nodeDoc);
 
-            exists = true;
-            accessible = true;
-            Element root = info.getRootElement();
+            _exists = true;
+            _accessible = true;
+            Element root = nodeDoc.getRootElement();
             if(root==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No root element");
+                throw new IOException("BES showNode response for "+dataSourceName+" was empty! No root element");
 
-            Element catalog  = root.getChild("showCatalog",BES_NS);
-            if(catalog==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No showCatalog element");
+            Element showNode  = root.getChild("showNode",BES_NS);
+            if(showNode==null)
+                throw new IOException("BES showNode response for "+dataSourceName+" was empty! No showNode element");
 
-            Element dataset = catalog.getChild("dataset",BES_NS);
-            if(dataset==null)
-                throw new IOException("BES Catalog response for "+dataSourceName+" was empty! No top level dataset element");
+            Element nodeElement = showNode.getChild("node",BES_NS);
 
-
-            name = dataset.getAttributeValue("name");
-            String s = dataset.getAttributeValue("size");
-            size = Long.valueOf(s);
-
-            SimpleDateFormat sdf = new SimpleDateFormat(BESDateFormat);
-            lastModified = sdf.parse(dataset.getAttributeValue("lastModified"));
-
-            String isNode = dataset.getAttributeValue("node");
-            node = isNode == null || isNode.equalsIgnoreCase("true");
-
-
-            Element e;
-            List srvcList = dataset.getChildren("serviceRef", BES_NS);
-
-            if (!srvcList.isEmpty()) {
-                serviceRefs = new String[srvcList.size()];
-                int i = 0;
-                Iterator iterator = srvcList.iterator();
-                while (iterator.hasNext()) {
-                    e = (Element) iterator.next();
-                    serviceRefs[i++] = e.getTextTrim();
+            if(nodeElement==null){
+                Element itemElement  = showNode.getChild("item",BES_NS);
+                if(itemElement == null)
+                    throw new IOException("BES showNode response for " + dataSourceName + " did not contain " +
+                            "expected content! No top level node or item element");
+                _name = itemElement.getAttributeValue("name");
+                String s = itemElement.getAttributeValue("size");
+                if (s != null) {
+                    _size = Long.valueOf(s);
+                } else {
+                    _size = itemElement.getChildren().size();
                 }
-                data = true;
 
+                s = itemElement.getAttributeValue("lastModified");
+                if (s != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat(BESDateFormat);
+                    _lastModified = sdf.parse(itemElement.getAttributeValue("lastModified"));
+                }
 
-            } else {
-                data = false;
+                String isNode = itemElement.getAttributeValue("type");
+                _isNode = isNode!=null && isNode.equalsIgnoreCase("node");
+
+                s = itemElement.getAttributeValue("isData");
+                _isData = s != null && s.equalsIgnoreCase("true");
             }
+            else {
+
+                _isNode = true;
+                _name = nodeElement.getAttributeValue("name");
+                String s = nodeElement.getAttributeValue("size");
+                if (s != null) {
+                    _size = Long.valueOf(s);
+                } else {
+                    _size = nodeElement.getChildren().size();
+                }
+
+                s = nodeElement.getAttributeValue("lastModified");
+                if (s != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat(BESDateFormat);
+                    _lastModified = sdf.parse(nodeElement.getAttributeValue("lastModified"));
+                }
+
+
+                s = nodeElement.getAttributeValue("isData");
+                _isData = s != null && s.equalsIgnoreCase("true");
+            }
+
         }
         catch (BESError err ){
-
-            exists        = !err.notFound();
-            accessible    = !err.forbidden();
-            node          = false;
-            data          = false;
-            name          = null;
-            size          = -1;
-            lastModified  = null;
-
+            _exists        = !err.notFound();
+            _accessible = !err.forbidden();
+            _isNode = false;
+            _isData = false;
+            _name          = null;
+            _size = -1;
+            _lastModified = null;
             log.debug("BES request for info document for: \""+dataSourceName+"\" returned an error");
-
         }
-
-
-
     }
 
     public  boolean sourceExists(){
-        return exists;
+        return _exists;
     }
 
     public  boolean sourceIsAccesible(){
-        return accessible;
+        return _accessible;
     }
 
 
     public  boolean isNode(){
-        return node;
+        return _isNode;
     }
 
     public  boolean isDataset(){
-        return data;
+        return _isData;
     }
 
     public String getName(){
-        return name;
+        return _name;
     }
 
     public long getSize(){
-        return size;
+        return _size;
     }
 
     public Date getLastModifiedDate(){
-        return lastModified;
+        return _lastModified;
     }
 
     public long lastModified(){
-        if(lastModified!=null)
-            return lastModified.getTime();
+        if(_lastModified !=null)
+            return _lastModified.getTime();
         return -1;
     }
 
@@ -212,13 +221,13 @@ public class BESResource implements ResourceInfo {
     public String toString(){
         String s = "BESResource("+requestedDataSource+"):\n";
 
-        s += "    exists:        "+exists+"\n";
-        if(exists){
-            s += "    name:          " + name         + "\n";
-            s += "    isCollection:  " + node + "\n";
-            s += "    isDataset:     " + data         + "\n";
-            s += "    size:          " + size         + "\n";
-            s += "    lastModified:  " + lastModified + "\n";
+        s += "    exists:  "+_exists+"\n";
+        if(_exists){
+            s += "    name:         " + _name         + "\n";
+            s += "    isNode:       " + _isNode + "\n";
+            s += "    isDataset:    " + _isData + "\n";
+            s += "    size:         " + _size + "\n";
+            s += "    lastModified: " + _lastModified + "\n";
         }
         return s;
     }

@@ -79,10 +79,12 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         log = LoggerFactory.getLogger(getClass());
     }
 
-
-
-
     public void init(HttpServlet servlet,Element config) throws Exception {
+        init(servlet,config,new BesApi());
+    }
+
+
+    public void init(HttpServlet servlet,Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
@@ -92,7 +94,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         ncmlRequestPatternRegexString = ".*\\.ncml";
         ncmlRequestPattern = Pattern.compile(ncmlRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
 
-        _besApi = new BesApi();
+        _besApi = besApi;
 
         initialized = true;
 
