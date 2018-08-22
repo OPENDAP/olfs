@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by ndp on 11/6/14.
@@ -49,6 +50,8 @@ public class PDPService extends HttpServlet {
     private Logger _log;
     private String _accessLogName = "PDP_SERVICE_ACCESS";
 
+
+    private ReentrantLock _configLock;
 
     private Element _config;
 
@@ -69,6 +72,7 @@ public class PDPService extends HttpServlet {
         _isInitialized = false;
         _reqNumber = new AtomicInteger(0);
         _requireSecureTransport = true;
+        _configLock = new ReentrantLock();
 
     }
 
@@ -77,20 +81,21 @@ public class PDPService extends HttpServlet {
         initLogging();
 
         _log.info("init() - BEGIN");
-
-        String msg;
-
         if (_isInitialized) {
             _log.info("init() - END (Already initialized. Nothing changed.)");
             return;
         }
 
-        _systemPath = ServletUtil.getSystemPath(this, "");
-        _isInitialized = true;
-        _requireSecureTransport = false;
-
-        load_config();
-
+        _configLock.lock();
+        try {
+            _systemPath = ServletUtil.getSystemPath(this, "");
+            _requireSecureTransport = false;
+            load_config();
+            _isInitialized = true;
+        }
+        finally {
+            _configLock.unlock();
+        }
 
         _log.info("init() - END");
     }
