@@ -28,6 +28,7 @@ package opendap.bes.dap2Responders;
 
 
 import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -164,6 +165,8 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", jsonLD);
+
+            AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
