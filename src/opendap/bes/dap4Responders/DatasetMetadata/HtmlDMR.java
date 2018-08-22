@@ -47,15 +47,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 
-
 public class HtmlDMR extends Dap4Responder {
-
-
 
     private Logger log;
     private static String defaultRequestSuffix = ".html";
-
-
 
     public HtmlDMR(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
@@ -81,17 +76,10 @@ public class HtmlDMR extends Dap4Responder {
 
     }
 
-
-
-
     public boolean isDataResponder(){ return false; }
     public boolean isMetadataResponder(){ return true; }
 
-
-
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-
 
         // String context = request.getContextPath();
         String requestedResourceId = ReqInfo.getLocalUrl(request);
@@ -100,7 +88,6 @@ public class HtmlDMR extends Dap4Responder {
         String resourceID = getResourceId(requestedResourceId, false);
         QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
-
 
         BesApi besApi = getBesApi();
 
@@ -116,31 +103,20 @@ public class HtmlDMR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
-
-
         // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-
         Document dmr = new Document();
-
-
         besApi.getDMRDocument(
                 resourceID,
                 qp,
                 xmlBase,
                 dmr);
-
         OutputStream os = response.getOutputStream();
-
-
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
         // dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
         String currentDir = System.getProperty("user.dir");
         log.debug("Cached working directory: "+currentDir);
-
 
         String xslDir = new PathBuilder(_systemPath).pathAppend("xsl").toString();
 
@@ -150,13 +126,10 @@ public class HtmlDMR extends Dap4Responder {
         try {
             String xsltDocName = "dap4_ifh.xsl";
 
-
             // This Transformer class is an attempt at making the use of the saxon-9 API
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-
-
             transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
@@ -165,8 +138,6 @@ public class HtmlDMR extends Dap4Responder {
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(dmr), os);
-
-
             os.flush();
             log.info("Sent {}", getServiceTitle());
         }
@@ -174,9 +145,6 @@ public class HtmlDMR extends Dap4Responder {
             log.debug("Restoring working directory to " + currentDir);
             System.setProperty("user.dir", currentDir);
         }
-
-
-
     }
 
 

@@ -103,17 +103,16 @@ public class Dap2IFH extends Dap4Responder {
 
         String collectionUrl = ReqInfo.getCollectionUrl(request);
 
-        QueryParameters qp = new QueryParameters(request);
+        //QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-
 
         BesApi besApi = getBesApi();
 
         _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        MediaType responseMediaType =  getNormativeMediaType();
+        MediaType responseMediaType = getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
@@ -124,16 +123,9 @@ public class Dap2IFH extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-
         Document ddx = new Document();
-
-
         besApi.getDDXDocument(resourceID,constraintExpression,"3.2",xmlBase,ddx);
-
         _log.debug(xmlo.outputString(ddx));
 
         OutputStream os = response.getOutputStream();
@@ -154,12 +146,10 @@ public class Dap2IFH extends Dap4Responder {
         try {
             String xsltDocName = "dap2_ifh.xsl";
 
-
             // This Transformer class is an attempt at making the use of the saxon-9 API
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-            // See the source code for opendap.xml.Transformer for more.
+            // See the source code in opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-
 
             transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
@@ -170,8 +160,6 @@ public class Dap2IFH extends Dap4Responder {
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
-
-
             os.flush();
             _log.info("Sent {}", getServiceTitle());
         }
