@@ -88,10 +88,12 @@ public class PDPService extends HttpServlet {
 
         _configLock.lock();
         try {
-            _systemPath = ServletUtil.getSystemPath(this, "");
-            _requireSecureTransport = false;
-            load_config();
-            _isInitialized = true;
+            if(!_isInitialized) {
+                _systemPath = ServletUtil.getSystemPath(this, "");
+                _requireSecureTransport = false;
+                load_config();
+                _isInitialized = true;
+            }
         }
         finally {
             _configLock.unlock();
