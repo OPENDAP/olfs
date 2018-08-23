@@ -348,11 +348,14 @@ public class Dap2IFH extends Dap4Responder {
             //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
 
             boolean jsEncode = true;
-            if(attribute.getAttributeValue("type").toLowerCase().contains("int") |
-                    attribute.getAttributeValue("type").toLowerCase().contains("float") |
-                    attribute.getAttributeValue("type").equalsIgnoreCase("byte")
-                    ){
-                jsEncode=false;
+            String type = attribute.getAttributeValue("type");
+            if(type !=null){
+                type = type.toLowerCase();
+                if (type.contains("int") |
+                    type.contains("float") |
+                    type.equals("byte")) {
+                    jsEncode = false;
+                }
             }
 
             if(values.size()==1){

@@ -123,7 +123,9 @@ public class BesApi implements Cloneable {
      * In more common parlance it's "the catalog called catalog" the utilizes
      * the BES.Catalog.catalog.RootDirectory filesystem as the catalog.
      */
-    public static final String DEFAULT_BES_CATALOG = "catalog";
+    public static final String DEFAULT_BES_CATALOG_NAME = "default";
+    public static final String DEFAULT_BES_CATALOG_TYPE_MATCH_KEY = "BES.Catalog."+ DEFAULT_BES_CATALOG_NAME +".TypeMatch";
+
 
     /**
      * This specifes the sdeafult BES "container" name. While this name could
@@ -2504,7 +2506,7 @@ public class BesApi implements Cloneable {
      *
      * @return The name os the BES "space" (aka catalog) which will be used to service the request.
      */
-    protected String getBesSpaceName(){ return DEFAULT_BES_CATALOG; }
+    protected String getBesSpaceName(){ return DEFAULT_BES_CATALOG_NAME; }
 
     /**
      * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
@@ -2807,14 +2809,16 @@ public class BesApi implements Cloneable {
 
 
     public String getBesCombinedTypeMatch() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
-        return getBesCombinedTypeMatchPattern("/");
+        return getDefaultBesCombinedTypeMatchPattern("/");
     }
 
-    public String getBesCombinedTypeMatchPattern(String besPrefix) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
+    public String getDefaultBesCombinedTypeMatchPattern(String besPrefix) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
 
         StringBuilder combinedTypeMatch = new StringBuilder();
-        Element typeMatchKey = showBesKey(besPrefix,"BES.Catalog.catalog.TypeMatch");
-
+        Element typeMatchKey = showBesKey(besPrefix, DEFAULT_BES_CATALOG_TYPE_MATCH_KEY);
+        if(typeMatchKey == null){
+            throw new BadConfigurationException("Failed to get BES Key '"+ DEFAULT_BES_CATALOG_TYPE_MATCH_KEY +"'");
+        }
         @SuppressWarnings("unchecked")
         List<Element> values = (List<Element>)typeMatchKey.getChildren("value",BES_NS);
 

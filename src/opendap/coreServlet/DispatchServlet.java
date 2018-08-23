@@ -133,9 +133,9 @@ public class DispatchServlet extends HttpServlet {
 
 
         httpGetDispatchHandlers = new Vector<>();
-        Vector<Element> httpGetHandlerConfigs = new Vector<>();
+        //Vector<Element> httpGetHandlerConfigs = new Vector<>();
         httpPostDispatchHandlers = new Vector<>();
-        Vector<Element> httpPostHandlerConfig = new Vector<>();
+        //Vector<Element> httpPostHandlerConfig = new Vector<>();
 
         // init logging
         LogUtil.logServerStartup("init()");

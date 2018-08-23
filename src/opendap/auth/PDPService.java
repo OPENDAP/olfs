@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -62,7 +63,7 @@ public class PDPService extends HttpServlet {
 
     private boolean _isInitialized;
 
-    private boolean _requireSecureTransport;
+    private AtomicBoolean _requireSecureTransport;
 
 
 
@@ -71,7 +72,7 @@ public class PDPService extends HttpServlet {
     public PDPService(){
         _isInitialized = false;
         _reqNumber = new AtomicInteger(0);
-        _requireSecureTransport = true;
+        _requireSecureTransport = new AtomicBoolean(true);
         _configLock = new ReentrantLock();
 
     }
@@ -88,8 +89,7 @@ public class PDPService extends HttpServlet {
             }
             
             _systemPath = ServletUtil.getSystemPath(this, "");
-            _requireSecureTransport = false;
-
+            _requireSecureTransport.set(false);
 
             String configFile = getInitParameter("config");
             if(configFile==null){
@@ -97,11 +97,18 @@ public class PDPService extends HttpServlet {
             }
             try {
                 _config = opendap.xml.Util.getDocumentRoot(configFile);
+                if(_config==null)
+                    throw new ServletException("Unable to read/parse configuration file: "+configFile);
+
                 Element e = _config.getChild("PolicyDecisionPoint");
+                if(e==null)
+                    throw new ServletException("Configuration file: "+configFile + " is missing the " +
+                            "required PolicyDecisionPoint element.");
+
                 _myPDP = PolicyDecisionPoint.pdpFactory(e);
                 e = _config.getChild("RequireSecureTransport");
                 if(e !=null){
-                    _requireSecureTransport = true;
+                    _requireSecureTransport.set(true);
                 }
             } catch (Exception e) {
                 String msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
@@ -308,7 +315,7 @@ public class PDPService extends HttpServlet {
     protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        if (_requireSecureTransport) {
+        if (_requireSecureTransport.get()) {
             if (!req.isSecure()) {
                 _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
                 resp.sendError(403);

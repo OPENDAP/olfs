@@ -65,11 +65,8 @@ public class MembershipRulesManager {
             throw new ConfigurationException("init() - Every <group> MUST have an \"id\" attribute.");
         }
 
-        Group group = _groups.get(gid);
-        if (group == null) {
-            group = new Group(gid);
-            _groups.put(gid, group);
-        }
+        Group group = new Group(gid);
+        _groups.putIfAbsent(gid, group);
 
         Iterator userItr = groupElem.getChildren("user").iterator();
         if(!userItr.hasNext()){
@@ -116,19 +113,18 @@ public class MembershipRulesManager {
 
         Iterator uItr = roleElem.getChildren("group").iterator();
         if(uItr.hasNext()){
+            _roles.putIfAbsent(rid, new HashSet<String>() );
             HashSet<String> members = _roles.get(rid);
-            if (members == null) {
-                members = new HashSet<>();
-                _roles.put(rid, members);
-            }
+            if (members == null)
+                throw new ConfigurationException("addRole() - Unable to process role: '"+rid+"'");
+
             while (uItr.hasNext()) {
                 Element user = (Element) uItr.next();
                 String gid = user.getAttributeValue("id");
                 if (gid == null) {
                     throw new ConfigurationException("init(): Every <group> must have an \"id\" attribute.");
                 }
-                if (!members.contains(gid))
-                    members.add(gid);
+                members.add(gid);
             }
         }
     }

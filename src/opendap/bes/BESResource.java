@@ -209,13 +209,8 @@ public class BESResource implements ResourceInfo {
         return -1;
     }
 
-    public String getRequestedDataSource(){
-        return requestedDataSource;
-    }
-
-    public String[] getServiceRefs(){
-        return serviceRefs;
-    }
+    // public String getRequestedDataSource(){ return requestedDataSource; }
+    // public String[] getServiceRefs(){ return serviceRefs; }
 
 
     public String toString(){
