@@ -123,8 +123,8 @@ public class BesApi implements Cloneable {
      * In more common parlance it's "the catalog called catalog" the utilizes
      * the BES.Catalog.catalog.RootDirectory filesystem as the catalog.
      */
-    public static final String DEFAULT_BES_CATALOG_NAME = "default";
-    public static final String DEFAULT_BES_CATALOG_TYPE_MATCH_KEY = "BES.Catalog."+ DEFAULT_BES_CATALOG_NAME +".TypeMatch";
+    public static final String DEFAULT_BES_CATALOG_NAME = "catalog";
+    public static final String DEFAULT_BES_CATALOG_TYPE_MATCH_KEY = "BES.Catalog." + DEFAULT_BES_CATALOG_NAME + ".TypeMatch";
 
 
     /**
@@ -133,7 +133,7 @@ public class BesApi implements Cloneable {
      * command readability a value should be chosen that relates to the BES "space"
      * name that is being used.
      */
-    public static final String DEFAULT_BES_CONTAINER = "catalogContainer";
+    public static final String DEFAULT_BES_CONTAINER = DEFAULT_BES_CATALOG_NAME + "Container";
 
 
     public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
