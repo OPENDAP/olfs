@@ -79,6 +79,8 @@ public class PDPService extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
+
+
         _configLock.lock();
         try {
             initLogging();
@@ -89,7 +91,6 @@ public class PDPService extends HttpServlet {
             }
             
             _systemPath = ServletUtil.getSystemPath(this, "");
-            _requireSecureTransport.set(false);
 
             String configFile = getInitParameter("config");
             if(configFile==null){
@@ -104,23 +105,21 @@ public class PDPService extends HttpServlet {
                 if(e==null)
                     throw new ServletException("Configuration file: "+configFile + " is missing the " +
                             "required PolicyDecisionPoint element.");
-
                 _myPDP = PolicyDecisionPoint.pdpFactory(e);
-                e = _config.getChild("RequireSecureTransport");
-                if(e !=null){
-                    _requireSecureTransport.set(true);
-                }
+
             } catch (Exception e) {
                 String msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
                 _log.error(msg);
                 throw new ServletException(msg, e);
             }
             _isInitialized = true;
-            _log.info("init() - END");
         }
         finally {
             _configLock.unlock();
         }
+        _requireSecureTransport.set(_config.getChild("RequireSecureTransport") != null);
+        _log.info("init() - END");
+
     }
 
 

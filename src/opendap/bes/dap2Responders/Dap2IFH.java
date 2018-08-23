@@ -251,8 +251,10 @@ public class Dap2IFH extends Dap4Responder {
         if(variable.getName().equals("Grid")){
             // It's a Grid so we look at the Grid array to determine the GRid metadata content.
             Element gridArray =  variable.getChild("Array",DAP.DAPv32_NS);
-            List<Element> attributes = gridArray.getContent(attributeFilter);
-            sb.append(attributesToProperties(attributes, myIndent));
+            if(gridArray!=null) {
+                List<Element> attributes = gridArray.getContent(attributeFilter);
+                sb.append(attributesToProperties(attributes, myIndent));
+            }
         }
         else if(variable.getName().equals("Sequence") || variable.getName().equals("Structure") ){
             // It's a Container type... Wut do?
@@ -351,8 +353,8 @@ public class Dap2IFH extends Dap4Responder {
             String type = attribute.getAttributeValue("type");
             if(type !=null){
                 type = type.toLowerCase();
-                if (type.contains("int") |
-                    type.contains("float") |
+                if (type.contains("int") ||
+                    type.contains("float") ||
                     type.equals("byte")) {
                     jsEncode = false;
                 }

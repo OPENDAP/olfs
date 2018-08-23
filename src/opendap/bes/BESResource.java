@@ -58,8 +58,6 @@ public class BESResource implements ResourceInfo {
     private long _size;
     private Date _lastModified;
 
-    private String[] serviceRefs;
-
     private String requestedDataSource;
 
     private BesApi _besApi;
