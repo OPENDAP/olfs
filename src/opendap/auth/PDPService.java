@@ -91,7 +91,24 @@ public class PDPService extends HttpServlet {
             if(!_isInitialized) {
                 _systemPath = ServletUtil.getSystemPath(this, "");
                 _requireSecureTransport = false;
-                load_config();
+
+                String configFile = getInitParameter("config");
+                if(configFile==null){
+                    configFile = _systemPath + "/WEB-INF/conf/SimplePDP.xml";
+                }
+                try {
+                    _config = opendap.xml.Util.getDocumentRoot(configFile);
+                    Element e = _config.getChild("PolicyDecisionPoint");
+                    _myPDP = PolicyDecisionPoint.pdpFactory(e);
+                    e = _config.getChild("RequireSecureTransport");
+                    if(e !=null){
+                        _requireSecureTransport = true;
+                    }
+                } catch (Exception e) {
+                    String msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+                    _log.error(msg);
+                    throw new ServletException(msg, e);
+                }
                 _isInitialized = true;
             }
         }
@@ -113,6 +130,7 @@ public class PDPService extends HttpServlet {
 
     }
 
+    /*
     private void load_config() throws ServletException {
         String msg;
         String configFile = getInitParameter("config");
@@ -145,6 +163,7 @@ public class PDPService extends HttpServlet {
 
     }
 
+*/
 
 
 
