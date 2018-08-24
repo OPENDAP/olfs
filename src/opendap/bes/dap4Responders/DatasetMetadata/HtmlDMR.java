@@ -38,14 +38,22 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
+import org.jdom.Attribute;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.filter.ElementFilter;
+import org.jdom.filter.Filter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Vector;
 
 public class HtmlDMR extends Dap4Responder {
 
@@ -82,12 +90,14 @@ public class HtmlDMR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // String context = request.getContextPath();
+        String collectionUrl = ReqInfo.getCollectionUrl(request);
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
         QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
+
 
         BesApi besApi = getBesApi();
 
@@ -133,6 +143,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+            transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
@@ -147,6 +158,228 @@ public class HtmlDMR extends Dap4Responder {
         }
     }
 
+
+    public String getDatasetJsonLD(String collectionUrl, Document dmr){
+
+        String indent = indent_inc;
+        Element dataset = dmr.getRootElement();
+
+        StringBuilder sb = new StringBuilder("\n");
+        sb.append("{\n");
+        sb.append(indent).append("\"@context\": {\n");
+        sb.append(indent).append(indent_inc).append("\"@vocab\": \"http://schema.org\"\n");
+        sb.append(indent).append("},\n");
+        sb.append(indent).append("\"@type\": \"Dataset\",\n");
+
+        String name  = dataset.getAttributeValue("name");
+        sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
+
+
+        Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
+        String datasetUrl;
+        if(xmlBase==null){
+            log.error("Unable to locate xml:base attribute for Dataset {}", name);
+            datasetUrl = PathBuilder.pathConcat(collectionUrl,name);
+        }
+        else {
+            datasetUrl = xmlBase.getValue();
+        }
+        sb.append(indent).append("\"url\": \"").append(datasetUrl).append("\",\n");
+        sb.append(indent).append("\"includedInDataCatalog\": { \n");
+        sb.append(indent).append(indent_inc).append("\"@type\": \"DataCatalog\", \n");
+        sb.append(indent).append(indent_inc).append("\"name\": \"Hyrax Data Server\", \n");
+        sb.append(indent).append(indent_inc).append("\"sameAs\": \"");
+        sb.append(PathBuilder.pathConcat(collectionUrl,"contents.html\"")).append("\n");
+        sb.append(indent).append("},\n");
+
+
+        @SuppressWarnings("unchecked")
+        List<Element> children = dataset.getChildren();
+        Vector<Element> variables = new Vector<>();
+        for(Element child : children){
+            if(!child.getName().equals("Attribute") && !child.getName().equals("blob")){
+                // It's not an Attribute so it must be a variable!
+                variables.add(child);
+            }
+        }
+        if(!variables.isEmpty()){
+            sb.append(indent).append("\"variableMeasured\": [\n");
+            // Top Level Attributes
+            String topLevelAttributes = dap4AttributesToProperties(dataset, datasetUrl, indent, true);
+            sb.append(topLevelAttributes);
+
+            boolean first = topLevelAttributes.isEmpty();
+            int mark = sb.length();
+            for(Element variable : variables){
+                if(!first)
+                    sb.append(",\n");
+                sb.append(dap4AttributesToProperties(variable,variable.getAttributeValue("name"), indent, first));
+                if(sb.length()>mark)
+                    first = false;
+            }
+            sb.append("\n");
+            sb.append(indent).append("]\n");
+            sb.append("}\n");
+        }
+        return sb.toString();
+    }
+
+
+
+    private Filter dap4AttributeFilter = new ElementFilter("Attribute", DAP.DAPv40_NS);
+    private String indent_inc = "  ";
+
+    public String dap4AttributesToProperties(Element variable, String name, String indent, boolean first){
+        String myIndent = indent + indent_inc;
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(indent).append("{\n");
+        sb.append(myIndent).append("\"@type\": \"PropertyValue\",\n");
+        sb.append(myIndent).append("\"name\": \"").append(name).append("\",\n");
+        sb.append(myIndent).append("\"valueReference\": [ \n");
+
+        if(variable.getName().equals("Sequence") || variable.getName().equals("Structure") ){
+            // It's a Container type... Wut do?
+            @SuppressWarnings("unchecked")
+            List<Element> attributes = variable.getContent(dap4AttributeFilter);
+            sb.append(dap4AttributesToProperties(attributes, myIndent));
+
+            //boolean first = true;
+            @SuppressWarnings("unchecked")
+            List<Element> children = variable.getChildren();
+            int mark = sb.length();
+            for(Element child : children){
+                if(!first)
+                    sb.append(",\n");
+                sb.append(dap4AttributesToProperties(child, child.getAttributeValue("name"), myIndent, first));
+                if(sb.length()>mark)
+                    first = false;
+            }
+
+            log.error("dap4AttributesToProperties() - We don't have a good mapping for container types to JSON-LD markup.");
+        }
+        else {
+            // It's an atomic variable or an Array!
+            @SuppressWarnings("unchecked")
+            List<Element> attributes = variable.getContent(dap4AttributeFilter);
+            sb.append(dap4AttributesToProperties(attributes, myIndent));
+        }
+
+        sb.append("\n");
+        sb.append(myIndent).append("]\n");
+        sb.append(indent).append("}");
+
+
+        return sb.toString();
+
+    }
+
+
+    public String dap4AttributesToProperties(List<Element> attributes, String indent){
+
+        StringBuilder sb = new StringBuilder();
+        String myIndent = indent + indent_inc;
+
+        boolean first = true;
+        int mark = sb.length();
+        for(Element attribute : attributes){
+            if(attribute.getChild("Attribute",DAP.DAPv40_NS)!=null){
+                if(!first)
+                    sb.append(",\n");
+                // It's an AttrTable so dig...
+                @SuppressWarnings("unchecked")
+                List<Element> myAttributes = attribute.getContent(dap4AttributeFilter);
+                sb.append(dap4AttributesToProperties(myAttributes,myIndent));
+            }
+            else {
+                // Not an AttrTable so it must have values...
+                String pValue = dap4AttributeToPropertyValue(attribute,myIndent);
+                if(!pValue.isEmpty()){
+                    if(!first)
+                        sb.append(",\n");
+                    sb.append(pValue);
+                }
+            }
+            if(sb.length()>mark)
+                first = false;
+        }
+        return sb.toString();
+    }
+
+
+    /**
+     * Minmal JSON text encoder. This method escapes:
+     * <ul>
+     *     <li>The \ (backslash)</li>
+     *     <li>The " (double-quote)</li>
+     * </ul>
+     * @param value The string to encode.
+     * @return The encoded value
+     */
+    private String jsonEncodeString(String value){
+        String str = value.trim();
+        str = str.replace("\\","\\\\");
+        str = str.replace("\"","\\\"");
+        return str;
+    }
+
+
+
+    public String dap4AttributeToPropertyValue(Element attribute, String indent){
+        StringBuilder sb = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        List<Element> values = attribute.getChildren("Value",DAP.DAPv40_NS);
+
+        if(!values.isEmpty()){
+            sb.append(indent).append("{\n");
+            sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"").append(jsonEncodeString(attribute.getAttributeValue("name"))).append("\", \n");
+            //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
+
+            boolean jsEncode = true;
+            String type = attribute.getAttributeValue("type");
+            if(type !=null){
+                type = type.toLowerCase();
+                if (type.contains("int") ||
+                        type.contains("float") ||
+                        type.equals("byte")) {
+                    jsEncode = false;
+                }
+            }
+            if(values.size()==1){
+                Element value = values.get(0);
+                sb.append(indent).append(indent_inc).append("\"value\": \"");
+                if(jsEncode) {
+                    sb.append(jsonEncodeString(value.getTextTrim()));
+                }
+                else {
+                    sb.append(value.getTextTrim());
+                }
+                sb.append("\"");
+            }
+            else {
+                sb.append(indent).append(indent_inc).append("\"value\": [ ");
+                boolean first = true;
+                for(Element value : values){
+                    if(!first)
+                        sb.append(", ");
+                    sb.append("\"");
+
+                    if(jsEncode) {
+                        sb.append(jsonEncodeString(value.getTextTrim()));
+                    }
+                    else {
+                        sb.append(value.getTextTrim());
+                    }
+                    sb.append("\"");
+                    first = false;
+                }
+                sb.append(" ]");
+            }
+            sb.append(indent).append("}");
+        }
+        return sb.toString();
+    }
 
 
 }
