@@ -47,7 +47,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class IdFilter implements Filter {
 
     private Logger _log;
-    private ReentrantLock _sessionLock;
 
     public static final String ORIGINAL_REQUEST_URL = "original_request_url";
     public static final String USER_PROFILE         = "user_profile";
@@ -65,7 +64,6 @@ public class IdFilter implements Filter {
 
     public IdFilter(){
         _is_initialized = false;
-        _sessionLock = new ReentrantLock();
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -166,7 +164,9 @@ public class IdFilter implements Filter {
         } else {
             // Check IdProviders to see if this request is a valid login context.
             for (IdProvider idProvider : IdPManager.getProviders()) {
+
                 String loginEndpoint = idProvider.getLoginEndpoint();
+
                 if (requestURI.equals(loginEndpoint)) {
                     synchronized (session){
                         String returnToUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
@@ -204,21 +204,16 @@ public class IdFilter implements Filter {
         // the presence of the USER_PROFILE attribute in the session) we need to spoof the API to show our
         // authenticated user.
         //
-        _sessionLock.lock();
-        try {
-
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
-            if (up != null) {
-                AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
-                authReq.setUid(up.getUID());
-                hsReq = authReq;
-            }
-            // Cache the  request URL in the session. We do this here because we know by now that the request was
-            // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
-            session.setAttribute(ORIGINAL_REQUEST_URL, requestUrl);
+        UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+        if (up != null) {
+            AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
+            authReq.setUid(up.getUID());
+            hsReq = authReq;
         }
-        finally {
-            _sessionLock.unlock();
+        // Cache the  request URL in the session. We do this here because we know by now that the request was
+        // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
+        synchronized(session) {
+            session.setAttribute(ORIGINAL_REQUEST_URL, requestUrl);
         }
         filterChain.doFilter(hsReq, hsRes);
     }
@@ -289,25 +284,18 @@ public class IdFilter implements Filter {
      */
 	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        _sessionLock.lock();
-        try {
-            HttpSession session = request.getSession(false);
-            String redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
-            session.invalidate();
-            HttpSession guest_session = request.getSession(true);
-            synchronized (guest_session){
-                guest_session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
-                guest_session.setAttribute(USER_PROFILE, new GuestProfile());
-            }
-            //
-            // Finally, redirect the user back to the their original requested resource.
-            //
-            response.sendRedirect(redirectUrl);
+        HttpSession session = request.getSession(false);
+        String redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+        session.invalidate();
+        HttpSession guest_session = request.getSession(true);
+        synchronized (guest_session){
+            guest_session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
+            guest_session.setAttribute(USER_PROFILE, new GuestProfile());
         }
-        finally {
-            _sessionLock.unlock();
-        }
-
+        //
+        // Finally, redirect the user back to the their original requested resource.
+        //
+        response.sendRedirect(redirectUrl);
 	}
 
 
