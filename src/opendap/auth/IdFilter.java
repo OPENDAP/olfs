@@ -168,14 +168,12 @@ public class IdFilter implements Filter {
             for (IdProvider idProvider : IdPManager.getProviders()) {
                 String loginEndpoint = idProvider.getLoginEndpoint();
                 if (requestURI.equals(loginEndpoint)) {
-                    _sessionLock.lock();
-                    try {
+                    synchronized (session){
                         String returnToUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
                         if (returnToUrl != null && returnToUrl.equals(loginEndpoint))
                             session.setAttribute(ORIGINAL_REQUEST_URL, contextPath);
-                    } finally {
-                        _sessionLock.unlock();
                     }
+
                     try {
                         //
                         // Run the login gizwhat. This may involve simply collecting credentials from the user and
@@ -296,9 +294,11 @@ public class IdFilter implements Filter {
             HttpSession session = request.getSession(false);
             String redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
             session.invalidate();
-            session = request.getSession(true);
-            session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
-            session.setAttribute(USER_PROFILE, new GuestProfile());
+            HttpSession guest_session = request.getSession(true);
+            synchronized (guest_session){
+                guest_session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
+                guest_session.setAttribute(USER_PROFILE, new GuestProfile());
+            }
             //
             // Finally, redirect the user back to the their original requested resource.
             //

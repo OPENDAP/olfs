@@ -112,12 +112,12 @@ public class PDPService extends HttpServlet {
                 _log.error(msg);
                 throw new ServletException(msg, e);
             }
+            _requireSecureTransport.set(_config.getChild("RequireSecureTransport") != null);
             _isInitialized = true;
         }
         finally {
             _configLock.unlock();
         }
-        _requireSecureTransport.set(_config.getChild("RequireSecureTransport") != null);
         _log.info("init() - END");
 
     }
