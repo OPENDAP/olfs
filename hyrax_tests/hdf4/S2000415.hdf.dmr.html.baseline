@@ -3072,6 +3072,1065 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "S2000415.HDF",
+  "url": "http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/hdf4/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Producer_Agency", 
+          "value": "NASA"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Producer_Institution", 
+          "value": "JPL"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Sensor_Name", 
+          "value": "NSCAT"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Project_ID", 
+          "value": "NSCAT"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "SIS_ID", 
+          "value": "597-512-24/1996-07-01"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Build_ID", 
+          "value": "3.2.1/1996-11-05"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "ADEOS_Data_Package_ID", 
+          "value": "S2"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "ADEOS_Data_Package_Type", 
+          "value": "S"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Product_Creation_Time", 
+          "value": "1996-318T01:35:16.000"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Data_Type", 
+          "value": "L2"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Data_Status", 
+          "value": "COMPLETE"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "First_Rev_Number", 
+          "value": "415"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "First_Rev_Eq_Crossing_Time", 
+          "value": "1996-259T04:01:28.226"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "First_Rev_Eq_Crossing_Lon", 
+          "value": "279.9830017"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "First_Data_Time", 
+          "value": "1996-259T03:43:48.945"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Last_Data_Time", 
+          "value": "1996-259T05:09:48.997"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Num_Expected_Output_Records", 
+          "value": "458"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Num_Actual_Output_Records", 
+          "value": "458"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Ambig_Removal_Method", 
+          "value": "Baseline used"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "HDF_Build_ID", 
+          "value": "JPL D-xxxxx 12/15/94"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "HDF_SIS_ID", 
+          "value": "JPL D-12060 12/15/94"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "HDF_Conversion_Organization", 
+          "value": "JPL PO.DAAC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "HDF_Conversion_Time", 
+          "value": "1996-320T17:32:34"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Data_Format_Type", 
+          "value": "HDF"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "position of the ambiguities"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "position"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "position of the ambiguities"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "position"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "position of the ambiguities"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "position"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "position of the ambiguities"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "position"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "position of the ambiguities"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "position"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "row"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "long_name", 
+          "value": "WVC index"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "name", 
+          "value": "WVC"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "row",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "458"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "WVC",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "24"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "position",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "4"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "820"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "458"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "458"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "458"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_WVC_Lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "latitude"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "deg"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "22"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "-9000", "7771" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_WVC_Lon",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "longitude"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "deg"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "22"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "31242" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Sigma0",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "The total number of sigma-0 measurements"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "19" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Beam_12",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "The total number of sigma-0s received from beam 1 or 2"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "6" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Beam_34",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "The total number of sigma-0s received from beam 3 or 4"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "6" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Beam_56",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "The total number of sigma-0s received from beam 5 or 6"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "6" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Beam_78",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "The total number of sigma-0s received from beam 7 or 8"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "6" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_WVC_Quality_Flag",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "WVC Quality Flag"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "3" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Mean_Wind",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Mean Wind Speed"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "m/s"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "23"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "2374" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Wind_Speed",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Wind speed associated with a WVC"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "m/s"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "23"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "2571" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Wind_Dir",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Wind direction solution associated with a WVC"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "deg"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "23"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "35997" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Error_Speed",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Uncertainty estimated for the wind speed value"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "m/s"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "23"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "2410" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Error_Dir",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Uncertainty estimated for the wind direction value"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "deg"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.010000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "23"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "2435" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_MLE_Likelihood",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Relative likelihood that a given win vector solution is correct"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "0.10000000000000001"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "22"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "-32768", "2825" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "NSCAT_Rev_20_Num_Ambigs",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "Number of ambiguous wind vectors reported for a given cell"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "counts"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor", 
+        "value": "1.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "scale_factor_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "add_offset_err", 
+        "value": "0.0000000000000000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "calibrated_nt", 
+        "value": "21"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "valid_range", 
+        "value": [ "0", "4" ]      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "vdata_NSCAT_Rev_20_SwathIndex_vdf_begin",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag",
+    "valueReference": [ 
+
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

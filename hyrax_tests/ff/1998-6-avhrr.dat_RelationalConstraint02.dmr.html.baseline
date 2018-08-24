@@ -600,6 +600,117 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "1998-6-avhrr.dat",
+  "url": "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/ff/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Server", 
+          "value": "DODS FreeFrom based on FFND release 4.2.3"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "hours_variable", 
+          "value": "GSO_AVHRR.hh"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "minutes_variable", 
+          "value": "GSO_AVHRR.mm"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "seconds_variable", 
+          "value": "GSO_AVHRR.ss"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "gmt_time", 
+          "value": "true"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_variable", 
+          "value": "GSO_AVHRR.year"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_base", 
+          "value": "1900"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_day_variable", 
+          "value": "GSO_AVHRR.day_num"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "GSO_AVHRR",
+    "valueReference": [ 
+,
+    {
+      "@type": "PropertyValue",
+      "name": "satellite",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "year",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "day_num",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "hh",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "mm",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "ss",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "DODS_URL",
+      "valueReference": [ 
+
+      ]
+    }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

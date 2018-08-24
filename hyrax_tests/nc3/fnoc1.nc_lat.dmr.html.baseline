@@ -269,6 +269,61 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "fnoc1.nc",
+  "url": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "base_time", 
+          "value": "88- 10-00:00:00"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "title", 
+          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Unlimited_Dimension", 
+          "value": "time_a"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "17"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "degree North"      }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

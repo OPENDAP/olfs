@@ -729,6 +729,181 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "avhrr.dat",
+  "url": "http://localhost:8080/opendap/data/ff/avhrr.dat",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/ff/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/ff/avhrr.dat",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Server", 
+          "value": "DODS FreeFrom based on FFND release 4.2.3"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_FileType", 
+          "value": "FileServer"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_Interfaces", 
+          "value": [ "date", "time", "date_time" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_Title", 
+          "value": "Univ. R.I. 5.5KM AVHRR Browse Archive"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_LatRange", 
+          "value": [ "60.5750", "9.4250" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_LonRange", 
+          "value": [ "-96.2220", "-33.7780" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Sel_Vars", 
+          "value": "Sea_Temp"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Dod_Vars", 
+          "value": "dsp_band_1"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_StartDate", 
+          "value": "1979/4/11"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_EndDate", 
+          "value": "2002/12/31"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_variable", 
+          "value": "URI_Avhrr.year"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "month_variable", 
+          "value": "URI_Avhrr.month"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "day_variable", 
+          "value": "URI_Avhrr.day"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "hours_variable", 
+          "value": "URI_Avhrr.hours"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "minutes_variable", 
+          "value": "URI_Avhrr.minutes"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "seconds_variable", 
+          "value": "URI_Avhrr.seconds"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "gmt_time", 
+          "value": "true"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_variable", 
+          "value": "URI.Avhrr.year"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "month_variable", 
+          "value": "URI_Avhrr.month"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "day_variable", 
+          "value": "URI_Avhrr.day"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "hours_variable", 
+          "value": "URI_Avhrr.hours"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "minutes_variable", 
+          "value": "URI_Avhrr.minutes"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "seconds_variable", 
+          "value": "URI_Avhrr.seconds"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "gmt_time", 
+          "value": "true"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "URI_Avhrr",
+    "valueReference": [ 
+,
+    {
+      "@type": "PropertyValue",
+      "name": "year",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "month",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "day",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "hours",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "minutes",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "seconds",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "DODS_URL",
+      "valueReference": [ 
+
+      ]
+    }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

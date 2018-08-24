@@ -647,6 +647,161 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "bears.nc",
+  "url": "http://localhost:8080/opendap/data/nc/bears.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/bears.nc",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "history", 
+          "value": "This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Unlimited_Dimension", 
+          "value": "k"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "i",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "2"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "j",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "l",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "i",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "attr1", 
+        "value": "1"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "attr2", 
+        "value": [ "1", "2", "3", "4" ]      },
+        {
+          "@type": "PropertyValue", 
+          "name": "attr3_1", 
+          "value": "17"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "attr3_2", 
+          "value": [ "19", "23", "27" ]        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "j",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "bears",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "act", 
+        "value": "text string\\012\\011123"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acs", 
+        "value": "-40"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acl", 
+        "value": "17000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acf", 
+        "value": [ "-2.00000000", "1.00000000", "0.00000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acd", 
+        "value": [ "-1.000000000000000", "0.7500000000000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "string_length", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "order",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "shot",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "aloan",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "cross",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "l",
+    "valueReference": [ 
+
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

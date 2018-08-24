@@ -320,6 +320,58 @@
       <h3>OPeNDAP Hyrax (Not.A.Release)
          <a href="/opendap/docs/">Documentation</a>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "gsodock.dat",
+  "url": "http://localhost:8080/opendap/data/ff/gsodock.dat",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/ff/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/ff/gsodock.dat",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Server", 
+          "value": "DODS FreeFrom based on FFND release 4.2.3"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "text", 
+          "value": "Time    Dep     Temp    Sal     DO%     pH      Turb    AirT    WndSpd  WndDir  Baro    Solar"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "URI_GSO-Dock",
+    "valueReference": [ 
+,
+    {
+      "@type": "PropertyValue",
+      "name": "Depth",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Air_Temp",
+      "valueReference": [ 
+
+      ]
+    }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);
