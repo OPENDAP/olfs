@@ -230,6 +230,7 @@ public class HtmlDMR extends Dap4Responder {
     private String indent_inc = "  ";
 
     public String dap4AttributesToProperties(Element variable, String name, String indent, boolean first){
+
         String myIndent = indent + indent_inc;
         StringBuilder sb = new StringBuilder();
 
@@ -257,6 +258,16 @@ public class HtmlDMR extends Dap4Responder {
             }
 
             log.error("dap4AttributesToProperties() - We don't have a good mapping for container types to JSON-LD markup.");
+        }
+        else if(variable.getName().equals("Dimension")) {
+            Element sizeAttr = new Element ("Attribute",DAP.DAPv40_NS);
+            sizeAttr.setAttribute("name", "size");
+            Element value = new Element("Value",DAP.DAPv40_NS);
+            value.setText(variable.getAttributeValue("size"));
+            sizeAttr.addContent(value);
+            Vector<Element> attributes = new Vector<>();
+            attributes.add(sizeAttr);
+            sb.append(dap4AttributesToProperties(attributes, myIndent));
         }
         else {
             // It's an atomic variable or an Array!
