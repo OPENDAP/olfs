@@ -258,12 +258,15 @@
 
     <xsl:template name="DapServiceLinks" >
         <td align="left">
-            <b><a href="{encode-for-uri(@name)}.html">
+            <b>
+                <a href="{encode-for-uri(@name)}.html">
                 <span itemprop="name">
                     <xsl:value-of select="@name"/>
                 </span>
-            </a>
+                </a>
             </b>
+            <span class="small">(<a href="{encode-for-uri(@name)}.ifh">ifh</a>)</span>
+
         </td>
 
         <td align="center" nowrap="nowrap">
