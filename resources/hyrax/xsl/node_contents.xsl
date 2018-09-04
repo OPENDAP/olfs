@@ -265,8 +265,6 @@
                 </span>
                 </a>
             </b>
-            <span class="small">(<a href="{encode-for-uri(@name)}.ifh">ifh</a>)</span>
-
         </td>
 
         <td align="center" nowrap="nowrap">
