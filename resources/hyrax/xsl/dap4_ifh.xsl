@@ -115,7 +115,7 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">DAP4 Data Access Form</div>
+                            <div class="large">OPeNDAP Data Access Form</div>
                         </td>
                     </tr>
                 </table>

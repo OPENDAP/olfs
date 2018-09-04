@@ -82,8 +82,8 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <xsl:choose>
-                    <xsl:when test="$userId">
 
+                    <xsl:when test="$userId">
                         <div style='float: right;vertical-align:middle;font-size:small;'>
                             <xsl:choose>
                                 <xsl:when test="$loginLink">
@@ -95,18 +95,16 @@
                             </xsl:choose>
                             <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
                         </div>
-
-
                     </xsl:when>
-                    <xsl:otherwise>
 
+                    <xsl:otherwise>
                         <xsl:if test="$loginLink">
                             <div style='float: right;vertical-align:middle;font-size:small;'>
                                 <a style="color: green;" href="{$loginLink}">login</a>
                             </div>
                         </xsl:if>
-
                     </xsl:otherwise>
+
                 </xsl:choose>
 
                 <!-- ****************************************************** -->
@@ -120,7 +118,7 @@
                         </td>
                         <td>
                             <div class="small_italic" style="padding-bottom: 5px;">Welcome to the new (<em>beta</em>) </div>
-                            <div class="large" style="padding-bottom: 5px;">DAP2 Data Access Form</div>
+                            <div class="large" style="padding-bottom: 5px;">OPeNDAP Data Access Form</div>
                             <div class="small_italic" style="padding-bottom: 5px;">
                                 <a href="{$datasetUrl}.html_old">The old form can be found here...</a>
                             </div>
