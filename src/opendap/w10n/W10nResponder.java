@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 import java.util.regex.Pattern;
+import org.owasp.encoder.Encode;
 
 /**
  * Handles w10n services. Performs  HTTP server/client content negotiation, evaluates w10n requests
@@ -1494,7 +1495,6 @@ public class W10nResponder {
 
         _besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(),  besResponse);
 
-
         boolean isNode = true;
 
         /**
@@ -1504,47 +1504,35 @@ public class W10nResponder {
          */
         if(w10nRequest.variableWasRequested()) {
             Element dataset = besResponse.getRootElement();
-
             Iterator<String> reqVarIter = w10nRequest.getRequestedVariableNameVector().iterator();
-
             Element requestedVariableElement = childSearchWorker(dataset, reqVarIter);
-
 
             if( requestedVariableElement.getName().equalsIgnoreCase("Grid") ||
                     requestedVariableElement.getName().equalsIgnoreCase("Structure") ||
                     requestedVariableElement.getName().equalsIgnoreCase("Sequence")){
 
-
                 dataset.removeContent();
-
                 @SuppressWarnings("unchecked")
                 List<Element> varsAndAttrs = requestedVariableElement.getChildren();
-
                 Vector<Element> containerContents = new Vector<>();
                 containerContents.addAll(varsAndAttrs);
                 for(Element e: containerContents){
                     e.detach();
                     dataset.addContent(e);
                 }
-
                 isNode = true;
             }
             else {
                 dataset.removeContent();
                 requestedVariableElement.detach();
                 dataset.addContent(requestedVariableElement);
-
                 isNode = false;
             }
-
-
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
             _log.debug("sendDap2MetadataAsW10nHtml() - Transforming modified dataset document: \n{}",xmlo.outputString(besResponse));
         }
 
-
-
+        String s;
 
         JDOMSource datasetDocumentSource = new JDOMSource(besResponse);
 
@@ -1552,11 +1540,15 @@ public class W10nResponder {
 
 
         Transformer transformer = new Transformer(xsltDoc);
-
         transformer.setParameter("serviceContext", w10nRequest.getServiceContextPath());
-        transformer.setParameter("w10nName", w10nRequest.getW10nResourcePath() + w10nRequest.getW10nId());
+
+        s = w10nRequest.getW10nResourcePath() + w10nRequest.getW10nId();
+        transformer.setParameter("w10nName", s);
         transformer.setParameter("w10nType", isNode?"node":"leaf");
-        transformer.setParameter("arrayConstraint", w10nRequest.getW10nArrayConstraint());
+
+        // Since the array constraint will most surely contain '[' and ']' we need to URI encode it.
+        s =  Encode.forUriComponent(w10nRequest.getW10nArrayConstraint());
+        transformer.setParameter("arrayConstraint",s);
 
         // Transform the BES  showCatalog response into a HTML page for the browser
         transformer.transform(datasetDocumentSource, response.getOutputStream());
