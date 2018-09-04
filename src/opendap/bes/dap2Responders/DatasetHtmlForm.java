@@ -50,7 +50,7 @@ public class DatasetHtmlForm extends Dap4Responder {
     private Logger log;
 
 
-    private static String _defaultRequestSuffix = ".html";
+    private static String _defaultRequestSuffix = ".html_old";
 
 
     public DatasetHtmlForm(String sysPath, BesApi besApi) {

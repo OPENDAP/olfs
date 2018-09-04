@@ -61,7 +61,7 @@ import java.util.Vector;
 public class Dap2IFH extends Dap4Responder {
 
     private Logger _log;
-    private static String _defaultRequestSuffix = ".ifh";
+    private static String _defaultRequestSuffix = ".html";
 
 
     public Dap2IFH(String sysPath, BesApi besApi) {

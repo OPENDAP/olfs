@@ -291,11 +291,11 @@ public class BesDapDispatcher implements DispatchHandler {
             // Add the HTML form conditionally because the ".html" suffix is used
             // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
             // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
-            _responders.add(htmlForm);
-
             Dap4Responder ifh = new Dap2IFH(_systemPath, besApi);
             _responders.add(ifh);
+
+            Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
+            _responders.add(htmlForm);
 
             FileAccess d4fa = new FileAccess(_systemPath, null, "", besApi);
             d4fa.clearAltResponders();

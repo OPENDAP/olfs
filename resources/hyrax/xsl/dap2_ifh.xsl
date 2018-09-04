@@ -119,7 +119,11 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">DAP2 Data Access Form</div>
+                            <div class="small_italic" style="padding-bottom: 5px;">Welcome to the new (<em>beta</em>) </div>
+                            <div class="large" style="padding-bottom: 5px;">DAP2 Data Access Form</div>
+                            <div class="small_italic" style="padding-bottom: 5px;">
+                                <a href="{$datasetUrl}.html_old">The old form can be found here...</a>
+                            </div>
                         </td>
                     </tr>
                 </table>
