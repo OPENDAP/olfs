@@ -215,7 +215,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        log.info("sendDIR() request = " + request);
+        log.info("xsltDir() BEGIN request = " + request);
 
         // String context = request.getContextPath();
 
@@ -223,11 +223,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dap_directory");
         response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-
-
-        //Cache-Control: max-age=0, no-cache, no-store
-
-        // response.setStatus(HttpServletResponse.SC_OK);
 
         Request oreq = new Request(null,request);
 
