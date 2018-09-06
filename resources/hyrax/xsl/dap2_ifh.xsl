@@ -74,7 +74,7 @@
                 </xsl:element>
 
 
-                <title>Interface From Hell <xsl:value-of select="@name"/></title>
+                <title>OPeNDAP Data Access Form for  <xsl:value-of select="@name"/></title>
             </head>
             <body>
                 <!-- ****************************************************** -->
