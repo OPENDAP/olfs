@@ -88,35 +88,6 @@
 
 
 
-    <xsl:function name="pathConcat" as="pathConcat">
-        <xsl:param name="s0"/>
-        <xsl:param name="s1"/>
-        <xsl:param name="s2"/>
-        <xsl:param name="s3"/>
-        <xsl:param name="s4"/>
-        <xsl:param name="s5"/>
-        <xsl:param name="s6"/>
-        <xsl:param name="s7"/>
-        <xsl:param name="s8"/>
-        <xsl:param name="s9"/>
-        <xsl:variable name="slash">
-            <xsl:if test="substring($s0, string-length($s0), 1)!='/' and substring($s1, 1, 1)!='/'">/</xsl:if>
-        </xsl:variable>
-        <xsl:sequence select="concat($s0, $slash,  $s1)"/>
-    </xsl:function>
-
-
-
-    <xsl:template name="pathConcat">
-        <xsl:param name="s1"/>
-        <xsl:param name="s2"/>
-        <xsl:variable name="slash">
-            <xsl:if test="substring($s1, string-length($s1), 1)!='/' and substring($s2, 1, 1)!='/'">/</xsl:if>
-        </xsl:variable>
-        <xsl:value-of select="concat($s1,$slash,$s2)"/>
-    </xsl:template>
-
-
     <!--***********************************************
        -
        -
