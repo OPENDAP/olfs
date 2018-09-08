@@ -37,7 +37,7 @@
                     DAP2_URL = new dap2_url("http://localhost:8080/opendap/data/nc/fnoc1.nc");
                     DEBUG = new debug_obj();
                 </script>
-      <title>Interface From Hell fnoc1.nc</title>
+      <title>OPeNDAP Data Access Form for  fnoc1.nc</title>
    </head>
    <body>
       <table width="100%" border="0">
