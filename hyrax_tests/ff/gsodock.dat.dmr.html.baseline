@@ -43,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -768,7 +768,7 @@
             </tr>
          </table>
       </form>
-      <h3>OPeNDAP Hyrax (Not.A.Release)
+      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
       <script type="application/ld+json">
