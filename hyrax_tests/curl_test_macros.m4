@@ -34,7 +34,7 @@ dnl The above macro modified to edit the '<h3>OPeNDAP Hyrax (Not.A.Release)' iss
 dnl so that whatever appears in the parens is moot.
 
 m4_define([PATCH_HYRAX_RELEASE], [dnl
-    sed 's@OPeNDAP Hyrax (\(.*\)).*@OPeNDAP Hyrax (Not.A.Release)@g' < $1 > $1.sed
+    sed 's@OPeNDAP Hyrax (.*))\(.*\)@OPeNDAP Hyrax (Not.A.Release)\1@g' < $1 > $1.sed
     mv $1.sed $1
 ])
 
