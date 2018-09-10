@@ -86,17 +86,25 @@
             <xsl:apply-templates />
     </xsl:template>
 
-    <xsl:function name="bes:clean_path_component">
-        <xsl:param name="sseq"/>
-        <xsl:sequence select="for $s in $sseq return replace($s,'^[/]+|[/]+$','')"/>
-    </xsl:function>
-
+    <!--***********************************************
+       -
+       - FUNCTION: bes:path_concat()
+       -
+       - Concatenates the string members of the passed
+       - sequence parameter using a default delimiter
+       - of slash "/".  This is a brute force method
+       - that first makes the concatenation and then
+       - uses a regexto replace any multiple occurance
+       - of the delimiter with a single occurance
+       -
+       - TODO - Have slash be the default and add a second param for supplying other delimiters.
+       -
+       -
+     -->
     <xsl:function name="bes:path_concat">
         <xsl:param name="sseq"/>
-        <!-- xsl:value-of select="string-join(bes:clean_path_component($sseq),'/')"/ -->
-        <xsl:value-of select="replace(string-join(bes:clean_path_component($sseq),'/'),'[/]+','/')"/>
+        <xsl:value-of select="replace(string-join($sseq,'/'),'[/]+','/')"/>
     </xsl:function>
-
 
     <!--***********************************************
        -
