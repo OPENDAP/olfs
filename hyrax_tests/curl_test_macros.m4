@@ -175,14 +175,12 @@ m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST], [dnl
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
         REMOVE_DATE_HEADER([http_header])
-        dnl REMOVE_DATE_HEADER([stdout])
         AT_CHECK([mv stdout $baseline.tmp])
         AT_CHECK([echo "^\c" > $baseline.http_header.tmp; head -1 http_header | sed "s/\./\\\./g" >> $baseline.http_header.tmp])
         ],
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
         REMOVE_DATE_HEADER([http_header])
-        dnl REMOVE_DATE_HEADER([stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_CHECK([grep -f $baseline.http_header http_header], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
