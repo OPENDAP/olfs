@@ -64,7 +64,7 @@
      -->
     <xsl:template match="bes:showNode">
         <thredds:catalog>
-            <xsl:comment>besPrefix: <xsl:value-of select="$besPrefix"/></xsl:comment>
+            <!--xsl:comment>besPrefix: <xsl:value-of select="$besPrefix"/></xsl:comment -->
             <thredds:service name="dap" serviceType="OPeNDAP" base="{$dapService}"/>
             <thredds:service name="file" serviceType="HTTPServer" base="{$dapService}"/>
             <xsl:if test="$ncWmsServiceBase">
