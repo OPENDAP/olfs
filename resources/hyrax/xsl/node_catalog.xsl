@@ -86,16 +86,17 @@
             <xsl:apply-templates />
     </xsl:template>
 
-
+    <xsl:function name="bes:clean_path_component">
+        <xsl:param name="sseq"/>
+        <xsl:sequence select="for $s in $sseq return replace($s,'^[/]+|[/]+$','')"/>
+    </xsl:function>
 
     <xsl:function name="bes:path_concat">
-        <xsl:param name="s0"/>
-        <xsl:param name="s1"/>
-        <xsl:variable name="slash">
-            <xsl:if test="substring($s0, string-length($s0), 1)!='/' and substring($s1, 1, 1)!='/'">/</xsl:if>
-        </xsl:variable>
-        <xsl:value-of select="concat($s0,$slash,$s1)" />
+        <xsl:param name="sseq"/>
+        <!-- xsl:value-of select="string-join(bes:clean_path_component($sseq),'/')"/ -->
+        <xsl:value-of select="replace(string-join(bes:clean_path_component($sseq),'/'),'[/]+','/')"/>
     </xsl:function>
+
 
     <!--***********************************************
        -
@@ -133,18 +134,65 @@
             -->
             <xsl:choose>
                 <xsl:when test="../@name='/'">
-                    <xsl:value-of select=" bes:path_concat($dapService,bes:path_concat($besPrefix,@name))" />
-                </xsl:when>
+                    <xsl:value-of select=" bes:path_concat(($dapService, $besPrefix, @name))" />
+               </xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
                         <xsl:when test="$besPrefix='/'">
-                            <xsl:value-of select="bes:path_concat($dapService,bes:path_concat(../@name,@name))" />
+                            <xsl:value-of select="bes:path_concat(($dapService, ../@name, @name))" />
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="
-                                bes:path_concat($dapService,
-                                bes:path_concat($besPrefix,
-                                bes:path_concat(../@name,@name)))" />
+                            <xsl:value-of select="bes:path_concat(($dapService, $besPrefix, ../@name, @name))" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="MooID">
+            <!--
+            <xsl:variable name="slash_0">
+                <xsl:if test="substring($dapService, string-length($dapService), 1)!='/' and substring($besPrefix, 1, 1)!='/'">/</xsl:if>
+            </xsl:variable>
+            <xsl:variable name="slash_1">
+                <xsl:if test="substring($besPrefix, string-length($besPrefix), 1)!='/' and substring(@name, 1, 1)!='/'">/</xsl:if>
+            </xsl:variable>
+            <xsl:variable name="slash_2">
+                <xsl:if test="substring($dapService, string-length($dapService), 1)!='/' and substring(../@name, 1, 1)!='/'">/</xsl:if>
+            </xsl:variable>
+            <xsl:variable name="slash_3">
+                <xsl:if test="substring(../@name, string-length(../@name), 1)!='/' and substring(@name, 1, 1)!='/'">/</xsl:if>
+            </xsl:variable>
+            <xsl:variable name="slash_4">
+                <xsl:if test="substring($besPrefix, string-length($besPrefix), 1)!='/' and substring(../@name, 1, 1)!='/'">/</xsl:if>
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="../@name='/'">
+                    <xsl:value-of select="concat($dapService,$slash_0,$besPrefix,$slash_1,@name)" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:choose>
+                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="concat($dapService,$slash_2,../@name,$slash_3,@name)" /></xsl:when>
+                        <xsl:otherwise><xsl:value-of select="concat($dapService,$slash_0,$besPrefix,$slash_4,../@name,$slash_3,@name)" /></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:otherwise>
+            </xsl:choose>
+            -->
+            <xsl:choose>
+                <xsl:when test="../@name='/'">
+                    <xsl:value-of select=" bes:path_concat(($dapService, $besPrefix, @name))" />
+                    <xsl:comment>otherwise - `<xsl:value-of select=" bes:path_concat(($dapService, $besPrefix, @name))" />`</xsl:comment>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:comment>otherwise - </xsl:comment>
+                    <xsl:choose>
+                        <xsl:when test="$besPrefix='/'">
+                            <xsl:value-of select="bes:path_concat(($dapService, ../@name, @name))" />
+                            <xsl:comment> when besPrefix='/' - `<xsl:value-of select="bes:path_concat(($dapService, ../@name, @name))" />`</xsl:comment>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="bes:path_concat(($dapService, $besPrefix, ../@name, @name))" />
+                            <xsl:comment>otherwise - `<xsl:value-of select="bes:path_concat(($dapService, $besPrefix, ../@name, @name))" />`</xsl:comment>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
@@ -186,7 +234,7 @@
                 <xsl:otherwise>
                     <xsl:choose>
                         <xsl:when test="$besPrefix='/'"><xsl:value-of select="@name"/></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="bes:path_concat($besPrefix,@name)"/></xsl:otherwise>
+                        <xsl:otherwise><xsl:value-of select="bes:path_concat(($besPrefix,@name))"/></xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
@@ -196,7 +244,7 @@
             <!-- xsl:variable name="slash">
                 <xsl:if test="substring($dapService, string-length($dapService), 1)!='/' and substring($name, 1, 1)!='/'">/</xsl:if>
             </xsl:variable -->
-            <xsl:value-of select="bes:path_concat($dapService, $name)" />
+            <xsl:value-of select="bes:path_concat(($dapService, $name))" />
         </xsl:variable>
 
         <thredds:dataset name="{$name}" ID="{$ID}">
@@ -220,15 +268,15 @@
         <xsl:variable name="urlPath">
             <xsl:choose>
                 <xsl:when test="../@name='/'" >
-                    <xsl:value-of select="bes:path_concat($besPrefix,@name)" />
+                    <xsl:value-of select="bes:path_concat(($besPrefix,@name))" />
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
                         <xsl:when test="$besPrefix='/'">
-                            <xsl:value-of select="bes:path_concat(../@name,@name)" />
+                            <xsl:value-of select="bes:path_concat((../@name,@name))" />
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select=" bes:path_concat($besPrefix,bes:path_concat(../@name,@name))" />
+                            <xsl:value-of select=" bes:path_concat(($besPrefix,../@name,@name))" />
                         </xsl:otherwise>
                     </xsl:choose>
 
