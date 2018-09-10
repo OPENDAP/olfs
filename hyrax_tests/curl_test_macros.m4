@@ -29,6 +29,10 @@ m4_define([REMOVE_DATE_TIME], [dnl
     dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
     mv $1.sed $1
 ])
+m4_define([REMOVE_DATE_HEADER], [dnl
+    sed 's/^Date:.*$/Date: REMOVED/g' < $1 > $1.sed
+    cp $1.sed $1
+])
 
 dnl The above macro modified to edit the '<h3>OPeNDAP Hyrax (Not.A.Release)' issue
 dnl so that whatever appears in the parens is moot.
@@ -170,11 +174,15 @@ m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST], [dnl
     AS_IF([test -n "$baselines" -a x$baselines = xyes],
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
+        dnl REMOVE_DATE_HEADER([stdout])
         AT_CHECK([mv stdout $baseline.tmp])
         AT_CHECK([echo "^\c" > $baseline.http_header.tmp; head -1 http_header | sed "s/\./\\\./g" >> $baseline.http_header.tmp])
         ],
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
+        dnl REMOVE_DATE_HEADER([stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_CHECK([grep -f $baseline.http_header http_header], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
