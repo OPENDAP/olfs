@@ -103,7 +103,7 @@
      -->
     <xsl:function name="bes:path_concat">
         <xsl:param name="sseq"/>
-        <xsl:value-of select="replace(string-join($sseq,'/'),'[/]+','/')"/>
+        <xsl:value-of select="replace(replace(string-join($sseq,'/'),'[/]+','/'),'[/]+$','')" />
     </xsl:function>
 
     <!--***********************************************
