@@ -252,7 +252,7 @@
             <!-- xsl:variable name="slash">
                 <xsl:if test="substring($dapService, string-length($dapService), 1)!='/' and substring($name, 1, 1)!='/'">/</xsl:if>
             </xsl:variable -->
-            <xsl:value-of select="bes:path_concat(($dapService, $name))" />
+            <xsl:value-of select="concat(bes:path_concat(($dapService, $name)),'/')" />
         </xsl:variable>
 
         <thredds:dataset name="{$name}" ID="{$ID}">
