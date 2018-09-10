@@ -241,7 +241,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
-                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="@name"/></xsl:when>
+                        <xsl:when test="$besPrefix='/'"><xsl:value-of select="replace(@name,'[/]$+','')"/></xsl:when>
                         <xsl:otherwise><xsl:value-of select="bes:path_concat(($besPrefix,@name))"/></xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
