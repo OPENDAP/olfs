@@ -215,7 +215,15 @@
                 <!-- It's a leaf, aka a file or a granule or whatnot -->
                 <thredds:dataset name="{@name}" ID="{$ID}" >
                     <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
-                    <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
+                    <!--
+                    BUG PATCH 9/11/2018 - ndp
+                    Hyrax produces iso-8601 dates like this: YYYY-MM-DDTHH:MM:SSzone
+                    But we know that the java-netcdf library will reject any time string that fails to match
+                    the regex:  ([\+\-?\d]+)([ t]([\.\:?\d]*)([ \+\-]\S*)?z?)?$
+                    So basically we can omit the timezone or change what we have to Z  or z.
+                    So I do this with a regex that matches everything after the final time digit: \D+$
+                    -->
+                    <thredds:date type="modified"><xsl:value-of select="replace(@lastModified,'\D+$','Z')" /></thredds:date>
                     <xsl:call-template name="DatasetAccess"/>
                 </thredds:dataset>
             </xsl:otherwise>
