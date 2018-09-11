@@ -139,15 +139,11 @@ public class Request {
      * @return The relative URL = _request.getPathInfo()
      */
     public String getRelativeUrl(){
-
-        String name=_request.getPathInfo();
-
-        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            name = "/";
-
+        String s = _request.getPathInfo();
+        if(s == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
+            s = "/";
         }
-        return name;
-
+        return s;
     }
 
 

@@ -52,9 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class W10nServlet extends HttpServlet   {
 
     private org.slf4j.Logger _log;
-
     private W10nResponder _responder;
-
 
     /**
      * ************************************************************************
@@ -64,7 +62,6 @@ public class W10nServlet extends HttpServlet   {
      */
     private AtomicInteger _reqNumber;
 
-
     /**
      * ************************************************************************
      *
@@ -73,22 +70,13 @@ public class W10nServlet extends HttpServlet   {
     @Override
     public void init() throws ServletException {
         super.init();
-
         _reqNumber = new AtomicInteger(0);
-
         _log = LoggerFactory.getLogger(this.getClass());
-
-
         _reqNumber = new AtomicInteger(0);
-
         _responder = new W10nResponder(ServletUtil.getSystemPath(this,""));
-
         W10nService w10nService = new W10nService();
-
         w10nService.init(this,null);
-
         ServicesRegistry.addService(w10nService);
-
     }
 
     /**
@@ -101,24 +89,16 @@ public class W10nServlet extends HttpServlet   {
      */
     @Override
     protected long getLastModified(HttpServletRequest req) {
-
-
         RequestCache.openThreadCache();
-
         long reqno = _reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
-
         long lmt = -1;
-
         Procedure timedProcedure = Timer.start();
         try {
-
             if (ReqInfo.isServiceOnlyRequest(req)) {
                 return lmt;
             }
-
             // @TODO Create a meaningful implementation of getLastModified for w10n service.
-
         } catch (Exception e) {
             _log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
             lmt = -1;
@@ -127,131 +107,87 @@ public class W10nServlet extends HttpServlet   {
             Timer.stop(timedProcedure);
 
         }
-
-
         return lmt;
-
     }
 
-        @Override
-        public void doGet(HttpServletRequest request,
-                          HttpServletResponse response) {
+    @Override
+    public void doGet(HttpServletRequest request,
+                      HttpServletResponse response) {
 
-
-            int request_status = HttpServletResponse.SC_OK;
+        int request_status = HttpServletResponse.SC_OK;
+        try {
+            Procedure timedProc = Timer.start();
             try {
-                Procedure timedProc = Timer.start();
-                try {
-
-                    if(LicenseManager.isExpired(request)){
-                        LicenseManager.sendLicenseExpiredPage(request,response);
-                        return;
-                    }
-                    RequestCache.openThreadCache();
-
-
-
-
-                    int reqno = _reqNumber.incrementAndGet();
-                    LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
-
-                    _log.debug(Util.getMemoryReport());
-
-                    _log.debug(ServletUtil.showRequest(request, reqno));
-                    //log.debug(AwsUtil.probeRequest(this, request));
-
-
-                    if(redirectForServiceOnlyRequest(request,response))
-                        return;
-
-
-
-
-
-                    if (Debug.isSet("probeRequest"))
-                        _log.debug(ServletUtil.probeRequest(this, request));
-
-
-                    /**
-                     * Do w10n STUFF
-                     */
-
-
-
-                    make_w10n(request, response );
-
-
-
-
-
-
+                if(LicenseManager.isExpired(request)){
+                    LicenseManager.sendLicenseExpiredPage(request,response);
+                    return;
                 }
-                finally {
-                    _log.info("doGet(): Response completed.\n");
-                    Timer.stop(timedProc);
-                }
+                RequestCache.openThreadCache();
 
-
-            }
-            catch (Throwable t) {
-                try {
-                    request_status = OPeNDAPException.anyExceptionHandler(t, this,  response);
-                }
-                catch(Throwable t2) {
-                	try {
-                		_log.error("\n########################################################\n" +
-                                "Request processing failed.\n" +
-                                "Normal Exception handling failed.\n" +
-                                "This is the last error log attempt for this request.\n" +
-                                "########################################################\n", t2);
-                	}
-                	catch(Throwable t3){
-                        // It's boned now.. Leave it be.
-                	}
-                }
+                int reqno = _reqNumber.incrementAndGet();
+                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+                _log.debug(Util.getMemoryReport());
+                _log.debug(ServletUtil.showRequest(request, reqno));
+                //log.debug(AwsUtil.probeRequest(this, request));
+                if(redirectForServiceOnlyRequest(request,response))
+                    return;
+                if (Debug.isSet("probeRequest"))
+                    _log.debug(ServletUtil.probeRequest(this, request));
+                /**
+                 * Do w10n STUFF
+                 */
+                _responder.send_w10n_response(request, response);
             }
             finally {
-                LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
-                RequestCache.closeThreadCache();
+                _log.info("doGet(): Response completed.\n");
+                Timer.stop(timedProc);
             }
-
-            _log.info(Timer.report());
-            Timer.reset();
         }
-        //**************************************************************************
-        private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
-                                                      HttpServletResponse res)
-                throws IOException {
-
-            // String localUrl = ReqInfo.getLocalUrl(req);
-
-            // @SuppressWarnings("unchecked")
-            // Map<String,String[]> queryParameters = req.getParameterMap();
-
-
-            ServletUtil.probeRequest(this, req);
-
-            if (ReqInfo.isServiceOnlyRequest(req)) {
-                String reqURI = req.getRequestURI();
-                String newURI = reqURI+"/";
-                res.sendRedirect(Scrub.urlContent(newURI));
-                _log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
-                        "context to a URL that ends in a '/' character!");
-                return true;
+        catch (Throwable t) {
+            try {
+                request_status = OPeNDAPException.anyExceptionHandler(t, this,  response);
             }
-            return false;
+            catch(Throwable t2) {
+                try {
+                    _log.error("\n########################################################\n" +
+                            "Request processing failed.\n" +
+                            "Normal Exception handling failed.\n" +
+                            "This is the last error log attempt for this request.\n" +
+                            "########################################################\n", t2);
+                }
+                catch(Throwable t3){
+                    // It's boned now.. Leave it be.
+                }
+            }
+        }
+        finally {
+            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
+            RequestCache.closeThreadCache();
         }
 
+        _log.info(Timer.report());
+        Timer.reset();
+    }
 
-
-        private void make_w10n(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-
-            _responder.send_w10n_response(request, response);
-
+    //**************************************************************************
+    private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
+                                                  HttpServletResponse res)
+            throws IOException {
+        // String localUrl = ReqInfo.getLocalUrl(req);
+        // @SuppressWarnings("unchecked")
+        // Map<String,String[]> queryParameters = req.getParameterMap();
+        ServletUtil.probeRequest(this, req);
+        if (ReqInfo.isServiceOnlyRequest(req)) {
+            String reqURI = req.getRequestURI();
+            String newURI = reqURI+"/";
+            res.sendRedirect(Scrub.urlContent(newURI));
+            _log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
+                    "context to a URL that ends in a '/' character!");
+            return true;
         }
-
-
+        return false;
+    }
+    //**************************************************************************
 
 
 }
