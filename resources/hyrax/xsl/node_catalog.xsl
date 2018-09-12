@@ -221,9 +221,19 @@
                     But we know that the java-netcdf library will reject any time string that fails to match
                     the regex:  ([\+\-?\d]+)([ t]([\.\:?\d]*)([ \+\-]\S*)?z?)?$
                     So basically we can omit the timezone or change what we have to Z  or z.
-                    So I do this with a regex that matches everything after the final time digit: \D+$
+                    So I do this with a regex that matches the UTC+0 equivalents and maps them to Z.
+                    (The list of UTC +0 timezones: AZOST, EGST, GMT, UTC, WET, Z)
+                    Any other time zone value is simply dropped. by the second regex '\D+$'
                     -->
-                    <thredds:date type="modified"><xsl:value-of select="replace(@lastModified,'\D+$','Z')" /></thredds:date>
+                    <xsl:variable name="utc_names_regex">(AZOST)|(EGST)|(GMT)|(UTC)|(WET)|(Z)$</xsl:variable>
+                    <xsl:choose>
+                        <xsl:when test="matches(@lastModified,$utc_names_regex)">
+                            <thredds:date type="modified"><xsl:value-of select="replace(@lastModified,$utc_names_regex,'Z')" /></thredds:date>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <thredds:date type="modified"><xsl:value-of select="replace(@lastModified,'\D+$','')" /></thredds:date>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <xsl:call-template name="DatasetAccess"/>
                 </thredds:dataset>
             </xsl:otherwise>
