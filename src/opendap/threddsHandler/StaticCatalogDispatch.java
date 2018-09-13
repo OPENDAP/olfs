@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.auth.AuthenticationControls;
+import opendap.gateway.BesGatewayApi;
 import opendap.http.error.BadGateway;
 import opendap.http.error.BadRequest;
 import opendap.logging.Timer;
@@ -52,6 +53,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -76,6 +79,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private HttpServlet _dispatchServlet;
     private String _prefix;
     boolean _useMemoryCache = false;
+    boolean _allowRemoteCatalogTraversal = false;
 
     String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
     Transformer _catalogToHtmlTransform = null;
@@ -133,6 +137,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
+    /**
+     * Returns the appropriate THREDDS catalog response. Basically the method embodies the THEREDDS/TDS
+     * web UI.
+     *
+     *
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     public void sendThreddsCatalogResponse(HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
 
@@ -149,14 +163,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
             if (redirectRequest(request, response))
                 return;
 
+
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
+
+                if(!_allowRemoteCatalogTraversal)
+                    throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
+
                 browseRemoteCatalog(orq, response, query);
-                // response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                //throw new BadRequest("Remote Catalog Browsing is not supported.");
-            } else if (query != null && query.startsWith("browseDataset=")) {
+            }
+            else if (query != null && query.startsWith("browseDataset=")) {
+                if(!_allowRemoteCatalogTraversal)
+                    throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
                 browseRemoteDataset(orq, response, query);
-                // throw new BadRequest("Remote Dataset Browsing is not supported.");
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -234,7 +253,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private void browseRemoteDataset(Request oRequest,
                                      HttpServletResponse response,
-                                     String query) throws IOException, BadRequest, BadGateway, JDOMException, BadConfigurationException, PPTException, BESError {
+                                     String query)
+            throws IOException, BadRequest, BadGateway, JDOMException, BadConfigurationException, PPTException, BESError {
 
 
         String http = "http://";
@@ -274,19 +294,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _log.debug("remoteCatalog: " + remoteCatalog);
         _log.debug("remoteHost: " + remoteHost);
 
+        BesApi besApi = new BesGatewayApi();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        besApi.writeFile(remoteCatalog,baos);
+        ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
-        // Go get the target catalog:
-        HttpClient httpClient = new HttpClient();
-        GetMethod request = new GetMethod(remoteCatalog);
-        int statusCode = httpClient.executeMethod(request);
-
-        if (statusCode != HttpStatus.SC_OK) {
-            _log.error("Can't find catalog: " + remoteCatalog);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
-            return;
-        }
-
-        InputStream catDocIs = null;
         String typeMatch = _besApi.getBesCombinedTypeMatch();
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         //_log.debug("browseRemoteDataset() - BES Combined TypeMatch: {}",typeMatch);
@@ -294,7 +306,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _datasetToHtmlTransformLock.lock();
         try {
             try {
-                catDocIs = request.getResponseBodyAsStream();
                 _datasetToHtmlTransform.reloadTransformIfRequired();
 
                 // Build the catalog document as an XdmNode.
@@ -342,12 +353,20 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
+    /**
+     * This retrieves a remote THREDDS catalog.
+     *
+     * TODO We could skip ussing the http client and use the BES gateway and ask for STREAM which should return the
+     * TODO catalog bytes and subject th request to the BES security stack.
+     * @param oRequest
+     * @param response
+     * @param query
+     * @throws OPeNDAPException
+     * @throws IOException
+     * @throws JDOMException
+     */
     private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
                                      String query) throws OPeNDAPException, IOException, JDOMException {
-
-
-        String http = "http://";
-        String https = "https://";
 
 
         // Sanitize the incoming query.
@@ -356,6 +375,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         String remoteHost;
 
+        String http = "http://";
+        String https = "https://";
         if (remoteCatalog.startsWith(https)) {
             remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
         }
@@ -369,26 +390,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
 
         // Build URL for remote system:
-
         String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
-
 
         _log.debug("Remote Catalog: " + remoteCatalog);
         _log.debug("Remote Catalog Host: " + remoteHost);
         _log.debug("Remote Catalog RelativeURL: " + remoteRelativeURL);
 
-
-        // Go get the target catalog:
-        HttpClient httpClient = new HttpClient();
-        GetMethod request = new GetMethod(remoteCatalog);
-        int statusCode = httpClient.executeMethod(request);
-
-        if (statusCode != HttpStatus.SC_OK) {
-            _log.error("Can't find catalog: " + remoteCatalog);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
-            return;
-        }
-        InputStream catDocIs = null;
+        BesApi besApi = new BesGatewayApi();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        besApi.writeFile(remoteCatalog,baos);
+        ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -397,7 +408,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _catalogToHtmlTransformLock.lock();
         try {
             try {
-                catDocIs = request.getResponseBodyAsStream();
                 _catalogToHtmlTransform.reloadTransformIfRequired();
 
                 // Build the catalog document as an XdmNode.
@@ -429,14 +439,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
             } finally {
                 // Clean up the transform before releasing it.
                 _catalogToHtmlTransform.clearAllParameters();
-
-                if (catDocIs != null) {
-                    try {
-                        catDocIs.close();
-                    } catch (IOException e) {
-                        _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
-                    }
-                }
             }
         }
         finally {
@@ -627,6 +629,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     @Override
     public void init(HttpServlet servlet, Element configuration) throws Exception {
+        // TODO USe an instance of BesGatewayApi here? I think it could be fine...
         init(servlet,configuration,new BesApi());
     }
 
@@ -676,6 +679,17 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 }
             }
             _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
+
+            s = threddsService.getAttributeValue("allowRemote");
+            if (s != null){
+                if(s.equalsIgnoreCase("true")) {
+                    _allowRemoteCatalogTraversal = true;
+                }
+                else {
+                    _allowRemoteCatalogTraversal = false;
+                }
+            }
+            _log.debug("init() - allowRemoteCatalogTraversal: {}", _allowRemoteCatalogTraversal);
 
         }
 
