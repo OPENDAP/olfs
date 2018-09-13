@@ -150,7 +150,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         return null;
     }
 
-
+    @Deprecated
     @Override
     public void getBesCatalog(String dataSourceUrl, Document response) throws IOException {
         // Go get the HEAD for the catalog

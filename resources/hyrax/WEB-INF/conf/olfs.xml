@@ -65,6 +65,7 @@
     </BESManager>
 
 
+    <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
     <ThreddsService  prefix="thredds" useMemoryCache="true" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
     <UseDAP2ResourceUrlResponse />
