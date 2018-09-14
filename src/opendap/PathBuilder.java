@@ -57,7 +57,7 @@ public class PathBuilder  {
         if(s==null || s.length()==0)
             return this;
 
-        while (s.startsWith("/") && s.length() > 0) {
+        while (_sb.length()!=0 && (s.startsWith("/") && s.length() > 0)) {
             s = s.substring(1);
         }
         //_log.debug("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);

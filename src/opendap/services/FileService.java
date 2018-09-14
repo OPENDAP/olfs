@@ -43,11 +43,11 @@ public class FileService implements WebServiceHandler {
     private String _base;
     private String _name;
     private String _threddsServiceType;
+    private static String _fileServiceSuffix = ".file";
 
 
 
     public FileService() {
-
         _serviceId = ID;
         _name = "File Access Service";
         _base = "/opendap/hyrax/";
@@ -56,9 +56,12 @@ public class FileService implements WebServiceHandler {
 
     @Override
     public void init(HttpServlet servlet, Element config) {
-        String base = servlet.getServletContext().getContextPath() + "/" +servlet.getServletName() + "/";
+        String base = PathBuilder.pathConcat(servlet.getServletContext().getContextPath(),servlet.getServletName());
+        if(!base.endsWith("/")) base += "/";
         setBase(base);
     }
+
+    public static String getFileServiceSuffix(){ return _fileServiceSuffix;}
 
     @Override
     public String getName() {

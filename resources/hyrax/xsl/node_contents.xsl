@@ -27,7 +27,7 @@
 <!DOCTYPE stylesheet [
 <!ENTITY NBSP "<xsl:text disable-output-escaping='yes'>&amp;nbsp;</xsl:text>" >
 ]>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
@@ -43,6 +43,27 @@
     <xsl:param name="logoutLink" />
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
+
+    <!--***********************************************
+   -
+   - FUNCTION: bes:path_concat()
+   -
+   - Concatenates the string members of the passed
+   - sequence parameter using a default delimiter
+   - of slash "/".  This is a brute force method
+   - that first makes the concatenation and then
+   - uses a regexto replace any multiple occurance
+   - of the delimiter with a single occurance
+   -
+   - TODO - Have slash be the default and add a second param for supplying other delimiters.
+   -
+   -
+ -->
+    <xsl:function name="bes:path_concat">
+        <xsl:param name="sseq"/>
+        <xsl:value-of select="replace(replace(string-join($sseq,'/'),'[/]+','/'),'[/]+$','')" />
+    </xsl:function>
+
 
     <xsl:variable name="besPrefix">
         <xsl:choose>
@@ -328,10 +349,10 @@
         <xsl:variable name="datasetID">
             <xsl:choose>
                 <xsl:when test="../../@name='/'">
-                   <xsl:value-of select="$besPrefix"/><xsl:value-of select="../@name" />
+                   <xsl:value-of select="bes:path_concat(($besPrefix,@name))" />
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="$besPrefix"/><xsl:value-of select="../../@name" />/<xsl:value-of select="../@name" />
+                    <xsl:value-of select="bes:path_concat(($besPrefix, ../@name,@name))" />
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>

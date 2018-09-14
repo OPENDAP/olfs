@@ -50,7 +50,7 @@
       <p align="left">&nbsp;</p>
       <p align="left">&nbsp;</p>
         <% if (message != null) { %>
-        <p align="left">The specific error message associated with your request was:</p>
+        <p align="center">The specific error message associated with your request was:</p>
         <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
         <% } %>
 

@@ -32,6 +32,7 @@ import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.http.error.Forbidden;
 import opendap.io.HyraxStringEncoding;
+import opendap.services.FileService;
 import org.jdom.Element;
 
 import javax.servlet.ServletOutputStream;
@@ -135,11 +136,15 @@ public class FileDispatchHandler implements DispatchHandler {
                                 HttpServletResponse response,
                                 boolean sendResponse) throws Exception {
 
+        String localUrl = ReqInfo.getLocalUrl(request);
+        ResourceInfo dsi = new BESResource(localUrl,_besApi);
 
-        ResourceInfo dsi = new BESResource(ReqInfo.getLocalUrl(request),_besApi);
+        if (!dsi.sourceExists() && localUrl.endsWith(FileService.getFileServiceSuffix())) {
+            localUrl =  localUrl.substring(0,localUrl.lastIndexOf(FileService.getFileServiceSuffix()));
+            dsi = new BESResource(localUrl,_besApi);
+        }
 
         boolean isFileResponse = false;
-
         if (dsi.sourceExists()) {
             if (!dsi.isNode()) {
                 isFileResponse = true;
@@ -148,7 +153,8 @@ public class FileDispatchHandler implements DispatchHandler {
                         if (!dsi.isDataset() ){
                             sendFile(request, response);
                         } else {
-                            throw new Forbidden("Datasets may not be accessed directly.");
+                            throw new Forbidden("This server does not support the direct download of the source data." +
+                                    "You may use one of the subsetting interfaces to request parts of the data.");
                         }
                     }
                     else {
@@ -156,6 +162,8 @@ public class FileDispatchHandler implements DispatchHandler {
                     }
                 }
             }
+        }
+        else {
 
         }
 
