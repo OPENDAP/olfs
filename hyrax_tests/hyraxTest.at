@@ -445,27 +445,33 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/IncompatibleMediaType.w10n)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dods)
+
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR_ERROR(errors/bes_internal_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_error.w10n)
 
 
+# This last group of tests use the 'debug functions' module and are only
+# valid when the BES is compiled in developer mode (--enable-developer). 
+# Run the testsuite using --besdev=yes to 'activate' these tests, 
+# otherwise, using --besdev=no or not using the --besdev option will mark
+# the tests as 'expected-fail.' jhrg 9/14/18
 
 ####################################################
 # TestName: errors/bes_internal_fatal_error
@@ -475,25 +481,25 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_error.json)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_internal_fatal_error.w10n)
 
 
 
@@ -505,25 +511,25 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_internal_fatal_error.json)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_syntax_user_error.w10n)
 
 
 
@@ -537,25 +543,25 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_syntax_user_error.json)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_forbidden_error.w10n)
 
 
 
@@ -568,25 +574,25 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_forbidden_error.json)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_not_found_error.w10n)
 
 
 
@@ -598,25 +604,25 @@ AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_not_found_error.json)
 #
 #
 # -- DAP2
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dds)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.ascii)
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dods)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dds)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.ascii)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dods)
 #
 # -- Alternate DAP2 encodings
-AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.json)
+AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.json)
 #
 # --------------- DAP4 Functions to yet able to do this -------------------------
 # -- DAP4
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dmr)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dmr.html)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dmr)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dmr.html)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dap)
 #
 # -- Alternate DAP4 encodings
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap.csv)
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.dap.json)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dap.csv)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.dap.json)
 #
 # -- w10n Response
-#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST(errors/bes_timeout_error.w10n)
+#AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR(errors/bes_timeout_error.w10n)
 
 
 ####################################################
