@@ -137,8 +137,9 @@ public class FileDispatchHandler implements DispatchHandler {
                                 boolean sendResponse) throws Exception {
 
         String localUrl = ReqInfo.getLocalUrl(request);
-        ResourceInfo dsi = new BESResource(localUrl,_besApi);
 
+        // TODO: Is this the correct order of eval? Should it check for the ".file" suffix first?
+        ResourceInfo dsi = new BESResource(localUrl,_besApi);
         if (!dsi.sourceExists() && localUrl.endsWith(FileService.getFileServiceSuffix())) {
             localUrl =  localUrl.substring(0,localUrl.lastIndexOf(FileService.getFileServiceSuffix()));
             dsi = new BESResource(localUrl,_besApi);

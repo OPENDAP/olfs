@@ -350,7 +350,7 @@ public class Dap2IFH extends Dap4Responder {
                 Element value = values.get(0);
                 sb.append(indent).append(indent_inc).append("\"value\": \"");
                 if(jsEncode) {
-                    sb.append(Encode.forJavaScript(Encode.forHtml(value.getTextTrim())));
+                    sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                 }
                 else {
                     sb.append(value.getTextTrim());
@@ -366,7 +366,7 @@ public class Dap2IFH extends Dap4Responder {
                     sb.append("\"");
 
                     if(jsEncode) {
-                        sb.append(Encode.forJavaScript(Encode.forHtml(value.getTextTrim())));
+                        sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                     }
                     else {
                         sb.append(value.getTextTrim());
