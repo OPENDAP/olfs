@@ -767,7 +767,7 @@
         {
           "@type": "PropertyValue", 
           "name": "DODS_LonRange", 
-          "value": [ "-96.2220", "-33.7780" ]        },
+          "value": [ "\-96.2220", "\-33.7780" ]        },
         {
           "@type": "PropertyValue", 
           "name": "Sel_Vars", 
@@ -779,11 +779,11 @@
         {
           "@type": "PropertyValue", 
           "name": "DODS_StartDate", 
-          "value": "1979/4/11"        },
+          "value": "1979\/4\/11"        },
         {
           "@type": "PropertyValue", 
           "name": "DODS_EndDate", 
-          "value": "2002/12/31"        },
+          "value": "2002\/12\/31"        },
         {
           "@type": "PropertyValue", 
           "name": "year_variable", 
