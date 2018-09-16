@@ -225,7 +225,7 @@
                     (The list of UTC +0 timezones: AZOST, EGST, GMT, UTC, WET, Z)
                     Any other time zone value is simply dropped. by the second regex '\D+$'
                     -->
-                    <xsl:variable name="utc_names_regex">(AZOST)|(EGST)|(GMT)|(UTC)|(WET)|(Z)$</xsl:variable>
+                    <xsl:variable name="utc_names_regex">(AZOST)|(EGST)|(GMT)|(UTC)|(WET)|(Z)|(\s*\+0+)$</xsl:variable>
                     <xsl:choose>
                         <xsl:when test="matches(@lastModified,$utc_names_regex)">
                             <thredds:date type="modified"><xsl:value-of select="replace(@lastModified,$utc_names_regex,'Z')" /></thredds:date>

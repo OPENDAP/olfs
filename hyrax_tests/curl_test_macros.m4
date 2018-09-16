@@ -33,10 +33,12 @@ dnl
 dnl jhrg 6/3/16
  
 m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\} [[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\( GMT\)*\( Hyrax-[[-0-9a-zA-Z.]]*\)*@removed date-time@g' < $1 > $1.sed
+    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\} [[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\( \(\s?\+\d+\)|\(\D+\)\)*\( Hyrax-[[-0-9a-zA-Z.]]*\)*@removed date-time@g' < $1 > $1.sed
     dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
     mv $1.sed $1
 ])
+
+
 
 m4_define([REMOVE_DATE_HEADER], [dnl
     sed 's/^Date:.*$/Date: REMOVED/g' < $1 > $1.sed
