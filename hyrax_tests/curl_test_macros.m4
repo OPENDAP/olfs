@@ -31,14 +31,19 @@ dnl
 dnl Note that the macro depends on the baseline being a file.
 dnl
 dnl jhrg 6/3/16
- 
+dnl
+dnl The regex was insufficient for time and hyrax version I have improved it.
+dnl Here's the rnew egex with out the mad escaping.
+dnl
+dnl [0-9]{4}-[0-9]{2}-[0-9]{2}(\s|T)[0-9]{2}:[0-9]{2}:[0-9]{2}(\.\d+)?\s?(((\+|-)\d+)|(\D{1,5}))|(OPeNDAP Hyrax \([@0-9a-zA-Z.]+\))
+dnl
+dnl ndp 09/16/18
+dnl
 m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.\d+\)?\s?\(\(\(\+|-\)\d+\)|\(\D+\)\)*\( Hyrax-[[-0-9a-zA-Z.]]*\)*@removed date-time@g' < $1 > $1.sed
+    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.\d+\)?\s?\(\(\(\+|-\)\d+\)|\(\D\{1,5\}\)\)|\(OPeNDAP Hyrax \\([[@0-9a-zA-Z.]]+\\)\)@removed date-time@g' < $1 > $1.sed
     dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
     mv $1.sed $1
 ])
-
-[0-9]{4}-[0-9]{2}-[0-9]{2}(\s|T)[0-9]{2}:[0-9]{2}:[0-9]{2}(\.\d+)?\s?(((\+|-)\d+)|(\D+))$
 
 m4_define([REMOVE_DATE_HEADER], [dnl
     sed 's/^Date:.*$/Date: REMOVED/g' < $1 > $1.sed
