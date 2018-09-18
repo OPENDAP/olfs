@@ -39,10 +39,13 @@ dnl [0-9]{4}-[0-9]{2}-[0-9]{2}(\s|T)[0-9]{2}:[0-9]{2}:[0-9]{2}(\.\d+)?\s?(((\+|-
 dnl
 dnl ndp 09/16/18
 dnl
-dnl |\(OPeNDAP Hyrax \\([[@0-9a-zA-Z.]]+\\)\)
+dnl sed does not support \d (and decimal digit) or \D (amd non-digit). I also removed the 'OPeNDAP
+dnl Hyrax...' bit since we can use the PATH_HYRAX_RELEASE to remove the release information.
+dnl
+dnl NOTE: This is not currently used. jhrg 9/18/18
 dnl
 m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}(\.\d+)?\s?(((\+|-)\d+)|(\D\{1,5\}))@removed date-time@g' < $1 > $1.sed
+    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.[[0-9]]+\)?\s?\(\(\(\+|-\)[[0-9]]+\)|\([[^0-9]]\{1,5\}\)\)@removed date-time@g' < $1 > $1.sed
     dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
     mv $1.sed $1
 ])
