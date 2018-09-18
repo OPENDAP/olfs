@@ -573,7 +573,7 @@
             </tr>
          </table>
       </form>
-      <h3>OPeNDAP Hyrax (@HyraxVersion@) <br/>
+      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
          <a href="/opendap/docs/">Documentation</a>
       </h3>
       <script type="application/ld+json">
@@ -597,11 +597,11 @@
         {
           "@type": "PropertyValue", 
           "name": "base_time", 
-          "value": "88- 10-00:00:00"        },
+          "value": "88\- 10\-00:00:00"        },
         {
           "@type": "PropertyValue", 
           "name": "title", 
-          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
+          "value": "FNOC UV wind components from 1988\- 10 to 1988\- 13."        },
         {
           "@type": "PropertyValue", 
           "name": "Unlimited_Dimension", 
@@ -623,7 +623,7 @@
       {
         "@type": "PropertyValue", 
         "name": "missing_value", 
-        "value": "-32767"      },
+        "value": "\-32767"      },
       {
         "@type": "PropertyValue", 
         "name": "scale_factor", 
@@ -643,7 +643,7 @@
       {
         "@type": "PropertyValue", 
         "name": "WOA01", 
-        "value": "\"http://localhost/junk\""      }
+        "value": "\x22http:\/\/localhost\/junk\x22"      }
     ]
   },
   {
@@ -661,7 +661,7 @@
       {
         "@type": "PropertyValue", 
         "name": "missing_value", 
-        "value": "-32767"      },
+        "value": "\-32767"      },
       {
         "@type": "PropertyValue", 
         "name": "scale_factor", 
