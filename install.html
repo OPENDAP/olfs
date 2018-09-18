@@ -25,21 +25,20 @@
   -->
 
 <html>
-  <head><title>Hyrax Installation</title></head>
+<title>Hyrax Installation</title>
 
-<body>
-<style type="text/css" scoped="">
+<style type="text/css">
 <!--
 .style1 {font-family: "Courier New", Courier, mono}
 -->
 </style>
-<img src="doc/images/logo.png" width="206" height="93" align="absmiddle" />
-<h1>Hyrax Installation</h1>
-<p>
-Updated for Hyrax version 1.15.x
+<h1 align="center"><img src="doc/images/logo.png" width="206" height="93" align="absmiddle"></h1>
+<h1 align="center">Hyrax Installation</h1>
+<p align="center">
+Updated for Hyrax version 1.14.x
 </p>
 <hr>
-<p align="left">Note: For more verbose instructions, see <a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html">The Hyrax Installation and Configuration Guide</a>. </p>
+<p align="left">Note: For more verbose instructions, see <a href="http://docs.opendap.org/index.php/Hyrax">documentation</a>. </p>
 <h2 align="left"><strong>First:</strong> </h2>
 <blockquote>
   <p>
@@ -82,20 +81,14 @@ Updated for Hyrax version 1.15.x
     to an existing directory to which the  Tomcat user has both read and write privileges.</li>
 
   <li>Create the directory <em>/etc/olfs</em> and set it's permissions/ownership so that the Tomcat user has both read and
-    write permission.* </li>
-  <li>Create the directory <em>/usr/share/olfs</em> and set it's permissions/ownership so that the Tomcat user has both read and
-    write permission.* </li>
+    write permission. </li>
   </ul>
-  These will be prioritized in the order they appear here.
-  So if more than one of these has been done then the priority is given to the firest one found, searched in the above order.
-  <b>Note:</b><e>When running under SELinux (CentOS-7 for example) you will need to do some things to allow Tomcat to write to those directories. 
-     Read about it in <a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html#OLFS-config">Section 2.7.1 of the Hyrax user Guide</a></e>
+  If both of these are done then priority is given to the environment variable.
 </p>
-
 <p>
-  Now, Restart Tomcat: <br/>
+  Restart Tomcat: <br/>
   <blockquote>
-    <p class="style1">$CATALINA_HOME/bin/shutdown.sh</p>
+    <p class="style1">$CATALINA_HOME/bin/shutdown.sh        </p>
     <p class="style1">$CATALINA_HOME/bin/startup.sh</p>
   </blockquote>
 
@@ -117,5 +110,4 @@ Updated for Hyrax version 1.15.x
 </blockquote>
 <p>&nbsp;</p>
 <h2><em>Go cat. Go. </em></h2>
-</body>
 </html>
