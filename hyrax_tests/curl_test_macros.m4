@@ -44,11 +44,13 @@ dnl Hyrax...' bit since we can use the PATH_HYRAX_RELEASE to remove the release 
 dnl
 dnl NOTE: This is not currently used. jhrg 9/18/18
 dnl
-m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.[[0-9]]+\)?\s?\(\(\(\+|-\)[[0-9]]+\)|\([[^0-9]]\{1,5\}\)\)@removed date-time@g' < $1 > $1.sed
-    dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
-    mv $1.sed $1
-])
+dnl m4_define([REMOVE_DATE_TIME], [dnl
+dnl     sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.[[0-9]]+\)?\s?\(\(\(\+|-\)[[0-9]]+\)|\([[^0-9]]\{1,5\}\)\)@removed date-time@g' < $1 > $1.sed
+dnl    dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
+dnl    mv $1.sed $1
+dnl ])
+dnl
+
 
 m4_define([REMOVE_DATE_HEADER], [dnl
     sed 's/^Date:.*$/Date: REMOVED/g' < $1 > $1.sed

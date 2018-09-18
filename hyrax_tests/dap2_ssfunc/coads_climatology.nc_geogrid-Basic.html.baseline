@@ -1,61 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter <ndp@opendap.org>
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
+        --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
+   <head>
+      <link rel="stylesheet" href="/opendap/docs/css/collapse.css" type="text/css"/>
+      <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
+      <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
+      <script type="text/javascript">
+                    DOCS_SERVICE="/opendap/docs";
+                </script>
+      <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
+      <script type="text/javascript" src="/opendap/js/dap2_buttons.js"> </script>
+      <script type="text/javascript">
+                    DAP2_URL = new dap2_url("http://localhost:8080/opendap/data/nc/coads_climatology.nc");
+                    DEBUG = new debug_obj();
+                </script>
+      <title>OPeNDAP Data Access Form for  function_result_coads_climatology.nc</title>
+   </head>
+   <body>
+      <table width="100%" border="0">
+         <tr>
+            <td>
+               <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
+            </td>
+            <td>
+               <div class="small_italic" style="padding-bottom: 5px;">Welcome to the new (<em>beta</em>) </div>
+               <div class="large" style="padding-bottom: 5px;">OPeNDAP Data Access Form</div>
+               <div class="small_italic" style="padding-bottom: 5px;">
+                  <a href="http://localhost:8080/opendap/data/nc/coads_climatology.nc.html_old">The old form can be found here...</a>
+               </div>
+            </td>
+         </tr>
+      </table>
+      <h1>
+         <span style="font-size: 12px;  vertical-align: 35%; font-weight: normal;">dataset:</span>
+         <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;">function_result_coads_climatology.nc</span>
+      </h1>
+      <hr size="1" noshade="noshade"/>
+      <form action="">
+         <table width="100%" border="0">
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition"
+                        target="help">
+                        Actions
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="width:100%;margin-left:10px;">
+                     <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
+                     <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
+                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
+                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                     <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Show Help" onclick="help_button()"/>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url"
+                        target="help">
+                        Data URL
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <input name="url" type="text" style="width:98%;margin-left:10;"
+                         value="http://localhost:8080/opendap/data/nc/coads_climatology.nc"/>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="95%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr"
+                        target="help">
+                        Global Attributes
+                    </a>
+                  </div>
+               </td>
+               <td width="100%">
+                  <div style="width:100%;margin-left:10px;"/>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="95%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
+                        target="help">Variables
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="margin-left:25px;">
+                     <script type="text/javascript">
+        if(DEBUG.enabled()) alert("dap:Grid()\n "+
+        "myFQN:         SST\n " +
+        "myJSVarName:   org_opendap_SST\n " +
+        "checkBoxName:  get_org_opendap_SST\n " +
+            "type:        Grid\n " +
+            "gridDataType:        Float32\n " +
+        "parentContainer:        \n"
+        );
+        </script>
+                     <script type="text/javascript">org_opendap_SST = new dap_var("SST", "org_opendap_SST",true,false);
 
 
-
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css'/>
-    <title>Hyrax: ERROR</title>
-    <style type="text/css">
-        <!--
-        .style1 {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        -->
-    </style>
-</head>
-
-<body>
-<p>&nbsp;</p>
-
-<h1 align="center">Hyrax Error - Internal Error (500)</h1>
-<hr size="1" noshade="noshade"/>
-<table width="100%" border="0">
-    <tr>
-        <td>
-            <img src="/opendap/docs/images/superman.jpg"
-                 alt="Bad things are happening"
-                 title="Bad things are happening"
-                 width="320"
-                 height="426"/>
-        </td>
-        <td>
-            <p align="left" class="style1">OUCH!</p>
-
-            <p align="left">Something Bad Happened On This Server.</p>
             
-            <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong>libdap error transmitting DDX: An internal error was encountered:
-Unimplemented BaseType::read() method called for the variable named: SST
-Please report this to support@opendap.org </strong></p> </blockquote>
-            
+                DAP2_URL.add_dap_var(org_opendap_SST);
+            org_opendap_SST.checkBox = "get_org_opendap_SST";
+            </script>
+                     <div style="color: black;margin-left:-15px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_SST"
+                               onclick="org_opendap_SST.handle_projection_change(get_org_opendap_SST)"
+                               onfocus="describe_projection()"/>SST<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>12]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>32]
+            </span>
+                        <span class="small" style="vertical-align: 15%;"> (Grid of Float32 values)</span>
+                     </div>
+                     <input type="text" id="org_opendap_SST_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP2_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_1,12);
+            </script>
+                     <input type="text" id="org_opendap_SST_dim_2" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP2_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_2,13);
+            </script>
+                     <input type="text" id="org_opendap_SST_dim_3" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP2_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_3,33);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">missing_value:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">_FillValue:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">SEA SURFACE TEMPERATURE</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">From coads_climatology</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">Deg C</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </td>
+            </tr>
+         </table>
+         <hr size="1" noshade="noshade"/>
+         <table width="100%" border="0">
+            <tr>
+               <td class="small">
+                  <input type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+               </td>
+               <td>
+                  <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                  </div>
+               </td>
+            </tr>
+         </table>
+      </form>
+      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
+         <a href="/opendap/docs/">Documentation</a>
+      </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "function_result_coads_climatology.nc",
+  "url": "http://localhost:8080/opendap/data/nc/coads_climatology.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/coads_climatology.nc",
+    "valueReference": [ 
 
-            <p align="left">If you think that the server is broken (that the URL you submitted should have
-                worked), then please contact the OPeNDAP user support coordinator at:
-                <a href="mailto:admin.email.address@your.domain.name">admin.email.address@your.domain.name</a>
-            </p>
-        </td>
-    </tr>
-
-</table>
-<hr size="1" noshade="noshade"/>
-<h1 align="center">Hyrax Error - Internal Error (500)</h1>
-</body>
-</html>
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "SST",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "missing_value", 
+        "value": "-9.99999979e+33"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "_FillValue", 
+        "value": "-9.99999979e+33"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "long_name", 
+        "value": "SEA SURFACE TEMPERATURE"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "history", 
+        "value": "From coads_climatology"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "Deg C"      }
+    ]
+  }
+  ]
+}
+</script>
+   </body>
+   <script type="text/javascript">
+                CollapsibleLists.apply(true);
+                initCollapsibles("/opendap/docs");
+            </script>
+</xhtml>
