@@ -455,7 +455,7 @@
                     "text/csv"
                 ],
                 "isAccessibleForFree": "True",
-                "dataset": [ <xsl:for-each select="bes:dataset/bes:dataset[bes:serviceRef='dap']">
+                "dataset": [ <xsl:for-each select="bes:node/bes:item[@isData='true']">
                     {
                         "@type": "Dataset",
                         "name": "<xsl:value-of select="@name"/>",
