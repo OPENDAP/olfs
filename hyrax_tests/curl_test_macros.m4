@@ -33,14 +33,16 @@ dnl
 dnl jhrg 6/3/16
 dnl
 dnl The regex was insufficient for time and hyrax version I have improved it.
-dnl Here's the rnew egex with out the mad escaping.
+dnl Here's the new regex with out the mad escaping.
 dnl
 dnl [0-9]{4}-[0-9]{2}-[0-9]{2}(\s|T)[0-9]{2}:[0-9]{2}:[0-9]{2}(\.\d+)?\s?(((\+|-)\d+)|(\D{1,5}))|(OPeNDAP Hyrax \([@0-9a-zA-Z.]+\))
 dnl
 dnl ndp 09/16/18
 dnl
+dnl |\(OPeNDAP Hyrax \\([[@0-9a-zA-Z.]]+\\)\)
+dnl
 m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.\d+\)?\s?\(\(\(\+|-\)\d+\)|\(\D\{1,5\}\)\)|\(OPeNDAP Hyrax \\([[@0-9a-zA-Z.]]+\\)\)@removed date-time@g' < $1 > $1.sed
+    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}(\.\d+)?\s?(((\+|-)\d+)|(\D\{1,5\}))@removed date-time@g' < $1 > $1.sed
     dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
     mv $1.sed $1
 ])
@@ -79,11 +81,11 @@ m4_define([_AT_CURL_TEST], [dnl
         [
         AT_CHECK([curl -K $input], [0], [stdout])
         AT_CHECK([mv stdout $baseline.tmp])
-	PATCH_HYRAX_RELEASE([$baseline.tmp])
+	    PATCH_HYRAX_RELEASE([$baseline.tmp])
         ],
         [
         AT_CHECK([curl -K $input], [0], [stdout])
-	PATCH_HYRAX_RELEASE([stdout])
+	    PATCH_HYRAX_RELEASE([stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
         ])
