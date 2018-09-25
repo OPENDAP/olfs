@@ -150,6 +150,24 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         return null;
     }
 
+    @Override
+    public void getBesNode(String dataSource, Document response)
+            throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
+        Element rootElement = new Element("response",BES.BES_NS);
+        response.setRootElement(rootElement);
+        Element showNode = new Element("showNode",BES.BES_NS);
+        rootElement.addContent(showNode);
+        Element item = new Element("item",BES.BES_NS);
+        showNode.addContent(item);
+
+        SimpleDateFormat fdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+        item.setAttribute("isData", "true");
+        item.setAttribute("lastModified", fdf.format(new Date()));
+        item.setAttribute("name", dataSource);
+        item.setAttribute("type", "leaf");
+    }
+
+
     @Deprecated
     @Override
     public void getBesCatalog(String dataSourceUrl, Document response) throws IOException {

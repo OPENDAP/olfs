@@ -356,7 +356,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     /**
      * This retrieves a remote THREDDS catalog.
      *
-     * TODO We could skip ussing the http client and use the BES gateway and ask for STREAM which should return the
+     * TODO We could skip using the http client and use the BES gateway and ask for STREAM which should return the
      * TODO catalog bytes and subject th request to the BES security stack.
      * @param oRequest
      * @param response
