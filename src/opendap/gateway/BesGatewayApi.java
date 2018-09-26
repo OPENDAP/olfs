@@ -31,9 +31,7 @@ import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
-import opendap.dap4.Dap4Error;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.Header;
@@ -45,7 +43,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -217,7 +214,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
                     size=0;
                 }
             }
-            Element catalogElement = getShowCatalogResponseDocForDatasetUrl(dataSourceUrl, size, lastModified);
+            Element catalogElement = getShowNodeResponseDocForDatasetUrl(dataSourceUrl, size, lastModified);
             response.detachRootElement();
             response.setRootElement(catalogElement);
             return;
@@ -233,12 +230,12 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         // If the resource can't be accessed it's an error. I commented this out and added the appropriate
         // exception immediately above - ndp 12/28/17
         //
-        //Element catalogElement = getShowCatalogResponseDocForDatasetUrl("", 0, new Date());
+        //Element catalogElement = getShowNodeResponseDocForDatasetUrl("", 0, new Date());
         //response.detachRootElement();
         //response.setRootElement(catalogElement);
     }
 
-    public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified) throws IOException {
+    public Element getShowNodeResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified) throws IOException {
 
         Element root = new Element("response",BES.BES_NS);
         root.addNamespaceDeclaration(BES.BES_NS);
