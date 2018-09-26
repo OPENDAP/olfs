@@ -1,3 +1,17 @@
+
+2018-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #44 from OPENDAP/gateway_get_node
+	woot. fixed.
+
+	olfs: Fixing BesGatewayApi implementation so that getBesNode() returns a dummy node/item.
+
+	olfs: Fixing BesGatewayApi implementation so that getBesNode() returns a dummy node/item.
+
+2018-09-25  Nathan Potter  <ndp@opendap.org>
+
+	Adding overridden GatewayBesApi.getBesNode()
+
 2018-09-18  Nathan Potter  <ndp@opendap.org>
 
 	Repaired Dataset list in the json-ld dataCatalog conent. Broken because of switch to showNode
