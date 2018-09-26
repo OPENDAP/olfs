@@ -65,11 +65,11 @@ public class BesGatewayApi extends BesApi implements Cloneable {
     private Logger log;
     private String _servicePrefix;
 
-    public BesGatewayApi(){
+    public BesGatewayApi() {
         this("");
     }
 
-    public BesGatewayApi(String servicePrefix){
+    public BesGatewayApi(String servicePrefix) {
         super();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _servicePrefix = servicePrefix;
@@ -83,36 +83,38 @@ public class BesGatewayApi extends BesApi implements Cloneable {
      * This method defines which "space" (aka catalog) the BES will use to service the request. Here
      * we override the parent class which uses the "space" called "catalog" to use the "space" called "gateway".
      * This is what causes the BES to invoke the gateway handler
+     *
      * @return
      */
     @Override
-    protected String getBesSpaceName(){
+    protected String getBesSpaceName() {
         return "gateway";
     }
 
     /**
      * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
      * the BES commands readable and consistent we typically associate it with the "space" name.
+     *
      * @return The name of the BES "container" which will be built into teh request document.
      */
     @Override
-    protected String getBesContainerName(){
+    protected String getBesContainerName() {
         return "gatewayContainer";
     }
 
-    public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
+    public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern) {
 
         // Strip leading slash(es)
-        while(relativeURL.startsWith("/") && !relativeURL.equals("/"))
-            relativeURL = relativeURL.substring(1,relativeURL.length());
+        while (relativeURL.startsWith("/") && !relativeURL.equals("/"))
+            relativeURL = relativeURL.substring(1, relativeURL.length());
 
         String dataSourceUrl = relativeURL;
 
         // Strip the path off.
-        if(pathPrefix!=null && dataSourceUrl.startsWith(pathPrefix))
+        if (pathPrefix != null && dataSourceUrl.startsWith(pathPrefix))
             dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
 
-        if(!dataSourceUrl.equals("")){
+        if (!dataSourceUrl.equals("")) {
             dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
         }
         dataSourceUrl = HexAsciiEncoder.hexToString(dataSourceUrl);
@@ -122,28 +124,27 @@ public class BesGatewayApi extends BesApi implements Cloneable {
     }
 
 
-
     /**
      * Because the gateway doesn't support a catalog we ignore the checkWithBes parameter
-     * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
-     * the URL - the question mark and everything after it.)
+     *
+     * @param relativeUrl        The relative URL of the client request. No Constraint expression (i.e. No query section of
+     *                           the URL - the question mark and everything after it.)
      * @param suffixMatchPattern This parameter provides the method with a suffix regex to use in evaluating what part,
-     * if any, of the relative URL must be removed to construct the besDataSourceId.
-     * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
-     * besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
-     * doesn't have catalog services this parameter is ignored.
+     *                           if any, of the relative URL must be removed to construct the besDataSourceId.
+     * @param checkWithBes       This boolean value instructs the code to ask the appropriate BES if the resulting
+     *                           besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
+     *                           doesn't have catalog services this parameter is ignored.
      * @return
      */
     @Override
-    public String getBesDataSourceID(String relativeUrl, Pattern suffixMatchPattern, boolean checkWithBes){
+    public String getBesDataSourceID(String relativeUrl, Pattern suffixMatchPattern, boolean checkWithBes) {
         log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
-        if(Util.matchesSuffixPattern(relativeUrl,suffixMatchPattern)){
+        if (Util.matchesSuffixPattern(relativeUrl, suffixMatchPattern)) {
             try {
                 String remoteDatasourceUrl = getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern);
                 log.debug("getBesDataSourceID() - besDataSourceId: {}", remoteDatasourceUrl);
                 return remoteDatasourceUrl;
-            }
-            catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 log.debug("getBesDataSourceID() - Failed to extract target dataset URL from relative URL '{}'", relativeUrl);
             }
         }
@@ -153,6 +154,16 @@ public class BesGatewayApi extends BesApi implements Cloneable {
     @Override
     public void getBesNode(String dataSource, Document response)
             throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
+
+        // Returns a dummied up BesResource object
+        getBesNodeDummy(dataSource, response);
+
+        // While this on the other hand runs out on the web and asks for the information
+        // directly from the remote service. Not a whitelisted task so not production
+        // getBesNodeRemote(dataSource, response);
+    }
+
+    public void getBesNodeDummy(String dataSource, Document response) {
         Element rootElement = new Element("response",BES.BES_NS);
         response.setRootElement(rootElement);
         Element showNode = new Element("showNode",BES.BES_NS);
@@ -168,9 +179,8 @@ public class BesGatewayApi extends BesApi implements Cloneable {
     }
 
 
-    @Deprecated
-    @Override
-    public void getBesCatalog(String dataSourceUrl, Document response) throws IOException {
+
+    public void getBesNodeRemote(String dataSourceUrl, Document response) throws IOException {
         // Go get the HEAD for the catalog
         // FIXME: This DOES NOT utilize the whitelist in the BES and this should to be MOVED to the BES
         HttpClient httpClient = new HttpClient();
@@ -228,36 +238,28 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         //response.setRootElement(catalogElement);
     }
 
-
-
     public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified) throws IOException {
 
         Element root = new Element("response",BES.BES_NS);
         root.addNamespaceDeclaration(BES.BES_NS);
         root.setAttribute("reqID","BesGatewayApi_Construct");
-
-        Element showCatalog = new Element("showCatalog",BES.BES_NS);
+        Element showCatalog = new Element("showNode",BES.BES_NS);
         root.addContent(showCatalog);
 
         if(dataSourceURL!=null && dataSourceURL.length()>0){
-            Element dataset = new Element("dataset",BES.BES_NS);
-            showCatalog.addContent(dataset);
-            dataset.setAttribute("name",dataSourceURL);
-            dataset.setAttribute("size",""+size);
+            Element item = new Element("item",BES.BES_NS);
+            showCatalog.addContent(item);
+            item.setAttribute("name",dataSourceURL);
+            item.setAttribute("size",""+size);
 
             SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
-            dataset.setAttribute("lastModified",sdf.format(lastModified));
-            dataset.setAttribute("node","false");
-
-            Element serviceRef = new Element("serviceRef",BES.BES_NS);
-            serviceRef.setText("dap");
-            dataset.addContent(serviceRef);
+            item.setAttribute("lastModified",sdf.format(lastModified));
+            item.setAttribute("isData", "true");
+            item.setAttribute("type", "leaf");
         }
         else {
             throw new IOException("Gateway target URL is unusable (either null or zero length)");
         }
         return root;
     }
-
-
 }
