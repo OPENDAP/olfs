@@ -42,7 +42,7 @@ import java.io.OutputStream;
 
 
 
-
+@Deprecated
 public class DatasetHtmlForm extends Dap4Responder {
 
 
