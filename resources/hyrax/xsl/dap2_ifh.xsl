@@ -643,7 +643,7 @@
                     <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
                     <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
                     <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
