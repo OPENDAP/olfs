@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -24,9 +24,9 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
-    <xsl:output method="html" version="4.01" encoding="UTF-8" indent="yes"/>
+    <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes" />
 
     <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
