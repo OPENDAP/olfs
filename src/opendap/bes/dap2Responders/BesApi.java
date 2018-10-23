@@ -1435,6 +1435,9 @@ public class BesApi implements Cloneable {
                 log.info(logPrefix + "No cached copy of BES showNode response for dataSource \"" +
                         dataSource + "\" found. Acquiring now.");
 
+                if(!dataSource.startsWith("/"))
+                    dataSource = "/" + dataSource;
+
                 Document showNodeRequestDoc = getShowNodeRequestDocument(dataSource);
 
                 try {
