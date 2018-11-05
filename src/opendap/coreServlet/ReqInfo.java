@@ -665,12 +665,16 @@ public class ReqInfo {
             requestUrl.append(req.getRequestURL().toString());
         }
         else {
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl.append(scheme).append("://").append(server);
-            if( port != 80)
-                requestUrl.append(":").append(port);
+            String serverName = req.getServerName();
+            int serverPort = req.getServerPort();
+            String transport = req.getScheme();
+            requestUrl.append(transport).append("://").append(serverName);
+            if( transport.equalsIgnoreCase("http") && serverPort != 80) {
+                requestUrl.append(":").append(serverPort);
+            }
+            else if( transport.equalsIgnoreCase("https") && serverPort != 443) {
+                requestUrl.append(":").append(serverPort);
+            }
             requestUrl.append(forwardRequestUri);
         }
 

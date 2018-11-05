@@ -123,7 +123,17 @@ public class Request {
         String dapService = getServiceLocalId();
 
         String serviceUrl = transport + "://"+ serverName + ":"+ serverPort + dapService;
+        
+        StringBuilder requestUrl = new StringBuilder();
 
+        requestUrl.append(transport).append("://").append(serverName);
+        if( transport.equalsIgnoreCase("http") && serverPort != 80) {
+            requestUrl.append(":").append(serverPort);
+        }
+        else if( transport.equalsIgnoreCase("https") && serverPort != 443) {
+            requestUrl.append(":").append(serverPort);
+        }
+        requestUrl.append(dapService);
 
         log.debug("getServiceUrl(): "+serviceUrl);
 
