@@ -672,7 +672,7 @@ public class ReqInfo {
             if( transport.equalsIgnoreCase("http") && serverPort != 80) {
                 requestUrl.append(":").append(serverPort);
             }
-            else if( transport.equalsIgnoreCase("https") && serverPort != 443) {
+            else if( transport.equalsIgnoreCase("https") && (serverPort != 443 && serverPort != 80) ) {
                 requestUrl.append(":").append(serverPort);
             }
             requestUrl.append(forwardRequestUri);
