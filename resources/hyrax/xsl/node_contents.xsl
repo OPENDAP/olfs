@@ -37,6 +37,7 @@
     <xsl:param name="docsService" />
     <xsl:param name="viewersService" />
     <xsl:param name="collectionURL" />
+    <xsl:param name="catalogPublisherJsonLD" />
     <xsl:param name="allowDirectDataSourceAccess" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
@@ -435,20 +436,7 @@
                 "@type": "DataCatalog",
                 "name": "Hyrax Data Server (OPeNDAP)",
                 "url": "https://www.opendap.org",
-                "publisher": {
-                    "@type": "Organization",
-                    "name": "@PublisherName@",
-                    "address": {
-                        "@type": "PostalAddress",
-                        "addressCountry": "@Country@",
-                        "addressLocality": "@Street,City@",
-                        "addressRegion": "@State@",
-                        "postalCode": "@PostalCode@"
-                    },
-                    "telephone": "@PublisherPhoneNumber@",
-                    "email": "@PublisherEmail@",
-                    "sameAs": "@OrganizationLandingPageURL@"
-                },
+                <xsl:value-of select="$catalogPublisherJsonLD"/>,
                 "fileFormat": [
                     "application/geo+json",
                     "application/json",

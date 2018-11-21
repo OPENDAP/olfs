@@ -26,24 +26,32 @@
 
 package opendap.bes;
 
-import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.auth.AuthenticationControls;
+import opendap.ppt.PPTException;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 
 /**
@@ -214,11 +222,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                                HttpServletResponse response)
             throws Exception {
 
-
         log.info("xsltDir() BEGIN request = " + request);
-
-        // String context = request.getContextPath();
-
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dap_directory");
@@ -229,8 +233,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String collectionName  = getCollectionName(oreq);
         String collectionURL = PathBuilder.pathConcat(ReqInfo.getServiceUrl(request),collectionName);
 
-
-
         Document showNodeDoc = new Document();
         _besApi.getBesNode(collectionName, showNodeDoc);
 
@@ -239,6 +241,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
         JDOMSource besNode = new JDOMSource(showNodeDoc);
+
+        String publisherJsonLD = getCatalogPublisherAsJsonLD(collectionName);
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
@@ -249,9 +253,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
         transformer.setParameter("collectionURL",collectionURL);
+        transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
-
 
         AuthenticationControls.setLoginParameters(transformer,request);
 
@@ -259,15 +263,100 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.transform(besNode, response.getOutputStream());
         // transformer.transform(besCatalog, System.out);
 
-
-
-
     }
+
+
+    /**
+     * <pre>
+     *     "publisher": {
+     *         "@type": "Organization",
+     *         "name": "@PublisherName@",
+     *         "address": {
+     *             "@type": "PostalAddress",
+     *             "addressCountry": "@Country@",
+     *             "addressLocality": "@Street,City@",
+     *             "addressRegion": "@State@",
+     *             "postalCode": "@PostalCode@"
+     *         },
+     *         "telephone": "@PublisherPhoneNumber@",
+     *         "email": "@PublisherEmail@",
+     *         "sameAs": "@OrganizationLandingPageURL@"
+     *     }
+     * </pre>
+     * @return
+     */
+    private String getCatalogPublisherAsJsonLD(String collectionName) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
+        BES bes = _besApi.getBES(collectionName);
+        Element admin = _besApi.showBesKey(bes.getPrefix(), "BES.ServerAdministrator");
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(admin, System.out);
+        HashMap<String,String> adminInfo = _besApi.getBESConfigParameterMap(collectionName,BES_SERVER_ADMINISTRATOR_KEY);
+
+        String name = adminInfo.get("organization");
+        if(name==null)
+            name = "";
+
+        String addressCountry = adminInfo.get("country");
+        if(addressCountry==null)
+            addressCountry = "";
+
+        String city = adminInfo.get("city");
+        if(city==null)
+            city = "";
+
+        String street = adminInfo.get("street");
+        if(street==null)
+            street = "";
+
+        String addressLocality = street + ", " +city;
+
+        String addressRegion = adminInfo.get("region");
+        if(addressRegion==null)
+            addressRegion = "";
+
+        String postalCode = adminInfo.get("postalcode");
+        if(postalCode==null)
+            postalCode = "";
+
+
+        String telephone = adminInfo.get("telephone");
+        if(telephone==null)
+            telephone = "";
+
+        String email = adminInfo.get("email");
+        if(email==null)
+            email = "";
+
+        String website = adminInfo.get("website");
+        if(website==null)
+            website = "";
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\"publisher\": {\n");
+        sb.append("    \"@type\": \"Organization\",\n");
+        sb.append("    \"name\": \"").append(name).append("\",\n");
+        sb.append("    \"address\": {\n");
+        sb.append("        \"@type\": \"PostalAddress\",\n");
+        sb.append("        \"addressCountry\": \"").append(addressCountry).append("\",\n");
+        sb.append("        \"addressLocality\": \"").append(addressLocality).append("\",\n");
+        sb.append("        \"addressRegion\": \"").append(addressRegion).append("\",\n");
+        sb.append("        \"postalCode\": \"").append(postalCode).append("\"\n");
+        sb.append("      },\n");
+        sb.append("    \"telephone\": \"").append(telephone).append("\",\n");
+        sb.append("    \"email\": \"").append(email).append("\",\n");
+        sb.append("    \"sameAs\": \"").append(website).append("\"\n");
+        sb.append("}\n");
+
+        return sb.toString();
+    }
+
+
+
 
     private String getCollectionName(Request oreq){
 
         String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
-
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
         }
@@ -275,11 +364,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
-
-       PathBuilder.normalizePath(collectionName, true, false);
-
-
-            while(!collectionName.equals("/") && collectionName.startsWith("/"))
+        PathBuilder.normalizePath(collectionName, true, false);
+        while(!collectionName.equals("/") && collectionName.startsWith("/"))
             collectionName = collectionName.substring(1);
 
         if(!collectionName.equals("/"))
@@ -288,10 +374,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
-        /*
-        while(!collectionName.equals("/") && collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1);
-*/
         log.debug("collectionName:  "+collectionName);
 
         return collectionName;
