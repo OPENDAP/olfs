@@ -752,8 +752,10 @@ public class BesApi implements Cloneable {
 
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
-     * stream.
+     * Writes the combined site map for the server to the passed stream. This means that one BES from each
+     * BesGroup (assumed to be identical to other BesGroup members) is queried for its site map and all of
+     * resulting BESGroup site maps are combined into a single server site map. woot.
+     *
      *
      * @param sitePrefix The requested DataSource
      * @param os         The Stream to which to write the response.
@@ -762,19 +764,19 @@ public class BesApi implements Cloneable {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public void writeSiteMapResponse(String sitePrefix,
-                                      OutputStream os)
+    public void writeCombinedSiteMapResponse(String sitePrefix,
+                                             OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         Iterator<BesGroup> bgIt = BESManager.getBesGroups();
         while(bgIt.hasNext()){
             BesGroup bg = bgIt.next();
             String besPrefix = bg.getGroupPrefix();
-            String prefix = PathBuilder.pathConcat(sitePrefix,besPrefix);
+            String siteMapPrefix = PathBuilder.pathConcat(sitePrefix,besPrefix);
 
             besTransaction(
                     besPrefix,
-                    getSiteMapRequestDocument(prefix),
+                    getSiteMapRequestDocument(siteMapPrefix),
                     os);
         }
     }

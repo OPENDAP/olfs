@@ -9,7 +9,6 @@ import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import opendap.ppt.PPTException;
-import org.jdom.Document;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -87,7 +86,7 @@ public class BESSiteMapHandler extends HttpServlet {
 
         Request dapReq = new Request(this,request);
         String dapService = dapReq.getWebApplicationUrl();
-        besApi.writeSiteMapResponse(dapService,baos);
+        besApi.writeCombinedSiteMapResponse(dapService,baos);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         BufferedReader bfr = new  BufferedReader (new InputStreamReader(bais,HyraxStringEncoding.getCharset()));
