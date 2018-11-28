@@ -748,6 +748,31 @@ public class BesApi implements Cloneable {
                 os);
     }
 
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param sitePrefix The requested DataSource
+     * @param os         The Stream to which to write the response.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public void writeSiteMapResponse(String sitePrefix,
+                                      OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        // @TODO make this work by having it look at all the BESGroups and adding them with appropriate prefix to the siteMap.
+        besTransaction(
+                "/",
+                getSiteMapRequestDocument(sitePrefix),
+                os);
+    }
+
+
+
     /**
      * Writes the NetCDF file out response for the dataSource to the passed
      * stream.
@@ -2577,8 +2602,52 @@ public class BesApi implements Cloneable {
     }
 
 
+    public  Document getSiteMapRequestDocument(String sitePrefix) {
+
+        Element request = new Element("request", BES_NS);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
+
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
+
+
+        request.addContent(getSiteMapRequestElement(sitePrefix,"contents.html", ".html"));
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        log.debug("getSiteMapRequestDocument() - Document\n {}",xmlo.outputString(request));
+
+        return new Document(request);
+
+    }
+
+
+    /**
+     *     <buildSiteMap prefix="http://machine/opendap" nodeSuffix="contents.html" leafSuffix="" filename="node_site_map.txt"/>
+     *
+     * @param prefix
+     * @return
+     */
+
+    public Element getSiteMapRequestElement(String prefix, String nodeSuffix, String leafSuffix ) {
+        Element e;
+        Element spi = new Element("buildSiteMap",BES_NS);
+
+        if(prefix!=null)
+            spi.setAttribute("prefix", prefix);
+
+        if(nodeSuffix!=null)
+            spi.setAttribute("nodeSuffix", nodeSuffix);
+
+        if(leafSuffix!=null)
+            spi.setAttribute("leafSuffix", leafSuffix);
+
+        return spi;
+    }
+
+
+
     public  Document getShowPathInfoRequestDocument(String dataSource)
-                throws BadConfigurationException {
+            throws BadConfigurationException {
 
 
         String besDataSource = getBES(dataSource).trimPrefix(dataSource);

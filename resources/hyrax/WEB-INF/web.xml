@@ -257,6 +257,13 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>site_map_service</servlet-name>
+        <servlet-class>opendap.bes.BESSiteMapHandler</servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
     <!-- servlet>
         <servlet-name>echo</servlet-name>
         <servlet-class>opendap.experiments.EchoServlet </servlet-class>
@@ -289,6 +296,11 @@
         <servlet-name>echo</servlet-name>
         <url-pattern>/echo/*</url-pattern>
     </servlet-mapping -->
+
+    <servlet-mapping>
+        <servlet-name>site_map_service</servlet-name>
+        <url-pattern>/siteMap/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
