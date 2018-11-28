@@ -71,8 +71,8 @@ public class BESSiteMapHandler extends HttpServlet {
 
     /**
      * Retrieves the entire site map from the BES by populating a TreeSet<String>.
-     * @param request
-     * @param siteMap
+     * @param request The particular client request for the site map - used to determine the server and port.
+     * @param siteMap Collection into which to place the site map entries.
      * @return The number of characters in the site map response from the BES.
      * @throws BadConfigurationException
      * @throws PPTException
@@ -119,12 +119,13 @@ public class BESSiteMapHandler extends HttpServlet {
      */
     private void sendTopSiteMap(HttpServletRequest request, ServletOutputStream sos, long siteMapFileCount, TreeSet<String> siteMap ) throws IOException {
         if(siteMapFileCount==1){
-            // Here we send the entire siteMap if the size is cool
+            // Here we send the entire siteMap if it fits in a single file.
             for(String aline: siteMap) {
                 sos.println(aline);
             }
         }
         else {
+            // Otherwise we have to break it up into pseudo files.
             Request dapReq = new Request(this,request);
             String siteMapService = dapReq.getServiceUrl();
             log.debug("Building siteMap files index response.");
