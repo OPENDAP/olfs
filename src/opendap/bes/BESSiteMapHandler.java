@@ -20,6 +20,10 @@ import java.io.*;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * This servlet works with the BES system to build site map responses for Hyrax.
+ *
+ */
 public class BESSiteMapHandler extends HttpServlet {
 
     private static final String PseudoFileOpener ="smap_";
@@ -66,6 +70,16 @@ public class BESSiteMapHandler extends HttpServlet {
         RequestCache.closeThreadCache();
     }
 
+    /**
+     * Retrieves the entire site map from the BES by populating a TreeSet<String>.
+     * @param request
+     * @param siteMap
+     * @return The number of characters in the site map response from the BES.
+     * @throws BadConfigurationException
+     * @throws PPTException
+     * @throws IOException
+     * @throws BESError
+     */
     private long getSiteMapFromBes(HttpServletRequest request, TreeSet<String> siteMap) throws BadConfigurationException, PPTException, IOException, BESError {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -80,17 +94,17 @@ public class BESSiteMapHandler extends HttpServlet {
 
         int i=0;
         String line = bfr.readLine();
-        long byte_count=0;
+        long char_count=0;
         while(line != null) {
             i++;
             siteMap.add(line);
-            byte_count += line.length();
+            char_count += line.length();
             line = bfr.readLine();
         }
         log.debug("i: {}", i);
-        log.debug("siteMap has {} entries, {} bytes.", siteMap.size(),byte_count);
+        log.debug("siteMap has {} entries, {} bytes.", siteMap.size(),char_count);
 
-        return byte_count;
+        return char_count;
     }
 
 
@@ -187,8 +201,8 @@ public class BESSiteMapHandler extends HttpServlet {
                 ServletOutputStream sos = response.getOutputStream();
 
                 TreeSet<String> siteMap = new TreeSet<>();
-                long byte_count = getSiteMapFromBes(request, siteMap);
-                long siteMapFileCount = siteMapFileCount(byte_count,siteMap.size());
+                long char_count = getSiteMapFromBes(request, siteMap);
+                long siteMapFileCount = siteMapFileCount(char_count,siteMap.size());
                 log.debug("siteMapFileCount: {}",siteMapFileCount);
 
                 if (relativeUrl.equals("/")) {

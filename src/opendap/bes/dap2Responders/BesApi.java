@@ -26,6 +26,7 @@
 
 package opendap.bes.dap2Responders;
 
+import opendap.PathBuilder;
 import opendap.bes.*;
 import opendap.bes.caching.BesCatalogCache;
 import opendap.coreServlet.ResourceInfo;
@@ -46,6 +47,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -764,11 +766,17 @@ public class BesApi implements Cloneable {
                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
-        // @TODO make this work by having it look at all the BESGroups and adding them with appropriate prefix to the siteMap.
-        besTransaction(
-                "/",
-                getSiteMapRequestDocument(sitePrefix),
-                os);
+        Iterator<BesGroup> bgIt = BESManager.getBesGroups();
+        while(bgIt.hasNext()){
+            BesGroup bg = bgIt.next();
+            String besPrefix = bg.getGroupPrefix();
+            String prefix = PathBuilder.pathConcat(sitePrefix,besPrefix);
+
+            besTransaction(
+                    besPrefix,
+                    getSiteMapRequestDocument(prefix),
+                    os);
+        }
     }
 
 
