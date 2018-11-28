@@ -22,9 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BESSiteMapHandler extends HttpServlet {
 
+    private static final String PseudoFileOpener ="smap_";
+    private static final String PseudoFileCloser =".txt";
 
-    public static final long SITE_MAP_FILE_MAX_ENTRIES = 50000;
-    public static final long SITE_MAP_FILE_MAX_BYTES = 52428800;
+    public static final long SITE_MAP_FILE_MAX_ENTRIES = 50000;  // Fifty Thousand entries per file.
+    public static final long SITE_MAP_FILE_MAX_BYTES = 52428800; // 50MB per file.
     //public static final long SITE_MAP_FILE_MAX_ENTRIES = 100;
     //public static final long SITE_MAP_FILE_MAX_BYTES = 500;
 
@@ -37,8 +39,6 @@ public class BESSiteMapHandler extends HttpServlet {
     private AtomicInteger reqNumber;
     private org.slf4j.Logger log;
 
-    private Document configDoc;
-
     /**
      * ************************************************************************
      * Intitializes the servlet. Init (at this time) basically sets up
@@ -49,6 +49,8 @@ public class BESSiteMapHandler extends HttpServlet {
      * @throws javax.servlet.ServletException
      */
     public void init() throws ServletException {
+
+        super.init();
 
         LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -64,15 +66,13 @@ public class BESSiteMapHandler extends HttpServlet {
         RequestCache.closeThreadCache();
     }
 
-    private long getSiteMap(HttpServletRequest request, TreeSet<String> siteMap) throws BadConfigurationException, PPTException, IOException, BESError {
+    private long getSiteMapFromBes(HttpServletRequest request, TreeSet<String> siteMap) throws BadConfigurationException, PPTException, IOException, BESError {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BesApi besApi = new BesApi();
 
         Request dapReq = new Request(this,request);
-
         String dapService = dapReq.getWebApplicationUrl();
-
         besApi.writeSiteMapResponse(dapService,baos);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -94,26 +94,17 @@ public class BESSiteMapHandler extends HttpServlet {
     }
 
 
-    private static final String PseudoFileOpener ="smap_";
-    private static final String PseudoFileCloser =".txt";
-
-    private String buildSiteMapFileIndex(HttpServletRequest request, long siteMapFileCount){
-        StringBuilder sb = new StringBuilder();
-
-        Request dapReq = new Request(this,request);
-
-        String siteMapService = dapReq.getServiceUrl();
-
-        log.debug("Building siteMap files index response.");
-        for(long i = 0; i < siteMapFileCount ; i++){
-            String pfn = siteMapService+"/"+ PseudoFileOpener +Long.toString(i)+ PseudoFileCloser;
-            sb.append(pfn).append("\n");
-        }
-        return sb.toString();
-
-    }
-
-    private void sendSiteMap(HttpServletRequest request, ServletOutputStream sos, long siteMapFileCount, TreeSet<String> siteMap ) throws IOException {
+    /**
+     * Sends the top level site map. If the siteMap fits in a single file then the siteMap is sent in total. If the site
+     * map requires multiple files then the list of site map files is sent.
+     *
+     * @param request
+     * @param sos
+     * @param siteMapFileCount
+     * @param siteMap
+     * @throws IOException
+     */
+    private void sendTopSiteMap(HttpServletRequest request, ServletOutputStream sos, long siteMapFileCount, TreeSet<String> siteMap ) throws IOException {
         if(siteMapFileCount==1){
             // Here we send the entire siteMap if the size is cool
             for(String aline: siteMap) {
@@ -121,11 +112,14 @@ public class BESSiteMapHandler extends HttpServlet {
             }
         }
         else {
-            log.debug("siteMap is large! It must be decomposed.");
-            // otherwise we send back the list of files.
-            sos.println(buildSiteMapFileIndex(request,siteMapFileCount));
+            Request dapReq = new Request(this,request);
+            String siteMapService = dapReq.getServiceUrl();
+            log.debug("Building siteMap files index response.");
+            for(long i = 0; i < siteMapFileCount ; i++){
+                String pfn = siteMapService+"/"+ PseudoFileOpener +Long.toString(i)+ PseudoFileCloser;
+                sos.println(pfn);
+            }
         }
-
     }
 
     /**
@@ -166,9 +160,7 @@ public class BESSiteMapHandler extends HttpServlet {
 
         try {
             Procedure timedProcedure = Timer.start();
-
             RequestCache.openThreadCache();
-
             try {
 
                 int reqno = reqNumber.incrementAndGet();
@@ -177,8 +169,6 @@ public class BESSiteMapHandler extends HttpServlet {
                 log.debug(Util.getMemoryReport());
                 log.debug(ServletUtil.showRequest(request, reqno));
                 log.debug(ServletUtil.probeRequest(this, request));
-                String opendap_context = request.getContextPath();
-
 
                 if (ReqInfo.isServiceOnlyRequest(request)) {
                     String reqURI = request.getRequestURI();
@@ -189,68 +179,25 @@ public class BESSiteMapHandler extends HttpServlet {
                     return;
                 }
 
-                ServletOutputStream sos = response.getOutputStream();
                 String msg = "Requested relative URL: '" + relativeUrl +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'";
-
                 log.debug(msg);
 
+                ServletOutputStream sos = response.getOutputStream();
 
                 TreeSet<String> siteMap = new TreeSet<>();
-                long byte_count = getSiteMap(request, siteMap);
-                long siteMapFileCount = 1 + siteMap.size() / SITE_MAP_FILE_MAX_ENTRIES;
-
-                long bytesPerFile = byte_count/siteMapFileCount;
-                long newFileCount = siteMapFileCount;
-                boolean done = false;
-
-                // Here we try to allow for long lines in the files, but only up to a point...
-                while(bytesPerFile > SITE_MAP_FILE_MAX_BYTES && !done){
-                    newFileCount++;
-                    bytesPerFile = byte_count/newFileCount;
-                    if(newFileCount > (siteMapFileCount+SITE_MAP_FILE_MAX_ENTRIES)) done = true;
-                }
-                siteMapFileCount = newFileCount;
+                long byte_count = getSiteMapFromBes(request, siteMap);
+                long siteMapFileCount = siteMapFileCount(byte_count,siteMap.size());
                 log.debug("siteMapFileCount: {}",siteMapFileCount);
-
 
                 if (relativeUrl.equals("/")) {
                     log.debug("Just the service endpoint. {}",request.getRequestURI());
-                    sendSiteMap(request,sos,siteMapFileCount,siteMap);
+                    sendTopSiteMap(request,sos,siteMapFileCount,siteMap);
                 }
                 else {
                     // If we are here then the request should be asking for a siteMap sub file.
-                    // If not then error (?) or possibly top level site map response...
-                    // We look at the total number of siteMapfiles in this siteMap (computed)
-                    // and then form the ith file based on their URL path.
-
-                    String pseudoFilename = relativeUrl;
-                    int indx = pseudoFilename.indexOf(PseudoFileOpener);
-
-                    int file_index = -1;
-                    if(indx==0 || indx==1){
-                        String s = pseudoFilename.substring(indx+ PseudoFileOpener.length());
-                        indx = s.indexOf(PseudoFileCloser);
-                        if(indx>0){
-                            s = s.substring(0,indx);
-                            try {
-                                file_index = Integer.parseInt(s);
-                            }
-                            catch (NumberFormatException nfe){
-                                log.error("Failed to parse integer file number in string '{}'",pseudoFilename);
-                            }
-                        }
-                    }
-
-                    // Did the parse effort succeed?
-                    if(file_index <0 || file_index >= siteMapFileCount) {
-                        // If the parse effort failed we just return the top level file index.
-                        sendSiteMap(request,sos,siteMapFileCount,siteMap);
-                        return;
-                    }
-
-                    send_pseudoSiteMapFile(file_index,siteMapFileCount,siteMap,sos);                }
+                    send_pseudoSiteMapFile(request,sos,relativeUrl,siteMapFileCount,siteMap);                }
             }
             finally {
                 Timer.stop(timedProcedure);
@@ -282,7 +229,73 @@ public class BESSiteMapHandler extends HttpServlet {
         Timer.reset();
     }
 
-    private void send_pseudoSiteMapFile(int file_index, long siteMapFileCount, TreeSet<String> siteMap, ServletOutputStream sos) throws IOException {
+    /**
+     * Determine the number of files into which the siteMap must be broken based on the rules at
+     * https://www.sitemaps.org/protocol.html
+     *
+     * @param byte_count Number of bytes in total site map.
+     * @param siteMap_size Number of entries in total site map.
+     * @return
+     */
+    long siteMapFileCount(long byte_count, int siteMap_size){
+        long siteMapFileCount = 1 + siteMap_size / SITE_MAP_FILE_MAX_ENTRIES;
+        long bytesPerFile = byte_count/siteMapFileCount;
+        long newFileCount = siteMapFileCount;
+        boolean done = false;
+
+        // Here we try to allow for long lines in the files, but only up to a point...
+        while(bytesPerFile > SITE_MAP_FILE_MAX_BYTES && !done){
+            newFileCount++;
+            bytesPerFile = byte_count/newFileCount;
+            if(newFileCount >= SITE_MAP_FILE_MAX_ENTRIES) {
+                done = true;
+            }
+        }
+        siteMapFileCount = newFileCount;
+        return siteMapFileCount;
+    }
+
+
+    /**
+     * Sends a partial siteMap response as a pseudo file .
+     *  If we are here then the request should be asking for a siteMap sub file.
+     *   If not then we return the top level site map response...
+     *   We look at the total number of siteMapfiles in this siteMap (computed)
+     *    and then form the ith file based on their URL path.
+     * @param request
+     * @param sos
+     * @param relativeUrl
+     * @param siteMapFileCount
+     * @param siteMap
+     * @throws IOException
+     */
+    private void send_pseudoSiteMapFile(HttpServletRequest request, ServletOutputStream sos, String relativeUrl, long siteMapFileCount, TreeSet<String> siteMap) throws IOException  {
+
+        // We try to "parse" the request URL to see if it's a site map sub file.
+        String pseudoFilename = relativeUrl;
+        int indx = pseudoFilename.indexOf(PseudoFileOpener);
+
+        int file_index = -1;
+        if(indx==0 || indx==1){
+            String s = pseudoFilename.substring(indx+ PseudoFileOpener.length());
+            indx = s.indexOf(PseudoFileCloser);
+            if(indx>0){
+                s = s.substring(0,indx);
+                try {
+                    file_index = Integer.parseInt(s);
+                }
+                catch (NumberFormatException nfe){
+                    log.error("Failed to parse integer file number in string '{}'",pseudoFilename);
+                }
+            }
+        }
+
+        // Did the parse effort succeed?
+        if(file_index <0 || file_index >= siteMapFileCount) {
+            // If the parse effort failed we just return the top level file index.
+            sendTopSiteMap(request,sos,siteMapFileCount,siteMap);
+            return;
+        }
 
         // Now we need to transmit a range from the site map that corresponds to their selected
         // pseudo file number. The following is crude, but required due to the nature of the
