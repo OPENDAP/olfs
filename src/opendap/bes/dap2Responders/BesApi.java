@@ -48,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,6 +145,8 @@ public class BesApi implements Cloneable {
      * The name of the BES Exception Element.
      */
     private static String BES_ERROR = "BESError";
+
+    public static String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -2893,6 +2896,50 @@ public class BesApi implements Cloneable {
     public String getBesCombinedTypeMatch() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
         return getDefaultBesCombinedTypeMatchPattern("/");
     }
+
+
+    /**
+     * Retrives a BES Key that holds a Map stored in the values of the key and formatted as key:value
+     * @param besPath
+     * @param mapName
+     * @return
+     * @throws BadConfigurationException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws PPTException
+     * @throws BESError
+     */
+    public HashMap<String,String> getBESConfigParameterMap(String besPath, String mapName)
+            throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
+
+        HashMap<String,String> pmap = new HashMap<>();
+
+        BES bes = getBES(besPath);
+        Element admin = showBesKey(bes.getPrefix(), mapName);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(admin, System.out);
+
+        @SuppressWarnings("unchecked")
+        List<Element> values = admin.getChildren("value", opendap.namespaces.BES.BES_NS);
+        for(Element v: values){
+            String s = v.getTextTrim();
+            log.debug("getBESConfigParameterMap() - Processing map string: {}",s);
+            int markIndex = s.indexOf(":");
+            if(markIndex < 0){
+                log.error("getBESConfigParameterMap() The BES returned an incorrectly formatted value for the {} key. value: '{}' SKIPPING",mapName,v);
+            }
+            else {
+                String key = s.substring(0,markIndex ).toLowerCase();
+                String value = s.substring(markIndex + 1);
+                pmap.put(key, value);
+            }
+        }
+        return pmap;
+    }
+
+
+
+
 
     public String getDefaultBesCombinedTypeMatchPattern(String besPrefix) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
 

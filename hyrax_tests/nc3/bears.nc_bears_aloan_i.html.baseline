@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "Hyrax Data Server" project.
@@ -75,7 +75,7 @@
                      <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
                      <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
                      <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
                      <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
@@ -211,7 +211,57 @@
                             onChange="DAP2_URL.update_url()"/>
                      <script type="text/javascript">org_opendap_bears.addDimension(org_opendap_bears_dim_2,3);
             </script>
-                     <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">act:
+                        </span>
+                                       <span class="em">text string\012\011123</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">acs:
+                        </span>
+                                       <span class="em">-40</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">acl:
+                        </span>
+                                       <span class="em">17000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">acf:
+                        </span>
+                                       <span class="em">-2.000000001.000000000.00000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">acd:
+                        </span>
+                                       <span class="em">-1.0000000000000000.7500000000000000</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">string_length:
+                        </span>
+                                       <span class="em">3</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
                      <script type="text/javascript">
         if(DEBUG.enabled()) alert("dap:Grid()\n "+
         "myFQN:         aloan\n " +
@@ -396,7 +446,30 @@
     "@type": "PropertyValue",
     "name": "bears",
     "valueReference": [ 
-
+      {
+        "@type": "PropertyValue", 
+        "name": "act", 
+        "value": "text string\\012\\011123"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acs", 
+        "value": "-40"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acl", 
+        "value": "17000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acf", 
+        "value": [ "-2.00000000", "1.00000000", "0.00000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acd", 
+        "value": [ "-1.000000000000000", "0.7500000000000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "string_length", 
+        "value": "3"      }
     ]
   },
   {
