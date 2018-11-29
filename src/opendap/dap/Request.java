@@ -111,24 +111,23 @@ public class Request {
     }
 
 
-
-
-    public String getServiceUrl()  {
-
+    public String getWebApplicationUrl(){
         String transport  = _request.getScheme();
         String serverName = _request.getServerName();
         int    serverPort = _request.getServerPort();
+        String contextName = _request.getContextPath();
+
+        String webappUrl = transport + "://"+ serverName + ":"+ serverPort + contextName ;
+
+        log.debug("getWebApplicationUrl(): "+webappUrl);
+        return webappUrl;
+    }
 
 
-        String dapService = getServiceLocalId();
-
-        String serviceUrl = transport + "://"+ serverName + ":"+ serverPort + dapService;
-
-
+    public String getServiceUrl()  {
+        String serviceUrl = getWebApplicationUrl() + _request.getServletPath();
         log.debug("getServiceUrl(): "+serviceUrl);
-
         return serviceUrl;
-
     }
 
 

@@ -26,6 +26,7 @@
 
 package opendap.bes.dap2Responders;
 
+import opendap.PathBuilder;
 import opendap.bes.*;
 import opendap.bes.caching.BesCatalogCache;
 import opendap.coreServlet.ResourceInfo;
@@ -46,6 +47,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -750,6 +752,39 @@ public class BesApi implements Cloneable {
                 getDap4DataAsCovJsonRequest(dataSource, qp, maxResponseSize),
                 os);
     }
+
+
+    /**
+     * Writes the combined site map for the server to the passed stream. This means that one BES from each
+     * BesGroup (assumed to be identical to other BesGroup members) is queried for its site map and all of
+     * resulting BESGroup site maps are combined into a single server site map. woot.
+     *
+     *
+     * @param sitePrefix The requested DataSource
+     * @param os         The Stream to which to write the response.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public void writeCombinedSiteMapResponse(String sitePrefix,
+                                             OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        Iterator<BesGroup> bgIt = BESManager.getBesGroups();
+        while(bgIt.hasNext()){
+            BesGroup bg = bgIt.next();
+            String besPrefix = bg.getGroupPrefix();
+            String siteMapPrefix = PathBuilder.pathConcat(sitePrefix,besPrefix);
+
+            besTransaction(
+                    besPrefix,
+                    getSiteMapRequestDocument(siteMapPrefix),
+                    os);
+        }
+    }
+
+
 
     /**
      * Writes the NetCDF file out response for the dataSource to the passed
@@ -2580,8 +2615,52 @@ public class BesApi implements Cloneable {
     }
 
 
+    public  Document getSiteMapRequestDocument(String sitePrefix) {
+
+        Element request = new Element("request", BES_NS);
+        request.setAttribute(REQUEST_ID,getRequestIdBase());
+
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
+
+
+        request.addContent(getSiteMapRequestElement(sitePrefix,"contents.html", ".html"));
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        log.debug("getSiteMapRequestDocument() - Document\n {}",xmlo.outputString(request));
+
+        return new Document(request);
+
+    }
+
+
+    /**
+     *     <buildSiteMap prefix="http://machine/opendap" nodeSuffix="contents.html" leafSuffix="" filename="node_site_map.txt"/>
+     *
+     * @param prefix
+     * @return
+     */
+
+    public Element getSiteMapRequestElement(String prefix, String nodeSuffix, String leafSuffix ) {
+        Element e;
+        Element spi = new Element("buildSiteMap",BES_NS);
+
+        if(prefix!=null)
+            spi.setAttribute("prefix", prefix);
+
+        if(nodeSuffix!=null)
+            spi.setAttribute("nodeSuffix", nodeSuffix);
+
+        if(leafSuffix!=null)
+            spi.setAttribute("leafSuffix", leafSuffix);
+
+        return spi;
+    }
+
+
+
     public  Document getShowPathInfoRequestDocument(String dataSource)
-                throws BadConfigurationException {
+            throws BadConfigurationException {
 
 
         String besDataSource = getBES(dataSource).trimPrefix(dataSource);
