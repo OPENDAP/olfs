@@ -1,5 +1,9 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
+<%@ page import="org.jdom.JDOMException" %>
+<%@ page import="opendap.ppt.PPTException" %>
+<%@ page import="opendap.bes.BESError" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
