@@ -36,7 +36,15 @@
     BESSiteMap besSiteMap;
     try {
         besSiteMap = new BESSiteMap(servicePrefix);
-    } catch (BESError | BadConfigurationException | PPTException e) {
+    }
+    catch (BESError  e) {
+        e.printStackTrace();
+        return ;
+    }
+    catch (BadConfigurationException e) {
+        e.printStackTrace();
+        return ;
+    } catch ( PPTException e) {
         e.printStackTrace();
         return ;
     }
