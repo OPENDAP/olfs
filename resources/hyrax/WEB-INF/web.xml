@@ -259,7 +259,7 @@
 
     <servlet>
         <servlet-name>site_map_service</servlet-name>
-        <servlet-class>opendap.bes.BESSiteMap</servlet-class>
+        <servlet-class>opendap.bes.BESSiteMapService</servlet-class>
         <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
         <load-on-startup>1</load-on-startup>
     </servlet>

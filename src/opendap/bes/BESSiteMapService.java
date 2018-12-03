@@ -1,18 +1,19 @@
 package opendap.bes;
 
 
+import opendap.PathBuilder;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
+import org.jdom.Element;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -53,6 +54,29 @@ public class BESSiteMapService extends HttpServlet {
         reqNumber = new AtomicInteger(0);
 
         log.debug("init() start");
+
+        if(!BESManager.isInitialized()) {
+
+            String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
+
+            Element configElement;
+            try {
+                configElement = opendap.xml.Util.getDocumentRoot(filename);
+
+            } catch (Exception e) {
+                throw new ServletException("Failed to read configuration file " + filename + " message: " + e.getMessage());
+            }
+
+            try {
+                Element besManagerElement = configElement.getChild("BESManager");
+                BESManager besManager = new BESManager();
+                besManager.init(besManagerElement);
+
+            } catch (Exception e) {
+                throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());
+            }
+
+        }
 
         log.info("init() complete.");
         RequestCache.closeThreadCache();
@@ -95,7 +119,8 @@ public class BESSiteMapService extends HttpServlet {
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         Request req = new Request(this,request);
-        String servicePrefix = req.getWebApplicationUrl();
+        String dapServicePrefix = PathBuilder.pathConcat(req.getWebApplicationUrl(),"opendap/");
+        String siteMapServicePrefix = req.getServiceUrl();
 
         int request_status = HttpServletResponse.SC_OK;
 
@@ -127,15 +152,15 @@ public class BESSiteMapService extends HttpServlet {
 
                 ServletOutputStream sos = response.getOutputStream();
 
-                BESSiteMap besSiteMap = new BESSiteMap();
+                BESSiteMap besSiteMap = new BESSiteMap(dapServicePrefix);
 
                 if (relativeUrl.equals("/")) {
                     log.debug("Just the service endpoint. {}",request.getRequestURI());
-                    sos.println(besSiteMap.getSiteMapEntryForRobotsDotText(request));
+                    sos.println(besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix));
                 }
                 else {
                     // If we are here then the request should be asking for a siteMap sub file.
-                    besSiteMap.send_pseudoSiteMapFile(request,sos,relativeUrl);                }
+                    besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);                }
             }
             finally {
                 Timer.stop(timedProcedure);

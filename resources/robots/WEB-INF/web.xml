@@ -26,10 +26,24 @@
     <description>
         Welcome to Tomcat
     </description>
+    <servlet>
+        <servlet-name>site_map_service</servlet-name>
+        <servlet-class>opendap.bes.BESSiteMapService</servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
 
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>
         <url-pattern>/robots.txt</url-pattern>
+        <url-pattern>*.jsp</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>site_map_service</servlet-name>
+        <url-pattern>/siteMap/*</url-pattern>
+    </servlet-mapping>
+
 
 </web-app>

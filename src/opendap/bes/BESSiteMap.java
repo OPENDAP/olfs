@@ -2,24 +2,14 @@ package opendap.bes;
 
 
 import opendap.bes.dap2Responders.BesApi;
-import opendap.coreServlet.*;
-import opendap.dap.Request;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
-import opendap.logging.Procedure;
-import opendap.logging.Timer;
 import opendap.ppt.PPTException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This servlet works with the BES system to build site map responses for Hyrax.
@@ -42,22 +32,15 @@ public class BESSiteMap {
     private org.slf4j.Logger _log;
     private TreeSet<String> _siteMap;
     private int _siteMapFileCount;
-    private String _servicePrefix;
+    private String _dapServicePrefix;
     private long _siteMapCharCount;
 
 
-    private void BESSiteMap() {
-
-    }
-
-
-
-
-    public void BESSiteMap(String servicePrefix) throws BESError, BadConfigurationException, PPTException, IOException {
+    public BESSiteMap(String dapServicePrefix) throws BESError, BadConfigurationException, PPTException, IOException {
         _log = org.slf4j.LoggerFactory.getLogger(getClass());
         _siteMap = new TreeSet<>();
         _siteMapFileCount = 1;
-        _servicePrefix = servicePrefix;
+        _dapServicePrefix = dapServicePrefix;
         _siteMapCharCount = getSiteMapFromBes();
     }
 
@@ -74,7 +57,7 @@ public class BESSiteMap {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BesApi besApi = new BesApi();
 
-        besApi.writeCombinedSiteMapResponse(_servicePrefix,baos);
+        besApi.writeCombinedSiteMapResponse(_dapServicePrefix,baos);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         BufferedReader bfr = new  BufferedReader (new InputStreamReader(bais,HyraxStringEncoding.getCharset()));
@@ -112,17 +95,15 @@ public class BESSiteMap {
      * Sends the top level site map. If the siteMap fits in a single file then the siteMap is sent in total. If the site
      * map requires multiple files then the list of site map files is sent.
      *
-     * @param request
+     * @param siteMapServicePrefix
      * @throws IOException
      */
-    public String getSiteMapEntryForRobotsDotText(HttpServletRequest request ) throws IOException {
+    public String getSiteMapEntryForRobotsDotText(String siteMapServicePrefix ) throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        Request dapReq = new Request(null,request);
-        String siteMapService = dapReq.getServiceUrl();
         _log.debug("Building siteMap files index response.");
         for(long i = 0; i < _siteMapFileCount ; i++){
-            sb.append("sitemap: ").append(siteMapService).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
+            sb.append("sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
         }
         return sb.toString();
     }
@@ -135,12 +116,12 @@ public class BESSiteMap {
      *   If not then we return the top level site map response...
      *   We look at the total number of siteMapfiles in this siteMap (computed)
      *    and then form the ith file based on their URL path.
-     * @param request
+     * @param siteMapServicePrefix
      * @param sos
      * @param relativeUrl
      * @throws IOException
      */
-    public void send_pseudoSiteMapFile(HttpServletRequest request, ServletOutputStream sos, String relativeUrl ) throws IOException  {
+    public void send_pseudoSiteMapFile(String siteMapServicePrefix , ServletOutputStream sos, String relativeUrl ) throws IOException  {
 
         // We try to "parse" the request URL to see if it's a site map sub file.
         String pseudoFilename = relativeUrl;
@@ -164,13 +145,13 @@ public class BESSiteMap {
         // Did the parse effort succeed?
         if(targetFileIndex <0 || targetFileIndex >= _siteMapFileCount) {
             // If the parse effort failed we just return the top level file index.
-            sos.println(getSiteMapEntryForRobotsDotText(request));
+            sos.println(getSiteMapEntryForRobotsDotText(siteMapServicePrefix));
             return;
         }
 
         int i=0;
         long char_count=0;
-        int currentPseudoFile = 1;
+        int currentPseudoFile = 0;
 
         for(String line: _siteMap){
             i++;
@@ -183,6 +164,8 @@ public class BESSiteMap {
             if(currentPseudoFile == targetFileIndex) {
                 sos.println(line);
             }
+            if(currentPseudoFile > targetFileIndex)
+                    break;
         }
 
     }
