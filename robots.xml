@@ -435,7 +435,7 @@
     <target
             name="robots"
             depends="clean,compile"
-            description="Performs a clean build of the core software and assembles the WAR file."
+            description="Performs a clean build of the robots/sitemap service and assembles the WAR file."
     >
         <echo level="info" message="Building Hyrax server war file."/>
         <echo level="info" message="build.resources: ${build.resources}"/>

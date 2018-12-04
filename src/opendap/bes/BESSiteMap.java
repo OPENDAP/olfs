@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import java.io.*;
+import java.util.Date;
 import java.util.TreeSet;
 
 /**
@@ -34,6 +35,7 @@ public class BESSiteMap {
     private int _siteMapFileCount;
     private String _dapServicePrefix;
     private long _siteMapCharCount;
+    private Date _creation;
 
 
     public BESSiteMap(String dapServicePrefix) throws BESError, BadConfigurationException, PPTException, IOException {
@@ -42,6 +44,7 @@ public class BESSiteMap {
         _siteMapFileCount = 1;
         _dapServicePrefix = dapServicePrefix;
         _siteMapCharCount = getSiteMapFromBes();
+        _creation = new Date();
     }
 
     /**
@@ -169,5 +172,8 @@ public class BESSiteMap {
         }
 
     }
+
+    public Date created(){ return _creation; }
+
 
 }
