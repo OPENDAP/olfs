@@ -257,12 +257,12 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
+    <!-- moved to the robots.txt service -->
+    <!-- servlet>
         <servlet-name>site_map_service</servlet-name>
         <servlet-class>opendap.bes.BESSiteMapService</servlet-class>
-        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
         <load-on-startup>1</load-on-startup>
-    </servlet>
+    </servlet -->
 
     <!-- servlet>
         <servlet-name>echo</servlet-name>
@@ -297,10 +297,10 @@
         <url-pattern>/echo/*</url-pattern>
     </servlet-mapping -->
 
-    <servlet-mapping>
+    <!-- servlet-mapping>
         <servlet-name>site_map_service</servlet-name>
         <url-pattern>/siteMap/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping -->
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>

@@ -825,6 +825,9 @@
         <echo level="info" message="build.robots.resources: ${build.robots.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
 
+        <echo level="info" message="Copying: ${build.robots.resources}/robots.jsp To: ${build.robots.resources}/robots.txt"/>
+        <move file="${build.robots.resources}/robots.jsp" tofile="${build.robots.resources}/robots.txt"/>
+
         <war destfile="${build.dist}/ROOT.war"
              webxml="${build.robots.resources}/WEB-INF/web.xml"
         >
@@ -891,7 +894,7 @@
 
     <target name="robots-dist"
             depends="server,robots"
-            description="Packages the war files for the robots/sitemap and Hyrax into a tar file with a release related name.">
+            description="Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.">
 
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
@@ -912,10 +915,6 @@
         <delete file="${build.dist}/ROOT.war"/>
 
     </target>
-
-
-
-
 
 </project>
 
