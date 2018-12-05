@@ -29,12 +29,12 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        name="Hyrax robots.txt service"
         default="all" basedir=".">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
-    <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
+    <property name="DEPLOYMENT_CONTEXT" value="ROOT"/>
 
 
     <!-- ********************************************* -->
@@ -141,7 +141,7 @@
         <echo level="info" message="    build.dir:         ${build.dir}"/>
         <echo level="info" message="    build.classes:     ${build.classes}"/>
         <echo level="info" message="    build.doc:         ${build.docs}"/>
-        <echo level="info" message="    build.resources:   ${build.hyrax.resources}"/>
+        <echo level="info" message="    build.resources:   ${build.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="    ant.file:          ${ant.file}"/>
@@ -174,8 +174,7 @@
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
-    <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
+    <property name="robots_service.dir" location="${resources.dir}/robots"/>
 
 
     <!-- Build Directories -->
@@ -186,15 +185,10 @@
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
+    <property name="build.resources" location="${build.dir}/resources"/>
+    <property name="build.webapp" location="${build.dir}/webapp"/>
 
-    <property name="build.hyrax.resources" location="${build.dir}/resources"/>
-    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
 
-    <property name="robotsResources.dir" location="${resources.dir}/robots"/>
-    <property name="build.robots.resources" location="${build.dir}/robots"/>
-
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
-    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
     <property name="json.lib" value="gson-2.3.1.jar"/>
@@ -283,27 +277,13 @@
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
         </fileset>
-        <fileset dir="${wcs.lib.dir}">
-            <include name="${ogc-wcs.lib}"/>
-            <include name="${ogc-gml.lib}"/>
-            <include name="${ogc-swe.lib}"/>
-            <include name="${ogc-gmlcov.lib}"/>
-            <include name="${ogc-ows.lib}"/>
-            <include name="${ogc-jaxb.lib}"/>
-            <include name="${jaxb-core.lib}"/>
-            <include name="${jaxb-impl.lib}"/>
-            <include name="${xlink.lib}"/>
-        </fileset>
 
     </path>
 
 
-    <target name="all" depends="clean,clients,check,server"
+    <target name="all" depends="clean,check,robots"
             description="Builds lots of stuff."/>
 
-
-    <target name="clients" depends="BESclient"
-            description="Compiles the clients."/>
 
 
     <target name="clean" description="Clean up ALL build products.">
@@ -381,50 +361,25 @@
 
 
                 <exclude name="opendap/cmr/**"/>
-
-                <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the auth code  -->
-                <!-- exclude name="opendap/auth/**"/ -->
-
-                <!-- Exclude the Metacat code  -->
                 <exclude name="opendap/metacat/**"/>
-
-                <!-- Exclude WCS 1.1.2 and semantics code  -->
-                <exclude name="opendap/wcs/v1_1_2/**"/>
-                <exclude name="opendap/semantics/**"/>
-
-                <!-- Exclude prototype Amazon Web Services code from production -->
                 <exclude name="opendap/aws/**"/>
                 <exclude name="opendap/noaa_s3/**"/>
-
-                <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
+                <exclude name="opendap/semantics/**"/>
+                <exclude name="opendap/wcs/**"/>
 
             </fileset>
 
         </copy>
 
 
-        <copy todir="${build.hyrax.resources}" filtering="true">
+        <copy todir="${build.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
-            <fileset dir="${hyraxResources.dir}"/>
+            <fileset dir="${robots_service.dir}"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
-            <fileset dir="${wcs.resources.dir}">
-                <include name="xsl/**"/>
-                <include name="WEB-INF/**"/>
-                <exclude name="WEB-INF/web.xml"/>
-                <exclude name="WEB-INF/urlrewrite.xml"/>
-                <exclude name="WEB-INF/logback.xml"/>
-            </fileset>
+
         </copy>
-
-        <copy todir="${build.robots.resources}" filtering="true">
-            <fileset dir="${robotsResources.dir}"/>
-        </copy>
-
-
     </target>
 
 
@@ -458,139 +413,8 @@
     </target>
 
 
-    <target
-            name="olfs-experiments"
-            depends="init"
-            description="Compiles the experimental code."
-    >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
 
 
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <classpath refid="olfs.compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/**/*.java"/>
-            <include name="hao/**/*.java"/>
-
-        </javac>
-
-    </target>
-
-
-    <target name="olfs-lib" depends="clean,compile">
-
-        <jar destfile="${build.lib}/${OLFS_LIB}.jar">
-            <fileset dir="${build.classes}"/>
-        </jar>
-
-    </target>
-
-
-    <target
-            name="javaDoc"
-            depends="clean,PreProcessSourceCode,IsJavaDocUpToDate"
-            description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
-            unless="JavaDocIsUpToDate"
-    >
-
-        <javadoc destdir="${build.docs}/javadoc"
-                 Author="true"
-                 Verbose="true"
-                 Version="true"
-                 failonerror="true"
-                 additionalparam="-Xdoclint:none"
-        >
-            <classpath refid="olfs.compile.classpath"/>
-
-            <packageset dir="${build.src}" defaultexcludes="yes"/>
-
-
-        </javadoc>
-
-    </target>
-
-
-    <target name="doc-dist"
-            depends="clean,javaDoc"
-            description="Builds documentation distribution"
-    >
-
-        <tar destfile="${build.dist}/${DOC_DIST}.tgz"
-             compression="gzip"
-        >
-            <zipfileset dir="${build.docs}" prefix="${DOC_DIST}"/>
-        </tar>
-
-    </target>
-
-
-    <target name="src-dist"
-            depends="clean,PreProcessSourceCode"
-            description="Builds source distribution"
-    >
-
-        <tar destfile="${build.dist}/${SRC_DIST}.tgz"
-             compression="gzip"
-        >
-
-            <zipfileset dir="${build.src}" prefix="${SRC_DIST}/src"/>
-
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="doc/**"/>
-
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="lib/**"/>
-
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/hyrax/**"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/WebStart/**"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/gateway/**"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/nciso/**"/>
-
-            <zipfileset dir="." prefix="${SRC_DIST}" file="build.xml"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="README"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="NEWS"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="ChangeLog"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="COPYRIGHT"/>
-
-        </tar>
-
-    </target>
-
-    <target name="server-dist"
-            depends="server"
-            description="Packages the war file into tar file with a release related name.">
-
-        <copy file="${distributionResources.dir}/WarFileReadMe"
-              tofile="${build.dist}/README"/>
-
-        <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
-             compression="gzip"
-        >
-            <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
-                <include name="opendap.war"/>
-                <include name="README"/>
-            </zipfileset>
-
-        </tar>
-
-        <delete file="${build.dist}/README"/>
-        <delete file="${build.dist}/opendap.war"/>
-
-    </target>
-
-    <target name="DISTRO"
-            depends="clean,src-dist,doc-dist,server-dist,check"
-            description="Builds complete distribution"
-    >
-
-    </target>
 
     <target name="IsJavaDocUpToDate"
             description="Checks to see if the JavaDoc is out of date."
@@ -605,144 +429,20 @@
 
     </target>
 
-    <target name="BESclient"
-            depends="olfs-lib"
-            description="Build and package the back end client."
-    >
 
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
-
-        <jar destfile="${build.dist}/beclient.jar"
-             manifest="resources/META-INF/BESclient.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ppt/**/*.class"/>
-            </fileset>
-        </jar>
-
-
-    </target>
-
-    <target name="hexEncoderApp"
-            depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
-
-
-        <mkdir dir="${build.dist}/hexEncoder"/>
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/hexEncoder/${commons-cli.lib}"/>
-        <copy file="resources/hexEncoder/hexEncoder" tofile="${build.dist}/hexEncoder/hexEncoder"/>
-
-        <jar destfile="${build.dist}/hexEncoder/hexEncoder.jar"
-             manifest="resources/hexEncoder/hexEncoder.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/gateway/Encoder.class"/>
-                <include name="opendap/gateway/HexAsciiEncoder.class"/>
-            </fileset>
-        </jar>
-
-        <tar destfile="${build.dist}/hexEncoder.tgz"
-             compression="gzip"
-        >
-            <zipfileset dir="${build.dist}/hexEncoder"/>
-
-        </tar>
-
-    </target>
-
-    <target name="NcmlDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the NcML Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ncml/DispatchHandler.class"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-    <target name="GatewayDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the Gateway Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
-            <fileset dir=".">
-                <include name="resources/gateway/**"/>
-            </fileset>
-            <fileset dir="${build.classes}">
-                <include name="opendap/gateway/**"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-    <target name="validatorApp"
-            depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
-        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
-        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
-        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
-        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
-        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
-        <!--
-        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
-        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
-        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
-        -->
-        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
-
-        <jar destfile="${build.dist}/validator.jar"
-             manifest="resources/META-INF/validator.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/xml/Validator.class"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-    <target name="XSLTransformer"
-            depends="clean,compile"
-            description="Builds executable jar file of a simple XSL Transformer application">
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
-        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
-        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
-        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
-        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
-        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
-        <!--
-        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
-        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
-        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
-        -->
-        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
-
-        <jar destfile="${build.dist}/xslt.jar"
-             manifest="resources/META-INF/xsltransformer.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/xml/Transformer.class"/>
-            </fileset>
-        </jar>
-
-
-    </target>
 
 
     <target
-            name="server"
+            name="robots"
             depends="clean,compile"
-            description="Performs a clean build of the core software and assembles the WAR file."
+            description="Performs a clean build of the robots/sitemap service and assembles the WAR file."
     >
         <echo level="info" message="Building Hyrax server war file."/>
-        <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="build.resources: ${build.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${build.hyrax.resources}/WEB-INF/web.xml"
+             webxml="${build.resources}/WEB-INF/web.xml"
         >
 
             <lib dir="${lib.dir}">
@@ -776,22 +476,11 @@
                 <include name="${logback-classic.lib}"/>
 
             </lib>
-            <lib dir="${wcs.lib.dir}">
-                <include name="${ogc-wcs.lib}"/>
-                <include name="${ogc-gml.lib}"/>
-                <include name="${ogc-swe.lib}"/>
-                <include name="${ogc-gmlcov.lib}"/>
-                <include name="${ogc-ows.lib}"/>
-                <include name="${ogc-jaxb.lib}"/>
-                <include name="${jaxb-core.lib}"/>
-                <include name="${jaxb-impl.lib}"/>
-                <include name="${xlink.lib}"/>
-            </lib>
 
             <classes dir="${build.classes}"/>
 
 
-            <zipfileset dir="${build.hyrax.resources}" prefix="">
+            <zipfileset dir="${build.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
@@ -802,7 +491,7 @@
             </zipfileset>
 
 
-            <webinf dir="${build.hyrax.resources}/WEB-INF">
+            <webinf dir="${build.resources}/WEB-INF">
                 <include name="logback-test.xml"/>
                 <include name="logback.xml"/>
                 <include name="urlrewrite.xml"/>
@@ -815,108 +504,6 @@
 
     </target>
 
-
-    <target
-            name="robots"
-            depends="compile"
-            description="Performs a clean build of the robots/sitemap service and assembles the WAR file."
-    >
-        <echo level="info" message="Building robots/sitemap ROOT service war file."/>
-        <echo level="info" message="build.robots.resources: ${build.robots.resources}"/>
-        <echo level="info" message="build.dist:      ${build.dist}"/>
-
-        <echo level="info" message="Copying: ${build.robots.resources}/robots.jsp To: ${build.robots.resources}/robots.txt"/>
-        <move file="${build.robots.resources}/robots.jsp" tofile="${build.robots.resources}/robots.txt"/>
-
-        <war destfile="${build.dist}/ROOT.war"
-             webxml="${build.robots.resources}/WEB-INF/web.xml"
-        >
-
-            <lib dir="${lib.dir}">
-                <include name="${owasp-encoder}"/>
-                <include name="${owasp-encoder-jsp}"/>
-
-                <include name="${json.lib}"/>
-                <include name="${jdom.lib}"/>
-                <include name="${junit.lib}"/>
-                <include name="${urlRewrite.lib}"/>
-
-                <include name="${commons-lang.lib}"/>
-                <include name="${commons-cli.lib}"/>
-                <include name="${commons-httpclient.lib}"/>
-                <include name="${commons-logging.lib}"/>
-                <include name="${commons-codec.lib}"/>
-
-                <include name="${http-components-httpclient.lib}"/>
-                <include name="${http-components-httpcore.lib}"/>
-
-                <include name="${commons-io.lib}"/>
-
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-                <include name="${saxon-jdom.lib}"/>
-                <include name="${saxon-s9api.lib}"/>
-                <include name="${saxon.lib}"/>
-
-                <include name="${slf4j.lib}"/>
-                <include name="${logback-core.lib}"/>
-                <include name="${logback-classic.lib}"/>
-
-            </lib>
-
-            <classes dir="${build.classes}"/>
-
-
-            <zipfileset dir="${build.robots.resources}" prefix="">
-                <include name="**/*"/>
-                <exclude name="WEB-INF/web.xml"/>
-            </zipfileset>
-
-
-            <zipfileset dir="${doc.dir}" prefix="docs">
-                <exclude name="src.distribution.readme"/>
-            </zipfileset>
-
-
-            <webinf dir="${build.robots.resources}/WEB-INF">
-                <include name="logback-test.xml"/>
-                <include name="logback.xml"/>
-                <include name="urlrewrite.xml"/>
-            </webinf>
-
-
-        </war>
-
-        <!-- delete file="${build.dist}/index.html"/ -->
-
-    </target>
-
-    <target name="hyrax-robots"
-            depends="server,robots"
-            description="Builds the war files for the robots/sitemap and Hyrax's OLFS.">
-    </target>
-
-
-    <target name="hyrax-robots-dist"
-            depends="hyrax-robots"
-            description="Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.">
-
-        <copy file="${distributionResources.dir}/WarFileReadMe"
-              tofile="${build.dist}/README"/>
-
-        <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
-             compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
-                <include name="opendap.war"/>
-                <include name="ROOT.war"/>
-                <include name="README"/>
-            </zipfileset>
-
-        </tar>
-        <delete file="${build.dist}/README"/>
-        <delete file="${build.dist}/opendap.war"/>
-        <delete file="${build.dist}/ROOT.war"/>
-    </target>
 
 </project>
 
