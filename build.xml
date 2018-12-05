@@ -891,17 +891,21 @@
 
     </target>
 
-
-    <target name="robots-dist"
+    <target name="hyrax-robots"
             depends="server,robots"
+            description="Builds the war files for the robots/sitemap and Hyrax's OLFS.">
+    </target>
+
+
+    <target name="hyrax-robots-dist"
+            depends="hyrax-robots"
             description="Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.">
 
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
 
         <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
-             compression="gzip"
-        >
+             compression="gzip">
             <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="ROOT.war"/>
@@ -909,11 +913,9 @@
             </zipfileset>
 
         </tar>
-
         <delete file="${build.dist}/README"/>
         <delete file="${build.dist}/opendap.war"/>
         <delete file="${build.dist}/ROOT.war"/>
-
     </target>
 
 </project>
