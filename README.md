@@ -1,8 +1,8 @@
 
 # Hyrax/OLFS
 
-Hyrax Version 1.15.0  (26 September 2018)
-OLFS  Version 1.18.0  (26 September 2018)
+Hyrax Version 1.15.2  (26 September 2018)
+OLFS  Version 1.18.1  (26 September 2018)
 
 [![DOI](https://www.zenodo.org/badge/26560831.svg)](https://www.zenodo.org/badge/latestdoi/26560831)
 

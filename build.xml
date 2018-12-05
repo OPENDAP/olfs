@@ -904,9 +904,9 @@
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
+        <tar destfile="${build.dist}/hyrax-robots-${WEBAPP_DIST}.tgz"
              compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
+            <zipfileset dir="${build.dist}" prefix="hyrax-robots-${WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="ROOT.war"/>
                 <include name="README"/>
