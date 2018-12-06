@@ -50,15 +50,8 @@
          tag information from CVS.
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
-    <property name="OLFS_VERSION"  value="Not.A.Release"/>
-
-    <property name="HYRAX_DOI"     value="NOT_A_DOI"/>
-    <property name="OLFS_DOI"      value="NOT_A_DOI"/>
-    <property name="LIBDAP_DOI"    value="NOT_A_DOI"/>
-    <property name="BES_DOI"       value="NOT_A_DOI"/>
-
+    <property name="OLFS_VERSION" value="Not.A.Release"/>
     <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
-
     <property name="WEBAPP_DIST" value="olfs-${OLFS_VERSION}-webapp"/>
     <property name="SRC_DIST" value="olfs-${OLFS_VERSION}-src"/>
     <property name="DOC_DIST" value="olfs-${OLFS_VERSION}-doc"/>
@@ -329,9 +322,8 @@
 
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
-        <filter token="WcsSoftwareVersion" value="${WCS_VERSION}"/>
-
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -373,15 +365,9 @@
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="OLFS_VERSION:  ${OLFS_VERSION}"/>
-        <echo level="info" message="WCS_VERSION:   ${WCS_VERSION}"/>
-
-        <echo level="info" message="HYRAX_DOI:     ${HYRAX_DOI}"/>
-        <echo level="info" message="OLFS_DOI:      ${OLFS_DOI}"/>
-        <echo level="info" message="BES_DOI:       ${BES_DOI}"/>
-        <echo level="info" message="LIBDAP_DOI:    ${LIBDAP_DOI}"/>
-
+        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
+        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
         <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
 
         <echo level="info" message=""/>
