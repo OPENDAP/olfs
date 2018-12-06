@@ -567,7 +567,7 @@
             depends="server"
             description="Packages the war file into tar file with a release related name.">
 
-        <copy file="${distributionResources.dir}/WarFileReadMe"
+        <copy file="README.md"
               tofile="${build.dist}/README"/>
 
         <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
@@ -901,7 +901,7 @@
             depends="hyrax-robots"
             description="Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.">
 
-        <copy file="${distributionResources.dir}/WarFileReadMe"
+        <copy file="README.md"
               tofile="${build.dist}/README"/>
 
         <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
