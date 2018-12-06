@@ -303,7 +303,7 @@
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
+        <filter token="WcsSoftwareVersion" value="${WCS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
