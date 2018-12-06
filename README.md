@@ -1,11 +1,15 @@
 
 # Hyrax/OLFS
 
-Hyrax Version 1.15.2  (10 December 2018)
-OLFS  Version 1.18.2  (10 December 2018)
-
+Hyrax Version 1.15.2  (10 December 2018)    
+OLFS  Version 1.18.2  (10 December 2018)    
 [![DOI](https://www.zenodo.org/badge/26560831.svg)](https://www.zenodo.org/badge/latestdoi/26560831)
 
+Which depends on:    
+BES Version 1.99.93 (10 December 2018)    
+[![DOI](https://www.zenodo.org/badge/26560831.svg)](https://www.zenodo.org/badge/latestdoi/26560831)  
+ 
+   
 The file install.html or docs/index.html may have additional information...
 
 ### First:
