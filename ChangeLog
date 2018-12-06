@@ -1,3 +1,15 @@
+2018-12-06  Nathan Potter  <ndp@opendap.org>
+
+	Switched war file read me to a copy of README.md Deleted old warFileReadme file.
+
+	Added bes DOI to olfs README
+
+	olfs: Changing WCS version key to match opther version keys. Was WCS_SOFTWARE_VERSION now it's WcsSoftwareVersion
+
+	Revert "olfs: Adding DOI injection to production rules."
+	This reverts commit 639b5ccb3a381866568227e6faa0a2c444dc63b4.
+
+	olfs: Adding DOI injection to production rules.
 2018-12-05  Nathan Potter  <ndp@opendap.org>
 
 	Merge pull request #47 from OPENDAP/robots
