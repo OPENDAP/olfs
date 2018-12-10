@@ -241,8 +241,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
         JDOMSource besNode = new JDOMSource(showNodeDoc);
-
-        String publisherJsonLD = getCatalogPublisherAsJsonLD(collectionName);
+        AdminInfo adminInfo = new AdminInfo(_besApi,collectionName);
+        String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
@@ -264,94 +264,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         // transformer.transform(besCatalog, System.out);
 
     }
-
-
-    /**
-     * <pre>
-     *     "publisher": {
-     *         "@type": "Organization",
-     *         "name": "@PublisherName@",
-     *         "address": {
-     *             "@type": "PostalAddress",
-     *             "addressCountry": "@Country@",
-     *             "addressLocality": "@Street,City@",
-     *             "addressRegion": "@State@",
-     *             "postalCode": "@PostalCode@"
-     *         },
-     *         "telephone": "@PublisherPhoneNumber@",
-     *         "email": "@PublisherEmail@",
-     *         "sameAs": "@OrganizationLandingPageURL@"
-     *     }
-     * </pre>
-     * @return
-     */
-    private String getCatalogPublisherAsJsonLD(String collectionName) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
-        BES bes = _besApi.getBES(collectionName);
-        Element admin = _besApi.showBesKey(bes.getPrefix(), "BES.ServerAdministrator");
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(admin, System.out);
-        HashMap<String,String> adminInfo = _besApi.getBESConfigParameterMap(collectionName,BES_SERVER_ADMINISTRATOR_KEY);
-
-        String name = adminInfo.get("organization");
-        if(name==null)
-            name = "";
-
-        String addressCountry = adminInfo.get("country");
-        if(addressCountry==null)
-            addressCountry = "";
-
-        String city = adminInfo.get("city");
-        if(city==null)
-            city = "";
-
-        String street = adminInfo.get("street");
-        if(street==null)
-            street = "";
-
-        String addressLocality = street + ", " +city;
-
-        String addressRegion = adminInfo.get("region");
-        if(addressRegion==null)
-            addressRegion = "";
-
-        String postalCode = adminInfo.get("postalcode");
-        if(postalCode==null)
-            postalCode = "";
-
-
-        String telephone = adminInfo.get("telephone");
-        if(telephone==null)
-            telephone = "";
-
-        String email = adminInfo.get("email");
-        if(email==null)
-            email = "";
-
-        String website = adminInfo.get("website");
-        if(website==null)
-            website = "";
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("\"publisher\": {\n");
-        sb.append("    \"@type\": \"Organization\",\n");
-        sb.append("    \"name\": \"").append(name).append("\",\n");
-        sb.append("    \"address\": {\n");
-        sb.append("        \"@type\": \"PostalAddress\",\n");
-        sb.append("        \"addressCountry\": \"").append(addressCountry).append("\",\n");
-        sb.append("        \"addressLocality\": \"").append(addressLocality).append("\",\n");
-        sb.append("        \"addressRegion\": \"").append(addressRegion).append("\",\n");
-        sb.append("        \"postalCode\": \"").append(postalCode).append("\"\n");
-        sb.append("      },\n");
-        sb.append("    \"telephone\": \"").append(telephone).append("\",\n");
-        sb.append("    \"email\": \"").append(email).append("\",\n");
-        sb.append("    \"sameAs\": \"").append(website).append("\"\n");
-        sb.append("}\n");
-
-        return sb.toString();
-    }
-
-
 
 
     private String getCollectionName(Request oreq){
