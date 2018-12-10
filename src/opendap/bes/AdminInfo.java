@@ -38,24 +38,23 @@ import java.util.HashMap;
 import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 /**
+ * A class to wrap the BES.ServerAdministrator object. In the BES the object is defined like this:
  * <pre>
- *     "publisher": {
- *         "@type": "Organization",
- *         "name": "@PublisherName@",
- *         "address": {
- *             "@type": "PostalAddress",
- *             "addressCountry": "@Country@",
- *             "addressLocality": "@Street,City@",
- *             "addressRegion": "@State@",
- *             "postalCode": "@PostalCode@"
- *         },
- *         "telephone": "@PublisherPhoneNumber@",
- *         "email": "@PublisherEmail@",
- *         "sameAs": "@OrganizationLandingPageURL@"
- *     }
+ *      BES.ServerAdministrator=email:support@opendap.org
+ *      BES.ServerAdministrator+=organization:OPeNDAP Inc.
+ *      BES.ServerAdministrator+=street:165 NW Dean Knauss Dr.
+ *      BES.ServerAdministrator+=city:Narragansett
+ *      BES.ServerAdministrator+=region:RI
+ *      BES.ServerAdministrator+=postalCode:02882
+ *      BES.ServerAdministrator+=country:US
+ *      BES.ServerAdministrator+=telephone:+1.401.575.4835
+ *      BES.ServerAdministrator+=website:http://www.opendap.org
  * </pre>
- * @return
- **/
+ * Where each rValue is a key:value pair wher the key is al of the characters before the first colon ":" and the
+ * value is all of the characters after the colon ":".
+ * If one or more of these fields is missing or un-parsable then the default AdminInfo (see above) will be utilized.
+ *
+ */
 public class AdminInfo {
 
     private String _organization;
@@ -67,18 +66,6 @@ public class AdminInfo {
     private String _telephone;
     private String _email;
     private String _website;
-
-    /**
-     BES.ServerAdministrator=email:support@opendap.org
-     BES.ServerAdministrator+=organization:OPeNDAP Inc.
-     BES.ServerAdministrator+=street:165 NW Dean Knauss Dr.
-     BES.ServerAdministrator+=city:Narragansett
-     BES.ServerAdministrator+=region:RI
-     BES.ServerAdministrator+=postalCode:02882
-     BES.ServerAdministrator+=country:US
-     BES.ServerAdministrator+=telephone:+1.401.575.4835
-     BES.ServerAdministrator+=website:http://www.opendap.org
-     **/
 
     public static final String EMAIL_KEY = "email";
     public static final String EMAIL_DEFAULT = "support@opendap.org";
@@ -163,9 +150,25 @@ public class AdminInfo {
     }
 
     /**
+     *  <pre>
+     *      "publisher": {
+     *          "@type": "Organization",
+     *          "name": "@PublisherName@",
+     *          "address": {
+     *              "@type": "PostalAddress",
+     *              "addressCountry": "@Country@",
+     *              "addressLocality": "@Street,City@",
+     *              "addressRegion": "@State@",
+     *              "postalCode": "@PostalCode@"
+     *          },
+     *          "telephone": "@PublisherPhoneNumber@",
+     *          "email": "@PublisherEmail@",
+     *          "sameAs": "@OrganizationLandingPageURL@"
+     *      }
+     *  </pre>
      *
-     * @return
-     */
+     * @return THe JSON-LD Publisher representation of the AdminInfo object.
+     **/
     public String getAsJsonLdPublisher() {
         String addressLocality = _street + ", " + _city;
         StringBuilder sb = new StringBuilder();
