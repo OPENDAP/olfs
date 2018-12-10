@@ -3,10 +3,6 @@
 
 
 
-
-
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
@@ -59,8 +55,7 @@
             </p>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at:
-                <a href="mailto:support@opendap.org">support@opendap.org
-                </a>
+                <a href="mailto:support@opendap.org?subject=Hyrax Error 400&amp;body=url: http://localhost:8080/opendap/error/error400.jsp?DODS_URL&amp;date_time%28%221998%2F160%3A17%3A45%3A00%22%2C%0Astatus: 400%0Amessage: libdap error transmitting DDX: Expected to find a matching closing parenthesis in DODS_URL&amp;amp;date_time(&amp;#34;1998/160:17:45:00&amp;#34;,%0A-- --%0A">support@opendap.org</a>
             </p>
         </td>
     </tr>

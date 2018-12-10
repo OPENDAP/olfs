@@ -3,10 +3,6 @@
 
 
 
-
-
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
@@ -59,8 +55,7 @@
             </p>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at:
-                <a href="mailto:support@opendap.org">support@opendap.org
-                </a>
+                <a href="mailto:support@opendap.org?subject=Hyrax Error 400&amp;body=url: http://localhost:8080/opendap/error/error400.jsp?dap4.ce=u,v%0Astatus: 400%0Amessage: libdap error transmitting DMR: u,v:1.2: syntax error, unexpected &amp;#34;,&amp;#34;, expecting end of file%0A-- --%0A">support@opendap.org</a>
             </p>
         </td>
     </tr>
