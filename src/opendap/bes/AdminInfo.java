@@ -134,6 +134,7 @@ public class AdminInfo {
         String email = adminInfo.get(EMAIL_KEY);
         String website = adminInfo.get(WEBSITE_KEY);
 
+        // %TODO This is a pretty simple (and brutal) qc in that any missing value prompts all of it to be rejected. Review. Fix?
         if(organization==null || country==null || city==null || street==null || region==null
                 || postalCode==null || telephone==null || email==null || website==null){
             return; // Use the default values.
