@@ -57,10 +57,13 @@ public class BESSiteMap {
      */
     private long getSiteMapFromBes() throws BadConfigurationException, PPTException, IOException, BESError {
 
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BesApi besApi = new BesApi();
 
         besApi.writeCombinedSiteMapResponse(_dapServicePrefix,baos);
+
+        _log.debug("getSiteMapFromBes() - BES returned {} bytes in the getSitemap response", baos.size());
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         BufferedReader bfr = new  BufferedReader (new InputStreamReader(bais,HyraxStringEncoding.getCharset()));
@@ -85,10 +88,8 @@ public class BESSiteMap {
             }
             line = bfr.readLine();
         }
-        Logger log = LoggerFactory.getLogger(BESSiteMap.class);
-        log.debug("i: {}", i);
-        log.debug("siteMap has {} entries, {} bytes.", _siteMap.size(),char_count);
-
+        _log.debug("getSiteMapFromBes() - Processed {} lines.", i);
+        _log.debug("getSiteMapFromBes() - siteMap has {} entries, {} characters.", _siteMap.size(),char_count);
 
         return char_count;
     }
