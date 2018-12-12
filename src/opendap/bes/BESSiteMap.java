@@ -63,7 +63,7 @@ public class BESSiteMap {
 
         besApi.writeCombinedSiteMapResponse(_dapServicePrefix,baos);
 
-        _log.debug("getSiteMapFromBes() - BES returned {} bytes in the getSitemap response", baos.size());
+        _log.debug("getSiteMapFromBes() - BES returned {} bytes in the getSiteMap response", baos.size());
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         BufferedReader bfr = new  BufferedReader (new InputStreamReader(bais,HyraxStringEncoding.getCharset()));
