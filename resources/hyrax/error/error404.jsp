@@ -39,8 +39,8 @@
     try {
         adminEmail = besApi.getAdministrator(localUrl);
     } catch (Exception e) { }
-
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
+    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,404,message,adminEmail);
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -76,7 +76,8 @@
             <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
             <% } %>
             <p align="left">If you think that the server is broken (that the URL you submitted should have worked),
-                then please contact the OPeNDAP user support coordinator at: <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a>
+                then please contact the OPeNDAP user support coordinator at:
+                <a href="<%=mailtoHrefAttributeValue%>"><%= adminEmail %></a>
             </p>
 
         </td>

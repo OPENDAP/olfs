@@ -29,10 +29,7 @@ package opendap.coreServlet;
 
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
-import opendap.http.mediaTypes.Dap4Error;
 import opendap.io.HyraxStringEncoding;
-import opendap.namespaces.DAP4;
-import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.owasp.encoder.Encode;
@@ -41,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -602,5 +600,23 @@ public class OPeNDAPException extends Exception {
     }
 
 
+    public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
+        String requestUrl = request.getRequestURL().toString();
+        String queryString = request.getQueryString();
+
+        StringBuilder mailtoHrefAttributeValue = new StringBuilder();
+        mailtoHrefAttributeValue.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
+        mailtoHrefAttributeValue.append("&body=");
+
+        mailtoHrefAttributeValue.append("url: ").append(requestUrl);
+        if(queryString!=null && !queryString.isEmpty())
+            mailtoHrefAttributeValue.append("?").append(queryString);
+        mailtoHrefAttributeValue.append("%0A");
+
+        mailtoHrefAttributeValue.append("status: ").append(http_status).append("%0A");
+        mailtoHrefAttributeValue.append("message: ").append(errorMessage).append("%0A");
+        mailtoHrefAttributeValue.append("-- --%0A");
+        return Encode.forHtmlAttribute(mailtoHrefAttributeValue.toString());
+    }
 
 }

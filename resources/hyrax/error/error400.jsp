@@ -1,9 +1,5 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
-<%@ page import="opendap.bes.BadConfigurationException" %>
-<%@ page import="org.jdom.JDOMException" %>
-<%@ page import="opendap.ppt.PPTException" %>
-<%@ page import="opendap.bes.BESError" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
@@ -46,6 +42,7 @@
     } catch (Exception e) { }
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
+    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,400,message,adminEmail);
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -96,8 +93,7 @@
             </p>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at:
-                <a href="mailto:<%= adminEmail %>"><%= adminEmail %>
-                </a>
+                <a href="<%=mailtoHrefAttributeValue%>"><%= adminEmail %></a>
             </p>
         </td>
     </tr>

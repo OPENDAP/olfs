@@ -42,6 +42,7 @@
     } catch (Exception e) { }
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
+    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,500,message,adminEmail);
 
 %>
 <head>
@@ -84,7 +85,7 @@
 
             <p align="left">If you think that the server is broken (that the URL you submitted should have
                 worked), then please contact the OPeNDAP user support coordinator at:
-                <a href="mailto:<%= adminEmail %>"><%= adminEmail %></a>
+                <a href="<%= mailtoHrefAttributeValue %>"><%= adminEmail %></a>
             </p>
         </td>
     </tr>
