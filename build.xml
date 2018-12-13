@@ -866,11 +866,15 @@
 
             <classes dir="${build.classes}"/>
 
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
+                <include name="WEB-INF/conf/olfs.xml"/>
+            </zipfileset>
 
             <zipfileset dir="${build.robots.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
+
 
 
             <zipfileset dir="${doc.dir}" prefix="docs">

@@ -194,6 +194,10 @@ public class BesApi implements Cloneable {
         return BESManager.getCombinedVersionDocument();
     }
 
+    public AdminInfo getAdminInfo(String path) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
+        return new AdminInfo(this,  path);
+    }
+
     public String getAdministrator(String path) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
 
         String adminEmail = "support@opendap.org";
