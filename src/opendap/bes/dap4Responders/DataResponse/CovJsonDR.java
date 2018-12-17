@@ -36,6 +36,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.CovJson;
 import opendap.http.mediaTypes.Json;
 import org.slf4j.Logger;
 
@@ -69,7 +70,7 @@ public class CovJsonDR extends Dap4Responder {
         setServiceDescription("CovJsonDR representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
-        setNormativeMediaType(new Json(getRequestSuffix()));
+        setNormativeMediaType(new CovJson(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

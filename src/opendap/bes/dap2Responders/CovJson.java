@@ -62,7 +62,7 @@ public class CovJson extends Dap4Responder {
         setServiceDescription("CovJson representation of the DAP2 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP2:_CovJson_Data_Service");
 
-        setNormativeMediaType(new opendap.http.mediaTypes.Json(getRequestSuffix()));
+        setNormativeMediaType(new opendap.http.mediaTypes.CovJson(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
