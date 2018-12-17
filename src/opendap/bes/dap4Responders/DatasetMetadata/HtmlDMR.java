@@ -140,7 +140,8 @@ public class HtmlDMR extends Dap4Responder {
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-            transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
+            // transformer.setParameter("serviceContext", request.getServletContext().getContextPath()); // This is ServletAPI-3.0
+            transformer.setParameter("serviceContext", request.getContextPath()); // This is ServletAPI-2.5 (Tomcat 6 stopped here)
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
