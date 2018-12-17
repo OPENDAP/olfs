@@ -32,7 +32,6 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import org.slf4j.Logger;
 

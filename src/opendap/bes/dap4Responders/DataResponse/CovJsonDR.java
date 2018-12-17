@@ -33,11 +33,9 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.CovJson;
-import opendap.http.mediaTypes.Json;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
