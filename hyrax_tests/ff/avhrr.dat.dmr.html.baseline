@@ -139,7 +139,7 @@
                                     <div class="small">
                                        <span class="bold">DODS_Interfaces:
                         </span>
-                                       <span class="em">datetimedate_time</span>
+                                       <span class="em">date, time, date_time</span>
                                     </div>
                                  </li>
                                  <li>
@@ -153,14 +153,14 @@
                                     <div class="small">
                                        <span class="bold">DODS_LatRange:
                         </span>
-                                       <span class="em">60.57509.4250</span>
+                                       <span class="em">60.5750, 9.4250</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">DODS_LonRange:
                         </span>
-                                       <span class="em">-96.2220-33.7780</span>
+                                       <span class="em">-96.2220, -33.7780</span>
                                     </div>
                                  </li>
                                  <li>

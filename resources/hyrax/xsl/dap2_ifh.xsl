@@ -603,9 +603,7 @@
                         <span class="bold"><xsl:value-of select="@name"/>:
                         </span>
                         <span class="em">
-                            <xsl:for-each select="dap:value">
-                                <xsl:value-of select="."/>
-                            </xsl:for-each>
+                            <xsl:for-each select="dap:value"><xsl:if test="(position( )) > 1">, </xsl:if><xsl:value-of select="."/></xsl:for-each>
                         </span>
                     </div>
                 </li>
