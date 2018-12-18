@@ -248,7 +248,7 @@
                                     <div class="small">
                                        <span class="bold">attr2:
                         </span>
-                                       <span class="em">1234</span>
+                                       <span class="em">1, 2, 3, 4</span>
                                     </div>
                                  </li>
                                  <ul class="collapsibleList">
@@ -267,7 +267,7 @@
                                                 <div class="small">
                                                    <span class="bold">attr3_2:
                         </span>
-                                                   <span class="em">192327</span>
+                                                   <span class="em">19, 23, 27</span>
                                                 </div>
                                              </li>
                                           </ul>
@@ -386,14 +386,14 @@
                                     <div class="small">
                                        <span class="bold">acf:
                         </span>
-                                       <span class="em">-2.000000001.000000000.00000000</span>
+                                       <span class="em">-2.00000000, 1.00000000, 0.00000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">acd:
                         </span>
-                                       <span class="em">-1.0000000000000000.7500000000000000</span>
+                                       <span class="em">-1.000000000000000, 0.7500000000000000</span>
                                     </div>
                                  </li>
                                  <li>

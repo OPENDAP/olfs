@@ -1246,7 +1246,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">06</span>
+                                       <span class="em">0, 6</span>
                                     </div>
                                  </li>
                               </ul>
