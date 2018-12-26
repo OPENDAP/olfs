@@ -603,39 +603,41 @@ public class OPeNDAPException extends Exception {
 
     public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
+        sb.append("&body=");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
+        sb.append("# %0A");
+        sb.append("# We're sorry you had a problem using the server.%0A");
+        sb.append("# Please use the space above to describe what you%0A");
+        sb.append("# were trying to do and we will try to assist you.%0A");
+        sb.append("# Thanks,%0A");
+        sb.append("# OPeNDAP Support.%0A");
+        sb.append("# %0A");
+        sb.append("# -- -- -- hyrax error info, please include -- -- --%0A");
+        sb.append("# %0A");
+        sb.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
+        sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
+        sb.append("# server: ").append(request.getServerName()).append("%0A");
+        sb.append("# port: ").append(request.getServerPort()).append("%0A");
+        sb.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+        sb.append("# query_string: ");
         String queryString = request.getQueryString();
-
-        StringBuilder mailtoHrefAttributeValue = new StringBuilder();
-        mailtoHrefAttributeValue.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
-        mailtoHrefAttributeValue.append("&body=");
-        mailtoHrefAttributeValue.append("%0A");
-        mailtoHrefAttributeValue.append("%0A");
-        mailtoHrefAttributeValue.append("%0A");
-        mailtoHrefAttributeValue.append("%0A");
-        mailtoHrefAttributeValue.append("%0A");
-        mailtoHrefAttributeValue.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
-        mailtoHrefAttributeValue.append("# We're sorry you had a problem using the server.%0A");
-        mailtoHrefAttributeValue.append("# Please use the space above to describe what you%0A");
-        mailtoHrefAttributeValue.append("# were trying to do and we will try to assist you.%0A");
-        mailtoHrefAttributeValue.append("# Thanks,%0A");
-        mailtoHrefAttributeValue.append("# OPeNDAP Support.%0A");
-        mailtoHrefAttributeValue.append("# %0A");
-        mailtoHrefAttributeValue.append("# -- -- hyrax error info -- --  please include -- --  %0A");
-        mailtoHrefAttributeValue.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
-        mailtoHrefAttributeValue.append("# protocol: ").append(request.getProtocol()).append("%0A");
-        mailtoHrefAttributeValue.append("# server: ").append(request.getServerName()).append("%0A");
-        mailtoHrefAttributeValue.append("# port: ").append(request.getServerPort()).append("%0A");
-        mailtoHrefAttributeValue.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
-        mailtoHrefAttributeValue.append("# query_string: ");
         if(queryString!=null && !queryString.isEmpty())
-            mailtoHrefAttributeValue.append(queryString).append("%0A");
+            sb.append(queryString).append("%0A");
         else
-            mailtoHrefAttributeValue.append("n/a");
+            sb.append("n/a");
 
-        mailtoHrefAttributeValue.append("# status: ").append(http_status).append("%0A");
-        mailtoHrefAttributeValue.append("# message: ").append(errorMessage).append("%0A");
-        mailtoHrefAttributeValue.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
-        return Encode.forHtmlAttribute(mailtoHrefAttributeValue.toString());
+        sb.append("# status: ").append(http_status).append("%0A");
+        sb.append("# message: ").append(errorMessage).append("%0A");
+        sb.append("# %0A");
+        sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
+        return Encode.forHtmlAttribute(sb.toString());
     }
 
 }
