@@ -27,6 +27,7 @@
 package opendap.coreServlet;
 
 
+import opendap.PathBuilder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
@@ -601,21 +602,39 @@ public class OPeNDAPException extends Exception {
 
 
     public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
-        String requestUrl = request.getRequestURL().toString();
+
         String queryString = request.getQueryString();
 
         StringBuilder mailtoHrefAttributeValue = new StringBuilder();
         mailtoHrefAttributeValue.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
         mailtoHrefAttributeValue.append("&body=");
-
-        mailtoHrefAttributeValue.append("url: ").append(requestUrl);
-        if(queryString!=null && !queryString.isEmpty())
-            mailtoHrefAttributeValue.append("?").append(queryString);
         mailtoHrefAttributeValue.append("%0A");
+        mailtoHrefAttributeValue.append("%0A");
+        mailtoHrefAttributeValue.append("%0A");
+        mailtoHrefAttributeValue.append("%0A");
+        mailtoHrefAttributeValue.append("%0A");
+        mailtoHrefAttributeValue.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
+        mailtoHrefAttributeValue.append("# We're sorry you had a problem using the server.%0A");
+        mailtoHrefAttributeValue.append("# Please use the space above to describe what you%0A");
+        mailtoHrefAttributeValue.append("# were trying to do and we will try to assist you.%0A");
+        mailtoHrefAttributeValue.append("# Thanks,%0A");
+        mailtoHrefAttributeValue.append("# OPeNDAP Support.%0A");
+        mailtoHrefAttributeValue.append("# %0A");
+        mailtoHrefAttributeValue.append("# -- -- hyrax error info -- --  please include -- --  %0A");
+        mailtoHrefAttributeValue.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
+        mailtoHrefAttributeValue.append("# protocol: ").append(request.getProtocol()).append("%0A");
+        mailtoHrefAttributeValue.append("# server: ").append(request.getServerName()).append("%0A");
+        mailtoHrefAttributeValue.append("# port: ").append(request.getServerPort()).append("%0A");
+        mailtoHrefAttributeValue.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+        mailtoHrefAttributeValue.append("# query_string: ");
+        if(queryString!=null && !queryString.isEmpty())
+            mailtoHrefAttributeValue.append(queryString).append("%0A");
+        else
+            mailtoHrefAttributeValue.append("n/a");
 
-        mailtoHrefAttributeValue.append("status: ").append(http_status).append("%0A");
-        mailtoHrefAttributeValue.append("message: ").append(errorMessage).append("%0A");
-        mailtoHrefAttributeValue.append("-- --%0A");
+        mailtoHrefAttributeValue.append("# status: ").append(http_status).append("%0A");
+        mailtoHrefAttributeValue.append("# message: ").append(errorMessage).append("%0A");
+        mailtoHrefAttributeValue.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
         return Encode.forHtmlAttribute(mailtoHrefAttributeValue.toString());
     }
 
