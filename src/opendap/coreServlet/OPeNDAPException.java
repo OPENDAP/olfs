@@ -468,25 +468,19 @@ public class OPeNDAPException extends Exception {
      */
     public void sendAsDap4Error(HttpServletResponse response) throws IOException{
 
-
         opendap.dap4.Dap4Error d4e = new opendap.dap4.Dap4Error();
         d4e.setHttpStatusCode(getHttpStatusCode());
         d4e.setMessage(getMessage());
-
 
         response.setContentType(d4e.getMediaType().getMimeType());
         response.setHeader("Content-Description", "DAP4 Error Object");
         response.setStatus(getHttpStatusCode());
 
         ServletOutputStream sos  = response.getOutputStream();
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         xmlo.output(d4e.getErrorDocument(),sos);
 
         sos.flush();
-
-
-
     }
 
 
@@ -501,9 +495,7 @@ public class OPeNDAPException extends Exception {
         response.setContentType(csvMediaType.getMimeType());
         response.setHeader("Content-Description", "Error Object");
         response.setStatus(getHttpStatusCode());
-
         ServletOutputStream sos = response.getOutputStream();
-
         sos.println("Dataset: ERROR");
         sos.println("status, " + getHttpStatusCode());
         sos.println("message, \""+getMessage()+"\"");
@@ -534,12 +526,10 @@ public class OPeNDAPException extends Exception {
         ServletOutputStream sos  = response.getOutputStream();
 
         sos.println("{");
-
         sos.println("  \"name\":  =  \"ERROR\",");
         sos.println("  \"type\":  =  \"node\",");
         sos.println("  \"attributes\":  =  \"[]\",");
         sos.println("  \"leaves\":  =  [\"");
-
         sos.println("    {");
         sos.println("      \"name\":  =  \"Message\",");
         sos.println("      \"type\":  =  \"String\",");
@@ -548,7 +538,6 @@ public class OPeNDAPException extends Exception {
         sos.print(getMessage());
         sos.println("\"");
         sos.println("    },");
-
         sos.println("      \"name\":  =  \"HttpStatus\",");
         sos.println("      \"type\":  =  \"Int32\",");
         sos.println("      \"attributes\":  =  \"[]\",");
@@ -556,11 +545,7 @@ public class OPeNDAPException extends Exception {
         sos.print(getHttpStatusCode());
         sos.println("");
         sos.println("    }");
-
-
-
         sos.println("}");
-
         sos.flush();
     }
 
