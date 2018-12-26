@@ -626,6 +626,7 @@ public class OPeNDAPException extends Exception {
         sb.append("# server: ").append(request.getServerName()).append("%0A");
         sb.append("# port: ").append(request.getServerPort()).append("%0A");
         sb.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+
         sb.append("# query_string: ");
         String queryString = request.getQueryString();
         if(queryString!=null && !queryString.isEmpty())
