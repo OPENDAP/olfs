@@ -27,6 +27,7 @@
 package opendap.coreServlet;
 
 
+import opendap.PathBuilder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
@@ -467,25 +468,19 @@ public class OPeNDAPException extends Exception {
      */
     public void sendAsDap4Error(HttpServletResponse response) throws IOException{
 
-
         opendap.dap4.Dap4Error d4e = new opendap.dap4.Dap4Error();
         d4e.setHttpStatusCode(getHttpStatusCode());
         d4e.setMessage(getMessage());
-
 
         response.setContentType(d4e.getMediaType().getMimeType());
         response.setHeader("Content-Description", "DAP4 Error Object");
         response.setStatus(getHttpStatusCode());
 
         ServletOutputStream sos  = response.getOutputStream();
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         xmlo.output(d4e.getErrorDocument(),sos);
 
         sos.flush();
-
-
-
     }
 
 
@@ -500,9 +495,7 @@ public class OPeNDAPException extends Exception {
         response.setContentType(csvMediaType.getMimeType());
         response.setHeader("Content-Description", "Error Object");
         response.setStatus(getHttpStatusCode());
-
         ServletOutputStream sos = response.getOutputStream();
-
         sos.println("Dataset: ERROR");
         sos.println("status, " + getHttpStatusCode());
         sos.println("message, \""+getMessage()+"\"");
@@ -533,12 +526,10 @@ public class OPeNDAPException extends Exception {
         ServletOutputStream sos  = response.getOutputStream();
 
         sos.println("{");
-
         sos.println("  \"name\":  =  \"ERROR\",");
         sos.println("  \"type\":  =  \"node\",");
         sos.println("  \"attributes\":  =  \"[]\",");
         sos.println("  \"leaves\":  =  [\"");
-
         sos.println("    {");
         sos.println("      \"name\":  =  \"Message\",");
         sos.println("      \"type\":  =  \"String\",");
@@ -547,7 +538,6 @@ public class OPeNDAPException extends Exception {
         sos.print(getMessage());
         sos.println("\"");
         sos.println("    },");
-
         sos.println("      \"name\":  =  \"HttpStatus\",");
         sos.println("      \"type\":  =  \"Int32\",");
         sos.println("      \"attributes\":  =  \"[]\",");
@@ -555,11 +545,7 @@ public class OPeNDAPException extends Exception {
         sos.print(getHttpStatusCode());
         sos.println("");
         sos.println("    }");
-
-
-
         sos.println("}");
-
         sos.flush();
     }
 
@@ -601,22 +587,43 @@ public class OPeNDAPException extends Exception {
 
 
     public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
-        String requestUrl = request.getRequestURL().toString();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
+        sb.append("&body=");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("%0A");
+        sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
+        sb.append("# %0A");
+        sb.append("# We're sorry you had a problem using the server.%0A");
+        sb.append("# Please use the space above to describe what you%0A");
+        sb.append("# were trying to do and we will try to assist you.%0A");
+        sb.append("# Thanks,%0A");
+        sb.append("# OPeNDAP Support.%0A");
+        sb.append("# %0A");
+        sb.append("# -- -- -- hyrax error info, please include -- -- --%0A");
+        sb.append("# %0A");
+        sb.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
+        sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
+        sb.append("# server: ").append(request.getServerName()).append("%0A");
+        sb.append("# port: ").append(request.getServerPort()).append("%0A");
+        sb.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+
+        sb.append("# query_string: ");
         String queryString = request.getQueryString();
-
-        StringBuilder mailtoHrefAttributeValue = new StringBuilder();
-        mailtoHrefAttributeValue.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
-        mailtoHrefAttributeValue.append("&body=");
-
-        mailtoHrefAttributeValue.append("url: ").append(requestUrl);
         if(queryString!=null && !queryString.isEmpty())
-            mailtoHrefAttributeValue.append("?").append(queryString);
-        mailtoHrefAttributeValue.append("%0A");
+            sb.append(queryString).append("%0A");
+        else
+            sb.append("n/a");
 
-        mailtoHrefAttributeValue.append("status: ").append(http_status).append("%0A");
-        mailtoHrefAttributeValue.append("message: ").append(errorMessage).append("%0A");
-        mailtoHrefAttributeValue.append("-- --%0A");
-        return Encode.forHtmlAttribute(mailtoHrefAttributeValue.toString());
+        sb.append("# status: ").append(http_status).append("%0A");
+        sb.append("# message: ").append(errorMessage).append("%0A");
+        sb.append("# %0A");
+        sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
+        return Encode.forHtmlAttribute(sb.toString());
     }
 
 }
