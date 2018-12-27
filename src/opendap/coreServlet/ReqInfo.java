@@ -117,7 +117,7 @@ public class ReqInfo {
         return maxPostBodyLength.get();
     }
 
-    private static ConcurrentHashMap<String,String> serviceContexts;
+    private static ConcurrentHashMap<String,String> serviceContexts = new ConcurrentHashMap<>();
 
 
     public static boolean addService(String serviceName, String serviceLocalID){

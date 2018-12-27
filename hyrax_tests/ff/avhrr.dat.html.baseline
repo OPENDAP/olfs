@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "Hyrax Data Server" project.
@@ -75,7 +75,7 @@
                      <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
                      <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
                      <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
                      <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
@@ -146,7 +146,7 @@
                                     <div class="small">
                                        <span class="bold">DODS_Interfaces:
                         </span>
-                                       <span class="em">datetimedate_time</span>
+                                       <span class="em">date, time, date_time</span>
                                     </div>
                                  </li>
                                  <li>
@@ -160,14 +160,14 @@
                                     <div class="small">
                                        <span class="bold">DODS_LatRange:
                         </span>
-                                       <span class="em">60.57509.4250</span>
+                                       <span class="em">60.5750, 9.4250</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">DODS_LonRange:
                         </span>
-                                       <span class="em">-96.2220-33.7780</span>
+                                       <span class="em">-96.2220, -33.7780</span>
                                     </div>
                                  </li>
                                  <li>

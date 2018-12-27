@@ -588,7 +588,7 @@ public class SiteMapToCatalog {
         CommandLineParser parser = new PosixParser();
         options = new Options();
         options.addOption("b", "hyraxServiceBase", true, "The hyrax service base. [default: '/opendap/hyrax/']");
-        options.addOption("o", "outputDirName", true, "The to which to write the catalog. [default: '/tmp/hic_ingest']");
+        options.addOption("o", "outputDirName", true, "The dir to which to write the catalog. [default: '/tmp/hic_ingest']");
         options.addOption("s", "siteMapFileName", true, "Name of the file into which to write the site map. [default: 'siteMap.txt']");
         options.addOption("h", "help", false, "Usage information.");
         options.addOption("v", "verbose", false, "Verbose mode [Always On].");

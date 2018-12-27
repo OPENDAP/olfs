@@ -1,3 +1,87 @@
+2018-12-06  Nathan Potter  <ndp@opendap.org>
+
+	Switched war file read me to a copy of README.md Deleted old warFileReadme file.
+
+	Added bes DOI to olfs README
+
+	olfs: Changing WCS version key to match opther version keys. Was WCS_SOFTWARE_VERSION now it's WcsSoftwareVersion
+
+	Revert "olfs: Adding DOI injection to production rules."
+	This reverts commit 639b5ccb3a381866568227e6faa0a2c444dc63b4.
+
+	olfs: Adding DOI injection to production rules.
+2018-12-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #47 from OPENDAP/robots
+	Robots
+
+	Simplified build target for robots and hyrax war files
+
+	added index.html to robots service. dropped robots.txt for robots.jsp which gets moved to robots.txt by the ant production rules.
+
+2018-12-04  Nathan Potter  <ndp@opendap.org>
+
+	Creation time added as an attribute of BESSiteMap. Production rules 'robots' and 'robots-dist' added to build.xml
+
+2018-12-03  Nathan Potter  <ndp@opendap.org>
+
+	updated robots.txt
+
+	olfs: Dropping back to JSP for JAva-6.
+
+	olfs: robots.txt service and site maps are working.
+
+	Another pass at robots.txt
+
+	Starting robots service
+
+2018-11-28  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #46 from OPENDAP/sitemap
+	Sitemap
+
+	Merged master to sitemap branch
+
+	Merge pull request #45 from OPENDAP/json-ld-admin
+	Json ld admin
+
+	Fixed regression tests to accomodate DAS responses with empty variable containers
+
+	olfs: Docs and refinements.
+
+	Rigged it so that multiple BES's get polled into the sitemap
+
+	Rigged it so that multiple BES's get polled into the sitemap
+
+	olfs: Docs and refinements.
+
+	Added on demand sitemap generation
+
+2018-11-21  Nathan Potter  <ndp@opendap.org>
+
+	Updated affected test baselines
+
+	olfs: Added code to retrieve a Map object stored in a multi=valued BES key. USed this to retrieve Server administrator information and inject that into the JSON-LD output.
+
+2018-10-23  Nathan Potter  <ndp@opendap.org>
+
+	Added bit to ensure that getBesNode() always submits a suitable (leading slashed) path
+
+2018-10-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: And dropped back to using XML as the output type to keep compatibility with newer Saxon transformers.
+
+2018-10-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated HTML version produced by the IFH XSL code to 4.01 from 1.0
+
+2018-10-12  Nathan Potter  <ndp@opendap.org>
+
+	Fixed poorly formed request URL for fileout netcdf4 on the dap2ifh.
+
+2018-10-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Deprecated old HTML form responder..
 
 2018-09-26  Nathan Potter  <ndp@opendap.org>
 

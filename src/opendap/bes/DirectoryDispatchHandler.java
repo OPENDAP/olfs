@@ -26,24 +26,32 @@
 
 package opendap.bes;
 
-import opendap.PathBuilder;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.auth.AuthenticationControls;
+import opendap.ppt.PPTException;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 
 /**
@@ -214,11 +222,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                                HttpServletResponse response)
             throws Exception {
 
-
         log.info("xsltDir() BEGIN request = " + request);
-
-        // String context = request.getContextPath();
-
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dap_directory");
@@ -229,8 +233,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String collectionName  = getCollectionName(oreq);
         String collectionURL = PathBuilder.pathConcat(ReqInfo.getServiceUrl(request),collectionName);
 
-
-
         Document showNodeDoc = new Document();
         _besApi.getBesNode(collectionName, showNodeDoc);
 
@@ -239,6 +241,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
         JDOMSource besNode = new JDOMSource(showNodeDoc);
+        AdminInfo adminInfo = new AdminInfo(_besApi,collectionName);
+        String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
@@ -249,9 +253,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
         transformer.setParameter("collectionURL",collectionURL);
+        transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
-
 
         AuthenticationControls.setLoginParameters(transformer,request);
 
@@ -259,15 +263,12 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.transform(besNode, response.getOutputStream());
         // transformer.transform(besCatalog, System.out);
 
-
-
-
     }
+
 
     private String getCollectionName(Request oreq){
 
         String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
-
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
         }
@@ -275,11 +276,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
-
-       PathBuilder.normalizePath(collectionName, true, false);
-
-
-            while(!collectionName.equals("/") && collectionName.startsWith("/"))
+        PathBuilder.normalizePath(collectionName, true, false);
+        while(!collectionName.equals("/") && collectionName.startsWith("/"))
             collectionName = collectionName.substring(1);
 
         if(!collectionName.equals("/"))
@@ -288,10 +286,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
-        /*
-        while(!collectionName.equals("/") && collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1);
-*/
         log.debug("collectionName:  "+collectionName);
 
         return collectionName;

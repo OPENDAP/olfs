@@ -1,12 +1,15 @@
 
 # Hyrax/OLFS
 
-Hyrax Version 1.15.0  (26 September 2018)
-OLFS  Version 1.18.0  (26 September 2018)
+Hyrax Version 1.15.2  (10 December 2018)    
+OLFS  Version 1.18.2  (10 December 2018)    
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2008584.svg)](https://doi.org/10.5281/zenodo.2008584)
 
-[![DOI](https://www.zenodo.org/badge/26560831.svg)](https://www.zenodo.org/badge/latestdoi/26560831)
+Which depends on:    
+BES Version 3.20.2 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2008575.svg)](https://doi.org/10.5281/zenodo.2008575)
+libdap Version 3.20.2 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2002799.svg)](https://doi.org/10.5281/zenodo.2002799)
 
-The file install.html or docs/index.html may have additional information...
+The file install.html or docs/index.html may have additional information.
 
 ### First:
 

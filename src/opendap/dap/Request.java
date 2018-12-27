@@ -44,7 +44,7 @@ public class Request {
     private Logger log;
     private HttpServletRequest _request;
 
-    public Request(HttpServlet servlet, HttpServletRequest request){
+    public Request(HttpServlet servlet, HttpServletRequest request) {
         log = LoggerFactory.getLogger(this.getClass());
         _request = request;
     }
@@ -54,91 +54,88 @@ public class Request {
      * Local ID for the service is whatever is after the third slash
      * in the URL ie after the server name (or IP) and port number combination and up to the first
      * dataset collection term in the URL.
-     *
+     * <p>
      * For example in the URL http://localhost:8080/opendap/hyrax/data/fnoc1.nc this
      * method will return /opendap/hyrax/ because the
-     *
+     * <p>
      * Or think of it as "the server" + "the service" is the minimum
      * URL to get to the DAP service. Thus http://localhost:8080/opendap/hyrax/ is the full DAP
      * service URL. for the preceding example.
      *
-     *
-     *
-     *
      * @return
      */
-    public String getServiceLocalId(){
+    public String getServiceLocalId() {
 
         String contextName = _request.getContextPath();
         String servletName = _request.getServletPath();
 
         String dapService = contextName + servletName;
 
-        log.debug("getServiceLocalId(): "+dapService);
+        log.debug("getServiceLocalId(): " + dapService);
 
         return dapService;
 
     }
 
-    public String getContextPath(){
+    public String getContextPath() {
         return _request.getContextPath();
     }
 
 
-    public String getDocsServiceLocalID(){
+    public String getDocsServiceLocalID() {
 
         String contextName = _request.getContextPath();
 
         String docsService = contextName + "/docs";
 
-        log.debug("getDocsServiceLocalID(): "+docsService);
+        log.debug("getDocsServiceLocalID(): " + docsService);
 
         return docsService;
 
     }
 
 
-    public String getWebStartServiceLocalID(){
+    public String getWebStartServiceLocalID() {
 
         String contextName = _request.getContextPath();
 
         String webStartService = contextName + "/webstart";
 
-        log.debug("getWebStartServiceLocalID(): "+webStartService);
+        log.debug("getWebStartServiceLocalID(): " + webStartService);
 
         return webStartService;
 
     }
 
 
+    public String getWebApplicationUrl() {
+        String transport = _request.getScheme();
+        String serverName = _request.getServerName();
+        int serverPort = _request.getServerPort();
+        String contextName = _request.getContextPath();
 
+        // String webappUrl = transport + "://" + serverName + ":" + serverPort + contextName;
+
+        StringBuilder webappUrl = new StringBuilder();
+        webappUrl.append(transport).append("://").append(serverName);
+        if (transport.equalsIgnoreCase("http") && serverPort != 80)
+        {
+            webappUrl.append(":").append(serverPort);
+        }
+        else if (transport.equalsIgnoreCase("https") && (serverPort != 443 && serverPort != 80))
+        {
+            webappUrl.append(":").append(serverPort);
+        }
+        webappUrl.append(contextName);
+
+        log.debug("getWebApplicationUrl(): " + webappUrl.toString());
+        return webappUrl.toString();
+    }
 
     public String getServiceUrl()  {
-
-        String transport  = _request.getScheme();
-        String serverName = _request.getServerName();
-        int    serverPort = _request.getServerPort();
-
-
-        String dapService = getServiceLocalId();
-
-        String serviceUrl = transport + "://"+ serverName + ":"+ serverPort + dapService;
-
-        StringBuilder requestUrl = new StringBuilder();
-
-        requestUrl.append(transport).append("://").append(serverName);
-        if( transport.equalsIgnoreCase("http") && serverPort != 80) {
-            requestUrl.append(":").append(serverPort);
-        }
-        else if( transport.equalsIgnoreCase("https") && (serverPort != 443 && serverPort != 80) ) {
-            requestUrl.append(":").append(serverPort);
-        }
-        requestUrl.append(dapService);
-
-        log.debug("getServiceUrl(): " + serviceUrl);
-
+        String serviceUrl = getWebApplicationUrl() + _request.getServletPath();
+        log.debug("getServiceUrl(): "+serviceUrl);
         return serviceUrl;
-
     }
 
 
@@ -156,9 +153,5 @@ public class Request {
         return s;
     }
 
-
-
-
-        
 
 }

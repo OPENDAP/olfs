@@ -42,7 +42,7 @@
 
     <xsl:decimal-format name="CoordinateFormatter" />
 
-    <xsl:variable name="WcsSoftwareVersion">@WCS_SOFTWARE_VERSION@</xsl:variable>
+    <xsl:variable name="WcsSoftwareVersion">@WcsSoftwareVersion@</xsl:variable>
     <xsl:variable name="WcsServiceVersion">1.1</xsl:variable>
 
     <xsl:template match="/wcs:Capabilities">
