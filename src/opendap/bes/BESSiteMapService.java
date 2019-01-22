@@ -32,6 +32,8 @@ public class BESSiteMapService extends HttpServlet {
     private AtomicInteger reqNumber;
     private org.slf4j.Logger log;
 
+    private String _dapServiceContext;
+
     /**
      * ************************************************************************
      * Intitializes the servlet. Init (at this time) basically sets up
@@ -54,6 +56,16 @@ public class BESSiteMapService extends HttpServlet {
         reqNumber = new AtomicInteger(0);
 
         log.debug("init() start");
+
+
+        _dapServiceContext = getInitParameter("DapServiceContext");
+        if(_dapServiceContext==null)
+            _dapServiceContext = "opendap/";
+
+        if(!_dapServiceContext.endsWith("/"))
+            _dapServiceContext += "/";
+
+
 
         if(!BESManager.isInitialized()) {
 
@@ -117,10 +129,21 @@ public class BESSiteMapService extends HttpServlet {
                       HttpServletResponse response) {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-
         Request req = new Request(this,request);
-        String dapServicePrefix = PathBuilder.pathConcat(req.getWebApplicationUrl(),"opendap/");
         String siteMapServicePrefix = req.getServiceUrl();
+
+        String webapp = req.getWebApplicationUrl();
+
+        String dapService;
+        if(getServletContext().getContextPath().isEmpty()){
+            // If we are running in the ROOT context (no contextPath) then we make the assumption that the DAP
+            // service is located at the _dapServiceContext as set in the configuration parameter DapServiceContext.
+            dapService = PathBuilder.pathConcat(webapp,_dapServiceContext);
+        }
+        else {
+            dapService = webapp;
+        }
+
 
         int request_status = HttpServletResponse.SC_OK;
 
@@ -152,7 +175,7 @@ public class BESSiteMapService extends HttpServlet {
 
                 ServletOutputStream sos = response.getOutputStream();
 
-                BESSiteMap besSiteMap = new BESSiteMap(dapServicePrefix);
+                BESSiteMap besSiteMap = new BESSiteMap(dapService);
 
                 if (relativeUrl.equals("/")) {
                     log.debug("Just the service endpoint. {}",request.getRequestURI());
