@@ -49,28 +49,21 @@ public class BESSiteMapService extends HttpServlet {
 
         LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-
+        log.debug("init() start");
         // Timer.enable();
         RequestCache.openThreadCache();
-
         reqNumber = new AtomicInteger(0);
-
-        log.debug("init() start");
-
 
         _dapServiceContext = getInitParameter("DapServiceContext");
         if(_dapServiceContext==null)
             _dapServiceContext = "opendap/";
 
-        if(!_dapServiceContext.endsWith("/"))
+        if(!_dapServiceContext.isEmpty() && !_dapServiceContext.endsWith("/"))
             _dapServiceContext += "/";
 
 
-
         if(!BESManager.isInitialized()) {
-
             String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
-
             Element configElement;
             try {
                 configElement = opendap.xml.Util.getDocumentRoot(filename);
