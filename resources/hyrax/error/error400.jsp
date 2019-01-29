@@ -32,17 +32,13 @@
 <%@page session="false" %>
 <%
     String contextPath = request.getContextPath();
-
     String localUrl = ReqInfo.getLocalUrl(request);
 
     BesApi besApi = new BesApi();
-    String adminEmail = "support@opendap.org";
-    try {
-        adminEmail = besApi.getAdministrator(localUrl);
-    } catch (Exception e) { }
+    String supportEmail = besApi.getSupportEmail(localUrl);
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,400,message,adminEmail);
+    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,400,message,supportEmail);
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -93,7 +89,7 @@
             </p>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at:
-                <a href="<%=mailtoHrefAttributeValue%>"><%= adminEmail %></a>
+                <a href="<%=mailtoHrefAttributeValue%>"><%= supportEmail %></a>
             </p>
         </td>
     </tr>

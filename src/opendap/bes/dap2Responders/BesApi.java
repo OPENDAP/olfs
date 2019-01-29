@@ -94,8 +94,12 @@ public class BesApi implements Cloneable {
     public static final String W10N_FLATTEN   = "w10nFlatten";
     public static final String W10N_TRAVERSE   = "w10nTraverse";
     public static final String SHOW_BES_KEY    = "showBesKey";
+    public static final String VALUE           = "value";
+    public static final String SUPPORT_EMAIL   = "SupportEmail";
+    public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "SupportEmail";
 
     public static final String REQUEST_ID      = "reqID";
+
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
@@ -198,39 +202,55 @@ public class BesApi implements Cloneable {
         return new AdminInfo(this,  path);
     }
 
+    /**
+     * Returns the Administrator email held by the BES associated with the path.
+     * @param path
+     * @return
+     */
     public String getAdministrator(String path) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
 
         String adminEmail = "support@opendap.org";
-
-
         BES bes = getBES(path);
-
         Document verDoc = bes.getVersionDocument();
-
         if(verDoc==null)
             return adminEmail;
 
-
         Element besElement = verDoc.getRootElement();
-
         if(besElement==null)
             return adminEmail;
 
-
         Element adminElement = besElement.getChild("Administrator", opendap.namespaces.BES.BES_NS);
-
-
         if(adminElement!=null)
             adminEmail = adminElement.getTextTrim();
 
         return adminEmail;
     }
 
-    //public static void configure(OLFSConfig olfsConfig) throws Exception {
+    /**
+     * Returns the support email held by the BES associated with the path.
+     * @param path
+     * @return
+     */
+    public String getSupportEmail(String path)  {
 
-    //    BESManager.configure(olfsConfig.getBESConfig());
+        String supportEmail = DEFAULT_SUPPORT_EMAIL_ADDRESS;
+        try {
+            Element showBesKey = showBesKey(path, SUPPORT_EMAIL);
+            if(showBesKey!=null){
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                log.error(xmlo.outputString(showBesKey));
+                Element value =  showBesKey.getChild(VALUE,opendap.namespaces.BES.BES_NS);
+                if(value!=null){
+                    supportEmail = value.getTextTrim();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to get {} from BES. Message: {}",SUPPORT_EMAIL,e.getMessage());
+        }
 
-    //}
+        return supportEmail;
+    }
+
 
 
     /**
