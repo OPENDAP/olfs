@@ -195,6 +195,7 @@ public class ChunkedInputStream  {
         boolean isError = false;
         boolean moreData = true;
         String extensionContent;
+        long bytesRead = 0;
 
         while(moreData && !isClosed){
 
@@ -239,6 +240,9 @@ public class ChunkedInputStream  {
                 // update the read pointer.
                 chunkReadPosition += bytesReceived;
 
+                // And keep the books...
+                bytesRead += bytesReceived;
+
                 switch (getCurrentChunkType()){
 
                     case Chunk.DATA:
@@ -266,6 +270,7 @@ public class ChunkedInputStream  {
 
         }
 
+        log.info("readChunkedMessage() - Message contained {} bytes.",bytesRead);
         return !isError;
     }
 
