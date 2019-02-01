@@ -326,14 +326,17 @@
                             <xsl:choose>
                                 <xsl:when test="$remoteCatalog" >
                                     <td class="small_italic">
-                                        <div title="The origin server's THREDDS catalog on which this dataset resides.">
+                                        <!-- div title="The origin server's THREDDS catalog where this dataset is located.">
                                             Remote<br/>Catalog:
-                                        </div>
+                                        </div -->
                                     </td>
-                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;padding-left: 5px;"> </td>
+                                    <td id="catalog_linky_poo" class="small" style="color: black;padding-left: 5px;">
+                                        <a href="{replace($remoteCatalog, '\.xml$', '.html')}"
+                                           title="The origin server's THREDDS catalog (as HTML) where this dataset is located.">Remote Catalog</a>
+                                        <a href="{$remoteCatalog}"
+                                           title="Source Catalog As XML">(xml)</a>
+                                    </td>
 
-                                    <a href="{replace($remoteCatalog, '\.xml$', '.html')}" title="Source Catalog as HTML">HTML</a>
-                                    <a href="{$remoteCatalog}" title="Source Catalog As XML">XML</a>
 
                                 </xsl:when>
                                 <xsl:otherwise>
