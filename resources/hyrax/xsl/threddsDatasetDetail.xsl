@@ -326,7 +326,7 @@
                             <xsl:choose>
                                 <xsl:when test="$remoteCatalog" >
                                     <td class="small_italic">
-                                        <div title="The orign server's THREDDS catalog on which this dataset resides.">
+                                        <div title="The origin server's THREDDS catalog on which this dataset resides.">
                                             Remote<br/>Catalog:
                                         </div>
                                     </td>
@@ -1016,21 +1016,21 @@
                                 -->
                                 <xsl:when test="matches(./@serviceType, 'opendap', 'i')">
 
-                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data."
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data"
                                        href="{$resourceUrl}.html">DAP2 Data Request Form</a>
 
                                     <xsl:if test="not($remoteHost)">
-                                        <a style="padding-right: 3px"  title="RDF representation of the DDX."
+                                        <a style="padding-right: 3px"  title="RDF representation of the DDX"
                                            href="{$resourceUrl}.rdf">rdf</a>
                                     </xsl:if>
 
-                                    <a style="padding-right: 3px" title="The DAP DDX document for this dataset."
+                                    <a style="padding-right: 3px" title="The DAP DDX document for this dataset"
                                        href="{$resourceUrl}.ddx">ddx</a>
-                                    <a style="padding-right: 3px" title="The DAP DDS document for this dataset."
+                                    <a style="padding-right: 3px" title="The DAP DDS document for this dataset"
                                        href="{$resourceUrl}.dds">dds</a>
-                                    <a style="padding-right: 3px" title="The DAP DAS document for this dataset."
+                                    <a style="padding-right: 3px" title="The DAP DAS document for this dataset"
                                        href="{$resourceUrl}.das">das</a>
-                                    <a style="padding-right: 3px" title="Browser accessible informational page regarding this dataset."
+                                    <a style="padding-right: 3px" title="Browser accessible informational page regarding this dataset"
                                        href="{$resourceUrl}.info">info</a>
                                 </xsl:when>
 
@@ -1041,42 +1041,97 @@
                                 -->
                                 <xsl:when test="matches(./@serviceType, 'dap4', 'i')">
 
-                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data."
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data"
                                        href="{$resourceUrl}.dmr.html">DAP4 Data Request Form</a>
 
-                                    <a style="padding-right: 3px" title="The DAP DMR document for this dataset."
+                                    <a style="padding-right: 3px" title="The DAP DMR document for this dataset"
                                        href="{$resourceUrl}.dmr.xml">dmr</a>
 
                                     <xsl:if test="not($remoteHost)">
-                                        <a style="padding-right: 3px" title="RDF representation of the DMR."
+                                        <a style="padding-right: 3px" title="RDF representation of the DMR"
                                            href="{$resourceUrl}.dmr.rdf">rdf</a>
                                     </xsl:if>
 
                                 </xsl:when>
 
+                                <!--
+                                WCS Service link
+                                -->
                                 <xsl:when test="matches(./@serviceType, 'wcs', 'i')">
-                                    <a title="WCS Service - GetCapabilities Response."
+                                    <a title="WCS Service - GetCapabilities Response"
                                        href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}?service=WCS&amp;request=GetCapabilities" >
                                         <xsl:value-of select="./@serviceType"/>
                                     </a>
                                 </xsl:when>
 
+                                <!--
+                                WMS Service Link
+                                -->
                                 <xsl:when test="matches(./@serviceType, 'wms', 'i')">
-                                    <a title="WMS Service - GetCapabilities Response."
+                                    <a title="WMS Service - GetCapabilities Response"
                                        href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}?service=WMS&amp;request=GetCapabilities" >
                                         <xsl:value-of select="./@serviceType"/>
                                     </a>
                                 </xsl:when>
 
                                 <!--
-
                                 Produce service URL's for the HTTPServer and File serviceType
-
                                 -->
                                 <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i') or matches(./@serviceType, 'File', 'i')">
-                                    <a
-                                            title="This link provides file download access via HTTP."
-                                            href="{$resourceUrl}" >File Download</a>
+                                    <a title="Complete File Download via HTTP"
+                                       href="{$resourceUrl}" >File Download</a>
+                                </xsl:when>
+
+                                <!--
+                                Netcdfsubset Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'netcdfsubset', 'i')">
+                                    <a title="Netcdfsubset Endpoint - REQUIRES user supplied constraint expression for use!"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+
+                                <!--
+                                NcML Response Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'ncml', 'i')">
+                                    <a title="NcML Dataset Description"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                UDDC Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'uddc', 'i')">
+                                    <a title="UNIDATA Dataset Discovery Conformance Report"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                ISO-19115 Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'iso', 'i')">
+                                    <a title="ISO-19115 Metadata"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+
+                                <!--
+                                CDM Remote Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'cdmremote', 'i')">
+                                    <a title="CDMRemote Service Endpoint - REQUIRES user supplied constraint expression for use!"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
                                 </xsl:when>
 
 
@@ -1109,10 +1164,10 @@
 
                                 <!--
                                   - No way to map service to a particular set of access URLs, so
-                                  - Give them the baseic service link.
+                                  - Give them the basic service link.
                                   -->
                                 <xsl:otherwise>
-                                    <a title="No additional links are available."
+                                    <a title="No Service Description Available."
                                        href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
                                         <xsl:value-of select="./@serviceType"/>
                                     </a>
