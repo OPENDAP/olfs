@@ -1,3 +1,8 @@
+
+function make_a_selection(){
+    alert("Please select one or more variables before attempting to download/access data.");
+}
+
 function ascii_button() {
     var url = new String(document.forms[0].url.value);
 
@@ -6,7 +11,9 @@ function ascii_button() {
     if (url_parts[1] != null) {
         var ascii_url = url_parts[0] + ".ascii?" + url_parts[1];
     } else {
-        var ascii_url = url_parts[0] + ".ascii?";
+        make_a_selection();
+        return;
+        // var ascii_url = url_parts[0] + ".ascii";
     }
 
     window.open(encodeURI(ascii_url), "ASCII_Data");
