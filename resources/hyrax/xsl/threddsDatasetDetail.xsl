@@ -1290,7 +1290,7 @@
 
         <!-- Make the link -->
         <tr>
-            <td align="center" style="margin-left: 10px;word-wrap: break-word;width: 20%">
+            <td align="center" style="margin-left: 10px;width: 20%">
                 <div class="medium_bold"
                      title="If the origin server does not offer a data service that you can utilize, Hyrax may broker the request and return the data in a form that you find more usable.">
                     Hyrax Broker
@@ -1460,18 +1460,16 @@
                             </td>
                         </tr>
                         <!-- - - - - - - - - - Data Responses - - - - - - - - - - -->
-                        <tr>
+                        <!-- tr>
                             <td class="small" align="right">data responses</td>
                             <td class="small_bold" align="left" style="margin-left: 10px;">
 
-                                <!-- Make link object -->
                                 <a id="{$resourceUrl}-DAP"
                                    class="medium-bold"
                                    style="padding-right: 3px;"
                                    title="Broker: DAP4 Data (.dap) response"
                                    href="TBD">dap4
                                 </a>
-                                <!-- Set the href value -->
                                 <xsl:element name="script">
                                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                                     ifhLink="<xsl:value-of
@@ -1482,14 +1480,12 @@
                                 </xsl:element>
 
 
-                                <!-- Make link object -->
                                 <a id="{$resourceUrl}-DODS"
                                    class="medium-bold"
                                    style="padding-right: 3px;"
                                    title="Broker: DAP2 Data (.dods) response"
                                    href="TBD">dap2
                                 </a>
-                                <!-- Set the href value -->
                                 <xsl:element name="script">
                                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                                     ifhLink="<xsl:value-of
@@ -1500,7 +1496,7 @@
                                 </xsl:element>
 
                             </td>
-                        </tr>
+                        </tr -->
                     </table>
                 </div>
             </td>
