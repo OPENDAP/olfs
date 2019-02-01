@@ -78,21 +78,21 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private boolean _initialized;
     private HttpServlet _dispatchServlet;
     private String _prefix;
-    boolean _useMemoryCache = false;
-    boolean _allowRemoteCatalogTraversal = false;
+    private boolean _useMemoryCache = false;
+    private boolean _allowRemoteCatalogTraversal = false;
 
-    String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
-    Transformer _catalogToHtmlTransform = null;
-    ReentrantLock _catalogToHtmlTransformLock;
+    private String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
+    private Transformer _catalogToHtmlTransform = null;
+    private ReentrantLock _catalogToHtmlTransformLock;
 
-    String _datasetToHtmlTransformFile = "/xsl/threddsDatasetDetail.xsl";
-    Transformer _datasetToHtmlTransform = null;
-    ReentrantLock _datasetToHtmlTransformLock;
+    private String _datasetToHtmlTransformFile = "/xsl/threddsDatasetDetail.xsl";
+    private Transformer _datasetToHtmlTransform = null;
+    private ReentrantLock _datasetToHtmlTransformLock;
 
 
-    String _besNodeToDatasetScanCatalogTrasformFile = "/xsl/besNodeToDatasetScanCatalog.xsl";
+    private String _besNodeToDatasetScanCatalogTrasformFile = "/xsl/besNodeToDatasetScanCatalog.xsl";
 
-    String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
+    private String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
 
     public StaticCatalogDispatch() {
 
