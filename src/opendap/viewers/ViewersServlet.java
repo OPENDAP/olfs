@@ -480,7 +480,7 @@ public class ViewersServlet extends HttpServlet {
         }
     }
 
-    
+
     private void sendDatasetPage(String webStartService, String docsService, String dapService, String datasetID, Document ddx, OutputStream os) throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException
     {
 
@@ -583,7 +583,6 @@ public class ViewersServlet extends HttpServlet {
             wsElement.setAttribute("serviceUrl",wsh.getServiceLink(datasetId));
 
             webServicesElement.addContent(wsElement);
-
         }
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(new Document(webServicesElement));
