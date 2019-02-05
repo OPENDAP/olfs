@@ -589,7 +589,12 @@ public class OPeNDAPException extends Exception {
     public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
 
         StringBuilder sb = new StringBuilder();
-        sb.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
+        if(http_status!=200){
+            sb.append("mailto:").append(adminEmail).append("?subject=Hyrax Error ").append(http_status);
+        }
+        else {
+            sb.append("mailto:").append(adminEmail).append("?subject=Hyrax Usage Question");
+        }
         sb.append("&body=");
         sb.append("%0A");
         sb.append("%0A");
@@ -604,7 +609,12 @@ public class OPeNDAPException extends Exception {
         sb.append("# Thanks,%0A");
         sb.append("# OPeNDAP Support.%0A");
         sb.append("# %0A");
-        sb.append("# -- -- -- hyrax error info, please include -- -- --%0A");
+        if(http_status !=200) {
+            sb.append("# -- -- -- hyrax error info, please include -- -- --%0A");
+        }
+        else {
+            sb.append("# -- -- -- hyrax location info, please include -- -- --%0A");
+        }
         sb.append("# %0A");
         sb.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
@@ -614,13 +624,16 @@ public class OPeNDAPException extends Exception {
 
         sb.append("# query_string: ");
         String queryString = request.getQueryString();
-        if(queryString!=null && !queryString.isEmpty())
+        if(queryString!=null && !queryString.isEmpty()){
             sb.append(queryString).append("%0A");
-        else
-            sb.append("n/a");
-
+        }
+        else {
+            sb.append("n/a%0A");
+        }
         sb.append("# status: ").append(http_status).append("%0A");
-        sb.append("# message: ").append(errorMessage).append("%0A");
+        if(http_status !=200) {
+            sb.append("# message: ").append(errorMessage).append("%0A");
+        }
         sb.append("# %0A");
         sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");
         return Encode.forHtmlAttribute(sb.toString());

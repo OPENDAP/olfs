@@ -111,6 +111,9 @@ public class Dap2IFH extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
+
         _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType = getNormativeMediaType();
@@ -158,6 +161,7 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", jsonLD);
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
