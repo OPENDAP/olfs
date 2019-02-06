@@ -26,20 +26,15 @@
 
 package opendap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by ndp on 4/21/15.
  */
 public class PathBuilder  {
 
-    private Logger _log;
-
     private StringBuilder _sb;
 
     public PathBuilder(){
-        _log = LoggerFactory.getLogger(this.getClass());
         _sb = new StringBuilder();
     }
 
@@ -57,17 +52,14 @@ public class PathBuilder  {
         if(s==null || s.length()==0)
             return this;
 
-        while (_sb.length()!=0 && (s.startsWith("/") && s.length() > 0)) {
+        while (_sb.length()!=0 && s.length() > 0 && (s.startsWith("/") )) {
             s = s.substring(1);
         }
-        //_log.debug("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);
-        //_log.debug("pathAppend: _sb.lastIndexOf(\"/\"): '{}' _sb.length(): '{}'",_sb.lastIndexOf("/"),_sb.length());
         if (_sb.length()==0 || (_sb.lastIndexOf("/") == _sb.length()-1)) {
             _sb.append(s);
         } else {
             _sb.append("/").append(s);
         }
-        _log.info("pathAppend: result _sb: ",_sb.toString());
         return this;
     }
 
@@ -127,7 +119,7 @@ public class PathBuilder  {
         if(path.isEmpty())
             path = separator;
 
-        if(path!=separator){
+        if(!path.equals(separator)){
             if(leadingSeparator && !path.startsWith(separator)){
                 path = separator + path;
             }

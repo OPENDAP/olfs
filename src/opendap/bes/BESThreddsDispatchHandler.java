@@ -160,7 +160,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if (!besCatalogName.endsWith("/"))
             besCatalogName += "/";
 
-        PathBuilder.normalizePath(besCatalogName,true,false);
+        besCatalogName = PathBuilder.normalizePath(besCatalogName,true,false);
         _log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
 
 
