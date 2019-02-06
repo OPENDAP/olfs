@@ -136,7 +136,7 @@ public class W10nServlet extends HttpServlet   {
                 /**
                  * Do w10n STUFF
                  */
-                _responder.send_w10n_response(request, response);
+                _responder.sendW10NResponse(request, response);
             }
             finally {
                 _log.info("doGet(): Response completed.\n");
