@@ -96,7 +96,7 @@ public class BesApi implements Cloneable {
     public static final String SHOW_BES_KEY    = "showBesKey";
     public static final String VALUE           = "value";
     public static final String SUPPORT_EMAIL   = "SupportEmail";
-    public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "SupportEmail";
+    public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "support@opendap.org";
 
     public static final String REQUEST_ID      = "reqID";
 
