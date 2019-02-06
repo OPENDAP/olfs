@@ -73,21 +73,33 @@ public class W10nResponder {
 
     private static final String DAP2_TYPE = "dap.2";
 
-    TreeMap<String,MediaType> _supportedMetaMediaTypes;
-    TreeMap<String,MediaType> _supportedDataMediaTypes;
+    private static final String dapLastModified ="lastModified";
+    private static final String nodeLastModified ="lastModified";
+    private static final String nodeCount ="count";
+    private static final String nodeItem ="item";
 
-    MediaType _defaultMetaMediaType;
-    MediaType _defaultDataMediaType;
+    private static final String keyLastModified ="last-modified";
+    private static final String keyAttributes ="attributes";
+    private static final String keySize ="size";
+    private static final String keyName ="name";
+    private static final String keyIsData ="isData";
+    private static final String keyIsDir ="isDir";
+    private static final String keyIsFile ="isFile";
 
-    BesApi _besApi;
+    private TreeMap<String,MediaType> _supportedMetaMediaTypes;
+    private TreeMap<String,MediaType> _supportedDataMediaTypes;
 
-    String _systemPath;
+    private MediaType _defaultMetaMediaType;
+    private MediaType _defaultDataMediaType;
+
+    private BesApi _besApi;
+
+    private String _systemPath;
 
 
 
     public W10nResponder(String systemPath){
         super();
-
 
         _log = LoggerFactory.getLogger(this.getClass());
 
@@ -97,20 +109,16 @@ public class W10nResponder {
 
         MediaType mt;
 
-
         mt = new Json();
         _defaultMetaMediaType = mt;
-
 
         _supportedMetaMediaTypes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         mt = new TextHtml();
         _supportedMetaMediaTypes.put(mt.getName(), mt);
 
-
         mt = new Json();
         _defaultDataMediaType = mt;
-
 
         _supportedDataMediaTypes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
@@ -122,10 +130,6 @@ public class W10nResponder {
 
         mt = new Netcdf4();
         _supportedDataMediaTypes.put(mt.getName(), mt);
-
-
-
-
     }
 
 
@@ -137,13 +141,17 @@ public class W10nResponder {
      * @param requestedResourceId   The thing they asked for.
      * @param mt The MediaType of the outgoing response.
      * @param response The response in which the headers will be set.
-     * @throws Exception
+     * @throws JDOMException
+     * @throws BadConfigurationException
+     * @throws PPTException
+     * @throws BESError
+     * @throws IOException
      */
-    private void setResponseHeaders(HttpServletRequest request, String requestedResourceId, MediaType mt, HttpServletResponse response) throws Exception {
+    private void setResponseHeaders(HttpServletRequest request, String requestedResourceId, MediaType mt, HttpServletResponse response) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
 
         response.setContentType(mt.getMimeType());
         response.setHeader("Content-Description",mt.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, _besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
 
         // If they aren't asking for html then set the Content-Disposition header which will trigger a browser
@@ -179,15 +187,16 @@ public class W10nResponder {
      * Handles all w10n service activity.
      * @param request Incoming client request
      * @param response Outbound response.
-     * @throws Exception
+     * @throws JDOMException
+     * @throws OPeNDAPException
+     * @throws IOException
+     * @throws SaxonApiException
      */
-    public void send_w10n_response(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void send_w10n_response(HttpServletRequest request, HttpServletResponse response) throws JDOMException, OPeNDAPException, IOException, SaxonApiException {
         _log.debug("send_w10n_response() - BEGIN");
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         W10nRequest w10nRequest = new W10nRequest(request);
         User user = new User(request);
-       // w10nRequest.setBestMediaType(_defaultMetaMediaType, _supportedMetaMediaTypes);
 
         /**
          * This section asks the BES to evaluate the requested resource and return a report that indicates what
@@ -198,7 +207,10 @@ public class W10nResponder {
          */
         Document pathInfoDoc =  new Document();
         _besApi.getPathInfoDocument(w10nRequest.getRequestedResourceId(), pathInfoDoc);
-        _log.debug("send_w10n_response() - getPathInfo response: \n {}",xmlo.outputString(pathInfoDoc));
+        if(_log.isDebugEnabled()) {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            _log.debug("send_w10n_response() - getPathInfo response: \n {}", xmlo.outputString(pathInfoDoc));
+        }
 
         Element besResponse = pathInfoDoc.getRootElement();
         if(besResponse==null)
@@ -221,9 +233,9 @@ public class W10nResponder {
             throw new IOException("BES failed to include a 'remainder' element in the PathInfoDocument.");
 
         String validResourcePath = vpE.getTextTrim();
-        boolean isData   = vpE.getAttributeValue("isData").equalsIgnoreCase("true");
-        boolean isDir    = vpE.getAttributeValue("isDir").equalsIgnoreCase("true");
-        boolean isFile   = vpE.getAttributeValue("isFile").equalsIgnoreCase("true");
+        boolean isData   = vpE.getAttributeValue(keyIsData).equalsIgnoreCase("true");
+        boolean isDir    = vpE.getAttributeValue(keyIsDir).equalsIgnoreCase("true");
+        boolean isFile   = vpE.getAttributeValue(keyIsFile).equalsIgnoreCase("true");
         String remainder = remE.getTextTrim();
 
         w10nRequest.setValidResourcePath(validResourcePath);
@@ -286,7 +298,7 @@ public class W10nResponder {
                     throw new BadRequest("In w10n data requests are only valid for 'leaves', the requested resource is a node or is not data.");
                 }
                 // It's not data. But did they try to w10n access it anyway?
-                else if(remainder.length()>0 && !isDir){
+                else if(remainder.length()>0){
                     // Yup, but that's a fail so - 400!
                     throw new BadRequest("The requested resource is not a data w10n leaf (data) object.");
                 }
@@ -328,10 +340,12 @@ public class W10nResponder {
             throws OPeNDAPException, JDOMException, IOException, SaxonApiException {
 
         MediaType mt = w10nRequest.getBestMediaType();
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document besNode = new Document();
         _besApi.getBesNode(w10nRequest.getValidResourcePath(), besNode);
-        _log.debug("sendMetaResponseForFileOrDir() - Catalog from BES:\n"+xmlo.outputString(besNode));
+        if(_log.isDebugEnabled()) {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            _log.debug("sendMetaResponseForFileOrDir() - Catalog from BES: {}\n", xmlo.outputString(besNode));
+        }
         if(mt.getName().equalsIgnoreCase(Json.NAME)){
             _log.debug("sendMetaResponseForFileOrDir() - Sending as JSON");
             sendBesNodeAsJson(w10nRequest, besNode, response);
@@ -346,7 +360,7 @@ public class W10nResponder {
     }
 
     /**
-     * Transmits a BES showCatalog response in a w10n JSON encoding.
+     * Transmits a BES showNode response in a w10n JSON encoding.
      *
      * @param node The showNode response document.
      * @param w10nRequest  The w10n request to be service.
@@ -355,8 +369,6 @@ public class W10nResponder {
      */
     private void sendBesNodeAsJson(W10nRequest w10nRequest, Document node, HttpServletResponse response) throws JDOMException, IOException, BESError {
 
-        // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        // response.getOutputStream().print(xmlo.outputString(node));
         Element root = node.getRootElement();
         if(root==null)
             throw new IOException("BES showNode response document is missing the root (response) element!");
@@ -379,7 +391,7 @@ public class W10nResponder {
         String type = getW10nTypeStringForBesNode(topElement);
         HashMap<String,Object> jsonBesCatalogResponse = getJsonForBesItemOrNodeElement(topElement);
         if(isNode) {
-            if(topElement.getName()=="node") {
+            if(topElement.getName().equals("node")) {
                 ArrayList<Object> nodes = new ArrayList<>();
                 ArrayList<Object> leaves = new ArrayList<>();
 
@@ -431,7 +443,6 @@ public class W10nResponder {
         }
 
         ServletOutputStream sos =  response.getOutputStream();
-
         if(w10nRequest.callback()!=null){
             sos.print(w10nRequest.callback()+"(");
         }
@@ -441,101 +452,10 @@ public class W10nResponder {
             sos.print(")");
         }
         sos.println();
-
     }
 
 
 
-    /**
-     * Transmits a BES showCatalog response in a w10n JSON encoding.
-     *
-     * @param showCatalogDoc The showCatalog response document.
-     * @param w10nRequest  The w10n request to be service.
-     * @throws JDOMException
-     * @throws IOException
-     */
-    @Deprecated
-    private void sendBesCatalogAsJson(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws JDOMException, IOException, BESError {
-
-        // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        // response.getOutputStream().print(xmlo.outputString(showCatalogDoc));
-
-
-
-
-        Element showCatalogElement = showCatalogDoc.getRootElement().getChild("showCatalog",BES.BES_NS);
-        if(showCatalogElement==null)
-            throw new IOException("BES showCatalog response document is missing the root element!");
-
-        Element topDataset = showCatalogElement.getChild("dataset",BES.BES_NS);
-        if(topDataset==null)
-            throw new IOException("BES showCatalog response document is missing the 'dataset' element!");
-
-        String type = getW10nTypeStringForBesNode(topDataset);
-
-
-        boolean isNode = isDatasetW10nNode(topDataset);
-
-        HashMap<String,Object> jsonBesCatalogResponse = getJsonForCatalogDatasetElement(topDataset);
-
-        if(isNode) {
-            ArrayList<Object> nodes = new ArrayList<>();
-            ArrayList<Object> leaves = new ArrayList<>();
-
-            @SuppressWarnings("unchecked")
-            List<Element> childDatasets = (List<Element>) topDataset.getChildren("dataset", BES.BES_NS);
-
-
-            for(Element childDataset: childDatasets){
-                HashMap<String,Object> jsonDataset = getJsonForCatalogDatasetElement(childDataset);
-
-                if(isDatasetW10nNode(childDataset)){
-                    nodes.add(jsonDataset);
-                }
-                else {
-                    leaves.add(jsonDataset);
-                }
-            }
-
-            jsonBesCatalogResponse.put("nodes", nodes);
-            jsonBesCatalogResponse.put("leaves", leaves);
-            jsonBesCatalogResponse.put("w10n",
-                    getW10nMetaObject(
-                            type,
-                            w10nRequest.getW10nResourcePath(),
-                            w10nRequest.getW10nId(),
-                            _defaultMetaMediaType,
-                            _supportedMetaMediaTypes)
-            );
-        }
-        else {
-            jsonBesCatalogResponse.put("w10n",
-                    getW10nMetaObject(
-                            type,
-                            w10nRequest.getW10nResourcePath(),
-                            w10nRequest.getW10nId(),
-                            _defaultMetaMediaType,
-                            _supportedMetaMediaTypes));
-
-        }
-
-        ServletOutputStream sos =  response.getOutputStream();
-
-        if(w10nRequest.callback()!=null){
-            sos.print(w10nRequest.callback()+"(");
-        }
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        sos.print(gson.toJson(jsonBesCatalogResponse));
-
-        if(w10nRequest.callback()!=null){
-            sos.print(")");
-        }
-
-        sos.println();
-
-    }
 
 
     /**
@@ -548,16 +468,12 @@ public class W10nResponder {
     private boolean isDatasetW10nNode(Element dataset){
 
         boolean isNode;
-
         isNode = dataset.getAttributeValue("node").equalsIgnoreCase("true");
-
         Element serviceRef = dataset.getChild("serviceRef", BES.BES_NS);
         if(serviceRef!=null &&  serviceRef.getTextTrim().equalsIgnoreCase(BES.DAP_SERVICE_ID)){
             isNode = true;
         }
-
         return isNode;
-
     }
 
 
@@ -577,7 +493,7 @@ public class W10nResponder {
         }
         else {
             // It's a leaf, but if it's data it's a node
-            String isData = item.getAttributeValue("isData");
+            String isData = item.getAttributeValue(keyIsData);
             if(isData!=null && isData.equals("true"))
                 isNode=true;
         }
@@ -592,8 +508,7 @@ public class W10nResponder {
      */
     private HashMap<String,Object> getJsonForCatalogDatasetElement(Element dataset){
 
-        String nodeName = dataset.getAttributeValue("name");
-
+        String nodeName = dataset.getAttributeValue(keyName);
         String name = nodeName;
 
         int lastIndexOfSlash = nodeName.lastIndexOf('/');
@@ -602,29 +517,16 @@ public class W10nResponder {
             while (name.startsWith("/") && name.length() > 1)
                 name = name.substring(1);
         }
-
-        long   size = Long.parseLong(dataset.getAttributeValue("size"));
-        String  lmt = dataset.getAttributeValue("lastModified");
-
-
+        long   size = Long.parseLong(dataset.getAttributeValue(keySize));
+        String  lmt = dataset.getAttributeValue(dapLastModified);
         HashMap<String,Object> jsonObject = new HashMap<>();
-
-        jsonObject.put("name",name);
-
+        jsonObject.put(keyName,name);
         ArrayList<Object> attributes = new ArrayList<>();
+        attributes.add(getW10nAttribute(keyLastModified,lmt));
+        attributes.add(getW10nAttribute(keySize, size));
 
-        attributes.add(getW10nAttribute("last-modified",lmt));
-
-        attributes.add(getW10nAttribute("size", size));
-
-        jsonObject.put("attributes",attributes);
-
-
-
+        jsonObject.put(keyAttributes,attributes);
         return jsonObject;
-
-
-
     }
 
 
@@ -638,46 +540,45 @@ public class W10nResponder {
         ArrayList<Object> attributes = new ArrayList<>();
         HashMap<String,Object> jsonObject = new HashMap<>();
 
-        if(item.getName().equals("item")){
+        if(item.getName().equals(nodeItem)){
 
-            String itemName = item.getAttributeValue("name");
+            String itemName = item.getAttributeValue(keyName);
 
             String name = PathBuilder.basename(itemName);
-            jsonObject.put("name",name);
+            jsonObject.put(keyName,name);
 
             long size = -1;
-            String s = item.getAttributeValue("size");
+            String s = item.getAttributeValue(keySize);
             if(s!=null) {
                 size = Long.parseLong(s);
             }
-            attributes.add(getW10nAttribute("size", size));
+            attributes.add(getW10nAttribute(keySize, size));
 
-            String  lmt = item.getAttributeValue("lastModified");
-            attributes.add(getW10nAttribute("last-modified",lmt));
+            String  lmt = item.getAttributeValue(nodeLastModified);
+            attributes.add(getW10nAttribute(keyLastModified,lmt));
 
-            jsonObject.put("attributes",attributes);
+            jsonObject.put(keyAttributes,attributes);
 
         }
         else {
             // It must be a node.
             Element node = item;
-            String nodeName = node.getAttributeValue("name");
+            String nodeName = node.getAttributeValue(keyName);
 
             String name = PathBuilder.basename(nodeName);
-            jsonObject.put("name",name);
+            jsonObject.put(keyName,name);
 
             long size = -1;
-            String s = node.getAttributeValue("count");
+            String s = node.getAttributeValue(nodeCount);
             if(s!=null) {
                 size = Long.parseLong(s);
             }
-            attributes.add(getW10nAttribute("size", size));
+            attributes.add(getW10nAttribute(keySize, size));
 
-            String  lmt = item.getAttributeValue("lastModified");
-            attributes.add(getW10nAttribute("last-modified",lmt));
+            String  lmt = item.getAttributeValue(nodeLastModified);
+            attributes.add(getW10nAttribute(keyLastModified,lmt));
 
-            jsonObject.put("attributes",attributes);
-
+            jsonObject.put(keyAttributes,attributes);
         }
         return jsonObject;
     }
@@ -700,17 +601,13 @@ public class W10nResponder {
             Map<String, MediaType> altMediaTypes){
 
         ArrayList<Object> w10n = new ArrayList<>();
-
         w10n.add(getW10nAttribute("spec","draft-20091228"));
         w10n.add(getW10nAttribute("application", "Hyrax-"+Version.getHyraxVersionString()));
         w10n.add(getW10nAttribute("type", type));
         w10n.add(getW10nAttribute("path", path));
         w10n.add(getW10nAttribute("identifier", id));
         w10n.add(getW10nAttribute("output", getW10nOutputTypes(defaultMT,altMediaTypes)));
-
         return w10n;
-
-
     }
 
 
@@ -721,18 +618,12 @@ public class W10nResponder {
      * @return List of available output MediaTypes
      */
     private ArrayList<Object> getW10nOutputTypes(MediaType defaultMT, Map<String,MediaType> altMediaTypes ) {
-
         ArrayList<Object> outputTypes = new ArrayList<>();
-
         outputTypes.add(getW10nAttribute(defaultMT.getName(), defaultMT.getMimeType()));
-
         for(MediaType mt : altMediaTypes.values()){
             outputTypes.add(getW10nAttribute(mt.getName(), mt.getMimeType()));
         }
-
         return outputTypes;
-
-
     }
 
 
@@ -743,48 +634,12 @@ public class W10nResponder {
      * @return Attribute as a JSONObject
      */
     private HashMap<String,Object> getW10nAttribute(String name, Object value){
-
         HashMap<String,Object> w10nAttribute = new HashMap<>();
         w10nAttribute.put("name", name);
         w10nAttribute.put("value", value);
-
         return w10nAttribute;
-
     }
 
-
-    /**
-     * Determines the w10n "type" of a BES catalog dataset element.
-     * @param dataset A bes:dataset element from a BES showCatalog response.
-     * @return The w10n "type" of a BES catalog dataset element
-     */
-    private String getW10nTypeStringForBesCatalogDataset(Element dataset){
-
-        String type;
-
-        boolean isNode;
-
-
-        isNode = dataset.getAttributeValue("node").equalsIgnoreCase("true");
-
-        if(isNode){
-            type = "fs.dir";
-        }
-        else {
-            Element serviceRef = dataset.getChild("serviceRef",BES.BES_NS);
-            if(serviceRef!=null){
-                type  = serviceRef.getTextTrim();
-            }
-            else {
-                type = "fs.file";
-            }
-
-        }
-        return type;
-
-
-
-    }
 
     /**
      * Determines the w10n "type" of a BES catalog node element.
@@ -794,71 +649,30 @@ public class W10nResponder {
     private String getW10nTypeStringForBesNode(Element node) throws BESError {
 
         String type;
-
-        if(node.getName().equals("node")){
-            type = "fs.dir";
-        }
-        else if(node.getName().equals("item")){
-            String nodeType = node.getAttributeValue("type");
-            if(nodeType.equals("node")){
+        switch (node.getName()) {
+            case "node":
                 type = "fs.dir";
-            }
-            else {
-                // Axiom: If an item is not a node, then it is a leaf.
-                // It's a leaf, but is it data?
-                String isData = node.getAttributeValue("isData");
-                if(isData!=null && isData.equals("true")){
-                    type  = "dap";
+                break;
+            case "item":
+                String nodeType = node.getAttributeValue("type");
+                if (nodeType.equals("node")) {
+                    type = "fs.dir";
+                } else {
+                    // Axiom: If an item is not a node, then it is a leaf.
+                    // It's a leaf, but is it data?
+                    String isData = node.getAttributeValue(keyIsData);
+                    if (isData != null && isData.equals("true")) {
+                        type = "dap";
+                    } else {
+                        type = "fs.file";
+                    }
                 }
-                else {
-                    type = "fs.file";
-                }
-            }
-        }
-        else {
-            throw new BESError("The bes:"+node.getName()+" element contains unanticipated content. expected " +
-                    "bes:node or bes:item. Received "+node.getName());
+                break;
+            default:
+                throw new BESError("The bes:" + node.getName() + " element contains unanticipated content. expected " +
+                        "bes:node or bes:item. Received " + node.getName());
         }
         return type;
-
-
-
-    }
-
-
-    /**
-     * Transmits a BES catalog document as a w10n meta response encoded as HTML (srsly.)
-     *
-     * @param w10nRequest The w10n request to be serviced.
-     * @param showCatalogDoc The BES showCatalog response document.
-     * @param response The outgoing response.
-     * @throws SaxonApiException
-     * @throws IOException
-     */
-    @Deprecated
-    private void sendBesCatalogAsHtml(W10nRequest w10nRequest, Document showCatalogDoc, HttpServletResponse response) throws SaxonApiException, IOException {
-
-
-        Request oreq = new Request(null,w10nRequest.getServletRequest());
-
-        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
-
-        String xsltDoc = _systemPath + "/xsl/w10nCatalog.xsl";
-
-
-        Transformer transformer = new Transformer(xsltDoc);
-
-        transformer.setParameter("dapService",oreq.getServiceLocalId());
-        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-        if(BesDapDispatcher.allowDirectDataSourceAccess())
-            transformer.setParameter("allowDirectDataSourceAccess","true");
-
-        // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform(besCatalog, response.getOutputStream());
-        // transformer.transform(besCatalog, System.out);
-
-
-
     }
 
     /**
@@ -870,18 +684,14 @@ public class W10nResponder {
      * @throws SaxonApiException
      * @throws IOException
      */
-    private void sendBesNodeAsHtml(W10nRequest w10nRequest, Document showNodeDoc, HttpServletResponse response) throws SaxonApiException, IOException {
-
+    private void sendBesNodeAsHtml(W10nRequest w10nRequest, Document showNodeDoc, HttpServletResponse response)
+            throws SaxonApiException, IOException {
 
         Request oreq = new Request(null,w10nRequest.getServletRequest());
-
         JDOMSource besCatalog = new JDOMSource(showNodeDoc);
-
         String xsltDoc = _systemPath + "/xsl/showNodeToW10nCatalog.xsl";
 
-
         Transformer transformer = new Transformer(xsltDoc);
-
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         if(BesDapDispatcher.allowDirectDataSourceAccess())
@@ -889,10 +699,6 @@ public class W10nResponder {
 
         // Transform the BES  showCatalog response into a HTML page for the browser
         transformer.transform(besCatalog, response.getOutputStream());
-        // transformer.transform(besCatalog, System.out);
-
-
-
     }
 
 
@@ -915,14 +721,12 @@ public class W10nResponder {
             HttpServletResponse response)
             throws IOException, OPeNDAPException {
 
-
         // Handle Response Media Type...
         MediaType mt = w10nRequest.getBestMediaType();
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, mt);
         response.setContentType(mt.getMimeType());
         response.setHeader("Content-Description", mt.getMimeType());
-
 
         // Call the best responder for the requested media type
         if(mt.getName().equalsIgnoreCase(Json.NAME)) {
@@ -944,9 +748,7 @@ public class W10nResponder {
             sendNetCDF_4(w10nRequest, maxResponseSize, response);
             return;
         }
-
-        throw new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
-
+        throw new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of "+ mt.getMimeType());
     }
 
     /**
@@ -967,17 +769,11 @@ public class W10nResponder {
                              HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-
-
-
         _log.debug("sendNetCDF_3() - Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
-
-
 
         String xdap_accept = "3.2";
 
         String resourceID = w10nRequest.getRequestedResourceId();
-
         MediaType responseMediaType =  new Netcdf3();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
@@ -986,22 +782,14 @@ public class W10nResponder {
         response.setContentType(responseMediaType.getMimeType());
 
         String downloadFileName = getDownloadFileName(resourceID);
-        Pattern startsWithNumber = Pattern.compile("[0-9].*");
-        if(startsWithNumber.matcher(downloadFileName).matches())
-            downloadFileName = "nc_"+downloadFileName;
+        downloadFileName += ".nc";
 
-        downloadFileName = downloadFileName+".nc";
-
-        _log.debug("sendNetCDF_3() - NetCDF file downloadFileName: " + downloadFileName );
+        _log.debug("sendNetCDF_3() - NetCDF file downloadFileName: {}", downloadFileName );
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
         OutputStream os = response.getOutputStream();
-
-
-
         _besApi.writeDap2DataAsNetcdf3(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
@@ -1009,14 +797,8 @@ public class W10nResponder {
                 xdap_accept,
                 maxResponseSize,
                 os);
-
-
-
         os.flush();
         _log.debug("sendNetCDF_3() - Sent NetCDF-3 for {}",w10nRequest.getValidResourcePath());
-
-
-
     }
 
 
@@ -1038,20 +820,9 @@ public class W10nResponder {
                                  HttpServletResponse response)
                 throws IOException, PPTException, BadConfigurationException, BESError {
 
-
-
-
-
         _log.debug("sendNetCDF_4() - Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
 
-
-
         String xdap_accept = "3.2";
-
-
-
-        OutputStream os = response.getOutputStream();
-
         String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType = new Netcdf4();
 
@@ -1060,22 +831,18 @@ public class W10nResponder {
 
         response.setContentType(responseMediaType.getMimeType());
 
-
-
         String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
 
         downloadFileName = downloadFileName+".nc4";
-
-        _log.debug("sendNetCDF_4() - NetCDF file downloadFileName: " + downloadFileName);
+        _log.debug("sendNetCDF_4() - NetCDF file downloadFileName: {}", downloadFileName);
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
-
+        OutputStream os = response.getOutputStream();
         _besApi.writeDap2DataAsNetcdf4(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
@@ -1083,15 +850,9 @@ public class W10nResponder {
                 xdap_accept,
                 maxResponseSize,
                 os);
-
-
-
-
         os.flush();
+
         _log.debug("sendNetCDF_4() - Sent NetCDF-4 for dataset: {}", w10nRequest.getValidResourcePath());
-
-
-
     }
 
 
@@ -1111,11 +872,8 @@ public class W10nResponder {
                                         HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-        _log.debug("Sending w10n JSON data response for dataset: {}",w10nRequest.getValidResourcePath());
-
-
         String resourceID = w10nRequest.getRequestedResourceId();
-
+        _log.debug("Sending w10n JSON data response for dataset: {}",w10nRequest.getValidResourcePath());
 
         MediaType responseMediaType =  new Json();
         RequestCache.put("ResponseMediaType", responseMediaType);
@@ -1128,14 +886,9 @@ public class W10nResponder {
 
         String downloadFileName = getDownloadFileName(resourceID)+".json";
         response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
-        _log.debug("sendDap2DataAsW10nJson() - JSON file downloadFileName: " + downloadFileName);
-
-
-
-
+        _log.debug("sendDap2DataAsW10nJson() - JSON file downloadFileName: {}", downloadFileName);
 
         Gson gson = new Gson();
-
         String w10nMetaObject = "\"w10n\":"+ gson.toJson(
                 getW10nMetaObject(
                         DAP2_TYPE,
@@ -1145,7 +898,6 @@ public class W10nResponder {
                         _supportedDataMediaTypes));
 
         ServletOutputStream os = response.getOutputStream();
-
         _besApi.writeDap2DataAsW10nJson(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
@@ -1155,10 +907,7 @@ public class W10nResponder {
                 "3.2",
                 maxResponseSize,
                 os);
-
-
         os.flush();
-
     }
 
     /**
@@ -1180,7 +929,6 @@ public class W10nResponder {
 
         _log.debug("sendDap2Data() - Sending DAP2 data response for dataset: {}",w10nRequest.getValidResourcePath());
 
-
         ServletOutputStream os = response.getOutputStream();
 
         String resourceID = w10nRequest.getRequestedResourceId();
@@ -1193,65 +941,46 @@ public class W10nResponder {
 
         String downloadFileName = getDownloadFileName(resourceID)+".dods";
         response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
-        _log.debug("sendDap2Data() - DAP2 Data file downloadFileName: " + downloadFileName);
-
+        _log.debug("sendDap2Data() - DAP2 Data file downloadFileName: {}", downloadFileName);
 
         response.setHeader("Content-Description", "DAP2 Data Response");
-
         _besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, os);
 
         os.flush();
-
     }
 
 
     /**
      * Transmits a non-data file from the BES to the requesting client.
      *
-     * @param req Client request
-     * @param response Outbound response.
-     * @throws Exception
+     * @param req
+     * @param response
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
      */
     public void sendFile(HttpServletRequest req,
                          HttpServletResponse response)
-            throws Exception {
-
+            throws IOException, PPTException, BadConfigurationException, BESError {
 
         String name = ReqInfo.getLocalUrl(req);
-
-
-        _log.debug("sendFile(): Sending file \"" + name + "\"");
+        _log.debug("sendFile(): Sending file \"{}\"", name);
 
         String downloadFileName = Scrub.fileName(name.substring(name.lastIndexOf("/")+1));
-
-        _log.debug("sendFile() downloadFileName: " + downloadFileName);
-
-        // I commented these two lines  out because it was incorrectly causing browsers to downloadJobOutput
-        // (as opposed to display) EVERY file retrieved.
-        //String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-        //response.setHeader("Content-Disposition",contentDisposition);
-
+        _log.debug("sendFile() downloadFileName: {}", downloadFileName);
 
         String suffix = ReqInfo.getRequestSuffix(req);
-
-
         if (suffix != null) {
             MediaType responseMediaType = MimeTypes.getMediaType(suffix);
             if (responseMediaType != null) {
                 response.setContentType(responseMediaType.getMimeType());
-                _log.debug("sendFile() - MIME type: " + responseMediaType.getMimeType() + "  ");
+                _log.debug("sendFile() - MIME type: {}", responseMediaType.getMimeType());
             }
         }
-
-
         ServletOutputStream sos = response.getOutputStream();
         _besApi.writeFile(name, sos);
-
         sos.flush();
-
-
-
-
     }
 
 
@@ -1275,35 +1004,24 @@ public class W10nResponder {
                                                     HttpServletResponse response)
             throws OPeNDAPException, IOException, JDOMException, SaxonApiException {
 
-
         // Handle Response Media Type...
         MediaType mt = w10nRequest.getBestMediaType();
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, mt);
         response.setContentType(mt.getMimeType());
         response.setHeader("Content-Description", mt.getMimeType());
-
-
-
         response.setContentType(mt.getMimeType());
-
 
         if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
             sendDap2MetadataAsW10nHtml(w10nRequest, response);
             return;
         }
 
-
         if(mt.getName().equalsIgnoreCase(Json.NAME)){
             sendDap2MetadataAsW10nJson(w10nRequest,maxResponseSize,response);
             return;
         }
-
-
-
-
         throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
-
     }
 
 
@@ -1388,7 +1106,7 @@ public class W10nResponder {
                 dataset.removeContent();
                 @SuppressWarnings("unchecked")
                 List<Element> varsAndAttrs = requestedVariableElement.getChildren();
-                Vector<Element> containerContents = new Vector<>();
+                ArrayList<Element> containerContents = new ArrayList<>();
                 containerContents.addAll(varsAndAttrs);
                 for(Element e: containerContents){
                     e.detach();
@@ -1403,7 +1121,8 @@ public class W10nResponder {
                 isNode = false;
             }
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            _log.debug("sendDap2MetadataAsW10nHtml() - Transforming modified dataset document: \n{}",xmlo.outputString(besResponse));
+            if(_log.isDebugEnabled())
+                _log.debug("sendDap2MetadataAsW10nHtml() - Transforming modified dataset document: \n{}",xmlo.outputString(besResponse));
         }
 
         String s;
@@ -1426,11 +1145,6 @@ public class W10nResponder {
 
         // Transform the BES  showCatalog response into a HTML page for the browser
         transformer.transform(datasetDocumentSource, response.getOutputStream());
-        // transformer.transform(besCatalog, System.out);
-
-
-
-
     }
 
 
@@ -1443,80 +1157,37 @@ public class W10nResponder {
      * @return
      */
     private Element childSearchWorker(Element e, Iterator<String> reqVarIter){
-
-
         Element requestedVariableElement = e;
-
         if(reqVarIter.hasNext()) {
-
             String requestedVarName = reqVarIter.next();
-
             @SuppressWarnings("unchecked")
             List<Element> varsAndAttrs = e.getChildren();
-
             for (Element vOrA : varsAndAttrs) {
                 String typeName = vOrA.getName();
-
                 // if it's not an attribute or the blob
                 if (!typeName.equalsIgnoreCase("Attribute") && !typeName.equalsIgnoreCase("blob")) {
-
                     String name = vOrA.getAttributeValue("name");
-
                     // Does the name match?
                     if (name.equals(requestedVarName)) {
                         requestedVariableElement = vOrA;
-
                         return childSearchWorker(requestedVariableElement,reqVarIter);
-
                     }
-
-
                 }
-
-
             }
         }
-
-
         return requestedVariableElement;
     }
 
 
-    public static  String  escapeForJson(String s) {
-
-        char[] input = s.toCharArray();
-
-        StringBuilder ss = new StringBuilder();
-
-        // Send all output to the Appendable object ss
-        Formatter formatter = new Formatter(ss, Locale.US);
-
-
-        for (int i = 0; i < input.length;  ++i) {
-            int c = input[i];
-            if (c < 0x20 || c == '\\' || c == '"') {
-
-                formatter.format("\\u%04x", (int)c);
-
-                // C++ version of the appender.
-                // ss << "\\u" << std::setfill('0') << std::setw(4) << std::hex << unsigned(input[i]);
-
-
-            } else {
-                formatter.format("%c", c);
-            }
-        }
-
-        return formatter.toString();
-    }
-
+    /**
+     *
+     * @param resourceID
+     * @return
+     */
     public String getDownloadFileName(String resourceID){
-        String downloadFileName = (resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
-
-
-
-        int lastOpenBracketIndex = downloadFileName.lastIndexOf("[");
-        int lastSlashIndex = downloadFileName.lastIndexOf("/");
+        String downloadFileName = (resourceID.substring(resourceID.lastIndexOf('/') + 1, resourceID.length()));
+        int lastOpenBracketIndex = downloadFileName.lastIndexOf('[');
+        int lastSlashIndex = downloadFileName.lastIndexOf('/');
         if ( lastOpenBracketIndex>0 && lastSlashIndex < lastOpenBracketIndex)
             downloadFileName = downloadFileName.substring(0,lastOpenBracketIndex);
 
