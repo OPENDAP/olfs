@@ -38,6 +38,7 @@
     <xsl:param name="viewersService" />
     <xsl:param name="collectionURL" />
     <xsl:param name="catalogPublisherJsonLD" />
+    <xsl:param name="supportLink"/>
     <xsl:param name="allowDirectDataSourceAccess" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
@@ -238,15 +239,17 @@
             <!--         HERE IS THE HYRAX VERSION NUMBER               -->
             <!--                                                        -->
             <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-
-                <xsl:if test="bes:dataset/@name='/'">
+                <!-- xsl:if test="bes:dataset/@name='/'">
                     <span class="uuid">
                         ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                     </span>
-                </xsl:if>
-
-                <br/>
-                <a href='{$docsService}/'>Documentation</a>
+                </xsl:if -->
+                <div>
+                    <a href="{$docsService}/">Documentation</a>
+                    <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+                        <a href="{$supportLink}">Questions? Contact Support</a>
+                    </span>
+                </div>
             </h3>
             <xsl:call-template name="json-ld-DataCatalog"/>
         </body>
