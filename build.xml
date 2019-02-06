@@ -935,10 +935,11 @@
 
     <!-- Define the SonarQube project properties -->
     <property name="sonar.projectKey" value="66f277d8ec0949b5ae994d79c3a3eea19f0be366" />
-    <property name="sonar.projectName" value="OLFS SonarQube Scanner for Ant Usage" />
+    <property name="sonar.projectName" value="olfs" />
     <property name="sonar.projectVersion" value="${OLFS_VERSION}" />
     <property name="sonar.organization" value="opendap" />
     <property name="sonar.sources" value="src" />
+    <property name="sonar.exclusions" value="src/opendap/experiments/**/*.java,src/opendap/metacat/**/*.java,src/opendap/aws/**/*.java,src/opendap/noaa_s3/**/*.java" />
     <property name="sonar.java.binaries" value="build" />
     <property name="sonar.java.libraries" value="lib/*.jar" />
 
