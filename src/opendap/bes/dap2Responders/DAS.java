@@ -101,7 +101,7 @@ public class DAS extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -109,16 +109,9 @@ public class DAS extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-
         OutputStream os = response.getOutputStream();
-
         besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os);
-
-
         os.flush();
         log.debug("Sent DAP DAS.");
-
-
     }
-
 }

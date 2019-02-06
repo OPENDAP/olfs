@@ -236,7 +236,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response,_besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "thredds_catalog");
 
 

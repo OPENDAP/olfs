@@ -88,15 +88,12 @@ public class DDS extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
-
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
-
 
         log.debug("Sending DDS for dataset: " + resourceID);
 
@@ -106,24 +103,17 @@ public class DDS extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-
         OutputStream os = response.getOutputStream();
-
         besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os);
-
         os.flush();
         log.debug("Sent DAP DDS.");
-
-
-
-
     }
 
 }

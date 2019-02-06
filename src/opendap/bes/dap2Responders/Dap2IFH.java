@@ -119,7 +119,7 @@ public class Dap2IFH extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");

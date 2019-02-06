@@ -81,14 +81,8 @@ public class CsvDR extends Dap4Responder {
 
     }
 
-
-
     public boolean isDataResponder(){ return true; }
     public boolean isMetadataResponder(){ return false; }
-
-
-
-
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -96,7 +90,6 @@ public class CsvDR extends Dap4Responder {
         QueryParameters qp = new QueryParameters(request);
 
         String resourceID = getResourceId(localUrl, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -108,26 +101,17 @@ public class CsvDR extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-
         User user = new User(request);
 
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDap4DataAsCsv(resourceID, qp, user.getMaxResponseSize(),os);
-
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
 
 
