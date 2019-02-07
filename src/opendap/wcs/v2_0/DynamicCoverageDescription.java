@@ -160,7 +160,7 @@ public class DynamicCoverageDescription extends CoverageDescription {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             String dmrXml = xmlo.outputString(dmr);
             InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
-            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLInputFactory factory = opendap.xml.Util.getXmlInputFactory();
             XMLStreamReader xsr = factory.createXMLStreamReader(is);
             XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
             Dataset dataset = (Dataset) um.unmarshal(xr);
@@ -918,15 +918,9 @@ public class DynamicCoverageDescription extends CoverageDescription {
 
         // TODO: marshal this into the OLFS JDOM object representation of CoverageDescription...more directly
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            String msg = "Failed to get DocumentBuilder! ParserConfigurationException Message: " + e.getMessage();
-            _log.error(msg);
-            throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
+        DocumentBuilder db = opendap.xml.Util.getDocumentBuilder();
+        if(db == null){
+            throw new WcsException("coverageDescriptionType2JDOM() - OUCH!! Failed to get DocumentBuilder!", WcsException.NO_APPLICABLE_CODE);
         }
         Document doc = db.newDocument();
 
