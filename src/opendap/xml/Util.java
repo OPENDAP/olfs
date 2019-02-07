@@ -39,12 +39,16 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.regex.Pattern;
 
 /**
@@ -54,9 +58,9 @@ import java.util.regex.Pattern;
  */
 public class Util {
 
-    private static final Logger _log;
+    private static final Logger log;
     static {
-        _log = org.slf4j.LoggerFactory.getLogger(Util.class);
+        log = org.slf4j.LoggerFactory.getLogger(Util.class);
     }
 
     public static Element getDocumentRoot(File f)throws IOException, JDOMException {
@@ -70,27 +74,23 @@ public class Util {
     }
 
     public static Document getDocument(File f)throws IOException, JDOMException{
-
         String msg;
-
-
         if(!f.exists()){
             msg = "Cannot find file: "+ f.getAbsoluteFile();
-            _log.error(msg);
+            log.error(msg);
             throw new IOException(msg);
         }
 
         if(!f.canRead()){
             msg = "Cannot read file: "+ f.getAbsoluteFile();
-            _log.error(msg);
+            log.error(msg);
             throw new IOException(msg);
         }
         if(!f.isFile()){
             msg = "The file " + f.getAbsoluteFile() +" is not actually a file.";
-            _log.error(msg);
+            log.error(msg);
             throw new IOException(msg);
         }
-
         SAXBuilder sb = new SAXBuilder();
         return sb.build(f);
     }
@@ -114,7 +114,7 @@ public class Util {
      * @throws IOException
      * @throws JDOMException
      */
-    static public Element  getDocumentRoot(String docUrlString, CredentialsProvider credsProvider)
+    public static  Element  getDocumentRoot(String docUrlString, CredentialsProvider credsProvider)
             throws IOException, JDOMException {
         Element docRoot = null;
         Document doc = getDocument(docUrlString,credsProvider);
@@ -138,9 +138,10 @@ public class Util {
      *         docUrlString
      * @throws IOException
      * @throws JDOMException
-     */     static public Document  getDocument(String docUrlString, CredentialsProvider credsProvider) throws IOException, JDOMException {
+     */
+    public static Document  getDocument(String docUrlString, CredentialsProvider credsProvider) throws IOException, JDOMException {
 
-        _log.debug("getDocument() - URL: {}",docUrlString);
+        log.debug("getDocument() - URL: {}", docUrlString);
         Document doc = null;
 
         CloseableHttpClient httpclient = HttpClients.custom()
@@ -150,16 +151,14 @@ public class Util {
         HttpGet httpGet = new HttpGet(docUrlString);
         CloseableHttpResponse resp = httpclient.execute(httpGet);
         try {
-            _log.debug("HTTP STATUS: {}",resp.getStatusLine());
+            log.debug("HTTP STATUS: {}", resp.getStatusLine());
             HttpEntity entity1 = resp.getEntity();
             doc = opendap.xml.Util.getDocument(entity1.getContent());
             EntityUtils.consume(entity1);
         } finally {
             resp.close();
         }
-
         return doc;
-
     }
 
 
@@ -172,7 +171,7 @@ public class Util {
      * @throws IOException
      * @throws JDOMException
      */
-    public static Element  getDocumentRoot(String filename)throws MalformedURLException, IOException, JDOMException {
+    public static Element  getDocumentRoot(String filename)throws IOException, JDOMException {
         Element docRoot = null;
         Document doc = getDocument(filename);
         if(doc!=null){
@@ -194,7 +193,7 @@ public class Util {
      */
     public static Document getDocument(String filename) throws IOException, JDOMException {
 
-        _log.debug("getDocument() - Retrieving: "+filename);
+        log.debug("getDocument() - Retrieving: {}",filename);
 
         Document doc;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
@@ -210,29 +209,14 @@ public class Util {
         }
         File f = new File(fname);
         doc = getDocument(f);
-        _log.debug("getDocument() - Loaded XML Document: \n"+xmlo.outputString(doc));
+        if(log.isDebugEnabled()) {
+            log.debug("getDocument() - Loaded XML Document: \n{}", xmlo.outputString(doc));
+        }
         return doc;
     }
 
 
-    private static String getUrlInfo(URL url){
-        String info = "URL:\n";
-
-        info += "    getHost():         " + url.getHost() + "\n";
-        info += "    getAuthority():    " + url.getAuthority() + "\n";
-        info += "    getFile():         " + url.getFile() + "\n";
-        info += "    getSystemPath():         " + url.getPath() + "\n";
-        info += "    getDefaultPort():  " + url.getDefaultPort() + "\n";
-        info += "    getPort():         " + url.getPort() + "\n";
-        info += "    getProtocol():     " + url.getProtocol() + "\n";
-        info += "    getQuery():        " + url.getQuery() + "\n";
-        info += "    getRef():          " + url.getRef() + "\n";
-        info += "    getUserInfo():     " + url.getUserInfo() + "\n";
-
-        return info;
-    }
-
-    public static String NCNAME_REGEX_STRING = "^[^\\.\\-\\d][\\w-\\._\\d]*$";
+    public static final String NCNAME_REGEX_STRING = "^[^\\.\\-\\d][\\w-\\._\\d]*$";
     public static boolean isNCNAME(String s){
         Pattern pattern = Pattern.compile(NCNAME_REGEX_STRING);
         return pattern.matcher(s).matches();
@@ -246,17 +230,6 @@ public class Util {
      * @return
      */
     public static String convertToNCNAME(String s){
-        /*
-        char[] allowedChars = {
-                '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-
-        char[] disallowedFirstChars = { '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-        */
-
         char[] disallowedChars = {
                 ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ':',
                 ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~'} ;
@@ -272,13 +245,84 @@ public class Util {
         return s;
     }
 
+    /**
+     * Returns a "safe" javax.xml.stream.XMLInputFactory.
+     * Because parsing "untrusted" XML document with external entities and DTD's enabled can can allow attackers to
+     * request pretty much any file from the host file system we disable these prior to returning the factory.
+     *
+     * @return An javax.xml.stream.XMLInputFactory with external entities and DTD's disabled.
+     */
+    public static XMLInputFactory getXmlInputFactory(){
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        return factory;
+    }
+
+    /**
+     * Returns a "safe" javax.xml.parsers.DocumentBuilder.
+     * Because parsing "untrusted" XML document with external entities and DTD's enabled can can allow attackers to
+     * request pretty much any file from the host file system we disable these prior to returning the factory.
+     *
+     * @return An javax.xml.parsers.DocumentBuilder with external entities and DTD's disabled.
+     */
+    public static DocumentBuilder getDocumentBuilder(){
+        DocumentBuilder db = null;
+        String FEATURE = null;
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            // This is the PRIMARY defense. If DTDs (doctypes) are disallowed, almost all XML entity attacks are prevented
+            // Xerces 2 only - http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
+            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+            dbf.setFeature(FEATURE, true);
+
+            // If you can't completely disable DTDs, then at least do the following:
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
+            // JDK7+ - http://xml.org/sax/features/external-general-entities
+            FEATURE = "http://xml.org/sax/features/external-general-entities";
+            dbf.setFeature(FEATURE, false);
+
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
+            // JDK7+ - http://xml.org/sax/features/external-parameter-entities
+            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+            dbf.setFeature(FEATURE, false);
+
+            // Disable external DTDs as well
+            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+            dbf.setFeature(FEATURE, false);
+
+            FEATURE = null;
+            // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
+            dbf.setXIncludeAware(false);
+            dbf.setExpandEntityReferences(false);
+            dbf.setNamespaceAware(true);
+
+            db = dbf.newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            // This should catch a failed setFeature feature
+            String msg = "Failed to get DocumentBuilder!";
+            if(FEATURE!=null){
+                msg +=  "The feature '" + FEATURE + "' is probably not supported by the XML processor.";
+            }
+            msg += " Caught ParserConfigurationException Message: " + e.getMessage();
+            log.error(msg);
+        }
+
+        return db;
+    }
 
     public static void main(String[] args) {
+
+        Logger log = LoggerFactory.getLogger(Util.class);
+
         String[]  ncNameConversionTests = {
                 "jhbwf", "2ljhb", "kbwv::(&^", "kbwv::(&^bartmight","238kbwv::(&^bartmight" };
 
         for(String testStr: ncNameConversionTests)
-            System.out.println(testStr+" --> "+convertToNCNAME(testStr));
+            log.info("{} --> {}",testStr, convertToNCNAME(testStr));
 
     }
 
