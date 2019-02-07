@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,59 +51,37 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DocServlet extends HttpServlet {
 
 
-    private String documentsDirectory;
+    private static String documentsDirectory;
+    private static Logger log;
+    private static AtomicInteger reqNumber;
 
-
-    private Logger log;
-
-
-    private AtomicInteger reqNumber;
-
-
+    @Override
     public void init() {
-
         reqNumber = new AtomicInteger(0);
-
         String dir = ServletUtil.getConfigPath(this) + "docs";
-
         File f = new File(dir);
 
         if (f.exists() && f.isDirectory())
             documentsDirectory = dir;
         else {
-
             documentsDirectory = this.getServletContext().getRealPath("docs");
-
         }
-
-
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-        log.info("documentsDirectory: " + documentsDirectory);
-
-
+        log.info("documentsDirectory: {}", documentsDirectory);
     }
 
-
+    @Override
     public long getLastModified(HttpServletRequest req) {
 
-        long lmt = -1;
-
+        long lmt = new Date().getTime(); // time is now...
 
         String name = Scrub.fileName(getName(req));
-
-
         if(name!=null) {
             File f = new File(name);
             if (f.exists())
                 lmt = f.lastModified();
-
         }
-        //log.debug("getLastModified() - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
-
         return lmt;
-
-
     }
 
 
@@ -132,10 +111,10 @@ public class DocServlet extends HttpServlet {
     }
 
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-        int request_status = HttpServletResponse.SC_OK;
-
+        int status = HttpServletResponse.SC_OK;
 
         try {
             String contextPath = ServletUtil.getContextPath(this);
@@ -147,12 +126,11 @@ public class DocServlet extends HttpServlet {
 
                 String name = Scrub.fileName(getName(request));
 
-                log.debug("DocServlet - The client requested this: " + name);
+                log.debug("DocServlet - The client requested this: {}", name);
 
                 if(name == null){
                     throw new NotFound("Unable to locate: "+name);
                 }
-
                 File f = new File(name);
 
                 if (f.exists()) {
@@ -162,7 +140,7 @@ public class DocServlet extends HttpServlet {
 
 
                         String suffix = null;
-                        if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
+                        if (name.lastIndexOf('/') < name.lastIndexOf('.')) {
                             suffix = name.substring(name.lastIndexOf('.') + 1);
                         }
 
@@ -171,39 +149,25 @@ public class DocServlet extends HttpServlet {
                             mType = MimeTypes.getMimeType(suffix);
                             if (mType != null)
                                 response.setContentType(mType);
-                            log.debug("   MIME type: " + mType + "  ");
+                            log.debug("   MIME type: {}", mType);
                         }
-
-                        // Gah! Don't do a setStatus()!!!! Doing so breaks the HTTP status value for <error-page>
-                        // declarations in the web.xml file.
-                        //response.setStatus(HttpServletResponse.SC_OK);
 
                         log.debug("   Sending.");
                         if (mType != null)
                             response.setContentType(mType);
 
-
                         ServletOutputStream sos  = response.getOutputStream();
-
 
                         if (mType != null && mType.startsWith("text/")) {
 
                             String docString = readFileAsString(f);
-
-                            log.debug("read file " + f.getAbsolutePath() + " into a String.");
-
-
+                            log.debug("Read file {} into a String.", f.getAbsolutePath());
                             docString = docString.replace("<CONTEXT_PATH />", contextPath);
                             docString = docString.replace("<SERVLET_NAME />", servletName);
-
-
                             sos.println(docString);
                         } else {
-
-                            FileInputStream fis = new FileInputStream(f);
-
-                            try {
-                                byte buff[] = new byte[8192];
+                            try (FileInputStream fis = new FileInputStream(f)) {
+                                byte[] buff = new byte[8192];
                                 int rc;
                                 boolean doneReading = false;
                                 while (!doneReading) {
@@ -217,9 +181,6 @@ public class DocServlet extends HttpServlet {
                                 }
                             } finally {
 
-                                if (fis != null)
-                                    fis.close();
-
                                 if (sos != null)
                                     sos.flush();
                             }
@@ -228,8 +189,6 @@ public class DocServlet extends HttpServlet {
                     } else if (f.isDirectory()) {
                         log.debug("   Requested directory exists.");
                         response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString())+"/");
-
-
                     }
                     else {
                         String msg = "Unable to determine type of requested item: "+f.getName();
@@ -241,15 +200,11 @@ public class DocServlet extends HttpServlet {
                 } else {
                     throw new NotFound("Failed to locate resource: "+name);
                 }
-
-            } else {
-
-                // throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+name);
             }
 
         } catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this,  response);
+                status = OPeNDAPException.anyExceptionHandler(t, this,  response);
             } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
@@ -259,7 +214,7 @@ public class DocServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
+            LogUtil.logServerAccessEnd(status, "HyraxAccess");
         }
     }
 
