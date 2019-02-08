@@ -60,17 +60,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Servlet extends HttpServlet {
 
-    private Logger _log;
+    private Logger log;
     private HttpGetHandler httpGetService;
     private FormHandler formService;
     private XmlRequestHandler wcsPostService ;
     private SoapHandler wcsSoapService;
     private AtomicInteger reqNumber;
 
-    //private Document configDoc;
-    private String _defaultWcsServiceConfigFilename;
+    private static final String DEFAULT_WCS_SERVICE_CONFIG_FILENAME = "wcs_service.xml";
+    private static final String WCS_ACCESS_LOG_ID = "WCS_2.0_ACCESS";
 
-    private boolean _initialized;
+    private boolean initialized;
 
     public Servlet(){
         httpGetService = null;
@@ -78,54 +78,53 @@ public class Servlet extends HttpServlet {
         wcsPostService = null;
         wcsSoapService = null;
         reqNumber = new AtomicInteger(0);
-        _defaultWcsServiceConfigFilename = "wcs_service.xml";
     }
 
 
 
+    @Override
     public void init() throws ServletException {
-        if(_initialized)
+        String prolog = "init() - ";
+        if(initialized)
             return;
 
         super.init();
 
         LogUtil.initLogging(this);
-        _log = org.slf4j.LoggerFactory.getLogger(getClass());
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         String contextPath = ServletUtil.getContextPath(this);
-        _log.info("contextPath: "+contextPath);
+        log.info("{}contextPath: {}", prolog, contextPath);
 
         String servletName = getServletName();
 
         contextPath = PathBuilder.pathConcat(contextPath,servletName);
 
-        // _log.info(ServletUtil.probeRequest(this,null));
-
         String resourcePath = ServletUtil.getSystemPath(this, "/");
-        _log.info("resourcePath: "+resourcePath);
+        log.info("{}resourcePath: {}", prolog, resourcePath);
 
         String configPath = ServletUtil.getConfigPath(this);
-        _log.info("configPath: "+configPath);
+        log.info("{} configPath: {}", prolog, configPath);
 
         boolean enableUpdateUrl;
         String s = this.getInitParameter("EnableUpdateUrl");
         enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
-        _log.debug("enableUpdateUrl: "+enableUpdateUrl);
+        log.debug("{}enableUpdateUrl: {}", prolog, enableUpdateUrl);
 
         String serviceConfigPath = configPath;
         if(!serviceConfigPath.endsWith("/"))
             serviceConfigPath += "/";
-        _log.debug("serviceConfigPath: {}",serviceConfigPath);
+        log.debug("{}serviceConfigPath: {}",prolog,serviceConfigPath);
 
 
         String wcsConfigFileName = getInitParameter("WCSConfigFileName");
         if (wcsConfigFileName == null) {
-            wcsConfigFileName = _defaultWcsServiceConfigFilename;
-            String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
+            wcsConfigFileName = DEFAULT_WCS_SERVICE_CONFIG_FILENAME;
+            String msg = prolog + "Servlet configuration (typically in the web.xml file) must include a file name for " +
                     "the WCS service configuration! This on is MISSING. Using default configuration file name.\n";
-            _log.warn(msg);
+            log.warn(msg);
         }
-        _log.info("configFilename: "+wcsConfigFileName);
+        log.info("{}configFilename: {}", prolog, wcsConfigFileName);
         PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
 
         WcsServiceManager.init(contextPath, serviceConfigPath, wcsConfigFileName);
@@ -139,11 +138,6 @@ public class Servlet extends HttpServlet {
         // Build configuration elements
         Element config  = new Element("config");
         Element prefix  = new Element("prefix");
-
-//        System.out.println(ServletUtil.probeServlet(this));
-
-        // ServletContext sc = this.getServletContext();
-        // prefix.setText(sc.getContextPath());
         config.addContent(prefix);
 
         try {
@@ -159,15 +153,13 @@ public class Servlet extends HttpServlet {
             throw new ServletException(e);
         }
 
-
         // Now we need to configure a BES
-
         initBesManager("olfs.xml");
 
-
-
-        _initialized = true;
+        initialized = true;
     }
+
+
     private void initBesManager(String configFileName) throws ServletException {
 
         String besConfigFilename = Scrub.fileName(ServletUtil.getConfigPath(this) + configFileName);
@@ -178,11 +170,11 @@ public class Servlet extends HttpServlet {
         } catch (IOException | JDOMException e) {
             String msg = "Unable to read BES configuration file: '"+besConfigFilename+"' Caught " + e.getClass().getSimpleName() +
                     " message: " + e.getMessage();
-            _log.error(msg);
+            log.error(msg);
             return;
         }
         if(config==null) {
-            _log.error("Failed to get BES configuration document: '{}'", besConfigFilename);
+            log.error("Failed to get BES configuration document: '{}'", besConfigFilename);
             return;
         }
         
@@ -190,7 +182,7 @@ public class Servlet extends HttpServlet {
 
         if (besManagerElement == null) {
             String msg = "Invalid BES configuration. Missing required 'BESManager' element. BES was not initialized!";
-            _log.error(msg);
+            log.error(msg);
             return;
         }
 
@@ -201,7 +193,7 @@ public class Servlet extends HttpServlet {
             } catch (Exception e) {
                 String msg = "BESManager initialization was an abject failure. BES was not initialized! " +
                         "Caught "+e.getClass().getName()+ " message: "+e.getMessage();
-                _log.error(msg);
+                log.error(msg);
             }
         }
 
@@ -209,11 +201,12 @@ public class Servlet extends HttpServlet {
     
 
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -242,12 +235,12 @@ public class Servlet extends HttpServlet {
                 Document errDoc = new Document( myBadThang.getExceptionElement());
 
                 if(!resp.isCommitted()){
-                    _log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
+                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
                     resp.setStatus(myBadThang.getHttpStatusCode());
                     xmlo.output(errDoc,resp.getOutputStream());
                 }
                 else {
-                    _log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
+                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
                     resp.sendError(myBadThang.getHttpStatusCode(),myBadThang.getMessage());
                 }
 
@@ -255,10 +248,10 @@ public class Servlet extends HttpServlet {
             }
             catch(Throwable t2) {
             	try {
-            		_log.error("\n########################################################\n" +
+            		log.error("\n########################################################\n" +
                                 "Request processing failed.\n" +
                                 "Normal Exception handling failed.\n" +
-                                "This is the last error _log attempt for this request.\n" +
+                                "This is the last error log attempt for this request.\n" +
                                 "########################################################\n", t2);
             	}
             	catch(Throwable t3){
@@ -267,17 +260,19 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WCS_2.0_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
     }
 
 
+
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -290,7 +285,7 @@ public class Servlet extends HttpServlet {
             }
             else {
                 String msg = "The request does not resolve to a WCS service operation that this server supports.";
-                _log.error("doPost() - {}",msg);
+                log.error("doPost() - {}",msg);
                 throw new BadRequest(msg);
             }
 
@@ -301,10 +296,10 @@ public class Servlet extends HttpServlet {
             }
             catch(Throwable t2) {
             	try {
-            		_log.error("\n########################################################\n" +
+            		log.error("\n########################################################\n" +
                                 "Request processing failed.\n" +
                                 "Normal Exception handling failed.\n" +
-                                "This is the last error _log attempt for this request.\n" +
+                                "This is the last error log attempt for this request.\n" +
                                 "########################################################\n", t2);
             	}
             	catch(Throwable t3){
@@ -313,28 +308,30 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WCS_2.0_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
     }
+
+    @Override
     protected long getLastModified(HttpServletRequest req) {
 
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "WCS_2.0_ACCESS", "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             return -1;
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "WCS_2.0_ACCESS");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, WCS_ACCESS_LOG_ID);
         }
 
 
     }
 
 
-
+    @Override
     public void destroy() {
         LogUtil.logServerShutdown("destroy()");
 
