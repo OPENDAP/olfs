@@ -30,9 +30,7 @@ import org.jdom.Element;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,10 +51,11 @@ public class XLink {
     public static final String LABEL = "label";
     public static final String FROM = "from";
     public static final String TO = "to";
-    Vector<Attribute> attributes = new Vector<Attribute>();
+    public static final String NONE = "none";
 
+    public enum Type {SIMPLE , EXTENDED, LOCATOR, ARC, RESOURCE, TITLE, EMPTY}
 
-    public static final HashSet<String> showValues = new HashSet<String>();
+    private static final Set<String> showValues = new HashSet<>();
     static {
         showValues.add("new");
         showValues.add("replace");
@@ -65,26 +64,22 @@ public class XLink {
         showValues.add("none");
     }
 
-    public static final HashSet<String> actuateValues = new HashSet<String>();
+    private static final Set<String> actuateValues = new HashSet<>();
     static {
-        showValues.add("onLoad");
-        showValues.add("onRequest");
-        showValues.add("other");
-        showValues.add("none");
+        actuateValues.add("onLoad");
+        actuateValues.add("onRequest");
+        actuateValues.add("other");
+        actuateValues.add("none");
     }
 
-    public static enum Type {SIMPLE , EXTENDED, LOCATOR, ARC, RESOURCE, TITLE, EMPTY}
+    private ArrayList<Attribute> attributes = new ArrayList<>();
 
 
     public XLink(Element e) throws WcsException {
 
         Iterator i = e.getAttributes().iterator();
-
-
-        Attribute a;
         while(i.hasNext()){
-            a = (Attribute)i.next();
-
+            Attribute a = (Attribute)i.next();
             if(a.getNamespace().equals(WCS.XLINK_NS)){
                 attributes.add(a);
             }
@@ -236,16 +231,19 @@ public class XLink {
 
 
                 if(show!=null){
-                    if(!showValues.contains(show))
-                    throw new WcsException("The xlink:show attribute may not have a value of '"+show+"'",
-                            WcsException.INVALID_PARAMETER_VALUE,"xlink:show");
+                    if(!showValues.contains(show)) {
+                        throw new WcsException("The xlink:show attribute may not have a value of '" + show + "'",
+                                WcsException.INVALID_PARAMETER_VALUE, "xlink:show");
+                    }
                     attributes.add(new Attribute(SHOW,show,WCS.XLINK_NS));
+
                 }
 
                 if(actuate!=null){
-                    if(!actuateValues.contains(actuate))
-                    throw new WcsException("The xlink:actuate attribute may not have a value of '"+actuate+"'",
-                            WcsException.INVALID_PARAMETER_VALUE,"xlink:actuate");
+                    if(!actuateValues.contains(actuate)) {
+                        throw new WcsException("The xlink:actuate attribute may not have a value of '" + actuate + "'",
+                                WcsException.INVALID_PARAMETER_VALUE, "xlink:actuate");
+                    }
                     attributes.add(new Attribute(ACTUATE,actuate,WCS.XLINK_NS));
                 }
 
@@ -279,14 +277,14 @@ public class XLink {
                 if(href!=null || role!=null || arcrole!=null || show!=null || actuate!=null || label!=null ||  from!=null || to!=null)
                     throw new WcsException("xlink attributes not compatible with xlink:type of 'title'",
                             WcsException.INVALID_PARAMETER_VALUE,"xlink:title");
-                attributes.add(new Attribute(TYPE,"title",WCS.XLINK_NS));
+                attributes.add(new Attribute(TYPE,TITLE,WCS.XLINK_NS));
                 break;
 
             case EMPTY:
                 if(href!=null || role!=null || arcrole!=null || title!=null || show!=null || actuate!=null || label!=null ||  from!=null || to!=null)
                     throw new WcsException("xlink attributes not compatible with xlink:type of 'empty'",
                             WcsException.INVALID_PARAMETER_VALUE,"xlink:empty");
-                attributes.add(new Attribute(TYPE,"none",WCS.XLINK_NS));
+                attributes.add(new Attribute(TYPE,NONE,WCS.XLINK_NS));
                 break;
 
             default:
@@ -299,7 +297,7 @@ public class XLink {
 
 
 
-    public Vector<Attribute> getAttributes() {
+    public List<Attribute> getAttributes() {
         return attributes;
 
     }
