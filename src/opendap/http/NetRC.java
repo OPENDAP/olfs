@@ -169,7 +169,7 @@ public class NetRC {
      * @param netrc
      *            the .netrc file
      */
-    public NetRC(File netrc) {
+    public NetRC(File netrc) throws IOException {
         this.netrc = netrc;
         parse();
     }
@@ -181,7 +181,7 @@ public class NetRC {
      * @param host
      * @return entry associated with host name or null
      */
-    public NetRCEntry getEntry(String host) {
+    public NetRCEntry getEntry(String host) throws IOException {
         if (netrc == null)
             return null;
 
@@ -203,7 +203,7 @@ public class NetRC {
         return hosts.values();
     }
 
-    private void parse() {
+    private void parse() throws IOException {
         this.hosts.clear();
         this.lastModified = this.netrc.lastModified();
 
@@ -310,15 +310,9 @@ public class NetRC {
 
             if (entry.complete())
                 hosts.put(entry.machine, entry);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } finally {
-            try {
-                if (bufRdr != null)
-                    bufRdr.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (bufRdr != null)
+                bufRdr.close();
         }
     }
 }
