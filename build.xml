@@ -931,10 +931,10 @@
     -->
     <!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
     <property name="sonar.host.url" value="https://sonarcloud.io" />
-    <property name="sonar.login" value="66f277d8ec0949b5ae994d79c3a3eea19f0be366" />
+    <property name="sonar.login" value="ping... ping... ping..." />
 
     <!-- Define the SonarQube project properties -->
-    <property name="sonar.projectKey" value="66f277d8ec0949b5ae994d79c3a3eea19f0be366" />
+    <property name="sonar.projectKey" value="opendap-olfs" />
     <property name="sonar.projectName" value="olfs" />
     <property name="sonar.projectVersion" value="${OLFS_VERSION}" />
     <property name="sonar.organization" value="opendap" />
