@@ -28,6 +28,7 @@ package opendap.wcs.v2_0.http;
 import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
@@ -67,15 +68,16 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
     }
-
     public void init(HttpServlet servlet, Element config) throws Exception {
+        init(servlet,config,null);
+    }
+
+    public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
         if (_initialized) return;
 
         //dispatchServlet = servlet;
         _config = config;
-
         ingestPrefix();
-
         _initialized = true;
     }
 

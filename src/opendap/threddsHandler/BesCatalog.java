@@ -194,12 +194,12 @@ public class BesCatalog implements Catalog {
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-            Document besShowCatalogDoc = loadBesCatalog();
+            Document nodeDoc = loadNodeCatalog();
 
             Transformer showCatalogToThreddsCatalog = new Transformer(_ingestTransformer);
 
 
-            JDOMSource besCatalog = new JDOMSource(besShowCatalogDoc);
+            JDOMSource besCatalog = new JDOMSource(nodeDoc);
 
             Document catalog = showCatalogToThreddsCatalog.getTransformedDocument(besCatalog);
 
@@ -487,34 +487,22 @@ public class BesCatalog implements Catalog {
 
 
 
-    private Document loadBesCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
-
+    private Document loadNodeCatalog() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
         ReentrantReadWriteLock.WriteLock lock = _catalogLock.writeLock();
-
         try {
             lock.lock();
-
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-            Document besShowCatalogDoc = new Document();
-            _besApi.getBesCatalog(_besCatalogResourceId, besShowCatalogDoc);
-
+            Document node = new Document();
+            _besApi.getBesNode(_besCatalogResourceId, node);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-
-            xmlo.output(besShowCatalogDoc, baos);
-
+            xmlo.output(node, baos);
             _rawCatalogBuffer = baos.toByteArray();
-
-            _log.debug("loadBesCatalog() - Loaded BES catalog response: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
-
-            return besShowCatalogDoc;
+            _log.debug("loadNodeCatalog() - Loaded BES catalog response: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
+            return node;
 
         } finally {
             lock.unlock();
         }
-
-
     }
 
 

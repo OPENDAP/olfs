@@ -117,7 +117,7 @@ public class ReqInfo {
         return maxPostBodyLength.get();
     }
 
-    private static ConcurrentHashMap<String,String> serviceContexts;
+    private static ConcurrentHashMap<String,String> serviceContexts = new ConcurrentHashMap<>();
 
 
     public static boolean addService(String serviceName, String serviceLocalID){
@@ -145,9 +145,7 @@ public class ReqInfo {
 
     public static String getServiceUrl(HttpServletRequest request){
         Request req = new Request(null,request);
-        
         return req.getServiceUrl();
-
     }
 
     /**
@@ -159,19 +157,12 @@ public class ReqInfo {
      */
 
     public static String getFullServiceContext(HttpServletRequest request){
-
         String requestUri = request.getRequestURI();
-
         String pathInfo = request.getPathInfo();
-
         String serviceContext = requestUri;
         if(pathInfo != null)
             serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
-
-
-
         return serviceContext;
-
     }
 
 
@@ -184,33 +175,25 @@ public class ReqInfo {
      * @return
      */
     public static String getLocalUrl(HttpServletRequest req){
-
         String requestPath=req.getPathInfo();
-
         if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
             requestPath = "/";
 
         }
-
         Pattern pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
         Matcher pathFunctionMatcher = pathFunctionSyntaxPattern.matcher(requestPath);
 
         boolean foundFunctionSyntax = false;
-
-
         while(!pathFunctionMatcher.hitEnd()){
             foundFunctionSyntax = pathFunctionMatcher.find();
             log.debug("{}", opendap.coreServlet.Util.checkRegex(pathFunctionMatcher, foundFunctionSyntax));
         }
-
         String resourceId = requestPath;
-
         if(foundFunctionSyntax){
             int start =  pathFunctionMatcher.start();
             int end = pathFunctionMatcher.end();
             resourceId = requestPath.substring(0,start) + requestPath.substring(end,requestPath.length());
         }
-
         return resourceId;
     }
 
@@ -232,46 +215,31 @@ public class ReqInfo {
      * @throws java.io.IOException When the body of a POST request cannot be read.
      */
     public static  String getConstraintExpression(HttpServletRequest req) throws IOException {
-
         StringBuilder CE;
-
         String ceCacheKey = ReqInfo.class.getName()+".getConstraintExpression()";
         Object o  = RequestCache.get(ceCacheKey);
 
-
         if(o == null){
-
-
             CE = new StringBuilder();
-
-
             StringBuilder pathFunctionCE = getPathFunctionCE(req.getPathInfo());
-
             CE.append(pathFunctionCE);
-
             String queryString = req.getQueryString();
             if(queryString != null){
-
                 if(CE.length() != 0){
                     CE.append(",");
                 }
                 CE.append(queryString);
-
             }
-
             StringBuilder bodyCE = getPostBodyCE(req);
             if(CE.length()!=0 && bodyCE.length() != 0){
                 CE.append(",");
             }
             CE.append(bodyCE);
             RequestCache.put(ceCacheKey,CE);
-
         }
         else {
             CE = (StringBuilder)o;
         }
-
-
         return CE.toString();
     }
 
@@ -279,21 +247,14 @@ public class ReqInfo {
     private static StringBuilder getPostBodyCE(HttpServletRequest req) throws IOException {
 
         StringBuilder bodyCE = new StringBuilder();
-
         if(req.getMethod().equalsIgnoreCase("POST")){
-
-
             if(req.getContentLength()> getPostBodyMaxLength()) {
                 throw new IOException("POST body content length is longer than maximum allowed by service.");
             }
-
             String contentType = req.getHeader("Content-Type");
-
             if(contentType!=null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded")){
                 Map paramMap = req.getParameterMap();
-
                 if(paramMap!=null){
-
                     String[] bodyCEValues = (String[]) paramMap.get("ce");
                     if(bodyCEValues!=null){
                         for(String ceValue: bodyCEValues){
@@ -303,7 +264,6 @@ public class ReqInfo {
                             bodyCE.append(ceValue);
                         }
                     }
-
                     bodyCEValues = (String[]) paramMap.get("dap4:ce");
                     if(bodyCEValues!=null){
                         for(String ceValue: bodyCEValues){
@@ -313,21 +273,13 @@ public class ReqInfo {
                             bodyCE.append(ceValue);
                         }
                     }
-
                 }
-
-
-
             }
             else {
                 bodyCE.append(convertStreamToString(req.getInputStream()));
             }
-
         }
-
         return bodyCE;
-
-
     }
 
 
@@ -345,11 +297,9 @@ public class ReqInfo {
      *
      */
     private static String convertStreamToString(java.io.InputStream is) throws IOException {
-
         // Using the scanner with the \A delimiter basically says "from the beginning of the input"
         // So then we get one big token from teh scanner and (see comment below)
         java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharset().name()).useDelimiter("\\A");
-
         // Since the Scanner is going to make one token from the whole shebang, either the  InputStream
         // is empty (in which case we return an empty string, or it's not empty and we return the single token.
         return s.hasNext() ? s.next() : "";
@@ -364,36 +314,25 @@ public class ReqInfo {
             requestPath = "/";
 
         }
-
         Pattern pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
         Matcher pathFunctionMatcher = pathFunctionSyntaxPattern.matcher(requestPath);
-
         boolean foundFunctionSyntax = false;
-
-
         while(!pathFunctionMatcher.hitEnd()){
             foundFunctionSyntax = pathFunctionMatcher.find();
             log.debug("{}", opendap.coreServlet.Util.checkRegex(pathFunctionMatcher, foundFunctionSyntax));
         }
-
         String pathFunction = null;
-
         if(foundFunctionSyntax){
             int start =  pathFunctionMatcher.start();
             int end = pathFunctionMatcher.end();
             pathFunction = requestPath.substring(start,end);
 
         }
-
         StringBuilder serverSideFunctionCalls = new StringBuilder();
-
         if(pathFunction!=null){
-
             int firstCurlyBrace = pathFunction.indexOf("{");
-
             if(firstCurlyBrace>=0){
                 int secondCurlyBrace = pathFunction.indexOf("{",firstCurlyBrace+1);
-
                 if(secondCurlyBrace>=0){
                     int endSecondCurlyBrace = pathFunction.indexOf("}",secondCurlyBrace+1);
                     if(endSecondCurlyBrace> secondCurlyBrace)
@@ -401,9 +340,7 @@ public class ReqInfo {
                 }
             }
         }
-
         return serverSideFunctionCalls;
-
     }
 
 
@@ -418,9 +355,7 @@ public class ReqInfo {
      * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getCollectionName(HttpServletRequest req){
-
         String cName, dSrc, dSetName;
-
         dSrc = getBesDataSourceID(getLocalUrl(req));
         dSetName = getDataSetName(req);
 
@@ -433,10 +368,7 @@ public class ReqInfo {
             cName = cName.substring(0,cName.length()-1);
 
         log.debug("getCollectionName(): " + cName);
-
         return cName;
-
-
     }
 
     public static String getCollectionUrl(HttpServletRequest req){
@@ -454,18 +386,13 @@ public class ReqInfo {
      * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getRequestSuffix(HttpServletRequest req){
-
         String requestSuffix = null;
         String relativeUrl = getLocalUrl(req);
         log.debug("getRequestSuffix() - relativeUrl(request): " + relativeUrl);
 
-
         requestSuffix = getSuffix(relativeUrl);
-
         log.debug("  requestSuffixRegex:  " + requestSuffix);
-
         return requestSuffix;
-
     }
 
 
@@ -477,30 +404,18 @@ public class ReqInfo {
      * @return
      */
     public static String getSuffix(String s){
-
-
-
         //String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$";
         //Matcher m = Pattern.compile(_regexToMatchLastDotSuffixString).matcher(s);
-
-
-
         String suffix="";
-
         if (s!=null && !s.endsWith("/")) {
-
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSetName
-
             if(s.lastIndexOf("/") < s.lastIndexOf(".")){
 
                 suffix = s.substring(s.lastIndexOf('.') + 1);
             }
-
-
         }
         return suffix;
-
     }
 
 
@@ -515,36 +430,23 @@ public class ReqInfo {
      * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getDataSetName(HttpServletRequest req){
-
         String localUrl = getLocalUrl(req);
         log.debug("getDataSetName()   - req.getLocalUrl(): " + localUrl);
 
-
         String dataSetName = localUrl;
-
-
-
         // Is it a collection?
         if (localUrl== null ||  localUrl.endsWith("/")) {
-
             dataSetName = null;
-
         }
         else{  // Must be a dataset...
-
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSetName
-
             if(localUrl.lastIndexOf("/") < localUrl.lastIndexOf(".")){
                    dataSetName = localUrl.substring(localUrl.lastIndexOf("/")+1, localUrl.lastIndexOf('.'));
             }
         }
-
         log.debug("  dataSetName:    " + dataSetName);
-
-
         return dataSetName;
-
     }
 
 
@@ -578,31 +480,20 @@ public class ReqInfo {
      * @deprecated 
      */
     public static String getBesDataSourceID(HttpServletRequest req){
-
         String requestPath = getLocalUrl(req);
         log.debug("getBesDataSourceID()    - req.getPathInfo(): " + requestPath);
-
-
         String dataSourceName;
-
         // Is it a dataset and not a collection?
-
         dataSourceName = requestPath;
-
         if (!dataSourceName.endsWith("/")) { // If it's not a collection then we'll look for a suffix to remove
-
-
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSourceName
-
             if(dataSourceName.lastIndexOf("/") < dataSourceName.lastIndexOf(".")){
                    dataSourceName = dataSourceName.substring(0, dataSourceName.lastIndexOf('.'));
             }
         }
         log.debug("  dataSourceName: " + dataSourceName);
-
         return dataSourceName;
-
     }
 
 
@@ -636,19 +527,12 @@ public class ReqInfo {
      */
     @Deprecated
     public static String getBesDataSourceID(String relativeUrl){
-
         String requestPath = relativeUrl;
         log.debug("getBesDataSourceID()    - req.getPathInfo(): " + requestPath);
-
-
         String dataSourceName;
-
         // Is it a dataset and not a collection?
-
         dataSourceName = requestPath;
-
         if (!dataSourceName.endsWith("/")) { // If it's not a collection then we'll look for a suffix to remove
-
 
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSourceName
@@ -658,14 +542,7 @@ public class ReqInfo {
             }
         }
         log.debug("  dataSourceName: " + dataSourceName);
-
-
-
-
-
-
         return dataSourceName;
-
     }
 
 
@@ -680,14 +557,12 @@ public class ReqInfo {
         boolean test = false;
         String dsName  = ReqInfo.getDataSetName(req);
         String rSuffix = ReqInfo.getRequestSuffix(req);
-
         if(     dsName!=null                        &&
                 dsName.equalsIgnoreCase("contents") &&
                 rSuffix!=null                       &&
                 rSuffix.equalsIgnoreCase("html") ){
             test = true;
         }
-
         return test;
     }
 
@@ -709,9 +584,7 @@ public class ReqInfo {
                 (rSuffix.equalsIgnoreCase("html") || rSuffix.equalsIgnoreCase("xml"))  ){
             test = true;
         }
-
         return test;
-
     }
 
 
@@ -745,36 +618,28 @@ public class ReqInfo {
         String contextPath = req.getContextPath();
         String servletPath = req.getServletPath();
 
-
         //String preq = ServletUtil.probeRequest(null,req);
-
         //System.out.println(preq);
         String reqURI = req.getRequestURI();
-
         String serviceName = contextPath + servletPath;
-
         boolean stringsMatch =  reqURI.equals(serviceName);
 
         if (stringsMatch && !reqURI.endsWith("/")) {
             return true;
         }
         return false;
-
     }
 
     private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
 
     public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
-
         StringBuilder cf_history_entry = new StringBuilder();
-
         // Add the date
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(CF_History_Entry_Date_Format);
         sdf.setTimeZone(new SimpleTimeZone(0,"GMT"));
         cf_history_entry.append(sdf.format(now,new StringBuffer(),new FieldPosition(0)));
         cf_history_entry.append(" ");
-
 
         // Add the Hyrax Version
         cf_history_entry.append("Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
@@ -794,17 +659,26 @@ public class ReqInfo {
 
     public static String getRequestUrlPath(HttpServletRequest req) {
         String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = req.getRequestURL().toString();
+        StringBuilder requestUrl = new StringBuilder();
 
-
-        if(forwardRequestUri != null){
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
+        if(forwardRequestUri == null) {
+            requestUrl.append(req.getRequestURL().toString());
+        }
+        else {
+            String serverName = req.getServerName();
+            int serverPort = req.getServerPort();
+            String transport = req.getScheme();
+            requestUrl.append(transport).append("://").append(serverName);
+            if( transport.equalsIgnoreCase("http") && serverPort != 80) {
+                requestUrl.append(":").append(serverPort);
+            }
+            else if( transport.equalsIgnoreCase("https") && (serverPort != 443 && serverPort != 80) ) {
+                requestUrl.append(":").append(serverPort);
+            }
+            requestUrl.append(forwardRequestUri);
         }
 
-        return requestUrl;
+        return requestUrl.toString();
     }
 
 

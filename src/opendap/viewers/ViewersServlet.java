@@ -59,10 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -297,11 +294,7 @@ public class ViewersServlet extends HttpServlet {
     private void buildWebServiceHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
 
         String msg;
-
-
         _log.debug("Building WebServiceHandlers...");
-
-
         int i = 0;
         for (Object o : webStartConfig.getChildren("WebServiceHandler")) {
             Element handlerElement = (Element) ((Element) o).clone();
@@ -354,33 +347,24 @@ public class ViewersServlet extends HttpServlet {
     public long getLastModified(HttpServletRequest req) {
 
         long lmt;
-
         if (_webStartDisabled)
-            return -1;
+            return new Date().getTime();
 
         String name = Scrub.fileName(getName(req));
-
-
         File f = new File(name);
-
         if (f.exists())
             lmt = f.lastModified();
         else
-            lmt = -1;
-
+            lmt = new Date().getTime();
 
         //log.debug("getLastModified() - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
-
         return lmt;
-
-
     }
 
 
     private String getName(HttpServletRequest req) {
 
         String name = req.getPathInfo();
-
         if (name == null)
             name = "/";
 
@@ -389,76 +373,25 @@ public class ViewersServlet extends HttpServlet {
     }
 
 
-
-    private HashMap<String, String> parseQuery(String query){
-
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        if(query==null){
-            _log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(), Scrub.simpleQueryString(query));
-            return params;
-        }
-
-        String args[] = query.split("&");
-        if (args == null) {
-            _log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(), Scrub.simpleQueryString(query));
-            return params;
-        }
-
-        String[] pairs;
-        for (String arg : args) {
-            pairs = arg.split("=");
-            if (pairs != null) {
-                if (pairs.length == 2) {
-                    params.put(pairs[0], pairs[1]);
-                } else {
-                    _log.error("Parse failed for argument: " + Scrub.simpleQueryString(arg));
-                }
-            }
-        }
-        return params;
-    }
-
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         RequestCache.openThreadCache();
-
         LogUtil.logServerAccessStart(req, "WebStartServletAccess", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
-
-
         _log.debug(ServletUtil.showRequest(req, reqNumber.get()));
         //log.debug(opendap.coreServlet.AwsUtil.probeRequest(this, req));
 
-
         Request dapRequest = new Request(this,req);
-
-
-        String query = req.getQueryString();
-        HashMap<String, String> params;
-
+        String query = Scrub.simpleQueryString(req.getQueryString());
         int request_status = HttpServletResponse.SC_OK;
         try {
-
-
-
-            //if (_webStartDisabled) {
-            //    log.error("Java WebStart is disabled!");
-            //    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            //    return;
-
-            //}
-
-            params = parseQuery(query);
-
-            String dapService = Scrub.fileName(params.get("dapService"));
-            String besDatasetId = Scrub.fileName(params.get("datasetID"));
+            String dapService = Scrub.fileName(req.getParameter("dapService"));
+            String besDatasetId = Scrub.fileName(req.getParameter("datasetID"));
 
             if(dapService==null || besDatasetId==null){
-                String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+  Scrub.simpleQueryString(query) +"'";
+                String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+ query +"'";
                 _log.error("doGet() - {}",msg);
                 throw new BadRequest(msg);
             }
-
 
             URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
             String protocol = serviceURL.getProtocol();
@@ -466,21 +399,14 @@ public class ViewersServlet extends HttpServlet {
             int port = serviceURL.getPort();
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
-
-
-
             Document ddx = getDDX(serverURL, dapService, besDatasetId);
-
             if(ddx == null){
                 String msg = "Failed to locate dataset: " + besDatasetId;
                 _log.error("doGet() - {}", msg);
                 throw new NotFound(msg);
             }
 
-
             String applicationID = req.getPathInfo();
-                 
-
             // Condition applicationID.
             if (applicationID != null)
             {
@@ -503,12 +429,10 @@ public class ViewersServlet extends HttpServlet {
                 sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, resp.getOutputStream());
                 
             } else {
-
                 String dataAccessURL = serverURL+dapService+besDatasetId;
 
                 // Attempt to locate the application...
                 JwsHandler jwsHandler = ServicesRegistry.getJwsHandlerById(applicationID);
-
                 if (jwsHandler != null) {
 
                     // get the jnlp content
@@ -526,14 +450,11 @@ public class ViewersServlet extends HttpServlet {
                     pw.print(jnlpContent);
 
                 } else {
-                    String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+Scrub.simpleQueryString(query);
+                    String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+query;
                     _log.error("doGet() - {}", msg);
                     throw new NotFound(msg);
                 }
-
-
             }
-
         }
         catch (Throwable t){
             try {
@@ -557,14 +478,7 @@ public class ViewersServlet extends HttpServlet {
             RequestCache.closeThreadCache();
              this.destroy();
         }
-
     }
-
-
-
-
-
-
 
 
     private void sendDatasetPage(String webStartService, String docsService, String dapService, String datasetID, Document ddx, OutputStream os) throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException
@@ -573,14 +487,10 @@ public class ViewersServlet extends HttpServlet {
         String xsltDoc = ServletUtil.getSystemPath(this, "/xsl/webStartDataset.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
-
-
         transformer.setParameter("datasetID",datasetID);
         transformer.setParameter("dapService",dapService);
         transformer.setParameter("docsService",docsService);
         transformer.setParameter("webStartService", webStartService);
-
-
 
         String handlers = getWebStartHandlersParam(datasetID, ddx);
         _log.debug("WebStart Handlers: " + handlers);
@@ -597,8 +507,6 @@ public class ViewersServlet extends HttpServlet {
             XdmNode valueNode = transformer.build(new StreamSource(reader));
             transformer.setParameter("webServices",valueNode);
         }
-
-
         JDOMSource ddxSource = new JDOMSource(ddx);
         transformer.transform(ddxSource, os);
     }
@@ -606,9 +514,9 @@ public class ViewersServlet extends HttpServlet {
 
 
     private Vector<JwsHandler> getWebStartApplicationsForDataset(String datasetId, Document ddx){
+
         Iterator<JwsHandler> e = ServicesRegistry.getJavaWebStartHandlers().values().iterator();
         JwsHandler jwsHandler;
-
         Vector<JwsHandler> canHandleDataset = new Vector<JwsHandler>();
 
         while(e.hasNext()){
@@ -616,35 +524,28 @@ public class ViewersServlet extends HttpServlet {
             if(jwsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.add(jwsHandler);
             }
-
         }
-
         return canHandleDataset;
-
     }
+
 
     private TreeMap<String, WebServiceHandler> getWebServicesForDataset(String datasetId, Document ddx){
 
         Iterator<WebServiceHandler> e = ServicesRegistry.getWebServiceHandlers().values().iterator();
         WebServiceHandler wsHandler;
-
         TreeMap<String, WebServiceHandler> canHandleDataset = new TreeMap<>();
-
 
         while(e.hasNext()){
             wsHandler = e.next();
             if(wsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.put(wsHandler.getName(), wsHandler);
             }
-
         }
-
         return canHandleDataset;
-
     }
 
-    private String getWebStartHandlersParam(String datsetId, Document ddx) {
 
+    private String getWebStartHandlersParam(String datsetId, Document ddx) {
 
         Vector<JwsHandler> jwsHandlers =  getWebStartApplicationsForDataset(datsetId, ddx);
 
@@ -655,30 +556,25 @@ public class ViewersServlet extends HttpServlet {
         Element wsElement;
 
         for(JwsHandler jwsh : jwsHandlers){
-
             wsElement = new Element("webStartApp");
             wsElement.setAttribute("id",jwsh.getServiceId());
             wsElement.setAttribute("applicationName",jwsh.getName());
-
             webStartAppsElement.addContent(wsElement);
         }
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(new Document(webStartAppsElement));
-
-
     }
+
+
 
     private String getWebServicesParam(String datasetId, Document ddx) {
 
         TreeMap<String, WebServiceHandler> webServicesForDataset =  getWebServicesForDataset(datasetId, ddx);
-
         if(webServicesForDataset.isEmpty())
             return null;
 
         Element webServicesElement = new Element("WebServices");
         Element wsElement;
-
 
         for(WebServiceHandler wsh: webServicesForDataset.values()){
             wsElement = new Element("webService");
@@ -687,13 +583,9 @@ public class ViewersServlet extends HttpServlet {
             wsElement.setAttribute("serviceUrl",wsh.getServiceLink(datasetId));
 
             webServicesElement.addContent(wsElement);
-
         }
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(new Document(webServicesElement));
-
-
     }
 
 
@@ -701,19 +593,13 @@ public class ViewersServlet extends HttpServlet {
 
     public Document getDDX(String serverURL, String dapService, String datasetID) throws IOException, PPTException, BadConfigurationException, BESError, SaxonApiException, JDOMException {
 
-
-
         String constraintExpression = "";
-
         String xdap_accept = "3.2";
-
         String xmlBase = serverURL+dapService+datasetID;
-
         Document ddx = new Document();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextHtml());
-
 
         _besApi.getDDXDocument(
                 datasetID,
@@ -721,17 +607,6 @@ public class ViewersServlet extends HttpServlet {
                 xdap_accept,
                 xmlBase,
                 ddx);
-
         return ddx;
-
-
-
-
     }
-
-
-
-
-
-
 }

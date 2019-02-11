@@ -26,6 +26,7 @@
 
 package opendap.coreServlet;
 
+import opendap.bes.dap2Responders.BesApi;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServlet;
@@ -70,6 +71,7 @@ public interface DispatchHandler {
      */
     public void init(HttpServlet servlet, Element config) throws Exception;
 
+    public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception;
 
 
     /**

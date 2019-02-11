@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "Hyrax Data Server" project.
@@ -43,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -318,8 +318,66 @@
          </table>
       </form>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-         <a href="/opendap/docs/">Documentation</a>
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/ff/gsodock.dat.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/ff/gsodock.dat.dmr.html%0A# query_string: dap4.ce=URI_GSO-Dock.Air_Temp;URI_GSO-Dock.Depth%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "gsodock.dat",
+  "url": "http://localhost:8080/opendap/data/ff/gsodock.dat",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/ff/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/ff/gsodock.dat",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Server", 
+          "value": "DODS FreeFrom based on FFND release 4.2.3"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "text", 
+          "value": "Time    Dep     Temp    Sal     DO%     pH      Turb    AirT    WndSpd  WndDir  Baro    Solar"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "URI_GSO-Dock",
+    "valueReference": [ 
+,
+    {
+      "@type": "PropertyValue",
+      "name": "Depth",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Air_Temp",
+      "valueReference": [ 
+
+      ]
+    }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

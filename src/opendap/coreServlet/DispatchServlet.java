@@ -29,13 +29,18 @@ package opendap.coreServlet;
 
 import opendap.bes.BESManager;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.VersionDispatchHandler;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
+import opendap.ncml.NcmlDatasetDispatcher;
+import opendap.threddsHandler.StaticCatalogDispatch;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -91,7 +96,6 @@ public class DispatchServlet extends HttpServlet {
 
     private Document configDoc;
 
-
     /**
      * ************************************************************************
      * Intitializes the servlet. Init (at this time) basically sets up
@@ -129,10 +133,9 @@ public class DispatchServlet extends HttpServlet {
 
 
         httpGetDispatchHandlers = new Vector<>();
-        Vector<Element> httpGetHandlerConfigs = new Vector<>();
+        //Vector<Element> httpGetHandlerConfigs = new Vector<>();
         httpPostDispatchHandlers = new Vector<>();
-        Vector<Element> httpPostHandlerConfig = new Vector<>();
-
+        //Vector<Element> httpPostHandlerConfig = new Vector<>();
 
         // init logging
         LogUtil.logServerStartup("init()");
@@ -150,8 +153,18 @@ public class DispatchServlet extends HttpServlet {
 
         loadConfig(configFile);
 
+        Element config = configDoc.getRootElement();
 
-        Element timer = configDoc.getRootElement().getChild("Timer");
+        boolean enablePost = false;
+        Element postConfig = config.getChild("HttpPost");
+        if(postConfig!=null){
+            String enabled = postConfig.getAttributeValue("enabled");
+            if(enabled.equalsIgnoreCase("true"))
+                enablePost = true;
+        }
+
+
+        Element timer = config.getChild("Timer");
         if(timer!=null){
             String enabled = timer.getAttributeValue("enabled");
             if(enabled!=null && enabled.equalsIgnoreCase("true")){
@@ -167,23 +180,19 @@ public class DispatchServlet extends HttpServlet {
 
         initAuthenticationControls();
 
-
-        buildHandlers("HttpGetHandlers", httpGetDispatchHandlers, httpGetHandlerConfigs);
-        //identifyRequiredGetHandlers(httpGetDispatchHandlers);
-        intitializeHandlers(httpGetDispatchHandlers, httpGetHandlerConfigs);
-
-
-        buildHandlers("HttpPostHandlers", httpPostDispatchHandlers, httpPostHandlerConfig);
-        intitializeHandlers(httpPostDispatchHandlers, httpPostHandlerConfig);
-        if(httpPostDispatchHandlers.size()==0){
-            log.info("No POST handlers configured. Adding the NoPostHandler.");
-            httpPostDispatchHandlers.add(new NoPostHandler());
+        try {
+            loadHyraxServiceHandlers(httpGetDispatchHandlers, config);
+            if(enablePost){
+                opendap.bes.BesDapDispatcher bdd = new opendap.bes.BesDapDispatcher();
+                bdd.init(this,config);
+                httpPostDispatchHandlers.add(bdd);
+            }
         }
-
+        catch (Exception e){
+            throw new ServletException(e);
+        }
         log.info("init() complete.");
-
         RequestCache.closeThreadCache();
-
     }
 
 
@@ -240,16 +249,13 @@ public class DispatchServlet extends HttpServlet {
 
 
     private void initBesManager() throws ServletException {
-
         Element besManagerElement = configDoc.getRootElement().getChild("BESManager");
-
         if(besManagerElement ==  null){
             String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
             log.error(msg);
             throw new ServletException(msg);
 
         }
-
         BESManager besManager  = new BESManager();
         try {
             besManager.init(besManagerElement);
@@ -257,11 +263,79 @@ public class DispatchServlet extends HttpServlet {
         catch(Exception e){
             throw new ServletException(e);
         }
-
     }
 
 
     /**
+     *             <Handler className="opendap.bes.VersionDispatchHandler" />
+     *
+     *             <!-- Bot Blocker
+     *                - This handler can be used to block access from specific IP addresses
+     *                - and by a range of IP addresses using a regular expression.
+     *               -->
+     *             <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
+     *                 <!-- <IpAddress>127.0.0.1</IpAddress> -->
+     *                 <!-- This matches all IPv4 addresses, work yours out from here.... -->
+     *                 <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
+     *                 <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
+     *                 <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+     *             <!-- </Handler>  -->
+     *             <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
+     *             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
+     *                 <prefix>thredds</prefix>
+     *                 <useMemoryCache>true</useMemoryCache>
+     *             </Handler>
+     *             <Handler className="opendap.gateway.DispatchHandler">
+     *                 <prefix>gateway</prefix>
+     *                 <UseDAP2ResourceUrlResponse />
+     *             </Handler>
+     *             <Handler className="opendap.bes.BesDapDispatcher" >
+     *                 <!-- AllowDirectDataSourceAccess
+     *                   - If this element is present then the server will allow users to request
+     *                   - the data source (file) directly. For example a user could just get the
+     *                   - underlying NetCDF files located on the server without using the OPeNDAP
+     *                   - request interface.
+     *                   -->
+     *                 <!-- AllowDirectDataSourceAccess / -->
+     *                 <!--
+     *                   By default, the server will provide a DAP2-style response
+     *                   to requests for a dataset resource URL. Commenting out the
+     *                   "UseDAP2ResourceUrlResponse" element will cause the server
+     *                   to return the DAP4 DSR response when a dataset resource URL
+     *                   is requested.
+     *                 -->
+     *                 <UseDAP2ResourceUrlResponse />
+     *             </Handler>
+     *             <Handler className="opendap.bes.DirectoryDispatchHandler" />
+     *             <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
+     *             <Handler className="opendap.bes.FileDispatchHandler" />
+     */
+    private void loadHyraxServiceHandlers(Vector<DispatchHandler> handlers, Element config ) throws Exception {
+
+        if(config==null)
+            throw new ServletException("Bad configuration! The configuration element was NULL");
+
+        Element botBlocker = config.getChild("BotBlocker");
+
+        handlers.add(new opendap.bes.VersionDispatchHandler());
+        if(botBlocker != null)
+            handlers.add(new opendap.coreServlet.BotBlocker());
+        handlers.add(new opendap.ncml.NcmlDatasetDispatcher());
+        handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
+        handlers.add(new opendap.gateway.DispatchHandler());
+        handlers.add(new opendap.bes.BesDapDispatcher());
+        handlers.add(new opendap.bes.DirectoryDispatchHandler());
+        handlers.add(new opendap.bes.BESThreddsDispatchHandler());
+        handlers.add(new opendap.bes.FileDispatchHandler());
+
+        for(DispatchHandler dh:handlers){
+            dh.init(this,config);
+        }
+    }
+
+
+
+    /*
      * Navigates the config document to instantiate an ordered list of
      * Dispatch Handlers. Once built the list is searched for a single instance
      * of an OpendapHttpDispatchHandler and a single instance of a
@@ -277,6 +351,7 @@ public class DispatchServlet extends HttpServlet {
      *                         Element for each IsoDispatchHandler
      * @throws ServletException When things go poorly
      */
+    /*
     private void buildHandlers(String type, Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
 
         String msg;
@@ -343,6 +418,9 @@ public class DispatchServlet extends HttpServlet {
         log.debug(type + " Built.");
 
     }
+    */
+
+    /*
 
     private void intitializeHandlers(Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
 
@@ -369,7 +447,7 @@ public class DispatchServlet extends HttpServlet {
 
 
     }
-
+*/
 
 
     /**
@@ -750,6 +828,9 @@ public class DispatchServlet extends HttpServlet {
         return lmt;
 
     }
+
+
+
 
 
     public void destroy() {

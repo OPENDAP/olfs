@@ -39,7 +39,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by ndp on 11/6/14.
@@ -50,6 +52,8 @@ public class PDPService extends HttpServlet {
     private String _accessLogName = "PDP_SERVICE_ACCESS";
 
 
+    private ReentrantLock _configLock;
+
     private Element _config;
 
 
@@ -59,7 +63,7 @@ public class PDPService extends HttpServlet {
 
     private boolean _isInitialized;
 
-    private boolean _requireSecureTransport;
+    private AtomicBoolean _requireSecureTransport;
 
 
 
@@ -68,31 +72,54 @@ public class PDPService extends HttpServlet {
     public PDPService(){
         _isInitialized = false;
         _reqNumber = new AtomicInteger(0);
-        _requireSecureTransport = true;
+        _requireSecureTransport = new AtomicBoolean(true);
+        _configLock = new ReentrantLock();
 
     }
 
     public void init() throws ServletException {
         super.init();
-        initLogging();
 
-        _log.info("init() - BEGIN");
 
-        String msg;
+        _configLock.lock();
+        try {
+            initLogging();
+            _log.info("init() - BEGIN");
+            if (_isInitialized) {
+                _log.info("init() - END (Already initialized. Nothing changed.)");
+                return;
+            }
+            
+            _systemPath = ServletUtil.getSystemPath(this, "");
 
-        if (_isInitialized) {
-            _log.info("init() - END (Already initialized. Nothing changed.)");
-            return;
+            String configFile = getInitParameter("config");
+            if(configFile==null){
+                configFile = _systemPath + "/WEB-INF/conf/SimplePDP.xml";
+            }
+            try {
+                _config = opendap.xml.Util.getDocumentRoot(configFile);
+                if(_config==null)
+                    throw new ServletException("Unable to read/parse configuration file: "+configFile);
+
+                Element e = _config.getChild("PolicyDecisionPoint");
+                if(e==null)
+                    throw new ServletException("Configuration file: "+configFile + " is missing the " +
+                            "required PolicyDecisionPoint element.");
+                _myPDP = PolicyDecisionPoint.pdpFactory(e);
+
+            } catch (Exception e) {
+                String msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+                _log.error(msg);
+                throw new ServletException(msg, e);
+            }
+            _requireSecureTransport.set(_config.getChild("RequireSecureTransport") != null);
+            _isInitialized = true;
         }
-
-        _systemPath = ServletUtil.getSystemPath(this, "");
-        _isInitialized = true;
-        _requireSecureTransport = false;
-
-        load_config();
-
-
+        finally {
+            _configLock.unlock();
+        }
         _log.info("init() - END");
+
     }
 
 
@@ -106,6 +133,7 @@ public class PDPService extends HttpServlet {
 
     }
 
+    /*
     private void load_config() throws ServletException {
         String msg;
         String configFile = getInitParameter("config");
@@ -138,6 +166,7 @@ public class PDPService extends HttpServlet {
 
     }
 
+*/
 
 
 
@@ -284,7 +313,7 @@ public class PDPService extends HttpServlet {
     protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        if (_requireSecureTransport) {
+        if (_requireSecureTransport.get()) {
             if (!req.isSecure()) {
                 _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
                 resp.sendError(403);

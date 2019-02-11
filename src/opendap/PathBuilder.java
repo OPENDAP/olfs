@@ -57,7 +57,7 @@ public class PathBuilder  {
         if(s==null || s.length()==0)
             return this;
 
-        while (s.startsWith("/") && s.length() > 0) {
+        while (_sb.length()!=0 && (s.startsWith("/") && s.length() > 0)) {
             s = s.substring(1);
         }
         //_log.debug("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);
@@ -92,6 +92,59 @@ public class PathBuilder  {
             }
         }
         return result;
+    }
+
+
+
+    public static String basename(String path){
+        String name = path;
+        int lastIndexOfSlash = path.lastIndexOf('/');
+        if(lastIndexOfSlash > 0) {
+            name = path.substring(lastIndexOfSlash);
+        }
+        while (name.startsWith("/") && name.length() > 1) {
+            name = name.substring(1);
+        }
+        return name;
+    }
+
+
+    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator) {
+        try {
+            return normalizePath(rawPath, leadingSeparator, trailingSeparator, "/");
+        }
+        catch (Exception e){
+            return "/";
+        }
+    }
+
+    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator, String separator) throws Exception {
+
+        if(separator.length()>1)
+            throw new Exception("The path separator character may only have a single character, not "+separator.length());
+        String doubleSeparator = separator+separator;
+        String path = rawPath.replace(doubleSeparator,separator);
+        if(path.isEmpty())
+            path = separator;
+
+        if(path!=separator){
+            if(leadingSeparator && !path.startsWith(separator)){
+                path = separator + path;
+            }
+            else {
+                if(path.startsWith(separator))
+                    path =  path.substring(1);
+            }
+
+            if(trailingSeparator && !path.endsWith(separator)){
+                path += separator;
+            }
+            else {
+                if(path.endsWith(separator))
+                    path =  path.substring(0,path.length()-1);
+            }
+        }
+        return path;
     }
 
 

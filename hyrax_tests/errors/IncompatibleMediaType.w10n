@@ -1,2 +1,2 @@
-url = http://localhost:8080/opendap/w10n/data/nc/fnoc1.nc/u%5B%5D%?output=ascii
+url = http://localhost:8080/opendap/w10n/data/nc/fnoc1.nc/u%5B%5D?output=ascii
 -s 

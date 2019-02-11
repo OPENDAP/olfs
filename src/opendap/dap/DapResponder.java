@@ -27,6 +27,7 @@
 package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,22 +93,8 @@ public abstract class DapResponder extends HttpResponder  {
 
 
     public String getXmlBase(HttpServletRequest req){
-
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = req.getRequestURL().toString();
-
-
-        if(forwardRequestUri != null){
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
-        }
-
-
+        String requestUrl = ReqInfo.getRequestUrlPath(req);
         String xmlBase = removeRequestSuffixFromString(requestUrl);
-
-
         log.debug("@xml:base='{}'",xmlBase);
         return xmlBase;
     }

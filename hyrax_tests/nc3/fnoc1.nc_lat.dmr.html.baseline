@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "Hyrax Data Server" project.
@@ -43,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -267,8 +267,69 @@
          </table>
       </form>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-         <a href="/opendap/docs/">Documentation</a>
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/nc/fnoc1.nc.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/nc/fnoc1.nc.dmr.html%0A# query_string: dap4.ce=lat%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "fnoc1.nc",
+  "url": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "base_time", 
+          "value": "88- 10-00:00:00"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "title", 
+          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Unlimited_Dimension", 
+          "value": "time_a"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "17"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "degree North"      }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

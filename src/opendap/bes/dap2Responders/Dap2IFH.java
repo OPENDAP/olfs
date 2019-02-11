@@ -28,6 +28,7 @@ package opendap.bes.dap2Responders;
 
 
 import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -48,6 +49,7 @@ import org.jdom.filter.Filter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +62,7 @@ import java.util.Vector;
 public class Dap2IFH extends Dap4Responder {
 
     private Logger _log;
-    private static String _defaultRequestSuffix = ".ifh";
+    private static String _defaultRequestSuffix = ".html";
 
 
     public Dap2IFH(String sysPath, BesApi besApi) {
@@ -102,17 +104,19 @@ public class Dap2IFH extends Dap4Responder {
 
         String collectionUrl = ReqInfo.getCollectionUrl(request);
 
-        QueryParameters qp = new QueryParameters(request);
+        //QueryParameters qp = new QueryParameters(request);
         Request oreq = new Request(null,request);
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-
         BesApi besApi = getBesApi();
+
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
         _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        MediaType responseMediaType =  getNormativeMediaType();
+        MediaType responseMediaType = getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
@@ -123,16 +127,9 @@ public class Dap2IFH extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-
         Document ddx = new Document();
-
-
         besApi.getDDXDocument(resourceID,constraintExpression,"3.2",xmlBase,ddx);
-
         _log.debug(xmlo.outputString(ddx));
 
         OutputStream os = response.getOutputStream();
@@ -140,6 +137,8 @@ public class Dap2IFH extends Dap4Responder {
         ddx.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
         String jsonLD = getDatasetJsonLD(collectionUrl,ddx);
+
+        _log.error(jsonLD);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
@@ -153,22 +152,21 @@ public class Dap2IFH extends Dap4Responder {
         try {
             String xsltDocName = "dap2_ifh.xsl";
 
-
             // This Transformer class is an attempt at making the use of the saxon-9 API
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
-            // See the source code for opendap.xml.Transformer for more.
+            // See the source code in opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-
-
-            transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
+            // transformer.setParameter("serviceContext", request.getServletContext().getContextPath()); // This is ServletAPI-3.0
+            transformer.setParameter("serviceContext", request.getContextPath()); // This is ServletAPI-2.5 (Tomcat 6 stopped here)
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", jsonLD);
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
+
+            AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
-
-
             os.flush();
             _log.info("Sent {}", getServiceTitle());
         }
@@ -260,8 +258,10 @@ public class Dap2IFH extends Dap4Responder {
         if(variable.getName().equals("Grid")){
             // It's a Grid so we look at the Grid array to determine the GRid metadata content.
             Element gridArray =  variable.getChild("Array",DAP.DAPv32_NS);
-            List<Element> attributes = gridArray.getContent(attributeFilter);
-            sb.append(attributesToProperties(attributes, myIndent));
+            if(gridArray!=null) {
+                List<Element> attributes = gridArray.getContent(attributeFilter);
+                sb.append(attributesToProperties(attributes, myIndent));
+            }
         }
         else if(variable.getName().equals("Sequence") || variable.getName().equals("Structure") ){
             // It's a Container type... Wut do?
@@ -327,23 +327,6 @@ public class Dap2IFH extends Dap4Responder {
     }
 
 
-    /**
-     * Minmal JSON text encoder. This method escapes:
-     * <ul>
-     *     <li>The \ (backslash)</li>
-     *     <li>The " (double-quote)</li>
-     * </ul>
-     * @param value The string to encode.
-     * @return The encoded value
-     */
-    private String jsonEncodeString(String value){
-        String str = value.trim();
-        str = str.replace("\\","\\\\");
-        str = str.replace("\"","\\\"");
-        return str;
-    }
-
-
 
     public String attributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
@@ -353,22 +336,25 @@ public class Dap2IFH extends Dap4Responder {
 
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(jsonEncodeString(attribute.getAttributeValue("name"))).append("\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("name"))).append("\", \n");
             //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
 
             boolean jsEncode = true;
-            if(attribute.getAttributeValue("type").toLowerCase().contains("int") |
-                    attribute.getAttributeValue("type").toLowerCase().contains("float") |
-                    attribute.getAttributeValue("type").equalsIgnoreCase("byte")
-                    ){
-                jsEncode=false;
+            String type = attribute.getAttributeValue("type");
+            if(type !=null){
+                type = type.toLowerCase();
+                if (type.contains("int") ||
+                    type.contains("float") ||
+                    type.equals("byte")) {
+                    jsEncode = false;
+                }
             }
 
             if(values.size()==1){
                 Element value = values.get(0);
                 sb.append(indent).append(indent_inc).append("\"value\": \"");
                 if(jsEncode) {
-                    sb.append(jsonEncodeString(value.getTextTrim()));
+                    sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                 }
                 else {
                     sb.append(value.getTextTrim());
@@ -384,7 +370,7 @@ public class Dap2IFH extends Dap4Responder {
                     sb.append("\"");
 
                     if(jsEncode) {
-                        sb.append(jsonEncodeString(value.getTextTrim()));
+                        sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                     }
                     else {
                         sb.append(value.getTextTrim());

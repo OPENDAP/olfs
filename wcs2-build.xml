@@ -302,7 +302,7 @@
         <mkdir dir="${build.src}"/>
         <mkdir dir="${build.resources}"/>
 
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_SOFTWARE_VERSION}"/>
+        <filter token="WcsSoftwareVersion" value="${WCS_SOFTWARE_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -24,14 +24,18 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
-    <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
+    <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes" />
 
     <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
     <xsl:param name="HyraxVersion"/>
     <xsl:param name="JsonLD"/>
+    <xsl:param name="supportLink"/>
+    <xsl:param name="userId" />
+    <xsl:param name="loginLink" />
+    <xsl:param name="logoutLink" />
 
     <xsl:variable name="debug" select="false()"/>
 
@@ -71,9 +75,38 @@
                 </xsl:element>
 
 
-                <title>Interface From Hell <xsl:value-of select="@name"/></title>
+                <title>OPeNDAP Data Access Form for  <xsl:value-of select="@name"/></title>
             </head>
             <body>
+                <!-- ****************************************************** -->
+                <!--                      LOGIN UI                          -->
+                <!--                                                        -->
+                <!--                                                        -->
+                <xsl:choose>
+
+                    <xsl:when test="$userId">
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <xsl:choose>
+                                <xsl:when test="$loginLink">
+                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <b><xsl:value-of select="$userId"/></b><br/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                        </div>
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                        <xsl:if test="$loginLink">
+                            <div style='float: right;vertical-align:middle;font-size:small;'>
+                                <a style="color: green;" href="{$loginLink}">login</a>
+                            </div>
+                        </xsl:if>
+                    </xsl:otherwise>
+
+                </xsl:choose>
 
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->
@@ -85,7 +118,11 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">DAP2 Data Access Form</div>
+                            <div class="small_italic" style="padding-bottom: 5px;">Welcome to the new (<em>beta</em>) </div>
+                            <div class="large" style="padding-bottom: 5px;">OPeNDAP Data Access Form</div>
+                            <div class="small_italic" style="padding-bottom: 5px;">
+                                <a href="{$datasetUrl}.html_old">The old form can be found here...</a>
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -144,8 +181,13 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>) <br/>
-                    <a href="{$docsService}/">Documentation</a>
+                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+                    <div>
+                        <a href="{$docsService}/">Documentation</a>
+                        <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+                            <a href="{$supportLink}">Questions? Contact Support</a>
+                        </span>
+                    </div>
                 </h3>
 
                 <xsl:if test="$JsonLD">
@@ -567,9 +609,7 @@
                         <span class="bold"><xsl:value-of select="@name"/>:
                         </span>
                         <span class="em">
-                            <xsl:for-each select="dap:value">
-                                <xsl:value-of select="."/>
-                            </xsl:for-each>
+                            <xsl:for-each select="dap:value"><xsl:if test="(position( )) > 1">, </xsl:if><xsl:value-of select="."/></xsl:for-each>
                         </span>
                     </div>
                 </li>
@@ -604,9 +644,10 @@
             </td>
             <td>
                 <div style="width:100%;margin-left:10px;">
-                    <input type="button" value="Get ASCII" onclick="ascii_button()"/>
+                    <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
+                    <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
                     <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>

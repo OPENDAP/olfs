@@ -29,6 +29,7 @@ package opendap.wcs.v1_1_2.http;
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -98,22 +99,19 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public void init(HttpServlet dispatchServlet, Element e) throws ServletException {
-
         init(dispatchServlet);
+    }
 
+    public void init(HttpServlet dispatchServlet, Element e, BesApi besApi) throws ServletException {
+        init(dispatchServlet);
     }
 
 
 
     public void init(HttpServlet dispatchServlet) throws ServletException {
-
         String contextPath = ServletUtil.getContextPath(dispatchServlet);
-
         String resourcePath = ServletUtil.getSystemPath(dispatchServlet, "/");
-
-
         init(contextPath, resourcePath);
-
     }
 
 

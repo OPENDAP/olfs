@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.io.HyraxStringEncoding;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -63,9 +64,8 @@ public class Util {
             connection.setUseCaches(false);
             connection.setDoInput(true);
 
-            for( String key : headers.keySet() )
-            {
-                connection.setRequestProperty(key, headers.get(key));
+            for(Map.Entry<String, String> header: headers.entrySet()){
+                connection.setRequestProperty(header.getKey(), header.getValue());
             }
 
             /**
@@ -101,7 +101,7 @@ public class Util {
              * Extract the body of the response so we can return it.
              */
             BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
+                new InputStreamReader(connection.getInputStream(),HyraxStringEncoding.getCharset()));
 
             String line;
             while( (line = in.readLine()) != null ) result.append(line);

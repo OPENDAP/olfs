@@ -100,6 +100,9 @@ public class SimplePDP extends PolicyDecisionPoint {
             addPolicy(p);
         }
         Element memberships = config.getChild("Memberships");
+        if(memberships==null)
+            throw new ConfigurationException("Configuration is missing required element 'Memberships'");
+
         MembershipRulesManager.init(memberships);
    }
 

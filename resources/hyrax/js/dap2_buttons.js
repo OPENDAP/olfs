@@ -1,3 +1,8 @@
+
+function make_a_selection(){
+    alert("Please select one or more variables before attempting to download/access data.");
+}
+
 function ascii_button() {
     var url = new String(document.forms[0].url.value);
 
@@ -6,10 +11,27 @@ function ascii_button() {
     if (url_parts[1] != null) {
         var ascii_url = url_parts[0] + ".ascii?" + url_parts[1];
     } else {
-        var ascii_url = url_parts[0] + ".ascii?";
+        make_a_selection();
+        return;
+        // var ascii_url = url_parts[0] + ".ascii?";
     }
 
     window.open(encodeURI(ascii_url), "ASCII_Data");
+}
+function covjson_button() {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var covjson_url = url_parts[0] + ".covjson?" + url_parts[1];
+    } else {
+        make_a_selection();
+        return;
+        // var covjson_url = url_parts[0] + ".covjson?";
+    }
+
+    window.open(encodeURI(covjson_url), "CoverageJSON Data");
 }
 
 /* The netcdf_button handler loads the data to the current window. Since it
@@ -24,7 +46,9 @@ function netcdf_button(ext) {
     if (url_parts[1] != null) {
         var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
     } else {
-        var binary_url = url_parts[0] + "." + ext + "?";
+        make_a_selection();
+        return;
+        // var binary_url = url_parts[0] + "." + ext + "?";
     }
 
     window.location = encodeURI(binary_url);
@@ -42,7 +66,9 @@ function binary_button(ext) {
     if (url_parts[1] != null) {
         var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
     } else {
-        var binary_url = url_parts[0] + "." + ext + "?";
+        make_a_selection();
+        return;
+        // var binary_url = url_parts[0] + "." + ext + "?";
     }
 
     window.location = encodeURI(binary_url);

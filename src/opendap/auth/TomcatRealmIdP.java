@@ -64,9 +64,7 @@ public class TomcatRealmIdP extends IdProvider {
      */
     @Override
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        /**
-         * Redirect the user back to the their original requested resource.
-         */
+        //Redirect the user back to the their original requested resource.
         HttpSession session = request.getSession();
         String redirectUrl = request.getContextPath();
         if(session!=null){
@@ -77,24 +75,14 @@ public class TomcatRealmIdP extends IdProvider {
         }
 
         String protocol = request.getScheme();
-
-
         if(protocol.equalsIgnoreCase("https")){
             redirectUrl = redirectUrl.replace("http://","https://");
             redirectUrl = redirectUrl.replace(":8080/",":8443/");
         }
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
-
-
-
         session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
-
-
         response.sendRedirect(redirectUrl);
-
-
-
         return true;
     }
 

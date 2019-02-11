@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "Hyrax Data Server" project.
@@ -43,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -139,7 +139,7 @@
                                     <div class="small">
                                        <span class="bold">DODS_Interfaces:
                         </span>
-                                       <span class="em">datetimedate_time</span>
+                                       <span class="em">date, time, date_time</span>
                                     </div>
                                  </li>
                                  <li>
@@ -153,14 +153,14 @@
                                     <div class="small">
                                        <span class="bold">DODS_LatRange:
                         </span>
-                                       <span class="em">60.57509.4250</span>
+                                       <span class="em">60.5750, 9.4250</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">DODS_LonRange:
                         </span>
-                                       <span class="em">-96.2220-33.7780</span>
+                                       <span class="em">-96.2220, -33.7780</span>
                                     </div>
                                  </li>
                                  <li>
@@ -727,8 +727,189 @@
          </table>
       </form>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-         <a href="/opendap/docs/">Documentation</a>
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/ff/avhrr.dat.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/ff/avhrr.dat.dmr.html%0A# query_string: n/a%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "avhrr.dat",
+  "url": "http://localhost:8080/opendap/data/ff/avhrr.dat",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/ff/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/ff/avhrr.dat",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "Server", 
+          "value": "DODS FreeFrom based on FFND release 4.2.3"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_FileType", 
+          "value": "FileServer"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_Interfaces", 
+          "value": [ "date", "time", "date_time" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_Title", 
+          "value": "Univ. R.I. 5.5KM AVHRR Browse Archive"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_LatRange", 
+          "value": [ "60.5750", "9.4250" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_LonRange", 
+          "value": [ "-96.2220", "-33.7780" ]        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Sel_Vars", 
+          "value": "Sea_Temp"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Dod_Vars", 
+          "value": "dsp_band_1"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_StartDate", 
+          "value": "1979/4/11"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "DODS_EndDate", 
+          "value": "2002/12/31"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_variable", 
+          "value": "URI_Avhrr.year"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "month_variable", 
+          "value": "URI_Avhrr.month"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "day_variable", 
+          "value": "URI_Avhrr.day"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "hours_variable", 
+          "value": "URI_Avhrr.hours"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "minutes_variable", 
+          "value": "URI_Avhrr.minutes"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "seconds_variable", 
+          "value": "URI_Avhrr.seconds"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "gmt_time", 
+          "value": "true"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "year_variable", 
+          "value": "URI.Avhrr.year"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "month_variable", 
+          "value": "URI_Avhrr.month"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "day_variable", 
+          "value": "URI_Avhrr.day"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "hours_variable", 
+          "value": "URI_Avhrr.hours"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "minutes_variable", 
+          "value": "URI_Avhrr.minutes"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "seconds_variable", 
+          "value": "URI_Avhrr.seconds"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "gmt_time", 
+          "value": "true"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "URI_Avhrr",
+    "valueReference": [ 
+,
+    {
+      "@type": "PropertyValue",
+      "name": "year",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "month",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "day",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "hours",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "minutes",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "seconds",
+      "valueReference": [ 
+
+      ]
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "DODS_URL",
+      "valueReference": [ 
+
+      ]
+    }
+    ]
+  }
+  ]
+}
+</script>
    </body>
    <script type="text/javascript">
                 CollapsibleLists.apply(true);

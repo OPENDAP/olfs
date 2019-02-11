@@ -64,118 +64,36 @@
         </BES>
     </BESManager>
 
+
+    <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
+    <GatewayService  prefix="gateway" useMemoryCache="true" />
+    <UseDAP2ResourceUrlResponse />
+    <HttpPost enabled="true" max="2000000"/>
+
+    <!-- AddFileoutTypeSuffixToDownloadFilename / -->
+    <!-- AllowDirectDataSourceAccess / -->
+    <!-- PreloadNcmlIntoBes -->
+
     <!-- CatalogCache>
         <maxEntries>10000</maxEntries>
         <updateIntervalSeconds>10000</updateIntervalSeconds>
     </CatalogCache -->
 
-    <DispatchHandlers>
+    <!--
+       'Bot Blocker' is used to block access from specific IP addresses
+       and by a range of IP addresses using a regular expression.
+    -->
+    <!-- BotBlocker -->
+    <!-- <IpAddress>127.0.0.1</IpAddress> -->
+    <!-- This matches all IPv4 addresses, work yours out from here.... -->
+    <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
+    <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
+    <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+    <!-- /BotBlocker -->
 
-        <HttpGetHandlers>
-
-            <Handler className="opendap.bes.VersionDispatchHandler" />
-
-            <!-- Bot Blocker
-               -
-               - This handler can be used to block access from specific IP addresses
-               - and by a range of IP addresses using a regular expression.
-               -
-              -->
-            <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-
-                <!-- <IpAddress>127.0.0.1</IpAddress> -->
-
-                <!-- This matches all IPv4 addresses, work yours out from here.... -->
-                <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-
-                <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-                <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-
-            <!-- </Handler>  -->
-                     
-                     
-            <Handler className="opendap.ncml.NcmlDatasetDispatcher" />            
-   
-            <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
-                <prefix>thredds</prefix>
-                <useMemoryCache>true</useMemoryCache>
-            </Handler>
-
-            <Handler className="opendap.gateway.DispatchHandler">
-                <prefix>gateway</prefix>
-                <UseDAP2ResourceUrlResponse />
-            </Handler>
-
-
-
-            <Handler className="opendap.bes.BesDapDispatcher" >
-
-                <!-- AllowDirectDataSourceAccess
-                  - If this element is present then the server will allow users to request
-                  - the data source (file) directly. For example a user could just get the
-                  - underlying NetCDF files located on the server without using the OPeNDAP
-                  - request interface.
-                  -->
-
-                <!-- AllowDirectDataSourceAccess / -->
-
-                <!--
-                  By default, the server will provide a DAP2-style response
-                  to requests for a dataset resource URL. Commenting out the
-                  "UseDAP2ResourceUrlResponse" element will cause the server
-                  to return the DAP4 DSR response when a dataset resource URL
-                  is requested.
-                -->
-                <UseDAP2ResourceUrlResponse />
-
-            </Handler>
-
-            <Handler className="opendap.bes.DirectoryDispatchHandler" />
-
-            <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
-
-            <Handler className="opendap.bes.FileDispatchHandler" />
-
-
-        </HttpGetHandlers>
-
-
-        <!--
-           If you need to accept a constraint expression (ce) that is larger than will fit in a URL query string then you
-           can configure the server to accept the ce as the body of a POST request referencing the same resource.
-           If the the Content-Encoding of the request is set to "application/x-www-form-urlencoded" then the server
-           will ingest all of parameter names "ce" and "dap4:ce"  to build the DAP constraint expression. Otherwise
-           the server will treat the entire POST body as a DAP ce.
-
-           By default the maximum length of the POST body is limited to 2000000 characters, and may never be
-           larger than 10000000 characters (if you need more then get in touch with support@opendap.org). You can adjust
-           the limit in the configuration for the BesDapDispatcher.
-
-           Configuration:
-           Uncomment the HttpPostHandlers element below. Make sure that the body of the BesDapDispatcher Handler element is
-           IDENTICAL to it's sister in the HttpGetHandlers element above.
-
-           If you need to change the default value of the maximum POST body length do it by adding a
-           "PostBodyMaxLength" element to the BesDapDispatcher Handler below:
-
-           <PostBodyMaxLength>500</PostBodyMaxLength>
-
-           The text content of which must be an integer between 0 and 10000000
-        -->
-        <!--
-        <HttpPostHandlers>
-            <Handler className="opendap.bes.dapResponders.BesDapDispatcher" >
-                MAKE SURE THAT THE CONTENT OF THIS ELEMENT IS IDENTICAL TO IT'S SISTER IN THE  HttpGetHandlers ELEMENT!
-                (Disregarding the presence of a PostBodyMaxLength element)
-            </Handler>
-        </HttpPostHandlers>
-        -->
-
-
-    </DispatchHandlers>
 
     <!--
-      This enables or disables the generation of internal timing metrics for the OLFS
+      'Timer' enables or disables the generation of internal timing metrics for the OLFS
       If commented out the timing is disabled. If you want timing metrics to be output
       to the log then uncomment the Timer and set the enabled attribute's value to "true"
       WARNING: There is some performance cost to utilizing the Timer.

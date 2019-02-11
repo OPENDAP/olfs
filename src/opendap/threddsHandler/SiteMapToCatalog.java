@@ -2,6 +2,7 @@ package opendap.threddsHandler;
 
 import opendap.PathBuilder;
 import opendap.gateway.HexAsciiEncoder;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 import org.jdom.Element;
@@ -237,8 +238,8 @@ public class SiteMapToCatalog {
 
         String url = PathBuilder.pathConcat(s3BucketUrl,smi.getFullNodeName());
         String gatewayRequestBase = HexAsciiEncoder.stringToHex(url);
-        PathBuilder.pathConcat(gatewayServicePath,gatewayRequestBase);
-        access.setAttribute(THREDDS.URL_PATH,gatewayRequestBase);
+        String gatewayAccess = PathBuilder.pathConcat(gatewayServicePath,gatewayRequestBase);
+        access.setAttribute(THREDDS.URL_PATH,gatewayAccess);
         dataset.addContent(access);
 
         return dataset;
@@ -399,7 +400,12 @@ public class SiteMapToCatalog {
 
 
     public void ingestSiteMap() throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(_siteMapFile))) {
+
+        try (
+            FileInputStream fos = new FileInputStream(_siteMapFile);
+            InputStreamReader osw = new InputStreamReader(fos, HyraxStringEncoding.getCharset());
+            BufferedReader br = new BufferedReader(osw);
+            ) {
             String line;
             while ((line = br.readLine()) != null) {
                 _log.debug("ingestSiteMap() Processing Line: {}",line);
@@ -449,7 +455,8 @@ public class SiteMapToCatalog {
             SiteMapNode smn = _catalogNodes.get(nodeKey);
             File dir = new File(catalogDir,nodeKey);
             _log.debug("writeCatalogTree() Creating directory '{}'",dir.getAbsolutePath());
-            dir.mkdirs();
+            if(!dir.mkdirs())
+                throw new IOException("writeCatalogTree() - Unable to create directory: '"+dir.getCanonicalPath()+"'");
 
             File catalog = new File(dir,"catalog.xml");
             _log.debug("writeCatalogTree() Writing catalog file '{}'",catalog.getAbsolutePath());
@@ -475,17 +482,22 @@ public class SiteMapToCatalog {
         _log.debug("Processing node: {}",dataTreeNode.getFullNodeName());
         if(addHtmlCatalog){
             File catalogFile = new File(targetDir,"index.html");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(catalogFile));
-            String catalogContent = getHtmlCatalogFromNode(dataTreeNode,_hyraxServiceBase,_gatewayServiceBase,_s3BucketUrl);
-            bw.write(catalogContent);
-            bw.close();
+            try(
+                FileOutputStream fos = new FileOutputStream(catalogFile);
+                OutputStreamWriter osw = new OutputStreamWriter(fos, HyraxStringEncoding.getCharset());
+            ) {
+                String catalogContent = getHtmlCatalogFromNode(dataTreeNode, _hyraxServiceBase, _gatewayServiceBase, _s3BucketUrl);
+                osw.write(catalogContent);
+            }
         }
 
         for(SiteMapItem smi :dataTreeNode._children.values()){
             if(smi instanceof SiteMapNode){
                 File nodeDir = new File(targetDir,smi._name);
-                nodeDir.mkdirs();
-                writeDataTreeNode(nodeDir, (SiteMapNode)smi, addHtmlCatalog);
+                if(nodeDir.mkdirs())
+                    writeDataTreeNode(nodeDir, (SiteMapNode)smi, addHtmlCatalog);
+                else
+                    throw new IOException("Failed to create directory: '"+nodeDir.getCanonicalPath()+"'");
             }
             else {
                 // it's a leaf!
@@ -576,7 +588,7 @@ public class SiteMapToCatalog {
         CommandLineParser parser = new PosixParser();
         options = new Options();
         options.addOption("b", "hyraxServiceBase", true, "The hyrax service base. [default: '/opendap/hyrax/']");
-        options.addOption("o", "outputDirName", true, "The to which to write the catalog. [default: '/tmp/hic_ingest']");
+        options.addOption("o", "outputDirName", true, "The dir to which to write the catalog. [default: '/tmp/hic_ingest']");
         options.addOption("s", "siteMapFileName", true, "Name of the file into which to write the site map. [default: 'siteMap.txt']");
         options.addOption("h", "help", false, "Usage information.");
         options.addOption("v", "verbose", false, "Verbose mode [Always On].");
