@@ -60,6 +60,10 @@
     <property name="compile.debuglevel" value="lines,vars,source"/>
     <property name="compile.deprecation" value="on"/>
 
+    <property name="compile.TARGET" value="1.7"/>
+    <property name="compile.SOURCE" value="1.7"/>
+
+
     <property name="modern.compiler" value="modern"/>
     <property name="classic.compiler" value="classic"/>
 
@@ -117,39 +121,6 @@
     </target>
 
 
-    <target name="show" description="Show build settings.">
-
-        <echo level="info" message="Project Name:         ${ant.project.name}"/>
-        <echo level="info" message="Project File:         ${ant.file}"/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${S3_DAP_SERVICE_SOFTWARE_VERSION}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:       ${src.dir}"/>
-        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
-        <echo level="info" message="    aws.resources:     ${aws.resources}"/>
-        <echo level="info" message="    glacier.resources: ${glacier.resources}"/>
-        <echo level="info" message="    s3dap.resources:   ${s3.resources}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:      ${build.dir}"/>
-        <echo level="info" message="    build.classes:  ${build.classes}"/>
-        <echo level="info" message="    build.doc:      ${build.doc}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="    ant.file:          ${ant.file}"/>
-        <echo level="info" message="    ant.home:          ${ant.home}"/>
-        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
-        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
-        <echo level="info" message="    ant.version:       ${ant.version}"/>
-        <echo level="info" message="    basedir:           ${basedir}"/>
-        <echo level="info" message="    user.name:         ${user.name}"/>
-        <echo level="info" message="    user.home:         ${user.home}"/>
-        <echo level="info" message="    java.home:         ${java.home}"/>
-        <echo level="info" message=""/>
-
-    </target>
 
 
     <!-- ################################################################# -->
@@ -165,6 +136,7 @@
     <property name="aws.resources"     location="resources/experiments/AWS" />
     <property name="glacier.resources" location="${aws.resources}/Glacier"/>
     <property name="s3.resources"      location="${aws.resources}/s3"/>
+    <property name="aws.lib.dir"       location="${aws.resources}/lib"/>
     <property name="hyrax.resources"   location="resources/hyrax"/>
 
 
@@ -178,9 +150,12 @@
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
     <property name="build.resources" location="${build.dir}/resources"/>
+    <property name="build.xsl" location="${build.dir}/xsl"/>
 
 
     <!-- Libraries -->
+    <property name="json.lib"       value="gson-2.3.1.jar"/>
+
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
     <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
@@ -222,14 +197,10 @@
     <property name="jackson.annotations" value="jackson-annotations-2.4.1.jar" />
 
 
+
     <property name="owasp-encoder"     value="encoder-1.2.1.jar" />
     <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar" />
 
-    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
-               property="fortify.present"/>
-
-    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
-    <property name="rules.dir" value="fortify"/>
 
 
     <!-- Library (class)paths -->
@@ -241,6 +212,8 @@
 
             <include name="${owasp-encoder}"/>
             <include name="${owasp-encoder-jsp}"/>
+
+            <include name="${json.lib}"/>
 
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
@@ -269,7 +242,7 @@
 
         </fileset>
 
-        <fileset dir="${aws.resources}/lib">
+        <fileset dir="${aws.lib.dir}">
             <include name="**"/>
         </fileset>
 
@@ -279,6 +252,39 @@
 
 
 
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:         ${ant.project.name}"/>
+        <echo level="info" message="Project File:         ${ant.file}"/>
+        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
+        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${S3_DAP_SERVICE_SOFTWARE_VERSION}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    aws.resources:     ${aws.resources}"/>
+        <echo level="info" message="    glacier.resources: ${glacier.resources}"/>
+        <echo level="info" message="    s3dap.resources:   ${s3.resources}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+
+    </target>
 
 
 
@@ -326,8 +332,8 @@
 
     <target  name="PreProcessSourceCode"
              depends="clean,init"
-             description="Moves selected source code from the development tree into
-             the build/src directory. The code text is filtered to update version numbers.">
+description="Moves selected source code from the development tree into
+the build/src directory. The code text is filtered to update version numbers.">
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
@@ -343,8 +349,13 @@
                 <exclude  name="opendap/wcs/**"/>
                 <exclude  name="opendap/hai/**"/>
                 <exclude  name="opendap/aws/glacier/**"/>
+                <exclude  name="opendap/aws/glacier/**"/>
                 <exclude  name="opendap/aws/demo.java"/>
                 <exclude  name="opendap/aws/s3/Testy.java"/>
+
+                <!-- Exclude async test code -->
+                <exclude name="opendap/async/**"/>
+
             </fileset>
 
         </copy>
@@ -358,8 +369,23 @@
         </copy>
 
 
-        <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${hyrax.resources}">
+        <copy todir="${build.resources}/xsl" filtering="true">
+            <fileset dir="${hyrax.resources}/xsl">
+                <include name="datasetServices.xsl"/>
+                <include name="dap4_ifh.xsl"/>
+                <include name="version.xsl"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.resources}/nciso" filtering="true">
+            <fileset dir="${hyrax.resources}/nciso">
+                <include name="**"/>
+            </fileset>
+        </copy>
+
+
+        <copy todir="${build.resources}/js" filtering="true">
+            <fileset dir="${hyrax.resources}/js">
                 <include name="**"/>
             </fileset>
         </copy>
@@ -368,17 +394,23 @@
 
     </target>
 
+
     <target
             name="compile"
             depends="PreProcessSourceCode"
             description="Compiles the S3 DAP Service software."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling S3 DAP Service"/>
+    >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="java.home (ant):       ${java.home}"/>
+        <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
+        <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
         <echo level="info" message=""/>
 
         <javac compiler="${build.compiler}"
+               target="${compile.TARGET}"
+               source="${compile.SOURCE}"
                destdir="${build.classes}"
                debug="${compile.debug}"
                debuglevel="${compile.debuglevel}"
@@ -391,7 +423,6 @@
         </javac>
 
     </target>
-
 
 
 
@@ -454,35 +485,23 @@
 
     </target>
 
+    <target name="CollectS3Libraries"
+            depends="init"
+    >
 
-
-
-
-    <target
-            name="server"
-            depends="clean,compile"
-            description="Performs a clean build of the core software and assembles the WAR file."
-            >
-
-
-        <echo level="info" message="Building s3 dap service war file."/>
-        <echo level="info" message="build.dist: ${build.dist}"/>
-
-
-        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${s3.resources}/WEB-INF/web.xml"
-                >
-
-
-
-            <lib dir="${lib.dir}">
-
+        <copy todir="${build.lib}" filtering="false">
+            <fileset dir="${lib.dir}">
+                
+                <!-- OWASP Encoding -->
                 <include name="${owasp-encoder}"/>
                 <include name="${owasp-encoder-jsp}"/>
 
+                <!-- JDOM. JUnit UrlRewrite -->
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
                 <include name="${urlRewrite.lib}"/>
+
+                <include name="${json.lib}"/>
 
                 <!-- Apache Commons tools -->
                 <include name="${commons-cli.lib}"/>
@@ -508,7 +527,38 @@
                 <!-- AWS libraries -->
                 <include name="${aws.sdk}"/>
                 <include name="${aws.sdk.tools}"/>
+            </fileset>
 
+            <fileset dir="${aws.lib.dir}">
+                <include name="**"/>
+            </fileset>
+
+        </copy>
+
+    </target>
+
+
+
+
+    <target
+            name="server"
+            depends="clean,compile,CollectS3Libraries"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
+
+
+        <echo level="info" message="Building s3 dap service war file."/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+
+        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
+             webxml="${s3.resources}/WEB-INF/web.xml"
+                >
+
+
+
+            <lib dir="${build.lib}">
+                <include name="**"/>
             </lib>
 
 
@@ -570,40 +620,51 @@
 
     -->
 
-    <property name="S3_BUCKET"            value="opendap.test"/>
-
-    <property name="UPLOAD_FILE"          value="resources/experiments/AWS/s3/index.xml"/>
-    <property name="UPLOAD_KEY"           value="/index.xml"/>
-
-    <property name="AWS_KEY_ID"           value="anonymous" />
-    <property name="AWS_SECRET_KEY"       value="YouShouldKnowBetterThanThat" />
-
-
-
-    <target  name="s3up" depends="compile">
-
+    <property name="S3_UPLOAD"       value="-h" />
+    <target  name="s3up"
+description="Loads files into an S3 bucket under the supplied upload key.
+Use -DS3_UPLOAD=&quot;...&quot; to specify the command line options."
+             depends="compile">
         <java classname="opendap.aws.s3.SimpleS3Uploader"
               fork="true"
-              maxmemory="1024m"
+              maxmemory="4096m"
               dir="${build.run}"
-                >
+        >
             <classpath refid="compile.classpath" />
-
-            <arg line="--verbose" />
-            <arg line="--s3-bucket-name=${S3_BUCKET}" />
-
-            <arg line="--uploadFile=${UPLOAD_FILE}" />
-            <arg line="--uploadKey=${UPLOAD_KEY}" />
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
+            <arg line="--s3-bucket-name=${S3_UPLOAD}" />
         </java>
 
     </target>
 
 
+    <!-- *******************************************************
 
-    <!-- *******************************************************  -->
+
+
+   -->
+
+    <property name="REPO_BUILDER"     value="-h"/>
+    <target  name="RepositoryBuilder"
+description="RepositoryBuilder:
+Starting at the supplied point the file system
+this code will build a simple XML index of the tree
+and transmit the index files and the regular files
+to the identified S3 bucket. The resulting index.xml
+files in S3 will provide the same logical view of the
+regular files as was manifested by the file system.
+Use -DREPO_BUILDER=&quot;...&quot; to specify the
+command line options."
+             depends="compile ">
+        <java classname="opendap.aws.s3.SimpleRepositoryUploader"
+              fork="true"
+              maxmemory="4096m"
+              dir="${build.run}"
+        >
+            <classpath refid="compile.classpath" />
+            <arg line="${REPO_BUILDER}" />
+        </java>
+
+    </target>
 
 
 

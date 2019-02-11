@@ -3069,8 +3069,14 @@
             </tr>
          </table>
       </form>
-      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
-         <a href="/opendap/docs/">Documentation</a>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/hdf4/S2000415.HDF.gz.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/hdf4/S2000415.HDF.gz.dmr.html%0A# query_string: n/a%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
       <script type="application/ld+json">
 {

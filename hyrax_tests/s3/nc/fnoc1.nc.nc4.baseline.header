@@ -1,0 +1,18 @@
+netcdf test {
+dimensions:
+	time_a = 16 ;
+	lat = 17 ;
+	lon = 21 ;
+variables:
+	short u(time_a, lat, lon) ;
+		u:units = "meter per second" ;
+		u:long_name = "Vector wind eastward component" ;
+		u:missing_value = "-32767" ;
+		u:scale_factor = "0.005" ;
+
+// global attributes:
+		:base_time = "88- 10-00:00:00" ;
+		:title = " FNOC UV wind components from 1988- 10 to 1988- 13." ;
+		:DODS_EXTRA.Unlimited_Dimension = "time_a" ;
+		:history = "removed date-time GMT Hyrax-“aws-dmr++” http://localhost:8080/s3/dap/test/data/nc/fnoc1.nc.nc4?u" ;
+}

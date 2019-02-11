@@ -101,6 +101,9 @@ public class HtmlDMR extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
+
         log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
@@ -145,6 +148,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
 
             AuthenticationControls.setLoginParameters(transformer,request);
 

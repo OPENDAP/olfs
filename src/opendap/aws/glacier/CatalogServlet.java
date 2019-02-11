@@ -113,6 +113,7 @@ public class CatalogServlet extends HttpServlet {
             throws ServletException,
             java.io.IOException{
 
+        int status = HttpServletResponse.SC_OK;
         try {
             LogUtil.logServerAccessStart(request, "GLACIER_CATALOG_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
 
@@ -124,14 +125,16 @@ public class CatalogServlet extends HttpServlet {
                 if (requestURI.startsWith(_servletContext) ){
                     if (!directoryDispatch(request, response)) {  // Is it a catalog request?
                         // We don't know how to cope, looks like it's time to 404!
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                        status = HttpServletResponse.SC_NOT_FOUND;
+                        response.sendError(status, "Unable to locate requested resource.");
                         _log.info("Sent 404 Response.");
 
                     }
                 }
                 else {   // It's not a catalog request, so:
                     // Looks like it's time to 404!
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                    status = HttpServletResponse.SC_NOT_FOUND;
+                    response.sendError(status, "Unable to locate requested resource.");
                     _log.info("Sent 404 Response.");
                 }
 
@@ -140,13 +143,13 @@ public class CatalogServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 _log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "GLACIER_CATALOG_ACCESS");
+            LogUtil.logServerAccessEnd(status, "GLACIER_CATALOG_ACCESS");
         }
 
     }

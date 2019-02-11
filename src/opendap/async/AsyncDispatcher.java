@@ -55,6 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpUpgradeHandler;
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
  */
@@ -696,7 +697,18 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public Part getPart(String s) throws IOException, ServletException {
             return wrappedRequest.getPart(s);
         }
-        /*
+
+
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* **********************************************************************************
+ * The following methods are part of the Servlet API version 3.1 that is not
+ * yet deployed to CentOS-6.6 yum repos. So - these will compile on more modrern
+ * systems, but not older ones.
+ * Comment them out or uncomment them as needed
+ */
+/*
         @Override
         public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException
             return wrappedRequest.upgrade(aClass)
@@ -709,7 +721,14 @@ public class AsyncDispatcher extends BesDapDispatcher {
         public long getContentLengthLong()
             return wrappedRequest.getContentLengthLong()
 
-        */
+ */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+
+
+
         public String getRequestedSessionId() { return null; }
 
         public Object getAttribute(String s) { return wrappedRequest.getAttribute(s); }

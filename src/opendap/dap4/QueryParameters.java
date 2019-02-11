@@ -47,6 +47,7 @@ public class QueryParameters {
     public static final String CONSTRAINT_EXPRESSION = "dap4.ce";
     public static final String FUNC = "dap4.function";
     public static final String ASYNC = "dap4.async";
+    public static final String CLOUDY_DAP = "cloudydap";
 
 
     private String async;
@@ -55,6 +56,7 @@ public class QueryParameters {
     private String func;
     private String ce;
     private String queryRemainder;
+    private String cloudyDap;
 
 
     public QueryParameters() {
@@ -64,6 +66,7 @@ public class QueryParameters {
         func = null;
         ce = null;
         queryRemainder = null;
+        cloudyDap=null;
     }
 
 
@@ -122,6 +125,11 @@ public class QueryParameters {
         return ce;
     }
 
+    /**  Added for cloudydap experiment - ndp 1/19/17 - - - - - - - - - - - - - - - - - - */
+    public void setCloudyDap(String cloudyDapString) { cloudyDap = cloudyDapString; }
+    public String getCloudyDap() { return cloudyDap; }
+    /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 
     /**
      * Using the passed HttpServletRequest this method extracts DAP4 query string parameters from the query string,
@@ -157,6 +165,14 @@ public class QueryParameters {
                     setFunc(req.getParameter(key));
                     dropList.add(key);
                 }
+                
+                /**  Added for cloudydap experiment - ndp 1/19/17 */
+                if(key.equals(CLOUDY_DAP)){
+                    setCloudyDap(req.getParameter(key));
+                    dropList.add(key);
+                }
+                /** - - - - - - - - - - - - - - - - - - - - - - - */
+
                 if(key.equals(ASYNC)){
                     setAsync(req.getParameter(key));
                     dropList.add(key);

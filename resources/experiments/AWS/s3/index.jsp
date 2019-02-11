@@ -65,7 +65,7 @@
 
 <head>
     <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
-    <title>NOAA S3 Index</title>
+    <title>S3 Bucket List</title>
 </head>
 
 <!-- ****************************************************** -->

@@ -147,6 +147,7 @@ public class IsoRubricDMR extends Dap4Responder {
         System.setProperty("user.dir",xslDir);
 
         try {
+
             String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
 
 
