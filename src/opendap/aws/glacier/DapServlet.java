@@ -168,7 +168,7 @@ public class DapServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        String filename = Scrub.fileName(ServletUtil.getContentPath(this) + basename);
+        String filename = Scrub.fileName(ServletUtil.getConfigPath(this) + basename);
 
 
         File confFile = new File(filename);
@@ -280,6 +280,7 @@ public class DapServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
+        int status = HttpServletResponse.SC_OK;
         try {
             LogUtil.logServerAccessStart(request, "GLACIER_DAP_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
 
@@ -290,7 +291,8 @@ public class DapServlet extends HttpServlet {
             if (!_glacierDapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
 
                 // We don't know how to cope, looks like it's time to 404!
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                status = HttpServletResponse.SC_NOT_FOUND;
+                response.sendError(status, "Unable to locate requested resource.");
                 _log.info("Sent 404 Response.");
 
             }
@@ -298,13 +300,13 @@ public class DapServlet extends HttpServlet {
 
         } catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, response);
+                OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 _log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "GLACIER_DAP_ACCESS");
+            LogUtil.logServerAccessEnd(status, "GLACIER_DAP_ACCESS");
         }
 
     }

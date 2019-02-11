@@ -62,7 +62,11 @@ public abstract class HttpResponder {
     protected HttpResponder(String sysPath, String pathPrefix, String regexPattern){
         super();
         _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
-        _systemPath = sysPath;
+
+        while(sysPath.endsWith("/") && sysPath.length()>0)
+            sysPath = sysPath.substring(0,sysPath.lastIndexOf('/'));
+        _systemPath = sysPath+"/";
+
         this.pathPrefix = pathPrefix;
     }
 

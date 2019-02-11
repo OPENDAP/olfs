@@ -30,6 +30,8 @@ import opendap.aws.AwsUtil;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.RequestCache;
 import opendap.dap.Dap2Error;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
@@ -75,7 +77,11 @@ public class GlacierBesApi extends BesApi {
 
 
     @Override
-    public boolean writeDDS(String dataSource, String constraintExpression, String xdap_accept, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public void writeDDS(String dataSource,
+                            String constraintExpression,
+                            String xdap_accept,
+                            OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
@@ -92,27 +98,24 @@ public class GlacierBesApi extends BesApi {
 
             if(dds!=null){
                 os.write(dds.getBytes());
-                return true;
+                return;
             }
             else {
                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDS metadata.";
-                Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
-                dap2Error.print(err);
-                // err.write(errMsg.getBytes());
+                throw new GlacierStateException(errMsg);
             }
 
         }
         else {
-            noSuchResource(dataSource, err);
+            noSuchResource(dataSource, os);
         }
 
-        return false;
 
 
     }
 
     @Override
-    public boolean writeDAS(String dataSource, String constraintExpression, String xdap_accept, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public void writeDAS(String dataSource, String constraintExpression, String xdap_accept, OutputStream os) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
@@ -129,22 +132,16 @@ public class GlacierBesApi extends BesApi {
 
             if(das!=null){
                 os.write(das.getBytes());
-                return true;
             }
             else {
                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DAS metadata.";
-                Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
-                dap2Error.print(err);
-                // err.write(errMsg.getBytes());
+                throw new GlacierStateException(errMsg);
             }
 
         }
         else {
-            noSuchResource(dataSource, err);
+            noSuchResource(dataSource, os);
         }
-
-        return false;
-
 
     }
 
@@ -152,7 +149,12 @@ public class GlacierBesApi extends BesApi {
 
 
     @Override
-    public boolean writeDDX(String dataSource, String constraintExpression, String xdap_accept,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public void writeDDX(String dataSource,
+                         String constraintExpression,
+                         String xdap_accept,
+                         String xml_base,
+                         OutputStream os)
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
@@ -171,44 +173,35 @@ public class GlacierBesApi extends BesApi {
 
                 if(ddx.contains(XML_BASE_TAG))
                     ddx = ddx.replace(XML_BASE_TAG,xml_base);
-
-
                 os.write(ddx.getBytes());
-                return true;
             }
             else {
                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDX metadata.";
-
-                Dap4Error error  = new Dap4Error();
-
-                error.setMessage(errMsg);
-                error.setContext("Glacier Service");
-                error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                err.write(error.toString().getBytes());
-
+                sendDap4Error(errMsg,HttpServletResponse.SC_INTERNAL_SERVER_ERROR,os);
             }
 
         }
         else {
             String errMsg = "ERROR: No such resource:  "+dataSource;
-
-            Dap4Error error  = new Dap4Error();
-
-            error.setMessage(errMsg);
-            error.setContext("Glacier Service");
-            error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
-
-            err.write(error.toString().getBytes());
+            sendDap4Error(errMsg,HttpServletResponse.SC_NOT_FOUND,os);
         }
 
-        return false;
 
 
     }
 
+    public void sendDap4Error(String msg, int status, OutputStream err) throws IOException {
+        Dap4Error error  = new Dap4Error();
+        error.setMessage(msg);
+        error.setContext("Glacier Service");
+        error.setHttpStatusCode(status);
+        err.write(error.toString().getBytes());
+    }
+
+
+
     @Override
-     public boolean writeDMR(String dataSource, QueryParameters qp,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+     public void writeDMR(String dataSource, QueryParameters qp,  String xml_base, OutputStream os) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
          dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
@@ -228,44 +221,24 @@ public class GlacierBesApi extends BesApi {
                  if(ddx.contains(XML_BASE_TAG))
                      ddx = ddx.replace(XML_BASE_TAG,xml_base);
 
-
                  os.write(ddx.getBytes());
-                 return true;
              }
              else {
                  String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DMR metadata.";
-
-                 Dap4Error error  = new Dap4Error();
-
-                 error.setMessage(errMsg);
-                 error.setContext("Glacier Service");
-                 error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                 err.write(error.toString().getBytes());
-
+                 sendDap4Error(errMsg,HttpServletResponse.SC_INTERNAL_SERVER_ERROR,os);
              }
 
          }
          else {
              String errMsg = "ERROR: No such resource:  "+dataSource;
-
-             Dap4Error error  = new Dap4Error();
-
-             error.setMessage(errMsg);
-             error.setContext("Glacier Service");
-             error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
-
-             err.write(error.toString().getBytes());
+             sendDap4Error(errMsg,HttpServletResponse.SC_NOT_FOUND,os);
          }
-
-         return false;
-
 
      }
 
 
     @Override
-    public boolean writeDap2DataRequestForm(String dataSource, String xdap_accept, String url, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+    public void  writeDap2DataRequestForm(String dataSource, String xdap_accept, String url, OutputStream os) throws BadConfigurationException, BESError, IOException, PPTException {
 
 
 
@@ -284,21 +257,19 @@ public class GlacierBesApi extends BesApi {
             if(ddx!=null){
 
                 os.write("<html><h1>Need an XSLT to make the DDX/DMR into the HTML form.</h1></html>".getBytes());
-                return true;
             }
             else {
                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDX metadata.";
                 Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
-                dap2Error.print(err);
+                dap2Error.print(os);
                 // err.write(errMsg.getBytes());
             }
 
         }
         else {
-            noSuchResource(dataSource,err);
+            noSuchResource(dataSource,os);
         }
 
-        return false;
     }
 
     private void noSuchResource(String missingResource, OutputStream err) {

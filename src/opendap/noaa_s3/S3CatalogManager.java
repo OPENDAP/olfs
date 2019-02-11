@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class S3CatalogManager {
 
-    org.slf4j.Logger log;
+    private org.slf4j.Logger log;
 
     /** The relative URL path to a file, minus hte bucket name */
     private ConcurrentHashMap<String, S3IndexedFile> _indexedFiles;
@@ -57,14 +57,14 @@ public class S3CatalogManager {
     private String _catalogServiceContext;
     private String _dapServiceContext;
 
-    String _s3CatalogCache;
+    private String _s3CatalogCache;
 
 
     private S3CatalogManager() {
         log = LoggerFactory.getLogger(this.getClass());
-        _catalogNodes = new ConcurrentHashMap<String, S3Index>();
-        _s3BucketList = new ConcurrentHashMap<String, String>();
-        _indexedFiles = new ConcurrentHashMap<String, S3IndexedFile>();
+        _catalogNodes = new ConcurrentHashMap<>();
+        _s3BucketList = new ConcurrentHashMap<>();
+        _indexedFiles = new ConcurrentHashMap<>();
         _dapServiceContext = "/dap";
         _catalogServiceContext = "/catalog";
         _s3CatalogCache = "/Users/ndp/scratch/s3Test/catalogCache";
@@ -73,10 +73,8 @@ public class S3CatalogManager {
 
 
     public static S3CatalogManager theManager(){
-
         if(theManager==null)
             theManager = new S3CatalogManager();
-
         return theManager;
     }
 
@@ -109,12 +107,11 @@ public class S3CatalogManager {
         return s3i;
     }
 
-    public void putIndex(S3Index s3i) throws JDOMException, IOException {
+    public void putIndex(S3Index s3i) {
         String key = s3i.getKey();
         String s3ServiceId = s3i.getBucketContext()+key;
         log.debug("putIndex() - Putting index for '{} in memory cache. S3Index URL: '{}'",s3ServiceId, s3i.getResourceUrl());
         _catalogNodes.putIfAbsent(s3ServiceId, s3i);
-
     }
 
     public S3IndexedFile getIndexedFile(String id){
@@ -126,7 +123,7 @@ public class S3CatalogManager {
     }
 
 
-    public void putIndexedFile(S3IndexedFile s3if, String bucketContext) throws JDOMException, IOException {
+    private void putIndexedFile(S3IndexedFile s3if, String bucketContext)  {
         String key = s3if.getKey();
         String s3ServiceId = bucketContext+key;
         log.debug("putIndexedFile() - Putting indexed file for '{} in memory cache. Resource URL: '{}'",s3ServiceId, s3if.getResourceUrl());
@@ -136,17 +133,10 @@ public class S3CatalogManager {
 
 
     public void addBucket(String bucketContext, String bucketName){
-
         while(bucketContext.startsWith("/"))
             bucketContext = bucketContext.substring(1);
-
         bucketContext = "/" + bucketContext;
-
         _s3BucketList.putIfAbsent(bucketContext, bucketName);
-    }
-
-    public String getBucketNameForContext(String bucketContext){
-        return _s3BucketList.get(bucketContext);
     }
 
     /**
@@ -166,12 +156,10 @@ public class S3CatalogManager {
                     bucketContext = context;
             }
         }
-
         return bucketContext;
     }
 
     public String getBucketName(String relativeUrl){
-
         return _s3BucketList.get(getBucketContext(relativeUrl));
     }
 
@@ -181,41 +169,27 @@ public class S3CatalogManager {
     }
 
     public void ingestIndex(String bucketContext,String bucketName) throws JDOMException, IOException {
-
         S3Index rootIndex = new S3Index(bucketName);
         rootIndex.setS3CacheRoot(_s3CatalogCache);
         rootIndex.setBucketContext(bucketContext);
 
-
         Vector<S3Index> indices = rootIndex.getChildren(true,0);
-
         putIndex(rootIndex);
         for(S3Index s3i : indices){
             putIndex(s3i);
         }
-
-
-
     }
 
     public void ingestIndexedFiles(String bucketContext, String bucketName) throws JDOMException, IOException {
-
-
         String rootIndexId = bucketContext + "/" + S3Index.getCatalogIndexString();
-
-
         S3Index rootIndex = _catalogNodes.get(rootIndexId);
-
         if(rootIndex==null){
             throw new IOException("Unable to load S3IndexedFiles for bucket "+bucketName+" because the root S3Index has not been loaded.");
         }
-
         Vector<S3IndexedFile> indexedFiles =rootIndex.getChildIndexedFiles(true,0);
         for(S3IndexedFile s3if : indexedFiles){
             putIndexedFile(s3if,bucketContext);
         }
-
-
     }
 
 
