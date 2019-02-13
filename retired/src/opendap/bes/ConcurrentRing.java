@@ -27,7 +27,6 @@
 package opendap.bes;
 
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
@@ -40,13 +39,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
-    private final ReentrantLock lock = new ReentrantLock();
-    private Logger log;
+    private final ReentrantLock crLock = new ReentrantLock();
 
 
     public ConcurrentRing(int capacity) {
         super(capacity);
-        log = LoggerFactory.getLogger(this.getClass());
     }
 
     public ConcurrentRing(int capacity, boolean fair) {
@@ -59,22 +56,22 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public boolean contains(Object o) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.contains(o);   // Check for containment when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean containsAll(Collection<?> f) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.containsAll(f);   // Check for containment when when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -82,33 +79,33 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public int drainTo(Collection<? super E> f) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.drainTo(f);   // Drain the ring when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public int drainTo(Collection<? super E> f, int i) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.drainTo(f,i);   // Drain the ring when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean isEmpty() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.isEmpty();   // Return isEmpty when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -116,11 +113,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public Iterator<E> iterator() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.iterator();   // Return the iterator when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -129,55 +126,55 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public int remainingCapacity() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.remainingCapacity();   // Return the remainingCapacity when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean remove(Object o) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.remove(o);   // Remove the object when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public E remove() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.remove();   // Remove the head of the Ring when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.removeAll(c);   // Remove everything  when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.retainAll(c);   // Retain the passed stuff and remove everything else when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -185,11 +182,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public int size() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.size();   // Return the size when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -197,11 +194,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public E take() throws InterruptedException {
-        lock.lock();
+        crLock.lock();
         try {
             return super.take();   // Take the head when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -209,11 +206,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public Object[] toArray() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.toArray();   // Return the array when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -221,11 +218,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public <E> E[] toArray(E[] a) {
-        lock.lock();
+        crLock.lock();
         try {
             return super.toArray(a);   // Return the array when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
@@ -234,22 +231,22 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public String toString() {
-        lock.lock();
+        crLock.lock();
         try {
             return super.toString();   // Return the array when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
 
     }
 
     @Override
     public boolean add(E e){
-        lock.lock();
+        crLock.lock();
         try {
             return super.add(e);   // Add a member when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
     }
 
@@ -257,11 +254,11 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
     @Override
     public boolean addAll(Collection<? extends E> e){
-        lock.lock();
+        crLock.lock();
         try {
             return super.addAll(e);   // Add members when nobody else is messing with it...
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
     }
 
@@ -279,15 +276,15 @@ public class ConcurrentRing<E> extends ArrayBlockingQueue<E>  {
 
         // Locking ensures that we don't accidentally cause a permutation of the members of the queue, since
         // the lock enforces that only one thread will be able to take and add at a time.
-        lock.lock();
+        crLock.lock();
         try {
             t = super.take();   // Take the head from the queue.
             add(t);       // Now put it right back on the tail of the queue.
             return t;     // Return it to the requester.
         } catch (InterruptedException e) {
-            log.error("getNext() - Caught Interrupted exception returning 'null'. Msg: "+e.getMessage());
+            LoggerFactory.getLogger(this.getClass()).error("getNext() - Caught Interrupted exception returning 'null'. Msg: "+e.getMessage());
         } finally {
-            lock.unlock();
+            crLock.unlock();
         }
         return null;
     }
