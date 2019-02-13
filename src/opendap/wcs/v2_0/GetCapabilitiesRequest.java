@@ -74,7 +74,7 @@ public class GetCapabilitiesRequest {
     public static final String DATASET_SERIES_SUMMARY = "DatasetSeriesSummary";
     public static final String COVERAGE_SUMMARY = "CoverageSummary";
 
-    public static final HashSet<String> sectionNames = new HashSet<String>();
+    private static final HashSet<String> sectionNames = new HashSet<String>();
     static {
         sectionNames.add(SERVICE_IDENTIFICATION);
         sectionNames.add(SERVICE_PROVIDER);
