@@ -47,10 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.*;
@@ -969,10 +966,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
      */
     public static void main(String[] args) {
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        String testDmrUrl = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2I1NXASM.5.12.4/1992/01/MERRA2_200.inst1_2d_asm_Nx.19920123.nc4.dmr.xml";
+        Logger log = LoggerFactory.getLogger(DynamicService.class);
 
-        testDmrUrl = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        String testDmrUrl  = "http://test.opendap.org/opendap/testbed-13/MERRA2_100.statD_2d_slv_Nx.19800101.SUB.nc4.dmr.xml";
+
         try {
             Element dmrElement =
                     opendap.xml.Util.getDocumentRoot(testDmrUrl, opendap.http.Util.getNetRCCredentialsProvider());
@@ -1014,7 +1012,11 @@ public class DynamicCoverageDescription extends CoverageDescription {
             System.out.println("");
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error("Caught {}  Message: {}",t.getClass().getName(),t.getMessage());
+            StringWriter writer = new StringWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            log.error("Stack trace: {}", writer.toString());
+
         }
 
     }

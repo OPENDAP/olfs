@@ -286,7 +286,7 @@ public class Servlet extends HttpServlet {
             else {
                 String msg = "The request does not resolve to a WCS service operation that this server supports.";
                 log.error("doPost() - {}",msg);
-                throw new BadRequest(msg);
+                request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
 
         }
