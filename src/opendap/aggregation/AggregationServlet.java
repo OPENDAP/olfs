@@ -190,13 +190,12 @@ public class AggregationServlet extends HttpServlet {
      * @param msg A message to indicate where this happened. Ex: "in doHead():"
      */
     private void logError(Throwable t, String msg) {
-        _log.error("Aggregation: Error {}{}", msg, t.getMessage());
+        _log.error("{}{}", msg, t.getMessage());
 
         StringWriter writer = new StringWriter();
         t.printStackTrace(new PrintWriter(writer));
 
-        _log.error("Aggregation: Stack trace: ");
-        _log.error(writer.toString());
+        _log.error("Stack trace: \n{}", writer.toString());
     }
 
     /**
