@@ -184,10 +184,10 @@ public class Util {
 
         ps.println("<h3>Runtime Info:</h3>");
         Runtime rt = Runtime.getRuntime();
-        ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)<br>");
-        ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)<br>");
-        ps.println("JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)<br>");
-        ps.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)<br>");
+        ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024.0) / 1000 + " MB (JVM Maximum Allowable Heap)<br>");
+        ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024.0) / 1000 + " MB (JVM Heap size)<br>");
+        ps.println("JVM Free Memory:  " + (rt.freeMemory() / 1024.0) / 1000 + " MB (Unused part of heap)<br>");
+        ps.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024.0) / 1000 + " MB (Currently active memory)<br>");
 
         ps.println("<hr>");
         ps.println("</body>");
