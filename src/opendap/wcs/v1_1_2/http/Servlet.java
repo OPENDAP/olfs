@@ -261,7 +261,9 @@ public class Servlet extends HttpServlet {
             log.info("Attempting to copy initial content for WCS from "+initialContentDir+" to "+serviceContentPath);
             try {
                 PersistentConfigurationHandler.copyDirTree(initialContentDir, serviceContentPath);
-                semaphore.createNewFile();
+                if(semaphore.createNewFile()){
+                    log.warn("Semapohore file {} already exists! Configuration may not have installed correctly.",semaphore.getAbsolutePath());
+                }
             } catch (IOException e) {
                 log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
                 throw new ServletException(e);
@@ -325,7 +327,7 @@ public class Servlet extends HttpServlet {
             else {
                 String msg = "The request does not resolve to a WCS service operation that this server supports.";
                 log.error("doPost() - {}",msg);
-                throw new BadRequest(msg);
+                request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
 
         }

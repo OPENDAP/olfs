@@ -47,7 +47,7 @@ import java.util.Vector;
 public class CoverageRequestProcessor {
 
 
-    public static String coveragesContentID = "urn:ogc:wcs:1.1:coverages";
+    public static final String COVERAGES_CONTENT_ID = "urn:ogc:wcs:1.1:coverages";
 
 
 
@@ -169,7 +169,7 @@ public class CoverageRequestProcessor {
             doc = SoapHandler.wrapDocumentInSoapEnvelope(doc);
 
 
-        mpr.addAttachment("text/xml; charset=UTF-8",coveragesContentID,doc);
+        mpr.addAttachment("text/xml; charset=UTF-8", COVERAGES_CONTENT_ID,doc);
         mpr.addAttachment(mime_type,dataPartID, dataAccessURL);
 
 

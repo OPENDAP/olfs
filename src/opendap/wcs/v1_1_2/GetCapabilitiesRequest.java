@@ -57,14 +57,14 @@ public class GetCapabilitiesRequest {
     private String[]        AcceptFormats = null;
 
 
-    public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
-    public static String SERVICE_PROVIDER = "ServiceProvider";
-    public static String OPERATIONS_METADATA = "OperationsMetadata";
-    public static String CONTENTS = "Contents";
-    public static String ALL = "All";
+    public static final String SERVICE_IDENTIFICATION = "ServiceIdentification";
+    public static final String SERVICE_PROVIDER = "ServiceProvider";
+    public static final String OPERATIONS_METADATA = "OperationsMetadata";
+    public static final String CONTENTS = "Contents";
+    public static final String ALL = "All";
 
 
-    public static final HashSet<String> sectionNames = new HashSet<String>();
+    private static final HashSet<String> sectionNames = new HashSet<String>();
     static {
         sectionNames.add(SERVICE_IDENTIFICATION);
         sectionNames.add(SERVICE_PROVIDER);

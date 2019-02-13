@@ -53,10 +53,10 @@ public class XLink {
     public static final String LABEL = "label";
     public static final String FROM = "from";
     public static final String TO = "to";
-    Vector<Attribute> attributes = new Vector<Attribute>();
+    private Vector<Attribute> attributes = new Vector<>();
 
 
-    public static final HashSet<String> showValues = new HashSet<String>();
+    private  static final HashSet<String> showValues = new HashSet<>();
     static {
         showValues.add("new");
         showValues.add("replace");
@@ -65,7 +65,7 @@ public class XLink {
         showValues.add("none");
     }
 
-    public static final HashSet<String> actuateValues = new HashSet<String>();
+    private static final HashSet<String> actuateValues = new HashSet<>();
     static {
         showValues.add("onLoad");
         showValues.add("onRequest");
@@ -73,7 +73,7 @@ public class XLink {
         showValues.add("none");
     }
 
-    public static enum Type {SIMPLE , EXTENDED, LOCATOR, ARC, RESOURCE, TITLE, EMPTY}
+    public enum Type {SIMPLE , EXTENDED, LOCATOR, ARC, RESOURCE, TITLE, EMPTY}
 
 
     public XLink(Element e) throws WcsException {
