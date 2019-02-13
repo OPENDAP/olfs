@@ -333,7 +333,6 @@ public class BesCatalogCache implements Runnable{
         Document response;
         Element e;
 
-        id="foo";
         request = new Document();
         e=new Element("request");
         e.setAttribute("id",id);
