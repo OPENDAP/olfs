@@ -132,10 +132,12 @@ import java.util.zip.ZipOutputStream;
  * @author James Gallagher <jgallagher@opendap.org>
  */
 public class AggregationServlet extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
-	private Logger _log;
-    private BesApi _besApi;
-    private ConcurrentSkipListSet<String> _granuleNames;
+
+	private static final Logger _log = LoggerFactory.getLogger(AggregationServlet.class);
+    private static BesApi _besApi = new BesApi();
+    private static ConcurrentSkipListSet<String> _granuleNames = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 
     private static final String invocationError =
             "I expected the operation to be one of: version, file, netcdf3, netcdf4, ascii or csv but got: ";
@@ -152,9 +154,6 @@ public class AggregationServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        _log = LoggerFactory.getLogger(this.getClass());
-        _besApi = new BesApi();
-        _granuleNames = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 
         _log.info(versionInfo);
 
@@ -502,15 +501,15 @@ public class AggregationServlet extends HttpServlet {
      *
      * @param request The HttpServletRequest object
      * @param response The HttpServletResponse object
-     * @throws IOException
      */
-    private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void processRequest(HttpServletRequest request, HttpServletResponse response) {
         // forget the names used in/by previous requests
         _granuleNames.clear();
 
-        ServletOutputStream out = response.getOutputStream();
 
         try {
+            ServletOutputStream out = response.getOutputStream();
+
             RequestCache.openThreadCache();
 
             // String requestKind = ReqInfo.getLocalUrl(request);
@@ -542,17 +541,16 @@ public class AggregationServlet extends HttpServlet {
                 default:
                     throw new Exception(invocationError + requestKind);
             }
+            out.flush();
         }
         catch (Throwable t) {
             OPeNDAPException.anyExceptionHandler(t, this,  response);
-
             logError(t, "in doGet():");
         }
         finally {
             RequestCache.closeThreadCache();
         }
 
-        out.flush();
     }
 
     @Override
@@ -579,10 +577,9 @@ public class AggregationServlet extends HttpServlet {
 
         _log.debug("doHead() - BEGIN");
 
-        ServletOutputStream out = response.getOutputStream();
-
         try {
-            // RequestCache.openThreadCache(); // I don't think we need this - ask Nathan
+            RequestCache.openThreadCache();
+            ServletOutputStream out = response.getOutputStream();
 
             String requestKind = request.getParameter("operation");
             _log.debug("Aggregation: The requested operation is: {}", requestKind);
@@ -616,6 +613,7 @@ public class AggregationServlet extends HttpServlet {
                 default:
                     throw new Exception(invocationError + requestKind);
             }
+            out.flush();
         }
         catch (Throwable t) {
             OPeNDAPException.anyExceptionHandler(t, this,  response);
@@ -625,18 +623,18 @@ public class AggregationServlet extends HttpServlet {
             RequestCache.closeThreadCache();
         }
 
-        out.flush();
 
         _log.debug("doHead() - END");
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+            throws ServletException {
 
         _log.debug("doPost() - BEGIN");
 
         processRequest(request, response);
+
 
         _log.debug("doPost() - END");
     }
