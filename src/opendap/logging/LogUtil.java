@@ -52,10 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LogUtil {
 
-    private static AtomicBoolean isLogInit = new AtomicBoolean();
-    static {
-        isLogInit.set(false);
-    }
+    private static AtomicBoolean isLogInit = new AtomicBoolean(false);
 
     private static Logger log;
     static{
