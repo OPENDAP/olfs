@@ -72,6 +72,7 @@ public class TomcatRealmIdP extends IdProvider {
             if(url != null) {
                 redirectUrl = url;
             }
+            session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
         }
 
         String protocol = request.getScheme();
@@ -81,7 +82,6 @@ public class TomcatRealmIdP extends IdProvider {
         }
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
-        session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
         response.sendRedirect(redirectUrl);
         return true;
     }
