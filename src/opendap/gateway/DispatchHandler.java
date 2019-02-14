@@ -26,6 +26,7 @@
 
 package opendap.gateway;
 
+import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
@@ -132,7 +133,7 @@ public class DispatchHandler extends BesDapDispatcher {
     }
 
 
-    private void ingestPrefix(Element config) throws Exception {
+    private void ingestPrefix(Element config) throws BadConfigurationException {
 
         _prefix = "gateway";
 
@@ -150,7 +151,7 @@ public class DispatchHandler extends BesDapDispatcher {
                             " MUST provide 1 <prefix>  " +
                             "child element whose value may not be equal to \"/\"";
                     log.error(msg);
-                    throw new Exception(msg);
+                    throw new BadConfigurationException(msg);
                 }
             }
         }
