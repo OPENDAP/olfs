@@ -134,10 +134,10 @@ public class Util {
         String msg;
         Runtime rt = Runtime.getRuntime();
         msg =  "Memory Usage:\n"    ;
-        msg += " JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)\n";
-        msg += " JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)\n";
-        msg += " JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)\n";
-        msg += " JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)\n";
+        msg += " JVM Max Memory:   " + (rt.maxMemory() / 1024.0) / 1000 + " MB (JVM Maximum Allowable Heap)\n";
+        msg += " JVM Total Memory: " + (rt.totalMemory() / 1024.0) / 1000 + " MB (JVM Heap size)\n";
+        msg += " JVM Free Memory:  " + (rt.freeMemory() / 1024.0) / 1000 + " MB (Unused part of heap)\n";
+        msg += " JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024.0) / 1000. + " MB (Currently active memory)\n";
         return msg;
 
     }
