@@ -232,17 +232,15 @@ public class LogUtil {
      *
      */
     public static void initLogging() {
-
         String path = System.getProperty("user.dir")+"/";
-
         initLogging(path);
     }
 
 
     /**
      *
-     * @param logbackConfig
-     * @param lc
+     * @param logbackConfig Path to logback configuration file.
+     * @param lc Logger context to condition.
      */
     private static void attemptJoranConfiguration(String logbackConfig, LoggerContext lc){
         try {
@@ -252,7 +250,7 @@ public class LogUtil {
             // rules
             lc.reset();
             configurator.doConfigure(logbackConfig);
-            log.info("JoranConfigurator successful.");
+            log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {
             log.error("Caught {} Messge: ",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
