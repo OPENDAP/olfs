@@ -33,6 +33,7 @@ import opendap.semantics.wcs.StaticRdfCatalog;
 import opendap.wcs.v1_1_2.CatalogWrapper;
 import org.jdom.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,8 +41,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,135 +56,118 @@ import java.util.concurrent.atomic.AtomicInteger;
  * To change this template use File | Settings | File Templates.
  */
 public class Servlet extends HttpServlet {
+    private static final String SERVICE_LOG_ID = "WCS_1.2_ACCESS";
+    private static final String SIMPLE_ERROR_LOG = "Caught: {}  Message: {}";
 
-    private Logger log;
-    private HttpGetHandler httpGetService = null;
+    private static final ReentrantLock INIT_LOCK = new ReentrantLock();
+    private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
+    private static final AtomicInteger REQ_NUMBER = new AtomicInteger(0);
+    private static final Logger LOG = LoggerFactory.getLogger(Servlet.class);
 
-    private FormHandler formService = null;
-    private XmlRequestHandler wcsPostService = null;
-    private SoapHandler wcsSoapService = null;
+    private static final HttpGetHandler httpGetService = new HttpGetHandler();
+    private static final FormHandler formService = new FormHandler();
+    private static final XmlRequestHandler wcsPostService = new XmlRequestHandler();
+    private static final SoapHandler wcsSoapService = new SoapHandler();
 
-    //private Document configDoc;
-    private AtomicInteger reqNumber;
 
 
     public void init() throws ServletException {
-        super.init();
-        reqNumber = new AtomicInteger(0);
-        LogUtil.initLogging(this);
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        String contextPath = ServletUtil.getContextPath(this);
-        log.debug("contextPath: "+contextPath);
-
-        String resourcePath = ServletUtil.getSystemPath(this, "/");
-        log.debug("resourcePath: "+resourcePath);
-
-        String contentPath = ServletUtil.getConfigPath(this);
-        log.debug("contentPath: "+contentPath);
-
-        String configFilename = this.getInitParameter("ConfigFileName");
-        log.debug("configFilename: "+configFilename);
-
-        String semanticPreload = this.getInitParameter("SemanticPreload");
-        log.debug("semanticPreload: "+semanticPreload);
-
-        boolean enableUpdateUrl = false;
-        String s = this.getInitParameter("EnableUpdateUrl");
-        enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
-        log.debug("enableUpdateUrl: "+enableUpdateUrl);
-
-
-
-        String serviceContentPath = contentPath;
-        if(!serviceContentPath.endsWith("/"))
-            serviceContentPath += "/";
-        log.debug("_serviceContentPath: "+serviceContentPath);
-
-        installInitialContent(resourcePath, serviceContentPath);
-
-        initializeSemanticCatalog(resourcePath, serviceContentPath, configFilename, semanticPreload);
-
-
-
-        // Build Handler Objects
-        httpGetService = new HttpGetHandler(enableUpdateUrl);
-        formService    = new FormHandler();
-        wcsPostService = new XmlRequestHandler();
-        wcsSoapService = new SoapHandler();
-
-        // Build configuration elements
-        Element config  = new Element("config");
-        Element prefix  = new Element("prefix");
-
-//        System.out.println(ServletUtil.probeServlet(this));
-
-        // ServletContext sc = this.getServletContext();
-        // prefix.setText(sc.getContextPath());
-        config.addContent(prefix);
-
+        INIT_LOCK.lock();
         try {
-            httpGetService.init(this);
-            prefix.setText("/form");
-            formService.init(this,config);
-            prefix.setText("/post");
-            wcsPostService.init(this,config);
-            prefix.setText("/soap");
-            wcsSoapService.init(this,config);
+            if(IS_INITIALIZED.get())
+                return;
 
-        } catch (Exception e) {
-            throw new ServletException(e);
+            super.init();
+            LogUtil.initLogging(this);
+
+            String contextPath = ServletUtil.getContextPath(this);
+            LOG.debug("contextPath: {}", contextPath);
+
+            String resourcePath = ServletUtil.getSystemPath(this, "/");
+            LOG.debug("resourcePath: {}", resourcePath);
+
+            String contentPath = ServletUtil.getConfigPath(this);
+            LOG.debug("contentPath: {}", contentPath);
+
+            String configFilename = this.getInitParameter("ConfigFileName");
+            LOG.debug("configFilename: {}", configFilename);
+
+            String semanticPreload = this.getInitParameter("SemanticPreload");
+            LOG.debug("semanticPreload: {}", semanticPreload);
+
+            boolean enableUpdateUrl = false;
+            String s = this.getInitParameter("EnableUpdateUrl");
+            enableUpdateUrl = s != null && s.equalsIgnoreCase("true");
+            httpGetService.setEnableUpdateUrl(enableUpdateUrl);
+            LOG.debug("enableUpdateUrl: {}", enableUpdateUrl);
+
+
+            String serviceContentPath = contentPath;
+            if (!serviceContentPath.endsWith("/"))
+                serviceContentPath += "/";
+            LOG.debug("_serviceContentPath: {}", serviceContentPath);
+
+            installInitialContent(resourcePath, serviceContentPath);
+
+            initializeSemanticCatalog(resourcePath, serviceContentPath, configFilename, semanticPreload);
+
+            // Build configuration elements
+            Element config = new Element("config");
+            Element prefix = new Element("prefix");
+
+            config.addContent(prefix);
+
+            try {
+                httpGetService.init(this);
+                prefix.setText("/form");
+                formService.init(this, config);
+                prefix.setText("/post");
+                wcsPostService.init(this, config);
+                prefix.setText("/soap");
+                wcsSoapService.init(this, config);
+
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+
+            IS_INITIALIZED.set(true);
+        }
+        finally {
+            INIT_LOCK.unlock();
         }
     }
 
 
-
-
-    private boolean _initialized;
-
-    private String _defaultWcsServiceConfigFilename = "wcs_service.xml";
-
-
-
-
+    private static final String DEFAULT_WCS_SERVICE_CONFIG_FILENAME = "wcs_service.xml";
 
 
     public void initializeSemanticCatalog(String resourcePath, String serviceContentPath,  String configFileName, String semanticPreload) throws ServletException {
 
-        if (_initialized) return;
+        LOG.debug("Initializing semantic WCS catalog engine...");
 
         URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
 
         StaticRdfCatalog semanticCatalog = new StaticRdfCatalog();
 
-        log.info("Using "+semanticCatalog.getClass().getName()+" WCS catalog implementation.");
-
-
-        log.debug("Initializing semantic WCS catalog engine...");
-
+        LOG.info("Using {} WCS catalog implementation.",semanticCatalog.getClass().getName());
 
         String defaultCatalogCacheDir = serviceContentPath + semanticCatalog.getClass().getSimpleName()+"/";
-
 
         try {
             semanticCatalog.init(serviceConfigFile, semanticPreload, resourcePath, defaultCatalogCacheDir);
         } catch (Exception e) {
-            log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+            LOG.error(SIMPLE_ERROR_LOG,e.getClass().getName(),e.getMessage());
             throw new ServletException(e);
         }
-
-
 
         try {
             CatalogWrapper.init(serviceContentPath, semanticCatalog);
         } catch (Exception e) {
-            log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+            LOG.error(SIMPLE_ERROR_LOG,e.getClass().getName(),e.getMessage());
             throw new ServletException(e);
         }
-
-        _initialized = true;
-        log.info("Initialized. ");
-
+        LOG.info("Initialized.");
     }
 
 
@@ -189,7 +177,7 @@ public class Servlet extends HttpServlet {
         String msg;
         URL serviceConfigUrl;
 
-        String serviceConfigFilename = _serviceContentPath + _defaultWcsServiceConfigFilename;
+        String serviceConfigFilename = _serviceContentPath + DEFAULT_WCS_SERVICE_CONFIG_FILENAME;
 
         if(configFileName!=null){
             serviceConfigFilename = _serviceContentPath + configFileName;
@@ -197,26 +185,26 @@ public class Servlet extends HttpServlet {
 
         serviceConfigFilename = Scrub.fileName(serviceConfigFilename);
         
-        log.info("Using WCS Service configuration file: "+serviceConfigFilename);
+        LOG.info("Using WCS Service configuration file: '{}'", serviceConfigFilename);
 
         File configFile = new File(serviceConfigFilename);
         if(!configFile.exists()){
-            msg = "Failed to located WCS Service Configuration File '"+serviceConfigFilename+"'";
-            log.error(msg);
+            msg = "Failed to located WCS Service Configuration File: '"+serviceConfigFilename+"'";
+            LOG.error(msg);
             throw new ServletException(msg);
         }
         if(!configFile.canRead()){
             String userName = System.getProperty("user.name");
             msg = "The WCS Service Configuration File '"+serviceConfigFilename+"' exists but cannot be read." +
                     " Is there a file permission problem? Is the user '"+userName+"' allowed read access on that file?";
-            log.error(msg);
+            LOG.error(msg);
             throw new ServletException(msg);
         }
 
         try{
             serviceConfigUrl = new URL("file://" + serviceConfigFilename);
-        } catch (Exception e) {
-            log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+        } catch (MalformedURLException e) {
+            LOG.error(SIMPLE_ERROR_LOG,e.getClass().getName(),e.getMessage());
             throw new ServletException(e);
         }
 
@@ -239,52 +227,50 @@ public class Servlet extends HttpServlet {
             if(!f.isDirectory()) {
                 msg = "The service content path "+serviceContentPath+
                         "exists, but it is not directory and cannot be used.";
-                log.error(msg);
+                LOG.error(msg);
                 throw new ServletException(msg);
             }
             if(!f.canWrite()) {
                 msg = "The service content path "+serviceContentPath+
                         "exists, but the directory is not writable.";
-                log.error(msg);
+                LOG.error(msg);
                 throw new ServletException(msg);
             }
 
         }
         else {
-            log.info("Creating WCS Service content directory: "+serviceContentPath);
+            LOG.info("Creating WCS Service content directory: {}", serviceContentPath);
             f.mkdirs();
         }
 
         File semaphore = new File(serviceContentPath+"wcs_service.xml");
         if(!semaphore.exists()){
             String initialContentDir = resourcePath + "initialContent/";
-            log.info("Attempting to copy initial content for WCS from "+initialContentDir+" to "+serviceContentPath);
+            LOG.info("Attempting to copy initial content for WCS from {} to {}",initialContentDir,serviceContentPath);
             try {
                 PersistentConfigurationHandler.copyDirTree(initialContentDir, serviceContentPath);
                 if(semaphore.createNewFile()){
-                    log.warn("Semapohore file {} already exists! Configuration may not have installed correctly.",semaphore.getAbsolutePath());
+                    LOG.warn("Semapohore file {} already exists! Configuration may not have installed correctly.",semaphore.getAbsolutePath());
                 }
             } catch (IOException e) {
-                log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+                LOG.error("Caught: {} Message: ",e.getClass().getName(),e.getMessage());
                 throw new ServletException(e);
             }
-            log.info("WCS Service default configuration and initial content installed.");
+            LOG.info("WCS Service default configuration and initial content installed.");
         }
-
-
-
     }
 
 
-
-
-
-
-
+    /**
+     *
+     * @param req
+     * @param resp
+     */
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, "WCS_1.2_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -293,10 +279,10 @@ public class Servlet extends HttpServlet {
             }
             catch(Throwable t2) {
             	try {
-            		log.error("\n########################################################\n" +
+            		LOG.error("\n########################################################\n" +
                                 "Request proccessing failed.\n" +
                                 "Normal Exception handling failed.\n" +
-                                "This is the last error log attempt for this request.\n" +
+                                "This is the last error logging attempt for this request.\n" +
                                 "########################################################\n", t2);
             	}
             	catch(Throwable t3){
@@ -305,15 +291,22 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WCS_1.2_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, SERVICE_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
 
 
+    /**
+     *
+     * @param req
+     * @param resp
+     */
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
+            LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "HTTP-POST", Integer.toString(REQ_NUMBER.incrementAndGet()));
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -326,7 +319,7 @@ public class Servlet extends HttpServlet {
             }
             else {
                 String msg = "The request does not resolve to a WCS service operation that this server supports.";
-                log.error("doPost() - {}",msg);
+                LOG.error("doPost() - {}",msg);
                 request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
 
@@ -337,10 +330,10 @@ public class Servlet extends HttpServlet {
             }
             catch(Throwable t2) {
             	try {
-            		log.error("\n########################################################\n" +
+            		LOG.error("\n########################################################\n" +
                                 "Request proccessing failed.\n" +
                                 "Normal Exception handling failed.\n" +
-                                "This is the last error log attempt for this request.\n" +
+                                "This is the last error logging attempt for this request.\n" +
                                 "########################################################\n", t2);
             	}
             	catch(Throwable t3){
@@ -349,44 +342,37 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WCS_1.2_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, SERVICE_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
     }
 
+    /**
+     *
+     * @param req
+     * @return
+     */
+    @Override
     protected long getLastModified(HttpServletRequest req) {
 
         RequestCache.openThreadCache();
-
-        long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "WCS_1.2_ACCESS", "LastModified", Long.toString(reqno));
-
+        LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "LastModified", Long.toString( REQ_NUMBER.incrementAndGet()));
 
         try {
-            return -1;
-
-        } catch (Exception e) {
-            return -1;
+            return new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "WCS_1.2_ACCESS");
-
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, SERVICE_LOG_ID);
         }
-
-
     }
 
 
     public void destroy() {
-
         LogUtil.logServerShutdown("destroy()");
-
         httpGetService.destroy();
         formService.destroy();
         wcsPostService.destroy();
         wcsSoapService.destroy();
-
-
         super.destroy();
     }
 

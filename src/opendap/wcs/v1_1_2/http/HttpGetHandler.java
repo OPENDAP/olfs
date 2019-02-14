@@ -87,6 +87,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     private static final int DESCRIBE_COVERAGE  = 1;
     private static final int GET_COVERAGE       = 2;
 
+    public HttpGetHandler()  {
+        this(false);
+    }
 
     public HttpGetHandler(boolean enableUpdateUrl)  {
 
@@ -140,6 +143,13 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
+    public boolean isUpdateUrlEnabled(){
+        return _enableUpdateUrl;
+    }
+
+    public void setEnableUpdateUrl(boolean state){
+        _enableUpdateUrl = state;
+    }
 
 
     public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {
