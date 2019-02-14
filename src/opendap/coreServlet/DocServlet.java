@@ -129,82 +129,86 @@ public class DocServlet extends HttpServlet {
                 log.debug("DocServlet - The client requested this: {}", name);
 
                 if(name == null){
-                    throw new NotFound("Unable to locate: "+name);
+                    // throw new NotFound("Unable to locate: "+name)
+                    OPeNDAPException.anyExceptionHandler(new NotFound("Unable to locate: "+name), this,  response);
                 }
-                File f = new File(name);
+                else {
+                    File f = new File(name);
+                    if (f.exists()) {
+                        log.debug("   Requested item exists.");
+                        if (f.isFile()) {
+                            log.debug("   It's a file...");
 
-                if (f.exists()) {
-                    log.debug("   Requested item exists.");
-                    if (f.isFile()) {
-                        log.debug("   It's a file...");
 
+                            String suffix = null;
+                            if (name.lastIndexOf('/') < name.lastIndexOf('.')) {
+                                suffix = name.substring(name.lastIndexOf('.') + 1);
+                            }
 
-                        String suffix = null;
-                        if (name.lastIndexOf('/') < name.lastIndexOf('.')) {
-                            suffix = name.substring(name.lastIndexOf('.') + 1);
-                        }
+                            String mType = null;
+                            if (suffix != null) {
+                                mType = MimeTypes.getMimeType(suffix);
+                                if (mType != null)
+                                    response.setContentType(mType);
+                                log.debug("   MIME type: {}", mType);
+                            }
 
-                        String mType = null;
-                        if (suffix != null) {
-                            mType = MimeTypes.getMimeType(suffix);
+                            log.debug("   Sending.");
                             if (mType != null)
                                 response.setContentType(mType);
-                            log.debug("   MIME type: {}", mType);
-                        }
 
-                        log.debug("   Sending.");
-                        if (mType != null)
-                            response.setContentType(mType);
+                            ServletOutputStream sos = response.getOutputStream();
 
-                        ServletOutputStream sos  = response.getOutputStream();
+                            if (mType != null && mType.startsWith("text/")) {
+                                String docString = readFileAsString(f);
+                                log.debug("Read file {} into a String.", f.getAbsolutePath());
+                                docString = docString.replace("<CONTEXT_PATH />", contextPath);
+                                docString = docString.replace("<SERVLET_NAME />", servletName);
+                                sos.println(docString);
+                            } else {
+                                try (FileInputStream fis = new FileInputStream(f)) {
+                                    byte[] buff = new byte[8192];
+                                    int rc;
+                                    boolean doneReading = false;
+                                    while (!doneReading) {
+                                        rc = fis.read(buff);
+                                        if (rc < 0) {
+                                            doneReading = true;
+                                        } else if (rc > 0) {
+                                            sos.write(buff, 0, rc);
+                                        }
 
-                        if (mType != null && mType.startsWith("text/")) {
-
-                            String docString = readFileAsString(f);
-                            log.debug("Read file {} into a String.", f.getAbsolutePath());
-                            docString = docString.replace("<CONTEXT_PATH />", contextPath);
-                            docString = docString.replace("<SERVLET_NAME />", servletName);
-                            sos.println(docString);
-                        } else {
-                            try (FileInputStream fis = new FileInputStream(f)) {
-                                byte[] buff = new byte[8192];
-                                int rc;
-                                boolean doneReading = false;
-                                while (!doneReading) {
-                                    rc = fis.read(buff);
-                                    if (rc < 0) {
-                                        doneReading = true;
-                                    } else if (rc > 0) {
-                                        sos.write(buff, 0, rc);
                                     }
+                                } finally {
 
+                                    if (sos != null)
+                                        sos.flush();
                                 }
-                            } finally {
-
-                                if (sos != null)
-                                    sos.flush();
                             }
+
+                        } else if (f.isDirectory()) {
+                            log.debug("   Requested directory exists.");
+                            try {
+                                response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString()) + "/");
+                            } catch (IOException e) {
+                                OPeNDAPException.anyExceptionHandler(e, this, response);
+                            }
+                        } else {
+                            String msg = "Unable to determine type of requested item: " + f.getName();
+                            log.error("doGet() - {}", msg);
+                            // throw new NotFound(msg)
+                            OPeNDAPException.anyExceptionHandler(new NotFound(msg), this, response);
                         }
-
-                    } else if (f.isDirectory()) {
-                        log.debug("   Requested directory exists.");
-                        response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString())+"/");
+                    } else {
+                        // throw new NotFound("Failed to locate resource: "+name)
+                        OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + name), this, response);
                     }
-                    else {
-                        String msg = "Unable to determine type of requested item: "+f.getName();
-                        log.error("doGet() - {}",msg);
-                        throw new NotFound(msg);
-                    }
-
-
-                } else {
-                    throw new NotFound("Failed to locate resource: "+name);
                 }
             }
-
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             try {
-                status = OPeNDAPException.anyExceptionHandler(t, this,  response);
+                OPeNDAPException.anyExceptionHandler(t, this,  response);
             } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
@@ -219,7 +223,7 @@ public class DocServlet extends HttpServlet {
     }
 
 
-    public static String readFileAsString(File file) throws IOException {
+    private static String readFileAsString(File file) throws IOException {
 
         Scanner scanner = new Scanner(file,  HyraxStringEncoding.getCharset().name());
         StringBuilder stringBuilder = new StringBuilder();
@@ -234,19 +238,6 @@ public class DocServlet extends HttpServlet {
         return stringBuilder.toString();
     }
 
-    public static String readFileAsString(String pathname) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(pathname),  HyraxStringEncoding.getCharset().name());
-
-        try {
-            while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine()).append("\n");
-            }
-        } finally {
-            scanner.close();
-        }
-        return stringBuilder.toString();
-    }
 
 
 }
