@@ -283,8 +283,6 @@ public class InheritedMetadataManager {
                     log.debug("ingestInheritedMetadata() - Found inherited metadata.");
 
 
-
-
                     //################################################################################
                     //@todo Right now it removes the serviceName elements. Why is that a good thing?
                     //@todo If we leave them then we have to see if the serviceName resolves in the
@@ -326,17 +324,15 @@ public class InheritedMetadataManager {
                         metadataRootPathElement = (Element) metadataRootPathIterator.next();
                         metadataRootPath = metadataRootPathElement.getTextTrim();
 
-                        int size =  _inheritedMetadata.size();
-                        _inheritedMetadata.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
-                        if (size<_inheritedMetadata.size()) {
+                        ConcurrentHashMap<String, Vector<Element>> heldInherMap = _inheritedMetadata.putIfAbsent(metadataRootPath, new ConcurrentHashMap<>());
+                        if (heldInherMap==null) {
                             log.debug("ingestInheritedMetadata() - Added new metadataRootPath: '" + metadataRootPath + "' ConcurrentHashMap storage.");
                         }
 
                         metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                        size = metadataForThisRootPath.size();
-                        metadataForThisRootPath.putIfAbsent(catalogKey, new Vector<Element>());
-                        if(size<metadataForThisRootPath.size()){
+                        Vector<Element> heldMeta = metadataForThisRootPath.putIfAbsent(catalogKey, new Vector<>());
+                        if(heldMeta == null){
                             log.debug("ingestInheritedMetadata() - The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Added storage Vector");
                         }
 
@@ -345,13 +341,11 @@ public class InheritedMetadataManager {
                         log.debug("ingestInheritedMetadata() - Adding metadata element to inventory.");
                         metadataElements.add(metadataElement);
 
-
                         if(inheritedService!=null){
                             log.debug("ingestInheritedMetadata() - Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
 
-                            size = _inheritedServices.size();
-                            _inheritedServices.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
-                            if(size < _inheritedServices.size()) {
+                            ConcurrentHashMap<String, Vector<Element>> heldISMap = _inheritedServices.putIfAbsent(metadataRootPath, new ConcurrentHashMap<>());
+                            if(heldISMap == null) {
                                 log.debug("ingestInheritedMetadata() - Added new inherited services ConcurrentHashMap storage for " +
                                         "metadataRootPath: '" + metadataRootPath + "'");
                             }
@@ -359,23 +353,11 @@ public class InheritedMetadataManager {
                             inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
 
                             // New Way
-                            size = inheritedServicesForThisRootPath.size();
-                            inheritedServicesForThisRootPath.putIfAbsent(catalogKey,new Vector<Element>());
-                            if(size<inheritedServicesForThisRootPath.size()){
+                            Vector<Element> heldVec = inheritedServicesForThisRootPath.putIfAbsent(catalogKey,new Vector<>());
+                            if(heldVec == null){
                                 log.debug("ingestInheritedMetadata() - Added new inherited services storage Vector for " +
                                         "metadataRootPath: '" + metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
                             }
-
-                            /*  OLD WAY
-                            if (!inheritedServicesForThisRootPath.containsKey(catalogKey)) {
-                                inheritedServicesForThisRootPath.put(catalogKey, new Vector<Element>());
-                                log.debug("ingestInheritedMetadata() - Added new inherited services storage Vector for " +
-                                        "metadataRootPath: '" + metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
-                            }
-                            */
-
-
-
 
                             log.debug("ingestInheritedMetadata() - Adding service '"+inheritedService.getAttributeValue("name")+
                                     "' to inherited services inventory for metadataRootPath: "+metadataRootPath+"' " +
