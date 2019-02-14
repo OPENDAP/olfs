@@ -31,6 +31,7 @@ import opendap.bes.BESManager;
 import opendap.auth.AuthenticationControls;
 import opendap.bes.VersionDispatchHandler;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.http.error.NotFound;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -50,6 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -530,8 +532,6 @@ public class DispatchServlet extends HttpServlet {
                     return;
                 }
 
-
-
                 int reqno = reqNumber.incrementAndGet();
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
@@ -561,15 +561,12 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    //send404(request,response);
-                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
+                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: "+relativeUrl), this, response);
                 }
             }
             finally {
                 Timer.stop(timedProcedure);
             }
-
-
         }
         catch (Throwable t) {
             try {
@@ -601,79 +598,9 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-    /*
-    private void send404(HttpServletRequest req, HttpServletResponse resp) throws Exception{
-
-        // Build a regex to use to see if they are looking for a DAP2 response:
-        StringBuilder dap2Regex = new StringBuilder(".*.(");
-        dap2Regex.append("dds");
-        dap2Regex.append("|das");
-        dap2Regex.append("|dods");
-        dap2Regex.append("|asc(ii)?");
-        dap2Regex.append(")");
-        Pattern dap2Pattern = Pattern.compile(dap2Regex.toString(),Pattern.CASE_INSENSITIVE);
-
-
-        // Build a regex to use to see if they are looking for a DAP3/4 response:
-        StringBuilder dap4Regex = new StringBuilder(".*.(");
-        dap4Regex.append("ddx");
-        dap4Regex.append("|dmr");
-        dap4Regex.append("|dap");
-        dap4Regex.append("|ddx");
-        dap4Regex.append("|rdf");
-        dap4Regex.append(")");
-        Pattern dap4Pattern = Pattern.compile(dap4Regex.toString(),Pattern.CASE_INSENSITIVE);
-
-
-        String requestURL = req.getRequestURL().toString();
-
-        if(dap2Pattern.matcher(requestURL).matches()){   // Is it a DAP2 request?
-            resp.setHeader("XDODS-Server", "dods/3.2");
-            resp.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
-            resp.setHeader("XDAP", "3.2");
-            resp.setHeader("Content-Description", "dods_error");
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            resp.getOutputStream().print(
-                    OPeNDAPException.getDap2Error(HttpServletResponse.SC_NOT_FOUND,
-                            "Cannot locate resource: " + Scrub.completeURL(requestURL)));
-        }
-        else if (dap4Pattern.matcher(requestURL).matches()){  // Is it a DAP3/4 request?
-            resp.setHeader("XDODS-Server", "dods/3.2");
-            resp.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
-            resp.setHeader("XDAP", "3.2");
-            resp.setHeader("Content-Description", "dods_error");
-            Document err = OPeNDAPException.getDAP32Error(
-                    HttpServletResponse.SC_NOT_FOUND,
-                    "Cannot locate resource: "+Scrub.completeURL(requestURL));
-
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            xmlo.output(err, resp.getOutputStream());
-
-        }
-        else { // Otherwise just send a web page.
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-
-
-
-
-        log.info("Sent Resource Not Found (404) - nothing left to check.");
-        LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
-
-
-
-    }
-    */
-
-
-
     private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
             throws IOException {
-
-
-        // log.debug(ServletUtil.probeRequest(this, req));
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
@@ -725,7 +652,7 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    throw  new OPeNDAPException(HttpServletResponse.SC_NOT_FOUND, "Failed to locate resource: "+relativeUrl);
+                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: "+relativeUrl), this, response);
                 }
 
 
@@ -796,7 +723,7 @@ public class DispatchServlet extends HttpServlet {
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
 
-        long lmt = -1;
+        long lmt = new Date().getTime();
 
         Procedure timedProcedure = Timer.start();
         try {
@@ -817,7 +744,7 @@ public class DispatchServlet extends HttpServlet {
             }
         } catch (Exception e) {
             log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
-            lmt = -1;
+            lmt = new Date().getTime();
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "HyraxAccess");
             Timer.stop(timedProcedure);
