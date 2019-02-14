@@ -139,40 +139,28 @@ public class OlfsControlApi extends HttpResponder {
         CyclicBufferAppender cyclicBufferAppender = getCyclicBufferAppender();
 
         if(lines!=null){
-
             try {
                 int maxLines = Integer.parseInt(lines);
-
-                if(maxLines>0 && maxLines<20000 && cyclicBufferAppender!=null)
+                if(maxLines>0 && maxLines<20000)
                     cyclicBufferAppender.setMaxSize(maxLines);
-
             }
             catch(NumberFormatException e){
                 log.error("Failed to parse the value of the parameter 'lines': {}",Scrub.integerString(lines));
             }
-
         }
 
-
-
-
-        if (cyclicBufferAppender != null) {
-            count = cyclicBufferAppender.getLength();
-        }
-
+        count = cyclicBufferAppender.getLength();
         if (count == -1) {
             logContent.append("Failed to locate CyclicBuffer content!\n");
         } else if (count == 0) {
             logContent.append("No logging events to display.\n");
         } else {
             LoggingEvent le;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count ; i++) {
                 le = (LoggingEvent) cyclicBufferAppender.get(i);
-                //logContent.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
                 logContent.append(formatLoggingEvent(le));
             }
         }
-
         return logContent.toString();
     }
 
