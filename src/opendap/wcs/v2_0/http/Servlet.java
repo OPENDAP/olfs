@@ -41,6 +41,7 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,7 +50,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,103 +63,97 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Servlet extends HttpServlet {
 
-    private Logger log;
-    private HttpGetHandler httpGetService;
-    private FormHandler formService;
-    private XmlRequestHandler wcsPostService ;
-    private SoapHandler wcsSoapService;
-    private AtomicInteger reqNumber;
+
+    private static final Logger log = LoggerFactory.getLogger(Servlet.class);
+    private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
+    private static final ReentrantLock INIT_LOCK = new ReentrantLock();
+
+    private static final AtomicInteger reqNumber = new AtomicInteger(0);
 
     private static final String DEFAULT_WCS_SERVICE_CONFIG_FILENAME = "wcs_service.xml";
     private static final String WCS_ACCESS_LOG_ID = "WCS_2.0_ACCESS";
 
-    private boolean initialized;
-
-    public Servlet(){
-        httpGetService = null;
-        formService = null;
-        wcsPostService = null;
-        wcsSoapService = null;
-        reqNumber = new AtomicInteger(0);
-    }
-
+    private static final HttpGetHandler httpGetService = new HttpGetHandler();
+    private static final FormHandler formService = new FormHandler();
+    private static final XmlRequestHandler wcsPostService = new XmlRequestHandler();
+    private static final SoapHandler wcsSoapService = new SoapHandler();;
 
 
     @Override
     public void init() throws ServletException {
-        String prolog = "init() - ";
-        if(initialized)
-            return;
-
-        super.init();
-
-        LogUtil.initLogging(this);
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-        String contextPath = ServletUtil.getContextPath(this);
-        log.info("{}contextPath: {}", prolog, contextPath);
-
-        String servletName = getServletName();
-
-        contextPath = PathBuilder.pathConcat(contextPath,servletName);
-
-        String resourcePath = ServletUtil.getSystemPath(this, "/");
-        log.info("{}resourcePath: {}", prolog, resourcePath);
-
-        String configPath = ServletUtil.getConfigPath(this);
-        log.info("{} configPath: {}", prolog, configPath);
-
-        boolean enableUpdateUrl;
-        String s = this.getInitParameter("EnableUpdateUrl");
-        enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
-        log.debug("{}enableUpdateUrl: {}", prolog, enableUpdateUrl);
-
-        String serviceConfigPath = configPath;
-        if(!serviceConfigPath.endsWith("/"))
-            serviceConfigPath += "/";
-        log.debug("{}serviceConfigPath: {}",prolog,serviceConfigPath);
-
-
-        String wcsConfigFileName = getInitParameter("WCSConfigFileName");
-        if (wcsConfigFileName == null) {
-            wcsConfigFileName = DEFAULT_WCS_SERVICE_CONFIG_FILENAME;
-            String msg = prolog + "Servlet configuration (typically in the web.xml file) must include a file name for " +
-                    "the WCS service configuration! This on is MISSING. Using default configuration file name.\n";
-            log.warn(msg);
-        }
-        log.info("{}configFilename: {}", prolog, wcsConfigFileName);
-        PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
-
-        WcsServiceManager.init(contextPath, serviceConfigPath, wcsConfigFileName);
-
-        // Build Handler Objects
-        httpGetService = new HttpGetHandler(enableUpdateUrl);
-        formService    = new FormHandler();
-        wcsPostService = new XmlRequestHandler();
-        wcsSoapService = new SoapHandler();
-
-        // Build configuration elements
-        Element config  = new Element("config");
-        Element prefix  = new Element("prefix");
-        config.addContent(prefix);
-
+        // Using this lock prevents thread contention when initializing
+        INIT_LOCK.lock();
         try {
-            httpGetService.init(this);
-            prefix.setText("/form");
-            formService.init(this,config);
-            prefix.setText("/post");
-            wcsPostService.init(this,config);
-            prefix.setText("/soap");
-            wcsSoapService.init(this,config);
+            if (INITIALIZED.get())
+                return;
 
-        } catch (Exception e) {
-            throw new ServletException(e);
+            super.init();
+
+            LogUtil.initLogging(this);
+
+            String contextPath = ServletUtil.getContextPath(this);
+            log.info("contextPath: {}", contextPath);
+
+            String servletName = getServletName();
+
+            contextPath = PathBuilder.pathConcat(contextPath, servletName);
+
+            String resourcePath = ServletUtil.getSystemPath(this, "/");
+            log.info("resourcePath: {}", resourcePath);
+
+            String configPath = ServletUtil.getConfigPath(this);
+            log.info("configPath: {}", configPath);
+
+            boolean enableUpdateUrl;
+            String s = this.getInitParameter("EnableUpdateUrl");
+            enableUpdateUrl = s != null && s.equalsIgnoreCase("true");
+            httpGetService.setEnableUpdateUrl(enableUpdateUrl);
+            log.debug("enableUpdateUrl: {}", enableUpdateUrl);
+
+            String serviceConfigPath = configPath;
+            if (!serviceConfigPath.endsWith("/"))
+                serviceConfigPath += "/";
+            log.debug("serviceConfigPath: {}", serviceConfigPath);
+
+
+            String wcsConfigFileName = getInitParameter("WCSConfigFileName");
+            if (wcsConfigFileName == null) {
+                wcsConfigFileName = DEFAULT_WCS_SERVICE_CONFIG_FILENAME;
+                String msg = "Servlet configuration (typically in the web.xml file) must include a file name for " +
+                        "the WCS service configuration! This on is MISSING. Using default configuration file name.\n";
+                log.warn(msg);
+            }
+            log.info("configFilename: {}", wcsConfigFileName);
+            PersistentConfigurationHandler.installDefaultConfiguration(this, wcsConfigFileName);
+
+            WcsServiceManager.init(contextPath, serviceConfigPath, wcsConfigFileName);
+
+            // Build configuration elements
+            Element config = new Element("config");
+            Element prefix = new Element("prefix");
+            config.addContent(prefix);
+
+            try {
+                httpGetService.init(this);
+                prefix.setText("/form");
+                formService.init(this, config);
+                prefix.setText("/post");
+                wcsPostService.init(this, config);
+                prefix.setText("/soap");
+                wcsSoapService.init(this, config);
+
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+
+            // Now we need to configure a BES
+            initBesManager("olfs.xml");
+
+            INITIALIZED.set(true);
         }
-
-        // Now we need to configure a BES
-        initBesManager("olfs.xml");
-
-        initialized = true;
+        finally {
+            INIT_LOCK.unlock();
+        }
     }
 
 
