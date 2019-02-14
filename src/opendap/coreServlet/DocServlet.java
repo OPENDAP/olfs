@@ -130,7 +130,7 @@ public class DocServlet extends HttpServlet {
 
                 if(name == null){
                     // throw new NotFound("Unable to locate: "+name)
-                    OPeNDAPException.anyExceptionHandler(new NotFound("Unable to locate: "+name), this,  response);
+                    status = OPeNDAPException.anyExceptionHandler(new NotFound("Unable to locate: "+name), this,  response);
                 }
                 else {
                     File f = new File(name);
@@ -191,24 +191,22 @@ public class DocServlet extends HttpServlet {
                             try {
                                 response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString()) + "/");
                             } catch (IOException e) {
-                                OPeNDAPException.anyExceptionHandler(e, this, response);
+                                status = OPeNDAPException.anyExceptionHandler(e, this, response);
                             }
                         } else {
                             String msg = "Unable to determine type of requested item: " + f.getName();
                             log.error("doGet() - {}", msg);
-                            // throw new NotFound(msg)
-                            OPeNDAPException.anyExceptionHandler(new NotFound(msg), this, response);
+                            status = OPeNDAPException.anyExceptionHandler(new NotFound(msg), this, response);
                         }
                     } else {
-                        // throw new NotFound("Failed to locate resource: "+name)
-                        OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + name), this, response);
+                        status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + name), this, response);
                     }
                 }
             }
         }
         catch (Throwable t) {
             try {
-                OPeNDAPException.anyExceptionHandler(t, this,  response);
+                status = OPeNDAPException.anyExceptionHandler(t, this,  response);
             } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
