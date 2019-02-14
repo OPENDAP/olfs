@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -232,12 +233,12 @@ public class Servlet extends HttpServlet {
                 Document errDoc = new Document( myBadThang.getExceptionElement());
 
                 if(!resp.isCommitted()){
-                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
+                    log.error("Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
                     resp.setStatus(myBadThang.getHttpStatusCode());
                     xmlo.output(errDoc,resp.getOutputStream());
                 }
                 else {
-                    log.error("doGet() - Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
+                    log.error("Encountered ERROR after response committed. Msg: {}",myBadThang.getMessage());
                     resp.sendError(myBadThang.getHttpStatusCode(),myBadThang.getMessage());
                 }
 
@@ -282,7 +283,7 @@ public class Servlet extends HttpServlet {
             }
             else {
                 String msg = "The request does not resolve to a WCS service operation that this server supports.";
-                log.error("doPost() - {}",msg);
+                log.error("{}",msg);
                 request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
 
@@ -319,7 +320,7 @@ public class Servlet extends HttpServlet {
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
-            return -1;
+            return new Date().getTime();
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, WCS_ACCESS_LOG_ID);
         }
