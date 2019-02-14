@@ -126,18 +126,17 @@ public class CoverageIdGenerator {
      */
     private static String getServerUrlString(URL url) {
 
-        String baseURL = null;
+        String baseURL = url.toString();
 
         String protocol = url.getProtocol();
 
         if (protocol.equalsIgnoreCase("file")) {
             log.debug("Protocol is FILE.");
-
-        } else if (protocol.equalsIgnoreCase("http")) {
-            log.debug("Protocol is HTTP.");
+        }
+        else if (protocol.equalsIgnoreCase("http") || protocol.equalsIgnoreCase("https")) {
+            log.debug("Protocol is HTTP(S).");
 
             String host = url.getHost();
-            String path = url.getPath();
             int port = url.getPort();
 
             baseURL = protocol + "://" + host;

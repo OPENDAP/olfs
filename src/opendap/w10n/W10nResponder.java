@@ -102,9 +102,7 @@ public class W10nResponder {
 
     private String systemPath;
 
-
-
-    public W10nResponder(String systemPath){
+    public W10nResponder() {
         super();
 
         log = LoggerFactory.getLogger(this.getClass());
@@ -136,6 +134,10 @@ public class W10nResponder {
 
         mt = new Netcdf4();
         supportedDataMediaTypes.put(mt.getName(), mt);
+    }
+
+    public void setSystemPath(String path){
+        systemPath = path;
     }
 
 
