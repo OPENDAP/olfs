@@ -36,12 +36,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.Vector;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -119,8 +114,9 @@ public class DispatchHandler extends BesDapDispatcher {
                 else {
                     if(!super.requestDispatch(request,response, true)){
                         if( !response.isCommitted()) {
-                            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
-                            log.info("Sent 404 Response.");
+                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(BesGatewayApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '"+
+                                    relativeURL.substring(s.length())+"' is not recognized by this server.");
                         }
                         else {
                             log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
