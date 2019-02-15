@@ -244,7 +244,7 @@ public class BES {
 
     public String getLoggerState(String loggerName) throws BesAdminFail {
 
-        TreeMap<String, BesLogger> besLoggers = getBesLoggers();
+        SortedMap<String, BesLogger> besLoggers = getBesLoggers();
 
         BesLogger logger = besLoggers.get(loggerName);
 
@@ -473,107 +473,95 @@ public class BES {
         sb.append(msg).append("\n");
         _clientCheckoutLock.lock();
         try {
-            try {
+            Date startTime = new Date();
 
-                Date startTime = new Date();
+            boolean done = false;
+            msg = "Attempting to acquire all BES clients...";
+            log.info(msg);
+            sb.append(msg).append("\n");
 
-                boolean done = false;
-                msg = "Attempting to acquire all BES clients...";
-                log.info(msg);
-                sb.append(msg).append("\n");
+            while (!done) {
 
-                while (!done) {
+                Collection<OPeNDAPClient> clients = _clients.values();
 
-                    Collection<OPeNDAPClient> clients = _clients.values();
-
-                    boolean allClientsAcquired = true;
-                    for (OPeNDAPClient client : clients) {
-                        boolean inQue = _clientQueue.remove(client);
-                        if (!inQue) {
-                            allClientsAcquired = false;
-                        } else {
-                            msg = "Shutting down client connection '" + client.getID() + "'...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-
-                            try {
-
-                                discardClient(client);
-                                msg = "Client connection '" + client.getID() + "'shutdown normally";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-                            } catch (PPTException e) {
-                                msg = "Shutdown FAILED for client connection '" + client.getID() + "'Trying to kill connection.";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-                                client.killClient();
-
-                                msg = "Killed client connection '" + client.getID() + "'.";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-
-                            }
-                            msg = "Removing client connection '" + client.getID() + "' from clients list.";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                            _clients.remove(client.getID());
-                        }
-                    }
-
-                    if (!allClientsAcquired) {
-                        Date endTime = new Date();
-
-                        long elapsedTime = endTime.getTime() - startTime.getTime();
-
-                        if (elapsedTime > timeOut) {
-                            done = true;
-                            msg = "Timeout Has Expired. Shutting down BES NOW...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                        } else {
-                            msg = "Did not acquire all clients. Sleeping...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                            Thread.sleep(timeOut / 3);
-                        }
-
-
+                boolean allClientsAcquired = true;
+                for (OPeNDAPClient client : clients) {
+                    boolean inQue = _clientQueue.remove(client);
+                    if (!inQue) {
+                        allClientsAcquired = false;
                     } else {
-                        done = true;
-
-
-                        msg = "Stopped all BES client connections.";
+                        msg = "Shutting down client connection '" + client.getID() + "'...";
                         log.info(msg);
                         sb.append(msg).append("\n");
 
+                        try {
+
+                            discardClient(client);
+                            msg = "Client connection '" + client.getID() + "'shutdown normally";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                        } catch (PPTException e) {
+                            msg = "Shutdown FAILED for client connection '" + client.getID() + "'Trying to kill connection.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                            client.killClient();
+
+                            msg = "Killed client connection '" + client.getID() + "'.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+
+                        }
+                        msg = "Removing client connection '" + client.getID() + "' from clients list.";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        _clients.remove(client.getID());
+                    }
+                }
+
+                if (!allClientsAcquired) {
+                    Date endTime = new Date();
+
+                    long elapsedTime = endTime.getTime() - startTime.getTime();
+
+                    if (elapsedTime > timeOut) {
+                        done = true;
+                        msg = "Timeout Has Expired. Shutting down BES NOW...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                    } else {
+                        msg = "Did not acquire all clients. Sleeping...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        Thread.sleep(timeOut / 3);
                     }
 
 
+                } else {
+                    done = true;
+                    msg = "Stopped all BES client connections.";
+                    log.info(msg);
+                    sb.append(msg).append("\n");
                 }
-
-                msg = "Stopping BES...";
-                log.info(msg);
-                sb.append(msg).append("\n");
-                besResponse = stopNow();
-            } catch (InterruptedException e) {
-
-                sb.append(e.getMessage());
-
-            } finally {
-                msg = "Releasing client checkout lock...";
-                log.info(msg);
-                sb.append(msg).append("\n");
             }
+
+            msg = "Stopping BES...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+            besResponse = stopNow();
+
+        }
+        catch (InterruptedException e) {
+            sb.append(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         finally {
+            sb.append("Releasing client checkout lock...").append("\n");
+            log.info("{}",sb);
             _clientCheckoutLock.unlock();
-
         }
-
-
         return besResponse;
     }
 
@@ -1066,7 +1054,8 @@ public class BES {
             return besClient;
 
         } catch (InterruptedException e) {
-            log.error("Interrupted!: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+            log.error("Whoops! Thread Interrupted!: {}", e.getMessage());
             if (besClient != null) {
                 log.error("Attempting to discard BES Client (id:{}) ", besClient.getID());
                 discardClient(besClient);
@@ -1268,6 +1257,7 @@ public class BES {
 
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             log.error("OUCH! Interrupted while shutting down BESPool", e);
         } finally {
             if (gotClientCheckoutLock)
