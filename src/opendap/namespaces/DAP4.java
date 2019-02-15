@@ -37,6 +37,11 @@ import org.jdom.Namespace;
  */
 public class DAP4 {
 
+    /**
+     * This class should never be instantiated.
+     */
+    private DAP4(){ throw new IllegalStateException("opendap.namespaces.DAP4 class"); }
+
     public static final String    NAMESPACE_STRING = "http://xml.opendap.org/ns/DAP/4.0#";
     public static final Namespace NS = Namespace.getNamespace("dap4",NAMESPACE_STRING);
 
