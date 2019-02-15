@@ -41,6 +41,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
@@ -54,7 +55,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -85,18 +88,16 @@ public class DispatchServlet extends HttpServlet {
      *
      * @serial
      */
-    private AtomicInteger reqNumber;
+    private static final AtomicInteger reqNumber = new AtomicInteger(0);
+    private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
+    private static final ReentrantLock INIT_LOCK = new ReentrantLock();
 
+    private static final Vector<DispatchHandler> httpGetDispatchHandlers = new Vector<>();
+    private static final Vector<DispatchHandler> httpPostDispatchHandlers = new Vector<>();
 
+    private static final Logger log = LoggerFactory.getLogger(DispatchServlet.class);
 
-    private Vector<DispatchHandler> httpGetDispatchHandlers;
-    private Vector<DispatchHandler> httpPostDispatchHandlers;
-
-    private OpendapHttpDispatchHandler odh = null;
-    // private ThreddsHandler tdh = null;
-    private org.slf4j.Logger log;
-
-    private Document configDoc;
+    private static Document configDoc;
 
     /**
      * ************************************************************************
@@ -108,93 +109,80 @@ public class DispatchServlet extends HttpServlet {
      * @throws javax.servlet.ServletException
      */
     public void init() throws ServletException {
-
-        super.init();
-        initDebug();
-        initLogging();
-
-        // Timer.enable();
-
-
-        RequestCache.openThreadCache();
-
-        reqNumber = new AtomicInteger(0);
-
-        log.debug("init() start");
-
-        /*
-        String xslTransformerFactoryImpl = "com.icl.saxon.TransformerFactoryImpl";
-        String xslTransformerFactoryProperty = "javax.xml.transform.TransformerFactory";
-
-        log.info("init(): Setting System Property " +
-                xslTransformerFactoryProperty +
-                "="+xslTransformerFactoryImpl);
-        System.setProperty(xslTransformerFactoryProperty,xslTransformerFactoryImpl);
-        */
-
-
-
-        httpGetDispatchHandlers = new Vector<>();
-        //Vector<Element> httpGetHandlerConfigs = new Vector<>();
-        httpPostDispatchHandlers = new Vector<>();
-        //Vector<Element> httpPostHandlerConfig = new Vector<>();
-
-        // init logging
-        LogUtil.logServerStartup("init()");
-        log.info("init() start.");
-
-        String configFile = getInitParameter("ConfigFileName");
-        if (configFile == null) {
-            String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
-                    "is the name of the OLFS configuration file!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
-
-        PersistentConfigurationHandler.installDefaultConfiguration(this,configFile);
-
-        loadConfig(configFile);
-
-        Element config = configDoc.getRootElement();
-
-        boolean enablePost = false;
-        Element postConfig = config.getChild("HttpPost");
-        if(postConfig!=null){
-            String enabled = postConfig.getAttributeValue("enabled");
-            if(enabled.equalsIgnoreCase("true"))
-                enablePost = true;
-        }
-
-
-        Element timer = config.getChild("Timer");
-        if(timer!=null){
-            String enabled = timer.getAttributeValue("enabled");
-            if(enabled!=null && enabled.equalsIgnoreCase("true")){
-                Timer.enable();
-            }
-        }
-
-        log.info("init() - Timer is {}",Timer.isEnabled()?"ENABLED":"DISABLED");
-
-
-
-        initBesManager();
-
-        initAuthenticationControls();
-
+        INIT_LOCK.lock();
         try {
-            loadHyraxServiceHandlers(httpGetDispatchHandlers, config);
-            if(enablePost){
-                opendap.bes.BesDapDispatcher bdd = new opendap.bes.BesDapDispatcher();
-                bdd.init(this,config);
-                httpPostDispatchHandlers.add(bdd);
+            if(IS_INITIALIZED.get())
+                return;
+
+            super.init();
+            initDebug();
+            LogUtil.initLogging(this);
+
+            // Timer.enable();
+
+            RequestCache.openThreadCache();
+
+
+            log.debug("init() start");
+
+            LogUtil.logServerStartup("init()");
+            log.info("init() start.");
+
+            String configFile = getInitParameter("ConfigFileName");
+            if (configFile == null) {
+                String msg = "Servlet configuration must include a parameter called 'ConfigFileName' whose value" +
+                        "is the name of the OLFS configuration file!\n";
+                System.err.println(msg);
+                throw new ServletException(msg);
             }
+
+            PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
+
+            loadConfig(configFile);
+
+            Element config = configDoc.getRootElement();
+
+            boolean enablePost = false;
+            Element postConfig = config.getChild("HttpPost");
+            if (postConfig != null) {
+                String enabled = postConfig.getAttributeValue("enabled");
+                if (enabled.equalsIgnoreCase("true"))
+                    enablePost = true;
+            }
+
+
+            Element timer = config.getChild("Timer");
+            if (timer != null) {
+                String enabled = timer.getAttributeValue("enabled");
+                if (enabled != null && enabled.equalsIgnoreCase("true")) {
+                    Timer.enable();
+                }
+            }
+
+            log.info("init() - Timer is {}", Timer.isEnabled() ? "ENABLED" : "DISABLED");
+
+
+            initBesManager();
+
+            initAuthenticationControls();
+
+            try {
+                loadHyraxServiceHandlers(httpGetDispatchHandlers, config);
+                if (enablePost) {
+                    opendap.bes.BesDapDispatcher bdd = new opendap.bes.BesDapDispatcher();
+                    bdd.init(this, config);
+                    httpPostDispatchHandlers.add(bdd);
+                }
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+            RequestCache.closeThreadCache();
+            IS_INITIALIZED.set(true);
+            log.info("init() complete.");
         }
-        catch (Exception e){
-            throw new ServletException(e);
+        finally {
+            INIT_LOCK.unlock();
         }
-        log.info("init() complete.");
-        RequestCache.closeThreadCache();
     }
 
 
@@ -470,14 +458,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * Starts the logging process.
-     */
-    private void initLogging() {
-        LogUtil.initLogging(this);
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-    }
 
 
 
