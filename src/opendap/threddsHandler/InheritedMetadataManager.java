@@ -324,14 +324,14 @@ public class InheritedMetadataManager {
                         metadataRootPathElement = (Element) metadataRootPathIterator.next();
                         metadataRootPath = metadataRootPathElement.getTextTrim();
 
-                        ConcurrentHashMap<String, Vector<Element>> heldInherMap = _inheritedMetadata.putIfAbsent(metadataRootPath, new ConcurrentHashMap<>());
+                        ConcurrentHashMap<String, Vector<Element>> heldInherMap = _inheritedMetadata.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
                         if (heldInherMap==null) {
                             log.debug("ingestInheritedMetadata() - Added new metadataRootPath: '" + metadataRootPath + "' ConcurrentHashMap storage.");
                         }
 
                         metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                        Vector<Element> heldMeta = metadataForThisRootPath.putIfAbsent(catalogKey, new Vector<>());
+                        Vector<Element> heldMeta = metadataForThisRootPath.putIfAbsent(catalogKey, new Vector<Element>());
                         if(heldMeta == null){
                             log.debug("ingestInheritedMetadata() - The catalog '"+catalogKey+"' is a new contributor of metadata to metadataRootPath '"+metadataRootPath+"' Added storage Vector");
                         }
@@ -344,7 +344,7 @@ public class InheritedMetadataManager {
                         if(inheritedService!=null){
                             log.debug("ingestInheritedMetadata() - Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
 
-                            ConcurrentHashMap<String, Vector<Element>> heldISMap = _inheritedServices.putIfAbsent(metadataRootPath, new ConcurrentHashMap<>());
+                            ConcurrentHashMap<String, Vector<Element>> heldISMap = _inheritedServices.putIfAbsent(metadataRootPath, new ConcurrentHashMap<String, Vector<Element>>());
                             if(heldISMap == null) {
                                 log.debug("ingestInheritedMetadata() - Added new inherited services ConcurrentHashMap storage for " +
                                         "metadataRootPath: '" + metadataRootPath + "'");
@@ -353,7 +353,7 @@ public class InheritedMetadataManager {
                             inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
 
                             // New Way
-                            Vector<Element> heldVec = inheritedServicesForThisRootPath.putIfAbsent(catalogKey,new Vector<>());
+                            Vector<Element> heldVec = inheritedServicesForThisRootPath.putIfAbsent(catalogKey,new Vector<Element>());
                             if(heldVec == null){
                                 log.debug("ingestInheritedMetadata() - Added new inherited services storage Vector for " +
                                         "metadataRootPath: '" + metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
