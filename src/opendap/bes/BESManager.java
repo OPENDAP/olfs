@@ -67,7 +67,7 @@ public class BESManager {
     }
 
 
-    public void init(Element config) throws Exception{
+    public void init(Element config) throws BadConfigurationException {
 
         _lock.lock();
         try {
@@ -106,7 +106,7 @@ public class BESManager {
     }
 
 
-    private void configure(Element besConfiguration) throws Exception {
+    private void configure(Element besConfiguration) throws BadConfigurationException {
 
         if(_isConfigured.get()) return;
 
@@ -159,7 +159,7 @@ public class BESManager {
     }
 
 
-    public static void addBes(BES bes) throws Exception {
+    public static void addBes(BES bes) throws BadConfigurationException {
 
         Iterator<BesGroup> i = BESManager.getBesGroups();
 
