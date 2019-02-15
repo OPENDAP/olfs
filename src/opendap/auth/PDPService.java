@@ -62,6 +62,7 @@ public class PDPService extends HttpServlet {
 
     private static PolicyDecisionPoint myPDP;
 
+    @Override
     public void init() throws ServletException {
         CONFIG_LOCK.lock();
         try {
@@ -101,7 +102,7 @@ public class PDPService extends HttpServlet {
         finally {
             CONFIG_LOCK.unlock();
         }
-        LOG.info("init() - END");
+        LOG.info("END");
 
     }
 
@@ -157,7 +158,7 @@ public class PDPService extends HttpServlet {
 
     }
 
-    public void doEvaluate(HttpServletRequest request,
+    private void doEvaluate(HttpServletRequest request,
                       HttpServletResponse response)  {
 
         String msg = "";
@@ -192,7 +193,7 @@ public class PDPService extends HttpServlet {
                 quadTuple.append("query:\"").append(query).append("\", ");
                 quadTuple.append("action:\"").append(action).append("\"");
                 quadTuple.append(" }");
-                LOG.debug("doGet() - {}", quadTuple);
+                LOG.debug("{}", quadTuple);
 
                 if(myPDP.evaluate(uid,authContext,resourceId,query,action)){
                     status = HttpServletResponse.SC_OK;
@@ -200,7 +201,7 @@ public class PDPService extends HttpServlet {
                     ServletOutputStream sos = response.getOutputStream();
                     msg = "Yes. Affirmative. Absolutely. I do.";
                     sos.println(msg);
-                    LOG.debug("doEvaluate() - ACCESS PERMITTED {}", quadTuple);
+                    LOG.debug("ACCESS PERMITTED {}", quadTuple);
 
                 }
                 else {
@@ -209,7 +210,7 @@ public class PDPService extends HttpServlet {
                     ServletOutputStream sos = response.getOutputStream();
                     msg = "No. Nope. Not even.";
                     sos.println(msg);
-                    LOG.debug("doEvaluate() - ACCESS DENIED {}", quadTuple);
+                    LOG.debug("ACCESS DENIED {}", quadTuple);
                 }
             }
 
@@ -217,7 +218,7 @@ public class PDPService extends HttpServlet {
         catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, this,  response);
-                LOG.error("doEvaluate() - The Bad Things have happened. Message: {}", t.getMessage());
+                LOG.error("The Bad Things have happened. Message: {}", t.getMessage());
             }
             catch(Throwable t2){
                 // It's boned now.. Leave it be.
