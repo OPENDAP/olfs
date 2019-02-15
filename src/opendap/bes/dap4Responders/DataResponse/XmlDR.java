@@ -94,11 +94,9 @@ public class XmlDR extends Dap4Responder{
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
-
         QueryParameters qp = new  QueryParameters(request);
-
+        User user = new User(request);
         String resourceID = getResourceId(requestedResourceId, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -110,29 +108,17 @@ public class XmlDR extends Dap4Responder{
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-
-
-        User user = new User(request);
-
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,os);
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
 
 }

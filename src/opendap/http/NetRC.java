@@ -60,14 +60,14 @@ import java.util.regex.Pattern;
  * @since 3.5
  */
 public class NetRC {
-    static final Pattern NETRC = Pattern.compile("(\\S+)"); //$NON-NLS-1$
+    private static final Pattern NETRC = Pattern.compile("(\\S+)"); //$NON-NLS-1$
 
     /**
      * 'default' netrc entry. This is the same as machine name except that
      * default matches any name. There can be only one default token, and it
      * must be after all machine tokens.
      */
-    static final String DEFAULT_ENTRY = "default"; //$NON-NLS-1$
+    private static final String DEFAULT_ENTRY = "default"; //$NON-NLS-1$
 
     /**
      * .netrc file entry
@@ -76,22 +76,26 @@ public class NetRC {
         /**
          * login netrc entry
          */
-        public String login;
+        private  String login;
+        public String getLogin(){ return login; }
 
         /**
          * password netrc entry
          */
-        public char[] password;
+        private char[] password;
+        public String getPassword() { return String.valueOf(password); }
 
         /**
          * machine netrc entry
          */
-        public String machine;
+        private String machine;
+        public String getMachine(){ return machine; }
 
         /**
          * account netrc entry
          */
-        public String account;
+        private String account;
+        public String getAccount(){ return account; }
 
         /**
          * macdef netrc entry. Defines a macro. This token functions like the
@@ -101,12 +105,14 @@ public class NetRC {
          * If a macro named init is defined, it is automatically executed as the
          * last step in the auto-login process.
          */
-        public String macdef;
+        private String macdef;
+        public String getMacdef() { return macdef; }
 
         /**
          * macro script body of macdef entry.
          */
-        public String macbody;
+        private String macbody;
+        public String getMacbody() { return macbody; }
 
         /**
          * Default constructor
@@ -169,7 +175,7 @@ public class NetRC {
      * @param netrc
      *            the .netrc file
      */
-    public NetRC(File netrc) {
+    public NetRC(File netrc) throws IOException {
         this.netrc = netrc;
         parse();
     }
@@ -181,7 +187,7 @@ public class NetRC {
      * @param host
      * @return entry associated with host name or null
      */
-    public NetRCEntry getEntry(String host) {
+    public NetRCEntry getEntry(String host) throws IOException {
         if (netrc == null)
             return null;
 
@@ -203,7 +209,7 @@ public class NetRC {
         return hosts.values();
     }
 
-    private void parse() {
+    private void parse() throws IOException {
         this.hosts.clear();
         this.lastModified = this.netrc.lastModified();
 
@@ -310,15 +316,9 @@ public class NetRC {
 
             if (entry.complete())
                 hosts.put(entry.machine, entry);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } finally {
-            try {
-                if (bufRdr != null)
-                    bufRdr.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (bufRdr != null)
+                bufRdr.close();
         }
     }
 }

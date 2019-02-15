@@ -87,7 +87,6 @@ public class DDX extends Dap4Responder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
-
         BesApi besApi = getBesApi();
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
@@ -99,7 +98,7 @@ public class DDX extends Dap4Responder {
 
         response.setContentType(responseMediaType.getMimeType());
         //response.setContentType("application/vnd.opendap.org.dap4.description+xml");
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_ddx");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -107,17 +106,9 @@ public class DDX extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = "3.2"; //request.getHeader("XDAP-Accept");
 
-
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os);
-
         os.flush();
         log.info("Sent DAP DDX.");
-
-
     }
-
 }

@@ -214,7 +214,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY,responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, _besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", responseMediaType.getMimeType());
 
 

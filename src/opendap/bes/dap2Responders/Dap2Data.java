@@ -97,16 +97,12 @@ public class Dap2Data extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-
         BesApi besApi = getBesApi();
-
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl,false);
-
         QueryParameters qp = new  QueryParameters(request);
-
+        User user = new User(request);
 
         // Here we must use the ReqInfo.getConstraintExpression() call
         // because tht is where the {}{}{} notation support is located.
@@ -119,9 +115,6 @@ public class Dap2Data extends Dap4Responder {
         //
         String dap2CE = ReqInfo.getConstraintExpression(request);
 
-        User user = new User(request);
-
-
         log.debug("sendNormativeRepresentation() For: " + resourceID+
                 "    CE: '" + dap2CE + "'");
 
@@ -131,22 +124,14 @@ public class Dap2Data extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_data");
-
-
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
-
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-
-
-
         OutputStream os;
         ByteArrayOutputStream srr = null;
-
-
 
         if(qp.isStoreResultRequest()){
             srr = new ByteArrayOutputStream();
@@ -155,24 +140,12 @@ public class Dap2Data extends Dap4Responder {
         else {
             os = response.getOutputStream();
         }
-
-
         besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os);
-
-
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }
-
         os.flush();
-
-
-
         log.info("sendNormativeRepresentation() Sent DAP2 data response.");
-
-
-
-
     }
 
 

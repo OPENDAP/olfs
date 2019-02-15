@@ -33,7 +33,6 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
-import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
@@ -286,7 +285,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         String relativeURL = ReqInfo.getLocalUrl(req);
 
-        return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(_regexToMatchLastDotSuffixString));
+        return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
 
     }
 

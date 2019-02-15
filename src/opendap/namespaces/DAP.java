@@ -35,6 +35,11 @@ import org.jdom.Namespace;
  * To change this template use File | Settings | File Templates.
  */
 public class DAP {
+    /**
+     * This class should never be instantiated.
+     */
+    private DAP(){ throw new IllegalStateException("opendap.namespaces.DAP class"); }
+
     public static final String    DAPv32_NAMESPACE_STRING = "http://xml.opendap.org/ns/DAP/3.2#";
     public static final Namespace DAPv32_NS = Namespace.getNamespace("dap",DAPv32_NAMESPACE_STRING);
     public static final String    DAPv32_SCHEMA_LOCATION= "http://xml.opendap.org/dap/dap3.2.xsd";

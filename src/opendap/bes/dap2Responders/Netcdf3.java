@@ -108,10 +108,9 @@ public class Netcdf3 extends Dap4Responder {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-
         String resourceID = getResourceId(requestedResourceId, false);
-
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        User user = new User(request);
 
         log.debug("sendNormativeRepresentation(): cf_history_entry: '{}'",cf_history_entry);
 
@@ -125,33 +124,16 @@ public class Netcdf3 extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-
         String xdap_accept = "3.2";
 
-        User user = new User(request);
-
-
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, cf_history_entry, xdap_accept, user.getMaxResponseSize(), os);
-
-
         os.flush();
         log.debug("sendNormativeRepresentation(): Sent {}",getServiceTitle());
-
-
-
     }
-
-
 }

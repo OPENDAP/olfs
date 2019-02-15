@@ -40,6 +40,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -49,22 +52,27 @@ import java.io.File;
  */
 public class LogUtil {
 
-    private static boolean isLogInit = false;
-    //private static volatile long logID = 0;
+    private static AtomicBoolean isLogInit = new AtomicBoolean(false);
 
     private static Logger log;
     static{
-        System.out.print("+++LogUtil.static - Instantiating Logger ... ");
+        System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
 
         try {
             log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
-            System.out.print("Logger instantiated.\n");
+            log.info("Logger instantiated. class: {}",log.getClass().getCanonicalName());
         }
         catch(NoClassDefFoundError e) {
             System.err.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
+
+    /**
+     * Private constructor prevents inadvertent instantiation of this class which is really a collection
+     * of functions (static methods).
+     */
+    private LogUtil(){}
 
     /**
      * Initialize logging for the web application context in which the given
@@ -84,10 +92,10 @@ public class LogUtil {
 
 
         // Initialize logging if not already done.
-        if (isLogInit)
+        if (isLogInit.get())
             return;
 
-        System.out.println("+++LogUtil.initLogging()");
+        log.info("BEGIN servlet name: {}  class: {}",servlet.getServletName(), servlet.getClass().getCanonicalName());
         ServletContext servletContext = servlet.getServletContext();
 
         String configPath = ServletUtil.getConfigPath(servlet);
@@ -95,80 +103,46 @@ public class LogUtil {
         // set up the log path
         String logPath =  configPath + "logs";
         File logPathFile = new File(logPath);
-        if (!logPathFile.exists()) {
-            if (!logPathFile.mkdirs()) {
-                throw new RuntimeException("Creation of logfile directory failed." + logPath);
-            }
+        if (!logPathFile.exists() && !logPathFile.mkdirs()) {
+            throw new RuntimeException("Creation of logfile directory failed." + logPath);
         }
 
         
         // read in Logback config file
         System.setProperty("logdir", logPath); // variable substitution
-        try {
 
-            String logbackConfig = servletContext.getInitParameter("logbackConfig");
-            if (logbackConfig == null){
-                logbackConfig = configPath + "logback-test.xml";
-                File f = new File(logbackConfig);
+        String logbackConfig = servletContext.getInitParameter("logbackConfig");
+        if (logbackConfig == null){
+            logbackConfig = configPath + "logback-test.xml";
+            File f = new File(logbackConfig);
+            if (!f.exists()) {
+                logbackConfig = configPath + "logback.xml";
+                f = new File(logbackConfig);
                 if (!f.exists()) {
-                    logbackConfig = configPath + "logback.xml";
-                    f = new File(logbackConfig);
-                    if (!f.exists()) {
-                        // Try to use the one that shipped with the webapp
-                        String defaultLogbackConfig = ServletUtil.getSystemPath(servlet, "WEB-INF/logback.xml");
-                        f = new File(defaultLogbackConfig);
-                        if (!f.exists())
-                            logbackConfig = null;
-                        else
-                            logbackConfig = defaultLogbackConfig;
-                    }
-
+                    // Try to use the one that shipped with the webapp
+                    String defaultLogbackConfig = ServletUtil.getSystemPath(servlet, "WEB-INF/logback.xml");
+                    f = new File(defaultLogbackConfig);
+                    if (!f.exists())
+                        logbackConfig = null;
+                    else
+                        logbackConfig = defaultLogbackConfig;
                 }
-            }
-
-            if(logbackConfig != null){
-                System.out.println("+++LogUtil.initLogging() - Logback configuration using: "+ logbackConfig);
-
-                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-                try {
-                  JoranConfigurator configurator = new JoranConfigurator();
-                  configurator.setContext(lc);
-                  // the context was probably already configured by default configuration
-                  // rules
-                  lc.reset();
-                  configurator.doConfigure(logbackConfig);
-                } catch (JoranException je) {
-                   je.printStackTrace();
-                }
-                StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 
             }
-            else {
-                System.out.println("+++LogUtil.initLogging() - Logback configuration using logback's " +
-                        "default configuration mechanism");
-            }
-
-            System.out.println("+++LogUtil.initLogging() - Logback configured.");
-
-        } catch (Exception t) {
-            t.printStackTrace();
         }
 
-        System.out.print("+++LogUtil.initLogging() - Insiantiating Logger...");
-
-        try {
-            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
+        if(logbackConfig != null){
+            log.info("Logback configuration using: {}", logbackConfig);
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            attemptJoranConfiguration(logbackConfig,lc);
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
         }
-        catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
-            throw e;
+        else {
+            log.info("Logback configuration using logback's default configuration mechanism");
         }
 
-        System.out.println("Done.");
-
-        isLogInit = true;
-
-
+        isLogInit.set(true);
+        log.info("END Logback is configured.");
     }
 
 
@@ -188,10 +162,10 @@ public class LogUtil {
      */
     public static void initLogging(String path) {
         // Initialize logging if not already done.
-        if (isLogInit)
+        if (isLogInit.get())
             return;
 
-        System.out.println("+++LogUtil.initLogging() - path='"+path+"'");
+        log.info("BEGIN path='{}'", path);
 
         // set up the log path
         if (!path.endsWith("/"))
@@ -199,72 +173,45 @@ public class LogUtil {
         String logPath = path + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
-            System.out.println("+++LogUtil.initLogging(): Creating log dir: " + logPath);
+            log.info("Creating log dir: {}", logPath);
             if (!logPathFile.mkdirs()) {
                 throw new RuntimeException("Creation of logfile directory failed." + logPath);
             }
         } else {
-            System.out.println("+++LogUtil.initLogging(): Found log dir: " + logPath);
+            log.info("Found log dir: {} ", logPath);
 
         }
 
-        System.out.println("+++LogUtil.initLogging(): Using log dir: " + logPath);
+        log.info("Using log dir: {}",logPath);
 
         // read in Log4J config file
         System.setProperty("logdir", logPath); // variable substitution
 
-
         String logbackConfig = path + "logback-test.xml";
         File f = new File(logbackConfig);
         if (!f.exists()) {
-            System.out.println("+++LogUtil.initLogging(): Unable to locate logback configuration: " + logbackConfig);
+            log.info("Unable to locate logback configuration: {}", logbackConfig);
             logbackConfig = path + "logback.xml";
             f = new File(logbackConfig);
             if (!f.exists()) {
-                System.out.println("+++LogUtil.initLogging(): Unable to locate logback configuration: " + logbackConfig);
+                log.info("Unable to locate logback configuration: {}", logbackConfig);
                 logbackConfig = null;
             }
 
         }
 
-
         if (logbackConfig != null) {
-            System.out.println("+++LogUtil.initLogging() - Logback configuration using: " + logbackConfig);
-
+            log.info("Logback configuration using: {}", logbackConfig);
             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-            try {
-                JoranConfigurator configurator = new JoranConfigurator();
-                configurator.setContext(lc);
-                // the context was probably already configured by default configuration
-                // rules
-                lc.reset();
-                configurator.doConfigure(logbackConfig);
-            } catch (JoranException je) {
-                je.printStackTrace();
-            }
+            attemptJoranConfiguration(logbackConfig,lc);
             StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 
         } else {
-            System.out.println("+++LogUtil.initLogging() - Logback configuration using logback " +
-                    "default configuration mechanism");
+            log.info("Logback configuration using logback default configuration mechanism");
         }
 
-        System.out.println("+++LogUtil.initLogging() - Logback configured.");
-
-
-        System.out.print("+++LogUtil.initLogging() - Instantiating Logger...");
-
-        try {
-            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
-        }
-        catch (NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: " + e.getMessage() + "  [ERROR]\n");
-            throw e;
-        }
-
-        System.out.println("Done.");
-
-        isLogInit = true;
+        isLogInit.set(true);
+        log.info("END Logback is configured.");
     }
 
 
@@ -282,12 +229,32 @@ public class LogUtil {
      *
      */
     public static void initLogging() {
-
         String path = System.getProperty("user.dir")+"/";
-
         initLogging(path);
     }
 
+
+    /**
+     *
+     * @param logbackConfig Path to logback configuration file.
+     * @param lc Logger context to condition.
+     */
+    private static void attemptJoranConfiguration(String logbackConfig, LoggerContext lc){
+        try {
+            JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext(lc);
+            // the context was probably already configured by default configuration
+            // rules
+            lc.reset();
+            configurator.doConfigure(logbackConfig);
+            log.info("Configuration via {} successful.",configurator.getClass().getName());
+        } catch (JoranException je) {
+            log.error("Caught {} Messge: ",je.getClass().getName(),je.getMessage());
+            StringWriter sw = new StringWriter();
+            je.printStackTrace(new PrintWriter(sw));
+            log.error("Stack trace: \n{}",sw.toString());
+        }
+    }
 
 
     /**

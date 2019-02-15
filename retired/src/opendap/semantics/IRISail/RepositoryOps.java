@@ -89,12 +89,15 @@ public class RepositoryOps {
     public static void setDropWithMemoryStoreDeleteDir (){
         dropWithMemoryStoreDeleteDir =  true;
     }
-    
+
+    /**
+     * private constructor because this is essentially a class of functions, not methods.
+     */
+    private RepositoryOps(){ }
+
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
-
-
 
         try {
             con = repo.getConnection();
@@ -102,45 +105,20 @@ public class RepositoryOps {
             
             long beforeDrop = new Date().getTime();
             
-            log.debug("dropStartingPointsAndContexts(): AutoCommit = " + con.isAutoCommit());
+            log.debug("dropStartingPointsAndContexts(): AutoCommit = {}", con.isAutoCommit());
             valueFactory = repo.getValueFactory();
-
-
-            /*
-
-            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
-            Thread.sleep(10000);
-            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
-            Thread.sleep(4000);
-            */
 
             dropStartingPoints(con, valueFactory, startingPointUrls);
             dropContexts(con, valueFactory, dropList);
             log.info("Remove uploadComplete statement!");
             removeUploadComplete(con, valueFactory);
-            /*
-            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
-            Thread.sleep(10000);
-            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
-            Thread.sleep(4000);
-            */
-
-
 
             log.info("dropStartingPointsAndContexts(): Calling commit.");
             con.commit();
             log.info("dropStartingPointsAndContexts(): Returned from commit().");
             long AfterDrop = new Date().getTime();
             double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
-
-            /*
-            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
-            Thread.sleep(10000);
-            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
-            Thread.sleep(4000);
-            */
-
-            log.info("dropStartingPointsAndContexts(): Drop operations took " + elapsedTime +" seconds.");
+            log.info("dropStartingPointsAndContexts(): Drop operations took {} seconds", elapsedTime);
 
             con.setAutoCommit(true);
             
@@ -169,14 +147,10 @@ public class RepositoryOps {
      */
     public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls)throws InterruptedException  {
 
-
-
         URI startingPointValue;
         URI isa = valueFactory.createURI(Terms.rdfType.getUri());
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContext.getUri());
         URI startingPointType = valueFactory.createURI(Terms.StartingPoint.getUri());
-
-
 
         try {
             for (String startingPoint : startingPointUrls) {
@@ -1730,25 +1704,19 @@ public class RepositoryOps {
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
-            log.debug("findChangedRDFDocuments(): query string '" + queryString+"'");
+            log.debug("findChangedRDFDocuments() - query string '{}'", queryString);
 
-            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
-                    queryString);
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
 
             result = tupleQuery.evaluate();
 
             if (result != null) {
-                //bindingNames = result.getBindingNames();
-
                 while (result.hasNext()) {
                     BindingSet bindingSet = result.next();
 
                     Value firstValue = bindingSet.getValue("doc");
                     String importURL = firstValue.stringValue();
                     Value secondtValue = bindingSet.getValue("lastmod");
-                    // log.debug("DOC: " + importURL);
-                    // log.debug("LASTMOD: " + secondtValue.stringValue());
-
                     if (olderContext(secondtValue.stringValue(), importURL) && !changedRdfDocuments.contains(importURL)) {
 
                         changedRdfDocuments.add(importURL);
@@ -1758,35 +1726,30 @@ public class RepositoryOps {
                         if(needRetransform != null){
                         changedRdfDocuments.addAll(needRetransform);
                         }
-                        log.debug("findChangedRDFDocuments(): Add to changedRdfDocuments list: " + importURL);
+                        log.debug("findChangedRDFDocuments() - Add to changedRdfDocuments list: {}", importURL);
 
                     }
                 }
             } else {
-                log.info("findChangedRDFDocuments(): No changed RDF document found!");
+                log.info("findChangedRDFDocuments() - No changed RDF document found!");
             }
         }
 
-        catch (RepositoryException e) {
-            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-        } catch (QueryEvaluationException e) {
-            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+            log.error("findChangedRDFDocuments() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
         } finally {
             if (result != null) {
                 try {
                     result.close();
                 } catch (Exception e) {
-                    log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("findChangedRDFDocuments() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
             }
 
         }
 
-        if(changedRdfDocuments.size()>0)
-            log.info("findChangedRDFDocuments(): Number of changed RDF documents detected:  "
-                + changedRdfDocuments.size());
+        if(!changedRdfDocuments.isEmpty())
+            log.info("findChangedRDFDocuments() - Number of changed RDF documents detected:  {}", changedRdfDocuments.size());
 
         return changedRdfDocuments;
     }
@@ -1797,59 +1760,47 @@ public class RepositoryOps {
  * @return vector holding all transformed Rdf documents.
  */
     private static Vector<String> getTransformedRdf(RepositoryConnection con, String importURL) throws InterruptedException{
-        Vector <String> transformedRdf = new Vector<String>();
+        Vector <String> transformedRdf = new Vector<>();
         TupleQueryResult result = null;
-       try{ 
-        String lookforTransformed = "select rdfDoc " +
-                                    "from " +
-                                    "{rdfDoc} rdfcache:hasXslTransformToRdf " +
-                                    "{<"+importURL+">} "+
-                                    "using namespace " +
-                                    "rdfcache=<http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>" ;
-        log.debug("queryforTransformedRdf: " + lookforTransformed);
+        try{
+            String lookforTransformed = "select rdfDoc " +
+                    "from " +
+                    "{rdfDoc} rdfcache:hasXslTransformToRdf " +
+                    "{<"+importURL+">} "+
+                    "using namespace " +
+                    "rdfcache=<http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>" ;
+            log.debug("getTransformedRdf - {}", lookforTransformed);
 
-        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,lookforTransformed);
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,lookforTransformed);
 
-        result = tupleQuery.evaluate();
-
-        if (result != null && result.hasNext()) {
-            
-            while (result.hasNext()) {
-                BindingSet bindingSet = result.next();
-
-                Value docName = bindingSet.getValue("rdfDoc");
-                if (!transformedRdf.contains(docName.stringValue())) {
-                    transformedRdf.add(docName.stringValue());
-
-                    log.info("Add to droplist transformed RDF Document: "
-                            + docName.toString());
+            result = tupleQuery.evaluate();
+            if (result != null && result.hasNext()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+                    Value docName = bindingSet.getValue("rdfDoc");
+                    if (!transformedRdf.contains(docName.stringValue())) {
+                        transformedRdf.add(docName.stringValue());
+                        log.info("getTransformedRdf() - Add to droplist transformed RDF Document: {}", docName.toString());
+                    }
+                }
+            } else {
+                log.debug("getTransformedRdf() - No transformed RDF document found!");
+            }
+        }
+        catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+            log.error("getTransformedRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
+        } finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (Exception e) {
+                    log.error("getTransformedRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
             }
-        } else {
-            log.debug("No transformed RDF document found!");
         }
-    }
-
-    catch (RepositoryException e) {
-        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-    } catch (QueryEvaluationException e) {
-        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-    } catch (MalformedQueryException e) {
-        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-    } finally {
-        if (result != null) {
-            try {
-                result.close();
-            } catch (Exception e) {
-                log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-            }
+        if(!transformedRdf.isEmpty()){
+            log.info("getTransformedRdf() - Identified " + transformedRdf.size() + " transformed RDF documents.");
         }
-
-    }
-
-    if(transformedRdf.size()>0){
-        log.info("getTransformedRdf(): Identified " + transformedRdf.size() + " transformed RDF documents.");
-    }
         return transformedRdf;
     }
 
@@ -1870,9 +1821,7 @@ public class RepositoryOps {
             con = repository.getConnection();
             valueFactory = repository.getValueFactory();
 
-
             // Get all of the statements in the repository that
-            
             statements =
                     con.getStatements(
                             valueFactory.createURI(importUrl),
@@ -1881,22 +1830,22 @@ public class RepositoryOps {
             statements.enableDuplicateFilter(); //memory intensive
             while (statements.hasNext()){
                 if(xsltTransformationFileUrl!=null){
-                    log.error("getUrlForTransformToRdf(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
+                    log.error("getUrlForTransformToRdf() - Error!!! Found multiple XSL transforms associated with url: {}  Lacking further instructions. DISCARDING: {}", importUrl, xsltTransformationFileUrl);
                 }
                 Statement s = statements.next();
                 xsltTransformationFileUrl= s.getObject().stringValue();
-                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + xsltTransformationFileUrl);
+                log.debug("getUrlForTransformToRdf() - Found Transformation file = {}", xsltTransformationFileUrl);
             }
         }
         catch (RepositoryException e) {
-            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+            log.error("getUrlForTransformToRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
         }
         finally {
             if (statements != null) {
                 try {
                     statements.close();
                 } catch (Exception e) {
-                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getUrlForTransformToRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
             }
 
@@ -1904,7 +1853,7 @@ public class RepositoryOps {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getUrlForTransformToRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
 
             }
@@ -1912,6 +1861,8 @@ public class RepositoryOps {
 
         return xsltTransformationFileUrl;
     }
+
+
     /**
      * Return URL of the transformation file.
      * @param importUrl-the file to transform.
@@ -1921,11 +1872,9 @@ public class RepositoryOps {
     public static String getUrlForTransformToRdf(RepositoryConnection con, ValueFactory valueFactory, String importUrl)throws InterruptedException {
         
         String xsltTransformationFileUrl = null;
-        
         RepositoryResult<Statement> statements = null;
 
         try {
-        
             // Get all of the statements in the repository that
             
             statements = con.getStatements(valueFactory.createURI(importUrl),
@@ -1933,38 +1882,38 @@ public class RepositoryOps {
             statements.enableDuplicateFilter(); //use more memory
             while (statements.hasNext()){
                 if(xsltTransformationFileUrl!=null){
-                    log.error("getUrlForTransformToRdf(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
+                    log.error("getUrlForTransformToRdf() - Error!!! Found multiple XSL transforms associated with url: {}  Lacking further instructions. DISCARDING: {}", importUrl, xsltTransformationFileUrl);
                 }
                 Statement s = statements.next();
                 xsltTransformationFileUrl= s.getObject().stringValue();
                 URI subj = new URIImpl(xsltTransformationFileUrl);
-                //URI pred = new URIImpl(Terms.isReplacedBy.getUri());
+
                 URI pred = new URIImpl("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#isReplacedBy");
                 Statement transformIsReplacedby = valueFactory.createStatement(subj,pred,null);
-                log.debug("getUrlForTransformToRdf(): St: "+transformIsReplacedby.toString());
+                log.debug("getUrlForTransformToRdf() - Statement: {}", transformIsReplacedby.toString());
                 if (con.hasStatement(subj, pred, null, true)){
                     xsltTransformationFileUrl = null;  
                     log.debug("Found replacedBy");
                 }
-                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + xsltTransformationFileUrl);
+                log.debug("getUrlForTransformToRdf() - Found Transformation file = {}", xsltTransformationFileUrl);
             }
         }
         catch (RepositoryException e) {
-            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+            log.error("getUrlForTransformToRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
         }
         finally {
             if (statements != null) {
                 try {
                     statements.close();
                 } catch (Exception e) {
-                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getUrlForTransformToRdf() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
             }
-
         }
-
         return xsltTransformationFileUrl;
     }
+
+
     /**
      * Return URL of the transformation file.
      * @param importUrl-the file to transform.
@@ -1978,7 +1927,6 @@ public class RepositoryOps {
         RepositoryResult<Statement> statements = null;
 
         try {
-        
             // Get all of the statements in the repository that
             
             statements = con.getStatements(valueFactory.createURI(importUrl),
@@ -1987,39 +1935,39 @@ public class RepositoryOps {
             statements.enableDuplicateFilter(); //use more memory
             while (statements.hasNext()){
                 if(styleSheetFileUrl!=null){
-                    log.error("getUrlForStyleSheet(): Error!!! Found multiple stylesheet with url: "+importUrl+" Lacking further instructions. DISCARDING: "+styleSheetFileUrl);
+                    log.error("getUrlForStyleSheet() - Error!!! Found multiple stylesheets with url: {}  Lacking further instructions. DISCARDING: {}", importUrl, styleSheetFileUrl);
                 }
                 Statement s = statements.next();
                 styleSheetFileUrl= s.getObject().stringValue();
                 URI subj = new URIImpl(styleSheetFileUrl);
                 
-                //URI pred = new URIImpl(Terms.isReplacedBy.getUri());
                 URI pred = new URIImpl("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#isReplacedBy");
                 Statement styleSheetIsReplacedby = valueFactory.createStatement(subj,pred,null);
-                log.debug("getUrlForTransformToRdf() looking for statement: "+styleSheetIsReplacedby.toString());
+                log.debug("getUrlForStyleSheet() looking for statement: {}",styleSheetIsReplacedby.toString());
                 if (con.hasStatement(subj, pred, null,  true)){
                     styleSheetFileUrl = null;  
-                    log.info(styleSheetFileUrl + " is replaced! Skip it.");
+                    log.info("getUrlForStyleSheet() - {} is replaced! Skip it.",styleSheetFileUrl);
                 }
-                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + styleSheetFileUrl);
+                log.debug("getUrlForStyleSheet() - Found Transformation file = {}", styleSheetFileUrl);
             }
         }
         catch (RepositoryException e) {
-            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+            log.error("getUrlForStyleSheet() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
         }
         finally {
             if (statements != null) {
                 try {
                     statements.close();
                 } catch (Exception e) {
-                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getUrlForStyleSheet() - Caught an {} Message: {}",e.getClass().getName(), e.getMessage());
                 }
             }
 
         }
-
         return styleSheetFileUrl;
-    } 
+    }
+
+
     /**
      * Setup and initialize a MemoryStore SailRepository. 
      * @return repository - a reference to the repository
@@ -2028,35 +1976,34 @@ public class RepositoryOps {
      */
     private static Repository setupMemoryStoreSailRepository() throws RepositoryException, InterruptedException {
 
-
-
-        
-        log.info("setupMemoryStoreSailRepository(): Configuring Semantic Repository.");
+        log.info("setupMemoryStoreSailRepository() - Configuring Semantic Repository.");
         String workingDir = "./";
         File storageDir = new File(workingDir + "_MemoryStore_"); //define local copy of repository
         MemoryStore memStore = new MemoryStore(storageDir);
         memStore.setPersist(true);
         memStore.setSyncDelay(1000L);
         
-        Repository repository = new SailRepository(memStore); 
-        
-        log.info("setupMemoryStoreSailRepository(): Intializing Semantic Repository.");
+        Repository repository = new SailRepository(memStore);
+        log.info("setupMemoryStoreSailRepository() - Intializing Semantic Repository.");
 
         // Initialize repository
-        repository.initialize(); 
-
-        log.info("setupMemoryStoreSailRepository(): Semantic Repository Ready.");
-
+        repository.initialize();
+        log.info("setupMemoryStoreSailRepository() - Semantic Repository Ready.");
 
         ProcessController.checkState();
-
-
         return repository;
-
     }
-    
-    public static void loadRepositoryFromTrigFile(Repository repo, String rdfFileName) throws InterruptedException, RepositoryException, IOException, RDFParseException {
 
+    /**
+     *
+     * @param repo
+     * @param rdfFileName
+     * @throws InterruptedException
+     * @throws RepositoryException
+     * @throws IOException
+     * @throws RDFParseException
+     */
+    public static void loadRepositoryFromTrigFile(Repository repo, String rdfFileName) throws InterruptedException, RepositoryException, IOException, RDFParseException {
 
         RepositoryConnection con = null;
 
@@ -2071,7 +2018,6 @@ public class RepositoryOps {
                 File rdfFile = new File(rdfFileName);
                 con.add(rdfFile, null, RDFFormat.TRIG);
             }
-            //con.commit();
         }
         finally {
             if (con != null) {
@@ -2079,12 +2025,10 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch (RepositoryException e) {
-                    log.error("loadRepositoryFromTrigFile(): Failed to close repository connection. Msg: " + e.getMessage());
+                    log.error("loadRepositoryFromTrigFile() - Failed to close repository connection. Msg: {}", e.getMessage());
                 }
             }
         }
-
-
     }
 
     

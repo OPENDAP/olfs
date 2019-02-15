@@ -67,7 +67,6 @@ public class BES {
     private BESConfig _config;
     private int totalClients;
     private ReentrantLock _adminLock;
-    // private OPeNDAPClient adminClient;
 
 
     private Document _serverVersionDocument;
@@ -78,8 +77,14 @@ public class BES {
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
     private static final Namespace BES_ADMIN_NS = opendap.namespaces.BES.BES_ADMIN_NS;
 
+    private static final String BES_ADMIN_COMMAND = "BesAdminCmd";
+    private static final String BES_ADMIN_SET_LOG_CONTEXT = "SetLogContext";
+    private static final String BES_ADMIN_GET_CONFIG = "GetConfig";
+    private static final String BES_ADMIN_SET_CONFIG = "SetConfig";
+    private static final String BES_ADMIN_TAIL_LOG = "TailLog";
 
-    public BES(BESConfig config) throws Exception {
+    
+    public BES(BESConfig config) {
         _config = config.copy();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -96,9 +101,8 @@ public class BES {
         _clients = new ConcurrentHashMap<>();
 
 
-        log.debug("BES built with configuration: \n" + _config);
+        log.debug("BES built with configuration:\n{}", _config);
         _serverVersionDocument = null;
-
 
     }
 
@@ -106,9 +110,9 @@ public class BES {
 
 
 
-    public Vector<BesConfigurationModule> getConfigurationModules() throws BesAdminFail {
+    public List<BesConfigurationModule> getConfigurationModules() throws BesAdminFail {
 
-        Vector<BesConfigurationModule> configurationModules = new Vector<BesConfigurationModule>();
+        ArrayList<BesConfigurationModule> configurationModules = new ArrayList<>();
 
         String configString = getConfiguration(null);
 
@@ -205,7 +209,7 @@ public class BES {
 
 
     public TreeMap<String, BesLogger> getBesLoggers() throws BesAdminFail {
-        TreeMap<String, BesLogger> besLoggers = new TreeMap<String, BesLogger>();
+        TreeMap<String, BesLogger> besLoggers = new TreeMap<>();
 
         String getLogContextsCmd = getSimpleBesAdminCommand("GetLogContexts");
 
@@ -240,7 +244,7 @@ public class BES {
 
     public String getLoggerState(String loggerName) throws BesAdminFail {
 
-        TreeMap<String, BesLogger> besLoggers = getBesLoggers();
+        SortedMap<String, BesLogger> besLoggers = getBesLoggers();
 
         BesLogger logger = besLoggers.get(loggerName);
 
@@ -277,9 +281,16 @@ public class BES {
 
     }
 
+
+    /**
+     *
+     * @param loggerName
+     * @param loggerState
+     * @return
+     */
     public String getSetBesLoggersStateCommand(String loggerName, String loggerState) {
-        Element docRoot = new Element("BesAdminCmd", BES_ADMIN_NS);
-        Element cmd = new Element("SetLogContext", BES_ADMIN_NS);
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_SET_LOG_CONTEXT, BES_ADMIN_NS);
 
         cmd.setAttribute("name", loggerName);
         cmd.setAttribute("state", loggerState);
@@ -292,6 +303,10 @@ public class BES {
         return xmlo.outputString(besCmdDoc);
     }
 
+
+    /*********************************************************************
+     * BES LOGGER BEGIN
+     */
     public static class BesLogger {
 
         public BesLogger(String name, boolean enabled) {
@@ -328,6 +343,9 @@ public class BES {
         }
 
     }
+    /*
+     * BES LOGGER END
+     *********************************************************************/
 
 
     public int getBesClientCount() {
@@ -455,111 +473,95 @@ public class BES {
         sb.append(msg).append("\n");
         _clientCheckoutLock.lock();
         try {
-            try {
+            Date startTime = new Date();
 
-                Date startTime = new Date();
+            boolean done = false;
+            msg = "Attempting to acquire all BES clients...";
+            log.info(msg);
+            sb.append(msg).append("\n");
 
-                boolean done = false;
-                msg = "Attempting to acquire all BES clients...";
-                log.info(msg);
-                sb.append(msg).append("\n");
+            while (!done) {
 
-                while (!done) {
+                Collection<OPeNDAPClient> clients = _clients.values();
 
-                    Collection<OPeNDAPClient> clients = _clients.values();
-
-                    boolean allClientsAcquired = true;
-                    for (OPeNDAPClient client : clients) {
-                        boolean inQue = _clientQueue.remove(client);
-                        if (!inQue) {
-                            allClientsAcquired = false;
-                        } else {
-                            msg = "Shutting down client connection '" + client.getID() + "'...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-
-                            try {
-
-                                discardClient(client);
-                                //client.shutdownClient();
-                                msg = "Client connection '" + client.getID() + "'shutdown normally";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-                            } catch (PPTException e) {
-                                msg = "Shutdown FAILED for client connection '" + client.getID() + "'Trying to kill connection.";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-                                client.killClient();
-
-                                msg = "Killed client connection '" + client.getID() + "'.";
-                                log.info(msg);
-                                sb.append(msg).append("\n");
-
-
-                            }
-                            msg = "Removing client connection '" + client.getID() + "' from clients list.";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                            _clients.remove(client.getID());
-                        }
-                    }
-
-                    if (!allClientsAcquired) {
-                        Date endTime = new Date();
-
-                        long elapsedTime = endTime.getTime() - startTime.getTime();
-
-                        if (elapsedTime > timeOut) {
-                            done = true;
-                            msg = "Timeout Has Expired. Shutting down BES NOW...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                        } else {
-                            msg = "Did not acquire all clients. Sleeping...";
-                            log.info(msg);
-                            sb.append(msg).append("\n");
-                            Thread.sleep(timeOut / 3);
-                        }
-
-
+                boolean allClientsAcquired = true;
+                for (OPeNDAPClient client : clients) {
+                    boolean inQue = _clientQueue.remove(client);
+                    if (!inQue) {
+                        allClientsAcquired = false;
                     } else {
-                        done = true;
-
-
-                        msg = "Stopped all BES client connections.";
+                        msg = "Shutting down client connection '" + client.getID() + "'...";
                         log.info(msg);
                         sb.append(msg).append("\n");
 
+                        try {
+
+                            discardClient(client);
+                            msg = "Client connection '" + client.getID() + "'shutdown normally";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                        } catch (PPTException e) {
+                            msg = "Shutdown FAILED for client connection '" + client.getID() + "'Trying to kill connection.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                            client.killClient();
+
+                            msg = "Killed client connection '" + client.getID() + "'.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+
+                        }
+                        msg = "Removing client connection '" + client.getID() + "' from clients list.";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        _clients.remove(client.getID());
+                    }
+                }
+
+                if (!allClientsAcquired) {
+                    Date endTime = new Date();
+
+                    long elapsedTime = endTime.getTime() - startTime.getTime();
+
+                    if (elapsedTime > timeOut) {
+                        done = true;
+                        msg = "Timeout Has Expired. Shutting down BES NOW...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                    } else {
+                        msg = "Did not acquire all clients. Sleeping...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        Thread.sleep(timeOut / 3);
                     }
 
 
+                } else {
+                    done = true;
+                    msg = "Stopped all BES client connections.";
+                    log.info(msg);
+                    sb.append(msg).append("\n");
                 }
-
-                msg = "Stopping BES...";
-                log.info(msg);
-                sb.append(msg).append("\n");
-                besResponse = stopNow();
-                //log.info(besResponse);
-
-
-            } catch (InterruptedException e) {
-
-                sb.append(e.getMessage());
-
-            } finally {
-                msg = "Releasing client checkout lock...";
-                log.info(msg);
-                sb.append(msg).append("\n");
             }
+
+            msg = "Stopping BES...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+            besResponse = stopNow();
+
+        }
+        catch (InterruptedException e) {
+            sb.append(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         finally {
+            sb.append("Releasing client checkout lock...").append("\n");
+            log.info("{}",sb);
             _clientCheckoutLock.unlock();
-
         }
-
-
         return besResponse;
     }
 
@@ -574,9 +576,10 @@ public class BES {
         return executeBesAdminCommand(cmd);
     }
 
+
     public String getGetConfigurationCommand(String moduleName) {
-        Element docRoot = new Element("BesAdminCmd", BES_ADMIN_NS);
-        Element cmd = new Element("GetConfig", BES_ADMIN_NS);
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_GET_CONFIG, BES_ADMIN_NS);
 
         if (moduleName != null)
             cmd.setAttribute("module", moduleName);
@@ -589,9 +592,10 @@ public class BES {
         return xmlo.outputString(besCmdDoc);
     }
 
+
     public String getSetConfigurationCommand(String moduleName, String configuration) {
-        Element docRoot = new Element("BesAdminCmd", BES_ADMIN_NS);
-        Element cmd = new Element("SetConfig", BES_ADMIN_NS);
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_SET_CONFIG, BES_ADMIN_NS);
 
         if (moduleName != null)
             cmd.setAttribute("module", moduleName);
@@ -613,8 +617,8 @@ public class BES {
     }
 
     public String getGetLogCommand(String lines) {
-        Element docRoot = new Element("BesAdminCmd", BES_ADMIN_NS);
-        Element cmd = new Element("TailLog", BES_ADMIN_NS);
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_TAIL_LOG, BES_ADMIN_NS);
 
         if (lines != null)
             cmd.setAttribute("lines", lines);
@@ -630,7 +634,7 @@ public class BES {
 
     public String getSimpleBesAdminCommand(String besCmd) {
 
-        Element docRoot = new Element("BesAdminCmd", BES_ADMIN_NS);
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
         Element cmd = new Element(besCmd, BES_ADMIN_NS);
 
         docRoot.addContent(cmd);
@@ -645,38 +649,30 @@ public class BES {
 
     public Document getVersionDocument() throws BESError, JDOMException, IOException, BadConfigurationException, PPTException {
 
-        // Have we cached it already?
-        if (_serverVersionDocument == null) {
-
-            // Apparently not, so lets lock the resource.
-            _versionDocLock.lock();
-
-            try {
-                // Make sure someone didn't change it when we weren't looking.
-                if (_serverVersionDocument == null) {
-                    // Cache it!
-                    cacheServerVersionDocument();
-                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
-                    log.info("BES Version Document: \n" + xmlo.outputString(_serverVersionDocument));
+        // Lock the resource.
+        _versionDocLock.lock();
+        try {
+            // Have we cached it already?
+            if (_serverVersionDocument == null) {
+                // Nope? Then Cache it!
+                cacheServerVersionDocument();
+                if (log.isInfoEnabled()) {
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    log.info("BES Version Document: \n{}", xmlo.outputString(_serverVersionDocument));
                 }
-            } finally {
-                // Unlock the resource.
-                _versionDocLock.unlock();
+
             }
         }
-        // Return a copy so nobody can break our stuff!
-        if (_serverVersionDocument != null) {
-            return (Document) _serverVersionDocument.clone();
+        finally {
+            // Unlock the resource.
+            _versionDocLock.unlock();
         }
+        // Return a copy so nobody can break our stuff!
+        return (Document) _serverVersionDocument.clone();
 
-        return null;
     }
 
 
-    /**
-     * The name of the BES Exception Element.
-     */
-    private static String BES_ERROR = "BESError";
 
 
     /**
@@ -707,11 +703,10 @@ public class BES {
      * @return true if the request is successful, false if there is a problem fulfilling the request.
      * @throws IOException
      * @throws PPTException
-     * @throws BadConfigurationException
      * @throws JDOMException
      */
     public void  besTransaction(Document request, Document response )
-            throws IOException, PPTException, BadConfigurationException, JDOMException, BESError {
+            throws IOException, PPTException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
 
@@ -719,8 +714,6 @@ public class BES {
         boolean trouble = false;
         Document doc;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
         SAXBuilder sb = new SAXBuilder();
 
         OPeNDAPClient oc = getClient();
@@ -731,19 +724,25 @@ public class BES {
             throw new IOException(msg);
         }
         tweakRequestId(request,oc);
-        log.debug("besTransaction() request document: \n{}-----------\n",showRequest(request));
-        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
+        if(log.isDebugEnabled()) {
+            log.debug("besTransaction() request document: \n{}-----------\n", showRequest(request));
+        }
+        Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
+        if(besCommandLogger.isInfoEnabled()){
+            besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
+        }
 
         Procedure timedProc = Timer.start();
 
-        try {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ByteArrayOutputStream erros = new ByteArrayOutputStream()) {
 
 
-            if(oc.sendRequest(request,baos,erros)){
+            if (oc.sendRequest(request, baos, erros)) {
 
-                log.debug("besTransaction() The BES returned this document:\n{}",baos);
+                log.debug("besTransaction() The BES returned this document:\n{}", baos);
 
-                if(baos.size() != 0){
+                if (baos.size() != 0) {
 
                     doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
 
@@ -761,17 +760,10 @@ public class BES {
                     response.setRootElement(root);
                 }
 
-                return;
-
             } else {
-
-                log.debug("BES returned this ERROR document:\n" +
-                        "-----------\n" + erros + "-----------");
-
+                log.debug("BES returned this ERROR document:\n-----------\n{}-----------", erros);
 
                 BESError besError;
-
-                // log.debug("BESError: \n{}",baos.toString());
                 if (erros.size() != 0) {
 
                     ByteArrayInputStream bais = new ByteArrayInputStream(erros.toByteArray());
@@ -800,7 +792,6 @@ public class BES {
                 int besErrCode = besError.getBesErrorCode();
                 if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
                     trouble = true;
-
                 }
 
                 throw besError;
@@ -813,12 +804,9 @@ public class BES {
             trouble = true;
 
             log.debug("OLFS Encountered a PPT Problem!", e);
-            //e.printStackTrace();
+            String msg = "Problem with OPeNDAPClient. OPeNDAPClient executed " + oc.getCommandCount() + " commands";
 
-            String msg = "Problem with OPeNDAPClient. " +
-                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-
-            log.error("besTransaction() - {}",msg);
+            log.error(msg);
 
             e.setErrorMessage(msg);
             throw e;
@@ -845,68 +833,67 @@ public class BES {
      * @throws PPTException
      */
     public void besTransaction(Document request, OutputStream os)
-            throws BadConfigurationException, IOException, PPTException, BESError {
+            throws IOException, PPTException, BESError {
 
-
-
-        log.debug("besTransaction() - Started.");
+        log.debug("BEGIN");
 
         boolean besTrouble = false;
         OPeNDAPClient oc = getClient();
         if(oc==null){
             String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
                     "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
-            log.error("besTransaction() - {}",msg);
+            log.error(msg);
             throw new IOException(msg);
 
         }
         tweakRequestId(request,oc);
-        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
-        LoggerFactory.getLogger("BesCommandLog").info("BES COMMAND: \n{}----------------------\n",showRequest(request));
+        if(log.isDebugEnabled()) {
+            log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
+        }
+        Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
+        if(besCommandLogger.isInfoEnabled()){
+            besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
+        }
+
 
 
 
         Procedure timedProc = Timer.start();
 
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
-            boolean result = oc.sendRequest(request,os,baos);
+            boolean result = oc.sendRequest(request, os, baos);
             log.debug("besTransaction() - Completed.");
-            if(!result){
+            if (!result) {
 
-                log.debug("BESError: \n{}",baos.toString(HyraxStringEncoding.getCharset().name()));
+                log.debug("BESError: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
                 ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
                 BESError besError = new BESError(bais);
 
-                log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}",besError.getMessage());
+                log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
 
                 int besErrCode = besError.getBesErrorCode();
-                if( besErrCode==BESError.INTERNAL_FATAL_ERROR || besErrCode==BESError.TIME_OUT ){
+                if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
                     besTrouble = true;
                 }
 
                 throw besError;
             }
 
-        }
-        catch (PPTException e) {
+        } catch (PPTException e) {
 
-            // e.printStackTrace();
             besTrouble = true;
-
-            String msg = "Problem encountered with BES connection. Message: '"  + e.getMessage() + "' " +
+            String msg = "Problem encountered with BES connection. Message: '" + e.getMessage() + "' " +
                     "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
 
-            log.error("besGetTransaction() - {}",msg);
-
+            log.error(msg);
             e.setErrorMessage(msg);
-
             throw e;
-        }
-        finally {
+        } finally {
             returnClient(oc, besTrouble);
             Timer.stop(timedProc);
+            log.debug("END");
+
         }
 
     }
@@ -1000,20 +987,14 @@ public class BES {
 
 
     public String trimPrefix(String dataset) {
-
         String trim;
-        if (getPrefix().equals("/"))
+        if (getPrefix().equals("/")) {
             trim = dataset;
-        else
+        }
+        else {
             trim = dataset.substring(getPrefix().length());
-
-        //if (trim.indexOf("/") != 0)
-        //    trim = "/" + trim;
-
-
+        }
         return trim;
-
-
     }
 
 //------------------------------------------------------------------------------
@@ -1036,7 +1017,7 @@ public class BES {
     public OPeNDAPClient getClient()
             throws PPTException {
 
-        OPeNDAPClient besClient = null;
+        OPeNDAPClient besClient=null;
 
         if (_checkOutFlag == null)
             return null;
@@ -1051,22 +1032,18 @@ public class BES {
 
             log.debug("_clientQueue size: '{}'",_clientQueue.size());
 
-            if (_clientQueue.size() == 0) {
-
+            if (_clientQueue.isEmpty()) {
                 besClient = getNewClient();
-
             } else {
 
                 // Get a client from the client pool.
                 besClient = _clientQueue.take();
-                log.debug("getClient() - Retrieved BES Client (id: " + besClient.getID() + ") from Pool.");
-
-                //log.debug("{}",besClient.showConnectionProperties());
+                log.debug("getClient() - Retrieved BES Client (id:{}) from Pool.", besClient.getID());
 
                 // If the bes connection is closed, or the client just is not connected, pitch the client
                 // and make a new one, if you can...
                 if(besClient.isClosed() || !besClient.isConnected()){
-                    log.warn("getClient() - BES Client (id: " + besClient.getID() + ") appears to be dead, discarding...");
+                    log.warn("getClient() - BES Client (id:{}) appears to be dead, discarding...",besClient.getID());
                     discardClient(besClient);
                     besClient = getNewClient();
                 }
@@ -1074,14 +1051,13 @@ public class BES {
 
 
             }
-
-
             return besClient;
 
         } catch (InterruptedException e) {
-            log.error("getClient() - Interrupted!: " + e.getMessage());
+            Thread.currentThread().interrupt();
+            log.error("Whoops! Thread Interrupted!: {}", e.getMessage());
             if (besClient != null) {
-                log.error("getClient() - Attempting to discard BES Client id: " + besClient.getID());
+                log.error("Attempting to discard BES Client (id:{}) ", besClient.getID());
                 discardClient(besClient);
                 _checkOutFlag.release(); // Release the client permit because this client is hosed...
             }
@@ -1098,28 +1074,20 @@ public class BES {
         // Make a new OPeNDAClient to connect to the BES
         OPeNDAPClient besClient = new OPeNDAPClient();
 
-        log.debug("getNewClient() - Made new BES Client. Starting...");
+        log.debug("Made new BES Client. (id:{}) Starting Client.",besClient.getID());
 
         // Start the client by opening the PPT connection to the BES.
         try {
             besClient.startClient(getHost(), getPort(), getTimeout());
-            log.debug("getNewClient() - BES Client started.");
+            log.debug("BES Client started. (id:{})",besClient.getID());
 
         }
         catch (PPTException ppte){
-
             _checkOutFlag.release(); // Release the client permit because this client is hosed...
-
-            StringBuilder msg = new StringBuilder().append("BES Client Failed To Start. ");
-            msg.append("Message: '").append(ppte.getMessage()).append("' ");
-
-
+            String msg ="BES Client Failed To Start. Message: '" + ppte.getMessage()+"' ";
             besClient.setID(new Date().toString() + msg);
-
-            String logMsg = "getNewClient() - " + msg;
-            log.error(logMsg);
-
-            throw new PPTException(msg.toString(),ppte);
+            log.error(msg);
+            throw new PPTException(msg,ppte);
         }
 
 
@@ -1134,7 +1102,7 @@ public class BES {
             _clients.put(clientId, besClient);
             totalClients++;
 
-            log.debug("getNewClient() - BES Client assigned ID : " + besClient.getID());
+            log.debug("New BES Client assigned ID: {}", besClient.getID());
 
         } finally {
             _clientsMapLock.unlock();
@@ -1158,10 +1126,6 @@ public class BES {
 
         if (dapClient == null)
             return;
-
-        //log.debug("returnClient() clientID="+dapClient.getID()+"  discard="+discard);
-
-
         try {
 
             if (discard) {
@@ -1171,10 +1135,7 @@ public class BES {
             }
 
         } catch (PPTException e) {
-
-
-            String msg = "returnClient() *** BES - WARNING! Problem with " +
-                    "OPeNDAPClient, discarding.";
+            String msg = "Problem with OPeNDAPClient, discarding.";
 
             log.error(msg);
             try {
@@ -1198,19 +1159,21 @@ public class BES {
 
         if (_config.getMaxCommands() > 0 && dapClient.getCommandCount() > _config.getMaxCommands()) {
             discardClient(dapClient);
-            log.debug("checkInClient() This instance of OPeNDAPClient (id:" +
-                    dapClient.getID() + ") has " +
-                    "excecuted " + dapClient.getCommandCount() +
-                    " commands which is in excess of the maximum command " +
-                    "limit of " + _config.getMaxCommands() + ", discarding client.");
+            if(log.isDebugEnabled()) {
+                String msg = "checkInClient() This instance of OPeNDAPClient (id:" +
+                        dapClient.getID() + ") has " +
+                        "excecuted " + dapClient.getCommandCount() +
+                        " commands which is in excess of the maximum command " +
+                        "limit of " + _config.getMaxCommands() + ", discarding client.";
+                log.debug(msg);
+            }
 
         } else {
 
             if (_clientQueue.offer(dapClient)) {
-                log.debug("checkInClient() Returned OPeNDAPClient (id:" +
-                        dapClient.getID() + ") to Pool.");
+                log.debug("Returned OPeNDAPClient (id:{}) to Client Pool.", dapClient.getID());
             } else {
-                log.error("checkInClient(): OUCH! OUCH! OUCH! The Pool is " +
+                log.error("OUCH! OUCH! OUCH! The Pool is " +
                         "full and I need to check in a client! This Should " +
                         "NEVER Happen!");
             }
@@ -1226,9 +1189,8 @@ public class BES {
         // removing the client from the _clients Map the client is
         // discarded.
 
-
         if(dapClient != null){
-            log.debug("discardClient() Discarding OPeNDAPClient #" + dapClient.getID());
+            log.debug("Discarding OPeNDAPClient (id:{})", dapClient.getID());
 
             try {
                 _clientsMapLock.lock();
@@ -1237,25 +1199,25 @@ public class BES {
             } finally {
                 _clientsMapLock.unlock();
             }
-
-
             if (dapClient.isRunning()) {
                 shutdownClient(dapClient);
             }
         }
         else {
-            log.error("discardClient() received a null value.");
+            log.error("Received a null valued OPeNDAPClient reference.");
         }
-
     }
 
 
-    private void shutdownClient(OPeNDAPClient oc) throws PPTException {
+    private void shutdownClient(OPeNDAPClient oc)  {
 
-        log.debug("shutdownClient() Shutting down client...");
-        oc.shutdownClient();
-        log.debug("shutdownClient() Client shutdown.");
-
+        try {
+            log.debug("Shutting down client...");
+            oc.shutdownClient();
+            log.debug("Client shutdown.");
+        } catch (PPTException e) {
+            log.error("Failed to shutdown OPeNDAPClient (id:{}) msg: {}",oc.getID(), e.getMessage());
+        }
     }
 
 
@@ -1273,31 +1235,20 @@ public class BES {
             if (_clientCheckoutLock.tryLock(10, TimeUnit.SECONDS)) {
                 gotClientCheckoutLock = true;
 
-                log.debug("destroy() Attempting to acquire all clients...");
+                log.debug("Attempting to acquire all client permits...");
 
 
                 if (_checkOutFlag.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
-                    log.debug("destroy() All "+getMaxClients()+" client permits acquired.");
+                    log.debug("All {} client permits acquired.",getMaxClients());
 
-                    log.debug("destroy() " + _clientQueue.size() +
-                            " client(s) to shutdown.");
+                    log.debug("There are {} client(s) to shutdown.", _clientQueue.size());
 
 
                     int i = 0;
-                    while (_clientQueue.size() > 0) {
+                    while (!_clientQueue.isEmpty()) {
                         OPeNDAPClient odc = _clientQueue.take();
-                        log.debug("destroy() Retrieved OPeNDAPClient["
-                                + i++ + "] (id:" + odc.getID() + ") from queue.");
-
-                        try {
-                            shutdownClient(odc);
-                        } catch (Throwable t) {
-                            log.error("destroy() Failed to shutdown " +
-                                    "OPeNDAPClient (id:" + odc.getID() + ") msg: " +
-                                    t.getMessage(), t);
-                        }
-
-
+                        log.debug("Retrieved OPeNDAPClient[{}] (id:{}) from queue.",i++,odc.getID());
+                        shutdownClient(odc);
                     }
                     _checkOutFlag.release(getMaxClients());
                     nicely = true;
@@ -1305,27 +1256,26 @@ public class BES {
 
 
             }
-        } catch (Throwable e) {
-            log.error("destroy() OUCH! Problem shutting down BESPool", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("OUCH! Interrupted while shutting down BESPool", e);
         } finally {
-            //_checkOutFlag = null;
             if (gotClientCheckoutLock)
                 _clientCheckoutLock.unlock();
         }
 
 
         if (!nicely) {
-            log.debug("destroy() Timed Out. Destroying BES Clients.");
+            log.debug("Timed Out. Destroying BES Clients.");
 
             try {
                 _clientsMapLock.lock();
                 for (OPeNDAPClient oc: _clients.values()) {
                     if (oc != null) {
-                        log.debug("destroy() Killing BES Client (id:" +
-                                oc.getID() + ")");
+                        log.debug("Killing BES Client (id:{})", oc.getID());
                         oc.killClient();
                     } else {
-                        log.error("destroy() Retrieved a 'null' BES Client instance from _clients collection!");
+                        log.error("Retrieved a 'null' BES Client instance from _clients collection!");
 
                     }
 

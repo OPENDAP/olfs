@@ -34,6 +34,10 @@ import org.jdom.Namespace;
  */
 public class NCML {
 
+    /**
+     * This class should never be instantiated.
+     */
+    private NCML(){ throw new IllegalStateException("opendap.namespaces.NCML class"); }
 
     public static final String NAMESPACE_STRING = "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2";
     public static final String NAMESPACE_PREFIX = "ncml";
@@ -41,7 +45,7 @@ public class NCML {
     public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_STRING);
 
     public static final String NETCDF = "netcdf";
-    public static final String AGGREGATION = "catalogRef";
+    public static final String CATALOG_REF = "catalogRef";
     public static final String VARIABLE_AGG = "variableAgg";
     public static final String VARIABLE = "variable";
     public static final String ATTRIBUTE = "attribute";

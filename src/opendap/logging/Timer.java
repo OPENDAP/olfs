@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Timer {
 
-    private static Logger _log = LoggerFactory.getLogger(Timer.class);
+    private static Logger log = LoggerFactory.getLogger(Timer.class);
 
     private static ConcurrentHashMap<String, StringBuilder> threadLogs = new ConcurrentHashMap<>();
 
@@ -85,15 +85,11 @@ public class Timer {
         if(!enabled)
             return null;
 
-
-        //List<Procedure> timedProcedures  = getTimedProcedures();
-
         StringBuilder threadLog = getThreadLog();
 
         String threadName = Thread.currentThread().getName();
 
-
-        StackTraceElement st[] = Thread.currentThread().getStackTrace();
+        StackTraceElement[] st = Thread.currentThread().getStackTrace();
 
         int callingMethodStackIndex = 2;
 
@@ -109,7 +105,7 @@ public class Timer {
 
         threadLog.append("[").append(threadName).append("] ").append(key.toString()).append("  STARTED: ").append(p.start).append("\n");
 
-        _log.info("start() - {} started:  {} ", key.toString(), p.start);
+        log.info("start() - {} started:  {} ", key.toString(), p.start);
 
 
         return p;
@@ -134,7 +130,9 @@ public class Timer {
         sb.append("stop() - ").append(procedure.name).append(" stopped:  ");
         sb.append(procedure.end).append(" (").append(procedure.elapsedTime()).append(" ms)");
 
-        _log.info(sb.toString());
+        if(log.isInfoEnabled()) {
+            log.info(sb.toString());
+        }
 
         StringBuilder threadLog = getThreadLog();
         threadLog.append("[").append(threadName).append("] ").append(procedure.name).append(" STOPPED: ").append(procedure.end);

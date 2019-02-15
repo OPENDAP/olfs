@@ -91,8 +91,6 @@ public class CovJsonDR extends Dap4Responder {
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
-
         MediaType responseMediaType =  getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
@@ -100,7 +98,7 @@ public class CovJsonDR extends Dap4Responder {
 
         response.setContentType(responseMediaType.getMimeType());
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 

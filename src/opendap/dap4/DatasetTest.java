@@ -61,7 +61,7 @@ public class DatasetTest {
 
     private Dataset dataset;
 
-    private Logger _log;
+    private Logger log;
     private boolean _datasetIsNotNull = false;
 
     /**
@@ -71,7 +71,7 @@ public class DatasetTest {
      */
     public DatasetTest(String dmrUrl)
             throws IOException, JDOMException, JAXBException, XMLStreamException {
-        _log = LoggerFactory.getLogger(this.getClass());
+        log = LoggerFactory.getLogger(this.getClass());
         String dmrXml = "";
         JAXBContext jc = JAXBContext.newInstance(Dataset.class);
         Unmarshaller um = jc.createUnmarshaller();
@@ -84,19 +84,20 @@ public class DatasetTest {
             dmrXml = xmlo.outputString(dmrElement);
         } else {
             // not protocol like http or ftp?  then raw hard-wired data from resources directory
-            _log.debug("Current relative path is: " + Paths.get(".").toAbsolutePath().normalize().toString());
-            //TODO: get this from configs
+            String current_path = Paths.get(".").toAbsolutePath().normalize().toString();
+            log.debug("Current relative path is: {}",current_path);
+            // @TODO: get this from configs
             Path file = Paths.get("./resources/WCS/2.0/tests/xml/" + dmrUrl);
             dmrXml = new String(Files.readAllBytes(file), HyraxStringEncoding.getCharset());
         }
-        InputStream is = new ByteArrayInputStream(dmrXml.getBytes("UTF-8"));
-        XMLInputFactory factory = XMLInputFactory.newInstance();
+        InputStream is = new ByteArrayInputStream(dmrXml.getBytes(HyraxStringEncoding.getCharset()));
+        XMLInputFactory factory = opendap.xml.Util.getXmlInputFactory();
         XMLStreamReader xsr = factory.createXMLStreamReader(is);
         XMLReaderWithNamespaceInMyPackageDotInfo xr = new XMLReaderWithNamespaceInMyPackageDotInfo(xsr);
         this.dataset = (Dataset) um.unmarshal(xr);
         if (dataset == null) {
             String msg = "JAXB failed to produce a Dataset from the DMR...aborting all tests";
-            _log.debug(msg);
+            log.debug(msg);
         } else {
             _datasetIsNotNull = true;
         }

@@ -138,10 +138,9 @@ public class ThreddsCatalogUtil {
                     }
                 }
             } catch (InterruptedException e) {
-
                 log.error("recur(): Caught InterruptedException returning with recursion incomplete!");
-
-            }
+				Thread.currentThread().interrupt();
+			}
         }
 		
 		@Override
@@ -156,11 +155,7 @@ public class ThreddsCatalogUtil {
 				recur(child);
 				return child;
 			}
-			catch (EmptyStackException e) {
-				return null;
-			} catch (JDOMException e) {
-                return null;
-            } catch (IOException e) {
+			catch (EmptyStackException | JDOMException | IOException e) {
                 return null;
             }
 

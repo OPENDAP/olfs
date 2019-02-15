@@ -85,17 +85,14 @@ public class GmlJpeg2000 extends Dap4Responder {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-
         String resourceID = getResourceId(requestedResourceId, false);
-
+        User user = new User(request);
 
         BesApi besApi = getBesApi();
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
-
-        Version.setOpendapMimeHeaders(request, response, besApi);
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -104,18 +101,13 @@ public class GmlJpeg2000 extends Dap4Responder {
 
         response.setContentType(responseMediaType.getMimeType());
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
-
         String xdap_accept = "3.2";
-        User user = new User(request);
-
 
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap2DataAsGmlJpeg2000(
                 resourceID,
                 constraintExpression,
@@ -125,11 +117,5 @@ public class GmlJpeg2000 extends Dap4Responder {
 
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
-
-
 }

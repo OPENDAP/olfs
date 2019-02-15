@@ -90,25 +90,18 @@ public class CovJson extends Dap4Responder {
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
-
         MediaType responseMediaType =  getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
-
         response.setContentType(responseMediaType.getMimeType());
-
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-
         User user = new User(request);
 
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap2DataAsCovJson(resourceID, constraintExpression, "3.2", user.getMaxResponseSize(), os);
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
     }
