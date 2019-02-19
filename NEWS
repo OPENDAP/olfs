@@ -1,3 +1,27 @@
+# OLFS Version 1.18.3 (25 February 2019)
+
+- Added a context/request sensitive message to all support email links.
+
+- Added support email links to directory/collection pages in addition to error
+  pages.
+  
+- Decoupled support email configuration from site/server administrator 
+  information.
+
+- Added sitemap generation and an (optional) ROOT.war service that adds a 
+  robots.txt service for said sitemap.
+
+- Enable THREDDS catalog brokering for remote catalogs.
+
+- Corrected the CovJson response Content-Type headers
+
+- Bug Fix: Repaired incompatibilty between IFH REquest forms and CentOS-6
+
+- Bug Fix: Fixed odd port problem with redirect code.
+
+- Bug Fix: Repaired Viewers pages to corectly process encoded URL content.
+
+
 # OLFS Version 1.18.2 (10 December 2018)
 
 ## Features:
