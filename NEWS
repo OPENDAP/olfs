@@ -19,7 +19,7 @@
 
 - Corrected the CovJson response Content-Type headers
 
-- Repaired incompatibilty between IFH REquest forms and CentOS-6
+- Repaired incompatibility between IFH Request forms and CentOS-6
 
 - Fixed odd port problem with redirect code.
 
