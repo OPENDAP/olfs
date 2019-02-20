@@ -87,7 +87,6 @@ public class DatasetHtmlForm extends Dap4Responder {
         String resourceID = getResourceId(relativeUrl, false);
         String xmlBase = getXmlBase(request);
 
-
         BesApi besApi = getBesApi();
 
         log.debug("Sending DAP2 Dataset HTML Form for dataset: " + resourceID);
@@ -97,24 +96,15 @@ public class DatasetHtmlForm extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "DAP2 Data Request Form");
 
-        
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap2DataRequestForm(resourceID, xdap_accept, xmlBase, os);
-
         os.flush();
         log.info("Sent DAP2 Dataset HTML Form page.");
-
-
-
-
     }
-
 }

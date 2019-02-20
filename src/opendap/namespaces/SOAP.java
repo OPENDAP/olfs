@@ -36,6 +36,10 @@ import org.jdom.Namespace;
  * To change this template use File | Settings | File Templates.
  */
 public class SOAP {
+    /**
+     * This class should never be instantiated.
+     */
+    private SOAP(){ throw new IllegalStateException("opendap.namespaces.SOAP class"); }
 
     public static final String    NAMESPACE_STRING = "http://www.w3.org/2003/05/soap-envelope";
     public static final Namespace NS = Namespace.getNamespace("soap",NAMESPACE_STRING);

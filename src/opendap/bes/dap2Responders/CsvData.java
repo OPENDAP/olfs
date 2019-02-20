@@ -78,13 +78,8 @@ public class CsvData extends Dap4Responder {
 
     }
 
-
     public boolean isDataResponder(){ return true; }
     public boolean isMetadataResponder(){ return false; }
-
-
-
-
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -92,7 +87,6 @@ public class CsvData extends Dap4Responder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -104,27 +98,15 @@ public class CsvData extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-
-
         String xdap_accept = "3.2";
-
         User user = new User(request);
 
-
-
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
-
 }

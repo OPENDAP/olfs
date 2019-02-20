@@ -275,26 +275,29 @@
                                     $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
 
                     <table>
-                        <tr>
-                            <td>
-                                <span class="small_italic">ID:</span>
-                            </td>
-                            <td>
-                                <span class="medium_bold" style="padding-left: 5px;">
-                                    <xsl:value-of select="@ID"/>
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="small_italic">name:</span>
-                            </td>
-                            <td>
-                                <span class="medium_bold" style="padding-left: 5px;">
-                                    <xsl:value-of select="@name"/>
-                                </span>
-                            </td>
-                        </tr>
+                        <xsl:if test="$debug">
+                            <tr>
+                                <td>
+                                    <span class="small_italic">ID:</span>
+                                </td>
+                                <td>
+                                    <span class="medium_bold" style="padding-left: 5px;">
+                                        <xsl:value-of select="@ID"/>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="small_italic">name:</span>
+                                </td>
+                                <td>
+                                    <span class="medium_bold" style="padding-left: 5px;">
+                                        <xsl:value-of select="@name"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </xsl:if>
+
                         <xsl:if test="$sizeTest" >
                             <tr>
                                 <td class="small_italic">size:</td>
@@ -305,9 +308,6 @@
                                 </td>
                             </tr>
                         </xsl:if>
-
-
-
 
                         <xsl:if test="$dateTest" >
                             <tr>
@@ -325,18 +325,19 @@
 
                             <xsl:choose>
                                 <xsl:when test="$remoteCatalog" >
-                                    <td class="small_italic">Remote<br/>Catalog:</td>
-                                    <td id="catalog_linky_poo" class="small_bold" style="color: black;padding-left: 5px;"> </td>
-                                    <xsl:element name="script">
-                                        <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                        var catalog_link = document.createElement('a');
-                                        var linkText = document.createTextNode("<xsl:value-of select="$remoteCatalog"/>");
-                                        catalog_link.appendChild(linkText);
-                                        catalog_link.title = "<xsl:value-of select="$remoteCatalog"/>";
-                                        catalog_link.href = "<xsl:value-of select="$remoteCatalog"/>";
-                                        catalog_link.class = "small_bold"
-                                        document.getElementById("catalog_linky_poo").appendChild(catalog_link);
-                                    </xsl:element>
+                                    <td class="small_italic">
+                                        <!-- div title="The origin server's THREDDS catalog where this dataset is located.">
+                                            Remote<br/>Catalog:
+                                        </div -->
+                                    </td>
+                                    <td id="catalog_linky_poo" class="small" style="color: black;padding-left: 5px;">
+                                        <a href="{replace($remoteCatalog, '\.xml$', '.html')}"
+                                           title="The origin server's THREDDS catalog (as HTML) where this dataset is located.">Remote Catalog</a>
+                                        <a href="{$remoteCatalog}"
+                                           title="Source Catalog As XML">(xml)</a>
+                                    </td>
+
+
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <td class="small_italic">Catalog:</td>
@@ -622,7 +623,7 @@
                 $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
                 thredds:access/@serviceName"
             >
-                <h2>Access:</h2>
+                <h2>Data Access:</h2>
             </xsl:when>
             <xsl:otherwise>
                 No serviceName could be found for this dataset.
@@ -664,43 +665,57 @@
             </xsl:choose>
         </xsl:variable>
 
-        <table>
-            <xsl:if test="$debug">
-                <tr>
-                    <td class="small" style="align: right;">myServices:</td>
-                    <td class="small" style="align: left;">
+        <xsl:if test="$debug">
+            <div class="row">
+                <span class="small" style="align: right;">myServices:</span>
+                <span class="small" style="align: left;">
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 <xsl:apply-templates select="$myServices" mode="copy" />
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    </td>
-                </tr>
-                <tr>
-                    <td class="small" style="align: right;">@urlPath:</td>
-                    <td class="small" style="align: left;"><xsl:value-of select="@urlPath"/></td>
-                </tr>
-            </xsl:if>
+                </span>
+            </div>
+            <div class="row">
+                <span class="small" style="align: right;">@urlPath:</span>
+                <span class="small" style="align: left;"><xsl:value-of select="@urlPath"/></span>
+            </div>
+        </xsl:if>
 
-            <xsl:call-template  name="DoBrokerLinks">
-                <xsl:with-param name="currentDataset" select="."/>
-                <xsl:with-param name="services" select="$myServices"/>
-            </xsl:call-template>
+        <xsl:call-template  name="DoBrokerLinks">
+            <xsl:with-param name="currentDataset" select="."/>
+            <xsl:with-param name="services" select="$myServices"/>
+        </xsl:call-template>
 
-            <tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr>
+        <hr size="1" noshade="noshade"/>
 
-            <xsl:apply-templates select="./thredds:access" mode="AccessLinks">
-                <xsl:with-param name="currentDataset" select="."/>
-                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
-            </xsl:apply-templates>
+        <ul class="collapsibleList" style="font-size: 10px;">
+            <li>
+                <div class="tightView">
+                    <span class="small_bold">Native Services</span>
+                    <span>(origin server: <xsl:value-of select="$remoteHost"/>)</span>
+                </div>
+                <ul>
+                    <li>
+                        <xsl:apply-templates select="./thredds:access" mode="AccessLinks">
+                            <xsl:with-param name="currentDataset" select="."/>
+                            <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
+                        </xsl:apply-templates>
 
-            <xsl:if test="boolean(@urlPath)">
-                <xsl:apply-templates select="$myServices" mode="ServiceLinks">
-                    <xsl:with-param name="urlPath" select="@urlPath"/>
-                </xsl:apply-templates>
-            </xsl:if>
+                        <xsl:if test="boolean(@urlPath)">
+                            <xsl:apply-templates select="$myServices" mode="ServiceLinksDiv">
+                                <xsl:with-param name="urlPath" select="@urlPath"/>
+                                <xsl:with-param name="indent" select="0"/>
+                            </xsl:apply-templates>
+                        </xsl:if>
 
-        </table>
+                    </li>
+                </ul>
+
+            </li>
+        </ul>
+
+
         <hr size="1" noshade="noshade" />
 
 
@@ -777,15 +792,15 @@
 
 
 
-    <xsl:template match="*" mode="ServiceLinks" >
+    <xsl:template match="*" mode="ServiceLinksOLDOFF" >
         <xsl:param name="urlPath" />
-        <xsl:apply-templates mode="ServiceLinks" >
+        <xsl:apply-templates mode="ServiceLinksOLDOFF" >
             <xsl:with-param name="urlPath" select="$urlPath"/>
         </xsl:apply-templates>
     </xsl:template>
 
 
-    <xsl:template match="thredds:service" mode="ServiceLinks" >
+    <xsl:template match="thredds:service" mode="ServiceLinksOLDOFF" >
         <xsl:param name="urlPath" />
 
         <xsl:choose>
@@ -795,8 +810,7 @@
                         <div class="small">Compound Service: <xsl:value-of select="./@name" /></div>
                     </td>
                 </tr>
-                <!-- tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr -->
-                <xsl:apply-templates mode="ServiceLinks" >
+                <xsl:apply-templates mode="ServiceLinksOLDOFF" >
                     <xsl:with-param name="urlPath" select="$urlPath"/>
                 </xsl:apply-templates>
             </xsl:when>
@@ -936,6 +950,260 @@
 
     </xsl:template>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <xsl:template match="*" mode="ServiceLinksDiv" >
+        <xsl:param name="urlPath" />
+        <xsl:param name="indent" />
+        <xsl:apply-templates mode="ServiceLinksDiv" >
+            <xsl:with-param name="urlPath" select="$urlPath"/>
+            <xsl:with-param name="indent" select="$indent"/>
+        </xsl:apply-templates>
+    </xsl:template>
+
+
+    <xsl:template match="thredds:service" mode="ServiceLinksDiv" >
+        <xsl:param name="urlPath" />
+        <xsl:param name="indent" />
+
+        <xsl:choose>
+            <xsl:when test="./@serviceType[.='Compound']">
+                <div style="padding-left: {$indent};">
+                    <span class="small_bold"><xsl:value-of select="./@name" /> </span><span class="small">(THREDDS Compound Service)</span>
+                </div>
+                <xsl:apply-templates mode="ServiceLinksDiv" >
+                    <xsl:with-param name="urlPath" select="$urlPath"/>
+                    <xsl:with-param name="indent" select="$indent+$indentIncrement"/>
+                </xsl:apply-templates>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xsl:variable name="resourceUrl" ><xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="./@base"/><xsl:value-of select="$urlPath"/></xsl:variable>
+
+                <xsl:if test="$debug">
+                    <div style="padding-left: {$indent};">
+                        <span class="small">thredds:service() - - - - - - - - - - - resourceUrl:</span>
+                        <span style="padding-left: {$indent};"> <xsl:value-of select="$resourceUrl"/></span>
+                    </div>
+                </xsl:if>
+
+                <div class="row">
+                        <span class="small_bold"
+                              style="margin-left: 10px;">
+                            <xsl:choose>
+
+                                <!-- Check to see if we can build an access URL. -->
+                                <xsl:when test="not($urlPath)">
+                                    No Service Links Available (Missing thredds:dataset/@urlPath or thredds:access/@urlPath) : urlPath: <xsl:value-of
+                                        select="$urlPath"/>
+                                </xsl:when>
+
+
+                                <!--
+
+                                DAP2 Service Links
+
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'opendap', 'i')">
+
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data"
+                                       href="{$resourceUrl}.html">DAP2 Data Request Form</a>
+
+                                    <xsl:if test="not($remoteHost)">
+                                        <a style="padding-right: 3px"  title="RDF representation of the DDX"
+                                           href="{$resourceUrl}.rdf">rdf</a>
+                                    </xsl:if>
+
+                                    <a style="padding-right: 3px" title="The DAP DDX document for this dataset"
+                                       href="{$resourceUrl}.ddx">ddx</a>
+                                    <a style="padding-right: 3px" title="The DAP DDS document for this dataset"
+                                       href="{$resourceUrl}.dds">dds</a>
+                                    <a style="padding-right: 3px" title="The DAP DAS document for this dataset"
+                                       href="{$resourceUrl}.das">das</a>
+                                    <a style="padding-right: 3px" title="Browser accessible informational page regarding this dataset"
+                                       href="{$resourceUrl}.info">info</a>
+                                </xsl:when>
+
+                                <!--
+
+                                DAP4 Service Links
+
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'dap4', 'i')">
+
+                                    <a style="padding-right: 3px" title="Browser accessible form for requesting data"
+                                       href="{$resourceUrl}.dmr.html">DAP4 Data Request Form</a>
+
+                                    <a style="padding-right: 3px" title="The DAP DMR document for this dataset"
+                                       href="{$resourceUrl}.dmr.xml">dmr</a>
+
+                                    <xsl:if test="not($remoteHost)">
+                                        <a style="padding-right: 3px" title="RDF representation of the DMR"
+                                           href="{$resourceUrl}.dmr.rdf">rdf</a>
+                                    </xsl:if>
+
+                                </xsl:when>
+
+                                <!--
+                                WCS Service link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'wcs', 'i')">
+                                    <a title="WCS Service - GetCapabilities Response"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}?service=WCS&amp;request=GetCapabilities" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                WMS Service Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'wms', 'i')">
+                                    <a title="WMS Service - GetCapabilities Response"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}?service=WMS&amp;request=GetCapabilities" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                Produce service URL's for the HTTPServer and File serviceType
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i') or matches(./@serviceType, 'File', 'i')">
+                                    <a title="Complete File Download via HTTP"
+                                       href="{$resourceUrl}" >File Download</a>
+                                </xsl:when>
+
+                                <!--
+                                Netcdfsubset Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'netcdfsubset', 'i')">
+                                    <a title="Netcdfsubset Endpoint - REQUIRES user supplied constraint expression for use!"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+
+                                <!--
+                                NcML Response Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'ncml', 'i')">
+                                    <a title="NcML Dataset Description"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                UDDC Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'uddc', 'i')">
+                                    <a title="UNIDATA Dataset Discovery Conformance Report"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+                                <!--
+                                ISO-19115 Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'iso', 'i')">
+                                    <a title="ISO-19115 Metadata"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+
+                                <!--
+                                CDM Remote Link
+                                -->
+                                <xsl:when test="matches(./@serviceType, 'cdmremote', 'i')">
+                                    <a title="CDMRemote Service Endpoint - REQUIRES user supplied constraint expression for use!"
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:when>
+
+
+                                <!-- #####################################################
+                                  -
+                                  -
+                                  - Here is where you would add code to provide data access
+                                  - for a new service.
+                                  -
+                                  - Simply add a when statement with one or more link items.
+                                  -
+                                  - In this example:
+
+                                        <xsl:when test="./@serviceType[.='YOUR_SERVICE_TYPE']" >
+                                            <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >TEXT_OF_RESPONSE_LINK</a>
+                                        </xsl:when>
+
+                                  - The href is formed to be the minium correct URL for a THREDDS catalog listing:
+                                  -
+                                  -     remoteHost + thredds:service/@base + thredds:dataset/@urlPath
+                                  -
+                                  - Example:
+                                  -
+                                  -    "http://test.opendap.org:8080" + "/opendap/" + "data/nc/fnoc1.nc"
+                                  -
+                                  - This should be how correct data access links can be formed from a THREDDS catalog.
+                                  -
+                                  -->
+
+
+                                <!--
+                                  - No way to map service to a particular set of access URLs, so
+                                  - Give them the basic service link.
+                                  -->
+                                <xsl:otherwise>
+                                    <a title="No Service Description Available."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >
+                                        <xsl:value-of select="./@serviceType"/>
+                                    </a>
+                                </xsl:otherwise>
+
+                            </xsl:choose>
+                        </span>
+
+                    </div>
+                <!-- tr><td><hr size="1" noshade="noshade"/></td><td><hr size="1" noshade="noshade"/></td></tr  -->
+
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- ******************************************************
      -  getBrokerUrl
      -
@@ -1025,218 +1293,231 @@
 
         <!-- Make the link -->
         <tr>
-            <td align="center" style="margin-left: 10px;word-wrap: break-word;width: 20%">
-                <div class="medium_bold">Hyrax Broker</div><div class="xsmall_italic">(If the origin server does not offer
-            a data service that you can utilize, Hyrax may broker the request and return the data in a form that
-                you find more usable).</div>
+            <td align="center" style="margin-left: 10px;width: 20%">
+                <div class="medium_bold"
+                     title="If the origin server does not offer a data service that you can utilize, Hyrax may broker the request and return the data in a form that you find more usable.">
+                    Hyrax Broker
+                </div>
             </td>
-            <td class="small_bold" align="left" style="margin-left: 10px;">
+            <td >
+                <div class="small_bold" align="left" style="margin-left: 10px;">
+                    <table>
+                        <!-- - - - - - - - - - Data Request Forms - - - - - - - - - - -->
+                        <tr>
+                            <td class="small" align="right" style="margin-left: 20px;">
+                                <div title="Data request forms provide a user interface for selecting/subsetting data and choosing a return data format that suits your needs.">
+                                    data request forms
+                                </div>
+                            </td>
+                            <td class="medium_bold" align="left">
 
-                <table>
-                    <!-- - - - - - - - - - Data Request Forms - - - - - - - - - - -->
-                    <tr>
-                        <td class="small" align="right">data request forms</td>
-                        <td class="small_bold" align="left" style="margin-left: 10px;">
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-D2IFH"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 Data Request Form"
+                                   href="TBD">DAP2
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".html";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-D2IFH").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-D4IFH"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP4 Data Request Form"
-                               href="TBD">dap4-form
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".dmr.html";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D4IFH").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-D4IFH"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP4 Data Request Form"
+                                   href="TBD">DAP4
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".dmr.html";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-D4IFH").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
+                            </td>
+                        </tr>
 
+                        <!-- - - - - - - - - - Metadata Responses - - - - - - - - - - -->
+                        <tr>
+                            <td class="small" align="right">
+                                <div title="Metadata responses allow you to see the structure of the dataset as well as the dataset's available semantic metadata.">
+                                    metadata responses
+                                </div>
+                            </td>
+                            <td class="small_bold" align="left" style="margin-left: 10px;">
 
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-D2IFH"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 Data Request Form"
-                               href="TBD">dap2-form
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".html";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-D2IFH").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-DMR"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP4 DMR response"
+                                   href="TBD">dmr
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".dmr.xml";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DMR").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
-                        </td>
-                    </tr>
-
-                    <!-- - - - - - - - - - Metadata Responses - - - - - - - - - - -->
-                    <tr>
-                        <td class="small" align="right">metadata responses</td>
-                        <td class="small_bold" align="left" style="margin-left: 10px;">
-
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DMR"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP4 DMR response"
-                               href="TBD">dmr
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".dmr.xml";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DMR").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
-
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DDS"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 DDS response"
-                               href="TBD">dds
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".dds";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDS").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
-
-
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DAS"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 DAS response"
-                               href="TBD">das
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".das";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAS").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
-
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DDX"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 DDX response"
-                               href="TBD">ddx
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".das";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDX").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-DDS"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 DDS response"
+                                   href="TBD">dds
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".dds";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDS").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
 
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-INFO"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 INFO response"
-                               href="TBD">info
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".info";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-INFO").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-DAS"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 DAS response"
+                                   href="TBD">das
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".das";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAS").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-RDF"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 RDF response"
-                               href="TBD">rdf
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".rdf";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-RDF").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
-
-                        </td>
-                    </tr>
-                    <!-- - - - - - - - - - Data Responses - - - - - - - - - - -->
-                    <tr>
-                        <td class="small" align="right">data responses</td>
-                        <td class="small_bold" align="left" style="margin-left: 10px;">
-
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DAP"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP4 Data (.dap) response"
-                               href="TBD">dap4
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".dap";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAP").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-DDX"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 DDX response"
+                                   href="TBD">ddx
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".das";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DDX").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
 
-                            <!-- Make link object -->
-                            <a id="{$resourceUrl}-DODS"
-                               class="medium-bold"
-                               style="padding-right: 3px;"
-                               title="Broker: DAP2 Data (.dods) response"
-                               href="TBD">dods
-                            </a>
-                            <!-- Set the href value -->
-                            <xsl:element name="script">
-                                <xsl:attribute name="type">text/javascript</xsl:attribute>
-                                ifhLink="<xsl:value-of
-                                    select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
-                                    select="$resourceUrl"/>") + ".dods";
-                                document.getElementById("<xsl:value-of select="$resourceUrl"/>-DODS").setAttribute("href",
-                                ifhLink);
-                            </xsl:element>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-INFO"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 INFO response"
+                                   href="TBD">info
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".info";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-INFO").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
 
-                        </td>
-                    </tr>
-                </table>
+                                <!-- Make link object -->
+                                <a id="{$resourceUrl}-RDF"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 RDF response"
+                                   href="TBD">rdf
+                                </a>
+                                <!-- Set the href value -->
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".rdf";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-RDF").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
+
+                            </td>
+                        </tr>
+                        <!-- - - - - - - - - - Data Responses - - - - - - - - - - -->
+                        <!-- tr>
+                            <td class="small" align="right">data responses</td>
+                            <td class="small_bold" align="left" style="margin-left: 10px;">
+
+                                <a id="{$resourceUrl}-DAP"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP4 Data (.dap) response"
+                                   href="TBD">dap4
+                                </a>
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".dap";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DAP").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
+
+
+                                <a id="{$resourceUrl}-DODS"
+                                   class="medium-bold"
+                                   style="padding-right: 3px;"
+                                   title="Broker: DAP2 Data (.dods) response"
+                                   href="TBD">dap2
+                                </a>
+                                <xsl:element name="script">
+                                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                                    ifhLink="<xsl:value-of
+                                        select="$serviceContext"/>"+"/gateway/"+convertToHex("<xsl:value-of
+                                        select="$resourceUrl"/>") + ".dods";
+                                    document.getElementById("<xsl:value-of select="$resourceUrl"/>-DODS").setAttribute("href",
+                                    ifhLink);
+                                </xsl:element>
+
+                            </td>
+                        </tr -->
+                    </table>
+                </div>
             </td>
         </tr>
-        <xsl:if test="true()"><tr> <td class="small" align="right">Broker Access URL:</td><td><a class="small" align="left" href="{$resourceUrl}"><xsl:value-of select="$resourceUrl"/> </a></td></tr></xsl:if>
+        <xsl:if test="true()">
+            <div class="row">
+                <span class="small" align="right" >Broker Access URL:</span>
+                <span>
+                    <span class="small" style="margin-left: 10px;" align="left" >
+                        <a href="{$resourceUrl}"><xsl:value-of select="$resourceUrl"/> </a>
+                    </span>
+                </span>
+            </div>
+        </xsl:if>
 
         <xsl:if test="$debug">
             <tr>
-                <td class="small">BrokerLinks() - - - END</td>
+                <td class="small" style="margin-left: 10px;">BrokerLinks() - - - END</td>
             </tr>
         </xsl:if>
     </xsl:template>
@@ -1256,7 +1537,7 @@
 
 
 
-    <xsl:template match="thredds:catalogRef" mode="ServiceLinks">
+    <xsl:template match="thredds:catalogRef" mode="ServiceLinksOLDOFF">
         <xsl:param name="indent" />
 
         <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
@@ -1330,6 +1611,90 @@
 
                 </td>
             </tr>
+        </xsl:if>
+
+        <!-- -->
+
+    </xsl:template>
+
+
+
+
+
+    <xsl:template match="thredds:catalogRef" mode="ServiceLinksDiv">
+        <xsl:param name="indent" />
+
+        <xsl:variable name="myIndent" select="$indent+$indentIncrement" />
+
+        <xsl:if test="not($remoteHost)">
+            <div class="row">
+                <span style="align: left; padding-left: {$myIndent}px;" >
+
+                    <!-- If the href ends in .xml, change it to .html
+                         so the link in the presentation points to
+                         another HTML page. -->
+
+                    <xsl:choose>
+
+                        <!-- Does it point towards a remote catalog?. -->
+                        <!-- -->
+                        <xsl:when test="starts-with(@xlink:href,'http://')">
+                            <a>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                                <xsl:choose>
+                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
+                                    <xsl:otherwise>Link</xsl:otherwise>
+                                </xsl:choose>
+                            </a>
+                        </xsl:when>
+                        <!-- -->
+
+                        <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
+                        <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
+                            <!--Then replace that with '.html'   -->
+                            <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:when>
+
+                        <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
+                        <xsl:otherwise>
+                            <a href="{./@xlink:href}" ><xsl:value-of select="./@name"/> /</a>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
+                </span>
+            </div>
+        </xsl:if>
+
+
+        <!-- -->
+
+        <xsl:if test="$remoteHost">
+            <div clss="row">
+                <span style="align: left; padding-left: {$myIndent}px;" >
+
+
+                    <a>
+                        <xsl:choose>
+                            <xsl:when test="starts-with(@xlink:href,'http://')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@xlink:href,'/')">
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteHost"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="$remoteRelativeURL"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:value-of select="./@xlink:title"/>/
+                    </a>
+                    <ul class="small">
+                        <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
+                        <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
+                        <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
+                    </ul>
+
+                </span>
+            </div>
         </xsl:if>
 
         <!-- -->

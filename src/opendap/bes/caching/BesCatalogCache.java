@@ -9,6 +9,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,45 +27,28 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BesCatalogCache implements Runnable{
 
 
-    private static Logger log;
-    static {
-        log = org.slf4j.LoggerFactory.getLogger(BesCatalogCache.class);
-    }
-    private static ReentrantLock lock;
-    static {
-        lock = new ReentrantLock();
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(BesCatalogCache.class);
+    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final ConcurrentHashMap<String,CatalogTransaction> CATALOG_TRANSACTION_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentSkipListSet<CatalogTransaction> MOST_RECENT = new ConcurrentSkipListSet<>();
 
-    private static ConcurrentHashMap<String,CatalogTransaction> catalogTransactionCache;
-    static {
-        catalogTransactionCache = new ConcurrentHashMap<>();
-    }
-
-    private static ConcurrentSkipListSet<CatalogTransaction> mostRecent;
-    static {
-        mostRecent = new ConcurrentSkipListSet<>();
-    }
+    private static final AtomicLong MAX_CACHE_ENTRIES = new AtomicLong(50); // # of entries in cache
+    private static final AtomicLong UPDATE_INTERVAL = new AtomicLong(10); // Update interval in seconds
+    private static final double CACHE_REDUCTION_FACTOR = 0.2; // Amount to reduce cache when purging
 
 
-    private static AtomicLong _maxCacheEntries = new AtomicLong(50); // # of entries in cache
-    private static AtomicLong _updateInterval = new AtomicLong(10); // Update interval in seconds
-    private static double _cache_reduction_factor; // Amount to reduce cache when purging
-
-
-    private static boolean ENABLED=false;
-
-    private static AtomicBoolean halt=new AtomicBoolean(false);
+    private static final AtomicBoolean ENABLED = new AtomicBoolean(false);
+    private static final AtomicBoolean HALT =new AtomicBoolean(false);
 
 
     public BesCatalogCache(long maxEntries, long updateInterval) {
-        if(ENABLED)
+        if(ENABLED.get())
             return;
 
-        _maxCacheEntries.set(maxEntries);
-        _updateInterval.set(updateInterval);
-        _cache_reduction_factor =  0.2;
-        ENABLED = true;
-        log.debug("BesCatalogCache() - CREATED  _maxCacheEntries: {}  _updateInterval: {}", _maxCacheEntries.get(),_updateInterval.get());
+        MAX_CACHE_ENTRIES.set(maxEntries);
+        UPDATE_INTERVAL.set(updateInterval);
+        ENABLED.set(true);
+        LOG.debug("BesCatalogCache() - CREATED  MAX_CACHE_ENTRIES: {}  UPDATE_INTERVAL: {}", MAX_CACHE_ENTRIES.get(), UPDATE_INTERVAL.get());
     }
 
     /**
@@ -75,23 +59,25 @@ public class BesCatalogCache implements Runnable{
      * ensure that the ordering remains correct.
      */
     private static class CatalogTransaction implements Comparable  {
-        private Document _request;
-        private Object _response;
-        long _lastUpdateTime;
-        long _lastAccessedTime;
-        private String _key;
-        private long _serialNumber;
-        private static AtomicLong counter = new AtomicLong(0);
+
+        private static final AtomicLong counter = new AtomicLong(0);
+
+        private Document request;
+        private Object response;
+        long lastUpdateTime;
+        long lastAccessedTime;
+        private String key;
+        private long serialNumber;
 
 
         public CatalogTransaction(String key, Document request, Object response){
-            _key = key;
-            _request = (Document)request.clone();
+            this.key = key;
+            this.request = (Document)request.clone();
 
 
             // Dump the timeout context from the request.
-            List list = _request.getRootElement().getChildren("setContext", BES.BES_NS);
-            Vector<Element> dropList = new Vector<>();
+            List list = this.request.getRootElement().getChildren("setContext", BES.BES_NS);
+            List<Element> dropList = new ArrayList<>();
             for(Object o : list){
                 Element setContextElement = (Element) o;
                 String contextName=setContextElement.getAttributeValue("name");
@@ -105,25 +91,25 @@ public class BesCatalogCache implements Runnable{
 
 
 
-            _response = response;
-            _lastAccessedTime = System.nanoTime();
-            _lastUpdateTime = _lastAccessedTime;
-            _serialNumber = counter.getAndIncrement();
+            this.response = response;
+            lastAccessedTime = System.nanoTime();
+            lastUpdateTime = lastAccessedTime;
+            serialNumber = counter.getAndIncrement();
         }
 
         public Object getResponse(){
-            return _response;
+            return response;
         }
 
         public Document getRequest(){
-            return (Document) _request.clone();
+            return (Document) request.clone();
         }
 
         /**
          * The evaluation is based on the last accessed time (firstly) and the serial number of the
          * CatalogTransaction (secondly). If the last accessed times of two objects are the same
          * (unlikely but possible) then the serial numbers are used to determine the hierarchy/ranking/relation
-         * @param o
+         * @param o object (CatalogTransaction) to be compared
          * @return
          */
         @Override
@@ -134,16 +120,16 @@ public class BesCatalogCache implements Runnable{
             if(this==that)
                 return 0;
 
-            if(this._lastAccessedTime == that._lastAccessedTime){
-                log.warn("compareTo() - Required object serial numbers to differentiate " +
-                        "instances. this: {} that: {}",this._serialNumber, that._serialNumber);
-                return (int) (this._serialNumber - that._serialNumber);
+            if(this.lastAccessedTime == that.lastAccessedTime){
+                LOG.warn("compareTo() - Required object serial numbers to differentiate " +
+                        "instances. this: {} that: {}",this.serialNumber, that.serialNumber);
+                return (int) (this.serialNumber - that.serialNumber);
             }
 
 
             // Why return like this? Because the return value is an integer and the computation produces a long
             // incorrect conversion (over/under flow) could change sign of result.
-            return (this._lastAccessedTime - that._lastAccessedTime)>0?1:-1;
+            return (this.lastAccessedTime - that.lastAccessedTime)>0?1:-1;
 
 
         }
@@ -154,9 +140,9 @@ public class BesCatalogCache implements Runnable{
 
             CatalogTransaction that = (CatalogTransaction)aThat;
 
-            return ( (this._lastAccessedTime == that._lastAccessedTime ) &&
-                     (this._request == that._request)  &&
-                     (this._response == that._response)
+            return ( (this.lastAccessedTime == that.lastAccessedTime) &&
+                     (this.request == that.request)  &&
+                     (this.response == that.response)
 
                    );
 
@@ -164,7 +150,7 @@ public class BesCatalogCache implements Runnable{
 
         @Override public int hashCode() {
             int result = 73;
-            result += _lastAccessedTime + (_request==null?0: _request.hashCode()) + (_response==null?0: _response.hashCode());
+            result += lastAccessedTime + (request ==null?0: request.hashCode()) + (response ==null?0: response.hashCode());
             return result;
         }
 
@@ -179,148 +165,148 @@ public class BesCatalogCache implements Runnable{
     private static void purgeLeastRecentlyAccessed(){
 
 
-        lock.lock();
+        LOCK.lock();
         try {
 
             // Cache not full? Then return...
-            if (catalogTransactionCache.size() < _maxCacheEntries.get())
+            if (CATALOG_TRANSACTION_CACHE.size() < MAX_CACHE_ENTRIES.get())
                 return;
 
-            int dropNum = (int) (_maxCacheEntries.get() * _cache_reduction_factor);
-            log.debug("purgeLeastRecentlyAccessed() - BEGIN  catalogTransactionCache.size(): {}  mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
-            log.debug("purgeLeastRecentlyAccessed() - dropNum: {}",dropNum);
-            log.debug("purgeLeastRecentlyAccessed() - Before purge catalogTransactionCache.size(): {}", catalogTransactionCache.size());
-            log.debug("purgeLeastRecentlyAccessed() - Before purge mostRecent.size(): {}",mostRecent.size());
+            int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
+            LOG.debug("purgeLeastRecentlyAccessed() - BEGIN  CATALOG_TRANSACTION_CACHE.size(): {}  MOST_RECENT.size(): {}", CATALOG_TRANSACTION_CACHE.size(), MOST_RECENT.size());
+            LOG.debug("purgeLeastRecentlyAccessed() - dropNum: {}",dropNum);
+            LOG.debug("purgeLeastRecentlyAccessed() - Before purge CATALOG_TRANSACTION_CACHE.size(): {}", CATALOG_TRANSACTION_CACHE.size());
+            LOG.debug("purgeLeastRecentlyAccessed() - Before purge MOST_RECENT.size(): {}", MOST_RECENT.size());
 
-            Vector<CatalogTransaction> purgeList = new Vector<>(dropNum);
+            List<CatalogTransaction> purgeList = new ArrayList<>(dropNum);
 
-            Iterator<CatalogTransaction> oldestToNewest = mostRecent.iterator();
+            Iterator<CatalogTransaction> oldestToNewest = MOST_RECENT.iterator();
             for(int i=0; i<dropNum && oldestToNewest.hasNext(); i++ ){
                 CatalogTransaction co = oldestToNewest.next();
                 purgeList.add(co);
-                log.debug("purgeLeastRecentlyAccessed() - Purging CatalogTransaction for key {}",co._key);
-                catalogTransactionCache.remove(co._key);
+                LOG.debug("purgeLeastRecentlyAccessed() - Purging CatalogTransaction for key {}",co.key);
+                CATALOG_TRANSACTION_CACHE.remove(co.key);
             }
-            mostRecent.removeAll(purgeList);
-            log.debug("purgeLeastRecentlyAccessed() - After purge catalogTransactionCache.size(): {}", catalogTransactionCache.size());
-            log.debug("purgeLeastRecentlyAccessed() - After purge mostRecent.size(): {}",mostRecent.size());
-            log.debug("purgeLeastRecentlyAccessed() - END");
+            MOST_RECENT.removeAll(purgeList);
+            LOG.debug("purgeLeastRecentlyAccessed() - After purge CATALOG_TRANSACTION_CACHE.size(): {}", CATALOG_TRANSACTION_CACHE.size());
+            LOG.debug("purgeLeastRecentlyAccessed() - After purge MOST_RECENT.size(): {}", MOST_RECENT.size());
+            LOG.debug("purgeLeastRecentlyAccessed() - END");
 
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
 
     }
 
     /**
-     * Updates the mostRecent list by dropping the passed CatalogTransaction from the mostRecent list, updating
-     * the CatalogTransaction's access time and then adding the updated CatalogTransaction back to the mostRecent list.
+     * Updates the MOST_RECENT list by dropping the passed CatalogTransaction from the MOST_RECENT list, updating
+     * the CatalogTransaction's access time and then adding the updated CatalogTransaction back to the MOST_RECENT list.
      * @param cct The CatalogTransaction whose access time needs updating.
      */
     private static  void updateMostRecentlyAccessed(CatalogTransaction cct){
 
-        lock.lock();
+        LOCK.lock();
         try {
-            log.debug("updateMostRecentlyAccessed() - Updating mostRecent list.  mostRecent.size(): {}", mostRecent.size());
-            if (mostRecent.contains(cct)) {
-                log.debug("updateMostRecentlyAccessed() - mostRecent list contains CatalogTransaction. Will drop.");
-                mostRecent.remove(cct);
+            LOG.debug("updateMostRecentlyAccessed() - Updating MOST_RECENT list.  MOST_RECENT.size(): {}", MOST_RECENT.size());
+            if (MOST_RECENT.contains(cct)) {
+                LOG.debug("updateMostRecentlyAccessed() - MOST_RECENT list contains CatalogTransaction. Will drop.");
+                MOST_RECENT.remove(cct);
             }
-            cct._lastAccessedTime = System.nanoTime();
+            cct.lastAccessedTime = System.nanoTime();
 
-            boolean status = mostRecent.add(cct);
+            boolean status = MOST_RECENT.add(cct);
             if (status) {
-                log.debug("updateMostRecentlyAccessed() - mostRecent list successfully added updated CatalogTransaction.");
+                LOG.debug("updateMostRecentlyAccessed() - MOST_RECENT list successfully added updated CatalogTransaction.");
 
             } else {
-                log.debug("updateMostRecentlyAccessed() - mostRecent list FAIL to add updated CatalogTransaction as it" +
-                        " appears to be already in the mostRecent collection.");
+                LOG.debug("updateMostRecentlyAccessed() - MOST_RECENT list FAIL to add updated CatalogTransaction as it" +
+                        " appears to be already in the MOST_RECENT collection.");
 
             }
-            log.debug("updateMostRecentlyAccessed() - mostRecent list updated.  mostRecent.size(): {}", mostRecent.size());
+            LOG.debug("updateMostRecentlyAccessed() - MOST_RECENT list updated.  MOST_RECENT.size(): {}", MOST_RECENT.size());
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
 
     }
 
     public static void putCatalogTransaction(String key, Document request, Object response) {
 
-        if(!ENABLED)
+        if(!ENABLED.get())
             return;
 
 
 
-        lock.lock();
+        LOCK.lock();
         try {
-            log.debug("putCatalogTransaction() - BEGIN  catalogTransactionCache.size(): {}  " +
-                    "mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
+            LOG.debug("putCatalogTransaction() - BEGIN  CATALOG_TRANSACTION_CACHE.size(): {}  " +
+                    "MOST_RECENT.size(): {}", CATALOG_TRANSACTION_CACHE.size(), MOST_RECENT.size());
 
             purgeLeastRecentlyAccessed();
 
             CatalogTransaction co = new CatalogTransaction(key, request, response);
-            log.debug("putCatalogTransaction() - CatalogTransaction created: {}", co._lastAccessedTime);
+            LOG.debug("putCatalogTransaction() - CatalogTransaction created: {}", co.lastAccessedTime);
 
-            boolean success = mostRecent.add(co);
+            boolean success = MOST_RECENT.add(co);
             if (!success) {
-                log.warn("putCatalogTransaction() - CatalogTransaction cache mostRecent list " +
+                LOG.warn("putCatalogTransaction() - CatalogTransaction cache MOST_RECENT list " +
                         "ALREADY contained CatalogTransaction {} for key: \"{}\"", co, key);
             }
 
-            CatalogTransaction previous = catalogTransactionCache.put(key, co);
+            CatalogTransaction previous = CATALOG_TRANSACTION_CACHE.put(key, co);
             if (co != previous) {
-                log.warn("putCatalogTransaction() - CatalogTransaction cache updated with new object for key: \"{}\"",key);
+                LOG.warn("putCatalogTransaction() - CatalogTransaction cache updated with new object for key: \"{}\"",key);
             } else {
-                log.debug("putCatalogTransaction() - CatalogTransaction cache updated by adding " +
+                LOG.debug("putCatalogTransaction() - CatalogTransaction cache updated by adding " +
                         "new object to cache using key \"{}\"",key);
             }
 
-            log.debug("putCatalogTransaction() - END  catalogTransactionCache.size(): {}  " +
-                    "mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
+            LOG.debug("putCatalogTransaction() - END  CATALOG_TRANSACTION_CACHE.size(): {}  " +
+                    "MOST_RECENT.size(): {}", CATALOG_TRANSACTION_CACHE.size(), MOST_RECENT.size());
 
         } finally {
-            lock.unlock();
+            LOCK.unlock();
         }
     }
 
-    public static int getCurrentCacheSize(){
-        lock.lock();
+    private static int getCurrentCacheSize(){
+        LOCK.lock();
         try {
-            return mostRecent.size();
+            return MOST_RECENT.size();
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
     }
 
     public static Object getCatalog(String key){
-        if(!ENABLED)
+        if(!ENABLED.get())
             return null;
 
-        lock.lock();
+        LOCK.lock();
         try {
-            log.debug("getCatalog() - BEGIN  catalogTransactionCache.size(): {}  mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
+            LOG.debug("BEGIN  CATALOG_TRANSACTION_CACHE.size(): {}  MOST_RECENT.size(): {}", CATALOG_TRANSACTION_CACHE.size(), MOST_RECENT.size());
 
             if(key==null)
                 return null;
-            CatalogTransaction co = catalogTransactionCache.get(key);
+            CatalogTransaction co = CATALOG_TRANSACTION_CACHE.get(key);
 
             if(co!=null) {
-                log.debug("getCatalog() - Found CatalogTransaction for key \""+ key+"\"");
+                LOG.debug("Found CatalogTransaction for key \"{}\"",key);
                 updateMostRecentlyAccessed(co);
                 return co.getResponse();
             }
             else {
-                log.debug("getCatalog() - No CatalogTransaction cached for key \""+ key+"\"");
+                LOG.debug("No CatalogTransaction cached for key \"{}\"",key);
             }
 
-            log.debug("getCatalog() - END  catalogTransactionCache.size(): {}  mostRecent.size(): {}", catalogTransactionCache.size(),mostRecent.size());
+            LOG.debug("END  CATALOG_TRANSACTION_CACHE.size(): {}  MOST_RECENT.size(): {}", CATALOG_TRANSACTION_CACHE.size(), MOST_RECENT.size());
 
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
 
 
@@ -333,7 +319,6 @@ public class BesCatalogCache implements Runnable{
         Document response;
         Element e;
 
-        id="foo";
         request = new Document();
         e=new Element("request");
         e.setAttribute("id",id);
@@ -350,10 +335,9 @@ public class BesCatalogCache implements Runnable{
 
     private static void updateCatalogTransaction(String resourceId)
             throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
-        String logPrefix = "updateCatalogTransaction() - ";
-        log.info(logPrefix + "Updating \"{}\"",resourceId);
+        LOG.info("Updating \"{}\"",resourceId);
 
-        CatalogTransaction cTransaction = catalogTransactionCache.get(resourceId);
+        CatalogTransaction cTransaction = CATALOG_TRANSACTION_CACHE.get(resourceId);
 
         if(cTransaction!=null) {
 
@@ -361,168 +345,147 @@ public class BesCatalogCache implements Runnable{
             try {
                 Document response = new Document();
                 besApi.besTransaction(resourceId, cTransaction.getRequest(), response);
-                cTransaction._response = response.clone();
+                cTransaction.response = response.clone();
             } catch (BESError be) {
-                log.info(logPrefix + "The showCatalog returned a BESError for id: \"" + resourceId +
-                        "\"  CACHING. (responseCacheKey=\"" + resourceId + "\")");
-                cTransaction._response = be;
+                LOG.info("The showCatalog returned a BESError for id: \"{}\" CACHING Error. (responseCacheKey=\"{}\")",resourceId,resourceId);
+                cTransaction.response = be;
             }
-            cTransaction._lastUpdateTime = System.nanoTime();
-            log.info(logPrefix + "Finished updating \"{}\"",resourceId);
+            cTransaction.lastUpdateTime = System.nanoTime();
+            LOG.info("Finished updating \"{}\"",resourceId);
         }
         else {
-            log.info(logPrefix + "Nothing to update! The CatalogTransaction " +
-                    "for resource \"{}\" is not cached.",resourceId);
+            LOG.info("Nothing to update! The CatalogTransaction for resource \"{}\" is not cached.",resourceId);
 
         }
     }
 
-
-
-    public static void main(String args[]) {
-
-
-
-        TreeSet<CatalogTransaction> set = new TreeSet<>();
-
-        CatalogTransaction co, a1;
-
-
-
-        co = getDummyCachedCatalogTransaction("foo");
-        set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime+" set.size(): "+set.size());
-        a1 = co;
-
-        co = getDummyCachedCatalogTransaction("bar");
-        set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
-
-        co = getDummyCachedCatalogTransaction("moo");
-        set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
-
-        co = getDummyCachedCatalogTransaction("soo");
-        set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
-
-        co = getDummyCachedCatalogTransaction("boo");
-        set.add(co);
-        System.out.println("key: "+co._key+" co.getTime(): "+co._lastAccessedTime +" set.size(): "+set.size());
-
-
-        System.out.println("List: ");
-        for(CatalogTransaction cco: set){
-            System.out.println(cco._key+": "+cco._lastAccessedTime );
-        }
-
-        set.remove(a1);
-        a1._lastAccessedTime = System.nanoTime();
-        set.add(a1);
-
-        System.out.println("List: ");
-        for(CatalogTransaction cco: set){
-            System.out.println(cco._key+": "+cco._lastAccessedTime );
-        }
-
-
-
-    }
     @Override
     public void run() {
 
-        if(!ENABLED)
+        if(!ENABLED.get())
             return;
 
         Thread thread = Thread.currentThread();
         boolean interrupted = false;
 
-        log.info("run(): ************* CATALOG UPDATE THREAD.("+thread.getName()+") HAS BEEN STARTED.");
+        LOG.info("************* CATALOG UPDATE THREAD.({}) HAS BEEN STARTED.",thread.getName());
 
         long updateCounter = 0;
-        while (!interrupted && !halt.get()) {
-
+        while (!interrupted && !HALT.get()) {
+            long startTime;
+            long endTime;
+            long elapsedTime;
             try {
 
-                long startTime = new Date().getTime();
-                try {
-                    update();
-                }
-                catch (InterruptedException e) {
-                    log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
-                            "  Message: " + e.getMessage());
-                    interrupted = true;
-                }
-                catch (BadConfigurationException | PPTException | IOException | JDOMException e) {
-                    log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
-                            "  Message: " + e.getMessage());
-                    halt.set(true);
-                }
+                startTime = new Date().getTime();
+                update();
+                endTime = new Date().getTime();
 
-                long endTime = new Date().getTime();
-                long elapsedTime = (endTime - startTime);
+                elapsedTime = (endTime - startTime);
                 updateCounter++;
-                log.info("run(): Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
 
-                long sleepTime = _updateInterval.get() - elapsedTime;
-                if (!halt.get() && sleepTime > 0) {
+                LOG.info("Completed catalog update {} in {} seconds.", updateCounter, elapsedTime / 1000.0);
+
+                long sleepTime = UPDATE_INTERVAL.get() - elapsedTime;
+                if (!HALT.get() && sleepTime > 0) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("run(): ").append(thread.getName()).append(" sleeping for ").append(sleepTime/1000.0);
-                    sb.append(" cache: ").append(getCurrentCacheSize()).append("/").append(_maxCacheEntries.get());
-                    log.info(sb.toString());
+                    sb.append(thread.getName()).append(" sleeping for ").append(sleepTime/1000.0);
+                    sb.append(" cache: ").append(getCurrentCacheSize()).append("/").append(MAX_CACHE_ENTRIES.get());
+                    LOG.info("{}",sb);
                     Thread.sleep(sleepTime);
                 }
 
-            } catch (InterruptedException e) {
-                log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
+            } catch (BadConfigurationException | PPTException | IOException | JDOMException e) {
+                LOG.error("Catalog Update FAILED!!! Caught {} Message: {}", e.getClass().getName(), e.getMessage());
+                HALT.set(true);
+            }
+            catch (InterruptedException e) {
+                LOG.warn("run(): {} caught InterruptedException. Stopping...", thread.getName());
                 interrupted=true;
-                halt.set(true);
-
+                HALT.set(true);
+                LOG.info("run(): ************* CATALOG UPDATE THREAD.({}) IS EXITING.", Thread.currentThread().getName());
+                Thread.currentThread().interrupt();
             }
         }
 
-        log.info("run(): ************* CATALOG UPDATE THREAD.("+Thread.currentThread().getName()+") IS EXITING.");
 
     }
 
     private void update() throws JDOMException, BadConfigurationException, PPTException, IOException, InterruptedException {
-        lock.lock();
+        LOCK.lock();
         try {
-            Map<String,CatalogTransaction> map = catalogTransactionCache;
-            for (String resourceId : map.keySet()) {
+            for (String resourceId : CATALOG_TRANSACTION_CACHE.keySet()) {
                 updateCatalogTransaction(resourceId);
-                if(halt.get())
+                if(HALT.get())
                     return;
             }
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
-
     }
+
 
 
     public void destroy(){
 
-        lock.lock();
+        LOCK.lock();
         try {
-
-            halt.set(true);
-
-            catalogTransactionCache.clear();
-            catalogTransactionCache = null;
-
-            mostRecent.clear();
-            mostRecent = null;
+            HALT.set(true);
+            CATALOG_TRANSACTION_CACHE.clear();
+            MOST_RECENT.clear();
         }
         finally {
-            lock.unlock();
+            LOCK.unlock();
         }
 
     }
 
     public void halt(){
-        halt.set(true);
+        HALT.set(true);
+    }
+
+
+
+
+    public static void main(String[] args) {
+
+        Logger log = LoggerFactory.getLogger(BesCatalogCache.class);
+
+        TreeSet<CatalogTransaction> set = new TreeSet<>();
+
+        String[] testKeys = {"foo", "bar", "moo", "soo", "bar", "baz"};
+
+        CatalogTransaction co;
+        CatalogTransaction first = null;
+        String msgFormat = "key: %s co.getTime(): %d set.size(): %d";
+        String msg;
+
+        for(String key: testKeys){
+            co = getDummyCachedCatalogTransaction(key);
+            set.add(co);
+            msg = String.format(msgFormat,co.key,co.lastAccessedTime,set.size());
+            log.info(msg);
+            if(first==null)
+                first = co;
+        }
+
+        log.info("Original List: ");
+        for(CatalogTransaction cco: set){
+            log.info("{}: {}",cco.key,cco.lastAccessedTime);
+        }
+
+        if(first!=null) {
+            set.remove(first);
+            first.lastAccessedTime = System.nanoTime();
+            set.add(first);
+        }
+
+        log.info("List after remove and replace: ");
+        for(CatalogTransaction cco: set){
+            log.info("{}: {}",cco.key,cco.lastAccessedTime);
+        }
+
     }
 
 }

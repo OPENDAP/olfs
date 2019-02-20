@@ -26,48 +26,54 @@
 
 package opendap;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.spi.FileSystemProvider;
 
 /**
  * Created by ndp on 4/21/15.
  */
 public class PathBuilder  {
 
-    private Logger _log;
+    private static final String DEFAULT_SYSTEM_SEPARATOR = FileSystems.getDefault().getSeparator();
 
-    private StringBuilder _sb;
+
+    private StringBuilder sb;
 
     public PathBuilder(){
-        _log = LoggerFactory.getLogger(this.getClass());
-        _sb = new StringBuilder();
+        sb = new StringBuilder();
     }
 
     public PathBuilder(String s){
         this();
-        _sb.append(s);
+        sb.append(s);
     }
 
     public PathBuilder(CharSequence cs){
         this();
-        _sb.append(cs);
+        sb.append(cs);
     }
 
     public PathBuilder pathAppend(String s){
         if(s==null || s.length()==0)
             return this;
 
-        while (_sb.length()!=0 && (s.startsWith("/") && s.length() > 0)) {
+        while (sb.length()!=0 && s.length() > 0 && (s.startsWith("/") )) {
             s = s.substring(1);
         }
-        //_log.debug("pathAppend: _sb: '{}' s: '{}'",_sb.toString(),s);
-        //_log.debug("pathAppend: _sb.lastIndexOf(\"/\"): '{}' _sb.length(): '{}'",_sb.lastIndexOf("/"),_sb.length());
-        if (_sb.length()==0 || (_sb.lastIndexOf("/") == _sb.length()-1)) {
-            _sb.append(s);
+        if (sb.length()==0 || (sb.lastIndexOf("/") == sb.length()-1)) {
+            sb.append(s);
         } else {
-            _sb.append("/").append(s);
+            sb.append("/").append(s);
         }
-        _log.info("pathAppend: result _sb: ",_sb.toString());
         return this;
     }
 
@@ -110,55 +116,112 @@ public class PathBuilder  {
 
 
     public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator) {
-        try {
-            return normalizePath(rawPath, leadingSeparator, trailingSeparator, "/");
-        }
-        catch (Exception e){
-            return "/";
-        }
+        return normalizePath(rawPath, leadingSeparator, trailingSeparator, "/");
     }
 
-    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator, String separator) throws Exception {
+    public static String normalizePath(String rawPath, boolean leadingSeparator, boolean trailingSeparator, String separator) {
 
         if(separator.length()>1)
-            throw new Exception("The path separator character may only have a single character, not "+separator.length());
+            throw new IllegalArgumentException("The path separator '"+separator+
+                    "' string may only have a single character, not "+separator.length()+".");
+
         String doubleSeparator = separator+separator;
         String path = rawPath.replace(doubleSeparator,separator);
+
         if(path.isEmpty())
             path = separator;
 
-        if(path!=separator){
-            if(leadingSeparator && !path.startsWith(separator)){
-                path = separator + path;
-            }
-            else {
-                if(path.startsWith(separator))
-                    path =  path.substring(1);
-            }
+        if(path.equals(separator))
+            return path;
 
-            if(trailingSeparator && !path.endsWith(separator)){
-                path += separator;
-            }
-            else {
-                if(path.endsWith(separator))
-                    path =  path.substring(0,path.length()-1);
-            }
+        if(leadingSeparator && !path.startsWith(separator)){
+            path = separator + path;
         }
+        else {
+            if(path.startsWith(separator))
+                path = path.substring(1);
+        }
+
+        if(trailingSeparator && !path.endsWith(separator)){
+            path += separator;
+        }
+        else {
+            if(path.endsWith(separator))
+                path =  path.substring(0,path.length()-1);
+        }
+
         return path;
     }
 
 
 
     public PathBuilder append(String s){
-        _sb.append(s);
+        sb.append(s);
         return this;
     }
 
     @Override
     public String toString(){
-        return _sb.toString();
+        return sb.toString();
     }
 
+
+
+    public static void main(String[] args) throws URISyntaxException, MalformedURLException {
+
+        Logger log = LoggerFactory.getLogger("MAIN");
+        String urlString = "http://test.opendap.org/";
+        String getMsg = "Paths.get(more): {}";
+        String uriMsg = "Path.toUri(): {}";
+        String absoMsg = "Path.isAbsolute(): {}";
+        String rootMsg = "Paths.get(\"{}\").getRoot(): {}";
+
+        URL url = new URL(urlString);
+
+        log.info("URL: {}",url);
+        log.info("URI: {}",url.toURI());
+
+        Path path = Paths.get("/opendap/","/data/","nc","fnoc1.nc");
+        log.info(getMsg,path);
+        log.info(uriMsg,path.toUri());
+        log.info(absoMsg,path.isAbsolute());
+        url = new URL(url,path.toString());
+        log.info("new URL(url,path.toString()): {}",url);
+
+
+        String s = "this/is///a//bogus////path//to/normalize";
+        path = Paths.get(s);
+        log.info(getMsg,path);
+        log.info(uriMsg,path.toUri());
+        log.info(absoMsg,path.isAbsolute());
+
+        s = "this/is/\\//a//bogus\\//\\///\\/\\/path//to/normalize";
+        path = Paths.get(s);
+        log.info(getMsg,path);
+        log.info(uriMsg,path.toUri());
+        log.info(absoMsg,path.isAbsolute());
+
+        s = "/etc/olfs/olfs.xml";
+        path = Paths.get(s);
+        log.info(getMsg,path);
+        log.info(uriMsg,path.toUri());
+        log.info(absoMsg,path.isAbsolute());
+
+        log.info("DEFAULT_SYSTEM_SEPARATOR: {}", DEFAULT_SYSTEM_SEPARATOR);
+
+        s = "/etc/olfs/olfs.xml";
+        log.info(rootMsg,s, Paths.get(s).getRoot());
+
+        s = "etc/olfs/olfs.xml";
+        log.info(rootMsg,s, Paths.get(s).getRoot());
+
+        for(FileSystemProvider fsp: FileSystemProvider.installedProviders()){
+            log.info("FileSystemProvider.getScheme(): {}",fsp.getScheme());
+        }
+
+
+
+    }
 
 
 

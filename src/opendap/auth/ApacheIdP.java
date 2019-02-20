@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.coreServlet.OPeNDAPException;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +101,7 @@ public class ApacheIdP extends IdProvider {
      * @throws Exception
      */
     @Override
-    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         /**
          * Redirect the user back to the their original requested resource.
@@ -120,11 +121,12 @@ public class ApacheIdP extends IdProvider {
                     );
 
             _log.error("doLogin() - OUCH! {}",msg.toString());
+            OPeNDAPException.setCachedErrorMessage(msg.toString());
             throw new ConfigurationException(msg.toString());
         }
         else {
             // We have a user - so let's make sure they have a profile,
-            // and then we just try to bounce them back to IdFilter.ORIGINAL_REQUEST_URL
+            // and then we just try to bounce them back to IdFilter.RETURN_TO_URL
 
             _log.info("doLogin() - User has uid: {}", uid);
             /*
@@ -140,7 +142,7 @@ public class ApacheIdP extends IdProvider {
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
             */
-            redirectUrl = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){
             redirectUrl = request.getContextPath();
@@ -163,7 +165,7 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            String returnToUrl =  (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
+            String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(returnToUrl!=null)
                 redirectUrl =returnToUrl;
             session.invalidate();

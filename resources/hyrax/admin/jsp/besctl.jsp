@@ -32,7 +32,7 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.Vector" %>
+<%@ page import="java.util.List" %>
 <%@ page import="opendap.coreServlet.RequestCache" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="org.slf4j.Logger" %>
@@ -484,7 +484,7 @@
      */
 } else if (currentBesTask.equals("config")) {
 
-        Vector<BesConfigurationModule> configurationModules =  null;;
+        List<BesConfigurationModule> configurationModules =  null;;
         BesConfigurationModule currentModule = null;
         boolean besFail = false;
         try {

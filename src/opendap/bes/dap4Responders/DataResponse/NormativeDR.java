@@ -115,9 +115,7 @@ public class NormativeDR extends Dap4Responder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
         String resourceID = getResourceId(relativeUrl, false);
-
         QueryParameters qp = new  QueryParameters(request);
-
 
         BesApi besApi = getBesApi();
 
@@ -129,7 +127,7 @@ public class NormativeDR extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -137,17 +135,13 @@ public class NormativeDR extends Dap4Responder {
         String contentDisposition = " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
         MimeBoundary mb = new MimeBoundary();
         String startID = mb.newContentID();
 
         User user = new User(request);
 
-
-
         OutputStream os;
         ByteArrayOutputStream srr = null;
-
         if(qp.isStoreResultRequest()){
             srr = new ByteArrayOutputStream();
             os = srr;
@@ -155,10 +149,6 @@ public class NormativeDR extends Dap4Responder {
         else {
             os = response.getOutputStream();
         }
-
-
-
-
         besApi.writeDap4Data(
                 resourceID,
                 qp,
@@ -167,27 +157,17 @@ public class NormativeDR extends Dap4Responder {
                 startID,
                 mb.getBoundary(),
                 os);
-
-
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }
-
         os.flush();
-
         log.info("Sent {}.",getServiceTitle());
-
-
-
-
     }
 
 
     public void handleStoreResultResponse(ByteArrayOutputStream besResponse,  HttpServletResponse resp) throws IOException {
 
-
         ServletOutputStream sos = resp.getOutputStream();
-
         SAXBuilder sb = new SAXBuilder();
         Document doc;
         try {
@@ -220,14 +200,9 @@ public class NormativeDR extends Dap4Responder {
         else if(status.equalsIgnoreCase("rejected")){
             resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
         }
-
         sos.write(besResponse.toByteArray());
         sos.flush();
 
-
     }
-
-
-
 
 }

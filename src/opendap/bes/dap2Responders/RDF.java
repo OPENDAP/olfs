@@ -92,11 +92,7 @@ public class RDF extends Dap4Responder {
 
         log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + resourceID);
 
-
-
         BesApi besApi = getBesApi();
-
-
 
         // Set the response headers
 
@@ -111,11 +107,8 @@ public class RDF extends Dap4Responder {
         response.setContentType(responseMediaType.getMimeType());
 
 
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
-
-        // response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
-
 
         String xdap_accept = "3.2";
 
@@ -149,18 +142,14 @@ public class RDF extends Dap4Responder {
         String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
         Transformer xml2rdf = new Transformer(proc, xml2rdfFileName);
 
-
         // set the destination of the 1st transform to be the 2nd transform
         addRdfId2DdxTransform.setDestination(xml2rdf);
 
         // Set the destination of the 2nd transform to be the response OutputStream
         xml2rdf.setOutputStream(os);
 
-
-
         // run the 1st transform. This will send the result through the 2nd transform and
         // the result of the 2nd transform will then be sent out the response OutputStream
-
 
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
@@ -168,12 +157,7 @@ public class RDF extends Dap4Responder {
             sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
-
-
         log.info("Sent RDF version of DDX.");
-
-
-
     }
 
 

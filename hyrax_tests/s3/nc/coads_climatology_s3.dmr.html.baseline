@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+            ~ /////////////////////////////////////////////////////////////////////////////
+            ~ // This file is part of the "Hyrax Data Server" project.
+            ~ //
+            ~ //
+            ~ // Copyright (c) 2016 OPeNDAP, Inc.
+            ~ // Author: Nathan David Potter <ndp@opendap.org>
+            ~ //
+            ~ // This library is free software; you can redistribute it and/or
+            ~ // modify it under the terms of the GNU Lesser General Public
+            ~ // License as published by the Free Software Foundation; either
+            ~ // version 2.1 of the License, or (at your option) any later version.
+            ~ //
+            ~ // This library is distributed in the hope that it will be useful,
+            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+            ~ // Lesser General Public License for more details.
+            ~ //
+            ~ // You should have received a copy of the GNU Lesser General Public
+            ~ // License along with this library; if not, write to the Free Software
+            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+            ~ //
+            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+            ~ /////////////////////////////////////////////////////////////////////////////
+        --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+   <head>
+      <link rel="stylesheet" href="/s3/docs/css/contents.css" type="text/css"/>
+      <link rel="stylesheet" href="/s3/docs/css/treeView.css" type="text/css"/>
+      <script type="text/javascript" src="/s3/js/CollapsibleLists.js"> </script>
+      <script type="text/javascript" src="/s3/js/dap4_buttons.js"> </script>
+      <script type="text/javascript">
+                    DAP4_URL = new dap4_url("http://localhost:8080/s3/dap/test/data/nc/coads_climatology.nc");
+                </script>
+      <title>DAP4 Data Request Form (beta)coads_climatology.nc</title>
+   </head>
+   <body>
+      <table width="100%" border="0">
+         <tr>
+            <td>
+               <img alt="OPeNDAP Logo" src="/s3/docs/images/logo.gif"/>
+            </td>
+            <td>
+               <div class="large">DAP4 Data Access Form</div>
+            </td>
+         </tr>
+      </table>
+      <h1>
+         <span style="font-size: 12px;  vertical-align: 35%; font-weight: normal;">dataset:</span>
+         <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;">coads_climatology.nc</span>
+      </h1>
+      <hr size="1" noshade="noshade"/>
+      <form action="">
+         <input type="checkbox" id="debug_checkbox"/>DEBUG
+                    <script type="text/javascript">
+                        DEBUG = new debug_obj(debug_checkbox);
+                    </script>
+         <table width="100%" border="0">
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#disposition"
+                        target="help">
+                        Actions
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="width:100%;margin-left:10px;">
+                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
+                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
+                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
+                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
+                     <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Show Help" onclick="help_button()"/>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td align="right">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#data_url"
+                        target="help">
+                        Data URL
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <input name="url" type="text" style="width:98%;margin-left:10;"
+                         value="http://localhost:8080/s3/dap/test/data/nc/coads_climatology.nc"/>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#global_attr"
+                        target="help">
+                        Global Attributes
+                    </a>
+                  </div>
+               </td>
+               <td width="100%">
+                  <div style="width:100%;margin-left:10px;">
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">NC_GLOBAL</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">FERRET V4.30 (debug/no GUI) 15-Aug-96</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                     <ul class="collapsibleList">
+                        <li>
+                           <div class="tightView">
+                              <div class="small_bold">DODS_EXTRA</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">Unlimited_Dimension:
+                        </span>
+                                       <span class="em">TIME</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </div>
+                        </li>
+                     </ul>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#shared_dimesions"
+                        target="help">Global Dimensions
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="margin-left:25px;">
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">COADSX =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..179</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">COADSY =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..89</span>
+            ]
+        </span>
+                     <span class="large">[
+            <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">TIME =
+                </span>
+                        <span class="medium_italic" style="vertical-align: 10%;">0..11</span>
+            ]
+        </span>
+                  </div>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <hr size="1" noshade="noshade" width="80%"/>
+               </td>
+               <td>
+                  <hr size="1" noshade="noshade" width="100%"/>
+               </td>
+            </tr>
+            <tr>
+               <td align="right" style="vertical-align:text-top">
+                  <div class="medium_bold">
+                     <a href="http://www.opendap.org/online_help_files/opendap_form_help.html#dataset_variables"
+                        target="help">Variables
+                    </a>
+                  </div>
+               </td>
+               <td>
+                  <div style="margin-left:25px;">
+                     <script type="text/javascript">org_opendap_COADSX = new dap_var("COADSX", "org_opendap_COADSX", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_COADSX);
+            org_opendap_COADSX.checkBox = "get_org_opendap_COADSX";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_COADSX"
+                               onclick="org_opendap_COADSX.handle_projection_change(get_org_opendap_COADSX)"
+                               onfocus="describe_projection()"/>COADSX<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>179]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float64)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_COADSX_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_COADSX.addDimension(org_opendap_COADSX_dim_1,180);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">degrees_east</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">modulo:
+                        </span>
+                                       <span class="em"> </span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">point_spacing:
+                        </span>
+                                       <span class="em">even</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_COADSY = new dap_var("COADSY", "org_opendap_COADSY", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_COADSY);
+            org_opendap_COADSY.checkBox = "get_org_opendap_COADSY";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_COADSY"
+                               onclick="org_opendap_COADSY.handle_projection_change(get_org_opendap_COADSY)"
+                               onfocus="describe_projection()"/>COADSY<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>89]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float64)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_COADSY_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_COADSY.addDimension(org_opendap_COADSY_dim_1,90);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">degrees_north</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">point_spacing:
+                        </span>
+                                       <span class="em">even</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_TIME = new dap_var("TIME", "org_opendap_TIME", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_TIME);
+            org_opendap_TIME.checkBox = "get_org_opendap_TIME";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_TIME"
+                               onclick="org_opendap_TIME.handle_projection_change(get_org_opendap_TIME)"
+                               onfocus="describe_projection()"/>TIME<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float64)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_TIME_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_TIME.addDimension(org_opendap_TIME_dim_1,12);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">hour since 0000-01-01 00:00:00</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">time_origin:
+                        </span>
+                                       <span class="em">1-JAN-0000 00:00:00</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">modulo:
+                        </span>
+                                       <span class="em"> </span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_SST = new dap_var("SST", "org_opendap_SST", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_SST);
+            org_opendap_SST.checkBox = "get_org_opendap_SST";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_SST"
+                               onclick="org_opendap_SST.handle_projection_change(get_org_opendap_SST)"
+                               onfocus="describe_projection()"/>SST<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>89]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>179]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_SST_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_1,12);
+            </script>
+                     <input type="text" id="org_opendap_SST_dim_2" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_2,90);
+            </script>
+                     <input type="text" id="org_opendap_SST_dim_3" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_SST.addDimension(org_opendap_SST_dim_3,180);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">missing_value:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">_FillValue:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">SEA SURFACE TEMPERATURE</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">From coads_climatology</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">Deg C</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_AIRT = new dap_var("AIRT", "org_opendap_AIRT", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_AIRT);
+            org_opendap_AIRT.checkBox = "get_org_opendap_AIRT";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_AIRT"
+                               onclick="org_opendap_AIRT.handle_projection_change(get_org_opendap_AIRT)"
+                               onfocus="describe_projection()"/>AIRT<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>89]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>179]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_AIRT_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_AIRT.addDimension(org_opendap_AIRT_dim_1,12);
+            </script>
+                     <input type="text" id="org_opendap_AIRT_dim_2" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_AIRT.addDimension(org_opendap_AIRT_dim_2,90);
+            </script>
+                     <input type="text" id="org_opendap_AIRT_dim_3" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_AIRT.addDimension(org_opendap_AIRT_dim_3,180);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">missing_value:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">_FillValue:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">AIR TEMPERATURE</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">From coads_climatology</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">DEG C</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_UWND = new dap_var("UWND", "org_opendap_UWND", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_UWND);
+            org_opendap_UWND.checkBox = "get_org_opendap_UWND";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_UWND"
+                               onclick="org_opendap_UWND.handle_projection_change(get_org_opendap_UWND)"
+                               onfocus="describe_projection()"/>UWND<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>89]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>179]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_UWND_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_UWND.addDimension(org_opendap_UWND_dim_1,12);
+            </script>
+                     <input type="text" id="org_opendap_UWND_dim_2" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_UWND.addDimension(org_opendap_UWND_dim_2,90);
+            </script>
+                     <input type="text" id="org_opendap_UWND_dim_3" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_UWND.addDimension(org_opendap_UWND_dim_3,180);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">missing_value:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">_FillValue:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">ZONAL WIND</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">From coads_climatology</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">M/S</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                     <script type="text/javascript">org_opendap_VWND = new dap_var("VWND", "org_opendap_VWND", true,false);
+
+            
+                DAP4_URL.add_dap_var(org_opendap_VWND);
+            org_opendap_VWND.checkBox = "get_org_opendap_VWND";
+            </script>
+                     <div style="color: black;margin-left:-20px;margin-top:10px">
+                        <input type="checkbox" id="get_org_opendap_VWND"
+                               onclick="org_opendap_VWND.handle_projection_change(get_org_opendap_VWND)"
+                               onfocus="describe_projection()"/>VWND<span class="medium">[
+                <span class="small" style="vertical-align: 15%;">TIME=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>11]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSY=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>89]
+            </span>
+                        <span class="medium">[
+                <span class="small" style="vertical-align: 15%;">COADSX=
+                    </span>
+                0
+                <span class="medium" style="vertical-align: 10%;">..</span>179]
+            </span>
+                        <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
+            </span>
+                     </div>
+                     <input type="text" id="org_opendap_VWND_dim_1" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_VWND.addDimension(org_opendap_VWND_dim_1,12);
+            </script>
+                     <input type="text" id="org_opendap_VWND_dim_2" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_VWND.addDimension(org_opendap_VWND_dim_2,90);
+            </script>
+                     <input type="text" id="org_opendap_VWND_dim_3" size="8" oninput="autoResize(event)"
+                            onfocus="describe_index()"
+                            onChange="DAP4_URL.update_url()"/>
+                     <script type="text/javascript">org_opendap_VWND.addDimension(org_opendap_VWND_dim_3,180);
+            </script>
+                     <div class="tightView">
+                        <ul class="collapsibleList">
+                           <li>
+                              <div class="small_bold" style="color:#527CC1;">attributes</div>
+                              <ul>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">missing_value:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">_FillValue:
+                        </span>
+                                       <span class="em">-9.99999979e+33</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">long_name:
+                        </span>
+                                       <span class="em">MERIDIONAL WIND</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">history:
+                        </span>
+                                       <span class="em">From coads_climatology</span>
+                                    </div>
+                                 </li>
+                                 <li>
+                                    <div class="small">
+                                       <span class="bold">units:
+                        </span>
+                                       <span class="em">M/S</span>
+                                    </div>
+                                 </li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </td>
+            </tr>
+         </table>
+      </form>
+      <hr size="1" noshade="noshade"/>
+      <table width="100%" border="0">
+         <tr>
+            <td/>
+            <td>
+               <div class="small" align="right">Hyrax development sponsored by
+                                <a href="http://www.nsf.gov/">NSF
+                                </a>
+                                ,
+                                <a href="http://www.nasa.gov/">NASA
+                                </a>
+                                , and
+                                <a href="http://www.noaa.gov/">NOAA</a>
+               </div>
+            </td>
+         </tr>
+      </table>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <br/>
+         <a href="/s3/docs/">Documentation</a>
+      </h3>
+   </body>
+   <script>CollapsibleLists.apply(true);</script>
+</xhtml>

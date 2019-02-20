@@ -25,6 +25,7 @@
  */
 package opendap.auth;
 
+import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
@@ -32,6 +33,7 @@ import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -39,6 +41,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -48,128 +51,60 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PDPService extends HttpServlet {
 
-    private Logger _log;
-    private String _accessLogName = "PDP_SERVICE_ACCESS";
+    private static final Logger LOG = LoggerFactory.getLogger(PDPService.class);
+    private static final String SERVICE_LOG_ID = "PDP_SERVICE_ACCESS";
+    private static final ReentrantLock CONFIG_LOCK = new ReentrantLock();
 
+    private static final AtomicInteger REQ_NUMBER = new AtomicInteger(0);
 
-    private ReentrantLock _configLock;
+    private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
+    private static final AtomicBoolean REQUIRE_SECURE_TRANSPORT = new AtomicBoolean(true);
 
-    private Element _config;
+    private static PolicyDecisionPoint myPDP;
 
-
-    private AtomicInteger _reqNumber;
-
-    private String _systemPath;
-
-    private boolean _isInitialized;
-
-    private AtomicBoolean _requireSecureTransport;
-
-
-
-    private PolicyDecisionPoint _myPDP;
-
-    public PDPService(){
-        _isInitialized = false;
-        _reqNumber = new AtomicInteger(0);
-        _requireSecureTransport = new AtomicBoolean(true);
-        _configLock = new ReentrantLock();
-
-    }
-
+    @Override
     public void init() throws ServletException {
-        super.init();
-
-
-        _configLock.lock();
+        CONFIG_LOCK.lock();
         try {
-            initLogging();
-            _log.info("init() - BEGIN");
-            if (_isInitialized) {
-                _log.info("init() - END (Already initialized. Nothing changed.)");
+            LOG.info("BEGIN");
+            if (IS_INITIALIZED.get()) {
+                LOG.info("END (Already initialized, SKIPPING.)");
                 return;
             }
-            
-            _systemPath = ServletUtil.getSystemPath(this, "");
+            super.init();
+            LogUtil.initLogging(this);
 
+            String systemPath = ServletUtil.getSystemPath(this, "");
             String configFile = getInitParameter("config");
             if(configFile==null){
-                configFile = _systemPath + "/WEB-INF/conf/SimplePDP.xml";
+                configFile = PathBuilder.pathConcat(systemPath,"/WEB-INF/conf/SimplePDP.xml");
             }
+            Element config;
             try {
-                _config = opendap.xml.Util.getDocumentRoot(configFile);
-                if(_config==null)
+                config = opendap.xml.Util.getDocumentRoot(configFile);
+                if(config ==null)
                     throw new ServletException("Unable to read/parse configuration file: "+configFile);
 
-                Element e = _config.getChild("PolicyDecisionPoint");
+                Element e = config.getChild("PolicyDecisionPoint");
                 if(e==null)
                     throw new ServletException("Configuration file: "+configFile + " is missing the " +
                             "required PolicyDecisionPoint element.");
-                _myPDP = PolicyDecisionPoint.pdpFactory(e);
+                myPDP = PolicyDecisionPoint.pdpFactory(e);
 
             } catch (Exception e) {
                 String msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-                _log.error(msg);
+                LOG.error(msg);
                 throw new ServletException(msg, e);
             }
-            _requireSecureTransport.set(_config.getChild("RequireSecureTransport") != null);
-            _isInitialized = true;
+            REQUIRE_SECURE_TRANSPORT.set(config.getChild("RequireSecureTransport") != null);
+            IS_INITIALIZED.set(true);
         }
         finally {
-            _configLock.unlock();
+            CONFIG_LOCK.unlock();
         }
-        _log.info("init() - END");
+        LOG.info("END");
 
     }
-
-
-
-    /**
-     * Starts the logging process.
-     */
-    private void initLogging() {
-        LogUtil.initLogging(this);
-        _log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-    }
-
-    /*
-    private void load_config() throws ServletException {
-        String msg;
-        String configFile = getInitParameter("config");
-
-        if(configFile==null){
-            configFile = _systemPath + "/WEB-INF/conf/SimplePDP.xml";
-        }
-
-        try {
-            _config = opendap.xml.Util.getDocumentRoot(configFile);
-
-            Element e = _config.getChild("PolicyDecisionPoint");
-
-            _myPDP = PolicyDecisionPoint.pdpFactory(e);
-
-
-            e = _config.getChild("RequireSecureTransport");
-            if(e !=null){
-                _requireSecureTransport = true;
-            }
-
-
-        } catch (Exception e) {
-            msg = "Unable to ingest configuration!!!! Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error(msg);
-            throw new ServletException(msg, e);
-
-        }
-
-
-    }
-
-*/
-
-
-
 
 
 
@@ -182,22 +117,17 @@ public class PDPService extends HttpServlet {
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
      *         since midnight January 1, 1970 GMT
      */
+    @Override
     protected long getLastModified(HttpServletRequest req) {
-
-
-
         try {
             RequestCache.openThreadCache();
-
-            long reqno = _reqNumber.incrementAndGet();
-            LogUtil.logServerAccessStart(req, _accessLogName, "LastModified", Long.toString(reqno));
-            return -1;
+            long reqno = REQ_NUMBER.incrementAndGet();
+            LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "LastModified", Long.toString(reqno));
+            return new Date().getTime();
 
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, _accessLogName);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, SERVICE_LOG_ID);
         }
-
-
     }
 
 
@@ -205,14 +135,14 @@ public class PDPService extends HttpServlet {
 
         if (req.getPathInfo() == null) {
             res.sendRedirect(Scrub.urlContent(req.getRequestURI() + "/"));
-            _log.debug("Sent redirect to make the web page work!");
+            LOG.debug("Sent redirect to make the web page work!");
             return true;
         }
         return false;
     }
 
 
-
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
@@ -220,6 +150,7 @@ public class PDPService extends HttpServlet {
 
     }
 
+    @Override
     public void doPost(HttpServletRequest request,
                       HttpServletResponse response) {
 
@@ -227,13 +158,13 @@ public class PDPService extends HttpServlet {
 
     }
 
-    public void doEvaluate(HttpServletRequest request,
+    private void doEvaluate(HttpServletRequest request,
                       HttpServletResponse response)  {
 
         String msg = "";
         int status = HttpServletResponse.SC_FORBIDDEN;
 
-        LogUtil.logServerAccessStart(request,_accessLogName, request.getMethod(), Integer.toString(_reqNumber.incrementAndGet()));
+        LogUtil.logServerAccessStart(request, SERVICE_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
         try {
             if (!redirect(request, response)) {
 
@@ -262,15 +193,15 @@ public class PDPService extends HttpServlet {
                 quadTuple.append("query:\"").append(query).append("\", ");
                 quadTuple.append("action:\"").append(action).append("\"");
                 quadTuple.append(" }");
-                _log.debug("doGet() - {}", quadTuple);
+                LOG.debug("{}", quadTuple);
 
-                if(_myPDP.evaluate(uid,authContext,resourceId,query,action)){
+                if(myPDP.evaluate(uid,authContext,resourceId,query,action)){
                     status = HttpServletResponse.SC_OK;
                     response.setStatus(status);
                     ServletOutputStream sos = response.getOutputStream();
                     msg = "Yes. Affirmative. Absolutely. I do.";
                     sos.println(msg);
-                    _log.debug("doEvaluate() - ACCESS PERMITTED {}", quadTuple);
+                    LOG.debug("ACCESS PERMITTED {}", quadTuple);
 
                 }
                 else {
@@ -279,7 +210,7 @@ public class PDPService extends HttpServlet {
                     ServletOutputStream sos = response.getOutputStream();
                     msg = "No. Nope. Not even.";
                     sos.println(msg);
-                    _log.debug("doEvaluate() - ACCESS DENIED {}", quadTuple);
+                    LOG.debug("ACCESS DENIED {}", quadTuple);
                 }
             }
 
@@ -287,17 +218,16 @@ public class PDPService extends HttpServlet {
         catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, this,  response);
-                _log.error("doEvaluate() - The Bad Things have happened. Message: {}", t.getMessage());
+                LOG.error("The Bad Things have happened. Message: {}", t.getMessage());
             }
             catch(Throwable t2){
                 // It's boned now.. Leave it be.
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(status, _accessLogName);
+            LogUtil.logServerAccessEnd(status, SERVICE_LOG_ID);
             RequestCache.closeThreadCache();
         }
-
     }
 
 
@@ -314,15 +244,15 @@ public class PDPService extends HttpServlet {
     protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        if (_requireSecureTransport.get()) {
+        if (REQUIRE_SECURE_TRANSPORT.get()) {
             if (!req.isSecure()) {
-                _log.error("service() - Connection is NOT secure. Protocol: " + req.getProtocol());
+                LOG.error("service() - Connection is NOT secure. Protocol: {}", req.getProtocol());
                 resp.sendError(403);
             } else {
-                _log.debug("service() - Connection is secure. Protocol: " + req.getProtocol());
+                LOG.debug("service() - Connection is secure. Protocol: {}", req.getProtocol());
             }
         } else {
-            _log.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
+            LOG.debug("service() - Secure transport not enforced.  Protocol: {} Scheme: {}", req.getProtocol(), req.getScheme());
 
         }
         super.service(req, resp);

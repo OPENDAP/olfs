@@ -79,15 +79,16 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     private static final int DESCRIBE_COVERAGE  = 1;
     private static final int GET_COVERAGE       = 2;
 
+    public HttpGetHandler()  {
+        this(false);
+    }
+
 
     public HttpGetHandler(boolean enableUpdateUrl)  {
-
         super();
-
         _enableUpdateUrl = enableUpdateUrl;
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
-
     }
 
     public void init(HttpServlet dispatchServlet, Element e) throws ServletException {
@@ -109,6 +110,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         init(contextPath, resourcePath);
 
+    }
+
+
+    public boolean isUpdateUrlEnabled(){
+        return _enableUpdateUrl;
+    }
+
+    public void setEnableUpdateUrl(boolean state){
+        _enableUpdateUrl = state;
     }
 
 

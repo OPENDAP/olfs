@@ -248,12 +248,17 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
             xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String supportEmail = _besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
+
         Transformer transformer = new Transformer(xsltDoc);
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
         transformer.setParameter("collectionURL",collectionURL);
         transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
+        transformer.setParameter("supportLink", mailtoHrefAttributeValue);
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
 
@@ -276,7 +281,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
-        PathBuilder.normalizePath(collectionName, true, false);
+        collectionName = PathBuilder.normalizePath(collectionName, true, false);
+
+        /*
         while(!collectionName.equals("/") && collectionName.startsWith("/"))
             collectionName = collectionName.substring(1);
 
@@ -285,6 +292,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(!collectionName.endsWith("/"))
             collectionName += "/";
+
+        */
 
         log.debug("collectionName:  "+collectionName);
 

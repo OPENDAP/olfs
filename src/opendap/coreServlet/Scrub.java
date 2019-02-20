@@ -45,113 +45,113 @@ public class Scrub {
 
     // The C++ coe uses this regex: Regex name("[-0-9A-z_./]+");
 
-    private static String fileNameInclusionRegex = "[-a-zA-Z0-9/.%_ :]*";
-    private static String fileNameExclusionRegex = "[^-a-zA-Z0-9/.%_ :]";
-    private static Pattern fileNameInclusionPattern = Pattern.compile(fileNameInclusionRegex);
+    private static final String FILE_NAME_INCLUSION_REGEX = "[-a-zA-Z0-9/.%_ :]*";
+    private static final String FILE_NAME_EXCLUSION_REGEX = "[^-a-zA-Z0-9/.%_ :]";
+    private static final Pattern FILE_NAME_INCLUSION_PATTERN = Pattern.compile(FILE_NAME_INCLUSION_REGEX);
 
     public static String fileName(String fileName){
         if(fileName==null)
             return null;
-        Matcher m = fileNameInclusionPattern.matcher(fileName);
+        Matcher m = FILE_NAME_INCLUSION_PATTERN.matcher(fileName);
 
-        log.debug("fileName() - Scrubbing file Name: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
+        log.debug("fileName() - Scrubbing file Name: "+fileName+"   white list pattern: "+ FILE_NAME_INCLUSION_REGEX +"    matches: "+m.matches());
         if(m.matches()){
             return fileName;
         }
         else {
-            return fileName.replaceAll(fileNameExclusionRegex,"#");
+            return fileName.replaceAll(FILE_NAME_EXCLUSION_REGEX,"#");
         }
 
     }
 
     // Added the colon (:) to the list of allowed characters, based on 
     // a bug report from NASA/Raytheon. jhrg 5/7/15
-    private static String urlContentInclusionRegex = "[-a-zA-Z0-9/.%_ :]*";
-    private static String urlContentExclusionRegex = "[^-a-zA-Z0-9/.%_ :]";
-    private static Pattern urlContentInclusionPattern = Pattern.compile(urlContentInclusionRegex);
+    private static final String URL_CONTENT_INCLUSION_REGEX = "[-a-zA-Z0-9/.%_ :]*";
+    private static final String URL_CONTENT_EXCLUSION_REGEX = "[^-a-zA-Z0-9/.%_ :]";
+    private static final Pattern URL_CONTENT_INCLUSION_PATTERN = Pattern.compile(URL_CONTENT_INCLUSION_REGEX);
 
     public static String urlContent(String urlContent){
 
         if(urlContent==null)
             return null;
 
-        Matcher m = urlContentInclusionPattern.matcher(urlContent);
+        Matcher m = URL_CONTENT_INCLUSION_PATTERN.matcher(urlContent);
 
-        log.debug("urlContent() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ urlContentInclusionRegex +"    matches: "+m.matches());
+        log.debug("urlContent() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ URL_CONTENT_INCLUSION_REGEX +"    matches: "+m.matches());
 
         if(m.matches()){
             return urlContent;
         }
         else {
-            return urlContent.replaceAll(urlContentExclusionRegex,"#");
+            return urlContent.replaceAll(URL_CONTENT_EXCLUSION_REGEX,"#");
         }
     }
 
-    private static String completeURLInclusionRegex = "http(s)?://"+ urlContentInclusionRegex;
-    private static String completeURLExclusionRegex = "http(s)?://"+ urlContentExclusionRegex;
-    private static Pattern completeURLInclusionPattern = Pattern.compile(completeURLInclusionRegex);
+    private static final String COMPLETE_URL_INCLUSION_REGEX = "http(s)?://"+ URL_CONTENT_INCLUSION_REGEX;
+    private static final String COMPLETE_URL_EXCLUSION_REGEX = "http(s)?://"+ URL_CONTENT_EXCLUSION_REGEX;
+    private static final Pattern COMPLETE_URL_INCLUSION_PATTERN = Pattern.compile(COMPLETE_URL_INCLUSION_REGEX);
 
     public static String completeURL(String url){
         if(url==null)
             return null;
-        Matcher m = completeURLInclusionPattern.matcher(url);
-        log.debug("completeURL() - Scrubbing complete URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
+        Matcher m = COMPLETE_URL_INCLUSION_PATTERN.matcher(url);
+        log.debug("completeURL() - Scrubbing complete URL: "+url+"   white list pattern: "+ COMPLETE_URL_INCLUSION_REGEX +"    matches: "+m.matches());
         if(m.matches()){
             return url;
         }
         else {
-            return url.replaceAll(completeURLExclusionRegex,"#");
+            return url.replaceAll(COMPLETE_URL_EXCLUSION_REGEX,"#");
         }
     }
 
-    private static String simpleStringInclusionRegex = "[a-zA-Z0-9_ ]*";
-    private static String simpleStringExclusionRegex = "[^a-zA-Z0-9_ ]";
-    private static Pattern simpleStringInclusionPattern = Pattern.compile(simpleStringInclusionRegex);
+    private static final String SIMPLE_STRING_INCLUSION_REGEX = "[a-zA-Z0-9_ ]*";
+    private static final String SIMPLE_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ ]";
+    private static final Pattern SIMPLE_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleString(String s){
         if(s==null)
             return null;
-        Matcher m = simpleStringInclusionPattern.matcher(s);
-        log.debug("simpleString() - Scrubbing simple String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
+        Matcher m = SIMPLE_STRING_INCLUSION_PATTERN.matcher(s);
+        log.debug("simpleString() - Scrubbing simple String: "+s+"   white list pattern: "+ SIMPLE_STRING_INCLUSION_REGEX +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
         else {
-            return s.replaceAll(simpleStringExclusionRegex,"#");
+            return s.replaceAll(SIMPLE_STRING_EXCLUSION_REGEX,"#");
         }
     }
 
-    private static String integerStringInclusionRegex = "[0-9]*";
-    private static String integerStringExclusionRegex = "[^0-9]";
-    private static Pattern integerStringInclusionPattern = Pattern.compile(integerStringInclusionRegex);
+    private static final String INTEGER_STRING_INCLUSION_REGEX = "[0-9]*";
+    private static final String INTEGER_STRING_EXCLUSION_REGEX = "[^0-9]";
+    private static final Pattern INTEGER_STRING_INCLUSION_PATTERN = Pattern.compile(INTEGER_STRING_INCLUSION_REGEX);
 
     public static String integerString(String s){
         if(s==null)
             return null;
-        Matcher m = integerStringInclusionPattern.matcher(s);
-        log.debug("integerString() - Scrubbing integer String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
+        Matcher m = INTEGER_STRING_INCLUSION_PATTERN.matcher(s);
+        log.debug("integerString() - Scrubbing integer String: "+s+"   white list pattern: "+ INTEGER_STRING_INCLUSION_REGEX +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
         else {
-            return s.replaceAll(integerStringExclusionRegex,"#");
+            return s.replaceAll(INTEGER_STRING_EXCLUSION_REGEX,"#");
         }
     }
 
-    private static String simpleQueryStringInclusionRegex = "[a-zA-Z0-9_ =\\.]*";
-    private static String simpleQueryStringExclusionRegex = "[^a-zA-Z0-9_ =\\.]";
-    private static Pattern simpleQueryStringInclusionPattern = Pattern.compile(simpleStringInclusionRegex);
+    private static final String SIMPLE_QUERY_STRING_INCLUSION_REGEX = "[a-zA-Z0-9_ =\\.]*";
+    private static final String SIMPLE_QUERY_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ =\\.]";
+    private static final Pattern SIMPLE_QUERY_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleQueryString(String s){
         if(s==null)
             return null;
-        Matcher m = simpleQueryStringInclusionPattern.matcher(s);
-        log.debug("simpleQueryString() - Scrubbing simple query String: "+s+"   white list pattern: "+ simpleQueryStringInclusionRegex +"    matches: "+m.matches());
+        Matcher m = SIMPLE_QUERY_STRING_INCLUSION_PATTERN.matcher(s);
+        log.debug("simpleQueryString() - Scrubbing simple query String: "+s+"   white list pattern: "+ SIMPLE_QUERY_STRING_INCLUSION_REGEX +"    matches: "+m.matches());
         if(m.matches()){
             return s;
         }
         else {
-            return s.replaceAll(simpleQueryStringExclusionRegex,"#");
+            return s.replaceAll(SIMPLE_QUERY_STRING_EXCLUSION_REGEX,"#");
         }
     }
 
@@ -198,9 +198,10 @@ public class Scrub {
                 true);
 
         checkCompleteURL("http://dataportal.ucar.edu:9191/dods/" +
-                "ASSIMtF_COLAMOM3/Tot/" +
-                "current.dds",
+                        "ASSIMtF_COLAMOM3/Tot/" +
+                        "current.dds",
                 true);
+
     }
 
     private static void checkCompleteURL(String s, boolean expected){
@@ -216,19 +217,26 @@ public class Scrub {
     }
 
     private static void simpleCheck(String s1, String s2, boolean expected){
-
-        boolean value =  s1.equals(s2);
+        boolean value;
 
         if(expected){
+            if(s1 == null)
+                value = s2==null;
+            else
+                value =  s1.equals(s2);
+
             String msg = value?"PASS (Strings Match):  ":"FAIL (Strings DO NOT Match):  ";
             msg+= "s1=\""+s1+"\";   s2: "+s2;
-            //System.out.println(msg);
             assertTrue(msg,value);
         }
         else{
+            if(s1 == null)
+                value = s2!=null;
+            else
+                value =  s1.equals(s2);
+
             String msg = value?"FAIL (Strings Match):  ":"PASS (Strings DO NOT Match):  ";
             msg+= "s1=\""+s1+"\";   s2: "+s2;
-            //System.out.println(msg);
             assertFalse(msg,value);
         }
 

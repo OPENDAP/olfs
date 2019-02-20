@@ -236,6 +236,8 @@ public class CyclicGroup<E> {
 
     public static void main(String[] args) {
 
+        Logger log = LoggerFactory.getLogger(CyclicGroup.class);
+
         int testThreadCount = 17;
         int groupSize = 13;
         final int  strokesToGive = 11;
@@ -253,8 +255,8 @@ public class CyclicGroup<E> {
                 _name = name;
                 _touched = new AtomicInteger();
                 _touched.set(0);
-                _strokers = new Vector<String>();
-                _strokes = new Vector<String>();
+                _strokers = new Vector<>();
+                _strokes = new Vector<>();
             }
 
             public int stroke(){
@@ -284,11 +286,14 @@ public class CyclicGroup<E> {
 
         class TestThread extends Thread {
 
-            CyclicGroup<TestThing> _cg;
-            String _name;
-            CountDownLatch _startSignal, _doneSignal;
+            private Logger log;
+            private CyclicGroup<TestThing> _cg;
+            private String _name;
+            private CountDownLatch _startSignal;
+            private CountDownLatch _doneSignal;
 
             public TestThread(String name, CyclicGroup<TestThing> cg, CountDownLatch startSignal, CountDownLatch doneSignal){
+                log = LoggerFactory.getLogger(this.getClass());
                 _cg = cg;
                 _name = name;
                 _startSignal = startSignal;
@@ -296,28 +301,25 @@ public class CyclicGroup<E> {
             }
 
             public void run() {
-
-
                 try{
-                    System.out.println(_name+" - Waiting for green light...");
+                    log.info("{} - Waiting for green light...",_name);
                     _startSignal.await();
 
-                    System.out.println(_name+" - Running: Delivering "+strokesToGive+" strokes to "+_cg.size()+" objects...");
-
+                    String msg = _name + " - Running. Delivering {}  strokes to {} objects.";
+                    log.info(msg,strokesToGive,_cg.size());
 
                     for(int i=0; i<strokesToGive ;i++){
                         TestThing tt = _cg.getNext();
                         int strokesReceived = tt.stroke();
-                        System.out.println(_name+ " stroked "+tt.getName()+" which now has received "+ strokesReceived +" strokes.");
+                        msg = _name+ " stroked {} which now has received {} strokes.";
+                        log.info(msg,tt.getName(),strokesReceived );
                     }
 
-
-
-
                 } catch (InterruptedException e) {
-                    System.err.println("run() - Caught Interrupted exception. Bailing... Msg: " + e.getMessage());
+                    log.warn("Caught Interrupted exception. Bailing... Msg: {}", e.getMessage());
+                    Thread.currentThread().interrupt();
                 } finally {
-                    System.out.println(_name+" - Finished");
+                    log.info("{} - Finished",_name);
                     _doneSignal.countDown();
                 }
 
@@ -353,7 +355,7 @@ public class CyclicGroup<E> {
         try {
             doneSignal.await();
             String name, number;
-            System.out.println("Final ordering:");
+            log.info("Final ordering:");
             int last;
             int totalStrokesGiven = 0;
 
@@ -365,37 +367,28 @@ public class CyclicGroup<E> {
 
                 totalStrokesGiven += thisThing.strokes();
 
-                System.out.println(name +" has " + thisThing.strokes() + " strokes.");
+                log.info("{} has {} strokes.",name,thisThing.strokes());
 
                 int j=0;
                 for(String stroker : thisThing._strokers){
                     String stroke = thisThing._strokes.get(j++);
-                    //System.out.println(stroker +" applied the " + stroke + " stroke.");
+                    log.info("{} applied the {} stroke.",stroker,stroke);
                 }
 
 
                 last = thisVal;
             }
-            System.out.println("");
 
-            System.out.println("");
-            System.out.println("threadCount: "+testThreadCount);
-            System.out.println("strokesToGive: "+strokesToGive);
-            System.out.println("totalStrokesGiven: "+totalStrokesGiven + " "+((strokesToGive*testThreadCount)!=totalStrokesGiven?"FAIL":"SUCCESS"));
-            System.out.println("Strokes distributed across "+groupSize+" TestThings.");
-
-
-
-
-
-
-
+            log.info("last: {}", last);
+            log.info("threadCount: {}", testThreadCount);
+            log.info("strokesToGive: {}",strokesToGive);
+            log.info("totalStrokesGiven: {} {}",totalStrokesGiven, (((strokesToGive*testThreadCount)!=totalStrokesGiven)?"FAIL":"SUCCESS"));
+            log.info("Strokes distributed across {} TestThings.", groupSize);
 
         } catch (InterruptedException e) {
-            System.err.println("main() - Caught Interrupted exception. Bailing... Msg: " + e.getMessage());
+            log.warn("Caught Interrupted exception. Bailing... Msg: {}", e.getMessage());
+            Thread.currentThread().interrupt();
         }
-
-
     }
 
 

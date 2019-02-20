@@ -404,8 +404,8 @@ public class ReqInfo {
      * @return
      */
     public static String getSuffix(String s){
-        //String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$";
-        //Matcher m = Pattern.compile(_regexToMatchLastDotSuffixString).matcher(s);
+        //String MATCH_LAST_DOT_SUFFIX_REGEX_STRING = "\\.(?=[^.]*$).*$";
+        //Matcher m = Pattern.compile(MATCH_LAST_DOT_SUFFIX_REGEX_STRING).matcher(s);
         String suffix="";
         if (s!=null && !s.endsWith("/")) {
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix

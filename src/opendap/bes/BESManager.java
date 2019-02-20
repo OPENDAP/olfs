@@ -51,6 +51,7 @@ public class BESManager {
     private static  org.slf4j.Logger _log;
     private static AtomicBoolean _initialized;
     private static Vector<BesGroup> _besCollection;
+    private static BesGroup rootGroup;
     private static AtomicBoolean _isConfigured;
     private static Element _config;
     private static ReentrantLock _lock;
@@ -66,7 +67,7 @@ public class BESManager {
     }
 
 
-    public void init(Element config) throws Exception{
+    public void init(Element config) throws BadConfigurationException {
 
         _lock.lock();
         try {
@@ -105,7 +106,7 @@ public class BESManager {
     }
 
 
-    private void configure(Element besConfiguration) throws Exception {
+    private void configure(Element besConfiguration) throws BadConfigurationException {
 
         if(_isConfigured.get()) return;
 
@@ -141,8 +142,10 @@ public class BESManager {
             groupForThisPrefix.add(bes);
 
 
-            if (groupForThisPrefix.getGroupPrefix().equals("/"))
+            if (groupForThisPrefix.getGroupPrefix().equals("/")) {
+                rootGroup = groupForThisPrefix;
                 foundRootBES = true;
+            }
         }
 
         if (!foundRootBES)
@@ -156,7 +159,7 @@ public class BESManager {
     }
 
 
-    public static void addBes(BES bes) throws Exception {
+    public static void addBes(BES bes) throws BadConfigurationException {
 
         Iterator<BesGroup> i = BESManager.getBesGroups();
 
@@ -250,7 +253,6 @@ public class BESManager {
         String prefix;
         for(BesGroup besGroup : _besCollection){
             prefix = besGroup.getGroupPrefix();
-
             if(path.indexOf(prefix) == 0){
                 if(result == null){
                     result = besGroup;
@@ -259,9 +261,10 @@ public class BESManager {
                     if(prefix.length() > result.getGroupPrefix().length())
                         result = besGroup;
                 }
-
             }
         }
+        if(result == null)
+            result = rootGroup;
 
         return result;
     }

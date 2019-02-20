@@ -47,33 +47,19 @@ import java.util.Vector;
  **/
 public class BesGroup extends CyclicGroup<BES> {
 
-
     Logger log;
     private String prefix;
 
-
-
+    /**
+     *
+     * @param prefix
+     * @throws BadConfigurationException
+     */
     public BesGroup(String prefix) throws BadConfigurationException {
         log = LoggerFactory.getLogger(getClass());
         this.prefix = prefix;
-        
-
     }
 
-
-    /*
-    public void addBes(BESConfig config) throws Exception {
-
-        if(!config.getPrefix().equals(prefix))
-            throw new BadConfigurationException("Members of a BesGroup must all have the same prefix. " +
-                    "This ring has prefix '"+prefix+"' the BESConfig  has a prefix of '"+config.getPrefix()+"'.");
-
-        BES bes = new BES(config);
-        add(bes);
-
-
-    }
-    */
 
     public boolean add(BES bes) {
         if(!bes.getPrefix().equals(prefix)){
@@ -83,14 +69,11 @@ public class BesGroup extends CyclicGroup<BES> {
         }
 
         String name = bes.getNickName();
-
         if(name==null){
             name = prefix+"-"+size();
             bes.setNickName(name);
         }
-
         return super.add(bes.getNickName(),bes);
-
     }
 
 
@@ -104,85 +87,77 @@ public class BesGroup extends CyclicGroup<BES> {
 
 
     public void destroy(){
-
         Object[] members = drain();
         
         for(Object o : members){
             BES bes = (BES)o;
             bes.destroy();
         }
-
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public BES getNext(){
-
-
         BES bes;
-
         String responseCacheKey = this.getClass().getName()+".getNext()";
-
         Object o  = RequestCache.get(responseCacheKey);
 
         if(o == null){
             bes = super.getNext();
-
             RequestCache.put(responseCacheKey,bes);
-
         }
         else {
             bes = (BES)o;
         }
-
-
         return bes;
-
     }
 
 
-
+    /**
+     *
+     * @return
+     * @throws JDOMException
+     * @throws BESError
+     * @throws IOException
+     * @throws BadConfigurationException
+     * @throws PPTException
+     */
     public Document getGroupVersion() throws JDOMException, BESError, IOException, BadConfigurationException, PPTException {
         Element besGroupElement = new Element("BesGroup");
         besGroupElement.setAttribute("prefix", getGroupPrefix());
 
         for(int i=0; i<size() ;i++){
             BES bes = get(i);
-
             Document besVerDoc = bes.getVersionDocument();
             Element verElement = besVerDoc.detachRootElement();
             besGroupElement.addContent(verElement);
         }
-
         return new Document(besGroupElement);
-
-
     }
 
+    /**
+     *
+     * @return
+     */
     public TreeSet<String> getCommonDapVersions()  {
-
 
         TreeSet<String> commonDapVersions  = new TreeSet<String>();
         Document groupVersionDoc = null;
-
-
         try {
             groupVersionDoc = getGroupVersion();
         } catch (Exception e) {
             log.error("Failed to retrieve BesGroup version document!");
         }
-
-
         if (groupVersionDoc != null) {
-
             Element besGroupElem = groupVersionDoc.getRootElement();
-
             List besList  = besGroupElem.getChildren("BES", opendap.namespaces.BES.BES_NS);
 
             boolean isFirst = true;
             for(Object o_beselem : besList){
                 Element besElement = (Element) o_beselem;
-
-
                 List serviceVersionList = besElement.getChildren("serviceVersion",opendap.namespaces.BES.BES_NS);
 
                 if(serviceVersionList.isEmpty())
@@ -205,18 +180,18 @@ public class BesGroup extends CyclicGroup<BES> {
                     commonDapVersions.removeAll(dropList);
                 }
             }
-
         }
-
         if(commonDapVersions.isEmpty()){
             commonDapVersions.add("DAP_VERSION_UNKNOWN");
         }
-
-
         return commonDapVersions;
-
     }
 
+    /**
+     *
+     * @param serviceVersionList
+     * @return
+     */
     public Vector<String> getDapVersions(List serviceVersionList ){
 
         Vector<String> dapVersions = new Vector<String>();
@@ -231,30 +206,30 @@ public class BesGroup extends CyclicGroup<BES> {
                 }
             }
         }
-
         return dapVersions;
-
     }
 
 
-
-    public TreeSet<String> getGroupComponentVersions() throws Exception {
+    /**
+     *
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     */
+    public TreeSet<String> getGroupComponentVersions() throws JDOMException, IOException, PPTException, BadConfigurationException, BESError {
 
         Document groupVersionDoc = getGroupVersion();
         TreeSet<String> components = new TreeSet<String>();
 
-
         if (groupVersionDoc != null) {
-
             Element besGroupElem = groupVersionDoc.getRootElement();
-
             List besGroupList  = besGroupElem.getChildren("BES", opendap.namespaces.BES.BES_NS);
-
 
             for(Object o_beselem : besGroupList){
                 Element besElement = (Element) o_beselem;
-
-
                 List libraries = besElement.getChildren("library", opendap.namespaces.BES.BES_NS);
                 List modules = besElement.getChildren("module", opendap.namespaces.BES.BES_NS);
 
@@ -266,26 +241,19 @@ public class BesGroup extends CyclicGroup<BES> {
                     log.error("The BES with prefix='" + besElement.getAttributeValue("prefix") + "' is running without modules! " +
                             "(bes:module elements are missing");
 
-
-
                 for(Object o : libraries){
                     Element lib = (Element) o;
                     String libName = lib.getAttributeValue("name") + "/" + lib.getTextTrim();
                     components.add(libName);
                 }
-
-
                 for(Object o : modules){
                     Element module = (Element) o;
                     String moduleName = module.getAttributeValue("name") + "/" + module.getTextTrim();
                     components.add(moduleName);
                 }
             }
-
         }
-
         return components;
-
     }
 
 
@@ -294,8 +262,4 @@ public class BesGroup extends CyclicGroup<BES> {
         BES[] myBesSet = new BES[size()];
         return super.toArray(myBesSet);        // Return it to the requester.
     }
-
-
-
-
 }
