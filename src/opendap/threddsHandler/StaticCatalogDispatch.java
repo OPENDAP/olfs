@@ -648,6 +648,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _prefix = "thredds";
         _useMemoryCache = true;
 
+        String ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
+
         Element threddsService = _config.getChild("ThreddsService");
         if (threddsService != null) {
             s = threddsService.getAttributeValue("prefix");
@@ -666,8 +668,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
             while (_prefix.startsWith("/") && _prefix.length()>1)
                 _prefix = _prefix.substring(1, _prefix.length());
 
-            _log.debug("init() - prefix: {}", _prefix);
-
 
             s = threddsService.getAttributeValue("useMemoryCache");
             if (s != null){
@@ -678,7 +678,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
                     _useMemoryCache = false;
                 }
             }
-            _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
 
             s = threddsService.getAttributeValue("allowRemote");
             if (s != null){
@@ -689,21 +688,22 @@ public class StaticCatalogDispatch implements DispatchHandler {
                     _allowRemoteCatalogTraversal = false;
                 }
             }
-            _log.debug("init() - allowRemoteCatalogTraversal: {}", _allowRemoteCatalogTraversal);
+
+            Element e;
+            e = threddsService.getChild("ingestTransformFile");
+            if (e != null) {
+                ingestTransformFile = e.getTextTrim();
+            }
 
         }
-
-
-        Element e;
-        String ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
-        e = _config.getChild("ingestTransformFile");
-        if (e != null) {
-            ingestTransformFile = e.getTextTrim();
-        }
+        _log.debug("init() - prefix: {}", _prefix);
+        _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
+        _log.debug("init() - allowRemoteCatalogTraversal: {}", _allowRemoteCatalogTraversal);
         _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
+
         String besNodeToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, _besNodeToDatasetScanCatalogTrasformFile);
-        e = _config.getChild("besNodeToDatasetScanCatalogTransformFile");
+        Element e = _config.getChild("besNodeToDatasetScanCatalogTransformFile");
         if (e != null) {
             besNodeToDatasetScanCatalogTransformFile = e.getTextTrim();
         }
@@ -713,8 +713,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
-        String contentPath = ServletUtil.getConfigPath(servlet);
-        CatalogManager.init(contentPath, ingestTransformFile, besNodeToDatasetScanCatalogTransformFile, _besApi);
+        String configPath = ServletUtil.getConfigPath(servlet);
+        CatalogManager.init(configPath, ingestTransformFile, besNodeToDatasetScanCatalogTransformFile, _besApi);
 
 
         String fileName, pathPrefix, thisUrlPrefix;
@@ -723,7 +723,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         thisUrlPrefix = s.substring(0, s.lastIndexOf(Util.basename(s)));
 
-        s = contentPath + s;
+        s = configPath + s;
         fileName = "catalog.xml";
         pathPrefix = s.substring(0, s.lastIndexOf(fileName));
 
