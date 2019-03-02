@@ -142,16 +142,16 @@ public class DispatchHandler extends BesDapDispatcher {
             Element gatewayService = config.getChild("GatewayService");
             if (gatewayService != null) {
                 Element e = gatewayService.getChild("prefix");
-                if (e != null)
+                if (e != null) {
                     _prefix = e.getTextTrim();
-
-                if (_prefix.equals("/")) {
-                    String msg = "Bad Configuration. The <Handler> " +
-                            "element that declares " + this.getClass().getName() +
-                            " MUST provide 1 <prefix>  " +
-                            "child element whose value may not be equal to \"/\"";
-                    log.error(msg);
-                    throw new BadConfigurationException(msg);
+                    if (_prefix.equals("/")) {
+                        String msg = "Bad Configuration. The <Handler> " +
+                                "element that declares " + this.getClass().getName() +
+                                " MUST provide 1 <prefix>  " +
+                                "child element whose value may not be equal to \"/\"";
+                        log.error(msg);
+                        throw new BadConfigurationException(msg);
+                    }
                 }
             }
         }
