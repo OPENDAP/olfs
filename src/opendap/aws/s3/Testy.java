@@ -433,7 +433,6 @@ public class Testy {
         sb.append("    getLastModified():          ").append(objectMetadata.getLastModified()).append("\n");
         sb.append("    getOngoingRestore():        ").append(objectMetadata.getOngoingRestore()).append("\n");
         sb.append("    getRestoreExpirationTime(): ").append(objectMetadata.getRestoreExpirationTime()).append("\n");
-        sb.append("    getServerSideEncryption():  ").append(objectMetadata.getServerSideEncryption()).append("\n");
         sb.append("    getVersionId():             ").append(objectMetadata.getVersionId()).append("\n");
 
 

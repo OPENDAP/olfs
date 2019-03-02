@@ -160,7 +160,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if (!besCatalogName.endsWith("/"))
             besCatalogName += "/";
 
-        PathBuilder.normalizePath(besCatalogName,true,false);
+        besCatalogName = PathBuilder.normalizePath(besCatalogName,true,false);
         _log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
 
 
@@ -236,7 +236,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response,_besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "thredds_catalog");
 
 

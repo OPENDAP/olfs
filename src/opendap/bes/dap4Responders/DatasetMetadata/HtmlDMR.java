@@ -101,6 +101,9 @@ public class HtmlDMR extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
+
         log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType =  getNormativeMediaType();
@@ -109,7 +112,7 @@ public class HtmlDMR extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -145,6 +148,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
 
             AuthenticationControls.setLoginParameters(transformer,request);
 

@@ -113,6 +113,7 @@ public class Netcdf4DR extends Dap4Responder{
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        User user = new User(request);
 
         BesApi besApi = getBesApi();
 
@@ -124,7 +125,7 @@ public class Netcdf4DR extends Dap4Responder{
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         String downloadFileName = getDownloadFileName(resourceID);
@@ -132,18 +133,9 @@ public class Netcdf4DR extends Dap4Responder{
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-        User user = new User(request);
-
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap4DataAsNetcdf4(resourceID, qp, cf_history_entry, user.getMaxResponseSize(), os);
-
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
 }

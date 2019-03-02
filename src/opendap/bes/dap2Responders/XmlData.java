@@ -85,21 +85,16 @@ public class XmlData extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
+        User user = new User(request);
 
         BesApi besApi = getBesApi();
 
-
-
         log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + resourceID +
                     "    CE: '" + constraintExpression + "'");
-
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -107,7 +102,7 @@ public class XmlData extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -116,13 +111,7 @@ public class XmlData extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-
-        User user = new User(request);
-
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDap2DataAsXml(
                 resourceID,
                 constraintExpression,
@@ -130,11 +119,7 @@ public class XmlData extends Dap4Responder {
                 user.getMaxResponseSize(),
                 xmlBase,
                 os);
-
-
         os.flush();
         log.info("Sent XML Data response.");
-
-
     }
 }

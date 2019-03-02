@@ -81,11 +81,11 @@ public class Util {
         NetRC netRC = new NetRC(filename);
 
         for (NetRC.NetRCEntry entry : netRC.getEntries()) {
-            String userId = entry.login;
-            String pword = String.valueOf(entry.password);
+            String userId = entry.getLogin();
+            String pword = entry.getPassword();
 
             credsProvider.setCredentials(
-                    new AuthScope(entry.machine, secure_transport ? 443 : 80),
+                    new AuthScope(entry.getMachine(), secure_transport ? 443 : 80),
                     new UsernamePasswordCredentials(userId, pword));
 
         }

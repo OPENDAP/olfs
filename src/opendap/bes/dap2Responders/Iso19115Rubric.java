@@ -109,20 +109,13 @@ public class Iso19115Rubric extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", "ISO19115 Metadata Compliance Report");
 
 
         OutputStream os = response.getOutputStream();
-
-
         String xdap_accept = "3.2";
-
-
-
         Document ddx = new Document();
-
-
         besApi.getDDXDocument(
                 resourceID,
                 constraintExpression,

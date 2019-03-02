@@ -88,14 +88,11 @@ public class GeoTiff extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
-
         BesApi besApi = getBesApi();
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
-
-        Version.setOpendapMimeHeaders(request, response, besApi);
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -104,33 +101,21 @@ public class GeoTiff extends Dap4Responder {
 
         response.setContentType(responseMediaType.getMimeType());
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-
-
 
         String xdap_accept = "3.2";
         User user = new User(request);
 
-
         OutputStream os = response.getOutputStream();
-
-
         besApi.writeDap2DataAsGeoTiff(
                 resourceID,
                 constraintExpression,
                 xdap_accept,
                 user.getMaxResponseSize(),
                 os);
-
         os.flush();
         log.debug("Sent {}",getServiceTitle());
-
-
-
     }
-
-
-
 }

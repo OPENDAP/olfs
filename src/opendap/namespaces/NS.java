@@ -37,13 +37,13 @@ import org.jdom.Namespace;
  */
 public class NS {
 
+    /**
+     * This class should never be instantiated.
+     */
+    private NS(){ throw new IllegalStateException("opendap.namespaces.NS class"); }
+
     public static boolean checkNamespace(Element e, String name, Namespace namespace)  {
-
-        if(e==null || !e.getName().equals(name) || !e.getNamespace().equals(namespace))
-            return false;
-
-        return true;
-
+        return e != null && e.getName().equals(name) && e.getNamespace().equals(namespace);
     }
 
 

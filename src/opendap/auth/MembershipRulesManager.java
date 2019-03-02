@@ -110,10 +110,9 @@ public class MembershipRulesManager {
             }
             group.addUserPattern(uidPatternStr,authContextPatternStr);
         }
-
-
-
     }
+
+
     private static void addRole(Element roleElem) throws ConfigurationException {
         String rid = roleElem.getAttributeValue("id");
         if (rid == null) {

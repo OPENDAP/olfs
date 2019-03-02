@@ -96,7 +96,7 @@ public class BesApi implements Cloneable {
     public static final String SHOW_BES_KEY    = "showBesKey";
     public static final String VALUE           = "value";
     public static final String SUPPORT_EMAIL   = "SupportEmail";
-    public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "SupportEmail";
+    public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "support@opendap.org";
 
     public static final String REQUEST_ID      = "reqID";
 
@@ -106,11 +106,6 @@ public class BesApi implements Cloneable {
     public static final String ERRORS_CONTEXT  = "errors";
     public static final String XML_ERRORS      = "xml";
 
-    // Dropped the use of these because now the OLFS is handling (parsing) all of the errors.
-    // Previously some errors were sent directly to the client in the stream from the BES. No. More.
-    //public static final String DAP2_ERRORS     = "dap2";
-    //public static final String DAP4_ERRORS     = "dap4";
-    //public static final String JSON_ERRORS     = "json";
     public static final String XMLBASE_CONTEXT = "xml:base";
 
     public static final String STORE_RESULT_CONTEXT  = "store_result";
@@ -120,6 +115,9 @@ public class BesApi implements Cloneable {
     public static final String DEFAULT_XDAP_ACCEPT = "2.0";
 
     public static final String EXPLICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
+
+    // Added for cloudydap experiment
+    public static final String CLOUDY_DAP_CONTEXT = "cloudydap";
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
@@ -143,14 +141,10 @@ public class BesApi implements Cloneable {
     public static final String DEFAULT_BES_CONTAINER = DEFAULT_BES_CATALOG_NAME + "Container";
 
 
-    public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
+    public static final String MATCH_LAST_DOT_SUFFIX_REGEX_STRING = "\\.(?=[^.]*$).*$" ;
 
-    /**
-     * The name of the BES Exception Element.
-     */
-    private static String BES_ERROR = "BESError";
 
-    public static String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
+    public static final String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -527,7 +521,7 @@ public class BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getDap2RequestDocument(DAP2_DATA, dataSource, constraintExpression, async, storeResult, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS),
+                getDap2RequestDocumentAsync(DAP2_DATA, dataSource, constraintExpression, async, storeResult, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS),
                 os);
     }
 
@@ -2499,12 +2493,12 @@ public class BesApi implements Cloneable {
 
 
 
-        return getDap2RequestDocument(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
+        return getDap2RequestDocumentAsync(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
 
     }
 
 
-    public  Document getDap2RequestDocument(String type,
+    public  Document getDap2RequestDocumentAsync(String type,
                                             String dataSource,
                                             String ce,
                                             String async,
@@ -2603,6 +2597,14 @@ public class BesApi implements Cloneable {
 
         request.setAttribute(REQUEST_ID,getRequestIdBase());
 
+        /**----------------------------------------------------------------------
+         * Added this bit for the cloudy dap experiment - ndp 1/19/17
+         */
+        String cloudyDap = qp.getCloudyDap();
+        if(cloudyDap!=null){
+            request.addContent(setContextElement(CLOUDY_DAP_CONTEXT,cloudyDap));
+        }
+        /**----------------------------------------------------------------------*/
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -2821,7 +2823,7 @@ public class BesApi implements Cloneable {
      */
     public String getBesDataSourceID(String relativeUrl, boolean checkWithBes){
 
-        Pattern lastDotSuffixPattern= Pattern.compile(_regexToMatchLastDotSuffixString);
+        Pattern lastDotSuffixPattern= Pattern.compile(MATCH_LAST_DOT_SUFFIX_REGEX_STRING);
 
         return getBesDataSourceID(relativeUrl,lastDotSuffixPattern,checkWithBes);
 

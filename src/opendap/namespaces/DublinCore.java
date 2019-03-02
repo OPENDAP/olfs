@@ -36,6 +36,11 @@ import org.jdom.Namespace;
  * To change this template use File | Settings | File Templates.
  */
 public class DublinCore {
+    /**
+     * This class should never be instantiated.
+     */
+    private DublinCore(){ throw new IllegalStateException("opendap.namespaces.DublinCore class"); }
+
     public static final String    NAMESPACE_STRING = "http://purl.org/dc/elements/1.1/";
     public static final Namespace NS = Namespace.getNamespace("dc",NAMESPACE_STRING);
 

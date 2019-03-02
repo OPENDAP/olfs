@@ -63,18 +63,18 @@ public class GetCapabilitiesRequest {
 
     private String[] _coverageIds;
 
-    public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
-    public static String SERVICE_PROVIDER = "ServiceProvider";
-    public static String OPERATIONS_METADATA = "OperationsMetadata";
-    public static String SERVICE_METADATA = "ServiceMetadata";
-    public static String CONTENTS = "Contents";
-    public static String ALL = "All";
+    public static final String SERVICE_IDENTIFICATION = "ServiceIdentification";
+    public static final String SERVICE_PROVIDER = "ServiceProvider";
+    public static final String OPERATIONS_METADATA = "OperationsMetadata";
+    public static final String SERVICE_METADATA = "ServiceMetadata";
+    public static final String CONTENTS = "Contents";
+    public static final String ALL = "All";
 
     // Earth Observation Profile sections
-    public static String DATASET_SERIES_SUMMARY = "DatasetSeriesSummary";
-    public static String COVERAGE_SUMMARY = "CoverageSummary";
+    public static final String DATASET_SERIES_SUMMARY = "DatasetSeriesSummary";
+    public static final String COVERAGE_SUMMARY = "CoverageSummary";
 
-    public static final HashSet<String> sectionNames = new HashSet<String>();
+    private static final HashSet<String> sectionNames = new HashSet<String>();
     static {
         sectionNames.add(SERVICE_IDENTIFICATION);
         sectionNames.add(SERVICE_PROVIDER);

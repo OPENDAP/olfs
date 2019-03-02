@@ -36,6 +36,12 @@ import org.jdom.Namespace;
  */
 public class BES {
 
+    /**
+     * This class should never be instantiated.
+     */
+    private BES(){ throw new IllegalStateException("opendap.namespaces.BES class"); }
+
+
     public static final String BES_NAMESPACE_STRING = "http://xml.opendap.org/ns/bes/1.0#";
     public static final Namespace BES_NS =  Namespace.getNamespace("bes", BES_NAMESPACE_STRING);
     

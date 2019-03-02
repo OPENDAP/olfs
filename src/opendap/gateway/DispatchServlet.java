@@ -42,6 +42,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,52 +51,39 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: Apr 22, 2008
  * Time: 3:36:36 PM
  */
+@Deprecated
 public class DispatchServlet extends HttpServlet {
 
 
-    private Logger log;
+    private static final Logger log  = org.slf4j.LoggerFactory.getLogger(DispatchServlet.class);
+    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+    private static final AtomicInteger reqNumber = new AtomicInteger(0);
 
+    private static final String GATEWAY_ACCESS_LOG_ID = "HYRAX_GATEWAY_ACCESS";
 
-    private Element _config;
+    private static Element config;
+    private static DispatchHandler gatewayDispatchHandler;
 
-    private AtomicInteger reqNumber;
+    @Override
+    public void init() throws ServletException {
 
-    private String systemPath;
-
-    private boolean isInitialized;
-
-    private DispatchHandler _gatewayDispatchHandler;
-
-    public void init() {
-
-        if (isInitialized)
+        if (isInitialized.get())
             return;
 
         LogUtil.logServerStartup("init()");
 
-
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
-        isInitialized = false;
-        reqNumber = new AtomicInteger(0);
-        systemPath = ServletUtil.getSystemPath(this, "");
-
-        _gatewayDispatchHandler = new DispatchHandler();
-
+        gatewayDispatchHandler = new DispatchHandler();
 
         try {
-            _config = loadConfig();
-            _gatewayDispatchHandler.init(this,_config);
+            config = loadConfig();
+            gatewayDispatchHandler.init(this, config);
 
         } catch (Exception e) {
             log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+            throw new ServletException(e);
         }
-
-
         log.info("Initialized.");
-
-
-        isInitialized = true;
+        isInitialized.set(true);
     }
 
 
@@ -118,17 +107,11 @@ public class DispatchServlet extends HttpServlet {
             return null;
         }
 
-
         filename = Scrub.fileName(ServletUtil.getConfigPath(this) + filename);
-
         log.debug("Loading Configuration File: " + filename);
-
-
         try {
-
             File confFile = new File(filename);
             FileInputStream fis = new FileInputStream(confFile);
-
             try {
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
@@ -139,7 +122,6 @@ public class DispatchServlet extends HttpServlet {
             } finally {
                 fis.close();
             }
-
         } catch (FileNotFoundException e) {
             String msg = "gateway configuration file \"" + filename + "\" cannot be found.";
             log.warn(msg);
@@ -153,10 +135,7 @@ public class DispatchServlet extends HttpServlet {
             log.error(msg);
             throw new ServletException(msg, e);
         }
-
         return null;
-
-
     }
 
 
@@ -169,26 +148,22 @@ public class DispatchServlet extends HttpServlet {
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
      *         since midnight January 1, 1970 GMT
      */
-    protected long getLastModified(HttpServletRequest req) {
+    @Override
+    public long getLastModified(HttpServletRequest req) {
 
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "GATEWAY_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, GATEWAY_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
-
             if (ReqInfo.isServiceOnlyRequest(req))
-                return -1;
-            return _gatewayDispatchHandler.getLastModified(req);
+                return new Date().getTime();
 
-
+            return gatewayDispatchHandler.getLastModified(req);
         }
         finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "GATEWAY_SERVICE_ACCESS");
-
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, GATEWAY_ACCESS_LOG_ID);
         }
-
-
     }
 
 
@@ -203,28 +178,28 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-
+    /**
+     *
+     * @param request
+     * @param response
+     */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
         int request_status = HttpServletResponse.SC_OK;
-
         try {
-
-            LogUtil.logServerAccessStart(request, "GATEWAY_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
-
+            LogUtil.logServerAccessStart(request, GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             if (!redirect(request, response)) {
 
-                if(!_gatewayDispatchHandler.requestDispatch(request,response,true)){
+                if(!gatewayDispatchHandler.requestDispatch(request,response,true)){
                     if(!response.isCommitted()){
                         log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                        throw new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix");
+                        // throw new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix");
+                        request_status = OPeNDAPException.anyExceptionHandler(new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix"), this,  response);
                     }
-
                 }
-
             }
-
         } catch (Throwable t) {
             try {
                 request_status = OPeNDAPException.anyExceptionHandler(t, this,  response);
@@ -232,24 +207,18 @@ public class DispatchServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, "GATEWAY_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, GATEWAY_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
 
 
-
+    @Override
     public void destroy() {
-
         LogUtil.logServerShutdown("destroy()");
-
-        _gatewayDispatchHandler.destroy();
-
+        gatewayDispatchHandler.destroy();
         super.destroy();
-
         log.info("Gateway service shutdown complete.");
     }
-
-
 
 }

@@ -28,29 +28,23 @@ package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.ppt.PPTException;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.TreeSet;
 
 /**
  * Contains the Version and UUID information for Hyrax Server.
  */
 public class Version  {
-
-    private static Logger log = org.slf4j.LoggerFactory.getLogger(Version.class);
-
-    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
-
-
-
-    private static String olfsVersion  = "@OlfsVersion@";
-    private static String hyraxVersion = "@HyraxVersion@";
-
-
+    private static final String olfsVersion  = "@OlfsVersion@";
+    private static final String hyraxVersion = "@HyraxVersion@";
 
 
     /**
@@ -74,13 +68,9 @@ public class Version  {
      * @return The version of OLFS.
      */
     public static Element getOLFSVersionElement() {
-
         Element olfs = new Element("OLFS");
-
         olfs.setAttribute("version",olfsVersion);
-
         return (olfs);
-
     }
 
     /**
@@ -88,13 +78,9 @@ public class Version  {
      * @return The version of Hyrax.
      */
     public static Element getHyraxVersionElement() {
-
         Element hyrax = new Element("Hyrax");
-
         hyrax.setAttribute("version",hyraxVersion);
-
         return (hyrax);
-
     }
 
     /**
@@ -114,20 +100,12 @@ public class Version  {
      * ascertained by querying the BES.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXDODSServerVersion(HttpServletRequest request)
-            throws Exception {
-
-
-
+    public static String getXDODSServerVersion(HttpServletRequest request) {
         String relativeUrl = ReqInfo.getLocalUrl(request);
-
         BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
-
         TreeSet<String> commonDapVersions = besGroup.getCommonDapVersions();
 
         return ("dods/" + commonDapVersions.last());
-
-
     }
 
     /**
@@ -137,19 +115,14 @@ public class Version  {
      * @throws Exception If these is a problem getting the version document.
      */
     public static String getXOPeNDAPServerVersion(HttpServletRequest request)
-            throws Exception {
+            throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-
-
-
         BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
-
         TreeSet<String> componentVersions = besGroup.getGroupComponentVersions();
 
         if(componentVersions.isEmpty())
             return ("Server-Version-Unknown");
-
 
         StringBuilder xOpendapServerVersion = new StringBuilder();
 
@@ -158,9 +131,7 @@ public class Version  {
             xOpendapServerVersion.append(comma).append(componentVersion);
             comma= ", ";
         }
-
         return (xOpendapServerVersion.toString());
-
     }
 
 
@@ -173,21 +144,15 @@ public class Version  {
      * the DAP specifcation that the server response conforms to.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXDAPVersion(HttpServletRequest request) throws Exception {
-
-
+    public static String getXDAPVersion(HttpServletRequest request) {
         String responseDAP = null;
         String clientDapVer = null;
         BesGroup besGroup;
 
         if (request != null) {
             clientDapVer = request.getHeader("X-DAP");
-
             String relativeUrl = ReqInfo.getLocalUrl(request);
-
-
             besGroup = BESManager.getBesGroup(relativeUrl);
-
         }
         else {
             besGroup = BESManager.getBesGroup("/");
@@ -201,37 +166,25 @@ public class Version  {
             }
         }
         String highestVersionString = commonDapVersions.last();
-
         if (responseDAP == null)
             responseDAP = highestVersionString;
 
         return (responseDAP);
-
-
     }
-
-
-
-
-
-
 
     /**
      * Adds the response HTTP headers with the OPeNDAP version content.
      *
      * @param request Client request to serviced
      * @param response The response in which to set the headers.
-     * @param besApi
      * @throws Exception If these is a problem getting the version document.
      */
-    public static void setOpendapMimeHeaders(HttpServletRequest request, HttpServletResponse response, BesApi besApi)
-            throws Exception{
-
+    public static void setOpendapMimeHeaders(HttpServletRequest request, HttpServletResponse response)
+            throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
         response.setHeader("XDODS-Server", getXDODSServerVersion(request));
         response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion(request));
         response.setHeader("X-DAP", getXDAPVersion(request));
 
     }
-
 
 }
