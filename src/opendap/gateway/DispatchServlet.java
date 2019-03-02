@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: Apr 22, 2008
  * Time: 3:36:36 PM
  */
+@Deprecated
 public class DispatchServlet extends HttpServlet {
 
 
