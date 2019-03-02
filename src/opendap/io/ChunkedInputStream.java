@@ -195,7 +195,7 @@ public class ChunkedInputStream  {
         boolean isError = false;
         boolean moreData = true;
         String extensionContent;
-        long bytesRead = 0;
+        long totalBytesReadInMessage = 0;
 
         while(moreData && !isClosed){
 
@@ -241,7 +241,7 @@ public class ChunkedInputStream  {
                 chunkReadPosition += bytesReceived;
 
                 // And keep the books...
-                bytesRead += bytesReceived;
+                totalBytesReadInMessage += bytesReceived;
 
                 switch (getCurrentChunkType()){
 
@@ -270,7 +270,7 @@ public class ChunkedInputStream  {
 
         }
 
-        log.info("readChunkedMessage() - Message contained {} bytes.",bytesRead);
+        log.info("readChunkedMessage() - Message contained {} bytes. (status:{})",totalBytesReadInMessage,isError?"ERROR":"SUCCESS");
         return !isError;
     }
 
