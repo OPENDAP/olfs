@@ -68,6 +68,9 @@ public class BES {
     private int totalClients;
     private ReentrantLock _adminLock;
 
+    private AdminInfo administratorInfo;
+    private String supportEmail;
+
 
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
@@ -100,6 +103,7 @@ public class BES {
         _clientsMapLock = new ReentrantLock(true);
         _clients = new ConcurrentHashMap<>();
 
+        supportEmail = null;
 
         log.debug("BES built with configuration:\n{}", _config);
         _serverVersionDocument = null;
@@ -107,8 +111,65 @@ public class BES {
     }
 
 
+    public AdminInfo getAdministratorInfo() throws JDOMException, BESError, PPTException, IOException {
+        if(administratorInfo==null){
+            _adminLock.lock();
+            try {
+                administratorInfo = retrieveAdminInfo();
+            }
+            finally {
+                _adminLock.unlock();
+            }
+        }
+        return new AdminInfo(administratorInfo);
+    }
 
+    private AdminInfo retrieveAdminInfo() throws JDOMException, BESError, PPTException, IOException {
+        Document showBesKeyCmd = BesApi.getShowBesKeyRequestDocument(BesApi.BES_SERVER_ADMINISTRATOR_KEY);
+        Document response = new Document();
+        besTransaction(showBesKeyCmd,response);
+        Element showBesKey = response.getRootElement().getChild("showBesKey",BES_NS);
+        showBesKey.detach();
+        Map<String,String> pmap = BesApi.processBesParameterMap(showBesKey);
+        return new AdminInfo(pmap);
+    }
 
+    public String getSupportEmail(){
+        if(supportEmail==null){
+            _adminLock.lock();
+            try {
+                supportEmail = retrieveSupportEmail();
+            }
+            finally {
+                _adminLock.unlock();
+            }
+        }
+        return supportEmail;
+    }
+
+    private String retrieveSupportEmail() {
+        String emailAddress = BesApi.DEFAULT_SUPPORT_EMAIL_ADDRESS;
+        Document showBesKeyCmd = BesApi.getShowBesKeyRequestDocument(BesApi.BES_SUPPORT_EMAIL_KEY);
+        Document response = new Document();
+        try {
+            besTransaction(showBesKeyCmd,response);
+            Element showBesKey = response.getRootElement().getChild("showBesKey",BES_NS);
+            if(showBesKey!=null){
+                if(log.isDebugEnabled()) {
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    log.debug("BES Support Email Key for \"{}\"\n{}",getPrefix(), xmlo.outputString(showBesKey));
+                }
+                Element value =  showBesKey.getChild(BesApi.VALUE,opendap.namespaces.BES.BES_NS);
+                if(value!=null){
+                    emailAddress = value.getTextTrim();
+                }
+            }
+        }
+        catch (PPTException | IOException | JDOMException | BESError e) {
+            log.error("Failed to get {} from BES. Message: {}", BesApi.BES_SUPPORT_EMAIL_KEY,e.getMessage());
+        }
+        return emailAddress;
+    }
 
     public List<BesConfigurationModule> getConfigurationModules() throws BesAdminFail {
 
@@ -1018,9 +1079,6 @@ public class BES {
             throws PPTException {
 
         OPeNDAPClient besClient=null;
-
-        if (_checkOutFlag == null)
-            return null;
 
         _clientCheckoutLock.lock();
         try {

@@ -42,6 +42,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,6 +51,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,6 +68,8 @@ import java.util.regex.Pattern;
  *  - override BesApi.besTransaction(*)
  */
 public class BesApi implements Cloneable {
+
+    private static Logger staticLog = LoggerFactory.getLogger(BesApi.class);
 
     public static final String DAP4_DATA  = "dap";
     public static final String DAP4_DMR   = "dmr";
@@ -95,7 +99,8 @@ public class BesApi implements Cloneable {
     public static final String W10N_TRAVERSE   = "w10nTraverse";
     public static final String SHOW_BES_KEY    = "showBesKey";
     public static final String VALUE           = "value";
-    public static final String SUPPORT_EMAIL   = "SupportEmail";
+    public static final String BES_SUPPORT_EMAIL_KEY = "SupportEmail";
+    public static final String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
     public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "support@opendap.org";
 
     public static final String REQUEST_ID      = "reqID";
@@ -144,7 +149,6 @@ public class BesApi implements Cloneable {
     public static final String MATCH_LAST_DOT_SUFFIX_REGEX_STRING = "\\.(?=[^.]*$).*$" ;
 
 
-    public static final String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -192,59 +196,21 @@ public class BesApi implements Cloneable {
         return BESManager.getCombinedVersionDocument();
     }
 
-    public AdminInfo getAdminInfo(String path) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
-        return new AdminInfo(this,  path);
-    }
-
-    /**
-     * Returns the Administrator email held by the BES associated with the path.
-     * @param path
-     * @return
-     */
-    public String getAdministrator(String path) throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
-
-        String adminEmail = "support@opendap.org";
+    public AdminInfo getAdminInfo(String path)
+            throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
         BES bes = getBES(path);
-        Document verDoc = bes.getVersionDocument();
-        if(verDoc==null)
-            return adminEmail;
-
-        Element besElement = verDoc.getRootElement();
-        if(besElement==null)
-            return adminEmail;
-
-        Element adminElement = besElement.getChild("Administrator", opendap.namespaces.BES.BES_NS);
-        if(adminElement!=null)
-            adminEmail = adminElement.getTextTrim();
-
-        return adminEmail;
+        return bes.getAdministratorInfo();
     }
+
 
     /**
      * Returns the support email held by the BES associated with the path.
      * @param path
      * @return
      */
-    public String getSupportEmail(String path)  {
-
-        String supportEmail = DEFAULT_SUPPORT_EMAIL_ADDRESS;
-        try {
-            Element showBesKey = showBesKey(path, SUPPORT_EMAIL);
-            if(showBesKey!=null){
-                if(log.isDebugEnabled()) {
-                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                    log.debug("BES Support Email Key for \"{}\"\n{}",path, xmlo.outputString(showBesKey));
-                }
-                Element value =  showBesKey.getChild(VALUE,opendap.namespaces.BES.BES_NS);
-                if(value!=null){
-                    supportEmail = value.getTextTrim();
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to get {} from BES. Message: {}",SUPPORT_EMAIL,e.getMessage());
-        }
-
-        return supportEmail;
+    public String getSupportEmail(String path) throws BadConfigurationException {
+        BES bes = getBES(path);
+        return bes.getSupportEmail();
     }
 
 
@@ -1813,7 +1779,7 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Element setContextElement(String name, String value) {
+    public static Element setContextElement(String name, String value) {
         Element e = new Element("setContext",BES_NS);
         e.setAttribute("name",name);
         e.setText(value);
@@ -2915,13 +2881,14 @@ public class BesApi implements Cloneable {
 
     }
 
-    private String getRequestIdBase(){
+    private static String getRequestIdBase(){
         return "[thread:"+Thread.currentThread().getName()+"-"+ Thread.currentThread().getId()+"]";
     }
 
 
 
-    public String getBesCombinedTypeMatch() throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
+    public String getBesCombinedTypeMatch()
+            throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
         return getDefaultBesCombinedTypeMatchPattern("/");
     }
 
@@ -2937,26 +2904,35 @@ public class BesApi implements Cloneable {
      * @throws PPTException
      * @throws BESError
      */
-    public HashMap<String,String> getBESConfigParameterMap(String besPath, String mapName)
+    public Map<String,String> getBESConfigParameterMap(String besPath, String mapName)
             throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
+
+        BES bes = getBES(besPath);
+        Element besParamMap = showBesKey(bes.getPrefix(), mapName);
+        if(log.isInfoEnabled()) {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            log.info("BES map {}:\n{}",mapName,xmlo.outputString(besParamMap));
+        }
+        return processBesParameterMap(besParamMap);
+    }
+
+    /**
+     * Retrieves a BES Key that holds a Map stored in the values of the key and formatted as key:value
+     * @param map
+     * @return
+     */
+    public static Map<String,String> processBesParameterMap(Element map) {
 
         HashMap<String,String> pmap = new HashMap<>();
 
-        BES bes = getBES(besPath);
-        Element admin = showBesKey(bes.getPrefix(), mapName);
-        if(log.isInfoEnabled()) {
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            log.info("BES map {}:\n{}",mapName,xmlo.outputString(admin));
-        }
-
         @SuppressWarnings("unchecked")
-        List<Element> values = admin.getChildren("value", opendap.namespaces.BES.BES_NS);
+        List<Element> values = map.getChildren("value", opendap.namespaces.BES.BES_NS);
         for(Element v: values){
             String s = v.getTextTrim();
-            log.debug("getBESConfigParameterMap() - Processing map string: {}",s);
+            staticLog.debug("getBESConfigParameterMap() - Processing map string: {}",s);
             int markIndex = s.indexOf(":");
             if(markIndex < 0){
-                log.error("getBESConfigParameterMap() The BES returned an incorrectly formatted value for the {} key. value: '{}' SKIPPING",mapName,v);
+                staticLog.error("getBESConfigParameterMap() The BES returned an incorrectly formatted value for the key. raw value: '{}' SKIPPING",v);
             }
             else {
                 String key = s.substring(0,markIndex ).toLowerCase();
@@ -3003,10 +2979,6 @@ public class BesApi implements Cloneable {
         return combinedTypeMatch.toString();
     }
 
-    public Element showBesKey(String besKey) throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
-        return showBesKey("/",besKey);
-    }
-
 
     public Element showBesKey(String besPrefix, String besKey) throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
         Document showBesKeyCmd = getShowBesKeyRequestDocument(besKey);
@@ -3018,7 +2990,7 @@ public class BesApi implements Cloneable {
     }
 
 
-    public  Document getShowBesKeyRequestDocument(String besKey) {
+    public static Document getShowBesKeyRequestDocument(String besKey) {
 
         Element request = new Element("request", BES_NS);
         request.setAttribute(REQUEST_ID,getRequestIdBase());
@@ -3027,12 +2999,12 @@ public class BesApi implements Cloneable {
         request.addContent(showBesKeyRequestElement(besKey));
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        log.debug("getShowBesPathInfoRequestDocument() - Document\n {}",xmlo.outputString(request));
+        staticLog.debug("Document\n {}",xmlo.outputString(request));
 
         return new Document(request);
 
     }
-    public Element showBesKeyRequestElement(String besKey) {
+    public static Element showBesKeyRequestElement(String besKey) {
         Element spi = new Element(SHOW_BES_KEY,BES_NS);
         spi.setAttribute("key", besKey);
         return spi;

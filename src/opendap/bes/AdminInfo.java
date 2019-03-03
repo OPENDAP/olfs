@@ -27,13 +27,12 @@ package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
 import opendap.ppt.PPTException;
-import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
@@ -56,6 +55,8 @@ import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
  *
  */
 public class AdminInfo {
+
+    private Logger log;
 
     private String _organization;
     private String _country;
@@ -99,31 +100,43 @@ public class AdminInfo {
      * Makes a default ServerAdmin object that holds the information for OPeNDAP Inc.
      */
     public AdminInfo(){
-     _organization = ORGANIZATION_DEFAULT;
-     _country      = COUNTRY_DEFAULT;
-     _city         = CITY_DEFAULT;
-     _street       = STREET_DEFAULT;
-     _region       = REGION_DEFAULT;
-     _postalCode   = POSTAL_CODE_DEFAULT;
-     _telephone    = TELEPHONE_DEFAULT;
-     _email        = EMAIL_DEFAULT;
-     _website      = WEBSITE_DEFAULT;
+        log = LoggerFactory.getLogger(this.getClass());
+        _organization = ORGANIZATION_DEFAULT;
+        _country      = COUNTRY_DEFAULT;
+        _city         = CITY_DEFAULT;
+        _street       = STREET_DEFAULT;
+        _region       = REGION_DEFAULT;
+        _postalCode   = POSTAL_CODE_DEFAULT;
+        _telephone    = TELEPHONE_DEFAULT;
+        _email        = EMAIL_DEFAULT;
+        _website      = WEBSITE_DEFAULT;
+    }
+
+    /**
+     * Copy Constructor
+     * @param adminInfo
+     */
+    public AdminInfo(AdminInfo adminInfo){
+        this();
+        _organization = adminInfo._organization;
+        _country      = adminInfo._country;
+        _city         = adminInfo._city;
+        _street       = adminInfo._street;
+        _region       = adminInfo._region;
+        _postalCode   = adminInfo._postalCode;
+        _telephone    = adminInfo._telephone;
+        _email        = adminInfo._email;
+        _website      = adminInfo._website;
     }
 
 
-    /**
-     *
-     * @param besApi
-     * @param collectionName
-     * @throws BadConfigurationException
-     * @throws JDOMException
-     * @throws IOException
-     * @throws PPTException
-     * @throws BESError
-     */
-    public AdminInfo(BesApi besApi, String collectionName)throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
+    public AdminInfo(Map<String,String> adminInfo){
         this();
-        HashMap<String,String> adminInfo = besApi.getBESConfigParameterMap(collectionName,BES_SERVER_ADMINISTRATOR_KEY);
+        ingestAdminInfoMap(adminInfo);
+    }
+
+
+    private  void ingestAdminInfoMap(Map<String,String> adminInfo){
         String organization = adminInfo.get(ORGANIZATION_KEY);
         String country = adminInfo.get(COUNTRY_KEY);
         String city = adminInfo.get(CITY_KEY);
@@ -137,6 +150,7 @@ public class AdminInfo {
         // %TODO This is a pretty simple (and brutal) qc in that any missing value prompts all of it to be rejected. Review. Fix?
         if(organization==null || country==null || city==null || street==null || region==null
                 || postalCode==null || telephone==null || email==null || website==null){
+            log.error("The provided Map does not contain the required values for AdminInfo! Using defaults.");
             return; // Use the default values.
         }
         _organization = organization;
@@ -149,6 +163,7 @@ public class AdminInfo {
         _email        = email;
         _website      = website;
     }
+
 
     /**
      *  <pre>
