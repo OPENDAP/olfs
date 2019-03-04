@@ -114,7 +114,7 @@ public class Dap2IFH extends Dap4Responder {
         String supportEmail = besApi.getSupportEmail(requestedResourceId);
         String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
-        _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        _log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType = getNormativeMediaType();
 
@@ -138,7 +138,7 @@ public class Dap2IFH extends Dap4Responder {
 
         String jsonLD = getDatasetJsonLD(collectionUrl,ddx);
 
-        _log.error(jsonLD);
+        _log.debug("JsonLD for dataset {}\n{}",requestedResourceId,jsonLD);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
