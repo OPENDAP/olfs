@@ -92,7 +92,7 @@ public class DispatchServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchServlet.class);
 
-    private static final String HYRAX_LOG_ID = "HYRAX_ACCESS";
+    private static final String HYRAX_LOG_ID = "HyraxAccess";
 
     private static Document configDoc;
 
