@@ -66,7 +66,7 @@ public class BES {
     private Semaphore _checkOutFlag;
     private BESConfig _config;
     private int totalClients;
-    private ReentrantLock _adminLock;
+    private ReentrantLock adminLock;
 
     private AdminInfo administratorInfo;
     private String supportEmail;
@@ -98,7 +98,7 @@ public class BES {
         _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
 
-        _adminLock = new ReentrantLock(true);
+        adminLock = new ReentrantLock(true);
         _versionDocLock = new ReentrantLock(true);
         _clientsMapLock = new ReentrantLock(true);
         _clients = new ConcurrentHashMap<>();
@@ -113,12 +113,14 @@ public class BES {
 
     public AdminInfo getAdministratorInfo() throws JDOMException, BESError, PPTException, IOException {
         if(administratorInfo==null){
-            _adminLock.lock();
+            adminLock.lock();
             try {
-                administratorInfo = retrieveAdminInfo();
+                if(administratorInfo==null) {
+                    administratorInfo = retrieveAdminInfo();
+                }
             }
             finally {
-                _adminLock.unlock();
+                adminLock.unlock();
             }
         }
         return new AdminInfo(administratorInfo);
@@ -136,12 +138,14 @@ public class BES {
 
     public String getSupportEmail(){
         if(supportEmail==null){
-            _adminLock.lock();
+            adminLock.lock();
             try {
-                supportEmail = retrieveSupportEmail();
+                if(supportEmail==null) {
+                    supportEmail = retrieveSupportEmail();
+                }
             }
             finally {
-                _adminLock.unlock();
+                adminLock.unlock();
             }
         }
         return supportEmail;
@@ -443,7 +447,7 @@ public class BES {
 
         OPeNDAPClient admin = null;
 
-        _adminLock.lock();
+        adminLock.lock();
         try {
 
             try {
@@ -491,7 +495,7 @@ public class BES {
             }
         }
         finally {
-            _adminLock.unlock();
+            adminLock.unlock();
         }
 
     }
