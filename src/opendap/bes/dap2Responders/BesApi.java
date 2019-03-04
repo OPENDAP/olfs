@@ -231,8 +231,10 @@ public class BesApi implements Cloneable {
         try {
             Element showBesKey = showBesKey(path, SUPPORT_EMAIL);
             if(showBesKey!=null){
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                log.error(xmlo.outputString(showBesKey));
+                if(log.isDebugEnabled()) {
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    log.debug("BES Support Email Key for \"{}\"\n{}",path, xmlo.outputString(showBesKey));
+                }
                 Element value =  showBesKey.getChild(VALUE,opendap.namespaces.BES.BES_NS);
                 if(value!=null){
                     supportEmail = value.getTextTrim();
@@ -2942,8 +2944,10 @@ public class BesApi implements Cloneable {
 
         BES bes = getBES(besPath);
         Element admin = showBesKey(bes.getPrefix(), mapName);
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(admin, System.out);
+        if(log.isInfoEnabled()) {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            log.info("BES map {}:\n{}",mapName,xmlo.outputString(admin));
+        }
 
         @SuppressWarnings("unchecked")
         List<Element> values = admin.getChildren("value", opendap.namespaces.BES.BES_NS);
@@ -3009,6 +3013,7 @@ public class BesApi implements Cloneable {
         Document response = new Document();
         besTransaction(besPrefix,showBesKeyCmd,response);
         Element showBesKey = response.getRootElement().getChild("showBesKey",BES_NS);
+        showBesKey.detach();
         return showBesKey;
     }
 
