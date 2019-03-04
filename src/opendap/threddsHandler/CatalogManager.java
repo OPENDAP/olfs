@@ -179,7 +179,7 @@ public class CatalogManager {
             // get the URL of the catalog.
             href = catRef.getAttributeValue(XLINK.HREF, XLINK.NS);
 
-            if (href.startsWith("http://")) {
+            if (href.startsWith("http://") || href.startsWith("https://")) {
                 _log.info("Found catalogRef that references an external " +
                         "catalog: '"+href+"' Target catalog not processed. The catalogRef element " +
                         "will remain in the catalog and will not be cached.");
