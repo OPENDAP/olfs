@@ -37,6 +37,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.RDF;
 import opendap.io.HyraxStringEncoding;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -136,7 +138,6 @@ public class RdfDMR extends Dap4Responder {
         log.debug(xmlo.outputString(dmr));
 
 
-        ServletOutputStream os = response.getOutputStream();
         StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(dmr).getBytes( HyraxStringEncoding.getCharset())));
 
         /*
@@ -162,6 +163,7 @@ public class RdfDMR extends Dap4Responder {
         // set the destination of the 1st transform to be the 2nd transform
         addRdfId2DdxTransform.setDestination(xml2rdf);
 
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         // Set the destination of the 2nd transform to be the response OutputStream
         xml2rdf.setOutputStream(os);
 
@@ -188,10 +190,9 @@ public class RdfDMR extends Dap4Responder {
             sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
-
-
-        log.info("Sent {}.",getServiceTitle());
-
+        os.flush();
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 
