@@ -141,7 +141,7 @@ public class Dap2Data extends Dap4Responder {
             handleStoreResultResponse(srr, response);
         }
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 

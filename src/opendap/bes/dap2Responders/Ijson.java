@@ -117,7 +117,7 @@ public class Ijson extends Dap4Responder {
                 os);
 
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 

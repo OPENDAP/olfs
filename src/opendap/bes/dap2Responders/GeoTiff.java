@@ -116,7 +116,7 @@ public class GeoTiff extends Dap4Responder {
                 user.getMaxResponseSize(),
                 os);
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
-        log.debug("Sent {} size: ",getServiceTitle(),os.size());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

@@ -115,7 +115,7 @@ public class Json extends Dap4Responder {
                 user.getMaxResponseSize(),
                 os);
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 

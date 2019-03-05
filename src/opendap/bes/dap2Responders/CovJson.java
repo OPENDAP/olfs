@@ -104,7 +104,7 @@ public class CovJson extends Dap4Responder {
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsCovJson(resourceID, constraintExpression, "3.2", user.getMaxResponseSize(), os);
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 }

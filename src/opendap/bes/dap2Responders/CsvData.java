@@ -108,7 +108,7 @@ public class CsvData extends Dap4Responder {
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

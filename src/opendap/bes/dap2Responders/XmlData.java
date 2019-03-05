@@ -121,7 +121,7 @@ public class XmlData extends Dap4Responder {
                 xmlBase,
                 os);
         os.flush();
-        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        LogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 }
