@@ -67,7 +67,7 @@ public class LogUtil {
     private static final String START_TIME_KEY = "startTime";
     private static final String RESOURCE_ID_KEY = "resourceID";
     private static final String QUERY_STRING_KEY = "query";
-    public static final String RESPONSE_SIZE_KEY = "RESPONSE_SIZE";
+    private static final String RESPONSE_SIZE_KEY = "size";
     private static final String DURATION_KEY = "duration";
     private static final String HTTP_STATUS_KEY = "http_status";
 
