@@ -33,17 +33,16 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf4;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.util.regex.Pattern;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -133,9 +132,10 @@ public class Netcdf4DR extends Dap4Responder{
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsNetcdf4(resourceID, qp, cf_history_entry, user.getMaxResponseSize(), os);
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }
