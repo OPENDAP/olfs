@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextXml;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 
@@ -106,9 +107,10 @@ public class DDX extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = "3.2"; //request.getHeader("XDAP-Accept");
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os);
         os.flush();
-        log.info("Sent DAP DDX.");
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 }

@@ -34,17 +34,18 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
 
 
 public class RDF extends Dap4Responder {
@@ -120,7 +121,6 @@ public class RDF extends Dap4Responder {
 
         log.debug(xmlo.outputString(ddx));
 
-        ServletOutputStream os = response.getOutputStream();
         StreamSource ddxStreamSource  =
                 new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes( HyraxStringEncoding.getCharset())));
 
@@ -145,6 +145,8 @@ public class RDF extends Dap4Responder {
         // set the destination of the 1st transform to be the 2nd transform
         addRdfId2DdxTransform.setDestination(xml2rdf);
 
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
+
         // Set the destination of the 2nd transform to be the response OutputStream
         xml2rdf.setOutputStream(os);
 
@@ -157,7 +159,8 @@ public class RDF extends Dap4Responder {
             sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
-        log.info("Sent RDF version of DDX.");
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 

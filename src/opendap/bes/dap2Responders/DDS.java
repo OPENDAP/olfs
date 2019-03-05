@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextPlain;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -110,10 +111,11 @@ public class DDS extends Dap4Responder {
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os);
         os.flush();
-        log.debug("Sent DAP DDS.");
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 }
