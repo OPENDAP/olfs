@@ -88,8 +88,14 @@ public class RequestCache {
     }
 
     public static void closeThreadCache(){
-        cache.remove(Thread.currentThread());
-        log.info("Destroyed request cache for thread: {}",Thread.currentThread());
+        int size = 0;
+        Thread thisThread = Thread.currentThread();
+        HashMap<String,CachedObj> value = cache.remove(thisThread);
+        if(value!=null){
+            size = value.size();
+            value.clear();
+        }
+        log.info("Closed RequestCache for thread: {} Cache contained {} values.",thisThread,size);
     }
 
 

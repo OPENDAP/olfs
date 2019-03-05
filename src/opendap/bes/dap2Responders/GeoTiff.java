@@ -32,13 +32,13 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Responder that transmits JSON encoded DAP2 data to the client.
@@ -108,7 +108,7 @@ public class GeoTiff extends Dap4Responder {
         String xdap_accept = "3.2";
         User user = new User(request);
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsGeoTiff(
                 resourceID,
                 constraintExpression,
@@ -116,6 +116,7 @@ public class GeoTiff extends Dap4Responder {
                 user.getMaxResponseSize(),
                 os);
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

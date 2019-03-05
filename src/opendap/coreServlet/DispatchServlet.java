@@ -92,8 +92,6 @@ public class DispatchServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchServlet.class);
 
-    private static final String HYRAX_LOG_ID = "HyraxAccess";
-
     private static Document configDoc;
 
     /**
@@ -394,7 +392,7 @@ public class DispatchServlet extends HttpServlet {
                 }
 
                 int reqno = reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, HYRAX_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
                 if(redirectForServiceOnlyRequest(request,response))
                     return;
@@ -444,7 +442,7 @@ public class DispatchServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, HYRAX_LOG_ID);
+            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             log.info("Response completed.\n");
         }
@@ -491,7 +489,7 @@ public class DispatchServlet extends HttpServlet {
 
                 int reqno = reqNumber.incrementAndGet();
 
-                LogUtil.logServerAccessStart(request, HYRAX_LOG_ID, "HTTP-POST", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
 
                 if(log.isDebugEnabled()) {
                     log.debug(ServletUtil.showRequest(request, reqno));
@@ -532,7 +530,7 @@ public class DispatchServlet extends HttpServlet {
             }
         }
         finally{
-            LogUtil.logServerAccessEnd(httpStatus, HYRAX_LOG_ID);
+            LogUtil.logServerAccessEnd(httpStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -575,7 +573,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, HYRAX_LOG_ID, "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
 
         long lmt = new Date().getTime();
 
@@ -596,9 +594,8 @@ public class DispatchServlet extends HttpServlet {
             log.error("Caught: {}  Message: {} ",e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, HYRAX_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
-
         }
         return lmt;
     }
