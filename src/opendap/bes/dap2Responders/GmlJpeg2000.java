@@ -32,14 +32,14 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.http.mediaTypes.Jpeg2000;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Responder that transmits GML-JPEG2000 encoded DAP2 data to the client.
@@ -107,15 +107,15 @@ public class GmlJpeg2000 extends Dap4Responder {
 
         String xdap_accept = "3.2";
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsGmlJpeg2000(
                 resourceID,
                 constraintExpression,
                 xdap_accept,
                 user.getMaxResponseSize(),
                 os);
-
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        log.debug("Sent {} size: ",getServiceTitle(),os.size());
     }
 }

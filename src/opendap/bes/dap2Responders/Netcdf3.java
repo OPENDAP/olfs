@@ -31,15 +31,13 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.regex.Pattern;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -131,9 +129,10 @@ public class Netcdf3 extends Dap4Responder {
 
         String xdap_accept = "3.2";
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, cf_history_entry, xdap_accept, user.getMaxResponseSize(), os);
         os.flush();
-        log.debug("sendNormativeRepresentation(): Sent {}",getServiceTitle());
+        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 }

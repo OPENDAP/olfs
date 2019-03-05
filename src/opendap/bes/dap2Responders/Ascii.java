@@ -32,13 +32,13 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.http.mediaTypes.TextCsv;
 import opendap.http.mediaTypes.TextPlain;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 /**
@@ -115,9 +115,10 @@ public class Ascii extends Dap4Responder {
 
         User user = new User(request);
 
-        OutputStream os = response.getOutputStream();
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
-        os.flush();
-        log.debug("Sent DAP ASCII data response.");
+        DataOutputStream dos = new DataOutputStream(response.getOutputStream());
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), dos);
+        dos.flush();
+        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,dos.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),dos.size());
     }
 }

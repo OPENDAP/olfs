@@ -33,11 +33,12 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextCsv;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -104,9 +105,10 @@ public class CsvData extends Dap4Responder {
         String xdap_accept = "3.2";
         User user = new User(request);
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,os.size());
+        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

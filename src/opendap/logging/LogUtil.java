@@ -30,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Time: 3:34:35 PM
  */
 public class LogUtil {
+
+    public static final String DOCS_ACCESS_LOG_ID = "DocsAccess";
+    public static final String SITEMAP_ACCESS_LOG_ID = "SiteMapAccess";
+    public static final String HYRAX_ACCESS_LOG_ID = "HyraxAccess";
+    public static final String RESPONSE_SIZE_KEY = "RESPONSE_SIZE";
 
     private static AtomicBoolean isLogInit = new AtomicBoolean(false);
 
@@ -375,12 +381,28 @@ public class LogUtil {
      * @param httpStatus        - the result code for this request.
      * @param logName the name of the Logger to which to write stuff.
      */
-    public static void logServerAccessEnd(int httpStatus,
-                                          String logName) {
+    public static void logServerAccessEnd(int httpStatus, String logName) {
+        int size = -1;
+        Object o = RequestCache.get(LogUtil.RESPONSE_SIZE_KEY);
+        if(o!=null){
+            size = (int)o;
+            MDC.put("size", Long.toString(size)+" bytes");
+            RequestCache.put(LogUtil.RESPONSE_SIZE_KEY,null);
+        }
+        logServerAccessEnd(httpStatus, size, logName);
+    }
+
+
+    /**
+     * Write log entry to named log.
+     *
+     * @param httpStatus        - the result code for this request.
+     * @param logName the name of the Logger to which to write stuff.
+     */
+    public static void logServerAccessEnd(int httpStatus, int size , String logName) {
 
         long endTime = System.currentTimeMillis();
 
-        MDC.put("http_status", Integer.toString(httpStatus));
 
         long  duration;
         String sTime = MDC.get("startTime");
@@ -392,14 +414,17 @@ public class LogUtil {
             duration = -1;
         }
         MDC.put("duration", Long.toString(duration)+" ms");
-
+        if(size>=0) {
+            MDC.put("size", Long.toString(size) + " bytes");
+        }
+        MDC.put("http_status", Integer.toString(httpStatus));
 
         // Doesn't matter what we write to the access_log because the access log formatter ignores
         // it in lieu of the stuff in MDC. All that matters is that we write something.
         Logger access_log = org.slf4j.LoggerFactory.getLogger(logName);
         access_log.info("");
 
-        log.info("REQUEST COMPLETE - http_status: " + httpStatus + " duration: "+ duration + " ms");
+        log.info("REQUEST COMPLETE - http_status: " + httpStatus + " duration: "+ duration + " ms  size: "+size);
 
     }
 
