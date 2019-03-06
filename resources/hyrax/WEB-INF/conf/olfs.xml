@@ -62,6 +62,9 @@
             <ClientPool maximum="200" maxCmds="2000" />
 
         </BES>
+
+        <NodeCache maxEntries="20000" refreshInterval="600"/>
+
     </BESManager>
 
 
@@ -73,11 +76,6 @@
     <!-- AddFileoutTypeSuffixToDownloadFilename / -->
     <!-- AllowDirectDataSourceAccess / -->
     <!-- PreloadNcmlIntoBes -->
-
-    <!-- CatalogCache>
-        <maxEntries>10000</maxEntries>
-        <updateIntervalSeconds>10000</updateIntervalSeconds>
-    </CatalogCache -->
 
     <!--
        'Bot Blocker' is used to block access from specific IP addresses
