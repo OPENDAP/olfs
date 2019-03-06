@@ -38,9 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Timer {
 
     private static Logger log = LoggerFactory.getLogger(Timer.class);
-
     private static ConcurrentHashMap<String, StringBuilder> threadLogs = new ConcurrentHashMap<>();
-
     private static boolean enabled = false;
 
     /**
@@ -86,31 +84,23 @@ public class Timer {
             return null;
 
         StringBuilder threadLog = getThreadLog();
-
         String threadName = Thread.currentThread().getName();
-
         StackTraceElement[] st = Thread.currentThread().getStackTrace();
-
         int callingMethodStackIndex = 2;
-
 
         StringBuilder key = new StringBuilder();
         key.append(st[callingMethodStackIndex].getClassName()).append(".")
                 .append(st[callingMethodStackIndex].getMethodName());
-
 
         Procedure p = new Procedure();
         p.name = key.toString();
         p.start();
 
         threadLog.append("[").append(threadName).append("] ").append(key.toString()).append("  STARTED: ").append(p.start).append("\n");
-
         log.info("start() - {} started:  {} ", key.toString(), p.start);
-
-
         return p;
-
     }
+
 
     /**
      * Stops and logs the timing of the associated procedure.
@@ -125,22 +115,18 @@ public class Timer {
         procedure.end();
 
         String threadName = Thread.currentThread().getName();
-
-
         sb.append("stop() - ").append(procedure.name).append(" stopped:  ");
         sb.append(procedure.end).append(" (").append(procedure.elapsedTime()).append(" ms)");
 
         if(log.isInfoEnabled()) {
             log.info(sb.toString());
         }
-
         StringBuilder threadLog = getThreadLog();
         threadLog.append("[").append(threadName).append("] ").append(procedure.name).append(" STOPPED: ").append(procedure.end);
         threadLog.append(" ELAPSED: ").append(procedure.elapsedTime()).append("\n");
 
-
-
     }
+
 
     /**
      * Writes the report() to the pass PrintStream.
@@ -151,7 +137,6 @@ public class Timer {
             pw.print("Timer is NOT enabled");
             return;
         }
-
         pw.print(report());
     }
 
@@ -162,10 +147,7 @@ public class Timer {
     public static void reset() {
         if(!enabled)
             return;
-
-
         String threadName = Thread.currentThread().getName();
-
         threadLogs.remove(threadName);
     }
 
@@ -179,13 +161,5 @@ public class Timer {
             return "Timer is NOT enabled";
 
         return getThreadLog().toString();
-
     }
-
-
-
-
-
-
-
 }
