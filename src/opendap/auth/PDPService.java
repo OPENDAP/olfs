@@ -52,7 +52,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class PDPService extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(PDPService.class);
-    private static final String SERVICE_LOG_ID = "PDP_SERVICE_ACCESS";
     private static final ReentrantLock CONFIG_LOCK = new ReentrantLock();
 
     private static final AtomicInteger REQ_NUMBER = new AtomicInteger(0);
@@ -122,11 +121,11 @@ public class PDPService extends HttpServlet {
         try {
             RequestCache.openThreadCache();
             long reqno = REQ_NUMBER.incrementAndGet();
-            LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "LastModified", Long.toString(reqno));
+            LogUtil.logServerAccessStart(req, LogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
             return new Date().getTime();
 
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, SERVICE_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -164,7 +163,7 @@ public class PDPService extends HttpServlet {
         String msg = "";
         int status = HttpServletResponse.SC_FORBIDDEN;
 
-        LogUtil.logServerAccessStart(request, SERVICE_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
+        LogUtil.logServerAccessStart(request, LogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
         try {
             if (!redirect(request, response)) {
 
@@ -225,7 +224,7 @@ public class PDPService extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(status, SERVICE_LOG_ID);
+            LogUtil.logServerAccessEnd(status, LogUtil.PDP_SERVICE_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }

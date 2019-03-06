@@ -355,7 +355,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
     @Override
     public long getLastModified(HttpServletRequest request) throws Exception {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = getResourceId(relativeUrl,true);
 
@@ -363,7 +362,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         ResourceInfo ri = getResourceInfo(dataSource);
         return ri.lastModified();
-
     }
 
 

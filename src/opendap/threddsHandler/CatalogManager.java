@@ -44,6 +44,7 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -342,17 +343,15 @@ public class CatalogManager {
 
         Catalog cat;
 
-
         try {
             cat = getCatalog(catalogKey);
             if (cat != null)
                 return cat.getLastModified();
         }
-        catch(Exception e){
-            _log.info("No such catalog: {}",catalogKey);
+        catch (SaxonApiException | BESError e) {
+            _log.info("Failed to retrieve catalog: {}  (msg: {})",catalogKey, e.getMessage());
         }
-
-        return -1;
+        return new Date().getTime();
     }
 
     /**

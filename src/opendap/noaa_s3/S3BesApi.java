@@ -131,14 +131,14 @@ public class S3BesApi extends BesGatewayApi {
 
 
 
-        log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
+        log.debug("remoteResourceUrl: {}", remoteResourceUrl);
 
 
         // Try to get it from the request cache.
         String lmt_cache_key = remoteResourceUrl+"_last-modified";
         Long lmt =  (Long) RequestCache.get(lmt_cache_key);
         if(lmt!=null){
-            log.debug("getLastModified() - using cached lmt: {}",lmt);
+            log.debug("Using cached lmt: {}",lmt);
             return lmt;
         }
 
@@ -156,7 +156,7 @@ public class S3BesApi extends BesGatewayApi {
 
                 if (statusCode != HttpStatus.SC_OK) {
                     log.error("getLastModified() - Unable to HEAD s3 object: " + remoteResourceUrl);
-                    lastModifiedTime = -1;
+                    lastModifiedTime = new Date().getTime();
                 }
                 else {
                     log.debug("getLastModified(): Executed HTTP HEAD for "+remoteResourceUrl);
@@ -164,7 +164,7 @@ public class S3BesApi extends BesGatewayApi {
                     Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
 
                     if(lastModifiedHeader==null){
-                     lastModifiedTime =  -1;
+                     lastModifiedTime =  new Date().getTime();
                     }
                     else {
                         String lmtString = lastModifiedHeader.getValue();
@@ -176,12 +176,12 @@ public class S3BesApi extends BesGatewayApi {
 
             } catch (Exception e) {
                 log.error("Unable to HEAD the s3 resource: {} Error Msg: {}", remoteResourceUrl, e.getMessage());
-                lastModifiedTime = -1;
+                lastModifiedTime = new Date().getTime();
             }
 
         } catch (Exception e) {
             log.debug("getLastModified(): Returning: -1");
-            lastModifiedTime =  -1;
+            lastModifiedTime =  new Date().getTime();
         }
 
         RequestCache.put(lmt_cache_key, lastModifiedTime);

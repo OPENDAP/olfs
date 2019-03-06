@@ -573,7 +573,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
 
         long lmt = new Date().getTime();
 
@@ -594,7 +594,7 @@ public class DispatchServlet extends HttpServlet {
             log.error("Caught: {}  Message: {} ",e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
         }
         return lmt;

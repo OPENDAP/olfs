@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 
@@ -56,6 +57,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
     public DatasetInfoHtmlPage(String sysPath, BesApi besApi) {
         this(sysPath,null, _defaultRequestSuffix,besApi);
     }
+
     public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
@@ -101,10 +103,11 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, os);
         os.flush();
-        log.info("Sent DAP Info page.");
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 }

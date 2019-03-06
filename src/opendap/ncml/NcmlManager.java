@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -211,11 +212,8 @@ public class NcmlManager {
     public static long getLastModified(String dapAccessID){
 
         Long lmt = _ncmlDatasetsLastModifiedTimes.get(dapAccessID);
-
-
         if(lmt==null)
-            lmt = (long) -1;
-
+            lmt = new Date().getTime();
 
         return lmt;
     }

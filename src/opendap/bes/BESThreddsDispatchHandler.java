@@ -52,10 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -338,11 +335,10 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
     public long getLastModified(HttpServletRequest req){
         String name = ReqInfo.getLocalUrl(req);
 
-        _log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
-                "collection: " + name );
-        _log.debug("getLastModified(): Returning: -1" );
+        _log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: {}", name );
+        _log.debug("getLastModified(): Returning current date/time" );
 
-        return -1;
+        return new Date().getTime();
     }
 
 
