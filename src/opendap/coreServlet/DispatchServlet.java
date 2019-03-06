@@ -234,16 +234,14 @@ public class DispatchServlet extends HttpServlet {
 
 
     private void initBesManager() throws ServletException {
-        Element besManagerElement = configDoc.getRootElement().getChild("BESManager");
+        Element besManagerElement = configDoc.getRootElement().getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
         if(besManagerElement ==  null){
             String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
             log.error(msg);
             throw new ServletException(msg);
-
         }
-        BESManager besManager  = new BESManager();
         try {
-            besManager.init(besManagerElement);
+            BESManager.init(besManagerElement);
         }
         catch(Exception e){
             throw new ServletException(e);

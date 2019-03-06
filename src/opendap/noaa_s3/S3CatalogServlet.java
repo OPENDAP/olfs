@@ -90,8 +90,7 @@ public class S3CatalogServlet extends HttpServlet {
         _s3DapDispatcher = new S3DapDispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
         try {
             Element besConfiguration = getBesManagerConfig();
-            BESManager besManager = new BESManager();
-            besManager.init(besConfiguration);
+            BESManager.init(besConfiguration);
             _s3DapDispatcher.init(this, getDapDispatConfig() );
 
         } catch (Exception e) {
@@ -285,7 +284,7 @@ public class S3CatalogServlet extends HttpServlet {
 
 
     private Element getBesManagerConfig() {
-        Element besManagerConfig = _configDoc.getRootElement().getChild("BESManager");
+        Element besManagerConfig = _configDoc.getRootElement().getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
         if(besManagerConfig==null){
             _log.warn("getBesManagerConfig() - BESManager element not found in configuration file. Using defaults.");
             Element e;
