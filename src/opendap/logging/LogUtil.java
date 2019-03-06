@@ -54,9 +54,27 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LogUtil {
 
-    public static final String DOCS_ACCESS_LOG_ID = "DocsAccess";
-    public static final String SITEMAP_ACCESS_LOG_ID = "SiteMapAccess";
     public static final String HYRAX_ACCESS_LOG_ID = "HyraxAccess";
+    public static final String HYRAX_LAST_MODIFIED_ACCESS_LOG_ID = "HyraxLastModifiedAccess";
+
+    public static final String DOCS_ACCESS_LOG_ID = "DocsAccess";
+
+    public static final String SITEMAP_ACCESS_LOG_ID = "SiteMapAccess";
+
+    public static final String PDP_SERVICE_ACCESS_LOG_ID = "PDPServiceAccess";
+    public static final String PDP_SERVICE_LAST_MODIFIED_LOG_ID = "PDPServiceLastModifiedAccess";
+
+    public static final String GATEWAY_ACCESS_LOG_ID = "HyraxGatewayAccess";
+    public static final String GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxGatewayLastModifiedAccess";
+
+    public static final String ADMIN_ACCESS_LOG_ID = "HyraxAdminAccess";
+    public static final String ADMIN_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxAdminLastModifiedAccess";
+
+    public static final String S3_SERVICE_ACCESS_LOG_ID = "S3ServiceAccess";
+    public static final String S3_SERVICE_LAST_MODIFIED_LOG_ID = "S3ServiceLastModifiedAccess";
+
+    public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
+    public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
     private static final String ID_KEY = "ID";
     private static final String SOURCE_KEY = "SOURCE";

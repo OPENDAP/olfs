@@ -857,19 +857,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
         try {
             catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(req));
             if (requestCanBeHandled(req)) {
-                long lm = CatalogManager.getLastModified(catalogKey);
-                _log.debug("lastModified(" + catalogKey + "): " + (lm == -1 ? "unknown" : new Date(lm)));
-                return lm;
+                long lmt = CatalogManager.getLastModified(catalogKey);
+                _log.debug("lastModified({}): {}", new Date(lmt));
+                return lmt;
             }
         }
         catch (Exception e) {
-            _log.error("Failed to get a last modified time for '" + Scrub.urlContent(catalogKey) + "'  msg: " + e.getMessage());
+            _log.error("Failed to get a last modified time for '{}' msg: {}", Scrub.urlContent(catalogKey), e.getMessage());
         }
         finally {
             Timer.stop(timedProc);
         }
 
-        return -1;
+        return new Date().getTime();
     }
 
     public void destroy() {

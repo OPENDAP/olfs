@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -72,7 +73,7 @@ public abstract class BesDapResponder extends DapResponder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
         if(dataSource == null){
-            return -1;
+            return new Date().getTime();
         }
 
         ResourceInfo ri = getResourceInfo(dataSource);

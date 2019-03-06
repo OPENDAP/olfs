@@ -46,10 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class BesControlApi extends HttpResponder {
 
@@ -91,7 +88,7 @@ public class BesControlApi extends HttpResponder {
 
     @Override
     public long getLastModified(HttpServletRequest request) throws Exception {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return new Date().getTime();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

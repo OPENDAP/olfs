@@ -205,20 +205,20 @@ public class RemoteResource {
         if (_lastModified == 0) {
             String lmt_string = getHeaderValue("last-modified");
 
-            if (lmt_string == null)
-                _lastModified = -1;
-
+            if (lmt_string == null) {
+                _lastModified = new Date().getTime();
+            }
             else {
                 try {
                     SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
                     Date d = format.parse(lmt_string);
                     _lastModified = d.getTime();
                 } catch (ParseException e) {
-                    _lastModified = -1;
+                    _lastModified = new Date().getTime();
                 }
             }
         }
-        log.debug("getLastModified() - {}", _lastModified);
+        log.debug("Returning: {}", _lastModified);
 
         return _lastModified;
     }

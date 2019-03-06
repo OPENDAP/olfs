@@ -53,7 +53,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class W10nServlet extends HttpServlet   {
 
-    private static final String SERVICE_LOG_ID = "W10N-ACCESS";
     private static final Logger LOG = LoggerFactory.getLogger(W10nServlet.class);
     private static final W10nResponder W10N_RESPONDER = new W10nResponder();
 
@@ -91,7 +90,7 @@ public class W10nServlet extends HttpServlet   {
     protected long getLastModified(HttpServletRequest req) {
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, SERVICE_LOG_ID, "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         long lmt = new Date().getTime();
         Procedure timedProcedure = Timer.start();
         try {
@@ -102,7 +101,7 @@ public class W10nServlet extends HttpServlet   {
         } catch (Exception e) {
             LOG.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, SERVICE_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
         }
         return lmt;
@@ -123,7 +122,7 @@ public class W10nServlet extends HttpServlet   {
                 RequestCache.openThreadCache();
 
                 int reqno = _reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, SERVICE_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
                 LOG.debug(Util.getMemoryReport());
                 LOG.debug(ServletUtil.showRequest(request, reqno));
                 //log.debug(AwsUtil.probeRequest(this, request));
@@ -160,7 +159,7 @@ public class W10nServlet extends HttpServlet   {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, SERVICE_LOG_ID);
+            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
 

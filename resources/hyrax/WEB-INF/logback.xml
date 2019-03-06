@@ -109,10 +109,22 @@
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
+
+<!--
+    <logger name="HyraxLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
     <logger name="SiteMapAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
+    <logger name="PDPServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="PDPServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+-->
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
     </logger -->

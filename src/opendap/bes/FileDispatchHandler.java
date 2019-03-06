@@ -92,9 +92,7 @@ public class FileDispatchHandler implements DispatchHandler {
     public long getLastModified(HttpServletRequest req) {
 
         String name = ReqInfo.getLocalUrl(req);
-
         log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
-
 
         try {
             ResourceInfo dsi = new BESResource(name,_besApi);
@@ -103,18 +101,16 @@ public class FileDispatchHandler implements DispatchHandler {
             return dsi.lastModified();
         }
         catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+            long now = new Date().getTime();
+            log.debug("getLastModified(): Returning current date/time: {}",now);
+            return now;
         }
-
-
     }
 
 
 
     public void destroy() {
         log.info("Destroy complete.");
-
     }
 
     /**

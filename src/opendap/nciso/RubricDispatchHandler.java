@@ -119,18 +119,18 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         String name = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("Locating LMT for collection: {}", name );
 
 
         try {
             ResourceInfo dsi = new BESResource(name,_besApi);
-            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+            log.debug("Returning: {}" + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
         }
         catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+            log.debug("Returning current date/time.");
+            return new Date().getTime();
         }
 
 

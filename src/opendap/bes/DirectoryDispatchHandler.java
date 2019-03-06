@@ -125,7 +125,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         catch (Exception e) {
             log.debug("getLastModified():  Returning: -1");
-            return -1;
+            return new Date().getTime();
         }
     }
 

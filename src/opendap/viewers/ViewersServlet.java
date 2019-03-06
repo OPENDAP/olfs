@@ -386,7 +386,7 @@ public class ViewersServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         RequestCache.openThreadCache();
-        LogUtil.logServerAccessStart(req, "WebStartServletAccess", "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
         LOG.debug(ServletUtil.showRequest(req, REQ_NUMBER.get()));
 
         Request dapRequest = new Request(this,req);
@@ -430,10 +430,10 @@ public class ViewersServlet extends HttpServlet {
             }
 
             if (applicationID.equals("viewers")) {
-
+                DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
                 resp.setContentType("text/html");
-                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, resp.getOutputStream());
-                
+                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
+                LogUtil.setResponseSize(dos.size());
             } else {
                 String dataAccessURL = serverURL+dapService+besDatasetId;
 
@@ -450,10 +450,12 @@ public class ViewersServlet extends HttpServlet {
                         resp.setContentType(mType);
 
                     // Get the sink
-                    PrintWriter pw = resp.getWriter();
+                    DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
+                    PrintStream ps = new PrintStream(dos);
 
                     // Send the jnlp to the client.
-                    pw.print(jnlpContent);
+                    ps.print(jnlpContent);
+                    LogUtil.setResponseSize(dos.size());
 
                 } else {
                     String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+query;
@@ -481,9 +483,9 @@ public class ViewersServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WebStartServletAccess");
+            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
-             this.destroy();
+            // this.destroy(); // I commented this out because: WTF? Why? - ndp 03/05/2019
         }
     }
 
