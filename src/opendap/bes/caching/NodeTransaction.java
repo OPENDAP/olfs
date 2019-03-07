@@ -32,7 +32,7 @@ class NodeTransaction implements Comparable  {
     private long serialNumber;
 
 
-    public NodeTransaction(String key, Document request, Object response){
+    NodeTransaction(String key, Document request, Object response){
         log = LoggerFactory.getLogger(getClass());
         this.key = key;
         this.request = (Document)request.clone();
@@ -62,23 +62,20 @@ class NodeTransaction implements Comparable  {
         return key;
     }
 
-    public long getLastAccessedTime(){
+    long getLastAccessedTime(){
         return lastAccessedTime;
     }
 
-    public void updateAccessedTime() {
+    void updateAccessedTime() {
         lastAccessedTime = System.nanoTime();
     }
 
 
 
-    public long getLastUpdateTime() {
+    long getLastUpdateTime() {
         return lastUpdateTime;
     }
 
-    public void setLastUpdateTime(long lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
-    }
 
     public Object getResponse(){
         return response;
@@ -97,7 +94,8 @@ class NodeTransaction implements Comparable  {
      * CatalogTransaction (secondly). If the last accessed times of two objects are the same
      * (unlikely but possible) then the serial numbers are used to determine the hierarchy/ranking/relation
      * @param o object (CatalogTransaction) to be compared
-     * @return
+     * @return -1 if this object is older than Object o, 0 is they are the same, and 1 if this object
+     * is newer than Object o
      */
     @Override
     public int compareTo(Object o) {

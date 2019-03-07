@@ -27,10 +27,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BesNodeCache {
 
     public static final String NODE_CACHE_ELEMENT_NAME = "NodeCache";
-    public static final String MAX_ENTRIES_ATTRIBUTE_NAME = "maxEntries";
-    public static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
-    public static final long NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
-    public static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
+    private static final String MAX_ENTRIES_ATTRIBUTE_NAME = "maxEntries";
+    private static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
+    private static final long NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
+    private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
 
 
     private static final Logger LOG = LoggerFactory.getLogger(BesNodeCache.class);
@@ -124,7 +124,7 @@ public class BesNodeCache {
     /**
      * The primary public method used to retrieve BES showNode command responses. Caching happens within this call.
      * @param key The name of the BES node to retrieve.
-     * @return
+     * @return The BES showNode response for "key"
      */
     public static Element getNode(String key) throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
         if(!ENABLED.get())
@@ -168,8 +168,7 @@ public class BesNodeCache {
             if (responseObject instanceof BESError) {
                 LOG.info("Cache contains BESError object.  dataSource=\"" +
                         key + "\"");
-                BESError error = (BESError) responseObject;
-                throw error;
+                throw (BESError) responseObject;
             }
             // The responseObject should only ever be a Document or a BESError
             throw new IOException("Cached object is of unexpected type! " +
@@ -190,10 +189,10 @@ public class BesNodeCache {
      * which is placed in the cache associated with the value of key.
      * @param key The name of the node to retrieve from the BES using the showNode command.
      * @return The NodeTransaction built from the BES response.
-     * @throws BadConfigurationException
-     * @throws PPTException
-     * @throws JDOMException
-     * @throws IOException
+     * @throws BadConfigurationException When a BES cannot be located.
+     * @throws PPTException When the PPT exchange between the BES process and the OLFS fails.
+     * @throws JDOMException When the documents cannot be parsed.
+     * @throws IOException When theings cannot be read or written.
      */
     private static NodeTransaction getAndCacheNodeTransaction(String key) throws BadConfigurationException, PPTException, JDOMException, IOException {
 
@@ -308,9 +307,9 @@ public class BesNodeCache {
 
     /**
      * Takes a node response (Document or BESError) and tucks it into the NodeCache
-     * @param key
-     * @param request
-     * @param response
+     * @param key The name of the node that was retrieved.
+     * @param request The BES showNode request document used to elicit the response.
+     * @param response The object (either a Document or a BESError) returned by the BES transaction.
      */
     private static NodeTransaction putNodeTransaction(String key, Document request, Object response) {
 
@@ -448,11 +447,10 @@ public class BesNodeCache {
             log.info(" node[{}]: {}",nodeT.getKey(),nodeT.getLastAccessedTime());
         }
 
-        if(first!=null) {
-            set.remove(first);
-            first.updateAccessedTime();
-            set.add(first);
-        }
+        set.remove(first);
+        first.updateAccessedTime();
+        set.add(first);
+
 
         log.info("List after remove and replace: ");
         for(NodeTransaction nodeT: set){
