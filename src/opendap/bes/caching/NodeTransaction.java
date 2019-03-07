@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * This private class is used to wrap whatever object is being cached along with data used to
+ * This class is used to wrap whatever object is being cached along with data used to
  * operate in the cache. Most significantly this class implements the Comparable interface such that
  * the "natural" ordering of instances will be based on the last time each instance was accessed by the server.
- * This is not an autonomous operation and is tightly coupled with code in "BesCatalogCache.getCatalog()" to
+ * This is not an autonomous operation and is tightly coupled with code in "BesNodeCache.getNode()" to
  * ensure that the ordering remains correct.
  */
 class NodeTransaction implements Comparable  {
@@ -65,9 +65,11 @@ class NodeTransaction implements Comparable  {
     public long getLastAccessedTime(){
         return lastAccessedTime;
     }
-    public void logAccess() {
+
+    public void updateAccessedTime() {
         lastAccessedTime = System.nanoTime();
     }
+
 
 
     public long getLastUpdateTime() {
