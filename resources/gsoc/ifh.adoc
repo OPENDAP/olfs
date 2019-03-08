@@ -7,7 +7,8 @@
 - Kodi Neumiller
 
 ## Information for students
-Just the generally information for students. See [ESIP Student Guide](https://github.com/ESIPFed/gsoc/blob/master/STUDENT-contribution-guide.md)
+Just the generally information for students. See
+[ESIP Student Guide](https://github.com/ESIPFed/gsoc/blob/master/STUDENT-contribution-guide.md)
 
 ## Project
 
@@ -59,3 +60,9 @@ geographic domain coordinate variables such as:
 - Javscript
 - Java
 - XSLT (nice, but not a must)
+
+#### First Steps
+
+- Look at the Hyrax Data Request Form on (http://test.opendpa.org/opendap/)
+- Google OPeNDAP and look at the interface on deployed servers with real (not test) data
+- Contact us!
