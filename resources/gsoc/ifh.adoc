@@ -6,12 +6,6 @@
 - Nathan Potter
 - Kodi Neumiller
 
-## Information for Students
-
-If you have special information / instructions for an application you should
-list/link to it here. If not you can delete it. Please keep in mind that we
-do have some general instructions for students.
-
 ## Project Ideas
 
 ###  Geo-Selection For Hyrax Data Request Form
@@ -62,9 +56,3 @@ geographic domain coordinate variables such as:
 - Javscript
 - Java
 - XSLT (nice, but not a must)
-
-#### First steps
-
-Students doesn't need to do this before Google Summer of Code code period starts
-but will be good if they do just because they will be sure if this is how they
-want to spend the summer.
