@@ -6,6 +6,9 @@
 - Nathan Potter
 - Kodi Neumiller
 
+## Information for students
+Just the generally information for students. See [ESIP Student Guide](https://github.com/ESIPFed/gsoc/blob/master/STUDENT-contribution-guide.md)
+
 ## Project
 
 ###  Geo-Selection For Hyrax Data Request Form
