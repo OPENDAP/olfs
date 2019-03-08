@@ -6,7 +6,7 @@
 - Nathan Potter
 - Kodi Neumiller
 
-## Project Ideas
+## Project
 
 ###  Geo-Selection For Hyrax Data Request Form
 
