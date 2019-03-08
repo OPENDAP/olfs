@@ -7,7 +7,7 @@
 - Kodi Neumiller
 
 ## Information for students
-Just the generally information for students. See
+See
 [ESIP Student Guide](https://github.com/ESIPFed/gsoc/blob/master/STUDENT-contribution-guide.md)
 
 ## Project
