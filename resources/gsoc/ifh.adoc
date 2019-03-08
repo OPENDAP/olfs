@@ -63,6 +63,6 @@ geographic domain coordinate variables such as:
 
 #### First Steps
 
-- Look at the Hyrax Data Request Form on (http://test.opendap.org/opendap/)
+- Look at the Hyrax Data Request Form on [test.opendap.org](http://test.opendap.org/opendap/)
 - Google OPeNDAP and look at the interface on deployed servers with real (not test) data
 - Contact us!
