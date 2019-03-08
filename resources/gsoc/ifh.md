@@ -62,8 +62,8 @@ these are:
 - [D3](https://d3js.org)
 - [Leaflet](https://leafletjs.com)
 
-This list is just a tiny sampleof what might be used and is not an endorsement or 
-recommendation about should utilized in your work..
+This list is just a tiny sample of what might be used and is neither an 
+endorsement or recommendation about should utilized in your work..
 
 ##### IFH Examples
 These examples show various datasets from different origins that we have 
@@ -100,11 +100,13 @@ that was used to construct the IFH.
 
 - Examine the IFH examples in the _Technical Details_ section along with the 
 metadata responses that were used build them.
+
 - You might try using Google with the terms _OPeNDAP_ and _Hyrax_ in order to 
 see the IFH produced by servers with real (not test) data. 
 _Caveat: Most of what you will find doing this will be older versions of the 
-Hyrax server which produce an antiquated version of the IFH. The server's 
+Hyrax server which produce an antiquated version of the IFH. These server's 
 metadata will be correct and data responses will be correct._
+
 - Think about how you might propose to develop these prototypes. The expectation 
 is not for you to integrate the result into the dynamic page generation of the 
 server, but rather to build standalone pages based on what is currently being 
