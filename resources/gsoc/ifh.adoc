@@ -19,7 +19,7 @@ do have some general instructions for students.
 #### Abstract
 The Hyrax Data Request Form (aka IFH) provides a UI from which people can choose
 and subset variables in a dataset. This project is to prototype adding a map
-interface that displays the bounds of the dataset and that allows users generate
+interface that displays the bounds of the variables in a dataset and that allows users generate
 subset values for the geographic domain coordinates by using a mouse to select an
 area on the map, or by entering latitude and longitude values in to text boxes
 associated with the map UI.
