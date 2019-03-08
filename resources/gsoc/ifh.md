@@ -17,8 +17,9 @@ Just the generally information for students. See
 #### Abstract
 The Hyrax Data Request Form (aka IFH) provides a UI from which people can choose
 and subset variables in a dataset. This project is to prototype adding a map
-interface that displays the bounds of the variables in a dataset and that allows users generate
-subset values for the geographic domain coordinates by using a mouse to select an
+interface that displays the bounds geographic domain coordinate variables in a
+dataset and that allows users to generate
+subset values for these domain coordinates by using a mouse to select an
 area on the map, or by entering latitude and longitude values in to text boxes
 associated with the map UI.
 
@@ -36,11 +37,12 @@ dataset are the geographic domain coordinates.
 
 Part of this heuristic should include searching the dataset and variable
 metadata for the
-Climate Forecast (CF) convention terms that would easily identify the geographic
+[Climate Forecast (CF)](http://cfconventions.org) convention terms that would
+easily identify the geographic
 domain coordinate variables within the dataset. If the dataset is either not
 advertising (in the metadata) that it is using the CF convention, or if it claims
-to utilize CF yet does not, the software should what obvious alternative names for
-geographic domain coordinate variables such as:
+to utilize CF yet does not, the software should evaluate obvious alternative 
+possible names for geographic domain coordinate variables such as:
 
 - *latitude* == latitude | lat | y | Y
 - *longitude* == longitude | lon | x | X
@@ -63,6 +65,6 @@ geographic domain coordinate variables such as:
 
 #### First Steps
 
-- Look at the Hyrax Data Request Form on [test.opendap.org](http://test.opendap.org/opendap/)
+- Look at the various Hyrax Data Request Form on [test.opendap.org](http://test.opendap.org/opendap/)
 - Google OPeNDAP and look at the interface on deployed servers with real (not test) data
 - Contact us!
