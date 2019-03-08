@@ -20,9 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * In memory cache for BES show catalog responses. In practice this is not designed for data but for BES API stuff like
- * show catalog, show info, etc. It will cache in memory any object that you wish however and associate it with
- * what ever "key" string you associate with it..
+ * An in-memory cache for BES showNode responses. This class is a singleton.
  */
 public class BesNodeCache {
 
@@ -76,7 +74,8 @@ public class BesNodeCache {
                 LOG.error(msg);
             }
         } catch (NumberFormatException nfe) {
-            LOG.error("Failed to parse value of NodeCache@maxEntries! Value must be an integer. Using default value: {}", maxEntries);
+            LOG.error("Failed to parse value of NodeCache@maxEntries! Value must" +
+                    " be an integer. Using default value: {}", maxEntries);
         }
 
         long refreshInterval = NODE_CACHE_REFRESH_INTERVAL_DEFAULT;
@@ -86,19 +85,23 @@ public class BesNodeCache {
             if (refreshInterval <= 0) {
                 refreshInterval = NODE_CACHE_REFRESH_INTERVAL_DEFAULT;
                 String msg = "Failed to parse value of " +
-                        NODE_CACHE_ELEMENT_NAME + "@" + REFRESH_INTERVAL_ATTRIBUTE_NAME + "! " +
-                        "Value must be an integer > 0. Using default value: " + refreshInterval;
+                        NODE_CACHE_ELEMENT_NAME + "@" +
+                        REFRESH_INTERVAL_ATTRIBUTE_NAME + "! " +
+                        "Value must be an integer > 0. Using default value: " +
+                        refreshInterval;
                 LOG.error(msg);
             }
         } catch (NumberFormatException nfe) {
-            LOG.error("Failed to parse value of NodeCache@refreshInterval! Value must be an integer. Using default value: {}", refreshInterval);
+            LOG.error("Failed to parse value of NodeCache@refreshInterval! Value" +
+                    " must be an integer. Using default value: {}", refreshInterval);
         }
         init(maxEntries, refreshInterval);
     }
 
 
     /**
-     * The _actual_ init method that sets up the cache
+     * The _actual_ init method that sets up the cache. This must be called
+     * prior to using the cache.
      * @param maxEntries The maximum number of entries in the cache
      * @param updateIntervalSeconds The time any object may reside in the cache before it is removed.
      */
@@ -106,14 +109,19 @@ public class BesNodeCache {
         LOCK.lock();
         try {
             if (ENABLED.get()) {
-                LOG.error("BesNodeCache has already been initialized!  MAX_CACHE_ENTRIES: {}  UPDATE_INTERVAL: {} s", MAX_CACHE_ENTRIES.get(), UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
+                LOG.error("BesNodeCache has already been initialized!  " +
+                        "MAX_CACHE_ENTRIES: {}  UPDATE_INTERVAL: {} s",
+                        MAX_CACHE_ENTRIES.get(),
+                        UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
                 return;
             }
 
             MAX_CACHE_ENTRIES.set(maxEntries);
             UPDATE_INTERVAL.set(updateIntervalSeconds * nanoInSeconds);
             ENABLED.set(true);
-            LOG.debug("INITIALIZED  MAX_CACHE_ENTRIES: {}  UPDATE_INTERVAL: {} s", MAX_CACHE_ENTRIES.get(), UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
+            LOG.debug("INITIALIZED  MAX_CACHE_ENTRIES: {}  UPDATE_INTERVAL: {} s",
+                    MAX_CACHE_ENTRIES.get(),
+                    UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
         }
         finally {
             LOCK.unlock();
@@ -126,7 +134,13 @@ public class BesNodeCache {
      * @param key The name of the BES node to retrieve.
      * @return The BES showNode response for "key"
      */
-    public static Element getNode(String key) throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
+    public static Element getNode(String key)
+            throws JDOMException,
+            BadConfigurationException,
+            PPTException,
+            IOException,
+            BESError {
+
         if(!ENABLED.get())
             return null;
 
@@ -402,6 +416,15 @@ public class BesNodeCache {
     }
 
 
+    /**
+     * This is a test method used to make a NodeTransaction without requiring a
+     * running BES to receive a request and generate a response. THe point is
+     * to provide a test fixture to allow the evaluation of the
+     * NodeTransaction.comparable() interface for the purposes of sorting.
+     *
+     * @param id
+     * @return
+     */
     private static NodeTransaction getDummyCachedNodeTransaction(String id){
         Document request;
         Document response;
