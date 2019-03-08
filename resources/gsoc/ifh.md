@@ -48,12 +48,12 @@ geographic domain coordinate variables such as:
 
 *Some IFH dataset examples:*
 
-- http://test.opendap.org/opendap/data/nc/20070917-MODIS_A-JPL-L2P-A2007260000000.L2_LAC_GHRSST-v01.nc.html[MODIS]
-- http://test.opendap.org/opendap/data/nc/coads_climatology.nc.html[COADS]
-- http://test.opendap.org/opendap/data/hdf4/S2000415.HDF.gz.html[NSCAT]
-- http://test.opendap.org/opendap/AIRS/AIRH3STM.003/2003.02.01/AIRS.2003.02.01.L3.RetStd_H028.v4.0.21.0.G06116143217.hdf.html[AIRS]
-- http://test.opendap.org/opendap/noaa_pathfinder/2005001-2005008.s0484pfv50-sst.hdf.html[NOAA Pathfinder]
-- http://test.opendap.org/opendap/trink/GMTCO_npp_d20120120_t0528446_e0530088_b01189_c20120120114656525950_noaa_ops.h5.html[NOAA VIIRS]
+- [MODIS](http://test.opendap.org/opendap/data/nc/20070917-MODIS_A-JPL-L2P-A2007260000000.L2_LAC_GHRSST-v01.nc.html)
+- [COADS](http://test.opendap.org/opendap/data/nc/coads_climatology.nc.html)
+- [NSCAT](http://test.opendap.org/opendap/data/hdf4/S2000415.HDF.gz.html)
+- [AIRS](http://test.opendap.org/opendap/AIRS/AIRH3STM.003/2003.02.01/AIRS.2003.02.01.L3.RetStd_H028.v4.0.21.0.G06116143217.hdf.html)
+- [NOAA Pathfinder](http://test.opendap.org/opendap/noaa_pathfinder/2005001-2005008.s0484pfv50-sst.hdf.html)
+- [NOAA VIIRS](http://test.opendap.org/opendap/trink/GMTCO_npp_d20120120_t0528446_e0530088_b01189_c20120120114656525950_noaa_ops.h5.html)
 
 #### Helpful Experience
 
