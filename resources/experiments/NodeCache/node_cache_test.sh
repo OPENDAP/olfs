@@ -15,7 +15,7 @@ function retrieveSitemap() {
 
     echo "Retrieving site map."
 
-    time siteMapFileList=`curl -s "${target_hyrax}/robots.jsp" | awk '{print $2}' - `
+    time siteMapFileList=`curl -s "${target_hyrax}/robots.jsp" | awk '{print $2}' - | tee robots.txt`
 
     echo "Site map file list: "
     echo "${siteMapFileList}"
@@ -133,7 +133,12 @@ function makeRandomDatasetRequest() {
     echo "randomDataURL=${randomDataURL}";
     
     # Get it...
-    curl -s "${randomDataURL}" > /dev/null;   
+    status=`curl -s -o /dev/null -w "%{http_code}" --url "${randomDataURL}"`
+    if [ ${status} -ne 200 ] 
+    then
+        echo "Curl request FAILED. Status: ${status} URL: ${randomDataURL}"
+    fi
+      
 }
 
 
@@ -151,10 +156,15 @@ function makeRandomCatRequest() {
     randomCatIndex=`echo "x=${rValue}*${catRanScale};print x" | bc | awk '{printf("%d",$0);}' -`;
     #echo "randomCatIndex=${randomCatIndex}";
     randomCatURL=`sed "${randomCatIndex}q;d" ${catalogsFile}`;
-    #echo "randomCatURL=${randomCatURL}";
+    # echo "randomCatURL=${randomCatURL}";
     
     # Get it...
-    curl -s "${randomCatURL}" > /dev/null;   
+    status=`curl -s -o /dev/null -w "%{http_code}" --url "${randomCatURL}"`
+    if [ ${status} -ne 200 ] 
+    then
+        echo "Curl request FAILED. Status: ${status} URL: ${randomCatURL}"
+    fi
+      
 }
 
 
@@ -189,9 +199,10 @@ function siteMapGrinder {
 #############################################################################
 
 
-# makeRandomRequests
 
-siteMapGrinder
+makeRandomRequests
+
+# siteMapGrinder
 
 
 
