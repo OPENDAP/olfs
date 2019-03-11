@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * An in-memory cache for BES showNode responses. This class is a singleton.
@@ -30,8 +31,9 @@ public class BesNodeCache {
     private static final long NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
     private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
 
+    private static final ReentrantReadWriteLock RWLOCK = new ReentrantReadWriteLock();
 
-    private static final Logger LOG = LoggerFactory.getLogger(BesNodeCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NODE_CACHE_ELEMENT_NAME);
     private static final ReentrantLock LOCK = new ReentrantLock();
     private static final ConcurrentHashMap<String,NodeTransaction> NODE_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentSkipListSet<NodeTransaction> MOST_RECENTLY_ACCESSED = new ConcurrentSkipListSet<>();
@@ -144,26 +146,29 @@ public class BesNodeCache {
         if(!ENABLED.get())
             return null;
 
-        LOCK.lock();
+        if(key==null)
+            throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
+
+        RWLOCK.readLock().lock();
         try {
             LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
 
-            if(key==null)
-                throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
-
-
             NodeTransaction nodeTransaction = NODE_CACHE.get(key);
-            if(nodeTransaction!=null) {
-                LOG.debug("Found NodeTransaction[{}]",key);
 
-                if(dropStaleNodeTransaction(nodeTransaction)) {
-                    // It got dropped so we need to replace it
-                    nodeTransaction = getAndCacheNodeTransaction(key);
+            if(isStaleNodeTransaction(nodeTransaction)){
+                RWLOCK.readLock().unlock();
+                RWLOCK.writeLock().lock();
+                try {
+                    if (isStaleNodeTransaction(nodeTransaction)) {
+                        dropStaleNodeTransaction(nodeTransaction);
+                        LOG.debug("Dropping stale NodeTransaction[{}] from cache!",key);
+                        nodeTransaction = getAndCacheNodeTransaction(key);
+                    }
+                    RWLOCK.readLock().lock();
                 }
-            }
-            else {
-                LOG.debug("NodeTransaction[{}] is not in NODE_CACHE, retrieving.",key);
-                nodeTransaction = getAndCacheNodeTransaction(key);
+                finally {
+                    RWLOCK.writeLock().unlock();
+                }
             }
 
             updateMostRecentlyAccessed(nodeTransaction);
@@ -191,10 +196,11 @@ public class BesNodeCache {
         }
         finally {
             LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-            LOCK.unlock();
+            RWLOCK.readLock().unlock();
         }
 
     }
+
 
     /**
      * Solicits a showNode response from the BES for the passed parameter key. Once the response is received the response
@@ -247,48 +253,62 @@ public class BesNodeCache {
         }
     }
 
+    /**
+     * Check to see if the passed NodeTransaction is stale. This is based
+     * comparing its time in the cache with the UPDATE_INTERVAL.
+     *
+     * @param nodeTransaction The NodeTransaction to test.
+     * @return Returns true is the NodeTransaction has been in the cache longer
+     *         the UPDATE_INTERVAL.
+     */
+    private static boolean isStaleNodeTransaction(NodeTransaction nodeTransaction){
+        boolean isStale = true; // if it's null it's stale...
+        if(nodeTransaction!=null) {
+            long timeInCache = System.nanoTime() - nodeTransaction.getLastUpdateTime();
+            LOG.debug("nodeTransaction[{}] has been in cache {} s", nodeTransaction.getKey(), timeInCache / (nanoInSeconds * 1.0));
+            // Is it stale?
+            isStale = timeInCache > UPDATE_INTERVAL.get();
+        }
+        return isStale;
+    }
 
     /**
-     * Removes the passed NodeTransaction from both the cache (NODE_CACHE) and from the most recently accessed list
-     * (MOST_RECENTLY_ACCESSED)
+     * Removes the passed NodeTransaction from both the cache (NODE_CACHE) and
+     * from the most recently accessed list (MOST_RECENTLY_ACCESSED). If a null
+     * value is passed, nothing is done and the method returns.
+     *
      * @param nodeTransaction The NodeTransaction to drop from the cache.
-     * @return True if the NodeTransaction was dropped from the cache, false otherwise.
      */
-    private static boolean dropStaleNodeTransaction(NodeTransaction nodeTransaction){
-        LOCK.lock();
-        try {
-            boolean dropped = false;
-            long timeInCache = System.nanoTime() - nodeTransaction.getLastUpdateTime();
-            LOG.debug("nodeTransaction[{}] has been in cache {} s",nodeTransaction.getKey(),timeInCache/(nanoInSeconds*1.0));
+    private static void dropStaleNodeTransaction(NodeTransaction nodeTransaction){
 
-            // Is it stale?
-            if(timeInCache > UPDATE_INTERVAL.get()) {
-
-                NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
-                LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}", nodeTransaction.getKey(), (nt == null) ? "NULL" : nt);
-                LOG.debug("NODE_CACHE.size(): {}", NODE_CACHE.size());
-
-                if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
-                    LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
-                } else {
-                    LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
-                }
-
-                dropped = true;
-            }
-            return dropped;
+        if(nodeTransaction==null){
+            // a null value is a noop, but not an error
+            return;
         }
-        finally {
-            LOCK.unlock();
+
+        NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
+        LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}",
+                nodeTransaction.getKey(), (nt == null) ? "NULL" : nt);
+        LOG.debug("NODE_CACHE.size(): {}", NODE_CACHE.size());
+
+        if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
+            LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
+        } else {
+            LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
         }
     }
 
 
 
+
+
     /**
-     * Updates the MOST_RECENTLY_ACCESSED list by dropping the passed CatalogTransaction from the MOST_RECENTLY_ACCESSED list, updating
-     * the CatalogTransaction's access time and then adding the updated CatalogTransaction back to the MOST_RECENTLY_ACCESSED list.
-     * @param nodeTransaction The CatalogTransaction whose access time needs updating.
+     * Updates the MOST_RECENTLY_ACCESSED list by dropping the passed
+     * CatalogTransaction from the MOST_RECENTLY_ACCESSED list, updating
+     * the CatalogTransaction's access time and then adding the updated
+     * CatalogTransaction back to the MOST_RECENTLY_ACCESSED list.
+     * @param nodeTransaction The CatalogTransaction whose access time needs
+     *                        updating.
      */
     private static  void updateMostRecentlyAccessed(NodeTransaction nodeTransaction){
 
@@ -341,7 +361,7 @@ public class BesNodeCache {
             if (nodeTransaction == previous) {
                 LOG.warn("NodeTransaction cache updated with new (replacement) object for key: \"{}\"",key);
             } else {
-                LOG.debug(" NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
+                LOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
             }
 
             LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
@@ -481,5 +501,119 @@ public class BesNodeCache {
         }
 
     }
+
+
+
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+    //#################################################################################################################
+
+
+
+
+
+    /**
+     * The primary public method used to retrieve BES showNode command responses. Caching happens within this call.
+     * @param key The name of the BES node to retrieve.
+     * @return The BES showNode response for "key"
+     */
+    public static Element getNodeOLD(String key)
+            throws JDOMException,
+            BadConfigurationException,
+            PPTException,
+            IOException,
+            BESError {
+
+        if(!ENABLED.get())
+            return null;
+
+        LOCK.lock();
+        try {
+            LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
+
+            if(key==null)
+                throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
+
+
+            NodeTransaction nodeTransaction = NODE_CACHE.get(key);
+            if(nodeTransaction!=null) {
+                LOG.debug("FOUND NodeTransaction[{}] in cache! w00t!",key);
+
+                if(dropStaleNodeTransactionOLD(nodeTransaction)) {
+                    // It got dropped so we need to replace it
+                    LOG.debug("Dropping stale NodeTransaction[{}] from cache!",key);
+                    nodeTransaction = getAndCacheNodeTransaction(key);
+                }
+            }
+            else {
+                LOG.debug("NodeTransaction[{}] is not in NODE_CACHE, retrieving.",key);
+                nodeTransaction = getAndCacheNodeTransaction(key);
+            }
+
+            updateMostRecentlyAccessed(nodeTransaction);
+
+            // Now we need to sort out the response - Document or Error?
+            Object responseObject = nodeTransaction.getResponse();
+
+            if(responseObject instanceof Document){
+                Document cachedNodeDoc = (Document)responseObject;
+                Element root = cachedNodeDoc.getRootElement();
+                Element newRoot =  (Element) root.clone();
+                newRoot.detach();
+                return newRoot;
+            }
+
+            if (responseObject instanceof BESError) {
+                LOG.info("Cache contains BESError object.  dataSource=\"" +
+                        key + "\"");
+                throw (BESError) responseObject;
+            }
+            // The responseObject should only ever be a Document or a BESError
+            throw new IOException("Cached object is of unexpected type! " +
+                    "This is a bad thing! Object: "+responseObject.getClass().getCanonicalName());
+
+        }
+        finally {
+            LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
+            LOCK.unlock();
+        }
+
+    }
+    /**
+     * Removes the passed NodeTransaction from both the cache (NODE_CACHE) and from the most recently accessed list
+     * (MOST_RECENTLY_ACCESSED)
+     * @param nodeTransaction The NodeTransaction to drop from the cache.
+     * @return True if the NodeTransaction was dropped from the cache, false otherwise.
+     */
+    private static boolean dropStaleNodeTransactionOLD(NodeTransaction nodeTransaction){
+        LOCK.lock();
+        try {
+            boolean dropped = false;
+            if(isStaleNodeTransaction(nodeTransaction)) {
+
+                NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
+                LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}", nodeTransaction.getKey(), (nt == null) ? "NULL" : nt);
+                LOG.debug("NODE_CACHE.size(): {}", NODE_CACHE.size());
+
+                if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
+                    LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
+                } else {
+                    LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
+                }
+                dropped = true;
+            }
+            return dropped;
+        }
+        finally {
+            LOCK.unlock();
+        }
+    }
+
 
 }
