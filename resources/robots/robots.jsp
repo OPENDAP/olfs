@@ -35,20 +35,13 @@
     String servicePrefix = req.getWebApplicationUrl();
     BESSiteMap besSiteMap;
     try {
-        besSiteMap = new BESSiteMap(servicePrefix);
-    }
-    catch (BESError  e) {
-        e.printStackTrace();
-        return ;
-    }
-    catch (BadConfigurationException e) {
-        e.printStackTrace();
-        return ;
-    } catch ( PPTException e) {
-        e.printStackTrace();
-        return ;
-    }
-    String siteMapServicePrefix = PathBuilder.pathConcat(req.getWebApplicationUrl(),"siteMap");
+        besSiteMap = new BESSiteMap("opendap");
 
+    }
+    catch (BESError | BadConfigurationException | PPTException e) {
+        e.printStackTrace();
+        return;
+    }
+    String siteMapServicePrefix = PathBuilder.pathConcat(servicePrefix,"siteMap");
 %>
 <%=besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix)%>
