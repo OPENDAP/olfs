@@ -31,17 +31,30 @@
   --%>
 <%@page session="false" %>
 <%
+    String dapServiceContext = "opendap/";
     Request req = new Request(null,request);
     String servicePrefix = req.getWebApplicationUrl();
+    String siteMapServicePrefix = PathBuilder.pathConcat(servicePrefix,"siteMap");
+    String webapp = req.getWebApplicationUrl();
+
+    String dapService;
+    if(getServletConfig().getServletContext().getContextPath().isEmpty()){
+        // If we are running in the ROOT context (no contextPath) then we make the assumption that the DAP
+        // service is located at the _dapServiceContext as set in the configuration parameter DapServiceContext.
+        dapService = PathBuilder.pathConcat(webapp,dapServiceContext);
+    }
+    else {
+        dapService = webapp;
+    }
+
     BESSiteMap besSiteMap;
     try {
-        besSiteMap = new BESSiteMap("opendap");
+        besSiteMap = new BESSiteMap(dapService);
 
     }
     catch (BESError | BadConfigurationException | PPTException e) {
         e.printStackTrace();
         return;
     }
-    String siteMapServicePrefix = PathBuilder.pathConcat(servicePrefix,"siteMap");
 %>
 <%=besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix)%>
