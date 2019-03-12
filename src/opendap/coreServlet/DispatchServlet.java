@@ -241,7 +241,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException(msg);
         }
         try {
-            BESManager.init(besManagerElement);
+            BESManager.init(getServletContext(), besManagerElement);
         }
         catch(Exception e){
             throw new ServletException(e);

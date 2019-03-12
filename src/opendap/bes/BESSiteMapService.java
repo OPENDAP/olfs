@@ -88,7 +88,7 @@ public class BESSiteMapService extends HttpServlet {
 
                 try {
                     Element besManagerElement = configElement.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
-                    BESManager.init(besManagerElement);
+                    BESManager.init(getServletContext(), besManagerElement);
 
                 } catch (Exception e) {
                     throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());

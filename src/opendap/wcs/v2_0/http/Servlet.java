@@ -185,7 +185,7 @@ public class Servlet extends HttpServlet {
 
         if(!BESManager.isInitialized()) {
             try {
-                BESManager.init(besManagerElement);
+                BESManager.init(getServletContext(), besManagerElement);
             } catch (Exception e) {
                 String msg = "BESManager initialization was an abject failure. BES was not initialized! " +
                         "Caught "+e.getClass().getName()+ " message: "+e.getMessage();

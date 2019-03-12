@@ -26,8 +26,10 @@
 
 package opendap.bes;
 
+import opendap.PathBuilder;
 import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -35,6 +37,7 @@ import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -68,14 +71,14 @@ public class BESManager {
      */
     private BESManager(){}
 
-    public static void init(Element config) throws BadConfigurationException {
+    public static void init(ServletContext servletContext, Element config) throws BadConfigurationException {
 
         LOCK.lock();
         try {
             if (INITIALIZED.get()) return;
 
             BESManager.config = (Element) config.clone();
-            configure(config);
+            configure(servletContext, config);
             LOG.info("Initialized.");
             INITIALIZED.set(true);
         }
@@ -102,7 +105,7 @@ public class BESManager {
     }
 
 
-    private static void configure(Element besConfiguration) throws BadConfigurationException {
+    private static void configure(ServletContext servletContext, Element besConfiguration) throws BadConfigurationException {
 
         if(CONFIGURED.get()) return;
 
@@ -152,6 +155,18 @@ public class BESManager {
         Element nodeCache = besConfiguration.getChild(BesNodeCache.NODE_CACHE_ELEMENT_NAME);
         if(nodeCache!=null){
             BesNodeCache.init(nodeCache);
+        }
+
+        Element siteMapCache = besConfiguration.getChild(BESSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
+        if(siteMapCache!=null){
+            String cacheFile = siteMapCache.getAttributeValue(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
+            if(cacheFile==null) {
+                ServletUtil.getConfigPath(servletContext);
+                String defaultSiteMapCacheFile = PathBuilder.pathConcat(ServletUtil.getConfigPath(servletContext),"cache");
+                defaultSiteMapCacheFile = PathBuilder.pathConcat(defaultSiteMapCacheFile,"SiteMap.cache");
+                siteMapCache.setAttribute(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
+            }
+            BESSiteMap.init(siteMapCache);
         }
         CONFIGURED.set(true);
 

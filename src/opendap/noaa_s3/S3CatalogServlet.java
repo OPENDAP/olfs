@@ -90,7 +90,7 @@ public class S3CatalogServlet extends HttpServlet {
         _s3DapDispatcher = new S3DapDispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
         try {
             Element besConfiguration = getBesManagerConfig();
-            BESManager.init(besConfiguration);
+            BESManager.init(getServletContext(),besConfiguration);
             _s3DapDispatcher.init(this, getDapDispatConfig() );
 
         } catch (Exception e) {
