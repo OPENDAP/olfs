@@ -1,3 +1,4 @@
+<%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="opendap.bes.BESSiteMap" %>
 <%@ page import="opendap.dap.Request" %>
 <%@ page import="opendap.PathBuilder" %>
