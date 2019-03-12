@@ -32,9 +32,9 @@ public class BesNodeCache {
     private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
 
     private static final ReentrantReadWriteLock RWLOCK = new ReentrantReadWriteLock();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     private static final Logger LOG = LoggerFactory.getLogger(NODE_CACHE_ELEMENT_NAME);
-    private static final ReentrantLock LOCK = new ReentrantLock();
     private static final ConcurrentHashMap<String,NodeTransaction> NODE_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentSkipListSet<NodeTransaction> MOST_RECENTLY_ACCESSED = new ConcurrentSkipListSet<>();
 
@@ -108,7 +108,7 @@ public class BesNodeCache {
      * @param updateIntervalSeconds The time any object may reside in the cache before it is removed.
      */
     public static void init(long maxEntries, long updateIntervalSeconds) {
-        LOCK.lock();
+        RWLOCK.writeLock().lock();
         try {
             if (ENABLED.get()) {
                 LOG.error("BesNodeCache has already been initialized!  " +
@@ -126,7 +126,7 @@ public class BesNodeCache {
                     UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
         }
         finally {
-            LOCK.unlock();
+            RWLOCK.writeLock().unlock();
         }
     }
 
@@ -216,41 +216,33 @@ public class BesNodeCache {
      */
     private static NodeTransaction getAndCacheNodeTransaction(String key) throws BadConfigurationException, PPTException, JDOMException, IOException {
 
-        LOG.info("Acquiring showNode response for key \"{}\"", key );
-        LOCK.lock();
+        BES bes = BesApi.getBES(key);
+        Document showNodeRequestDoc = BesApi.getShowNodeRequestDocument(key);
+        Document response = new Document();
+
+        NodeTransaction result;
         try {
+            bes.besTransaction(showNodeRequestDoc, response);
+            // Get the root element.
+            Element root = response.getRootElement();
+            if (root == null)
+                throw new IOException("BES showNode response for " + key + " was empty! No root element");
 
-            BES bes = BesApi.getBES(key);
-            Document showNodeRequestDoc = BesApi.getShowNodeRequestDocument(key);
-            Document response = new Document();
+            Element showNode = root.getChild("showNode", opendap.namespaces.BES.BES_NS);
+            if (showNode == null)
+                throw new IOException("BES showNode response for " + key + " was malformed! No showNode element");
 
-            NodeTransaction result;
-            try {
-                bes.besTransaction(showNodeRequestDoc, response);
-                // Get the root element.
-                Element root = response.getRootElement();
-                if (root == null)
-                    throw new IOException("BES showNode response for " + key + " was empty! No root element");
+            showNode.setAttribute("prefix", bes.getPrefix());
 
-                Element showNode = root.getChild("showNode", opendap.namespaces.BES.BES_NS);
-                if (showNode == null)
-                    throw new IOException("BES showNode response for " + key + " was malformed! No showNode element");
+            LOG.info("Caching copy of BES showNode response for key: \"{}\"",key);
+            result = putNodeTransaction(key, showNodeRequestDoc, response.clone());
 
-                showNode.setAttribute("prefix", bes.getPrefix());
-
-                LOG.info("Caching copy of BES showNode response for key: \"{}\"",key);
-                result = putNodeTransaction(key, showNodeRequestDoc, response.clone());
-
-            } catch (BESError be) {
-                LOG.info("The BES returned a BESError for key: \"{} \" CACHING BESError",key);
-                result = putNodeTransaction(key, showNodeRequestDoc, be);
-            }
-
-            return result;
+        } catch (BESError be) {
+            LOG.info("The BES returned a BESError for key: \"{} \" CACHING BESError",key);
+            result = putNodeTransaction(key, showNodeRequestDoc, be);
         }
-        finally {
-            LOCK.unlock();
-        }
+
+        return result;
     }
 
     /**
@@ -347,30 +339,25 @@ public class BesNodeCache {
      */
     private static NodeTransaction putNodeTransaction(String key, Document request, Object response) {
 
-        LOCK.lock();
-        try {
-            LOG.debug("BEGIN  NODE_CACHE.size(): {} ", NODE_CACHE.size());
+        LOG.debug("BEGIN  NODE_CACHE.size(): {} ", NODE_CACHE.size());
 
-            // Make sure the cache has not grown too large.
-            purgeLeastRecentlyAccessed();
+        // Make sure the cache has not grown too large.
+        purgeLeastRecentlyAccessed();
 
-            NodeTransaction nodeTransaction = new NodeTransaction(key, request, response);
-            LOG.debug("Created nodeTransaction[{}] @ {}", key, nodeTransaction.getLastUpdateTime());
+        NodeTransaction nodeTransaction = new NodeTransaction(key, request, response);
+        LOG.debug("Created nodeTransaction[{}] @ {}", key, nodeTransaction.getLastUpdateTime());
 
-            NodeTransaction previous = NODE_CACHE.put(key, nodeTransaction);
-            if (nodeTransaction == previous) {
-                LOG.warn("NodeTransaction cache updated with new (replacement) object for key: \"{}\"",key);
-            } else {
-                LOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
-            }
-
-            LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
-
-            return nodeTransaction;
-
-        } finally {
-            LOCK.unlock();
+        NodeTransaction previous = NODE_CACHE.put(key, nodeTransaction);
+        if (nodeTransaction == previous) {
+            LOG.warn("NodeTransaction cache updated with new (replacement) object for key: \"{}\"",key);
+        } else {
+            LOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
         }
+
+        LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
+
+        return nodeTransaction;
+
     }
 
 
@@ -384,40 +371,33 @@ public class BesNodeCache {
      * list.
      */
     private static void purgeLeastRecentlyAccessed(){
-        LOCK.lock();
-        try {
 
-            // Cache not full? Then return...
-            if (NODE_CACHE.size() < MAX_CACHE_ENTRIES.get())
-                return;
+        // Cache not full? Then return...
+        if (NODE_CACHE.size() < MAX_CACHE_ENTRIES.get())
+            return;
 
-            int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
-            if(dropNum==0) {
-                dropNum = 1;
-            }
-            LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-            LOG.debug("dropNum: {}",dropNum);
-            LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-            LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-
-            List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
-
-            Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
-            for(int i=0; i<dropNum && oldestToNewest.hasNext(); i++ ){
-                NodeTransaction nodeTransaction = oldestToNewest.next();
-                purgeList.add(nodeTransaction);
-                LOG.debug("Purging CatalogTransaction for key {}",nodeTransaction.getKey());
-                NODE_CACHE.remove(nodeTransaction.getKey());
-            }
-            MOST_RECENTLY_ACCESSED.removeAll(purgeList);
-            LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-            LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-            LOG.debug("END");
-
+        int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
+        if(dropNum==0) {
+            dropNum = 1;
         }
-        finally {
-            LOCK.unlock();
+        LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
+        LOG.debug("dropNum: {}",dropNum);
+        LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+        LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+
+        List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
+
+        Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
+        for(int i=0; i<dropNum && oldestToNewest.hasNext(); i++ ){
+            NodeTransaction nodeTransaction = oldestToNewest.next();
+            purgeList.add(nodeTransaction);
+            LOG.debug("Purging CatalogTransaction for key {}",nodeTransaction.getKey());
+            NODE_CACHE.remove(nodeTransaction.getKey());
         }
+        MOST_RECENTLY_ACCESSED.removeAll(purgeList);
+        LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+        LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+        LOG.debug("END");
 
     }
 
@@ -425,13 +405,13 @@ public class BesNodeCache {
      * Drops all references from the cache.
      */
     public void destroy(){
-        LOCK.lock();
+        RWLOCK.writeLock().lock();
         try {
             NODE_CACHE.clear();
             MOST_RECENTLY_ACCESSED.clear();
         }
         finally {
-            LOCK.unlock();
+            RWLOCK.writeLock().unlock();
         }
     }
 
@@ -513,107 +493,6 @@ public class BesNodeCache {
     //#################################################################################################################
     //#################################################################################################################
     //#################################################################################################################
-
-
-
-
-
-    /**
-     * The primary public method used to retrieve BES showNode command responses. Caching happens within this call.
-     * @param key The name of the BES node to retrieve.
-     * @return The BES showNode response for "key"
-     */
-    public static Element getNodeOLD(String key)
-            throws JDOMException,
-            BadConfigurationException,
-            PPTException,
-            IOException,
-            BESError {
-
-        if(!ENABLED.get())
-            return null;
-
-        LOCK.lock();
-        try {
-            LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-
-            if(key==null)
-                throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
-
-
-            NodeTransaction nodeTransaction = NODE_CACHE.get(key);
-            if(nodeTransaction!=null) {
-                LOG.debug("FOUND NodeTransaction[{}] in cache! w00t!",key);
-
-                if(dropStaleNodeTransactionOLD(nodeTransaction)) {
-                    // It got dropped so we need to replace it
-                    LOG.debug("Dropping stale NodeTransaction[{}] from cache!",key);
-                    nodeTransaction = getAndCacheNodeTransaction(key);
-                }
-            }
-            else {
-                LOG.debug("NodeTransaction[{}] is not in NODE_CACHE, retrieving.",key);
-                nodeTransaction = getAndCacheNodeTransaction(key);
-            }
-
-            updateMostRecentlyAccessed(nodeTransaction);
-
-            // Now we need to sort out the response - Document or Error?
-            Object responseObject = nodeTransaction.getResponse();
-
-            if(responseObject instanceof Document){
-                Document cachedNodeDoc = (Document)responseObject;
-                Element root = cachedNodeDoc.getRootElement();
-                Element newRoot =  (Element) root.clone();
-                newRoot.detach();
-                return newRoot;
-            }
-
-            if (responseObject instanceof BESError) {
-                LOG.info("Cache contains BESError object.  dataSource=\"" +
-                        key + "\"");
-                throw (BESError) responseObject;
-            }
-            // The responseObject should only ever be a Document or a BESError
-            throw new IOException("Cached object is of unexpected type! " +
-                    "This is a bad thing! Object: "+responseObject.getClass().getCanonicalName());
-
-        }
-        finally {
-            LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-            LOCK.unlock();
-        }
-
-    }
-    /**
-     * Removes the passed NodeTransaction from both the cache (NODE_CACHE) and from the most recently accessed list
-     * (MOST_RECENTLY_ACCESSED)
-     * @param nodeTransaction The NodeTransaction to drop from the cache.
-     * @return True if the NodeTransaction was dropped from the cache, false otherwise.
-     */
-    private static boolean dropStaleNodeTransactionOLD(NodeTransaction nodeTransaction){
-        LOCK.lock();
-        try {
-            boolean dropped = false;
-            if(isStaleNodeTransaction(nodeTransaction)) {
-
-                NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
-                LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}", nodeTransaction.getKey(), (nt == null) ? "NULL" : nt);
-                LOG.debug("NODE_CACHE.size(): {}", NODE_CACHE.size());
-
-                if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
-                    LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
-                } else {
-                    LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
-                }
-                dropped = true;
-            }
-            return dropped;
-        }
-        finally {
-            LOCK.unlock();
-        }
-    }
 
 
 }
