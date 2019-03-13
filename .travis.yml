@@ -1,5 +1,6 @@
 
 # Initial Travic-CI control file. 6.11.15 jhrg
+# Added sonar scan 3.12.19 jhrg 
 
 # Use the docker container-based build systems
 sudo: false
@@ -22,32 +23,6 @@ notifications:
     - jgallagher@opendap.org
     - ukari@opendap.org
     
-# Use this to prepare the system to install prerequisites or dependencies
-#
-# before_install:
-
-# Use this to install any prerequisites or dependencies necessary to run your build
-#
-# install:
-
-# Use this to prepare your build for testing
-# e.g. copy database configurations, environment variables, etc.
-#
-# before_script:
-
-# All commands must exit with code 0 on success. Anything else is considered failure.
-#
-script:
-  - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-  - ant check
-  
-# after_script:
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
-
 addons:
   coverity_scan:
     project:
@@ -57,3 +32,32 @@ addons:
     build_command_prepend: "ant clean"
     build_command:   "ant server -DHYRAX_VERSION=Coverity_Build -DOLFS_VERSION=Coverity_Build"
     branch_pattern: coverity_scan
+
+env:
+  global:
+   # COVERITY_SCAN_TOKEN, made with "travis encrypt" command using the project repo's public key
+   - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
+   # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
+   #- secure: "" <--- FIXME
+
+stages:
+- name: build
+  if:  branch = master
+- name: scan
+  if:  branch = master AND NOT type = pull_request
+
+jobs:
+  include:
+  - stage: scan
+    addons: 
+      sonarcloud: 
+    script:
+    # FIXME- ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+  - stage: build
+    script: 
+   - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+   - ant check
+
+# We could copy the logic in the bes or libdap travis.yml files to 
+# build and deploy a dist.

@@ -45,3 +45,4 @@ foo.*
 /.externalToolBuilders/
 /.settings/
 /bin/
+/conf/
