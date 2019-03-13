@@ -56,8 +56,8 @@ jobs:
 
   - stage: build
     script: 
-   - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-   - ant check
+    - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    - ant check
 
 # We could copy the logic in the bes or libdap travis.yml files to 
 # build and deploy a dist.
