@@ -63,7 +63,18 @@
 
         </BES>
 
+        <!-- Controls the state of the in-memory cache for BES catalog/node
+             responses. refreshInterval in seconds.
+        -->
         <NodeCache maxEntries="20000" refreshInterval="600"/>
+
+        <!--
+        Sets the location and life span of the SiteMap response cache.
+        The optional "cacheFile" attribute may be used to identify
+        a particular location for the SiteMap cache file.
+        refreshInterval in seconds.
+        -->
+        <SiteMapCache refreshInterval="600" />
 
     </BESManager>
 
