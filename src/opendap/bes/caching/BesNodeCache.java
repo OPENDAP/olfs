@@ -427,8 +427,8 @@ public class BesNodeCache {
      * to provide a test fixture to allow the evaluation of the
      * NodeTransaction.comparable() interface for the purposes of sorting.
      *
-     * @param id
-     * @return
+     * @param id The id/key for the dummy NodeTransaction
+     * @return A Dummy NodeTransaction for testing purposes.
      */
     private static NodeTransaction getDummyCachedNodeTransaction(String id){
         Document request;
