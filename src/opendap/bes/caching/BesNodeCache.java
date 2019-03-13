@@ -147,8 +147,9 @@ public class BesNodeCache {
             IOException,
             BESError {
 
-        if(!ENABLED.get())
-            return null;
+        if(!ENABLED.get()) {
+            init(NODE_CACHE_MAX_ENTRIES_DEFAULT,NODE_CACHE_REFRESH_INTERVAL_DEFAULT);
+        }
 
         if(key==null)
             throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
