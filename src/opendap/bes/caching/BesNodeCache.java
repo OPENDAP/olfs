@@ -165,7 +165,7 @@ public class BesNodeCache {
                 RWLOCK.writeLock().lock();
                 try {
                     if (isStaleNodeTransaction(nodeTransaction)) {
-                        dropStaleNodeTransaction(nodeTransaction);
+                        dropNodeTransaction(nodeTransaction);
                         nodeTransaction = getAndCacheNodeTransaction(key);
                     }
                     RWLOCK.readLock().lock();
@@ -276,13 +276,13 @@ public class BesNodeCache {
      *
      * @param nodeTransaction The NodeTransaction to drop from the cache.
      */
-    private static void dropStaleNodeTransaction(NodeTransaction nodeTransaction){
+    private static void dropNodeTransaction(NodeTransaction nodeTransaction){
 
         if(nodeTransaction==null){
             // a null value is a noop, but not an error
             return;
         }
-        LOG.debug("Dropping stale NodeTransaction[{}] from cache!",nodeTransaction.getKey());
+        LOG.debug("Dropping NodeTransaction[{}] from cache.",nodeTransaction.getKey());
 
         NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
         LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}",
