@@ -313,8 +313,6 @@ public class BesNodeCache {
         boolean status;
         LOCK.lock();
         try {
-            //LOG.debug("Updating MOST_RECENTLY_ACCESSED list.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-
             status = MOST_RECENTLY_ACCESSED.remove(nodeTransaction);
             if(status) {
                 LOG.debug("Removed NodeTransaction[{},{}] from MOST_RECENTLY_ACCESSED", nodeTransaction.getKey(),nodeTransaction);
@@ -322,7 +320,6 @@ public class BesNodeCache {
             else {
                 LOG.debug("The NodeTransaction[{},{}] was not found in MOST_RECENTLY_ACCESSED", nodeTransaction.getKey(),nodeTransaction);
             }
-            //LOG.debug("MOST_RECENTLY_ACCESSED list updated.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
 
             nodeTransaction.updateAccessedTime();
 
@@ -333,7 +330,6 @@ public class BesNodeCache {
             else {
                 LOG.debug("FAILED to add NodeTransaction[{}] to MOST_RECENTLY_ACCESSED",nodeTransaction.getKey());
             }
-            LOG.debug("MOST_RECENTLY_ACCESSED list updated.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
         }
         finally {
             LOCK.unlock();
