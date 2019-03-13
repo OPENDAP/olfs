@@ -53,7 +53,7 @@
         besSiteMap = new BesSiteMap(dapService);
 
     }
-    catch (BESError | BadConfigurationException | PPTException e) {
+    catch (Exception e) {
         e.printStackTrace();
         return;
     }
