@@ -1,6 +1,6 @@
 #!/bin/bash
 
-target_hyrax="http://localhost:8080/"
+target_hyrax="http://3.91.237.29:8080/"
 sitemapFileName="site_map.txt"
 catalogsFile="catalogs.txt"
 datasetsFile="datasets.txt"
@@ -168,15 +168,6 @@ function makeRandomCatRequest() {
 }
 
 
-
-
-
-# buildTestTreeDirs 10;
-
-# copyData /Users/ndp/OPeNDAP/hyrax/build/share/hyrax/data/nc/fnoc1.nc 5
-
-# retrieveSitemap
-
 function makeRandomRequests {
     for i in {1..30000}
     do
@@ -198,9 +189,13 @@ function siteMapGrinder {
 #############################################################################
 #############################################################################
 
+# buildTestTreeDirs 10;
 
+# copyData /Users/ndp/OPeNDAP/hyrax/build/share/hyrax/data/nc/fnoc1.nc 5
 
-makeRandomRequests
+# retrieveSitemap
+
+# makeRandomRequests
 
 # siteMapGrinder
 
