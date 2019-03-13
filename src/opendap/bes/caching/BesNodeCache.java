@@ -166,7 +166,6 @@ public class BesNodeCache {
                 try {
                     if (isStaleNodeTransaction(nodeTransaction)) {
                         dropStaleNodeTransaction(nodeTransaction);
-                        LOG.debug("Dropping stale NodeTransaction[{}] from cache!",key);
                         nodeTransaction = getAndCacheNodeTransaction(key);
                     }
                     RWLOCK.readLock().lock();
@@ -259,7 +258,8 @@ public class BesNodeCache {
      *         the UPDATE_INTERVAL.
      */
     private static boolean isStaleNodeTransaction(NodeTransaction nodeTransaction){
-        boolean isStale = true; // if it's null it's stale...
+        boolean isStale = true;
+        // if it's null it's stale, if it's nit null it might be stale...
         if(nodeTransaction!=null) {
             long timeInCache = System.nanoTime() - nodeTransaction.getLastUpdateTime();
             LOG.debug("nodeTransaction[{}] has been in cache {} s", nodeTransaction.getKey(), timeInCache / (nanoInSeconds * 1.0));
@@ -282,6 +282,7 @@ public class BesNodeCache {
             // a null value is a noop, but not an error
             return;
         }
+        LOG.debug("Dropping stale NodeTransaction[{}] from cache!",nodeTransaction.getKey());
 
         NodeTransaction nt = NODE_CACHE.remove(nodeTransaction.getKey());
         LOG.debug("Remove NodeTransaction[{}] from NODE_CACHE returned: {}",
