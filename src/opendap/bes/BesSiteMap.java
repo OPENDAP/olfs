@@ -19,8 +19,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This servlet works with the BES system to build site map responses for Hyrax.
  *
  */
-public class BESSiteMap {
-    private static final Logger LOG = LoggerFactory.getLogger(BESSiteMap.class);
+public class BesSiteMap {
+    private static final Logger LOG = LoggerFactory.getLogger(BesSiteMap.class);
 
     public static final String SITE_MAP_CACHE_ELEMENT_NAME = "SiteMapCache";
     public static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
@@ -59,7 +59,7 @@ public class BESSiteMap {
      * @throws PPTException
      * @throws IOException
      */
-    public BESSiteMap(String dapServicePrefix)
+    public BesSiteMap(String dapServicePrefix)
             throws BESError, BadConfigurationException, PPTException, IOException {
         if(!ENABLED.get()){
             throw new BadConfigurationException("BESSiteMap has not been initialized.");

@@ -159,13 +159,13 @@ public class BESManager {
             BesNodeCache.init(nodeCache);
         }
 
-        Element siteMapCache = besConfiguration.getChild(BESSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
+        Element siteMapCache = besConfiguration.getChild(BesSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
         // The SiteMap cache is required, so if it's not in the configuration
         // then we need to gin one up.
         if(siteMapCache==null) {
-            siteMapCache = new Element(BESSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
+            siteMapCache = new Element(BesSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
         }
-        String cacheFile = siteMapCache.getAttributeValue(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
+        String cacheFile = siteMapCache.getAttributeValue(BesSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
         if(cacheFile==null) {
             // Critically, we need to tell the BESSiteMap where to cache so if
             // the cache file is missing from the configuration we sort that
@@ -173,11 +173,11 @@ public class BESManager {
             ServletUtil.getConfigPath(servletContext);
             String defaultSiteMapCacheFile = PathBuilder.pathConcat(ServletUtil.getConfigPath(servletContext),"cache");
             defaultSiteMapCacheFile = PathBuilder.pathConcat(defaultSiteMapCacheFile,"SiteMap.cache");
-            siteMapCache.setAttribute(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
+            siteMapCache.setAttribute(BesSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
         }
         // We don't need a refresh interval because if it's missing the
         // default BESSiteMap.DEFAULT_CACHE_REFRESH_INTERVAL will be used
-        BESSiteMap.init(siteMapCache);
+        BesSiteMap.init(siteMapCache);
         CONFIGURED.set(true);
 
     }

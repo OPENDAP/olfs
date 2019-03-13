@@ -1,5 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true" %>
-<%@ page import="opendap.bes.BESSiteMap" %>
+<%@ page import="opendap.bes.BesSiteMap" %>
 <%@ page import="opendap.dap.Request" %>
 <%@ page import="opendap.PathBuilder" %>
 <%@ page import="opendap.bes.BESError" %>
@@ -48,9 +48,9 @@
         dapService = webapp;
     }
 
-    BESSiteMap besSiteMap;
+    BesSiteMap besSiteMap;
     try {
-        besSiteMap = new BESSiteMap(dapService);
+        besSiteMap = new BesSiteMap(dapService);
 
     }
     catch (BESError | BadConfigurationException | PPTException e) {

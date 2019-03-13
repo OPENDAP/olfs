@@ -187,7 +187,7 @@ public class BESSiteMapService extends HttpServlet {
                 DataOutputStream dos = new DataOutputStream(response.getOutputStream());
                 PrintStream sos = new PrintStream(dos);
 
-                BESSiteMap besSiteMap = new BESSiteMap(dapService);
+                BesSiteMap besSiteMap = new BesSiteMap(dapService);
 
                 if (relativeUrl.equals("/")) {
                     LOG.debug("Just the service endpoint. {}",request.getRequestURI());
