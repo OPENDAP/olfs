@@ -313,7 +313,7 @@ public class BesNodeCache {
         boolean status;
         LOCK.lock();
         try {
-            LOG.debug("Updating MOST_RECENTLY_ACCESSED list.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+            //LOG.debug("Updating MOST_RECENTLY_ACCESSED list.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
 
             status = MOST_RECENTLY_ACCESSED.remove(nodeTransaction);
             if(status) {
@@ -322,12 +322,17 @@ public class BesNodeCache {
             else {
                 LOG.debug("The NodeTransaction[{},{}] was not found in MOST_RECENTLY_ACCESSED", nodeTransaction.getKey(),nodeTransaction);
             }
-            LOG.debug("MOST_RECENTLY_ACCESSED list updated.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+            //LOG.debug("MOST_RECENTLY_ACCESSED list updated.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
 
             nodeTransaction.updateAccessedTime();
 
             status = MOST_RECENTLY_ACCESSED.add(nodeTransaction);
-            LOG.debug("{} NodeTransaction[{}] to MOST_RECENTLY_ACCESSED",status?"Added":"FAILED to add",nodeTransaction.getKey());
+            if(status){
+                LOG.debug("Added NodeTransaction[{}] to MOST_RECENTLY_ACCESSED",nodeTransaction.getKey());
+            }
+            else {
+                LOG.debug("FAILED to add NodeTransaction[{}] to MOST_RECENTLY_ACCESSED",nodeTransaction.getKey());
+            }
             LOG.debug("MOST_RECENTLY_ACCESSED list updated.  MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
         }
         finally {
