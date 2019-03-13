@@ -4,12 +4,14 @@ package opendap.bes;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
+import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -18,57 +20,35 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  */
 public class BESSiteMap {
+    private static final Logger LOG = LoggerFactory.getLogger(BESSiteMap.class);
+
+    public static final String SITE_MAP_CACHE_ELEMENT_NAME = "SiteMapCache";
+    public static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
+    public static final String CACHE_FILE_ATTRIBUTE_NAME = "cacheFile";
 
     private static final ReentrantReadWriteLock cacheLock = new ReentrantReadWriteLock();
+    private static final AtomicBoolean ENABLED = new AtomicBoolean(false);
 
     private static final String PseudoFileOpener ="smap_";
     private static final String PseudoFileCloser =".txt";
 
-    public static final long SITE_MAP_FILE_MAX_ENTRIES = 50000;  // Fifty Thousand entries per file.
-    public static final long SITE_MAP_FILE_MAX_BYTES = 52428800; // 50MB per file.
+    public static final long SITE_MAP_FILE_MAX_ENTRIES = 49500;  // Fifty Thousand entries per file is the specification max
+    public static final long SITE_MAP_FILE_MAX_BYTES = 50000000; // 50MB per file is the specification max
     //public static final long SITE_MAP_FILE_MAX_ENTRIES = 100;
     //public static final long SITE_MAP_FILE_MAX_BYTES = 500;
 
-    // @FIXME Make this a configuration option!!!!
-    private static String SiteMapCacheFileName = "/etc/olfs/cache/SiteMap.cache";
+    public static final String  DEFAULT_CACHE_FILE = "/etc/olfs/cache/SiteMap.cache"; // this is a punt
+    private static String SiteMapCacheFileName = DEFAULT_CACHE_FILE;
 
-    // @FIXME Make this a configuration option!!!!
-    private static AtomicLong cacheRefreshInterval_ms = new AtomicLong(180 * 1000); // Ten minutes of ms
+    public static final long DEFAULT_CACHE_REFRESH_INTERVAL = 600; // Ten minutes worth of seconds.
+    private static AtomicLong cacheRefreshInterval_ms = new AtomicLong(DEFAULT_CACHE_REFRESH_INTERVAL * 1000);
 
-    static void setSiteMapCacheFileName(String fname){
-        cacheLock.writeLock().lock();
-        try{
-            SiteMapCacheFileName = fname;
-        }
-        finally {
-            cacheLock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * Set the SiteMap cache refresh interval
-     * @param interval The number seconds in the refresh interval.
-     */
-    static void setCacheRefreshInterval(long interval){
-
-        cacheLock.writeLock().lock();
-        try{
-            cacheRefreshInterval_ms.set(interval);
-        }
-        finally {
-            cacheLock.writeLock().unlock();
-        }
-
-    }
-
-    /**
-     */
-    private Logger _log;
-    private TreeSet<String> _siteMap;
-    private int _siteMapFileCount;
-    private String _dapServicePrefix;
-    private long _siteMapCharCount;
-    private Date _creation;
+    private Logger log;
+    private TreeSet<String> siteMap;
+    private int siteMapFileCount;
+    private String dapServicePrefix;
+    private long siteMapCharCount;
+    private Date creation;
 
 
     /**
@@ -81,13 +61,102 @@ public class BESSiteMap {
      */
     public BESSiteMap(String dapServicePrefix)
             throws BESError, BadConfigurationException, PPTException, IOException {
-        _log = LoggerFactory.getLogger(getClass());
-        _siteMap = new TreeSet<>();
-        _siteMapFileCount = 1;
-        _dapServicePrefix = dapServicePrefix;
-        _siteMapCharCount = getSiteMap();
-        _creation = new Date();
+        if(!ENABLED.get()){
+            throw new BadConfigurationException("BESSiteMap has not been initialized.");
+        }
+        log = LoggerFactory.getLogger(getClass());
+        siteMap = new TreeSet<>();
+        siteMapFileCount = 1;
+        this.dapServicePrefix = dapServicePrefix;
+        siteMapCharCount = getSiteMap();
+        creation = new Date();
     }
+
+    /**
+     * Initialize the Node Cache using an XML Element.
+     * @param config The "NodeCache" configuration element
+     * @throws BadConfigurationException When the configuration is broken.
+     */
+    public static void init(Element config)
+            throws BadConfigurationException {
+
+        if(ENABLED.get())
+            return;
+
+        if (config == null || !config.getName().equals(SITE_MAP_CACHE_ELEMENT_NAME))
+            throw new BadConfigurationException("BESSiteMap must be passed a non-null configuration " +
+                    "element named " + SITE_MAP_FILE_MAX_ENTRIES);
+
+        long refreshIntervalSeconds = DEFAULT_CACHE_REFRESH_INTERVAL;
+        String refreshIntervalString = config.getAttributeValue(REFRESH_INTERVAL_ATTRIBUTE_NAME);
+        if(refreshIntervalString!= null) {
+            try {
+                refreshIntervalSeconds = Long.parseLong(refreshIntervalString);
+                if (refreshIntervalSeconds <= 0) {
+                    refreshIntervalSeconds = DEFAULT_CACHE_REFRESH_INTERVAL;
+                    String msg = "Failed to parse value of " +
+                            SITE_MAP_CACHE_ELEMENT_NAME + "@" +
+                            REFRESH_INTERVAL_ATTRIBUTE_NAME + "! " +
+                            "Value must be an integer > 0. Using default value: " +
+                            refreshIntervalSeconds;
+                    LOG.error(msg);
+                }
+            } catch (NumberFormatException nfe) {
+                String errMsg = "Failed to parse value of " +
+                        SITE_MAP_CACHE_ELEMENT_NAME + "@" +
+                        REFRESH_INTERVAL_ATTRIBUTE_NAME + "! Value must be an integer." +
+                        " Using default value: " + refreshIntervalSeconds;
+                LOG.error(errMsg);
+            }
+        }
+
+        String cacheFileName = DEFAULT_CACHE_FILE;
+        String cacheFileNameString = config.getAttributeValue(CACHE_FILE_ATTRIBUTE_NAME);
+        if(cacheFileNameString!=null){
+            cacheFileName = cacheFileNameString;
+        }
+
+        init(cacheFileName, refreshIntervalSeconds);
+    }
+
+
+    /**
+     * The _actual_ init method that sets up the cache. This must be called
+     * prior to using the cache.
+     * @param cacheFileName The maximum number of entries in the cache
+     * @param refreshIntervalSeconds The time that a site map is considered
+     *                               valid, after which it must be refreshed.
+     */
+    public static void init(String cacheFileName, long refreshIntervalSeconds)
+            throws BadConfigurationException {
+        cacheLock.writeLock().lock();
+        try {
+            if (ENABLED.get()) {
+                LOG.error("BESSiteMap has already been initialized!  " +
+                                "SiteMapCacheFile: {}  RefreshInterval: {} s",
+                        SiteMapCacheFileName,
+                        cacheRefreshInterval_ms.get()/1000);
+                return;
+            }
+
+            // convert to milliseconds
+            cacheRefreshInterval_ms.set(refreshIntervalSeconds * 1000);
+
+            SiteMapCacheFileName = cacheFileName;
+
+            checkSiteMapFileLocation();
+
+            ENABLED.set(true);
+            LOG.debug("INITIALIZED  SiteMapCacheFile: {}  RefreshInterval: {} s",
+                    SiteMapCacheFileName,
+                    cacheRefreshInterval_ms.get()/(1000));
+        }
+        finally {
+            cacheLock.writeLock().unlock();
+        }
+    }
+
+
 
 
     /**
@@ -115,7 +184,7 @@ public class BESSiteMap {
             msg = "SiteMap Cache is EXPIRED. (No Cache File Found: "+
                     SiteMapCacheFileName+")";
         }
-        _log.debug(msg);
+        log.debug(msg);
         return expired;
     }
 
@@ -142,7 +211,7 @@ public class BESSiteMap {
                 // got the writeLock
                 if(cacheExpired()){
                     makeCacheFileAsRequired();
-                    _log.debug("UPDATING SiteMap file: {}", smcFile.getAbsolutePath());
+                    log.debug("UPDATING SiteMap file: {}", smcFile.getAbsolutePath());
                     try (FileOutputStream fos = new FileOutputStream(smcFile)) {
                         writeBesSiteMap(fos);
                     }
@@ -156,7 +225,7 @@ public class BESSiteMap {
         }
 
         try {
-            _log.debug("Ingesting SiteMap file: {}", smcFile.getAbsolutePath());
+            log.debug("Ingesting SiteMap file: {}", smcFile.getAbsolutePath());
             try (FileInputStream smcIs = new FileInputStream(smcFile)) {
                 return ingestSiteMap(smcIs);
             }
@@ -168,27 +237,75 @@ public class BESSiteMap {
     }
 
     /**
+     * This checks to make sure that a site map file can be placed in the
+     * location indicated by SiteMapCacheFileName.
+     *
+     * If the site map files exists and can be written to and read from then the
+     * check returns.
+     *
+     * @throws BadConfigurationException When the cache file is unusable or the
+     * parent directory coannot be created or does not exist.
+     **/
+    private static void checkSiteMapFileLocation()
+            throws BadConfigurationException {
+
+        File cacheFile = new File(SiteMapCacheFileName);
+        if(cacheFile.exists()){
+            if(!cacheFile.canRead() || !cacheFile.canWrite()) {
+                throw new BadConfigurationException("Unable to read and write " +
+                        "to the SiteMap cache file: "+SiteMapCacheFileName);
+            }
+            LOG.debug("Cache file: '{}' exists and rw privileges confirmed",
+                    cacheFile.getAbsolutePath());
+            return;
+        }
+
+        File parent = cacheFile.getParentFile();
+
+        if(parent.mkdirs()){
+            LOG.debug("Created cache dir: '{}'",
+                    cacheFile.getParentFile().getAbsolutePath());
+        }
+        else if(parent.exists()){
+            LOG.debug("Cache dir: '{}' is present.",
+                    cacheFile.getParentFile().getAbsolutePath());
+        }
+        else {
+            throw new BadConfigurationException("Unable to create cache " +
+                    "directory: "+parent.getAbsolutePath());
+        }
+
+
+    }
+
+
+    /**
      * Creates the cache file (and any required parent directories)
      *
      * @throws IOException If the parent directories or or the cache file cannot
      * be created.
      */
-    private void makeCacheFileAsRequired() throws IOException{
+    private static void makeCacheFileAsRequired() throws IOException{
 
         File cacheFile = new File(SiteMapCacheFileName);
 
-        if(cacheFile.exists())
+        if(cacheFile.exists()) {
             return;
-
-        if(cacheFile.getParentFile().mkdirs()){
-            _log.debug("Created cache dir: '{}'",cacheFile.getParentFile().getAbsolutePath());
+        }
+        File parent = cacheFile.getParentFile();
+        if(parent.mkdirs()){
+            LOG.debug("Created cache dir: '{}'",cacheFile.getParentFile().getAbsolutePath());
+        }
+        else if(parent.exists()){
+            LOG.debug("Cache dir: '{}' is present.",cacheFile.getParentFile().getAbsolutePath());
         }
         else {
-            _log.debug("Cache dir: '{}' is present.",cacheFile.getParentFile().getAbsolutePath());
+            throw new IOException("Unable to find or create the cache " +
+                    "directory: "+parent.getAbsolutePath());
         }
 
         if (cacheFile.createNewFile()) {
-            _log.debug("Created new SiteMap cache file: {}", cacheFile.getAbsolutePath());
+            LOG.debug("Created new SiteMap cache file: {}", cacheFile.getAbsolutePath());
         }
     }
 
@@ -203,7 +320,7 @@ public class BESSiteMap {
      */
     private void writeBesSiteMap(OutputStream os) throws BadConfigurationException, PPTException, IOException, BESError {
         BesApi besApi = new BesApi();
-        besApi.writeCombinedSiteMapResponse(_dapServicePrefix,os);
+        besApi.writeCombinedSiteMapResponse(dapServicePrefix,os);
     }
 
     /**
@@ -216,10 +333,10 @@ public class BESSiteMap {
      */
     private long ingestSiteMap(InputStream smcIs) throws IOException {
 
-        _log.debug("Ingesting SiteMap from Stream");
+        log.debug("Ingesting SiteMap from Stream");
 
         BufferedReader bfr = new BufferedReader(new InputStreamReader(smcIs, HyraxStringEncoding.getCharset()));
-        _siteMapFileCount = 1;
+        siteMapFileCount = 1;
         long charsInSiteMapPseudoFile = 0;
         long linesInSiteMapPseudoFile = 0;
 
@@ -228,19 +345,19 @@ public class BESSiteMap {
         long char_count = 0;
         while (line != null) {
             i++;
-            _siteMap.add(line);
+            siteMap.add(line);
             char_count += line.length();
             linesInSiteMapPseudoFile++;
             charsInSiteMapPseudoFile += line.length();
             if (charsInSiteMapPseudoFile > SITE_MAP_FILE_MAX_BYTES || linesInSiteMapPseudoFile > SITE_MAP_FILE_MAX_ENTRIES) {
-                _siteMapFileCount++;
+                siteMapFileCount++;
                 charsInSiteMapPseudoFile = 0;
                 linesInSiteMapPseudoFile = 0;
             }
             line = bfr.readLine();
         }
-        _log.debug("getSiteMapFromBes() - Processed {} lines.", i);
-        _log.debug("getSiteMapFromBes() - siteMap has {} entries, {} characters.", _siteMap.size(), char_count);
+        log.debug("getSiteMapFromBes() - Processed {} lines.", i);
+        log.debug("getSiteMapFromBes() - siteMap has {} entries, {} characters.", siteMap.size(), char_count);
 
         return char_count;
     }
@@ -258,11 +375,11 @@ public class BESSiteMap {
     public String getSiteMapEntryForRobotsDotText(String siteMapServicePrefix ) throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        _log.debug("Building siteMap files index response.");
-        for(long i = 0; i < _siteMapFileCount ; i++){
+        log.debug("Building siteMap files index response.");
+        for(long i = 0; i < siteMapFileCount; i++){
             sb.append("sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
         }
-        _log.debug("siteMap files response content:\n{}",sb.toString());
+        log.debug("siteMap files response content:\n{}",sb.toString());
         return sb.toString();
     }
 
@@ -294,13 +411,13 @@ public class BESSiteMap {
                     targetFileIndex = Integer.parseInt(s);
                 }
                 catch (NumberFormatException nfe){
-                    _log.error("Failed to parse integer file number in string '{}'",pseudoFilename);
+                    log.error("Failed to parse integer file number in string '{}'",pseudoFilename);
                 }
             }
         }
 
         // Did the parse effort succeed?
-        if(targetFileIndex <0 || targetFileIndex >= _siteMapFileCount) {
+        if(targetFileIndex <0 || targetFileIndex >= siteMapFileCount) {
             // If the parse effort failed we just return the top level file index.
             ps.println(getSiteMapEntryForRobotsDotText(siteMapServicePrefix));
             return;
@@ -310,7 +427,7 @@ public class BESSiteMap {
         long char_count=0;
         int currentPseudoFile = 0;
 
-        for(String line: _siteMap){
+        for(String line: siteMap){
             i++;
             char_count += line.length();
             if( char_count > SITE_MAP_FILE_MAX_BYTES || i > SITE_MAP_FILE_MAX_ENTRIES){
@@ -327,7 +444,7 @@ public class BESSiteMap {
 
     }
 
-    public Date created(){ return _creation; }
+    public Date created(){ return creation; }
 
 
 }

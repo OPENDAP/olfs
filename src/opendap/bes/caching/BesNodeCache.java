@@ -66,36 +66,40 @@ public class BesNodeCache {
 
         long maxEntries = NODE_CACHE_MAX_ENTRIES_DEFAULT;
         String maxEntriesString = config.getAttributeValue(MAX_ENTRIES_ATTRIBUTE_NAME);
-        try {
-            maxEntries = Long.parseLong(maxEntriesString);
-            if (maxEntries <= 0) {
-                maxEntries = NODE_CACHE_MAX_ENTRIES_DEFAULT;
-                String msg = "Failed to parse value of " +
-                        NODE_CACHE_ELEMENT_NAME + "@" + MAX_ENTRIES_ATTRIBUTE_NAME + "! " +
-                        "Value must be an integer > 0. Using default value: " + maxEntries;
-                LOG.error(msg);
+        if(maxEntriesString!=null) {
+            try {
+                maxEntries = Long.parseLong(maxEntriesString);
+                if (maxEntries <= 0) {
+                    maxEntries = NODE_CACHE_MAX_ENTRIES_DEFAULT;
+                    String msg = "Failed to parse value of " +
+                            NODE_CACHE_ELEMENT_NAME + "@" + MAX_ENTRIES_ATTRIBUTE_NAME + "! " +
+                            "Value must be an integer > 0. Using default value: " + maxEntries;
+                    LOG.error(msg);
+                }
+            } catch (NumberFormatException nfe) {
+                LOG.error("Failed to parse value of NodeCache@maxEntries! Value must" +
+                        " be an integer. Using default value: {}", maxEntries);
             }
-        } catch (NumberFormatException nfe) {
-            LOG.error("Failed to parse value of NodeCache@maxEntries! Value must" +
-                    " be an integer. Using default value: {}", maxEntries);
         }
 
         long refreshInterval = NODE_CACHE_REFRESH_INTERVAL_DEFAULT;
         String refreshIntervalString = config.getAttributeValue(REFRESH_INTERVAL_ATTRIBUTE_NAME);
-        try {
-            refreshInterval = Long.parseLong(refreshIntervalString);
-            if (refreshInterval <= 0) {
-                refreshInterval = NODE_CACHE_REFRESH_INTERVAL_DEFAULT;
-                String msg = "Failed to parse value of " +
-                        NODE_CACHE_ELEMENT_NAME + "@" +
-                        REFRESH_INTERVAL_ATTRIBUTE_NAME + "! " +
-                        "Value must be an integer > 0. Using default value: " +
-                        refreshInterval;
-                LOG.error(msg);
+        if(refreshIntervalString != null) {
+            try {
+                refreshInterval = Long.parseLong(refreshIntervalString);
+                if (refreshInterval <= 0) {
+                    refreshInterval = NODE_CACHE_REFRESH_INTERVAL_DEFAULT;
+                    String msg = "Failed to parse value of " +
+                            NODE_CACHE_ELEMENT_NAME + "@" +
+                            REFRESH_INTERVAL_ATTRIBUTE_NAME + "! " +
+                            "Value must be an integer > 0. Using default value: " +
+                            refreshInterval;
+                    LOG.error(msg);
+                }
+            } catch (NumberFormatException nfe) {
+                LOG.error("Failed to parse value of NodeCache@refreshInterval! Value" +
+                        " must be an integer. Using default value: {}", refreshInterval);
             }
-        } catch (NumberFormatException nfe) {
-            LOG.error("Failed to parse value of NodeCache@refreshInterval! Value" +
-                    " must be an integer. Using default value: {}", refreshInterval);
         }
         init(maxEntries, refreshInterval);
     }

@@ -153,21 +153,31 @@ public class BESManager {
 
 
         Element nodeCache = besConfiguration.getChild(BesNodeCache.NODE_CACHE_ELEMENT_NAME);
+        // If nodeCache is null no action needs to be taken because the NodeCache
+        // will be disabled, and that's fine.
         if(nodeCache!=null){
             BesNodeCache.init(nodeCache);
         }
 
         Element siteMapCache = besConfiguration.getChild(BESSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
-        if(siteMapCache!=null){
-            String cacheFile = siteMapCache.getAttributeValue(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
-            if(cacheFile==null) {
-                ServletUtil.getConfigPath(servletContext);
-                String defaultSiteMapCacheFile = PathBuilder.pathConcat(ServletUtil.getConfigPath(servletContext),"cache");
-                defaultSiteMapCacheFile = PathBuilder.pathConcat(defaultSiteMapCacheFile,"SiteMap.cache");
-                siteMapCache.setAttribute(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
-            }
-            BESSiteMap.init(siteMapCache);
+        // The SiteMap cache is required, so if it's not in the configuration
+        // then we need to gin one up.
+        if(siteMapCache==null) {
+            siteMapCache = new Element(BESSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
         }
+        String cacheFile = siteMapCache.getAttributeValue(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
+        if(cacheFile==null) {
+            // Critically, we need to tell the BESSiteMap where to cache so if
+            // the cache file is missing from the configuration we sort that
+            // out using our configuration stack.
+            ServletUtil.getConfigPath(servletContext);
+            String defaultSiteMapCacheFile = PathBuilder.pathConcat(ServletUtil.getConfigPath(servletContext),"cache");
+            defaultSiteMapCacheFile = PathBuilder.pathConcat(defaultSiteMapCacheFile,"SiteMap.cache");
+            siteMapCache.setAttribute(BESSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
+        }
+        // We don't need a refresh interval because if it's missing the
+        // default BESSiteMap.DEFAULT_CACHE_REFRESH_INTERVAL will be used
+        BESSiteMap.init(siteMapCache);
         CONFIGURED.set(true);
 
     }
