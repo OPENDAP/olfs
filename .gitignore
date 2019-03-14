@@ -47,3 +47,4 @@ foo.*
 /.settings/
 /bin/
 /conf/
+/.sonar/

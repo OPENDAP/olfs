@@ -42,24 +42,31 @@ env:
 stages:
 - name: build
   if:  branch = master
-- name: scan
+- name: test
   if:  branch = master
-  
-# AND NOT type = pull_request
+- name: scan
+  if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
   - stage: build
     script: 
     - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+  - stage: test
+    script: 
     - ant check
 
   - stage: scan
     addons: 
       sonarcloud: 
     script:
-    - ant server -DHYRAX_VERSION=Sonar-Build -DOLFS_VERSION=Sonar-Build
+    - ant server
     - ant sonar -Dsonar.login=$SONAR_LOGIN
+
+script:
+  # Empty script suppresses the default (ant test) which fails. We run the
+  # tests in a separate stage. See above.
 
 # We could copy the logic in the bes or libdap travis.yml files to 
 # build and deploy a dist.
