@@ -66,7 +66,6 @@
 
 
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
-    <ThreddsService  prefix="thredds" useMemoryCache="true" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
     <UseDAP2ResourceUrlResponse />
     <HttpPost enabled="true" max="2000000"/>

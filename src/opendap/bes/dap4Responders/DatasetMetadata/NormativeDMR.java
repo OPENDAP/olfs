@@ -35,11 +35,12 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.DMR;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 public class NormativeDMR extends Dap4Responder {
@@ -94,11 +95,8 @@ public class NormativeDMR extends Dap4Responder {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         QueryParameters qp = new QueryParameters(request);
-
         String xmlBase = getXmlBase(request);
-
         String resourceID = getResourceId(requestedResourceId, false);
-
 
         BesApi besApi = getBesApi();
 
@@ -110,26 +108,13 @@ public class NormativeDMR extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
 
-
-        OutputStream os = response.getOutputStream();
-
-
-
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDMR(resourceID, qp, xmlBase, os);
-
         os.flush();
-        log.info("Sent {}",getServiceTitle());
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
-
-
-
-
 }

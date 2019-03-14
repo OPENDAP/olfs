@@ -241,14 +241,14 @@
                                     <div class="small">
                                        <span class="bold">acf:
                         </span>
-                                       <span class="em">-2.000000001.000000000.00000000</span>
+                                       <span class="em">-2.00000000, 1.00000000, 0.00000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">acd:
                         </span>
-                                       <span class="em">-1.0000000000000000.7500000000000000</span>
+                                       <span class="em">-1.000000000000000, 0.7500000000000000</span>
                                     </div>
                                  </li>
                                  <li>
@@ -358,7 +358,7 @@
                                     <div class="small">
                                        <span class="bold">attr2:
                         </span>
-                                       <span class="em">1234</span>
+                                       <span class="em">1, 2, 3, 4</span>
                                     </div>
                                  </li>
                                  <ul class="collapsibleList">
@@ -377,7 +377,7 @@
                                                 <div class="small">
                                                    <span class="bold">attr3_2:
                         </span>
-                                                   <span class="em">192327</span>
+                                                   <span class="em">19, 23, 27</span>
                                                 </div>
                                              </li>
                                           </ul>
@@ -411,8 +411,14 @@
             </tr>
          </table>
       </form>
-      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
-         <a href="/opendap/docs/">Documentation</a>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/nc/bears.nc.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/nc/bears.nc.html%0A# query_string: bears,aloan,i%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
       <script type="application/ld+json">
 {

@@ -52,6 +52,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -539,7 +540,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
     @Override
     public long getLastModified() {
-        return 0;
+        return new Date().getTime();
     }
 
     @Override

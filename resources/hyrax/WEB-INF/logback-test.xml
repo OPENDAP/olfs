@@ -4,7 +4,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2019 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 <configuration>
 
 
-    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}]  %-5p - %c - %m%n" />
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M\\(\\) - %m%n" />
 
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
@@ -69,7 +69,7 @@
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
+            <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
         </encoder>
     </appender>
 
@@ -82,7 +82,7 @@
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] %n</pattern>
+            <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
         </encoder>
     </appender>
 
@@ -108,7 +108,12 @@
         <appender-ref ref="ErrorLog"/>
         <appender-ref ref="stdout"/>
     </logger>
-    
+
+    <logger name="opendap.io" level="info" />
+    <logger name="opendap.bes.dap2Responders.Ascii"   level="info"/>
+
+    <logger name="opendap.logging.LogUtil" level="info" />
+
     <logger name="org.jdom" level="all" />
 
     <logger name="opendap.coreServlet" level="error" />
@@ -225,9 +230,54 @@
 
 
 
-    <logger name="HyraxAccess" level="all">
-        <appender-ref ref="HyraxAccessLog" />
+    <logger name="HyraxAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
     </logger>
+    <logger name="HyraxLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="DocsAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="SiteMapAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="PDPServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="PDPServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="HyraxGatewayAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxGatewayLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="HyraxAdmindAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxAdminLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="S3ServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="S3ServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="WCSAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="WCSLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
 
     <logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>

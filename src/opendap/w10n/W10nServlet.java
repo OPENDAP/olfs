@@ -37,6 +37,7 @@ import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
 import opendap.services.ServicesRegistry;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
@@ -44,6 +45,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -51,8 +53,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class W10nServlet extends HttpServlet   {
 
-    private org.slf4j.Logger _log;
-    private W10nResponder _responder;
+    private static final Logger LOG = LoggerFactory.getLogger(W10nServlet.class);
+    private static final W10nResponder W10N_RESPONDER = new W10nResponder();
 
     /**
      * ************************************************************************
@@ -60,7 +62,7 @@ public class W10nServlet extends HttpServlet   {
      *
      * @serial
      */
-    private AtomicInteger _reqNumber;
+    private static final AtomicInteger _reqNumber =  new AtomicInteger(0);
 
     /**
      * ************************************************************************
@@ -70,10 +72,7 @@ public class W10nServlet extends HttpServlet   {
     @Override
     public void init() throws ServletException {
         super.init();
-        _reqNumber = new AtomicInteger(0);
-        _log = LoggerFactory.getLogger(this.getClass());
-        _reqNumber = new AtomicInteger(0);
-        _responder = new W10nResponder(ServletUtil.getSystemPath(this,""));
+        W10N_RESPONDER.setSystemPath(ServletUtil.getSystemPath(this,""));
         W10nService w10nService = new W10nService();
         w10nService.init(this,null);
         ServicesRegistry.addService(w10nService);
@@ -91,8 +90,8 @@ public class W10nServlet extends HttpServlet   {
     protected long getLastModified(HttpServletRequest req) {
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "HyraxAccess", "LAST-MOD", Long.toString(reqno));
-        long lmt = -1;
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        long lmt = new Date().getTime();
         Procedure timedProcedure = Timer.start();
         try {
             if (ReqInfo.isServiceOnlyRequest(req)) {
@@ -100,12 +99,10 @@ public class W10nServlet extends HttpServlet   {
             }
             // @TODO Create a meaningful implementation of getLastModified for w10n service.
         } catch (Exception e) {
-            _log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
-            lmt = -1;
+            LOG.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "HyraxAccess");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
-
         }
         return lmt;
     }
@@ -125,21 +122,21 @@ public class W10nServlet extends HttpServlet   {
                 RequestCache.openThreadCache();
 
                 int reqno = _reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
-                _log.debug(Util.getMemoryReport());
-                _log.debug(ServletUtil.showRequest(request, reqno));
+                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                LOG.debug(Util.getMemoryReport());
+                LOG.debug(ServletUtil.showRequest(request, reqno));
                 //log.debug(AwsUtil.probeRequest(this, request));
                 if(redirectForServiceOnlyRequest(request,response))
                     return;
                 if (Debug.isSet("probeRequest"))
-                    _log.debug(ServletUtil.probeRequest(this, request));
+                    LOG.debug(ServletUtil.probeRequest(this, request));
                 /**
                  * Do w10n STUFF
                  */
-                _responder.send_w10n_response(request, response);
+                W10N_RESPONDER.sendW10NResponse(request, response);
             }
             finally {
-                _log.info("doGet(): Response completed.\n");
+                LOG.info("doGet(): Response completed.\n");
                 Timer.stop(timedProc);
             }
         }
@@ -149,11 +146,12 @@ public class W10nServlet extends HttpServlet   {
             }
             catch(Throwable t2) {
                 try {
-                    _log.error("\n########################################################\n" +
+                    String msg = "\n########################################################\n" +
                             "Request processing failed.\n" +
                             "Normal Exception handling failed.\n" +
                             "This is the last error log attempt for this request.\n" +
-                            "########################################################\n", t2);
+                            "########################################################\n{}";
+                    LOG.error(msg,t2);
                 }
                 catch(Throwable t3){
                     // It's boned now.. Leave it be.
@@ -161,11 +159,11 @@ public class W10nServlet extends HttpServlet   {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
+            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
 
-        _log.info(Timer.report());
+        LOG.info(Timer.report());
         Timer.reset();
     }
 
@@ -181,8 +179,7 @@ public class W10nServlet extends HttpServlet   {
             String reqURI = req.getRequestURI();
             String newURI = reqURI+"/";
             res.sendRedirect(Scrub.urlContent(newURI));
-            _log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
-                    "context to a URL that ends in a '/' character!");
+            LOG.debug("Sent redirectForServiceOnlyRequest to map the servlet context to a URL that ends in a '/' character!");
             return true;
         }
         return false;

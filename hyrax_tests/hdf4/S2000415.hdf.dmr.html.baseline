@@ -1291,7 +1291,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">-90007771</span>
+                                       <span class="em">-9000, 7771</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1402,7 +1402,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">031242</span>
+                                       <span class="em">0, 31242</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1513,7 +1513,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">019</span>
+                                       <span class="em">0, 19</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1624,7 +1624,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">06</span>
+                                       <span class="em">0, 6</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1735,7 +1735,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">06</span>
+                                       <span class="em">0, 6</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1846,7 +1846,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">06</span>
+                                       <span class="em">0, 6</span>
                                     </div>
                                  </li>
                               </ul>
@@ -1957,7 +1957,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">06</span>
+                                       <span class="em">0, 6</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2061,7 +2061,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">03</span>
+                                       <span class="em">0, 3</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2172,7 +2172,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">02374</span>
+                                       <span class="em">0, 2374</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2295,7 +2295,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">02571</span>
+                                       <span class="em">0, 2571</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2418,7 +2418,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">035997</span>
+                                       <span class="em">0, 35997</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2541,7 +2541,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">02410</span>
+                                       <span class="em">0, 2410</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2664,7 +2664,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">02435</span>
+                                       <span class="em">0, 2435</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2780,7 +2780,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">-327682825</span>
+                                       <span class="em">-32768, 2825</span>
                                     </div>
                                  </li>
                               </ul>
@@ -2891,7 +2891,7 @@
                                     <div class="small">
                                        <span class="bold">valid_range:
                         </span>
-                                       <span class="em">04</span>
+                                       <span class="em">0, 4</span>
                                     </div>
                                  </li>
                               </ul>
@@ -3069,8 +3069,14 @@
             </tr>
          </table>
       </form>
-      <h3>OPeNDAP Hyrax (Not.A.Release) <br/>
-         <a href="/opendap/docs/">Documentation</a>
+      <h3>OPeNDAP Hyrax (Not.A.Release)
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/hdf4/S2000415.HDF.gz.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/hdf4/S2000415.HDF.gz.dmr.html%0A# query_string: n/a%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
       <script type="application/ld+json">
 {

@@ -114,18 +114,18 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         String name = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("Tomcat requesting LMT for collection: {}", name );
 
 
         try {
             ResourceInfo dsi = new BESResource(name, _besApi);
-            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+            log.debug("Returning: {}", new Date(dsi.lastModified()));
 
             return dsi.lastModified();
         }
         catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+            log.debug("Returning current date/time.");
+            return new Date().getTime();
         }
 
 
@@ -214,7 +214,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY,responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, _besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", responseMediaType.getMimeType());
 
 

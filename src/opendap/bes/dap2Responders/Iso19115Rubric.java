@@ -35,6 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -42,7 +43,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Responder that transmits JSON encoded DAP2 data to the client.
@@ -109,20 +110,12 @@ public class Iso19115Rubric extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", "ISO19115 Metadata Compliance Report");
 
 
-        OutputStream os = response.getOutputStream();
-
-
         String xdap_accept = "3.2";
-
-
-
         Document ddx = new Document();
-
-
         besApi.getDDXDocument(
                 resourceID,
                 constraintExpression,
@@ -155,12 +148,15 @@ public class Iso19115Rubric extends Dap4Responder {
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
+            DataOutputStream os = new DataOutputStream(response.getOutputStream());
+
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
 
 
             os.flush();
-            log.info("Sent {}", getServiceTitle());
+            LogUtil.setResponseSize(os.size());
+            log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {
             log.debug("Restoring working directory to " + currentDir);

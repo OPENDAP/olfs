@@ -36,8 +36,8 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
-import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -111,7 +111,10 @@ public class Dap2IFH extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
-        _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
+
+        _log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType = getNormativeMediaType();
 
@@ -119,7 +122,7 @@ public class Dap2IFH extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -129,13 +132,12 @@ public class Dap2IFH extends Dap4Responder {
         besApi.getDDXDocument(resourceID,constraintExpression,"3.2",xmlBase,ddx);
         _log.debug(xmlo.outputString(ddx));
 
-        OutputStream os = response.getOutputStream();
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
         ddx.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
         String jsonLD = getDatasetJsonLD(collectionUrl,ddx);
 
-        _log.error(jsonLD);
+        _log.debug("JsonLD for dataset {}\n{}",requestedResourceId,jsonLD);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
@@ -153,18 +155,21 @@ public class Dap2IFH extends Dap4Responder {
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
             // See the source code in opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-
-            transformer.setParameter("serviceContext", request.getServletContext().getContextPath());
+            // transformer.setParameter("serviceContext", request.getServletContext().getContextPath()); // This is ServletAPI-3.0
+            transformer.setParameter("serviceContext", request.getContextPath()); // This is ServletAPI-2.5 (Tomcat 6 stopped here)
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", jsonLD);
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
+            DataOutputStream os = new DataOutputStream(response.getOutputStream());
             transformer.transform(new JDOMSource(ddx), os);
             os.flush();
-            _log.info("Sent {}", getServiceTitle());
+            LogUtil.setResponseSize(os.size());
+            _log.info("Sent {} size: {}", getServiceTitle(),os.size());
         }
         finally {
             _log.debug("Restoring working directory to " + currentDir);

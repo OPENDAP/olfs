@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Created by ndp on 10/7/14.
@@ -62,13 +63,16 @@ public class TomcatRealmIdP extends IdProvider {
      * @throws Exception
      */
     @Override
-    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
-         // Redirect the user back to the their original requested resource.
+    public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //Redirect the user back to the their original requested resource.
         HttpSession session = request.getSession();
         String redirectUrl = request.getContextPath();
-        String url = (String) session.getAttribute(IdFilter.ORIGINAL_REQUEST_URL);
-        if(url != null) {
-            redirectUrl = url;
+        if(session!=null){
+            String url = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            if(url != null) {
+                redirectUrl = url;
+            }
+            session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
         }
 
         String protocol = request.getScheme();
@@ -78,7 +82,6 @@ public class TomcatRealmIdP extends IdProvider {
         }
         _log.info("doLogin() - redirectURL: {}",redirectUrl);
 
-        session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
         response.sendRedirect(redirectUrl);
         return true;
     }

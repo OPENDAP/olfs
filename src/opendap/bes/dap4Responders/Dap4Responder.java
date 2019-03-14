@@ -341,69 +341,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
     }
 
-    /*
-
-    public String getResourceId(String requestedResource, boolean checkWithBes){
-
-        Pattern suffixPattern = Pattern.compile(combinedRequestSuffixRegex, Pattern.CASE_INSENSITIVE);
-        Matcher suffixMatcher = suffixPattern.matcher(requestedResource);
-
-        boolean suffixMatched = false;
-
-
-        while(!suffixMatcher.hitEnd()){
-            suffixMatched = suffixMatcher.find();
-            log.debug("{}", AwsUtil.checkRegex(suffixMatcher, suffixMatched));
-        }
-
-        String besDataSourceId = null;
-
-        if(suffixMatched){
-            int start =  suffixMatcher.start();
-            besDataSourceId = requestedResource.substring(0,start);
-
-            if(checkWithBes){
-                log.debug("Asking BES about resource: {}", besDataSourceId);
-
-                try {
-                    ResourceInfo dsi = new BESResource(besDataSourceId, getBesApi());
-                    if (!dsi.isDataset()) {
-                        besDataSourceId = null;
-                    }
-                } catch (Exception e) {
-                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
-                }
-
-            }
-        }
-
-
-
-
-
-        return besDataSourceId;
-    }
-
-    */
-
-    /*
-
-    public String getRequestUrlPath(HttpServletRequest req) {
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = req.getRequestURL().toString();
-
-
-        if(forwardRequestUri != null){
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
-        }
-
-        return requestUrl;
-    }
-
-     */
 
     @Override
     public String getXmlBase(HttpServletRequest req){
@@ -418,7 +355,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
     @Override
     public long getLastModified(HttpServletRequest request) throws Exception {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = getResourceId(relativeUrl,true);
 
@@ -426,42 +362,9 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         ResourceInfo ri = getResourceInfo(dataSource);
         return ri.lastModified();
-
     }
 
 
-    /*
-
-    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
-
-    public  String getCFHistoryEntry(HttpServletRequest request) throws IOException {
-
-        StringBuilder cf_history_entry = new StringBuilder();
-
-        // Add the date
-        Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(CF_History_Entry_Date_Format);
-        sdf.setTimeZone(new SimpleTimeZone(0,"GMT"));
-        cf_history_entry.append(sdf.format(now,new StringBuffer(),new FieldPosition(0)));
-        cf_history_entry.append(" ");
-
-
-        // Add the Hyrax Version
-        cf_history_entry.append("Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
-        cf_history_entry.append(" ");
-
-        // Add the complete request URL
-        cf_history_entry.append(ReqInfo.getRequestUrlPath(request));
-        cf_history_entry.append("?");
-        cf_history_entry.append(ReqInfo.getConstraintExpression(request));
-        cf_history_entry.append("\n");
-
-        return cf_history_entry.toString();
-    }
-
-
-
-      */
 
 
 

@@ -35,6 +35,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -74,6 +76,43 @@ public class S3BesApi extends BesGatewayApi {
 
     }
 
+    /**
+     * Because We are a child of the Gateway API we know that the relative URL is not going to be relative but absolute
+     * SO - we fix that bit.
+     * @param gatewayServiceUrl The gateway service URL. No Constraint expression (i.e. No query section of
+     * the URL - the question mark and everything after it.)
+     * @param suffixMatchPattern This parameter provides the method with a suffix regex to use in evaluating what part,
+     * if any, of the relative URL must be removed to construct the besDataSourceId/
+     * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
+     * besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
+     * doesn't have catalog services this parameter is ignored.
+     * @return
+     */
+    @Override
+    public String getBesDataSourceID(String gatewayServiceUrl, Pattern suffixMatchPattern, boolean checkWithBes){
+
+        log.debug("getBesDataSourceID() - gatewayServiceUrl: " + gatewayServiceUrl);
+
+        // Not a thing we need to fuss with...
+        if(!(gatewayServiceUrl.startsWith("http://") || gatewayServiceUrl.startsWith("https://")))
+            return super.getBesDataSourceID(gatewayServiceUrl,suffixMatchPattern,checkWithBes);
+
+        URL url;
+        try {
+            url = new URL(gatewayServiceUrl);
+        } catch (MalformedURLException e) {
+            log.error("getBesDataSourceID() - Failed to extract relative URL " +
+                    "from relative URL '{}' msg: {}", gatewayServiceUrl, e.getMessage());
+            return null;
+        }
+
+
+        return url.getPath();
+
+    }
+
+
+
 
 
     /**
@@ -92,14 +131,14 @@ public class S3BesApi extends BesGatewayApi {
 
 
 
-        log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
+        log.debug("remoteResourceUrl: {}", remoteResourceUrl);
 
 
         // Try to get it from the request cache.
         String lmt_cache_key = remoteResourceUrl+"_last-modified";
         Long lmt =  (Long) RequestCache.get(lmt_cache_key);
         if(lmt!=null){
-            log.debug("getLastModified() - using cached lmt: {}",lmt);
+            log.debug("Using cached lmt: {}",lmt);
             return lmt;
         }
 
@@ -117,7 +156,7 @@ public class S3BesApi extends BesGatewayApi {
 
                 if (statusCode != HttpStatus.SC_OK) {
                     log.error("getLastModified() - Unable to HEAD s3 object: " + remoteResourceUrl);
-                    lastModifiedTime = -1;
+                    lastModifiedTime = new Date().getTime();
                 }
                 else {
                     log.debug("getLastModified(): Executed HTTP HEAD for "+remoteResourceUrl);
@@ -125,7 +164,7 @@ public class S3BesApi extends BesGatewayApi {
                     Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
 
                     if(lastModifiedHeader==null){
-                     lastModifiedTime =  -1;
+                     lastModifiedTime =  new Date().getTime();
                     }
                     else {
                         String lmtString = lastModifiedHeader.getValue();
@@ -137,12 +176,12 @@ public class S3BesApi extends BesGatewayApi {
 
             } catch (Exception e) {
                 log.error("Unable to HEAD the s3 resource: {} Error Msg: {}", remoteResourceUrl, e.getMessage());
-                lastModifiedTime = -1;
+                lastModifiedTime = new Date().getTime();
             }
 
         } catch (Exception e) {
             log.debug("getLastModified(): Returning: -1");
-            lastModifiedTime =  -1;
+            lastModifiedTime =  new Date().getTime();
         }
 
         RequestCache.put(lmt_cache_key, lastModifiedTime);

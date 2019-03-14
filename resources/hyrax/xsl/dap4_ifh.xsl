@@ -32,6 +32,7 @@
     <xsl:param name="docsService"/>
     <xsl:param name="HyraxVersion"/>
     <xsl:param name="JsonLD"/>
+    <xsl:param name="supportLink"/>
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
@@ -181,8 +182,13 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>) <br/>
-                    <a href="{$docsService}/">Documentation</a>
+                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+                    <div>
+                        <a href="{$docsService}/">Documentation</a>
+                        <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+                            <a href="{$supportLink}">Questions? Contact Support</a>
+                        </span>
+                    </div>
                 </h3>
 
                 <xsl:if test="$JsonLD">
@@ -618,7 +624,7 @@
             <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and not(parent::dap:Map)">
                 <xsl:value-of select="$separator"/>
             </xsl:if>
-            <xsl:value-of select="translate(@name,' ','_')"/>
+            <xsl:value-of select="translate(@name,' .','__')"/>
         </xsl:if>
     </xsl:template>
     <!-- ################################################################### -->
@@ -691,9 +697,7 @@
                         <span class="bold"><xsl:value-of select="@name"/>:
                         </span>
                         <span class="em">
-                            <xsl:for-each select="dap:Value">
-                                <xsl:value-of select="."/>
-                            </xsl:for-each>
+                            <xsl:for-each select="dap:Value"><xsl:if test="(position( )) > 1">, </xsl:if><xsl:value-of select="."/></xsl:for-each>
                         </span>
                     </div>
                 </li>

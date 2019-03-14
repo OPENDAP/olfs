@@ -33,15 +33,15 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.http.mediaTypes.Json;
+import opendap.http.mediaTypes.CovJson;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Responder that transmits CovJSON encoded DAP4 data to the client.
@@ -69,7 +69,7 @@ public class CovJsonDR extends Dap4Responder {
         setServiceDescription("CovJsonDR representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
-        setNormativeMediaType(new Json(getRequestSuffix()));
+        setNormativeMediaType(new CovJson(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -92,8 +92,6 @@ public class CovJsonDR extends Dap4Responder {
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
-
         MediaType responseMediaType =  getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
@@ -101,17 +99,16 @@ public class CovJsonDR extends Dap4Responder {
 
         response.setContentType(responseMediaType.getMimeType());
 
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
 
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         User user = new User(request);
 
-        OutputStream os = response.getOutputStream();
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsCovJson(resourceID, qp, user.getMaxResponseSize(), os);
-
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size: ",getServiceTitle(),os.size());
     }
 }

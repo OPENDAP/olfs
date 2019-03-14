@@ -148,8 +148,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- Uncomment These two filters to enable access control.
-    <filter>
+    <!-- Uncomment These two filters to enable access control. -->
+    <!-- filter>
         <filter-name>IdP</filter-name>
         <filter-class>opendap.auth.IdFilter</filter-class>
     </filter>
@@ -258,11 +258,11 @@
     </servlet>
 
     <!-- moved to the robots.txt service -->
-    <!-- servlet>
+    <servlet>
         <servlet-name>site_map_service</servlet-name>
         <servlet-class>opendap.bes.BESSiteMapService</servlet-class>
         <load-on-startup>1</load-on-startup>
-    </servlet -->
+    </servlet>
 
     <!-- servlet>
         <servlet-name>echo</servlet-name>
@@ -297,10 +297,10 @@
         <url-pattern>/echo/*</url-pattern>
     </servlet-mapping -->
 
-    <!-- servlet-mapping>
+    <servlet-mapping>
         <servlet-name>site_map_service</servlet-name>
         <url-pattern>/siteMap/*</url-pattern>
-    </servlet-mapping -->
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>

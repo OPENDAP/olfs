@@ -8,13 +8,19 @@ import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This servlet works with the BES system to build site map responses for Hyrax.
@@ -29,8 +35,13 @@ public class BESSiteMapService extends HttpServlet {
      *
      * @serial
      */
-    private AtomicInteger reqNumber;
-    private org.slf4j.Logger log;
+    private static final AtomicInteger REQ_NUMBER = new AtomicInteger(0);
+    private static final Logger LOG = LoggerFactory.getLogger(BESSiteMapService.class);
+
+    private static final ReentrantLock INIT_LOCK = new ReentrantLock();
+    private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
+
+    private static String _dapServiceContext;
 
     /**
      * ************************************************************************
@@ -41,45 +52,58 @@ public class BESSiteMapService extends HttpServlet {
      *
      * @throws javax.servlet.ServletException
      */
+    @Override
     public void init() throws ServletException {
 
-        super.init();
+        INIT_LOCK.lock();
+        try {
+            if(IS_INITIALIZED.get())
+                return;
 
-        LogUtil.initLogging(this);
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
+            super.init();
 
-        // Timer.enable();
-        RequestCache.openThreadCache();
+            LogUtil.initLogging(this);
+            LOG.debug("init() start");
+            // Timer.enable();
+            RequestCache.openThreadCache();
 
-        reqNumber = new AtomicInteger(0);
 
-        log.debug("init() start");
+            _dapServiceContext = getInitParameter("DapServiceContext");
+            if (_dapServiceContext == null)
+                _dapServiceContext = "opendap/";
 
-        if(!BESManager.isInitialized()) {
+            if (!_dapServiceContext.isEmpty() && !_dapServiceContext.endsWith("/"))
+                _dapServiceContext += "/";
 
-            String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
 
-            Element configElement;
-            try {
-                configElement = opendap.xml.Util.getDocumentRoot(filename);
+            if (!BESManager.isInitialized()) {
+                String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
+                Element configElement;
+                try {
+                    configElement = opendap.xml.Util.getDocumentRoot(filename);
 
-            } catch (Exception e) {
-                throw new ServletException("Failed to read configuration file " + filename + " message: " + e.getMessage());
+                } catch (Exception e) {
+                    throw new ServletException("Failed to read configuration file " + filename + " message: " + e.getMessage());
+                }
+
+                try {
+                    Element besManagerElement = configElement.getChild("BESManager");
+                    BESManager besManager = new BESManager();
+                    besManager.init(besManagerElement);
+
+                } catch (Exception e) {
+                    throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());
+                }
+
             }
+            IS_INITIALIZED.set(true);
 
-            try {
-                Element besManagerElement = configElement.getChild("BESManager");
-                BESManager besManager = new BESManager();
-                besManager.init(besManagerElement);
-
-            } catch (Exception e) {
-                throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());
-            }
-
+            LOG.info("init() complete.");
+            RequestCache.closeThreadCache();
         }
-
-        log.info("init() complete.");
-        RequestCache.closeThreadCache();
+        finally {
+            INIT_LOCK.unlock();
+        }
     }
 
 
@@ -117,30 +141,41 @@ public class BESSiteMapService extends HttpServlet {
                       HttpServletResponse response) {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-
         Request req = new Request(this,request);
-        String dapServicePrefix = PathBuilder.pathConcat(req.getWebApplicationUrl(),"opendap/");
         String siteMapServicePrefix = req.getServiceUrl();
 
-        int request_status = HttpServletResponse.SC_OK;
+        String webapp = req.getWebApplicationUrl();
 
+        String dapService;
+        if(getServletContext().getContextPath().isEmpty()){
+            // If we are running in the ROOT context (no contextPath) then we make the assumption that the DAP
+            // service is located at the _dapServiceContext as set in the configuration parameter DapServiceContext.
+            dapService = PathBuilder.pathConcat(webapp,_dapServiceContext);
+        }
+        else {
+            dapService = webapp;
+        }
+
+
+        int request_status = HttpServletResponse.SC_OK;
+        int response_size = -1;
         try {
             Procedure timedProcedure = Timer.start();
             RequestCache.openThreadCache();
             try {
 
-                int reqno = reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+                int reqno = REQ_NUMBER.incrementAndGet();
+                LogUtil.logServerAccessStart(request, LogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
-                log.debug(Util.getMemoryReport());
-                log.debug(ServletUtil.showRequest(request, reqno));
-                log.debug(ServletUtil.probeRequest(this, request));
+                LOG.debug(Util.getMemoryReport());
+                LOG.debug(ServletUtil.showRequest(request, reqno));
+                LOG.debug(ServletUtil.probeRequest(this, request));
 
                 if (ReqInfo.isServiceOnlyRequest(request)) {
                     String reqURI = request.getRequestURI();
                     String newURI = reqURI+"/";
                     response.sendRedirect(Scrub.urlContent(newURI));
-                    log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
+                    LOG.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
                             "context to a URL that ends in a '/' character!");
                     return;
                 }
@@ -148,19 +183,22 @@ public class BESSiteMapService extends HttpServlet {
                 String msg = "Requested relative URL: '" + relativeUrl +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'";
-                log.debug(msg);
+                LOG.debug(msg);
 
-                ServletOutputStream sos = response.getOutputStream();
+                DataOutputStream dos = new DataOutputStream(response.getOutputStream());
+                PrintStream sos = new PrintStream(dos);
 
-                BESSiteMap besSiteMap = new BESSiteMap(dapServicePrefix);
+                BESSiteMap besSiteMap = new BESSiteMap(dapService);
 
                 if (relativeUrl.equals("/")) {
-                    log.debug("Just the service endpoint. {}",request.getRequestURI());
+                    LOG.debug("Just the service endpoint. {}",request.getRequestURI());
                     sos.println(besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix));
                 }
                 else {
                     // If we are here then the request should be asking for a siteMap sub file.
-                    besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);                }
+                    besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);
+                }
+                response_size = dos.size();
             }
             finally {
                 Timer.stop(timedProcedure);
@@ -172,10 +210,10 @@ public class BESSiteMapService extends HttpServlet {
             }
             catch(Throwable t2) {
                 try {
-                    log.error("\n########################################################\n" +
+                    LOG.error("\n########################################################\n" +
                             "Request processing failed.\n" +
                             "Normal Exception handling failed.\n" +
-                            "This is the last error log attempt for this request.\n" +
+                            "This is the last error logging attempt for this request.\n" +
                             "########################################################\n", t2);
                 }
                 catch(Throwable t3){
@@ -184,13 +222,19 @@ public class BESSiteMapService extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
+            LogUtil.logServerAccessEnd(request_status, response_size, LogUtil.SITEMAP_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
-            log.info("doGet(): Response completed.\n");
+            LOG.info("Response completed.\n");
         }
-        log.info("doGet() - Timing Report: \n{}", Timer.report());
+        LOG.info("Timing Report: \n{}", Timer.report());
         Timer.reset();
     }
+
+    @Override
+    protected long getLastModified(HttpServletRequest req) {
+        return new Date().getTime();
+    }
+
 
 
 }

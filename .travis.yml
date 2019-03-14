@@ -21,8 +21,7 @@ notifications:
   email:
     - ndp@opendap.org
     - jgallagher@opendap.org
-    - ukari@opendap.org
-    
+
 addons:
   coverity_scan:
     project:

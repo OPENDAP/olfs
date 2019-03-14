@@ -618,6 +618,6 @@ public class BesCatalog implements Catalog {
 
     @Override
     public long getLastModified() {
-        return -1;
+        return new Date().getTime();
     }
 }

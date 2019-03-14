@@ -119,18 +119,18 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         String name = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("Locating LMT for collection: {}", name );
 
 
         try {
             ResourceInfo dsi = new BESResource(name,_besApi);
-            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+            log.debug("Returning: {}" + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
         }
         catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+            log.debug("Returning current date/time.");
+            return new Date().getTime();
         }
 
 
@@ -195,25 +195,17 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
 
         Request oreq = new Request(null,request);
-
-
-        // This first bit just collects a bunch of information about the request
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-        // String context = request.getContextPath();
 
 
         String xmlBase = request.getRequestURL().toString();
         int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
         xmlBase = xmlBase.substring(0, suffix_start);
 
-
         log.debug("Sending rubric Response() for dataset: " + dataSourceId);
-
 
         MediaType responseMediaType = new TextXml();
 
@@ -222,19 +214,15 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         response.setContentType(responseMediaType.getMimeType());
 
-        Version.setOpendapMimeHeaders(request, response, _besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", "ISO 19115 Metadata Compliance Score");
-
 
         ServletOutputStream os = response.getOutputStream();
 
         // Doing this insures that the DDX that
         String xdap_accept = "3.2";
 
-
-
         Document ddx = new Document();
-
 
         _besApi.getDDXDocument(
                 dataSourceId,
@@ -248,9 +236,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         String currentDir = System.getProperty("user.dir");
         log.debug("Cached working directory: "+currentDir);
 
-
         String xslDir = _systemPath + "/nciso/xsl";
-
 
         log.debug("Changing working directory to "+ xslDir);
         System.setProperty("user.dir",xslDir);
@@ -258,20 +244,15 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         try {
             String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
 
-
             // This Transformer class is an attempt at making the use of the saxon-9 API
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
-
-
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
-
-
             os.flush();
             log.info("Sent Rubric version of DDX.");
         }
@@ -280,15 +261,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
             System.setProperty("user.dir",currentDir);
         }
 
-
-
-
     }
-
-
-
-
-
 
 
 }

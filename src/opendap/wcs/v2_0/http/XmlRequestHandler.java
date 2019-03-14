@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Date;
 
 /**
  * This class is responsible for processing WCS XML request documents.
@@ -114,7 +115,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;
+        return new Date().getTime();
     }
 
     public void destroy() {

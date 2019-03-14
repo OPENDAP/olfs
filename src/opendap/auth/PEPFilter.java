@@ -72,7 +72,7 @@ public class PEPFilter implements Filter {
         try {
             init();
         }
-        catch (IOException | JDOMException | ConfigurationException se){
+        catch (IOException | JDOMException se){
             _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE PEPFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
 
@@ -118,13 +118,13 @@ public class PEPFilter implements Filter {
 
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws  ServletException {
 
         if(!_is_initialized) {
             try {
                 init();
             }
-            catch (IOException | JDOMException | ConfigurationException e){
+            catch (IOException | JDOMException  e){
                 String msg = "doFilter() - PEPFilter INITIALIZATION HAS FAILED! " +
                         "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
                 _log.error(msg);
@@ -163,39 +163,41 @@ public class PEPFilter implements Filter {
             // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
         }
 
-        // So - Do they have to be authenticated?
-        if(userId == null  && _everyOneMustHaveUid) {
-            if(IdPManager.hasDefaultProvider()) {
-                hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
-            }
-            else {
-                OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
-                hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            }
-            return;
-        }
-        // Are they allowed access?
-        if(requestIsGranted(userId, authContext, hsReq)){
-            // Yup, so we just move along...
-            filterChain.doFilter(hsReq, hsRes);
-        }
-        else {
-            // Access was denied, so...
-            if(userId == null) {
-                // If they aren't logged in then we tell them to do that
-                if(IdPManager.hasDefaultProvider()) {
+        try {
+            // So - Do they have to be authenticated?
+            if (userId == null && _everyOneMustHaveUid) {
+                if (IdPManager.hasDefaultProvider()) {
                     hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
-                }
-                else {
+                } else {
                     OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
                     hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 }
+                return;
             }
-            else {
-                // If they are logged in then we tell them NO.
-                OPeNDAPException.setCachedErrorMessage("I'm Sorry "+userId+", But I'm Afraid You Can't Do That.");
-                hsRes.sendError(HttpServletResponse.SC_FORBIDDEN);
+            // Are they allowed access?
+            if (requestIsGranted(userId, authContext, hsReq)) {
+                // Yup, so we just move along...
+                filterChain.doFilter(hsReq, hsRes);
+            } else {
+                // Access was denied, so...
+                if (userId == null) {
+                    // If they aren't logged in then we tell them to do that
+                    if (IdPManager.hasDefaultProvider()) {
+                        hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
+                    } else {
+                        OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                        hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    }
+                } else {
+                    // If they are logged in then we tell them NO.
+                    OPeNDAPException.setCachedErrorMessage("I'm Sorry " + userId + ", But I'm Afraid You Can't Do That.");
+                    hsRes.sendError(HttpServletResponse.SC_FORBIDDEN);
+                }
             }
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw new ServletException(e.getMessage(),e);
         }
     }
 

@@ -33,6 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,7 +63,7 @@ public class NoPostHandler implements DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;  // punt...
+        return new Date().getTime();  // Return current date/time
     }
 
     public void destroy() {

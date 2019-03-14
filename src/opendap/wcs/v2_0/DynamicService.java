@@ -391,6 +391,8 @@ public class DynamicService {
 
     public static void main(String args[]) {
 
+        Logger log = LoggerFactory.getLogger(DynamicService.class);
+
         String urlStrings[] =
                 {
                         "http://wcs.opendap.org:8080/opendap",
@@ -402,9 +404,9 @@ public class DynamicService {
         for (String urlString : urlStrings) {
             try {
                 url = new URL(urlString);
-                System.out.println("urlString: " + urlString + "  URL: " + url.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
+                log.info("urlString: {}  URL: {}" ,urlString, url.toString());
+            } catch (MalformedURLException e) {
+                log.error("Caught {}  Message: {}",e.getClass().getName(),e.getMessage());
             }
         }
 

@@ -35,6 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -42,9 +43,9 @@ import org.jdom.ProcessingInstruction;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
 import java.util.HashMap;
 
 /**
@@ -129,7 +130,6 @@ public class HtmlDSR extends Dap4Responder {
         try {
             String xsltDocName = "datasetServices.xsl";
             Transformer transformer = new Transformer(xsltDocName);
-            ServletOutputStream os = response.getOutputStream();
 
             MediaType responseMediaType = getNormativeMediaType();
             // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
@@ -137,9 +137,11 @@ public class HtmlDSR extends Dap4Responder {
             response.setContentType(responseMediaType.getMimeType());
             response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
+            DataOutputStream os = new DataOutputStream(response.getOutputStream());
             // Transform the DSR into an HTML page.
             transformer.transform(new JDOMSource(responseDoc), os);
-            log.debug("Sent {}", getServiceTitle());
+            LogUtil.setResponseSize(os.size());
+            log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {
             System.setProperty("user.dir", currentDir);

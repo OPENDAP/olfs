@@ -52,10 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -160,7 +157,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if (!besCatalogName.endsWith("/"))
             besCatalogName += "/";
 
-        PathBuilder.normalizePath(besCatalogName,true,false);
+        besCatalogName = PathBuilder.normalizePath(besCatalogName,true,false);
         _log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
 
 
@@ -236,7 +233,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response,_besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "thredds_catalog");
 
 
@@ -338,11 +335,10 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
     public long getLastModified(HttpServletRequest req){
         String name = ReqInfo.getLocalUrl(req);
 
-        _log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
-                "collection: " + name );
-        _log.debug("getLastModified(): Returning: -1" );
+        _log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: {}", name );
+        _log.debug("getLastModified(): Returning current date/time" );
 
-        return -1;
+        return new Date().getTime();
     }
 
 

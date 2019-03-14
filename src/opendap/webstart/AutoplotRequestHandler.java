@@ -54,10 +54,10 @@ public class AutoplotRequestHandler  extends JwsHandler {
     private Logger log;
     //private Element config;
 
-    private String _serviceId = "Autoplot";
-    private String _applicationName = "Autoplot Data Viewer";
+    private static final String _serviceId = "Autoplot";
+    private static final String _applicationName = "Autoplot Data Viewer";
 
-    private String _base = "/opendap/viewers/Autoplot";
+    private static final String _base = "/opendap/viewers/Autoplot";
 
 
     public void init(Element config, String resourcesDirectory) {
@@ -92,7 +92,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
     private static final Set<String> SUPPORTED_DISPLAY_TYPES;
 
     static {
-        SUPPORTED_DISPLAY_TYPES = new HashSet<String>();
+        SUPPORTED_DISPLAY_TYPES = new HashSet<>();
 
         SUPPORTED_DISPLAY_TYPES.add("\"time_series\"");
         SUPPORTED_DISPLAY_TYPES.add("\"spectrogram\"");
@@ -162,6 +162,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
      */
     public String getJnlpForDataset(String datasetUrl) {
 
+        BufferedReader jnlpReader = null;
         try {
 
             URL jnlpUrl = 
@@ -170,7 +171,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
                                        // url for a service that can 
                                        // produce an autoplot jnlp to
                                        // display the given dataset
-            BufferedReader jnlpReader = 
+            jnlpReader =
                 new BufferedReader(
                     new InputStreamReader(jnlpUrl.openStream(), HyraxStringEncoding.getCharset()));
                                        // reader to get the jnlp
@@ -194,6 +195,15 @@ public class AutoplotRequestHandler  extends JwsHandler {
 
             log.error("IOException while retrieving Autoplot JNLP URL: " + 
                 e.getMessage());
+        }
+        finally {
+            if(jnlpReader!=null) {
+                try {
+                    jnlpReader.close();
+                } catch (IOException e) {
+                    log.error("getJnlpForDataset() - Failed to close input stream. Message: {}",e.getMessage());
+                }
+            }
         }
 
         return "";
