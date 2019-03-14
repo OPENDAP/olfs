@@ -55,11 +55,11 @@ jobs:
     - jdk: openjdk8
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
-    #- stage: test
-    #  jdk: openjdk7
-    #  script: ant check
-    #- jdk: openjdk8
-    #  script: ant check
+    - stage: test
+      jdk: openjdk7
+      script: ant check
+    - jdk: openjdk8
+      script: ant check
     
     - stage: scan
       addons: 
