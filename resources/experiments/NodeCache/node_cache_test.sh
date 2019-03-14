@@ -1,12 +1,13 @@
 #!/bin/bash
 
-target_hyrax="http://3.91.237.29:8080/"
-sitemapFileName="site_map.txt"
-catalogsFile="catalogs.txt"
-datasetsFile="datasets.txt"
+export target_hyrax="http://3.91.237.29:8080/"
+# export target_hyrax="http://localhost:8080/"
+export sitemapFileName="site_map.txt"
+export catalogsFile="catalogs.txt"
+export datasetsFile="datasets.txt"
 
 
-maxRandom=32767;
+export maxRandom=32767;
 
 
 function retrieveSitemap() {
