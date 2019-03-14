@@ -180,6 +180,7 @@ public class BesNodeCache {
                 MRA_LOCK.lock();
                 try {
                     updateMostRecentlyAccessed(nodeTransaction);
+                    LOG.debug("Updated MRA  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
                 }
                 finally {
                     MRA_LOCK.unlock();
