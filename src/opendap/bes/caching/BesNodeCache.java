@@ -368,7 +368,15 @@ public class BesNodeCache {
             LOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
         }
 
-        updateMostRecentlyAccessed(nodeTransaction);
+        boolean status = MOST_RECENTLY_ACCESSED.add(nodeTransaction);
+        if(status){
+            LOG.debug("Added  nodeTransaction[{}] to MOST_RECENTLY_ACCESSED.",key);
+        }
+        else {
+            LOG.error("FAILED to add nodeTransaction[{}] to MOST_RECENTLY_ACCESSED.",key);
+
+        }
+        // updateMostRecentlyAccessed(nodeTransaction);
 
         LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
 
