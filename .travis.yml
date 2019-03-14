@@ -58,6 +58,7 @@ jobs:
     addons: 
       sonarcloud: 
     script:
+    - ant server -DHYRAX_VERSION=Sonar-Build -DOLFS_VERSION=Sonar-Build
     - ant sonar -Dsonar.login=$SONAR_LOGIN
 
 # We could copy the logic in the bes or libdap travis.yml files to 
