@@ -169,7 +169,7 @@ function makeRandomCatRequest() {
 
 
 function makeRandomRequests {
-    for i in {1..30000}
+    for i in {1..100000}
     do
         makeRandomCatRequest
     done
