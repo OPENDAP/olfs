@@ -39,15 +39,15 @@ env:
    # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
      - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
 
-script: true
-
 stages:
 - name: build
   if:  branch = master
 - name: test
   if:  branch = master
 - name: scan
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = master 
+  
+  # AND NOT type = pull_request
 
 jobs:
   include:
@@ -65,7 +65,7 @@ jobs:
     
     - stage: scan
       addons: 
-      sonarcloud: 
+        sonarcloud: 
       jdk: openjdk8
       script: an sonar -Dsonar.login=$SONAR_LOGIN
   
