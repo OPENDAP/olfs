@@ -31,8 +31,8 @@ public class BesNodeCache {
     private static final long NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
     private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
 
-    private static final ReentrantReadWriteLock RWLOCK = new ReentrantReadWriteLock();
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final ReentrantReadWriteLock RW_CACHE_LOCK = new ReentrantReadWriteLock();
+    private static final ReentrantLock MRA_LOCK = new ReentrantLock();
 
     private static final Logger LOG = LoggerFactory.getLogger(NODE_CACHE_ELEMENT_NAME);
     private static final ConcurrentHashMap<String,NodeTransaction> NODE_CACHE = new ConcurrentHashMap<>();
@@ -112,7 +112,7 @@ public class BesNodeCache {
      * @param updateIntervalSeconds The time any object may reside in the cache before it is removed.
      */
     public static void init(long maxEntries, long updateIntervalSeconds) {
-        RWLOCK.writeLock().lock();
+        RW_CACHE_LOCK.writeLock().lock();
         try {
             if (ENABLED.get()) {
                 LOG.error("BesNodeCache has already been initialized!  " +
@@ -130,7 +130,7 @@ public class BesNodeCache {
                     UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
         }
         finally {
-            RWLOCK.writeLock().unlock();
+            RW_CACHE_LOCK.writeLock().unlock();
         }
     }
 
@@ -154,24 +154,24 @@ public class BesNodeCache {
         if(key==null)
             throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
 
-        RWLOCK.readLock().lock();
+        RW_CACHE_LOCK.readLock().lock();
         try {
             LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
 
             NodeTransaction nodeTransaction = NODE_CACHE.get(key);
 
             if(isStaleNodeTransaction(nodeTransaction)){
-                RWLOCK.readLock().unlock();
-                RWLOCK.writeLock().lock();
+                RW_CACHE_LOCK.readLock().unlock();
+                RW_CACHE_LOCK.writeLock().lock();
                 try {
                     if (isStaleNodeTransaction(nodeTransaction)) {
                         dropNodeTransaction(nodeTransaction);
                         nodeTransaction = getAndCacheNodeTransaction(key);
                     }
-                    RWLOCK.readLock().lock();
+                    RW_CACHE_LOCK.readLock().lock();
                 }
                 finally {
-                    RWLOCK.writeLock().unlock();
+                    RW_CACHE_LOCK.writeLock().unlock();
                 }
             }
 
@@ -200,7 +200,7 @@ public class BesNodeCache {
         }
         finally {
             LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-            RWLOCK.readLock().unlock();
+            RW_CACHE_LOCK.readLock().unlock();
         }
 
     }
@@ -311,7 +311,7 @@ public class BesNodeCache {
     private static  void updateMostRecentlyAccessed(NodeTransaction nodeTransaction){
 
         boolean status;
-        LOCK.lock();
+        MRA_LOCK.lock();
         try {
             status = MOST_RECENTLY_ACCESSED.remove(nodeTransaction);
             if(status) {
@@ -332,7 +332,7 @@ public class BesNodeCache {
             }
         }
         finally {
-            LOCK.unlock();
+            MRA_LOCK.unlock();
         }
 
     }
@@ -383,28 +383,37 @@ public class BesNodeCache {
         if (NODE_CACHE.size() < MAX_CACHE_ENTRIES.get())
             return;
 
-        int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
-        if(dropNum==0) {
-            dropNum = 1;
-        }
-        LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-        LOG.debug("dropNum: {}",dropNum);
-        LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-        LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+        // We know that the RW_CACHE_LOCK.writeLock() has been acquired
+        // upstream, but since we are going to be messing with
+        // MOST_RECENTLY_ACCESSED we have to use its special lock too.
+        MRA_LOCK.lock();
+        try {
+            int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
+            if (dropNum == 0) {
+                dropNum = 1;
+            }
+            LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
+            LOG.debug("dropNum: {}", dropNum);
+            LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+            LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
 
-        List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
+            List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
 
-        Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
-        for(int i=0; i<dropNum && oldestToNewest.hasNext(); i++ ){
-            NodeTransaction nodeTransaction = oldestToNewest.next();
-            purgeList.add(nodeTransaction);
-            LOG.debug("Purging CatalogTransaction for key {}",nodeTransaction.getKey());
-            NODE_CACHE.remove(nodeTransaction.getKey());
+            Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
+            for (int i = 0; i < dropNum && oldestToNewest.hasNext(); i++) {
+                NodeTransaction nodeTransaction = oldestToNewest.next();
+                purgeList.add(nodeTransaction);
+                LOG.debug("Purging CatalogTransaction for key {}", nodeTransaction.getKey());
+                NODE_CACHE.remove(nodeTransaction.getKey());
+            }
+            MOST_RECENTLY_ACCESSED.removeAll(purgeList);
+            LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+            LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+            LOG.debug("END");
         }
-        MOST_RECENTLY_ACCESSED.removeAll(purgeList);
-        LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-        LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-        LOG.debug("END");
+        finally {
+            MRA_LOCK.unlock();
+        }
 
     }
 
@@ -412,13 +421,13 @@ public class BesNodeCache {
      * Drops all references from the cache.
      */
     public void destroy(){
-        RWLOCK.writeLock().lock();
+        RW_CACHE_LOCK.writeLock().lock();
         try {
             NODE_CACHE.clear();
             MOST_RECENTLY_ACCESSED.clear();
         }
         finally {
-            RWLOCK.writeLock().unlock();
+            RW_CACHE_LOCK.writeLock().unlock();
         }
     }
 
