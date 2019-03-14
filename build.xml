@@ -29,8 +29,9 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
-        default="all" basedir=".">
+    name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+    default="all" basedir="."
+	xmlns:sonar="antlib:org.sonar.ant">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -918,6 +919,31 @@
         <delete file="${build.dist}/ROOT.war"/>
     </target>
 
+    <!-- SonarCloud build stuff -->
+	<!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
+	<property name="sonar.host.url" value="https://sonarcloud.io" />
+	<property name="sonar.login" value="ping... ping... ping..." />
+
+	<!-- Define the SonarQube project properties -->
+	<property name="sonar.projectKey" value="opendap-olfs" />
+	<property name="sonar.projectName" value="olfs" />
+	<property name="sonar.projectVersion" value="${OLFS_VERSION}" />
+	<property name="sonar.organization" value="opendap" />
+	<property name="sonar.sources" value="src" />
+	<property name="sonar.exclusions" value="src/opendap/experiments/**/*.java,src/opendap/metacat/**/*.java,src/opendap/aws/**/*.java,src/opendap/noaa_s3/**/*.java" />
+	<property name="sonar.java.binaries" value="build" />
+	<property name="sonar.java.libraries" value="lib/*.jar" />
+
+	<!-- Define SonarQube Scanner for Ant Target -->
+	<target name="sonar">
+	    <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+	        <classpath path="resources/sonar/sonarqube-ant-task-2.5.jar" />
+	    </taskdef>
+	    <!-- taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml" / -->
+        <!-- Execute SonarQube Scanner for Ant Analysis -->
+        <sonar:sonar />
+    </target>
+	
 </project>
 
 

@@ -38,7 +38,7 @@ env:
    # COVERITY_SCAN_TOKEN, made with "travis encrypt" command using the project repo's public key
    - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
    # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
-   #- secure: "" <--- FIXME
+   - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
 
 stages:
 - name: build
@@ -52,7 +52,7 @@ jobs:
     addons: 
       sonarcloud: 
     script:
-    # FIXME- ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    - ant sonar -Dsonar.login=$SONAR_LOGIN
 
   - stage: build
     script: 
