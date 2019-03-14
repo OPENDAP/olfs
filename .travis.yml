@@ -67,5 +67,5 @@ jobs:
       addons: 
         sonarcloud: 
       jdk: openjdk8
-      script: an sonar -Dsonar.login=$SONAR_LOGIN
+      script: ant sonar -Dsonar.login=$SONAR_LOGIN
   
