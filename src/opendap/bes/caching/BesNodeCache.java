@@ -379,7 +379,7 @@ public class BesNodeCache {
         }
         // updateMostRecentlyAccessed(nodeTransaction);
 
-        LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
+        LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
 
         return nodeTransaction;
 
