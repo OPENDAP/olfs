@@ -160,12 +160,12 @@ public class BesNodeCache {
 
             NodeTransaction nodeTransaction = NODE_CACHE.get(key);
 
-            if(staleOrNew(nodeTransaction)){
+            if(staleOrMissing(nodeTransaction)){
                 RW_CACHE_LOCK.readLock().unlock();
                 RW_CACHE_LOCK.writeLock().lock();
                 MRA_LOCK.lock();
                 try {
-                    if (staleOrNew(nodeTransaction)) {
+                    if (staleOrMissing(nodeTransaction)) {
                         dropNodeTransaction(nodeTransaction);
                         nodeTransaction = getAndCacheNodeTransaction(key);
                     }
@@ -267,7 +267,7 @@ public class BesNodeCache {
      * @return Returns true is the NodeTransaction has been in the cache longer
      *         the UPDATE_INTERVAL.
      */
-    private static boolean staleOrNew(NodeTransaction nodeTransaction){
+    private static boolean staleOrMissing(NodeTransaction nodeTransaction){
         boolean isStale = true;
         // if it's null it's stale, if it's nit null it might be stale...
         if(nodeTransaction!=null) {
@@ -299,10 +299,13 @@ public class BesNodeCache {
                 nodeTransaction.getKey(), (nt == null) ? "NULL" : nt);
         LOG.debug("NODE_CACHE.size(): {}", NODE_CACHE.size());
 
-        if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
-            LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
+
+        LOG.debug("DROP RESULT nodeTransaction: {} nt: {}", nodeTransaction,nt);
+
+        if (MOST_RECENTLY_ACCESSED.remove(nt)) {
+            LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nt.getKey(), MOST_RECENTLY_ACCESSED.size());
         } else {
-            LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nodeTransaction.getKey(), MOST_RECENTLY_ACCESSED.size());
+            LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nt.getKey(), MOST_RECENTLY_ACCESSED.size());
         }
     }
 
