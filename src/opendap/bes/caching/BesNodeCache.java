@@ -419,8 +419,27 @@ public class BesNodeCache {
             purgeList.add(nodeTransaction);
             LOG.debug("Purging CatalogTransaction for key {}", nodeTransaction.getKey());
             NODE_CACHE.remove(nodeTransaction.getKey());
+            oldestToNewest.remove();
         }
-        MOST_RECENTLY_ACCESSED.removeAll(purgeList);
+        if(MOST_RECENTLY_ACCESSED.size() > NODE_CACHE.size()){
+            while(oldestToNewest.hasNext()){
+                NodeTransaction nodeTransaction = oldestToNewest.next();
+                if(!NODE_CACHE.contains(nodeTransaction)) {
+                    oldestToNewest.remove();
+                    LOG.debug("Dropped nt[{}] from MOST_RECENTLY_ACCESSED",nodeTransaction.getKey());
+
+                }
+            }
+        }
+        boolean status;
+        if(NODE_CACHE.size() > MOST_RECENTLY_ACCESSED.size()){
+            for (Map.Entry<String, NodeTransaction> entry : NODE_CACHE.entrySet()) {
+                status = MOST_RECENTLY_ACCESSED.add(entry.getValue());
+                LOG.debug("{} nt[{}] to MOST_RECENTLY_ACCESSED",status?"Added":"Skipped",entry.getKey());
+            }
+        }
+
+        // MOST_RECENTLY_ACCESSED.removeAll(purgeList);
         LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
         LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
         LOG.debug("END");
