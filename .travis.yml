@@ -45,9 +45,7 @@ stages:
 - name: test
   if:  branch = master
 - name: scan
-  if:  branch = master 
-  
-  # AND NOT type = pull_request
+  if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
@@ -57,15 +55,16 @@ jobs:
     - jdk: openjdk8
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
-    - stage: test
-      jdk: openjdk7
-      script: ant check
-    - jdk: openjdk8
-      script: ant check
+    #- stage: test
+    #  jdk: openjdk7
+    #  script: ant check
+    #- jdk: openjdk8
+    #  script: ant check
     
     - stage: scan
       addons: 
-        sonarcloud: 
+        sonarcloud:
+      # jdk 7 does not work with sonar scan. jhrg 3/14/19
       jdk: openjdk8
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
