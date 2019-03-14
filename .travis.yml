@@ -44,20 +44,22 @@ stages:
 - name: build
   if:  branch = master
 - name: scan
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = master
+  
+# AND NOT type = pull_request
 
 jobs:
   include:
+  - stage: build
+    script: 
+    - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    - ant check
+
   - stage: scan
     addons: 
       sonarcloud: 
     script:
     - ant sonar -Dsonar.login=$SONAR_LOGIN
-
-  - stage: build
-    script: 
-    - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - ant check
 
 # We could copy the logic in the bes or libdap travis.yml files to 
 # build and deploy a dist.
