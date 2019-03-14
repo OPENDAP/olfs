@@ -160,12 +160,12 @@ public class BesNodeCache {
 
             NodeTransaction nodeTransaction = NODE_CACHE.get(key);
 
-            if(isStaleNodeTransaction(nodeTransaction)){
+            if(staleOrNew(nodeTransaction)){
                 RW_CACHE_LOCK.readLock().unlock();
                 RW_CACHE_LOCK.writeLock().lock();
                 MRA_LOCK.lock();
                 try {
-                    if (isStaleNodeTransaction(nodeTransaction)) {
+                    if (staleOrNew(nodeTransaction)) {
                         dropNodeTransaction(nodeTransaction);
                         nodeTransaction = getAndCacheNodeTransaction(key);
                     }
@@ -176,8 +176,16 @@ public class BesNodeCache {
                     RW_CACHE_LOCK.writeLock().unlock();
                 }
             }
+            else {
+                MRA_LOCK.lock();
+                try {
+                    updateMostRecentlyAccessed(nodeTransaction);
+                }
+                finally {
+                    MRA_LOCK.unlock();
+                }
+            }
 
-            updateMostRecentlyAccessed(nodeTransaction);
 
             // Now we need to sort out the response - Document or Error?
             Object responseObject = nodeTransaction.getResponse();
@@ -259,7 +267,7 @@ public class BesNodeCache {
      * @return Returns true is the NodeTransaction has been in the cache longer
      *         the UPDATE_INTERVAL.
      */
-    private static boolean isStaleNodeTransaction(NodeTransaction nodeTransaction){
+    private static boolean staleOrNew(NodeTransaction nodeTransaction){
         boolean isStale = true;
         // if it's null it's stale, if it's nit null it might be stale...
         if(nodeTransaction!=null) {
@@ -313,8 +321,6 @@ public class BesNodeCache {
     private static  void updateMostRecentlyAccessed(NodeTransaction nodeTransaction){
 
         boolean status;
-        MRA_LOCK.lock();
-        try {
             status = MOST_RECENTLY_ACCESSED.remove(nodeTransaction);
             if(status) {
                 LOG.debug("Removed NodeTransaction[{},{}] from MOST_RECENTLY_ACCESSED", nodeTransaction.getKey(),nodeTransaction);
@@ -332,10 +338,6 @@ public class BesNodeCache {
             else {
                 LOG.debug("FAILED to add NodeTransaction[{}] to MOST_RECENTLY_ACCESSED",nodeTransaction.getKey());
             }
-        }
-        finally {
-            MRA_LOCK.unlock();
-        }
 
     }
 
@@ -362,6 +364,8 @@ public class BesNodeCache {
         } else {
             LOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
         }
+
+        updateMostRecentlyAccessed(nodeTransaction);
 
         LOG.debug("END  NODE_CACHE.size(): {}", NODE_CACHE.size());
 
