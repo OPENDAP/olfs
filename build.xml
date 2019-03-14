@@ -358,7 +358,9 @@
         </junit>
     </target>
 
-
+	<!-- Alias for Travis which expects tests to be run by 'ant test' jhrg 3/14/19 -->
+    <target name="test" depends="check"/>
+	
     <target name="PreProcessSourceCode"
             depends="clean,init"
             description="Moves selected source code from the development tree into
