@@ -163,6 +163,7 @@ public class BesNodeCache {
             if(isStaleNodeTransaction(nodeTransaction)){
                 RW_CACHE_LOCK.readLock().unlock();
                 RW_CACHE_LOCK.writeLock().lock();
+                MRA_LOCK.lock();
                 try {
                     if (isStaleNodeTransaction(nodeTransaction)) {
                         dropNodeTransaction(nodeTransaction);
@@ -171,6 +172,7 @@ public class BesNodeCache {
                     RW_CACHE_LOCK.readLock().lock();
                 }
                 finally {
+                    MRA_LOCK.unlock();
                     RW_CACHE_LOCK.writeLock().unlock();
                 }
             }
@@ -380,40 +382,32 @@ public class BesNodeCache {
     private static void purgeLeastRecentlyAccessed(){
 
         // Cache not full? Then return...
-        if (NODE_CACHE.size() < MAX_CACHE_ENTRIES.get())
+        if (NODE_CACHE.size() < MAX_CACHE_ENTRIES.get()) {
             return;
-
-        // We know that the RW_CACHE_LOCK.writeLock() has been acquired
-        // upstream, but since we are going to be messing with
-        // MOST_RECENTLY_ACCESSED we have to use its special lock too.
-        MRA_LOCK.lock();
-        try {
-            int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
-            if (dropNum == 0) {
-                dropNum = 1;
-            }
-            LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
-            LOG.debug("dropNum: {}", dropNum);
-            LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-            LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-
-            List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
-
-            Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
-            for (int i = 0; i < dropNum && oldestToNewest.hasNext(); i++) {
-                NodeTransaction nodeTransaction = oldestToNewest.next();
-                purgeList.add(nodeTransaction);
-                LOG.debug("Purging CatalogTransaction for key {}", nodeTransaction.getKey());
-                NODE_CACHE.remove(nodeTransaction.getKey());
-            }
-            MOST_RECENTLY_ACCESSED.removeAll(purgeList);
-            LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
-            LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
-            LOG.debug("END");
         }
-        finally {
-            MRA_LOCK.unlock();
+
+        int dropNum = (int) (MAX_CACHE_ENTRIES.get() * CACHE_REDUCTION_FACTOR);
+        if (dropNum == 0) {
+            dropNum = 1;
         }
+        LOG.debug("BEGIN  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
+        LOG.debug("dropNum: {}", dropNum);
+        LOG.debug("Before purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+        LOG.debug("Before purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+
+        List<NodeTransaction> purgeList = new ArrayList<>(dropNum);
+
+        Iterator<NodeTransaction> oldestToNewest = MOST_RECENTLY_ACCESSED.iterator();
+        for (int i = 0; i < dropNum && oldestToNewest.hasNext(); i++) {
+            NodeTransaction nodeTransaction = oldestToNewest.next();
+            purgeList.add(nodeTransaction);
+            LOG.debug("Purging CatalogTransaction for key {}", nodeTransaction.getKey());
+            NODE_CACHE.remove(nodeTransaction.getKey());
+        }
+        MOST_RECENTLY_ACCESSED.removeAll(purgeList);
+        LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
+        LOG.debug("After purge MOST_RECENTLY_ACCESSED.size(): {}", MOST_RECENTLY_ACCESSED.size());
+        LOG.debug("END");
 
     }
 
