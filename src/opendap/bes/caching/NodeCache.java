@@ -30,7 +30,7 @@ public class NodeCache {
     private static final int NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
     private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
 
-    private static final ReentrantReadWriteLock RW_CACHE_LOCK = new ReentrantReadWriteLock();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     private static final Logger SLOG = LoggerFactory.getLogger(NODE_CACHE_ELEMENT_NAME);
 
@@ -107,7 +107,7 @@ public class NodeCache {
      * @param updateIntervalSeconds The time any object may reside in the cache before it is removed.
      */
     public static void init(int maxEntries, long updateIntervalSeconds) {
-        RW_CACHE_LOCK.writeLock().lock();
+        LOCK.lock();
         try {
             if (ENABLED.get()) {
                 SLOG.error("BesNodeCache has already been initialized!  " +
@@ -127,7 +127,7 @@ public class NodeCache {
                     UPDATE_INTERVAL.get()/(nanoInSeconds*1.0));
         }
         finally {
-            RW_CACHE_LOCK.writeLock().unlock();
+            LOCK.unlock();
         }
     }
 
@@ -151,26 +151,15 @@ public class NodeCache {
         if(key==null)
             throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
 
-        RW_CACHE_LOCK.readLock().lock();
+        LOCK.lock();
         try {
             SLOG.debug("BEGIN  LRUCache.size(): {}", lruCache.size());
 
             NodeTransaction nodeTransaction = lruCache.get(key);
 
             if(staleOrMissing(nodeTransaction)){
-                RW_CACHE_LOCK.readLock().unlock();
-                RW_CACHE_LOCK.writeLock().lock();
-                try {
-                    if (staleOrMissing(nodeTransaction)) {
-                        nodeTransaction = getAndCacheNodeTransaction(key);
-                    }
-                    RW_CACHE_LOCK.readLock().lock();
-                }
-                finally {
-                    RW_CACHE_LOCK.writeLock().unlock();
-                }
+                nodeTransaction = getAndCacheNodeTransaction(key);
             }
-
 
             // Now we need to sort out the response - Document or Error?
             Object responseObject = nodeTransaction.getResponse();
@@ -195,7 +184,7 @@ public class NodeCache {
         }
         finally {
             SLOG.debug("END  LRUCache.size(): {}", lruCache.size());
-            RW_CACHE_LOCK.readLock().unlock();
+            LOCK.unlock();
         }
 
     }
@@ -300,12 +289,12 @@ public class NodeCache {
      * Drops all references from the cache.
      */
     public void destroy(){
-        RW_CACHE_LOCK.writeLock().lock();
+        LOCK.lock();
         try {
             lruCache.clear();
         }
         finally {
-            RW_CACHE_LOCK.writeLock().unlock();
+            LOCK.unlock();
         }
     }
 

@@ -38,8 +38,8 @@ class LRUCache<K,V> extends LinkedHashMap<K,V> {
     public static void main(String[] args){
         Logger log = LoggerFactory.getLogger(LRUCache.class);
 
-        int maxEntries = 20;
-        int initialCapacity = 10;
+        int maxEntries = 10;
+        int initialCapacity = 5;
 
         long start = System.nanoTime();
 
@@ -59,7 +59,7 @@ class LRUCache<K,V> extends LinkedHashMap<K,V> {
 
 
         log.debug("Loading values");
-        for(int i=10; i<22 ; i++){
+        for(int i=10; i<30 ; i++){
             cache.put(Integer.toString(i), System.nanoTime()-start);
         }
 
@@ -70,7 +70,7 @@ class LRUCache<K,V> extends LinkedHashMap<K,V> {
             cache.get(Integer.toString(i));
         }
         log.debug("Loading values");
-        for(int i=0; i<10 ; i++){
+        for(int i=0; i<5 ; i++){
             cache.put(Integer.toString(i), System.nanoTime()-start);
         }
 
