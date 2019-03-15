@@ -303,7 +303,7 @@ public class BesNodeCache {
 
         LOG.debug("DROP RESULT nodeTransaction: {} nt: {}", nodeTransaction,nt);
 
-        if (MOST_RECENTLY_ACCESSED.remove(nt)) {
+        if (MOST_RECENTLY_ACCESSED.remove(nodeTransaction)) {
             LOG.debug("Successfully dropped NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nt.getKey(), MOST_RECENTLY_ACCESSED.size());
         } else {
             LOG.error("FAILED to drop NodeTransaction[{}] from MOST_RECENTLY_ACCESSED (size: {})", nt.getKey(), MOST_RECENTLY_ACCESSED.size());
