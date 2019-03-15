@@ -196,7 +196,7 @@ function siteMapGrinder {
 
 # retrieveSitemap
 
-# makeRandomRequests
+makeRandomRequests
 
 # siteMapGrinder
 
