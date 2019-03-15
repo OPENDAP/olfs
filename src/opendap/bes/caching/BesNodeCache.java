@@ -375,9 +375,7 @@ public class BesNodeCache {
         }
         else {
             LOG.error("FAILED to add nodeTransaction[{}] to MOST_RECENTLY_ACCESSED.",key);
-
         }
-        // updateMostRecentlyAccessed(nodeTransaction);
 
         LOG.debug("END  NODE_CACHE.size(): {}  MOST_RECENTLY_ACCESSED.size(): {}", NODE_CACHE.size(), MOST_RECENTLY_ACCESSED.size());
 
@@ -421,6 +419,7 @@ public class BesNodeCache {
             NODE_CACHE.remove(nodeTransaction.getKey());
             oldestToNewest.remove();
         }
+        /*
         if(MOST_RECENTLY_ACCESSED.size() > NODE_CACHE.size()){
             while(oldestToNewest.hasNext()){
                 NodeTransaction nodeTransaction = oldestToNewest.next();
@@ -438,6 +437,7 @@ public class BesNodeCache {
                 LOG.debug("{} nt[{}] to MOST_RECENTLY_ACCESSED",status?"Added":"Skipped",entry.getKey());
             }
         }
+        */
 
         // MOST_RECENTLY_ACCESSED.removeAll(purgeList);
         LOG.debug("After purge NODE_CACHE.size(): {}", NODE_CACHE.size());
@@ -527,17 +527,6 @@ public class BesNodeCache {
 
     }
 
-
-
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
-    //#################################################################################################################
 
 
 }
