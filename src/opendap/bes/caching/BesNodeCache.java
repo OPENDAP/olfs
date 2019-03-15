@@ -28,7 +28,7 @@ public class BesNodeCache {
     private static final String MAX_ENTRIES_ATTRIBUTE_NAME = "maxEntries";
     private static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
     private static final int NODE_CACHE_MAX_ENTRIES_DEFAULT = 2000;
-    private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 600;
+    private static final long NODE_CACHE_REFRESH_INTERVAL_DEFAULT = 60;
     private static final long nanoInSeconds = 1000000000;
 
     private static final ReentrantLock LOCK = new ReentrantLock();
