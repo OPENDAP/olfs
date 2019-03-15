@@ -29,7 +29,6 @@ package opendap.bes.dap2Responders;
 import opendap.PathBuilder;
 import opendap.bes.*;
 import opendap.bes.caching.BesNodeCache;
-import opendap.bes.caching.NodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap4.QueryParameters;
 import opendap.logging.Procedure;
@@ -1350,7 +1349,7 @@ public class BesApi implements Cloneable {
         try {
             log.info("Retrieving BES showNode response for dataSource \"{}\"", dataSource);
 
-            Element responseElement = NodeCache.getNode(dataSource);
+            Element responseElement = BesNodeCache.getNode(dataSource);
             response.setRootElement(responseElement);
 
         }

@@ -28,7 +28,6 @@ package opendap.bes;
 
 import opendap.PathBuilder;
 import opendap.bes.caching.BesNodeCache;
-import opendap.bes.caching.NodeCache;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.ppt.PPTException;
@@ -157,7 +156,7 @@ public class BESManager {
         // If nodeCache is null no action needs to be taken because the NodeCache
         // will run with default settings
         if(nodeCache!=null){
-            NodeCache.init(nodeCache);
+            BesNodeCache.init(nodeCache);
         }
 
         Element siteMapCache = besConfiguration.getChild(BesSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
