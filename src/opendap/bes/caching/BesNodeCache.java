@@ -1,6 +1,5 @@
 package opendap.bes.caching;
 
-import opendap.bes.BES;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
@@ -133,9 +132,8 @@ public class BesNodeCache {
     /**
      * The primary public method used to retrieve BES showNode command responses. Caching happens within this call.
      * @param key The name of the BES node to retrieve.
-     * @return The BES showNode response for "key"
      */
-    public static Element getNode(String key)
+    public static void getNode(BesApi besApi, String key, Document response)
             throws JDOMException,
             BadConfigurationException,
             PPTException,
@@ -143,7 +141,7 @@ public class BesNodeCache {
             BESError {
 
         if(!INITIALIZED.get()) {
-            init(NODE_CACHE_MAX_ENTRIES_DEFAULT,NODE_CACHE_REFRESH_INTERVAL_DEFAULT);
+            throw new BadConfigurationException("Ouch! The BesNodeCache has not been initialized!");
         }
 
         if(key==null)
@@ -152,42 +150,35 @@ public class BesNodeCache {
         NodeTransaction nodeTransaction;
         LOCK.lock();
         try {
-            SLOG.debug("BEGIN  LRUCache.size(): {}", lruCache.size());
+            SLOG.debug("LRUCache.size(): {}", lruCache.size());
 
             nodeTransaction = lruCache.get(key);
 
             if(staleOrMissing(nodeTransaction)){
-                nodeTransaction = getAndCacheNodeTransaction(key);
+                nodeTransaction = getAndCacheNodeTransaction(besApi,key);
             }
         }
         finally {
-            SLOG.debug("END  LRUCache.size(): {}", lruCache.size());
             LOCK.unlock();
         }
 
-        // Now we need to sort out the response - Document or Error?
-        Object responseObject = nodeTransaction.getResponse();
-
-        if(responseObject instanceof Document){
-            Document cachedNodeDoc = (Document)responseObject;
-            Element root = cachedNodeDoc.getRootElement();
-            Element newRoot =  (Element) root.clone();
-            newRoot.detach();
-            return newRoot;
+        if(nodeTransaction.isError()) {
+            SLOG.debug("Found BESError object for dataSource=\"{}\" msg: {}",
+                    key,nodeTransaction.getBesError().getMessage());
+            throw nodeTransaction.getBesError();
         }
 
-        if (responseObject instanceof BESError) {
-            SLOG.info("Cache contains BESError object.  dataSource=\"" +
-                    key + "\"");
-            throw (BESError) responseObject;
-        }
-        // The responseObject should only ever be a Document or a BESError
-        throw new IOException("Cached object is of unexpected type! " +
-                "This is a bad thing! Object: "+responseObject.getClass().getCanonicalName());
-
+        Document cachedNodeDoc = nodeTransaction.getResponseDocument();
+        Element root = cachedNodeDoc.getRootElement();
+        Element newRoot =  (Element) root.clone();
+        newRoot.detach();
+        response.setRootElement(newRoot);
 
     }
 
+    public static boolean isInitialized() {
+        return INITIALIZED.get();
+    }
 
     /**
      * Solicits a showNode response from the BES for the passed parameter key. Once the response is received the response
@@ -201,33 +192,33 @@ public class BesNodeCache {
      * @throws JDOMException When the documents cannot be parsed.
      * @throws IOException When theings cannot be read or written.
      */
-    private static NodeTransaction getAndCacheNodeTransaction(String key) throws BadConfigurationException, PPTException, JDOMException, IOException {
+    private static NodeTransaction getAndCacheNodeTransaction(BesApi besApi, String key)
+            throws BadConfigurationException, PPTException, JDOMException, IOException {
 
-        BES bes = BesApi.getBES(key);
-        Document showNodeRequestDoc = BesApi.getShowNodeRequestDocument(key);
+        SLOG.debug("BEGIN  NODE_CACHE.size(): {} ", lruCache.size());
+
         Document response = new Document();
-
         NodeTransaction result;
         try {
-            bes.besTransaction(showNodeRequestDoc, response);
-            // Get the root element.
-            Element root = response.getRootElement();
-            if (root == null)
-                throw new IOException("BES showNode response for " + key + " was empty! No root element");
-
-            Element showNode = root.getChild("showNode", opendap.namespaces.BES.BES_NS);
-            if (showNode == null)
-                throw new IOException("BES showNode response for " + key + " was malformed! No showNode element");
-
-            showNode.setAttribute("prefix", bes.getPrefix());
-
-            SLOG.info("Caching copy of BES showNode response for key: \"{}\"",key);
-            result = putNodeTransaction(key, showNodeRequestDoc, response.clone());
+            besApi.getBesNodeNoCache(key,response);
+            SLOG.debug("Caching copy of BES showNode response for key: \"{}\"",key);
+            //result = putNodeTransaction(key, response.clone());
+            result = new NodeTransaction(key, (Document) response.clone());
 
         } catch (BESError be) {
-            SLOG.info("The BES returned a BESError for key: \"{} \" CACHING BESError",key);
-            result = putNodeTransaction(key, showNodeRequestDoc, be);
+            SLOG.debug("The BES returned a BESError for key: \"{} \" CACHING BESError",key);
+            //result = putNodeTransaction(key, be);
+            result = new NodeTransaction(key, be);
         }
+
+        NodeTransaction previous = lruCache.put(key, result);
+        if (result == previous) {
+            SLOG.warn("NodeTransaction cache updated with new (replacement) object for key: \"{}\"",key);
+        } else {
+            SLOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
+        }
+
+        SLOG.debug("END  LRUCache.size(): {}  ", lruCache.size());
 
         return result;
     }
@@ -242,7 +233,7 @@ public class BesNodeCache {
      */
     private static boolean staleOrMissing(NodeTransaction nodeTransaction){
         boolean isStale = true;
-        // if it's null it's stale, if it's nit null it might be stale...
+        // If it's null it's stale, if it's not null it might be stale...
         if(nodeTransaction!=null) {
             long timeInCache = System.nanoTime() - nodeTransaction.getTimeCreated();
             // Is it stale?
@@ -257,32 +248,6 @@ public class BesNodeCache {
     }
 
 
-
-    /**
-     * Takes a node response (Document or BESError) and tucks it into the NodeCache
-     * @param key The name of the node that was retrieved.
-     * @param request The BES showNode request document used to elicit the response.
-     * @param response The object (either a Document or a BESError) returned by the BES transaction.
-     */
-    private static NodeTransaction putNodeTransaction(String key, Document request, Object response) {
-
-        SLOG.debug("BEGIN  NODE_CACHE.size(): {} ", lruCache.size());
-
-        NodeTransaction nodeTransaction = new NodeTransaction(key, request, response);
-        SLOG.debug("Created nodeTransaction[{}] @ {}", key, nodeTransaction.getTimeCreated());
-
-        NodeTransaction previous = lruCache.put(key, nodeTransaction);
-        if (nodeTransaction == previous) {
-            SLOG.warn("NodeTransaction cache updated with new (replacement) object for key: \"{}\"",key);
-        } else {
-            SLOG.debug("NodeTransaction cache updated by adding new object to cache using key \"{}\"",key);
-        }
-
-        SLOG.debug("END  LRUCache.size(): {}  ", lruCache.size());
-
-        return nodeTransaction;
-
-    }
 
     /**
      * Drops all references from the cache.
@@ -308,20 +273,14 @@ public class BesNodeCache {
      * @return A Dummy NodeTransaction for testing purposes.
      */
     private static NodeTransaction getDummyCachedNodeTransaction(String id){
-        Document request;
         Document response;
         Element e;
-
-        request = new Document();
-        e=new Element("request");
-        e.setAttribute("id",id);
-        request.setRootElement(e);
 
         response = new Document();
         e= new Element("response");
         e.setAttribute("id",id);
         response.setRootElement(e);
-        return new NodeTransaction(id,request,response);
+        return new NodeTransaction(id,response);
     }
 
 

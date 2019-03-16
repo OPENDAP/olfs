@@ -3,7 +3,6 @@ package opendap.bes.caching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,7 +10,7 @@ class LRUCache<K,V> extends LinkedHashMap<K,V> {
 
     private int maxEntries;
 
-    public LRUCache(int maxEntries, int initialCapacity) {
+    LRUCache(int maxEntries, int initialCapacity) {
         super(initialCapacity, (float)Math.log(2), true);
         this.maxEntries = maxEntries;
     }
@@ -21,7 +20,7 @@ class LRUCache<K,V> extends LinkedHashMap<K,V> {
         return size() > maxEntries;
     }
 
-    public int maxEntries(){ return maxEntries; }
+    int maxEntries(){ return maxEntries; }
 
     private void show(){
         Logger log = LoggerFactory.getLogger(LRUCache.class);

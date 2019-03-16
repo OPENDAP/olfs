@@ -1324,8 +1324,6 @@ public class BesApi implements Cloneable {
     }
 
 
-
-
     /**
      * Returns the BES catalog document for the specified dataSource.
      *
@@ -1347,17 +1345,39 @@ public class BesApi implements Cloneable {
 
         Procedure timedProc = Timer.start();
         try {
-            log.info("Retrieving BES showNode response for dataSource \"{}\"", dataSource);
 
-            Element responseElement = BesNodeCache.getNode(dataSource);
-            response.setRootElement(responseElement);
-
+            if (BesNodeCache.isInitialized()) {
+                log.info("Using BesNodeCache to acquire showNode response for dataSource \"{}\"", dataSource);
+                BesNodeCache.getNode(this, dataSource, response);
+            }
+            else {
+                log.info("BesNodeCache DISABLED. Acquiring BES showNode response for dataSource \"{}\"",dataSource);
+                getBesNodeNoCache(dataSource, response);
+            }
         }
         finally {
             Timer.stop(timedProc);
 
         }
 
+    }
+
+    public void getBesNodeNoCache(String dataSource, Document response)
+            throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
+
+        Document showNodeRequestDoc = getShowNodeRequestDocument(dataSource);
+
+        besTransaction(dataSource, showNodeRequestDoc, response);
+        // Get the root element.
+        Element root = response.getRootElement();
+        if(root==null)
+            throw new IOException("BES showNode response for "+dataSource+" was empty! No root element");
+
+        Element showNode  = root.getChild("showNode", BES_NS);
+        if(showNode==null)
+            throw new IOException("BES showNode response for "+dataSource+" was malformed! No showNode element");
+
+        showNode.setAttribute("prefix", getBESprefix(dataSource));
     }
 
 
@@ -2474,7 +2494,6 @@ public class BesApi implements Cloneable {
      */
 
     public Element getSiteMapRequestElement(String prefix, String nodeSuffix, String leafSuffix ) {
-        Element e;
         Element spi = new Element("buildSiteMap",BES_NS);
 
         if(prefix!=null)
@@ -2535,8 +2554,9 @@ public class BesApi implements Cloneable {
 
 
 
-    public static Document getShowNodeRequestDocument(String dataSource)
+    public Document getShowNodeRequestDocument(String dataSource)
             throws BadConfigurationException {
+
         return getShowRequestDocument("showNode", dataSource);
     }
 
@@ -2548,7 +2568,7 @@ public class BesApi implements Cloneable {
 
 
 
-    public static Document getShowRequestDocument(String type, String dataSource)
+    public Document getShowRequestDocument(String type, String dataSource)
             throws BadConfigurationException {
 
 
@@ -2569,7 +2589,7 @@ public class BesApi implements Cloneable {
 
     }
 
-    public static BES getBES(String dataSource) throws BadConfigurationException {
+    public BES getBES(String dataSource) throws BadConfigurationException {
         return BESManager.getBES(dataSource);
     }
 
