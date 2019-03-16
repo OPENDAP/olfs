@@ -5,6 +5,7 @@
 sudo: false
 
 language: java
+script: ant check
 
 jdk:
   - openjdk8
