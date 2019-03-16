@@ -800,21 +800,13 @@ public class BesApi implements Cloneable {
             IOException,
             JDOMException, BESError {
 
-
         ByteArrayOutputStream pathInfoDocString = new ByteArrayOutputStream();
-
-
         writePathInfoResponse(dataSource,pathInfoDocString);
 
-
         SAXBuilder sb = new SAXBuilder();
-
         Document pathInfoResponseDoc = sb.build(new ByteArrayInputStream(pathInfoDocString.toByteArray()));
-
         response.detachRootElement();
-
         response.setRootElement(pathInfoResponseDoc.detachRootElement());
-
     }
 
 
@@ -1379,110 +1371,6 @@ public class BesApi implements Cloneable {
 
         showNode.setAttribute("prefix", getBESprefix(dataSource));
     }
-
-
-    /**
-     * Returns the BES INFO document for the specified dataSource.
-     *
-     * @param dataSource The data source whose information is to be retrieved
-     * @param response The document where the response (be it datasource
-     * information or an error) will be placed.
-     * @return True if successful, false if the BES generated an error in
-     * while servicing the request.
-     * @throws PPTException              .
-     * @throws BadConfigurationException .
-     * @throws IOException               .
-     * @throws JDOMException             .
-     */
-    /*
-    public void getInfo(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException,
-            BESError {
-
-
-        Procedure timedProc = Timer.start();
-        try {
-            String responseCacheKey = this.getClass().getName() + ".showInfo(\"" + dataSource + "\")";
-
-            log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \"" + dataSource + "\"  (responseCacheKey=\"" + responseCacheKey + "\")");
-
-            Object o = RequestCache.getCatalog(responseCacheKey);
-
-            if (o == null) {
-                log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\"" +responseCacheKey + "\"  not found in cache.");
-
-
-                Document request = getShowInfoRequestDocument(dataSource);
-
-                try {
-                    besTransaction(dataSource, request, response);
-                    // Get the root element.
-                    Element responseElement = response.getRootElement();
-
-                    // Find the top level dataset Element
-                    Element topDataset = responseElement.getChild("showInfo", BES_NS).getChild("dataset", BES_NS);
-
-                    // Add the prefix attribute for this BES.
-                    topDataset.setAttribute("prefix", getBESprefix(dataSource));
-
-                    RequestCache.putCatalogTransaction(responseCacheKey, response.clone());
-                    log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\"" + responseCacheKey + "\"");
-
-                } catch(BESError e) {
-
-                    if(e.convertBesErrorCodeToHttpStatusCode()== HttpServletResponse.SC_NOT_FOUND) {
-                        RequestCache.putCatalogTransaction(responseCacheKey, new NoSuchDatasource((Document) response.clone()));
-                        log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\"" + responseCacheKey + "\"");
-                    }
-                    else {
-                        throw e;
-
-                    }
-                }
-
-            } else {
-                log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\"" +responseCacheKey + "\" returned an object of type " + o.getClass().getName());
-
-
-                Document result;
-
-                if (o instanceof NoSuchDatasource) {
-                    result = ((NoSuchDatasource) o).getErrDoc();
-                } else {
-                    result = (Document) ((Document) o).clone();
-                }
-
-                Element root = result.getRootElement();
-                root.detach();
-                response.setRootElement(root);
-
-
-            }
-
-        }
-        finally {
-            Timer.stop(timedProc);
-        }
-
-    }
-
-
-    public static class NoSuchDatasource {
-        Document err;
-        public NoSuchDatasource(Document besError){
-            err = besError;
-        }
-
-        public Document getErrDoc(){
-            return (Document)err.clone();
-        }
-
-    }
-
-*/
 
 
 
@@ -2475,7 +2363,6 @@ public class BesApi implements Cloneable {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
-
         request.addContent(getSiteMapRequestElement(sitePrefix,"contents.html", ".html"));
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -2487,7 +2374,9 @@ public class BesApi implements Cloneable {
 
 
     /**
-     *     <buildSiteMap prefix="http://machine/opendap" nodeSuffix="contents.html" leafSuffix="" filename="node_site_map.txt"/>
+     *     <buildSiteMap prefix="http://machine/opendap"
+     *     nodeSuffix="contents.html" leafSuffix=""
+     *     filename="node_site_map.txt"/>
      *
      * @param prefix
      * @return
@@ -2522,7 +2411,6 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
-        //request.addContent(w10nRequestElement(besDataSource,queryString,mediaType,maxResponseSize));
 
         request.addContent(showPathInfoRequestElement(besDataSource));
 

@@ -94,8 +94,9 @@ public class BESManager {
 
 
 
-    public void destroy(){
+    public static void destroy(){
         shutdown();
+        BesNodeCache.destroy();
         LOG.info("Destroy complete.");
     }
 
@@ -307,7 +308,7 @@ public class BESManager {
             besGroup.destroy();
         }
         LOG.debug("All BesGroup's have been shut down.");
-
+        CONFIGURED.set(false);
     }
 
 

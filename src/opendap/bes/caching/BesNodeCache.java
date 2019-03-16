@@ -32,29 +32,30 @@ public class BesNodeCache {
 
     private static final ReentrantLock LOCK = new ReentrantLock();
 
+    // A static logger for this singleton class.
     private static final Logger SLOG = LoggerFactory.getLogger(NODE_CACHE_ELEMENT_NAME);
 
     // Update interval in seconds
     private static final AtomicLong UPDATE_INTERVAL = new AtomicLong(NODE_CACHE_REFRESH_INTERVAL_DEFAULT);
 
-    private static LRUCache<String,NodeTransaction> lruCache=null;
+    private static LRUCache<String,NodeTransaction> lruCache = null;
 
     /**
-     * This is a singleton class and as such all methods are static and the constructor is private because an
-     * instance should never be created.
+     * This is a singleton class and as such all methods are static and the
+     * constructor is private because an instance should never be created.
      */
     private BesNodeCache(){}
 
     /**
      * Initialize the BesNodeCache using an XML Element.
-     * @param config The "NodeCache" configuration element
+     * @param config The NODE_CACHE_ELEMENT_NAME configuration element
      * @throws BadConfigurationException When the configuration is broken.
      */
     public static void init(Element config) throws BadConfigurationException {
 
         if (config == null || !config.getName().equals(NODE_CACHE_ELEMENT_NAME))
-            throw new BadConfigurationException("BesNodeCache must be passed a non-null configuration " +
-                    "element named " + NODE_CACHE_ELEMENT_NAME);
+            throw new BadConfigurationException("BesNodeCache must be passed a " +
+                    "non-null configuration element named " + NODE_CACHE_ELEMENT_NAME);
 
         int maxEntries = NODE_CACHE_MAX_ENTRIES_DEFAULT;
         String maxEntriesString = config.getAttributeValue(MAX_ENTRIES_ATTRIBUTE_NAME);
@@ -101,7 +102,8 @@ public class BesNodeCache {
      * The _actual_ init method that sets up the cache. This must be called
      * prior to using the cache.
      * @param maxEntries The maximum number of entries in the cache
-     * @param updateIntervalSeconds The time any object may reside in the cache before it is removed.
+     * @param updateIntervalSeconds The time any object may reside in the cache
+     *                              before it is removed.
      */
     public static void init(int maxEntries, long updateIntervalSeconds) {
         LOCK.lock();
@@ -130,8 +132,22 @@ public class BesNodeCache {
 
 
     /**
-     * The primary public method used to retrieve BES showNode command responses. Caching happens within this call.
+     * The primary public method used to retrieve BES showNode command responses.
+     * The caching happens within this call.
+     *
+     * @param besApi THe instance of BesApi to use when accessing the BES.
      * @param key The name of the BES node to retrieve.
+     * @param response The Document into which the BES showNode response will
+     *                 be placed.
+     * @throws JDOMException When the response cannot be parsed.
+     * @throws BadConfigurationException When this method is called and the
+     * init(...) method has not been called.
+     * @throws PPTException When there is a communication problem with the BES.
+     * @throws IOException When there is a low-level communication (socket etc)
+     * issue communicating with the BES, or when the passed value of "key" is
+     * null.
+     * @throws BESError When the BES response to the showNode command is a
+     * BESError object.
      */
     public static void getNode(BesApi besApi, String key, Document response)
             throws JDOMException,
@@ -148,9 +164,9 @@ public class BesNodeCache {
             throw new IOException("The BesApi.getNode() method was passed a key value of null. That's bad.");
 
         NodeTransaction nodeTransaction;
+
         LOCK.lock();
         try {
-            SLOG.debug("LRUCache.size(): {}", lruCache.size());
 
             nodeTransaction = lruCache.get(key);
 
@@ -176,19 +192,28 @@ public class BesNodeCache {
 
     }
 
+    /**
+     *
+     * @return True if BesNodeCache g=has been successfully initialized, false
+     * otherwise.
+     */
     public static boolean isInitialized() {
         return INITIALIZED.get();
     }
 
     /**
-     * Solicits a showNode response from the BES for the passed parameter key. Once the response is received the response
-     * is used to make a new NodeTransaction which is then placed in the cache associated with the value of key.
-     * If the BES returns an error that is handled the same way, the error object is used to make a new NodeTransaction
-     * which is placed in the cache associated with the value of key.
-     * @param key The name of the node to retrieve from the BES using the showNode command.
+     * Solicits a showNode response from the BES for the passed parameter key.
+     * Once the response is received the response is used to make a new
+     * NodeTransaction which is then placed in the cache associated with the
+     * value of key. If the BES returns an error that is handled the same way,
+     * the error object is used to make a new NodeTransaction which is placed
+     * in the cache associated with the value of key.
+     * @param key The name of the node to retrieve from the BES using the
+     *            showNode command.
      * @return The NodeTransaction built from the BES response.
      * @throws BadConfigurationException When a BES cannot be located.
-     * @throws PPTException When the PPT exchange between the BES process and the OLFS fails.
+     * @throws PPTException When the PPT exchange between the BES process and
+     * the OLFS fails.
      * @throws JDOMException When the documents cannot be parsed.
      * @throws IOException When theings cannot be read or written.
      */
@@ -202,12 +227,10 @@ public class BesNodeCache {
         try {
             besApi.getBesNodeNoCache(key,response);
             SLOG.debug("Caching copy of BES showNode response for key: \"{}\"",key);
-            //result = putNodeTransaction(key, response.clone());
             result = new NodeTransaction(key, (Document) response.clone());
 
         } catch (BESError be) {
             SLOG.debug("The BES returned a BESError for key: \"{} \" CACHING BESError",key);
-            //result = putNodeTransaction(key, be);
             result = new NodeTransaction(key, be);
         }
 
@@ -239,8 +262,10 @@ public class BesNodeCache {
             // Is it stale?
             isStale = timeInCache > UPDATE_INTERVAL.get();
             if(SLOG.isDebugEnabled()) {
-                String msg ="nodeTransaction["+nodeTransaction.getKey()+ "] has been in cache for " +
-                        timeInCache / (nanoInSeconds * 1.0) + " s  it's " + (isStale?"STALE":"FRESH");
+                String msg ="nodeTransaction["+nodeTransaction.getKey()+
+                        "] has been in cache for " +
+                        timeInCache / (nanoInSeconds * 1.0) + " s  it's " +
+                        (isStale?"STALE":"FRESH");
                 SLOG.debug(msg);
             }
         }
@@ -252,10 +277,14 @@ public class BesNodeCache {
     /**
      * Drops all references from the cache.
      */
-    public void destroy(){
+    public static void destroy(){
         LOCK.lock();
         try {
-            lruCache.clear();
+            if(lruCache!=null)
+                lruCache.clear();
+            lruCache=null;
+            INITIALIZED.set(false);
+            SLOG.info("Destroy complete.");
         }
         finally {
             LOCK.unlock();
@@ -284,6 +313,10 @@ public class BesNodeCache {
     }
 
 
+    /**
+     * Simple test code to verify that the BesNodeCache works as expected.
+     * @param args Are ignored.
+     */
     public static void main(String[] args) {
 
         Logger log = LoggerFactory.getLogger(BesNodeCache.class);

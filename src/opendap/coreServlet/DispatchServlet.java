@@ -610,6 +610,7 @@ public class DispatchServlet extends HttpServlet {
             log.debug("Shutting down handler: {}", dh.getClass().getName());
             dh.destroy();
         }
+        BESManager.destroy();
         super.destroy();
     }
 
