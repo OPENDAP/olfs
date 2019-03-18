@@ -275,6 +275,16 @@ public class Dataset {
         this.int64Vars = int64List;
     }
 
+    private List<DapString> stringVars;
+    @XmlElement(name = "String")
+    public List<DapString> getStringVars() {
+        return stringVars;
+    }
+    public void setStringVars(List<DapString> stringList) {
+        variables.addAll(stringList);
+        this.stringVars = stringList;
+    }
+
 
     /**
      * This finds the named Dimension if it exists.
