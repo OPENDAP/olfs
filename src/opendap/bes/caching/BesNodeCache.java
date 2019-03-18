@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * An in-memory cache for BES showNode responses. This class is a singleton.
+ * An in-memory LRU cache for BES showNode responses. This class is a singleton.
  */
 public class BesNodeCache {
 
