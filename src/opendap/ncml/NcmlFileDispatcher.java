@@ -79,10 +79,12 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         log = LoggerFactory.getLogger(getClass());
     }
 
-
-
-
     public void init(HttpServlet servlet,Element config) throws Exception {
+        init(servlet,config,new BesApi());
+    }
+
+
+    public void init(HttpServlet servlet,Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
@@ -92,7 +94,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         ncmlRequestPatternRegexString = ".*\\.ncml";
         ncmlRequestPattern = Pattern.compile(ncmlRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
 
-        _besApi = new BesApi();
+        _besApi = besApi;
 
         initialized = true;
 
@@ -119,18 +121,18 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         String name = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("Locating LMT for collection: {}", name );
 
 
         try {
             ResourceInfo dsi = new BESResource(name, _besApi);
-            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+            log.debug("Returning: {}", new Date(dsi.lastModified()));
 
             return dsi.lastModified();
         }
         catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+            log.debug("Returning current date/time.");
+            return new Date().getTime();
         }
 
 

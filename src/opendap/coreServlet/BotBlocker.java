@@ -25,12 +25,14 @@
  */
 package opendap.coreServlet;
 
+import opendap.bes.dap2Responders.BesApi;
 import opendap.http.error.Forbidden;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -43,8 +45,7 @@ import java.util.regex.Pattern;
 public class BotBlocker implements DispatchHandler {
 
 
-
-    private static  org.slf4j.Logger log = null;
+    private static org.slf4j.Logger log = null;
 
     private boolean initialized;
 
@@ -80,58 +81,52 @@ public class BotBlocker implements DispatchHandler {
      * interogating the IsoDispatchHandler methods.
      *
      * @param servlet This should be the IsoDispatchHandler that creates the
-     * instance of DispatychHandler that is being intialized.
-     * @param config A JDOM Element objct containing the XML Element that
-     * announced which implementation of IsoDispatchHandler to use. It may (or
-     * may not) contain additional confguration information.
+     *                instance of DispatychHandler that is being intialized.
+     * @param config  A JDOM Element objct containing the XML Element that
+     *                announced which implementation of IsoDispatchHandler to use. It may (or
+     *                may not) contain additional confguration information.
      * @throws Exception When the bad things happen.
      * @see DispatchServlet
      */
-    public void init(HttpServlet servlet, Element config) throws Exception
+    @Override
+    public void init(HttpServlet servlet, Element config) throws Exception{
+        init(servlet,config,null);
+    }
+
+    @Override
+    public void init(HttpServlet servlet, Element config, BesApi ignored) throws Exception
     {
         if(initialized) return;
-
         configure(config);
-
         log.info("Initialized.");
-
         initialized = true;
-
-
     }
 
     private void configure(Element config){
-
-
-        for (Object o : config.getChildren("IpAddress")) {
-            String ipAddr = ((Element) o).getTextTrim();
-            ipAddresses.add(ipAddr);
+        Element botBlocker = config.getChild("BotBlocker");
+        if(botBlocker!=null) {
+            for (Object o : config.getChildren("IpAddress")) {
+                String ipAddr = ((Element) o).getTextTrim();
+                ipAddresses.add(ipAddr);
+            }
+            for (Object o : config.getChildren("IpMatch")) {
+                String ipMatch = ((Element) o).getTextTrim();
+                Pattern ipP = Pattern.compile(ipMatch);
+                ipMatchPatterns.add(ipP);
+            }
+            for (Object o : config.getChildren("allowedResponseRegex")) {
+                String ipMatch = ((Element) o).getTextTrim();
+                Pattern ipP = Pattern.compile(ipMatch);
+                allowedResponsePatterns.add(ipP);
+                responseFiltering = true;
+            }
+            for (Object o : config.getChildren("blockedResponseRegex")) {
+                String ipMatch = ((Element) o).getTextTrim();
+                Pattern ipP = Pattern.compile(ipMatch);
+                blockedResponsePatterns.add(ipP);
+                responseFiltering = true;
+            }
         }
-
-        for (Object o : config.getChildren("IpMatch")) {
-            String ipMatch = ((Element) o).getTextTrim();
-            Pattern ipP = Pattern.compile(ipMatch);
-            ipMatchPatterns.add(ipP);
-        }
-
-
-        for (Object o : config.getChildren("allowedResponseRegex")) {
-            String ipMatch = ((Element) o).getTextTrim();
-            Pattern ipP = Pattern.compile(ipMatch);
-            allowedResponsePatterns.add(ipP);
-            responseFiltering = true;
-        }
-
-        for (Object o : config.getChildren("blockedResponseRegex")) {
-            String ipMatch = ((Element) o).getTextTrim();
-            Pattern ipP = Pattern.compile(ipMatch);
-            blockedResponsePatterns.add(ipP);
-            responseFiltering = true;
-        }
-
-
-
-
     }
 
 
@@ -255,7 +250,7 @@ public class BotBlocker implements DispatchHandler {
      * @see javax.servlet.http.HttpServlet
      */
     public long getLastModified(HttpServletRequest req) {
-        return -1;
+        return new Date().getTime();
 
     }
 

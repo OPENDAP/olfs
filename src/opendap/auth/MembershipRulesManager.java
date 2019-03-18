@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 /**
@@ -41,21 +42,29 @@ public class MembershipRulesManager {
 
     private static ConcurrentHashMap<String, Group> _groups;
     private static ConcurrentHashMap<String, HashSet<String>> _roles;
+    private static ReentrantLock _configLock;
     static {
         _groups = new ConcurrentHashMap<>();
         _roles = new ConcurrentHashMap<>();
+        _configLock = new ReentrantLock();
     }
 
     public static void init(Element config) throws ConfigurationException {
 
-        for (Object o : config.getChildren("group")) {
-            Element groupElem = (Element) o;
-            addGroup(groupElem);
-        }
+        _configLock.lock();
+        try {
+            for (Object o : config.getChildren("group")) {
+                Element groupElem = (Element) o;
+                addGroup(groupElem);
+            }
 
-        for (Object o : config.getChildren("role")) {
-            Element roleElem = (Element) o;
-            addRole(roleElem);
+            for (Object o : config.getChildren("role")) {
+                Element roleElem = (Element) o;
+                addRole(roleElem);
+            }
+        }
+        finally {
+            _configLock.unlock();
         }
     }
 
@@ -65,11 +74,8 @@ public class MembershipRulesManager {
             throw new ConfigurationException("init() - Every <group> MUST have an \"id\" attribute.");
         }
 
+        _groups.putIfAbsent(gid, new Group(gid));
         Group group = _groups.get(gid);
-        if (group == null) {
-            group = new Group(gid);
-            _groups.put(gid, group);
-        }
 
         Iterator userItr = groupElem.getChildren("user").iterator();
         if(!userItr.hasNext()){
@@ -104,10 +110,9 @@ public class MembershipRulesManager {
             }
             group.addUserPattern(uidPatternStr,authContextPatternStr);
         }
-
-
-
     }
+
+
     private static void addRole(Element roleElem) throws ConfigurationException {
         String rid = roleElem.getAttributeValue("id");
         if (rid == null) {
@@ -116,19 +121,18 @@ public class MembershipRulesManager {
 
         Iterator uItr = roleElem.getChildren("group").iterator();
         if(uItr.hasNext()){
+            _roles.putIfAbsent(rid, new HashSet<String>() );
             HashSet<String> members = _roles.get(rid);
-            if (members == null) {
-                members = new HashSet<>();
-                _roles.put(rid, members);
-            }
+            if (members == null)
+                throw new ConfigurationException("addRole() - Unable to process role: '"+rid+"'");
+
             while (uItr.hasNext()) {
                 Element user = (Element) uItr.next();
                 String gid = user.getAttributeValue("id");
                 if (gid == null) {
                     throw new ConfigurationException("init(): Every <group> must have an \"id\" attribute.");
                 }
-                if (!members.contains(gid))
-                    members.add(gid);
+                members.add(gid);
             }
         }
     }

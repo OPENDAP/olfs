@@ -26,11 +26,8 @@
 
 package opendap.async;
 
-import opendap.bes.BES;
-import opendap.bes.BESConfig;
-import opendap.bes.BESManager;
+import opendap.bes.*;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.bes.BesDapDispatcher;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.NotFound;
 import org.jdom.Document;
@@ -55,10 +52,10 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpUpgradeHandler;
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
  */
@@ -69,24 +66,21 @@ public class AsyncDispatcher extends BesDapDispatcher {
     private Logger log;
     private boolean initialized;
     private boolean usePendingAndGoneResponses;
-    private ReentrantLock cacheLock;
 
     private ConcurrentHashMap<String,Date> asyncCache;
 
-    private String _prefix = "async/";
+    private String prefix = "async/";
 
     private int cachePersistTime; // In milliseconds
     private int responseDelay; // In milliseconds
-
-
-    //private String dapMetadataRegex = ".*\\.xml|.*\\.iso|.*\\.rubric|.*\\.ver|.*\\.ddx|.*\\.dds|.*\\.das|.*\\.info|.*\\.html?";
-    //private Pattern dapMetadataPattern = Pattern.compile(dapMetadataRegex, Pattern.CASE_INSENSITIVE);
 
     private String dap4DataRegex;
     private Pattern dap4DataPattern;
 
     private String dap2DataRegex;
     private Pattern dap2DataPattern;
+
+    private static final String BAD_CONF_MSG_START = "Bad Configuration. The <Handler> element that declares ";
 
 
 
@@ -95,9 +89,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
     public AsyncDispatcher(){
         log = LoggerFactory.getLogger(getClass());
 
-        asyncCache = new ConcurrentHashMap<String, Date>();
-        cacheLock = new ReentrantLock();
-
+        asyncCache = new ConcurrentHashMap<>();
         cachePersistTime = 3600000; // In milliseconds
         responseDelay    = 60000;   // In milliseconds
 
@@ -143,25 +135,24 @@ public class AsyncDispatcher extends BesDapDispatcher {
             besConfigElement = (Element) o;
 
             Element prefixElement = besConfigElement.getChild("prefix");
-            String prefix = null;
+            String configPrefix = null;
             if(prefixElement!=null)
-                prefix = prefixElement.getTextTrim();
+                configPrefix = prefixElement.getTextTrim();
 
             // Find the BESs whose prefix is "/" note that there may be more than one
             // And that's fine. This will just cause the BESManager to form another BESGroup with
             // the new prefix.
-            if(prefix!=null && prefix.equals("/")){
+            if(configPrefix!=null && configPrefix.equals("/")){
 
                 // Change the prefix to be the prefix for our async responder.
-                prefixElement.setText(_prefix);
+                prefixElement.setText(this.prefix);
 
                 besConfig = new BESConfig(besConfigElement);
 
                 // Add the new BES to the BESManager
                 bes = new BES(besConfig);
                 BESManager.addBes(bes);
-                log.info("Added BES to service asynchronous responses. BES prefix: '"+_prefix+"'");
-
+                log.info("Added BES to service asynchronous responses. BES prefix: '{}'", this.prefix );
 
                 initialized = true;
             }
@@ -170,93 +161,71 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
     }
 
-    private void ingestPrefix(Element config) throws Exception{
 
-        String msg;
+    private void ingestPrefix(Element config) throws BadConfigurationException{
+
         Element e = config.getChild("prefix");
         if(e!=null)
-            _prefix = e.getTextTrim();
+            prefix = e.getTextTrim();
 
-        if(_prefix.equals("/")){
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <prefix>  " +
-                    "child element whose value may not be equal to \"/\"";
-            log.error(msg);
-            throw new Exception(msg);
+        if(prefix.equals("/")){
+            String msg = BAD_CONF_MSG_START + this.getClass().getName();
+            msg += " MUST provide 1 <prefix> child element whose value may not be equal to \"/\"";
+            log.error("ingestPrefix() - {}",msg);
+            throw new BadConfigurationException(msg);
         }
 
+        if(prefix.endsWith("/"))
+            prefix = prefix.substring(0, prefix.length()-1);
 
+        if(!prefix.startsWith("/"))
+            prefix = "/" + prefix;
 
-        if(_prefix.endsWith("/"))
-            _prefix = _prefix.substring(0,_prefix.length()-1);
-
-        if(!_prefix.startsWith("/"))
-            _prefix = "/" + _prefix;
-
-        log.info("prefix="+ _prefix);
-
+        log.info("prefix={}", prefix);
     }
 
-    private void ingestCachePersistTime(Element config) throws Exception{
+    private void ingestCachePersistTime(Element config) throws BadConfigurationException{
 
-        String msg;
         Element e = config.getChild("cachePersistTime");
-
-
         if(e!=null)
             cachePersistTime = Integer.parseInt(e.getTextTrim()) * 1000; // Make it into milliseconds
 
         if(cachePersistTime < 0){
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide a <cachePersistTime>  " +
-                    "child element whose value may not be less than 0";
-            log.error(msg);
-            throw new Exception(msg);
+            String msg = BAD_CONF_MSG_START + this.getClass().getName();
+            msg += " MUST provide a <cachePersistTime> child element whose value may not be less than 0";
+            log.error("ingestCachePersistTime() - {}",msg);
+            throw new BadConfigurationException(msg);
         }
-        log.info("cachePersistTime="+ cachePersistTime);
+        log.info("cachePersistTime={}", cachePersistTime);
 
     }
 
 
 
-    private void ingestUsePendingGone(Element config) throws Exception{
-
-        String msg;
+    private void ingestUsePendingGone(Element config) {
 
         Element e = config.getChild("usePendingAndGoneResponses");
-
-
         if(e!=null)
             usePendingAndGoneResponses = e.getTextTrim().equalsIgnoreCase("true");
 
-        log.info("usePendingAndGoneResponses="+ usePendingAndGoneResponses);
-
+        log.info("usePendingAndGoneResponses={}",usePendingAndGoneResponses);
     }
 
 
 
-    private void ingestResponseDelay(Element config) throws Exception{
-
-        String msg;
+    private void ingestResponseDelay(Element config) throws BadConfigurationException{
 
         Element e = config.getChild("responseDelay");
-
-
         if(e!=null)
             responseDelay = Integer.parseInt(e.getTextTrim()) * 1000; // Make it into milliseconds
 
         if(responseDelay < 0){
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide a <responseDelay>  " +
-                    "child element whose value may not be less than 0";
-            log.error(msg);
-            throw new Exception(msg);
+            String msg = BAD_CONF_MSG_START + this.getClass().getName();
+            msg += " MUST provide a <responseDelay> child element whose value may not be less than 0";
+            log.error("ingestResponseDelay() - {}",msg);
+            throw new BadConfigurationException(msg);
         }
-        log.info("responseDelay="+ responseDelay);
-
+        log.info("responseDelay={}ms", responseDelay);
     }
 
 
@@ -268,25 +237,17 @@ public class AsyncDispatcher extends BesDapDispatcher {
                                     boolean sendResponse)
             throws Exception {
 
-
-
         String serviceContext = ReqInfo.getFullServiceContext(request);
         String relativeURL = ReqInfo.getLocalUrl(request);
 
-        log.debug("The client requested this resource: " + relativeURL);
-
-        log.debug("serviceContext: "+serviceContext);
-        log.debug("relativeURL:    "+relativeURL);
+        log.debug("The client requested this resource: {}", relativeURL);
+        log.debug("serviceContext: {}",serviceContext);
+        log.debug("relativeURL:    {}",relativeURL);
 
         if(!relativeURL.startsWith("/"))
             relativeURL = "/" + relativeURL;
 
-
-
-        boolean isMyRequest = relativeURL.startsWith(_prefix);
-
-
-
+        boolean isMyRequest = relativeURL.startsWith(prefix);
         if (isMyRequest) {
             if(sendResponse){
                 return(sendAsyncResponse(request, response));
@@ -295,9 +256,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
                 return(super.requestDispatch(request, response, false));
             }
         }
-
         return isMyRequest;
-
     }
 
 
@@ -341,7 +300,7 @@ public class AsyncDispatcher extends BesDapDispatcher {
      * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
      * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
      */
-    public long getClientAsyncAcceptVal_ms(HttpServletRequest request){
+    public long getClientAsyncAcceptValMilliseconds(HttpServletRequest request){
 
         // Get the values of the "async" parameter in the query string.
         String[] ceAsyncAccept     = request.getParameterValues("async");
@@ -349,20 +308,16 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         // Get the values of the (possibly repeated) DAP Async Accept header
         Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
-        Vector<String> v  = new Vector<String>();
+        ArrayList<String> asyncHeaders  = new ArrayList<>();
         while(enm.hasMoreElements())
-            v.add((String)enm.nextElement());
-
+            asyncHeaders.add((String)enm.nextElement());
 
         long acceptableDelay;
-
         long headerAcceptDelay = -1;
         long ceAcceptDelay = -1;
 
-
         // Check the constraint expression for the async control parameter
         if(ceAsyncAccept!=null && ceAsyncAccept.length>0){
-
 
             try {
                 // Only look at the first value.
@@ -374,30 +329,23 @@ public class AsyncDispatcher extends BesDapDispatcher {
                 ceAcceptDelay = -1;
             }
         }
-
         // Check HTTP headers for Async Control
-        if(v.size()>0){
+        if(!asyncHeaders.isEmpty()){
                 try {
                     // Only look at the first value.
-                    headerAcceptDelay = Long.parseLong(v.get(0))*1000; // Value comes as seconds, make it milliseconds
+                    headerAcceptDelay = Long.parseLong(asyncHeaders.get(0))*1000; // Value comes as seconds, make it milliseconds
                 }
                 catch(NumberFormatException e){
                     log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
                             " header. msg: "+e.getMessage());
                     headerAcceptDelay = -1;
                 }
-
         }
-
         // The constraint expression parameter "asnyc=seconds" takes precedence.
-
         acceptableDelay = headerAcceptDelay;
-
         if(ceAcceptDelay>=0){
             acceptableDelay = ceAcceptDelay;
         }
-
-
         return acceptableDelay;
     }
 
@@ -417,12 +365,12 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         // Get the values of the (possibly repeated) DAP Async Accept header
         Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
-        Vector<String> acceptAsyncHeaderValues  = new Vector<String>();
+        ArrayList<String> acceptAsyncHeaderValues  = new ArrayList<>();
         while(enm.hasMoreElements())
             acceptAsyncHeaderValues.add((String)enm.nextElement());
 
 
-        return ceAsyncAccept==null && acceptAsyncHeaderValues.size()>0;
+        return ceAsyncAccept==null && !acceptAsyncHeaderValues.isEmpty();
     }
 
 
@@ -431,24 +379,21 @@ public class AsyncDispatcher extends BesDapDispatcher {
     public boolean asyncDap2DataResponse(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         Date now = new Date();
-
         Date timeAvailable;
-
         String xmlBase = DocFactory.getXmlBase(request);
-
         timeAvailable = addResourceToCacheAsNeeded(xmlBase);
 
         long timeTillReady = timeAvailable.getTime() - now.getTime();
 
         if(timeTillReady>0){
-            log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
+            log.info("Delaying DAP2 data request for {}ms",timeTillReady);
             try { Thread.sleep(timeTillReady);}
-            catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
+            catch(InterruptedException e){
+                log.error("Thread Interrupted. msg: {}",e.getMessage());
+                throw e;
+            }
         }
-
         return(super.requestDispatch(request,response,true));
-
-
     }
 
 
@@ -462,15 +407,13 @@ public class AsyncDispatcher extends BesDapDispatcher {
         Date now = new Date();
         Date timeAvailable;
 
-        timeAvailable = new Date(now.getTime()+ getResponseDelay_ms());
-
+        timeAvailable = new Date(now.getTime()+ getResponseDelayMilliseconds());
         Date resourceAvailabilityTime = asyncCache.putIfAbsent(id,timeAvailable);
 
         if(resourceAvailabilityTime != null)
             return resourceAvailabilityTime;
 
         return timeAvailable;
-
     }
 
 
@@ -482,18 +425,18 @@ public class AsyncDispatcher extends BesDapDispatcher {
         Date startTime;
         String xmlBase = DocFactory.getXmlBase(request);
 
+        long clientAcceptableDelayMs = getClientAsyncAcceptValMilliseconds(request);
 
-        long clientAcceptableDelay_ms = getClientAsyncAcceptVal_ms(request);
-
-        if(clientAcceptableDelay_ms<0){
+        if(clientAcceptableDelayMs<0){
             // There was no indication that the client can accept an asynchronous response, so tell that
             // it's required that they indicate their willingness to accept async in order to get the resource.
-            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelay_s(), getCachePersistTime_s());
+            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelaySeconds(), getCachePersistTimeSeconds());
             response.setHeader(HttpHeaders.ASYNC_REQUIRED, "");
             sendDocument(response, asyncResponse, HttpServletResponse.SC_BAD_REQUEST);
             return true;
         }
-        else if(clientAcceptableDelay_ms>0 && clientAcceptableDelay_ms < getResponseDelay_ms()){
+
+        if(clientAcceptableDelayMs>0 && clientAcceptableDelayMs < getResponseDelayMilliseconds()){
             // The client indicated that amount of time that they are willing to wait for the
             // asynchronous response is less than the expected delay.
             // So - tell them that the request is REJECTED!
@@ -504,64 +447,60 @@ public class AsyncDispatcher extends BesDapDispatcher {
             return true;
 
         }
-        else {
 
-            // Looks like the client wants an async response!
+        // Looks like the client wants an async response!
 
-            // First, let's figure out if the request is for a pending, or expired resource.
-            startTime = asyncCache.get(xmlBase);
-            if(startTime!=null) {
+        // First, let's figure out if the request is for a pending, or expired resource.
+        startTime = asyncCache.get(xmlBase);
+        if(startTime!=null) {
 
-                Date endTime = new Date(startTime.getTime()+cachePersistTime);
+            Date endTime = new Date(startTime.getTime()+cachePersistTime);
+            if(now.after(startTime)){
+                if(now.before(endTime) ){
+                    // The request is for an available resource. I.e. The requested resource is in the cache,
+                    // it's start has past and it's end time has not yet arrived. So - send the data.
 
-                if(now.after(startTime)){
-                    if(now.before(endTime) ){
-                        // The request is for an available resource. I.e. The requested resource is in the cache,
-                        // it's start has past and it's end time has not yet arrived. So - send the data.
-
-                        // And because this is hack to add DAP4 functionality to a DAP2 server, make the request
-                        // palatable to the underlying DAP2 service.
-                        Dap4RequestToDap2Request dap2Request = new Dap4RequestToDap2Request(request);
-                        return(super.requestDispatch(dap2Request,response,true));
-                    }
-                    else if(now.after(endTime)){
-
-
-                        if(usePendingAndGoneResponses){
-                            // Async Response is expired. Return GONE!
-                            Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
-                            sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
-                            asyncCache.remove(xmlBase, startTime);
-                        }
-                        else {
-                            asyncCache.remove(xmlBase, startTime);
-                            throw new NotFound("The requested resource is no longer available.");
-                        }
-
-                        return true;
-                    }
+                    // And because this is hack to add DAP4 functionality to a DAP2 server, make the request
+                    // palatable to the underlying DAP2 service.
+                    Dap4RequestToDap2Request dap2Request = new Dap4RequestToDap2Request(request);
+                    return(super.requestDispatch(dap2Request,response,true));
                 }
-                else {
+                else if(now.after(endTime)){
                     if(usePendingAndGoneResponses){
-                        // Async Response is PENDING!
-                        Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
-                        sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
+                        // Async Response is expired. Return GONE!
+                        Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
+                        sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
+                        asyncCache.remove(xmlBase, startTime);
                     }
                     else {
-                        throw new NotFound("The requested resource is not yet available.");
+                        asyncCache.remove(xmlBase, startTime);
+                        throw new NotFound("The requested resource is no longer available.");
                     }
-                    return true;
 
+                    return true;
                 }
             }
+            else {
+                if(usePendingAndGoneResponses){
+                    // Async Response is PENDING!
+                    Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
+                    sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
+                }
+                else {
+                    throw new NotFound("The requested resource is not yet available.");
+                }
+                return true;
 
-            // The resource is not in the cache, so add the resource to the cache. and then
-            // tell the client that the request is accepted.
-            addResourceToCacheAsNeeded(xmlBase);
-            sendAsyncRequestAccepted(request,response);
-
-            return true;
+            }
         }
+
+        // The resource is not in the cache, so add the resource to the cache. and then
+        // tell the client that the request is accepted.
+        addResourceToCacheAsNeeded(xmlBase);
+        sendAsyncRequestAccepted(request,response);
+
+        return true;
+
 
     }
 
@@ -571,13 +510,13 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
 
         // Async Request is accepted.
-        response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay_s()+"");
+        response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelaySeconds()+"");
 
         String requestUrl = request.getRequestURL().toString();
         String ce = request.getQueryString();
 
         if(addAsyncParameterToCE(request))
-            ce="async="+ getClientAsyncAcceptVal_ms(request) + "&" + ce;
+            ce="async="+ getClientAsyncAcceptValMilliseconds(request) + "&" + ce;
 
         String resultLinkUrl = requestUrl + "?" + ce;
 
@@ -585,8 +524,8 @@ public class AsyncDispatcher extends BesDapDispatcher {
                 DocFactory.getAsynchronousResponseAccepted(
                         request,
                         resultLinkUrl,
-                        getResponseDelay_s(),
-                        getCachePersistTime_s());
+                        getResponseDelaySeconds(),
+                        getCachePersistTimeSeconds());
 
 
         sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
@@ -605,69 +544,60 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
 
 
-    private int getResponseDelay_s(){
+    private int getResponseDelaySeconds(){
         return responseDelay/1000;
     }
 
 
-    private int getCachePersistTime_s(){
+    private int getCachePersistTimeSeconds(){
         return cachePersistTime/1000;
     }
 
 
-    private int getResponseDelay_ms(){
+    private int getResponseDelayMilliseconds(){
         return responseDelay;
     }
-
-
-    private int getCachePersistTime_ms(){
-        return cachePersistTime;
-    }
-
-
 
 
 
     class Dap4RequestToDap2Request implements HttpServletRequest {
 
-        HttpServletRequest r;
+        HttpServletRequest wrappedRequest;
 
         public Dap4RequestToDap2Request(HttpServletRequest request) {
-            r = request;
+            wrappedRequest = request;
         }
 
         
-        public String getAuthType() { return r.getAuthType(); }
+        public String getAuthType() { return wrappedRequest.getAuthType(); }
 
-        public Cookie[] getCookies() {  return r.getCookies(); }
+        public Cookie[] getCookies() {  return wrappedRequest.getCookies(); }
 
-        public long getDateHeader(String s) { return r.getDateHeader(s); }
+        public long getDateHeader(String s) { return wrappedRequest.getDateHeader(s); }
 
-        public String getHeader(String s) { return r.getHeader(s); }
+        public String getHeader(String s) { return wrappedRequest.getHeader(s); }
 
-        public Enumeration getHeaders(String s) { return r.getHeaders(s); }
+        public Enumeration getHeaders(String s) { return wrappedRequest.getHeaders(s); }
 
-        public Enumeration getHeaderNames() { return r.getHeaderNames(); }
+        public Enumeration getHeaderNames() { return wrappedRequest.getHeaderNames(); }
 
-        public int getIntHeader(String s) { return r.getIntHeader(s); }
+        public int getIntHeader(String s) { return wrappedRequest.getIntHeader(s); }
 
-        public String getMethod() { return r.getMethod(); }
+        public String getMethod() { return wrappedRequest.getMethod(); }
 
-        public String getPathInfo() { return r.getPathInfo(); }
+        public String getPathInfo() { return wrappedRequest.getPathInfo(); }
 
-        public String getPathTranslated() { return r.getPathTranslated(); }
+        public String getPathTranslated() { return wrappedRequest.getPathTranslated(); }
 
-        public String getContextPath() { return r.getContextPath(); }
+        public String getContextPath() { return wrappedRequest.getContextPath(); }
 
         public String getQueryString() {
 
-            String query = r.getQueryString();
+            String query = wrappedRequest.getQueryString();
+            log.debug("getQueryString() - dap4 query: {}",query);
 
-            log.debug("dap4 query: "+query);
-
-            String dap2Query = convertDap4ceToDap2ce(r);
-
-            log.debug("dap2 query: "+dap2Query);
+            String dap2Query = convertDap4ceToDap2ce(wrappedRequest);
+            log.debug("getQueryString() - dap2 query: {}", dap2Query);
 
             return dap2Query;
         }
@@ -711,147 +641,176 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
 
         
-        public String getRemoteUser() { return r.getRemoteUser(); }
+        public String getRemoteUser() { return wrappedRequest.getRemoteUser(); }
 
-        public boolean isUserInRole(String s) { return r.isUserInRole(s); }
+        public boolean isUserInRole(String s) { return wrappedRequest.isUserInRole(s); }
 
-        public Principal getUserPrincipal() { return r.getUserPrincipal(); }
+        public Principal getUserPrincipal() { return wrappedRequest.getUserPrincipal(); }
 
-        public String getRequestedSessionId() { return r.getRequestedSessionId(); }
+        public String getRequestURI() { return wrappedRequest.getRequestURI(); }
 
-        public String getRequestURI() { return r.getRequestURI(); }
+        public StringBuffer getRequestURL() { return wrappedRequest.getRequestURL(); }
 
-        public StringBuffer getRequestURL() { return r.getRequestURL(); }
+        public String getServletPath() { return wrappedRequest.getServletPath(); }
 
-        public String getServletPath() { return r.getServletPath(); }
+        public HttpSession getSession(boolean b) { return wrappedRequest.getSession(b); }
 
-        public HttpSession getSession(boolean b) { return r.getSession(b); }
+        public HttpSession getSession() { return wrappedRequest.getSession(); }
 
-        public HttpSession getSession() { return r.getSession(); }
+        public boolean isRequestedSessionIdValid() { return wrappedRequest.isRequestedSessionIdValid(); }
 
-        @Override
-        public String changeSessionId() {
-            return r.changeSessionId();
-        }
+        public boolean isRequestedSessionIdFromCookie() { return wrappedRequest.isRequestedSessionIdFromCookie(); }
 
-        public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
+        public boolean isRequestedSessionIdFromURL() { return wrappedRequest.isRequestedSessionIdFromURL(); }
 
-        public boolean isRequestedSessionIdFromCookie() { return r.isRequestedSessionIdFromCookie(); }
-
-        public boolean isRequestedSessionIdFromURL() { return r.isRequestedSessionIdFromURL(); }
-
+        /**
+         *
+         * @return
+         * @deprecated Not needed.
+         */
         @Deprecated
-        public boolean isRequestedSessionIdFromUrl() { return r.isRequestedSessionIdFromUrl(); }
+        public boolean isRequestedSessionIdFromUrl() { return wrappedRequest.isRequestedSessionIdFromUrl(); }
 
         @Override
         public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException {
-            return r.authenticate(httpServletResponse);
+            return wrappedRequest.authenticate(httpServletResponse);
         }
 
         @Override
         public void login(String s, String s1) throws ServletException {
 
-            r.login(s,s1);
+            wrappedRequest.login(s,s1);
         }
 
         @Override
         public void logout() throws ServletException {
 
-            r.logout();
+            wrappedRequest.logout();
         }
 
         @Override
         public Collection<Part> getParts() throws IOException, ServletException {
-            return r.getParts();
+            return wrappedRequest.getParts();
         }
 
         @Override
         public Part getPart(String s) throws IOException, ServletException {
-            return r.getPart(s);
+            return wrappedRequest.getPart(s);
         }
+
+
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* **********************************************************************************
+ * The following methods are part of the Servlet API version 3.1 that is not
+ * yet deployed to CentOS-6.6 yum repos. So - these will compile on more modrern
+ * systems, but not older ones.
+ * Comment them out or uncomment them as needed
+ */
+/*
+        @Override
+        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException
+            return wrappedRequest.upgrade(aClass)
 
         @Override
-        public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
-            return r.upgrade(aClass);
-        }
-
-        public Object getAttribute(String s) { return r.getAttribute(s); }
-
-        public Enumeration getAttributeNames() { return r.getAttributeNames(); }
-
-        public String getCharacterEncoding() { return r.getCharacterEncoding(); }
-
-        public void setCharacterEncoding(String s) throws UnsupportedEncodingException { r.setCharacterEncoding(s); }
-
-        public int getContentLength() { return r.getContentLength(); }
+        public String changeSessionId()
+            return wrappedRequest.changeSessionId()
 
         @Override
-        public long getContentLengthLong() {
-            return r.getContentLengthLong();
-        }
+        public long getContentLengthLong()
+            return wrappedRequest.getContentLengthLong()
 
-        public String getContentType() { return r.getContentType(); }
+ */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
 
-        public ServletInputStream getInputStream() throws IOException { return r.getInputStream(); }
 
-        public String getParameter(String s) { return r.getParameter(s); }
 
-        public Enumeration getParameterNames() { return r.getParameterNames(); }
+        public String getRequestedSessionId() { return null; }
 
-        public String[] getParameterValues(String s) { return r.getParameterValues(s); }
+        public Object getAttribute(String s) { return wrappedRequest.getAttribute(s); }
 
-        public Map getParameterMap() { return r.getParameterMap(); }
+        public Enumeration getAttributeNames() { return wrappedRequest.getAttributeNames(); }
 
-        public String getProtocol() { return r.getProtocol(); }
+        public String getCharacterEncoding() { return wrappedRequest.getCharacterEncoding(); }
 
-        public String getScheme() { return r.getScheme(); }
+        public void setCharacterEncoding(String s) throws UnsupportedEncodingException { wrappedRequest.setCharacterEncoding(s); }
 
-        public String getServerName() { return r.getServerName(); }
+        public int getContentLength() { return wrappedRequest.getContentLength(); }
 
-        public int getServerPort() { return r.getServerPort(); }
 
-        public BufferedReader getReader() throws IOException { return r.getReader(); }
+        public String getContentType() { return wrappedRequest.getContentType(); }
 
-        public String getRemoteAddr() { return r.getRemoteAddr(); }
+        public ServletInputStream getInputStream() throws IOException { return wrappedRequest.getInputStream(); }
 
-        public String getRemoteHost() { return r.getRemoteHost(); }
+        public String getParameter(String s) { return wrappedRequest.getParameter(s); }
 
-        public void setAttribute(String s, Object o) { r.setAttribute(s, o); }
+        public Enumeration getParameterNames() { return wrappedRequest.getParameterNames(); }
 
-        public void removeAttribute(String s) { r.removeAttribute(s); }
+        public String[] getParameterValues(String s) { return wrappedRequest.getParameterValues(s); }
 
-        public Locale getLocale() { return r.getLocale(); }
+        public Map getParameterMap() { return wrappedRequest.getParameterMap(); }
 
-        public Enumeration getLocales() { return r.getLocales(); }
+        public String getProtocol() { return wrappedRequest.getProtocol(); }
 
-        public boolean isSecure() { return r.isSecure(); }
+        public String getScheme() { return wrappedRequest.getScheme(); }
 
-        public RequestDispatcher getRequestDispatcher(String s) { return r.getRequestDispatcher(s); }
+        public String getServerName() { return wrappedRequest.getServerName(); }
 
+        public int getServerPort() { return wrappedRequest.getServerPort(); }
+
+        public BufferedReader getReader() throws IOException { return wrappedRequest.getReader(); }
+
+        public String getRemoteAddr() { return wrappedRequest.getRemoteAddr(); }
+
+        public String getRemoteHost() { return wrappedRequest.getRemoteHost(); }
+
+        public void setAttribute(String s, Object o) { wrappedRequest.setAttribute(s, o); }
+
+        public void removeAttribute(String s) { wrappedRequest.removeAttribute(s); }
+
+        public Locale getLocale() { return wrappedRequest.getLocale(); }
+
+        public Enumeration getLocales() { return wrappedRequest.getLocales(); }
+
+        public boolean isSecure() { return wrappedRequest.isSecure(); }
+
+        public RequestDispatcher getRequestDispatcher(String s) { return wrappedRequest.getRequestDispatcher(s); }
+
+        /**
+         *
+         *
+         * @param s
+         * @return
+         * @deprecated No longer used...
+         */
         @Deprecated
-        public String getRealPath(String s) { return r.getRealPath(s); }
+        public String getRealPath(String s) { return wrappedRequest.getRealPath(s); }
 
-        public int getRemotePort() { return r.getRemotePort(); }
+        public int getRemotePort() { return wrappedRequest.getRemotePort(); }
 
-        public String getLocalName() { return r.getLocalName(); }
+        public String getLocalName() { return wrappedRequest.getLocalName(); }
 
-        public String getLocalAddr() { return r.getLocalAddr(); }
+        public String getLocalAddr() { return wrappedRequest.getLocalAddr(); }
 
-        public int getLocalPort() { return r.getLocalPort(); }
+        public int getLocalPort() { return wrappedRequest.getLocalPort(); }
 
         @Override
         public ServletContext getServletContext() {
-            return r.getServletContext();
+            return wrappedRequest.getServletContext();
         }
 
         @Override
         public AsyncContext startAsync() throws IllegalStateException {
-            return r.startAsync();
+            return wrappedRequest.startAsync();
         }
 
         @Override
         public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
-            return r.startAsync(servletRequest,servletResponse);
+            return wrappedRequest.startAsync(servletRequest,servletResponse);
         }
 
         @Override
@@ -866,12 +825,12 @@ public class AsyncDispatcher extends BesDapDispatcher {
 
         @Override
         public AsyncContext getAsyncContext() {
-            return r.getAsyncContext();
+            return wrappedRequest.getAsyncContext();
         }
 
         @Override
         public DispatcherType getDispatcherType() {
-            return r.getDispatcherType();
+            return wrappedRequest.getDispatcherType();
         }
     }
 

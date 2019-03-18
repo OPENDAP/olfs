@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.auth.AuthenticationControls;
+import opendap.gateway.BesGatewayApi;
 import opendap.http.error.BadGateway;
 import opendap.http.error.BadRequest;
 import opendap.logging.Timer;
@@ -44,12 +45,16 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -73,19 +78,21 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private boolean _initialized;
     private HttpServlet _dispatchServlet;
     private String _prefix;
-    boolean _useMemoryCache = false;
+    private boolean _useMemoryCache = false;
+    private boolean _allowRemoteCatalogTraversal = false;
 
-    String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
-    Transformer _catalogToHtmlTransform = null;
-    ReentrantLock _catalogToHtmlTransformLock;
+    private String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
+    private Transformer _catalogToHtmlTransform = null;
+    private ReentrantLock _catalogToHtmlTransformLock;
 
-    String _datasetToHtmlTransformFile = "/xsl/threddsDatasetDetail.xsl";
-    Transformer _datasetToHtmlTransform = null;
-    ReentrantLock _datasetToHtmlTransformLock;
+    private String _datasetToHtmlTransformFile = "/xsl/threddsDatasetDetail.xsl";
+    private Transformer _datasetToHtmlTransform = null;
+    private ReentrantLock _datasetToHtmlTransformLock;
 
 
+    private String _besNodeToDatasetScanCatalogTrasformFile = "/xsl/besNodeToDatasetScanCatalog.xsl";
 
-    String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
+    private String _staticCatalogIngestTransformFile = "/xsl/threddsCatalogIngest.xsl";
 
     public StaticCatalogDispatch() {
 
@@ -130,6 +137,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
+    /**
+     * Returns the appropriate THREDDS catalog response. Basically the method embodies the THEREDDS/TDS
+     * web UI.
+     *
+     *
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     public void sendThreddsCatalogResponse(HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
 
@@ -146,14 +163,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
             if (redirectRequest(request, response))
                 return;
 
+
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
-                // browseRemoteCatalog(response, query);
-                // response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                throw new BadRequest("Remote Catalog Browsing is not supported.");
-            } else if (query != null && query.startsWith("browseDataset=")) {
-                // browseRemoteDataset(response, query);
-                throw new BadRequest("Remote Dataset Browsing is not supported.");
+
+                if(!_allowRemoteCatalogTraversal)
+                    throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
+
+                browseRemoteCatalog(orq, response, query);
+            }
+            else if (query != null && query.startsWith("browseDataset=")) {
+                if(!_allowRemoteCatalogTraversal)
+                    throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
+                browseRemoteDataset(orq, response, query);
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -231,10 +253,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private void browseRemoteDataset(Request oRequest,
                                      HttpServletResponse response,
-                                     String query) throws IOException, SaxonApiException, BadRequest, BadGateway {
+                                     String query)
+            throws IOException, BadRequest, BadGateway, JDOMException, BadConfigurationException, PPTException, BESError {
 
 
         String http = "http://";
+        String https = "https://";
 
         // Sanitize the incoming query.
         query = Scrub.completeURL(query);
@@ -245,55 +269,55 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throw new IOException("Not a browseDataset request!");
         }
 
-
         query = query.substring("browseDataset=".length(), query.length());
 
         String targetDataset = query.substring(0, query.indexOf('&'));
 
         String remoteCatalog = query.substring(query.indexOf('&') + 1, query.length());
+        String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
+        String remoteHost;
 
-        if (!remoteCatalog.startsWith(http)) {
-            _log.error("Catalog Must be remote: " + remoteCatalog);
-           throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
+        if (remoteCatalog.startsWith(https)) {
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
         }
-
-
-        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        else if(remoteCatalog.startsWith(http)){
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        }
+        else {
+            String msg = "Catalog must be remote: " + remoteCatalog;
+            _log.error(msg);
+            throw new BadRequest(msg);
+        }
 
         _log.debug("targetDataset: " + targetDataset);
         _log.debug("remoteCatalog: " + remoteCatalog);
         _log.debug("remoteHost: " + remoteHost);
 
+        BesApi besApi = new BesGatewayApi();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        besApi.writeFile(remoteCatalog,baos);
+        ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
-        // Go get the target catalog:
-        HttpClient httpClient = new HttpClient();
-        GetMethod request = new GetMethod(remoteCatalog);
-        int statusCode = httpClient.executeMethod(request);
-
-        if (statusCode != HttpStatus.SC_OK) {
-            _log.error("Can't find catalog: " + remoteCatalog);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
-            return;
-        }
-
-        InputStream catDocIs = null;
+        String typeMatch = _besApi.getBesCombinedTypeMatch();
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //_log.debug("browseRemoteDataset() - BES Combined TypeMatch: {}",typeMatch);
 
         _datasetToHtmlTransformLock.lock();
-
         try {
             try {
-                catDocIs = request.getResponseBodyAsStream();
                 _datasetToHtmlTransform.reloadTransformIfRequired();
 
                 // Build the catalog document as an XdmNode.
                 XdmNode catDoc = _datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
-                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getContextPath());
                 _datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
                 _datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
                 _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _datasetToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
+                _datasetToHtmlTransform.setParameter("typeMatch", typeMatch);
 
 
                 // Set up the Http headers.
@@ -308,7 +332,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
             } catch (SaxonApiException sapie) {
-                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Could not ingest remote resource as a THREDDS Catalog. msg: "+sapie.getMessage());
             } finally {
                 _datasetToHtmlTransform.clearAllParameters();
 
@@ -329,50 +353,61 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
+    /**
+     * This retrieves a remote THREDDS catalog.
+     *
+     * TODO We could skip using the http client and use the BES gateway and ask for STREAM which should return the
+     * TODO catalog bytes and subject th request to the BES security stack.
+     * @param oRequest
+     * @param response
+     * @param query
+     * @throws OPeNDAPException
+     * @throws IOException
+     * @throws JDOMException
+     */
     private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
-                                     String query) throws OPeNDAPException, IOException, SaxonApiException {
-
-
-        String http = "http://";
+                                     String query) throws OPeNDAPException, IOException, JDOMException {
 
 
         // Sanitize the incoming query.
         query = query.substring("browseCatalog=".length(), query.length());
         String remoteCatalog = Scrub.completeURL(query);
 
-        if (!remoteCatalog.startsWith(http)) {
-            _log.error("Catalog Must be remote: " + Scrub.completeURL(remoteCatalog));
-            throw new BadRequest("Catalog Must be remote: " + remoteCatalog);
+        String remoteHost;
+
+        String http = "http://";
+        String https = "https://";
+        if (remoteCatalog.startsWith(https)) {
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
+        }
+        else if(remoteCatalog.startsWith(http)){
+            remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        }
+        else {
+            String msg = "Catalog Must be remote: " + Scrub.completeURL(remoteCatalog);
+            _log.error(msg);
+            throw new BadRequest(msg);
         }
 
         // Build URL for remote system:
-
-        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
         String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
-
 
         _log.debug("Remote Catalog: " + remoteCatalog);
         _log.debug("Remote Catalog Host: " + remoteHost);
         _log.debug("Remote Catalog RelativeURL: " + remoteRelativeURL);
 
+        BesApi besApi = new BesGatewayApi();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        besApi.writeFile(remoteCatalog,baos);
+        ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
-        // Go get the target catalog:
-        HttpClient httpClient = new HttpClient();
-        GetMethod request = new GetMethod(remoteCatalog);
-        int statusCode = httpClient.executeMethod(request);
-
-        if (statusCode != HttpStatus.SC_OK) {
-            _log.error("Can't find catalog: " + remoteCatalog);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
-            return;
-        }
-        InputStream catDocIs = null;
-
+        String typeMatch = _besApi.getBesCombinedTypeMatch();
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //_log.debug("browseRemoteDataset() - BES Combined TypeMatch: {}",typeMatch);
 
         _catalogToHtmlTransformLock.lock();
         try {
             try {
-                catDocIs = request.getResponseBodyAsStream();
                 _catalogToHtmlTransform.reloadTransformIfRequired();
 
                 // Build the catalog document as an XdmNode.
@@ -380,12 +415,13 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
                 _catalogToHtmlTransform.setParameter("serviceContext", _dispatchServlet.getServletContext().getContextPath());
                 _catalogToHtmlTransform.setParameter("dapService", oRequest.getServiceLocalId());
-                _datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
+                //_datasetToHtmlTransform.setParameter("serviceContext", oRequest.getServiceLocalId());
                 _catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
 
                 _catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
                 _catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+                _catalogToHtmlTransform.setParameter("typeMatch", typeMatch);
 
 
                 // Set up the Http headers.
@@ -399,18 +435,10 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
             } catch (SaxonApiException sapie) {
-                throw new BadGateway("Remote resource does not appear to reference a THREDDS Catalog.");
+                throw new BadGateway("Could not ingest remote resource as a THREDDS Catalog. msg: "+sapie.getMessage());
             } finally {
                 // Clean up the transform before releasing it.
                 _catalogToHtmlTransform.clearAllParameters();
-
-                if (catDocIs != null) {
-                    try {
-                        catDocIs.close();
-                    } catch (IOException e) {
-                        _log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
-                    }
-                }
             }
         }
         finally {
@@ -458,6 +486,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
                     return;
                 }
+
 
                 String targetDataset = query.substring("dataset=".length(), query.length());
 
@@ -598,9 +627,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-
+    @Override
     public void init(HttpServlet servlet, Element configuration) throws Exception {
+        // TODO USe an instance of BesGatewayApi here? I think it could be fine...
+        init(servlet,configuration,new BesApi());
+    }
 
+    @Override
+    public void init(HttpServlet servlet, Element configuration, BesApi besApi) throws Exception {
+
+        _besApi = besApi;
 
         String s;
 
@@ -609,74 +645,76 @@ public class StaticCatalogDispatch implements DispatchHandler {
         _dispatchServlet = servlet;
         _config = configuration;
 
+        _prefix = "thredds";
+        _useMemoryCache = true;
 
-        Element e;
+        String ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
 
-        e = _config.getChild("prefix");
-        if (e != null)
-            _prefix = e.getTextTrim();
+        Element threddsService = _config.getChild("ThreddsService");
+        if (threddsService != null) {
+            s = threddsService.getAttributeValue("prefix");
+            if (s != null)
+                _prefix = s;
 
-        if (_prefix.equals("/"))
-            throw new Exception("Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <prefix>  " +
-                    "child element whose value may not be equal to \"/\"");
+            if (_prefix.equals("/"))
+                throw new Exception("Bad Configuration. The <Handler> " +
+                        "element that declares " + this.getClass().getName() +
+                        " MUST provide 1 <prefix>  " +
+                        "child element whose value may not be equal to \"/\"");
 
-        if (!_prefix.endsWith("/"))
-            _prefix += "/";
+            if (!_prefix.endsWith("/"))
+                _prefix += "/";
 
-        while (_prefix.startsWith("/") && _prefix.length()>1)
-            _prefix = _prefix.substring(1, _prefix.length());
-
-        _log.debug("init() - prefix: {}", _prefix);
+            while (_prefix.startsWith("/") && _prefix.length()>1)
+                _prefix = _prefix.substring(1, _prefix.length());
 
 
-        e = _config.getChild("useMemoryCache");
-        if (e != null) {
-            s = e.getTextTrim();
-            if (s.equalsIgnoreCase("true")) {
-                _useMemoryCache = true;
+            s = threddsService.getAttributeValue("useMemoryCache");
+            if (s != null){
+                if(s.equalsIgnoreCase("true")) {
+                    _useMemoryCache = true;
+                }
+                else {
+                    _useMemoryCache = false;
+                }
             }
+
+            s = threddsService.getAttributeValue("allowRemote");
+            if (s != null){
+                if(s.equalsIgnoreCase("true")) {
+                    _allowRemoteCatalogTraversal = true;
+                }
+                else {
+                    _allowRemoteCatalogTraversal = false;
+                }
+            }
+
+            Element e;
+            e = threddsService.getChild("ingestTransformFile");
+            if (e != null) {
+                ingestTransformFile = e.getTextTrim();
+            }
+
         }
+        _log.debug("init() - prefix: {}", _prefix);
         _log.debug("init() - useMemoryCache: {}", _useMemoryCache);
+        _log.debug("init() - allowRemoteCatalogTraversal: {}", _allowRemoteCatalogTraversal);
+        _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
 
-        String ingestTransformFile = null;
-        e = _config.getChild("ingestTransformFile");
+        String besNodeToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, _besNodeToDatasetScanCatalogTrasformFile);
+        Element e = _config.getChild("besNodeToDatasetScanCatalogTransformFile");
         if (e != null) {
-            ingestTransformFile = e.getTextTrim();
+            besNodeToDatasetScanCatalogTransformFile = e.getTextTrim();
         }
-
-        String besCatalogToDatasetScanCatalogTransformFile = null;
-        e = _config.getChild("besCatalogToDatasetScanCatalogTransformFile");
-        if (e != null) {
-            besCatalogToDatasetScanCatalogTransformFile = e.getTextTrim();
-        }
+        _log.debug("init() - Using BES Node to DatasetScan Catalog transform file: " + besNodeToDatasetScanCatalogTransformFile);
 
         _log.debug("init() - Configuration file ingest complete.");
 
-        /* USe the generic one for now and if later we want to reuse this code we can pass in another on through the
-        config */
-        _besApi = new BesApi();
-
-        if (ingestTransformFile == null) {
-
-            ingestTransformFile = ServletUtil.getSystemPath(servlet, _staticCatalogIngestTransformFile);
-        }
-
-        _log.debug("init() - Using ingest transform file: " + ingestTransformFile);
-
-        if (besCatalogToDatasetScanCatalogTransformFile == null) {
-            besCatalogToDatasetScanCatalogTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/besCatalogToDatasetScanCatalog.xsl");
-        }
-        _log.debug("init() - Using BES ingest transform file: " + besCatalogToDatasetScanCatalogTransformFile);
-
-
-
         _log.debug("init() - Processing THREDDS catalog.xml file...");
 
-        String contentPath = ServletUtil.getConfigPath(servlet);
-        CatalogManager.init(contentPath, ingestTransformFile, besCatalogToDatasetScanCatalogTransformFile, _besApi);
+        String configPath = ServletUtil.getConfigPath(servlet);
+        CatalogManager.init(configPath, ingestTransformFile, besNodeToDatasetScanCatalogTransformFile, _besApi);
 
 
         String fileName, pathPrefix, thisUrlPrefix;
@@ -685,7 +723,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         thisUrlPrefix = s.substring(0, s.lastIndexOf(Util.basename(s)));
 
-        s = contentPath + s;
+        s = configPath + s;
         fileName = "catalog.xml";
         pathPrefix = s.substring(0, s.lastIndexOf(fileName));
 
@@ -819,19 +857,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
         try {
             catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(req));
             if (requestCanBeHandled(req)) {
-                long lm = CatalogManager.getLastModified(catalogKey);
-                _log.debug("lastModified(" + catalogKey + "): " + (lm == -1 ? "unknown" : new Date(lm)));
-                return lm;
+                long lmt = CatalogManager.getLastModified(catalogKey);
+                _log.debug("lastModified({}): {}", new Date(lmt));
+                return lmt;
             }
         }
         catch (Exception e) {
-            _log.error("Failed to get a last modified time for '" + Scrub.urlContent(catalogKey) + "'  msg: " + e.getMessage());
+            _log.error("Failed to get a last modified time for '{}' msg: {}", Scrub.urlContent(catalogKey), e.getMessage());
         }
         finally {
             Timer.stop(timedProc);
         }
 
-        return -1;
+        return new Date().getTime();
     }
 
     public void destroy() {

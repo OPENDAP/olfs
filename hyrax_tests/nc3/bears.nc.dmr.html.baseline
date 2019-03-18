@@ -1,36 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
-            ~ /////////////////////////////////////////////////////////////////////////////
-            ~ // This file is part of the "Hyrax Data Server" project.
-            ~ //
-            ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
-            ~ // Author: Nathan David Potter <ndp@opendap.org>
-            ~ //
-            ~ // This library is free software; you can redistribute it and/or
-            ~ // modify it under the terms of the GNU Lesser General Public
-            ~ // License as published by the Free Software Foundation; either
-            ~ // version 2.1 of the License, or (at your option) any later version.
-            ~ //
-            ~ // This library is distributed in the hope that it will be useful,
-            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            ~ // Lesser General Public License for more details.
-            ~ //
-            ~ // You should have received a copy of the GNU Lesser General Public
-            ~ // License along with this library; if not, write to the Free Software
-            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-            ~ //
-            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-            ~ /////////////////////////////////////////////////////////////////////////////
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter <ndp@opendap.org>
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
+      <link rel="stylesheet" href="/opendap/docs/css/collapse.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
       <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
       <script type="text/javascript" src="/opendap/js/dap4_buttons.js"> </script>
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/nc/bears.nc");
+                    DEBUG = new debug_obj();
                 </script>
       <title>DAP4 Data Request Form (beta)bears.nc</title>
    </head>
@@ -41,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -51,10 +53,6 @@
       </h1>
       <hr size="1" noshade="noshade"/>
       <form action="">
-         <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
@@ -201,7 +199,17 @@
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <script type="text/javascript">org_opendap_i = new dap_var("i", "org_opendap_i", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         i\n" +
+            "myJSVarName:   org_opendap_i\n" +
+            "checkBoxName:  get_org_opendap_i\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_i = new dap_var("i", "org_opendap_i", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_i);
@@ -240,7 +248,7 @@
                                     <div class="small">
                                        <span class="bold">attr2:
                         </span>
-                                       <span class="em">1234</span>
+                                       <span class="em">1, 2, 3, 4</span>
                                     </div>
                                  </li>
                                  <ul class="collapsibleList">
@@ -259,7 +267,7 @@
                                                 <div class="small">
                                                    <span class="bold">attr3_2:
                         </span>
-                                                   <span class="em">192327</span>
+                                                   <span class="em">19, 23, 27</span>
                                                 </div>
                                              </li>
                                           </ul>
@@ -270,7 +278,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_j = new dap_var("j", "org_opendap_j", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         j\n" +
+            "myJSVarName:   org_opendap_j\n" +
+            "checkBoxName:  get_org_opendap_j\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_j = new dap_var("j", "org_opendap_j", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_j);
@@ -294,7 +312,17 @@
                      <script type="text/javascript">org_opendap_j.addDimension(org_opendap_j_dim_1,3);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_bears = new dap_var("bears", "org_opendap_bears", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         bears\n" +
+            "myJSVarName:   org_opendap_bears\n" +
+            "checkBoxName:  get_org_opendap_bears\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_bears = new dap_var("bears", "org_opendap_bears", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_bears);
@@ -358,14 +386,14 @@
                                     <div class="small">
                                        <span class="bold">acf:
                         </span>
-                                       <span class="em">-2.000000001.000000000.00000000</span>
+                                       <span class="em">-2.00000000, 1.00000000, 0.00000000</span>
                                     </div>
                                  </li>
                                  <li>
                                     <div class="small">
                                        <span class="bold">acd:
                         </span>
-                                       <span class="em">-1.0000000000000000.7500000000000000</span>
+                                       <span class="em">-1.000000000000000, 0.7500000000000000</span>
                                     </div>
                                  </li>
                                  <li>
@@ -379,7 +407,17 @@
                            </li>
                         </ul>
                      </div>
-                     <script type="text/javascript">org_opendap_order = new dap_var("order", "org_opendap_order", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         order\n" +
+            "myJSVarName:   org_opendap_order\n" +
+            "checkBoxName:  get_org_opendap_order\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_order = new dap_var("order", "org_opendap_order", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_order);
@@ -414,7 +452,17 @@
                      <script type="text/javascript">org_opendap_order.addDimension(org_opendap_order_dim_2,3);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_shot = new dap_var("shot", "org_opendap_shot", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         shot\n" +
+            "myJSVarName:   org_opendap_shot\n" +
+            "checkBoxName:  get_org_opendap_shot\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_shot = new dap_var("shot", "org_opendap_shot", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_shot);
@@ -449,7 +497,17 @@
                      <script type="text/javascript">org_opendap_shot.addDimension(org_opendap_shot_dim_2,3);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_aloan = new dap_var("aloan", "org_opendap_aloan", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         aloan\n" +
+            "myJSVarName:   org_opendap_aloan\n" +
+            "checkBoxName:  get_org_opendap_aloan\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_aloan = new dap_var("aloan", "org_opendap_aloan", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_aloan);
@@ -484,7 +542,17 @@
                      <script type="text/javascript">org_opendap_aloan.addDimension(org_opendap_aloan_dim_2,3);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_cross = new dap_var("cross", "org_opendap_cross", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         cross\n" +
+            "myJSVarName:   org_opendap_cross\n" +
+            "checkBoxName:  get_org_opendap_cross\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_cross = new dap_var("cross", "org_opendap_cross", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_cross);
@@ -519,7 +587,17 @@
                      <script type="text/javascript">org_opendap_cross.addDimension(org_opendap_cross_dim_2,3);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
-                     <script type="text/javascript">org_opendap_l = new dap_var("l", "org_opendap_l", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         l\n" +
+            "myJSVarName:   org_opendap_l\n" +
+            "checkBoxName:  get_org_opendap_l\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_l = new dap_var("l", "org_opendap_l", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_l);
@@ -547,28 +625,192 @@
                </td>
             </tr>
          </table>
+         <hr size="1" noshade="noshade"/>
+         <table width="100%" border="0">
+            <tr>
+               <td class="small">
+                  <input type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+               </td>
+               <td>
+                  <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                  </div>
+               </td>
+            </tr>
+         </table>
       </form>
-      <hr size="1" noshade="noshade"/>
-      <table width="100%" border="0">
-         <tr>
-            <td/>
-            <td>
-               <div class="small" align="right">Hyrax development sponsored by
-                                <a href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/">NASA
-                                </a>
-                                , and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-               </div>
-            </td>
-         </tr>
-      </table>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-                    <br/>
-         <a href="/opendap/docs/">Documentation</a>
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/nc/bears.nc.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/nc/bears.nc.dmr.html%0A# query_string: n/a%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "bears.nc",
+  "url": "http://localhost:8080/opendap/data/nc/bears.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/bears.nc",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "history", 
+          "value": "This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Unlimited_Dimension", 
+          "value": "k"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "i",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "2"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "j",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "l",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "i",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "attr1", 
+        "value": "1"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "attr2", 
+        "value": [ "1", "2", "3", "4" ]      },
+        {
+          "@type": "PropertyValue", 
+          "name": "attr3_1", 
+          "value": "17"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "attr3_2", 
+          "value": [ "19", "23", "27" ]        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "j",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "bears",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "act", 
+        "value": "text string\\012\\011123"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acs", 
+        "value": "-40"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acl", 
+        "value": "17000"      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acf", 
+        "value": [ "-2.00000000", "1.00000000", "0.00000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "acd", 
+        "value": [ "-1.000000000000000", "0.7500000000000000" ]      },
+      {
+        "@type": "PropertyValue", 
+        "name": "string_length", 
+        "value": "3"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "order",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "shot",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "aloan",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "cross",
+    "valueReference": [ 
+
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "l",
+    "valueReference": [ 
+
+    ]
+  }
+  ]
+}
+</script>
    </body>
-   <script>CollapsibleLists.apply(true);</script>
+   <script type="text/javascript">
+                CollapsibleLists.apply(true);
+                initCollapsibles("/opendap/docs");
+            </script>
 </xhtml>

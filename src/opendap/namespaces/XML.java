@@ -36,6 +36,10 @@ import org.jdom.Namespace;
  * To change this template use File | Settings | File Templates.
  */
 public class XML {
+    /**
+     * This class should never be instantiated.
+     */
+    private XML(){ throw new IllegalStateException("opendap.namespaces.XML class"); }
 
     public static final String NAMESPACE_STRING = "http://www.w3.org/XML/1998/namespace";
     public static final String NAMESPACE_PREFIX = "xml";

@@ -26,12 +26,14 @@
 
 package opendap.coreServlet;
 
+import opendap.bes.dap2Responders.BesApi;
 import org.jdom.Element;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,6 +44,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class NoPostHandler implements DispatchHandler {
     public void init(HttpServlet servlet, Element config) throws Exception {
+        // Do nothing
+    }
+
+    public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
         // Do nothing
     }
 
@@ -57,7 +63,7 @@ public class NoPostHandler implements DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;  // punt...
+        return new Date().getTime();  // Return current date/time
     }
 
     public void destroy() {

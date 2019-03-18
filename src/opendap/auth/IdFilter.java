@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.PathBuilder;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -41,15 +42,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class IdFilter implements Filter {
 
     private Logger _log;
 
-    public static final String ORIGINAL_REQUEST_URL = "original_request_url";
-    public static final String USER_PROFILE         = "user_profile";
-    public static final String IDENTITY_PROVIDER    = "identity_provider";
+    public static final String RETURN_TO_URL      = "return_to_url";
+    public static final String USER_PROFILE       = "user_profile";
+    public static final String IDENTITY_PROVIDER  = "identity_provider";
 
     private boolean _is_initialized;
     private FilterConfig _filterConfig;
@@ -71,14 +73,14 @@ public class IdFilter implements Filter {
         try {
             init();
         }
-        catch (IOException | JDOMException | ConfigurationException se){
+        catch (IOException | JDOMException se){
             _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
         }
 
     }
 
-    public void init() throws IOException, JDOMException, ConfigurationException {
+    public void init() throws IOException, JDOMException {
 
         if(_is_initialized)
             return;
@@ -125,60 +127,53 @@ public class IdFilter implements Filter {
     }
 
 
-
-
-
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        if(!_is_initialized) {
+        if (!_is_initialized) {
             try {
                 init();
-            }
-            catch (IOException | JDOMException | ConfigurationException e){
+            } catch (IOException | JDOMException e) {
                 String msg = "doFilter() - IdFilter INITIALIZATION HAS FAILED! " +
-                        "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
+                        "Caught " + e.getClass().getName() + " Message: " + e.getMessage();
                 _log.error(msg);
+                OPeNDAPException.setCachedErrorMessage(msg);
                 throw new ServletException(msg,e);
             }
         }
 
-        HttpServletRequest  hsReq = (HttpServletRequest)  request;
+        HttpServletRequest hsReq = (HttpServletRequest) request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
-        String contextPath =  hsReq.getContextPath();
+        String contextPath = hsReq.getContextPath();
 
         String query = hsReq.getQueryString();
-        String requestUrl = hsReq.getRequestURL().toString() + ((query!=null)?("?"+ query):"");
+        String requestUrl = hsReq.getRequestURL().toString() + ((query != null) ? ("?" + query) : "");
 
 
         // Get session, make new as needed.
         HttpSession session = hsReq.getSession(true);
 
         // Intercept login/logout requests
-        if( requestURI.equals(AuthenticationControls.getLogoutEndpoint()) )
-        {
+        if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
             doLogout(hsReq, hsRes);
             return;
-        }
-        else if( AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint()) )
-        {
+        } else if (AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
             doLandingPage(hsReq, hsRes);
             return;
-        }
-        else if( _enableGuestProfile && requestURI.equals(_guest_endpoint) )
-        {
+        } else if (_enableGuestProfile && requestURI.equals(_guest_endpoint)) {
             doGuestLogin(hsReq, hsRes);
             return;
-        }
-        else
-        {
+        } else {
             // Check IdProviders to see if this request is a valid login context.
-            for(IdProvider idProvider: IdPManager.getProviders()){
+            for (IdProvider idProvider : IdPManager.getProviders()) {
+
                 String loginEndpoint = idProvider.getLoginEndpoint();
                 if(requestURI.equals(loginEndpoint)) {
-                    String returnToUrl =  (String) session.getAttribute(ORIGINAL_REQUEST_URL);
-                    if(returnToUrl!=null && returnToUrl.equals(loginEndpoint))
-                        session.setAttribute(ORIGINAL_REQUEST_URL,contextPath);
+                    synchronized (session) {
+                        String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
+                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint))
+                            session.setAttribute(RETURN_TO_URL, contextPath);
+                    }
                     try {
                         //
                         // Run the login gizwhat. This may involve simply collecting credentials from the user and
@@ -187,7 +182,7 @@ public class IdFilter implements Filter {
                         // to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
                         // complete.
                         //
-                        idProvider.doLogin(hsReq,hsRes);
+                        idProvider.doLogin(hsReq, hsRes);
                         //
                         // We return here and don't do the filter chain because the "doLogin" method will, when
                         // completed send a 302 redirect to the client. Thus we want the process to stop here until
@@ -195,13 +190,19 @@ public class IdFilter implements Filter {
                         //
                         return;
 
-                    } catch (Exception e) {
-                        _log.error("doFilter() - {} Login Interaction FAILED! Message: {}",idProvider.getAuthContext(), e.getMessage());
-                        throw new IOException(e);
+                    } catch (IOException e) {
+                        String msg = "Your Login Transaction FAILED!   " +
+                                     "Authentication Context: '"+idProvider.getAuthContext()+
+                                     "'   Message: "+ e.getMessage();
+                        _log.error("doFilter() - " + msg);
+                        OPeNDAPException.setCachedErrorMessage(msg);
+                        ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                        return;
                     }
                 }
             }
         }
+
         //
         // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
         // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
@@ -209,20 +210,47 @@ public class IdFilter implements Filter {
         // authenticated user.
         //
         UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
-        if(up != null) {
+        if (up != null) {
             AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
             authReq.setUid(up.getUID());
             hsReq = authReq;
         }
         // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
-        session.setAttribute(ORIGINAL_REQUEST_URL,requestUrl);
-
+        synchronized(session) {
+            cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+        }
         filterChain.doFilter(hsReq, hsRes);
     }
 
     public void destroy() {
         _log = null;
+    }
+
+
+    /**
+     * Here we make sure that request is really for something that the user would like to return to before we cache
+     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
+     * @param session
+     * @param requestUrl
+     * @param requestURI
+     * @param contextPath
+     */
+    private void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
+
+        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
+        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
+        String jsPath = PathBuilder.pathConcat(contextPath,"js");
+        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
+
+        if(requestURI.startsWith(docsPath) ||
+                requestURI.startsWith(xslPath) ||
+                requestURI.startsWith(jsPath)  ||
+                requestURI.startsWith(webStartPath)
+                ){
+            return;
+        }
+        session.setAttribute(RETURN_TO_URL,requestUrl);
     }
 
 
@@ -240,7 +268,7 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             _log.info("doLogout() - Got session...");
-            String href = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            String href = (String) session.getAttribute(RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
 
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
@@ -249,7 +277,7 @@ public class IdFilter implements Filter {
                 IdProvider idProvider = up.getIdP();
                 if (idProvider != null) {
                     _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getAuthContext());
-                    // Redirect to ORIGINAL_REQUEST_URL is done by idProvider
+                    // Redirect to RETURN_TO_URL is done by idProvider
                     idProvider.doLogout(request, response);
                     _log.info("doLogout() - END");
                     return;
@@ -264,7 +292,13 @@ public class IdFilter implements Filter {
         if(session!=null)
             session.invalidate();
 
-        response.sendRedirect(redirectUrl);
+        try {
+            response.sendRedirect(redirectUrl);
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
         _log.info("doLogout() - END");
     }
 
@@ -290,17 +324,25 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         String redirectUrl = request.getContextPath();
         if(session != null) {
-            redirectUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+            redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
             session.invalidate();
         }
-        session = request.getSession(true);
-        session.setAttribute(ORIGINAL_REQUEST_URL, redirectUrl);
-        session.setAttribute(USER_PROFILE, new GuestProfile());
+        HttpSession guest_session = request.getSession(true);
+        synchronized (guest_session) {
+            guest_session.setAttribute(RETURN_TO_URL, redirectUrl);
+            guest_session.setAttribute(USER_PROFILE, new GuestProfile());
+        }
 
         //
         // Finally, redirect the user back to the their original requested resource.
         //
-        response.sendRedirect(redirectUrl);
+        try {
+            response.sendRedirect(redirectUrl);
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
 	}
 
 
@@ -321,7 +363,8 @@ public class IdFilter implements Filter {
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
 
-        noProfile.append("<i>You may login using one of these identity providers:</i>");
+
+        noProfile.append("<b><i>You may login using one of these identity providers:</i></b>");
 
         noProfile.append("<ul>");
 
@@ -337,6 +380,16 @@ public class IdFilter implements Filter {
             noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
             noProfile.append("</ul>");
         }
+        if(session!=null){
+            String origUrl = (String) session.getAttribute(RETURN_TO_URL);
+            noProfile.append("<dl>");
+            if(origUrl!=null){
+                noProfile.append("<dt><b>").append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
+            }
+            noProfile.append("</dl>");
+        }
+
+
         _log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -345,7 +398,14 @@ public class IdFilter implements Filter {
         _log.debug("doLandingPage() - Writing page contents.");
 
         // Generate the html page header
-		PrintWriter out = response.getWriter();
+        PrintWriter out;
+        try {
+            out = response.getWriter();
+        }
+        catch(IOException e){
+            OPeNDAPException.setCachedErrorMessage(e.getMessage());
+            throw e;
+        }
 		out.println("<html><head><title></title></head>");
 		out.println("<body><h1>"+AuthenticationControls.getLoginBanner()+"</h1>");
         out.println("<hr/>");
@@ -365,22 +425,36 @@ public class IdFilter implements Filter {
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                String first_name = userProfile.getAttribute("first_name").replaceAll("\"","");
-                String last_name =  userProfile.getAttribute("last_name").replaceAll("\"","");
+                String first_name = userProfile.getAttribute("first_name");
+                if(first_name!=null)
+                    first_name = first_name.replaceAll("\"","");
+
+                String last_name =  userProfile.getAttribute("last_name");
+                if(last_name!=null)
+                    last_name = last_name.replaceAll("\"","");
 
     		    out.println("<p>Greetings " + first_name + " " + last_name + ", this is your profile.</p>");
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
     		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
                 out.println("<h3>"+first_name+"'s Profile</h3>");
 
-                String origUrl = (String) session.getAttribute(ORIGINAL_REQUEST_URL);
+                String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
                 out.println("<dl>");
                 if(origUrl!=null){
-                    out.println("<dt><b>"+ORIGINAL_REQUEST_URL+"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                    out.println("<dt><b>"+ RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
                 out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
+
+                OAuthAccessToken oaToken = (OAuthAccessToken) session.getAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN);
+
+                if(oaToken != null){
+                    out.println("<dt><b>"+OAuthAccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
+
+                }
                 out.println("</dl>");
+
+
 
                 out.println("<hr />");
                 out.println("<pre>");

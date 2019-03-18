@@ -25,44 +25,86 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#"
-                >
-    <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+    xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+    <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes"/>
 
     <xsl:param name="serviceContext"/>
     <xsl:param name="docsService"/>
     <xsl:param name="HyraxVersion"/>
+    <xsl:param name="JsonLD"/>
+    <xsl:param name="supportLink"/>
+    <xsl:param name="userId" />
+    <xsl:param name="loginLink" />
+    <xsl:param name="logoutLink" />
 
+    <xsl:variable name="debug" select="false()"/>
 
-    <!-- xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable> -->
-    <!-- xsl:variable name="datasetUrl">http://ec2-54-242-224-73.compute-1.amazonaws.com:8080/opendap/hyrax/data/nc/fnoc1.nc</xsl:variable -->
     <xsl:variable name="datasetUrl">
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
     <xsl:key name="DimensionNames" match="dap:Dimension" use="@name"/>
 
-
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
         <xhtml>
             <head>
+                <link rel="stylesheet" href="{$docsService}/css/collapse.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/contents.css" type="text/css"/>
                 <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
-                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js">
-                    <xsl:value-of select="' '"/>
-                </script>
-                <script type="text/javascript" src="{$serviceContext}/js/dap4_buttons.js">
-                    <xsl:value-of select="' '"/>
-                </script>
-                <script type="text/javascript">
-                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
-                </script>
 
-                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/>
-                </title>
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
+                    <xsl:value-of select="' '"/>
+                </xsl:element>
+
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/dap4_buttons.js</xsl:attribute>
+                    <xsl:value-of select="' '"/>
+                </xsl:element>
+
+                <xsl:element name="script">
+                    <xsl:attribute name="type">text/javascript</xsl:attribute>
+                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
+                    DEBUG = new debug_obj();
+                </xsl:element>
+
+                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>
             </head>
             <body>
+                <!-- ****************************************************** -->
+                <!--                      LOGIN UI                          -->
+                <!--                                                        -->
+                <!--                                                        -->
+                <xsl:choose>
+                    <xsl:when test="$userId">
+
+                        <div style='float: right;vertical-align:middle;font-size:small;'>
+                            <xsl:choose>
+                                <xsl:when test="$loginLink">
+                                    <b><a href="{$loginLink}"><xsl:value-of select="$userId"/></a></b> <br/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <b><xsl:value-of select="$userId"/></b><br/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="$logoutLink"><a style="color: green;" href="{$logoutLink}">logout</a></xsl:if>
+                        </div>
+
+
+                    </xsl:when>
+                    <xsl:otherwise>
+
+                        <xsl:if test="$loginLink">
+                            <div style='float: right;vertical-align:middle;font-size:small;'>
+                                <a style="color: green;" href="{$loginLink}">login</a>
+                            </div>
+                        </xsl:if>
+
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <!-- ****************************************************** -->
                 <!--                      PAGE BANNER                       -->
@@ -74,7 +116,7 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">DAP4 Data Access Form</div>
+                            <div class="large">OPeNDAP Data Access Form</div>
                         </td>
                     </tr>
                 </table>
@@ -93,10 +135,6 @@
                 <!--                                                        -->
                 <!--                                                        -->
                 <form action="">
-                    <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
 
 
                     <table width="100%" border="0">
@@ -116,41 +154,55 @@
 
                     </table>
 
+                    <!-- ****************************************************** -->
+                    <!--                              FOOTER                    -->
+                    <!--                                                        -->
+                    <!--                                                        -->
+                    <hr size="1" noshade="noshade"/>
+                    <table width="100%" border="0">
+                        <tr>
+                            <td class="small">
+                                <input  type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+                            </td>
+                            <td>
+                                <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
                 </form>
-                <!-- ****************************************************** -->
-                <!--                              FOOTER                    -->
-                <!--                                                        -->
-                <!--                                                        -->
-                <hr size="1" noshade="noshade"/>
-                <table width="100%" border="0">
-                    <tr>
-                        <td></td>
-                        <td>
-                            <div class="small" align="right">Hyrax development sponsored by
-                                <a
-                                        href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/"
-                                >NASA
-                                </a>
-                                , and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
 
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
                 <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-                    <br/>
-                    <a href="{$docsService}/">Documentation</a>
+                    <div>
+                        <a href="{$docsService}/">Documentation</a>
+                        <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+                            <a href="{$supportLink}">Questions? Contact Support</a>
+                        </span>
+                    </div>
                 </h3>
 
+                <xsl:if test="$JsonLD">
+                    <xsl:element name="script">
+                        <xsl:attribute name="type">application/ld+json</xsl:attribute>
+                        <xsl:value-of select="$JsonLD" />
+                    </xsl:element>
+                </xsl:if>
             </body>
-            <script>CollapsibleLists.apply(true);</script>
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                CollapsibleLists.apply(true);
+                initCollapsibles("<xsl:value-of select="$docsService"/>");
+            </xsl:element>
 
         </xhtml>
 
@@ -241,7 +293,7 @@
             <xsl:otherwise>
                 <xsl:call-template name="ContainerTypeWorker">
                 </xsl:call-template>
-            </xsl:otherwise>
+        </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -260,18 +312,24 @@
         </xsl:if>
 
         <div class="tightView">
-            <ul class="collapsibleList">
-                <li>
-                    <div class="small_bold" style="color:#527CC1;">members</div>
-                    <ul>
-                        <xsl:apply-templates select="./*[not(self::dap:Attribute | self::dap:Dimension)]">
-                            <xsl:with-param name="container">
-                                <xsl:call-template name="computeVarName"/>
-                            </xsl:with-param>
-                        </xsl:apply-templates>
-                    </ul>
-                </li>
-            </ul>
+            <!-- This makes the collapsible view once it's initialized by initCollapsibles() -->
+            <button type="button" class="collapsible" onclick="doNothing()">
+                <img style="padding-right: 3px;" alt="click-to-open" src="{$docsService}/images/button-closed.png" />member variables
+            </button>
+            <div class="content">
+                <ul>
+                    <xsl:choose>
+                        <xsl:when test="true()">
+                            <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
+                                <xsl:with-param name="container">
+                                    <xsl:call-template name="computeVarName"/>
+                                </xsl:with-param>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:otherwise><li>no members shown</li></xsl:otherwise>
+                    </xsl:choose>
+                </ul>
+            </div>
         </div>
     </xsl:template>
 
@@ -316,7 +374,17 @@
         </xsl:variable>
 
 
-        <script type="text/javascript">
+        <xsl:element name="script">
+            <xsl:attribute name="type">text/javascript</xsl:attribute>
+            if(DEBUG.enabled()) alert(
+            "myFQN:         <xsl:value-of select="$myFQN"/>\n" +
+            "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n" +
+            "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
+            "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
+            "isArray:       <xsl:value-of select="$isArray"/>\n" +
+            "(parent) container: <xsl:value-of select="$container"/>\n"
+            );
+
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
@@ -329,8 +397,7 @@
                 <xsl:value-of select="$container"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
                 <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$container"/>;
             </xsl:if>
-
-        </script>
+        </xsl:element>
 
         <div style="color: black;margin-left:-20px;margin-top:10px">
             <input type="checkbox" id="{$checkBoxName}"
@@ -372,6 +439,7 @@
     <xsl:template name="DimHeader">
 
         <xsl:for-each select="dap:Dim">
+
             <xsl:variable name="dimName">
                 <xsl:choose>
                     <xsl:when test="starts-with(@name,'/')">
@@ -382,6 +450,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
+
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
@@ -409,10 +478,11 @@
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
                    onChange="DAP4_URL.update_url()"/>
-            <script type="text/javascript">
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
                 <xsl:value-of select="$myJSVarName"/>.addDimension(<xsl:value-of select="$dimTag"/>,<xsl:value-of
                     select="$dimSize"/>);
-            </script>
+            </xsl:element>
         </xsl:for-each>
     </xsl:template>
 
@@ -449,26 +519,29 @@
             <xsl:value-of select="$myJSVarName"/>_rValueWidget_<xsl:value-of select="$index"/>
         </xsl:variable>
 
+        <xsl:variable name="selectionId" select="concat($myJSVarName,'_selection')" />
 
-        <span class="medium" style="margin-left: 10px;">
+        <div class="medium" style="margin-left: 10px;padding: 1px;" id="{$selectionId}">
             <xsl:value-of select="@name"/>
-        </span>
-        <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_URL.update_url()">
-            <option value="=" selected="">=</option>
-            <option value="!=">!=</option>
-            <option value="&lt;">&lt;</option>
-            <option value="&lt;=">&lt;=</option>
-            <option value=">">&gt;</option>
-            <option value=">=">&gt;=</option>
-            <option value="-">--</option>
-        </select>
-        <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
-               onChange="DAP4_URL.update_url()"/>
+            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_URL.update_url()">
+                <option value="==" selected="">==</option>
+                <option value="!=">!=</option>
+                <option value="&lt;">&lt;</option>
+                <option value="&lt;=">&lt;=</option>
+                <option value=">">&gt;</option>
+                <option value=">=">&gt;=</option>
+                <option value="-">--</option>
+            </select>
+            <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
+                   onChange="DAP4_URL.update_url()"/>
+        </div>
 
-        <script type="text/javascript">
-            <xsl:value-of select="$myJSVarName"/>.addSelectionClause(<xsl:value-of select="$relOpWidget"/>,<xsl:value-of
-                select="$rValueWidget"/>);
-        </script>
+        <xsl:element name="script">
+            <xsl:attribute name="type">text/javascript</xsl:attribute>
+            <xsl:value-of select="$myJSVarName"/>.addSelectionClause("<xsl:value-of select="$selectionId"/>",
+            <xsl:value-of select="$relOpWidget"/>,
+            <xsl:value-of select="$rValueWidget"/>);
+        </xsl:element>
 
     </xsl:template>
 
@@ -479,6 +552,7 @@
      -
      -
     -->
+    <!--
     <xsl:template name="AttributeHeader">
         <xsl:param name="container"/>
 
@@ -516,14 +590,15 @@
 
 
     </xsl:template>
+    -->
     <!-- ################################################################### -->
 
 
     <!-- ###################################################################
-     -
-     -    isContainerType
-     -
-     -
+    -
+    -    isContainerType
+    -
+    -
     -->
     <xsl:template name="isContainerType">
         <xsl:choose>
@@ -549,7 +624,7 @@
             <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and not(parent::dap:Map)">
                 <xsl:value-of select="$separator"/>
             </xsl:if>
-            <xsl:value-of select="translate(@name,' ','_')"/>
+            <xsl:value-of select="translate(@name,' .','__')"/>
         </xsl:if>
     </xsl:template>
     <!-- ################################################################### -->
@@ -605,12 +680,12 @@
                 <ul class="collapsibleList">
                     <li>
                         <div class="tightView">
-                            <div class="small_bold">
-                                <xsl:value-of select="@name"/>
-                            </div>
-                            <ul>
-                                <xsl:apply-templates/>
-                            </ul>
+                        <div class="small_bold">
+                            <xsl:value-of select="@name"/>
+                        </div>
+                        <ul>
+                            <xsl:apply-templates/>
+                        </ul>
                         </div>
                     </li>
                 </ul>
@@ -622,11 +697,8 @@
                         <span class="bold"><xsl:value-of select="@name"/>:
                         </span>
                         <span class="em">
-                            <xsl:for-each select="dap:Value">
-                                <xsl:value-of select="."/>
-                            </xsl:for-each>
+                            <xsl:for-each select="dap:Value"><xsl:if test="(position( )) > 1">, </xsl:if><xsl:value-of select="."/></xsl:for-each>
                         </span>
-
                     </div>
                 </li>
 
@@ -661,6 +733,8 @@
             <td>
                 <div style="width:100%;margin-left:10px;">
                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
+                    <!-- CoverageJSON needs a DAP4 implementation in the BES -->
+                    <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
@@ -686,7 +760,7 @@
                 </div>
             </td>
             <td>
-                <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"></input>
+                <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"> </input>
             </td>
         </tr>
     </xsl:template>
@@ -746,7 +820,7 @@
     </xsl:template>
 
     <!-- ######################################## -->
-    <!--            Dimensions Row                 -->
+    <!--            DAP4 Dimensions Row           -->
     <xsl:template name="DimensionsRow">
         <tr>
             <td align="right" style="vertical-align:text-top">
@@ -789,29 +863,29 @@
 
     <xsl:template name="copyright">
         <xsl:comment>
-            ~ /////////////////////////////////////////////////////////////////////////////
-            ~ // This file is part of the "Hyrax Data Server" project.
-            ~ //
-            ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
-            ~ // Author: Nathan David Potter &lt;ndp@opendap.org&gt;
-            ~ //
-            ~ // This library is free software; you can redistribute it and/or
-            ~ // modify it under the terms of the GNU Lesser General Public
-            ~ // License as published by the Free Software Foundation; either
-            ~ // version 2.1 of the License, or (at your option) any later version.
-            ~ //
-            ~ // This library is distributed in the hope that it will be useful,
-            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            ~ // Lesser General Public License for more details.
-            ~ //
-            ~ // You should have received a copy of the GNU Lesser General Public
-            ~ // License along with this library; if not, write to the Free Software
-            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-            ~ //
-            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-            ~ /////////////////////////////////////////////////////////////////////////////
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter &lt;ndp@opendap.org&gt;
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
         </xsl:comment>
     </xsl:template>
 

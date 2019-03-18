@@ -34,17 +34,18 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
 
 
 public class RDF extends Dap4Responder {
@@ -92,11 +93,7 @@ public class RDF extends Dap4Responder {
 
         log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + resourceID);
 
-
-
         BesApi besApi = getBesApi();
-
-
 
         // Set the response headers
 
@@ -111,10 +108,8 @@ public class RDF extends Dap4Responder {
         response.setContentType(responseMediaType.getMimeType());
 
 
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
-
-        // response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         Document ddx = new Document();
         besApi.getDDXDocument(resourceID, constraintExpression, xmlBase, ddx);
@@ -123,7 +118,6 @@ public class RDF extends Dap4Responder {
 
         log.debug(xmlo.outputString(ddx));
 
-        ServletOutputStream os = response.getOutputStream();
         StreamSource ddxStreamSource  =
                 new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes( HyraxStringEncoding.getCharset())));
 
@@ -145,18 +139,16 @@ public class RDF extends Dap4Responder {
         String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
         Transformer xml2rdf = new Transformer(proc, xml2rdfFileName);
 
-
         // set the destination of the 1st transform to be the 2nd transform
         addRdfId2DdxTransform.setDestination(xml2rdf);
+
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
 
         // Set the destination of the 2nd transform to be the response OutputStream
         xml2rdf.setOutputStream(os);
 
-
-
         // run the 1st transform. This will send the result through the 2nd transform and
         // the result of the 2nd transform will then be sent out the response OutputStream
-
 
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
@@ -164,12 +156,8 @@ public class RDF extends Dap4Responder {
             sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
-
-
-        log.info("Sent RDF version of DDX.");
-
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 

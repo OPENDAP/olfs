@@ -27,22 +27,31 @@
 package opendap.bes;
 
 import opendap.bes.dap2Responders.BesApi;
+import opendap.PathBuilder;
+import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.auth.AuthenticationControls;
+import opendap.ppt.PPTException;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 
 /**
@@ -58,40 +67,25 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private HttpServlet dispatchServlet;
     private String systemPath;
 
-
     private BesApi _besApi;
-
-    private String _loginPath;
-    private String _logoutPath;
 
 
     public DirectoryDispatchHandler() {
-
-
-
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
-        _loginPath = null;
-        _logoutPath = null;
-
     }
 
-
-
     public void init(HttpServlet s, Element config) throws Exception {
+        init(s,config,new BesApi());
+    }
+
+    public void init(HttpServlet s, Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
 
         dispatchServlet = s;
         systemPath = ServletUtil.getSystemPath(s,"");
-
-        _besApi = new BesApi();
-
-
-        // Moved this step to opendap.coreServlet.DispatchServlet
-        // Element loginControls = config.getChild("AuthenticationControls");
-        // AuthenticationControls.init(loginControls,s.getServletContext().getContextPath());
-
+        _besApi = besApi;
         initialized = true;
     }
 
@@ -131,7 +125,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         catch (Exception e) {
             log.debug("getLastModified():  Returning: -1");
-            return -1;
+            return new Date().getTime();
         }
     }
 
@@ -228,65 +222,59 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                                HttpServletResponse response)
             throws Exception {
 
-
-        log.info("sendDIR() request = " + request);
-
-        // String context = request.getContextPath();
-
+        log.info("xsltDir() BEGIN request = " + request);
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dap_directory");
         response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
 
-
-        //Cache-Control: max-age=0, no-cache, no-store
-
-        // response.setStatus(HttpServletResponse.SC_OK);
-
         Request oreq = new Request(null,request);
 
         String collectionName  = getCollectionName(oreq);
+        String collectionURL = PathBuilder.pathConcat(ReqInfo.getServiceUrl(request),collectionName);
 
+        Document showNodeDoc = new Document();
+        _besApi.getBesNode(collectionName, showNodeDoc);
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        if(log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
+        }
+        JDOMSource besNode = new JDOMSource(showNodeDoc);
 
-        Document showCatalogDoc = new Document();
-
-        _besApi.getBesCatalog(collectionName, showCatalogDoc);
-
-        log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
-
-        JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
+        AdminInfo adminInfo = _besApi.getAdminInfo(collectionName);
+        String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-
         if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-            xsltDoc = systemPath + "/xsl/contents.xsl";
+            xsltDoc = systemPath + "/xsl/node_contents.xsl";
+
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String supportEmail = _besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
         Transformer transformer = new Transformer(xsltDoc);
-
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
+        transformer.setParameter("collectionURL",collectionURL);
+        transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
+        transformer.setParameter("supportLink", mailtoHrefAttributeValue);
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
-
 
         AuthenticationControls.setLoginParameters(transformer,request);
 
         // Transform the BES  showCatalog response into a HTML page for the browser
-        transformer.transform(besCatalog, response.getOutputStream());
+        transformer.transform(besNode, response.getOutputStream());
         // transformer.transform(besCatalog, System.out);
 
-
-
-
     }
+
 
     private String getCollectionName(Request oreq){
 
         String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
-
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
         }
@@ -294,11 +282,19 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
+        collectionName = PathBuilder.normalizePath(collectionName, true, false);
+
+        /*
+        while(!collectionName.equals("/") && collectionName.startsWith("/"))
+            collectionName = collectionName.substring(1);
+
+        if(!collectionName.equals("/"))
+            collectionName = "/" + collectionName;
+
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
-        while(!collectionName.equals("/") && collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1);
+        */
 
         log.debug("collectionName:  "+collectionName);
 

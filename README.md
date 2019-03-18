@@ -1,20 +1,24 @@
 
 # Hyrax/OLFS
 
-Hyrax Version 1.14.0  (16 October 2017)
-OLFS  Version 1.17.0  (16 October 2017)
+Hyrax Version 1.15.3  (25 February 2019)    
+OLFS  Version 1.18.3  (25 February 2019)    
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2576022.svg)](https://doi.org/10.5281/zenodo.2576022)
 
-[![DOI](https://www.zenodo.org/badge/26560831.svg)](https://www.zenodo.org/badge/latestdoi/26560831)
 
-The file install.html or docs/index.html may have additional information...
+### OLFS-1.18.3 requires
+* BES Version 3.20.3 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2576017.svg)](https://doi.org/10.5281/zenodo.2576017)
+* libdap Version 3.20.3 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2566512.svg)](https://doi.org/10.5281/zenodo.2566512)
+
+_The files `install.html` and/or `docs/index.html` may have additional information._
 
 ### First:
 
-Build and install bes and at minimum the netcdf_handler projects.
+Build and install the [`libdap4`](https://github.com/OPENDAP/libdap4) and [`bes`](https://github.com/OPENDAP/bes) projects.
 
-Launch the bes (you can use besctl to do that). 
+Launch the bes (you can use `besctl` to do that). 
 
-Make sure there s a beslistener process running.
+Make sure there is a _beslistener_ process running.
 
 ### Check it out:
 

@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -160,18 +161,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     }
 
 
-    /*
-    public long getLastModified(HttpServletRequest req) {
-
-        long lmt;
-        lmt = -1;
-        return lmt;
-
-
-    }
-    */
-
-
     /**
      * Gets the last modified date of the requested resource. Because the data handler is really
      * the only entity capable of determining the last modified date the job is passed  through to it.
@@ -181,27 +170,15 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      *         since midnight January 1, 1970 GMT
      */
     protected long getLastModified(HttpServletRequest req) {
-
         RequestCache.openThreadCache();
-
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "ADMIN_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
-
-        if (ReqInfo.isServiceOnlyRequest(req))
-            return -1;
-
-
+        LogUtil.logServerAccessStart(req, LogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
         try {
-            return -1;
-
-        } catch (Exception e) {
-            return -1;
-        } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, "ADMIN_SERVICE_ACCESS");
-
+            return new Date().getTime();
         }
-
-
+        finally {
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID);
+        }
     }
 
 
@@ -228,7 +205,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, LogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -268,7 +245,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, "ADMIN_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, LogUtil.ADMIN_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -280,7 +257,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, LogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -316,7 +293,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, "ADMIN_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(request_status, LogUtil.ADMIN_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }

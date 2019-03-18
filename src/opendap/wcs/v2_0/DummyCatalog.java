@@ -28,6 +28,7 @@ package opendap.wcs.v2_0;
 import org.jdom.Element;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Vector;
 
 public class DummyCatalog implements WcsCatalog {
@@ -74,7 +75,7 @@ public class DummyCatalog implements WcsCatalog {
 
     @Override
     public long getLastModified() {
-        return 0;
+        return new Date().getTime();
     }
 
     @Override

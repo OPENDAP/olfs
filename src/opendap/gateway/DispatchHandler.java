@@ -26,7 +26,9 @@
 
 package opendap.gateway;
 
+import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -35,12 +37,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.Vector;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,6 +63,12 @@ public class DispatchHandler extends BesDapDispatcher {
 
     @Override
     public void init(HttpServlet servlet, Element config) throws Exception {
+        init(servlet,config,null);
+    }
+
+
+    @Override
+    public void init(HttpServlet servlet, Element config, BesApi ignored) throws Exception {
 
         if(_initialized)
             return;
@@ -73,7 +76,7 @@ public class DispatchHandler extends BesDapDispatcher {
         ingestPrefix(config);
 
         _besApi = new BesGatewayApi(_prefix);
-        init(servlet, config, _besApi);
+        super.init(servlet, config, _besApi);
         _gatewayForm  =  new GatewayForm(getSystemPath(), _prefix);
         _initialized=true;
     }
@@ -94,70 +97,70 @@ public class DispatchHandler extends BesDapDispatcher {
         boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
         boolean itsJustThePrefix = _prefix.equals(relativeURL);
 
-        if (relativeURL != null) {
 
-            if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash ) {
-                isMyRequest = true;
+        if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash) {
+            isMyRequest = true;
 
-                if (sendResponse) {
-                    log.info("Sending Gateway Response");
+            if (sendResponse) {
+                log.info("Sending Gateway Response");
 
-                    if(itsJustThePrefixWithoutTheSlash){
-                        response.sendRedirect(_prefix);
-                        log.debug("Sent redirect to service prefix: "+_prefix);
-                    }
-                    else if(itsJustThePrefix){
-                        _gatewayForm.respondToHttpGetRequest(request,response);
-                        log.info("Sent Gateway Access Form");
-                    }
-                    else {
-                        if(!super.requestDispatch(request,response, true)){
-                            if( !response.isCommitted()) {
-                                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
-                                log.info("Sent 404 Response.");
-                            }
-                            else {
-                                log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                            }
+                if(itsJustThePrefixWithoutTheSlash ){
+                    response.sendRedirect(_prefix);
+                    log.debug("Sent redirect to service prefix: "+_prefix);
+                }
+                else if(itsJustThePrefix || relativeURL.toLowerCase().endsWith("contents.html")){
+                    _gatewayForm.respondToHttpGetRequest(request,response);
+                    log.info("Sent Gateway Access Form");
+                }
+                else {
+                    if(!super.requestDispatch(request,response, true)){
+                        if( !response.isCommitted()) {
+                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(BesGatewayApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '"+
+                                    relativeURL.substring(s.length())+"' is not recognized by this server.");
                         }
-                        else
-                            log.info("Sent DAP Gateway Response.");
+                        else {
+                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
+                        }
                     }
+                    else
+                        log.info("Sent DAP Gateway Response.");
                 }
             }
         }
+
         return isMyRequest;
     }
 
 
-    private void ingestPrefix(Element config) throws Exception {
+    private void ingestPrefix(Element config) throws BadConfigurationException {
 
+        _prefix = "gateway";
 
         if (config != null) {
 
-            String msg;
-
-            Element e = config.getChild("prefix");
-            if (e != null)
-                _prefix = e.getTextTrim();
-
-            if (_prefix.equals("/")) {
-                msg = "Bad Configuration. The <Handler> " +
-                        "element that declares " + this.getClass().getName() +
-                        " MUST provide 1 <prefix>  " +
-                        "child element whose value may not be equal to \"/\"";
-                log.error(msg);
-                throw new Exception(msg);
+            Element gatewayService = config.getChild("GatewayService");
+            if (gatewayService != null) {
+                Element e = gatewayService.getChild("prefix");
+                if (e != null) {
+                    _prefix = e.getTextTrim();
+                    if (_prefix.equals("/")) {
+                        String msg = "Bad Configuration. The <Handler> " +
+                                "element that declares " + this.getClass().getName() +
+                                " MUST provide 1 <prefix>  " +
+                                "child element whose value may not be equal to \"/\"";
+                        log.error(msg);
+                        throw new BadConfigurationException(msg);
+                    }
+                }
             }
-
-
-            if (!_prefix.endsWith("/"))
-                _prefix += "/";
-
-            if (_prefix.startsWith("/"))
-                _prefix = _prefix.substring(1);
-
         }
+        if (!_prefix.endsWith("/"))
+            _prefix += "/";
+
+        if (_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1);
+
         log.info("Using prefix=" + _prefix);
 
     }

@@ -42,7 +42,7 @@ import java.io.OutputStream;
 
 
 
-
+@Deprecated
 public class DatasetHtmlForm extends Dap4Responder {
 
 
@@ -50,7 +50,7 @@ public class DatasetHtmlForm extends Dap4Responder {
     private Logger log;
 
 
-    private static String _defaultRequestSuffix = ".html";
+    private static String _defaultRequestSuffix = ".html_old";
 
 
     public DatasetHtmlForm(String sysPath, BesApi besApi) {
@@ -96,21 +96,13 @@ public class DatasetHtmlForm extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "DAP2 Data Request Form");
-
         response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
-
         besApi.writeDap2DataRequestForm(resourceID, xmlBase, os);
-
         os.flush();
         log.info("Sent DAP2 Dataset HTML Form page.");
-
-
-
-
     }
-
 }

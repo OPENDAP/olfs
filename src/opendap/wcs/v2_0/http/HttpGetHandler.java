@@ -28,6 +28,7 @@ package opendap.wcs.v2_0.http;
 
 import net.sf.saxon.s9api.XdmNode;
 import opendap.PathBuilder;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -78,21 +79,24 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     private static final int DESCRIBE_COVERAGE  = 1;
     private static final int GET_COVERAGE       = 2;
 
+    public HttpGetHandler()  {
+        this(false);
+    }
+
 
     public HttpGetHandler(boolean enableUpdateUrl)  {
-
         super();
-
         _enableUpdateUrl = enableUpdateUrl;
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
-
     }
 
     public void init(HttpServlet dispatchServlet, Element e) throws ServletException {
-
         init(dispatchServlet);
+    }
 
+    public void init(HttpServlet dispatchServlet, Element e, BesApi besApi ) throws ServletException {
+        init(dispatchServlet);
     }
 
 
@@ -106,6 +110,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         init(contextPath, resourcePath);
 
+    }
+
+
+    public boolean isUpdateUrlEnabled(){
+        return _enableUpdateUrl;
+    }
+
+    public void setEnableUpdateUrl(boolean state){
+        _enableUpdateUrl = state;
     }
 
 

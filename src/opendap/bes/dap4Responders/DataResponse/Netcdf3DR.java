@@ -33,15 +33,15 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf3;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 import java.util.regex.Pattern;
 
 /**
@@ -108,12 +108,10 @@ public class Netcdf3DR extends Dap4Responder{
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-
         QueryParameters qp = new QueryParameters(request);
-
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
-
+        User user = new User(request);
 
         BesApi besApi = getBesApi();
 
@@ -125,11 +123,9 @@ public class Netcdf3DR extends Dap4Responder{
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
-        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
+        Version.setOpendapMimeHeaders(request, response);
 
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         String downloadFileName = getDownloadFileName(resourceID);
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
@@ -143,23 +139,10 @@ public class Netcdf3DR extends Dap4Responder{
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
-
-        User user = new User(request);
-
-
-
-        OutputStream os = response.getOutputStream();
-
-
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsNetcdf3(resourceID, qp, cf_history_entry, user.getMaxResponseSize(), os);
-
-
         os.flush();
-        log.debug("Sent {}",getServiceTitle());
-
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
-
 }

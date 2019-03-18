@@ -1,36 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
-            ~ /////////////////////////////////////////////////////////////////////////////
-            ~ // This file is part of the "Hyrax Data Server" project.
-            ~ //
-            ~ //
-            ~ // Copyright (c) 2016 OPeNDAP, Inc.
-            ~ // Author: Nathan David Potter <ndp@opendap.org>
-            ~ //
-            ~ // This library is free software; you can redistribute it and/or
-            ~ // modify it under the terms of the GNU Lesser General Public
-            ~ // License as published by the Free Software Foundation; either
-            ~ // version 2.1 of the License, or (at your option) any later version.
-            ~ //
-            ~ // This library is distributed in the hope that it will be useful,
-            ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
-            ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            ~ // Lesser General Public License for more details.
-            ~ //
-            ~ // You should have received a copy of the GNU Lesser General Public
-            ~ // License along with this library; if not, write to the Free Software
-            ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-            ~ //
-            ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-            ~ /////////////////////////////////////////////////////////////////////////////
+~ /////////////////////////////////////////////////////////////////////////////
+~ // This file is part of the "Hyrax Data Server" project.
+~ //
+~ //
+~ // Copyright (c) 2018 OPeNDAP, Inc.
+~ // Author: Nathan David Potter <ndp@opendap.org>
+~ //
+~ // This library is free software; you can redistribute it and/or
+~ // modify it under the terms of the GNU Lesser General Public
+~ // License as published by the Free Software Foundation; either
+~ // version 2.1 of the License, or (at your option) any later version.
+~ //
+~ // This library is distributed in the hope that it will be useful,
+~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ // Lesser General Public License for more details.
+~ //
+~ // You should have received a copy of the GNU Lesser General Public
+~ // License along with this library; if not, write to the Free Software
+~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+~ //
+~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+~ /////////////////////////////////////////////////////////////////////////////
         --><xhtml xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
    <head>
+      <link rel="stylesheet" href="/opendap/docs/css/collapse.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/contents.css" type="text/css"/>
       <link rel="stylesheet" href="/opendap/docs/css/treeView.css" type="text/css"/>
       <script type="text/javascript" src="/opendap/js/CollapsibleLists.js"> </script>
       <script type="text/javascript" src="/opendap/js/dap4_buttons.js"> </script>
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/nc/fnoc1.nc");
+                    DEBUG = new debug_obj();
                 </script>
       <title>DAP4 Data Request Form (beta)fnoc1.nc</title>
    </head>
@@ -41,7 +43,7 @@
                <img alt="OPeNDAP Logo" src="/opendap/docs/images/logo.png"/>
             </td>
             <td>
-               <div class="large">DAP4 Data Access Form</div>
+               <div class="large">OPeNDAP Data Access Form</div>
             </td>
          </tr>
       </table>
@@ -51,10 +53,6 @@
       </h1>
       <hr size="1" noshade="noshade"/>
       <form action="">
-         <input type="checkbox" id="debug_checkbox"/>DEBUG
-                    <script type="text/javascript">
-                        DEBUG = new debug_obj(debug_checkbox);
-                    </script>
          <table width="100%" border="0">
             <tr>
                <td align="right">
@@ -196,7 +194,17 @@
                </td>
                <td>
                   <div style="margin-left:25px;">
-                     <script type="text/javascript">org_opendap_lat = new dap_var("lat", "org_opendap_lat", true,false);
+                     <script type="text/javascript">
+            if(DEBUG.enabled()) alert(
+            "myFQN:         lat\n" +
+            "myJSVarName:   org_opendap_lat\n" +
+            "checkBoxName:  get_org_opendap_lat\n" +
+            "isContainer:   false\n" +
+            "isArray:       true\n" +
+            "(parent) container: \n"
+            );
+
+            org_opendap_lat = new dap_var("lat", "org_opendap_lat", true,false);
 
             
                 DAP4_URL.add_dap_var(org_opendap_lat);
@@ -239,28 +247,92 @@
                </td>
             </tr>
          </table>
+         <hr size="1" noshade="noshade"/>
+         <table width="100%" border="0">
+            <tr>
+               <td class="small">
+                  <input type="checkbox" id="debug_checkbox"/>debug
+                                <script type="text/javascript">
+                                    DEBUG.setCheckBox(debug_checkbox);
+                                </script>
+               </td>
+               <td>
+                  <div class="small" align="right">Hyrax development sponsored by
+                                    <a href="http://www.nsf.gov/">NSF</a>,
+                                    <a href="http://www.nasa.gov/">NASA</a>, and
+                                    <a href="http://www.noaa.gov/">NOAA</a>
+                  </div>
+               </td>
+            </tr>
+         </table>
       </form>
-      <hr size="1" noshade="noshade"/>
-      <table width="100%" border="0">
-         <tr>
-            <td/>
-            <td>
-               <div class="small" align="right">Hyrax development sponsored by
-                                <a href="http://www.nsf.gov/">NSF
-                                </a>
-                                ,
-                                <a href="http://www.nasa.gov/">NASA
-                                </a>
-                                , and
-                                <a href="http://www.noaa.gov/">NOAA</a>
-               </div>
-            </td>
-         </tr>
-      </table>
       <h3>OPeNDAP Hyrax (Not.A.Release)
-                    <br/>
-         <a href="/opendap/docs/">Documentation</a>
+                    <div>
+            <a href="/opendap/docs/">Documentation</a>
+            <span class="small"
+                  style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+               <a href="mailto:support@opendap.org?subject=Hyrax Usage Question&amp;body=%0A%0A%0A%0A%0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A# %0A# We're sorry you had a problem using the server.%0A# Please use the space above to describe what you%0A# were trying to do and we will try to assist you.%0A# Thanks,%0A# OPeNDAP Support.%0A# %0A# -- -- -- hyrax location info, please include -- -- --%0A# %0A# request_url: http://localhost:8080/opendap/hyrax/data/nc/fnoc1.nc.dmr.html%0A# protocol: HTTP/1.1%0A# server: localhost%0A# port: 8080%0A# javax.servlet.forward.request_uri: /opendap/data/nc/fnoc1.nc.dmr.html%0A# query_string: dap4.ce=lat%0A# status: 200%0A# %0A# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A">Questions? Contact Support</a>
+            </span>
+         </div>
       </h3>
+      <script type="application/ld+json">
+{
+  "@context": {
+    "@vocab": "http://schema.org"
+  },
+  "@type": "Dataset",
+  "name": "fnoc1.nc",
+  "url": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+  "includedInDataCatalog": { 
+    "@type": "DataCatalog", 
+    "name": "Hyrax Data Server", 
+    "sameAs": "http://localhost:8080/opendap/hyrax/data/nc/contents.html"
+  },
+  "variableMeasured": [
+  {
+    "@type": "PropertyValue",
+    "name": "http://localhost:8080/opendap/data/nc/fnoc1.nc",
+    "valueReference": [ 
+        {
+          "@type": "PropertyValue", 
+          "name": "base_time", 
+          "value": "88- 10-00:00:00"        },
+        {
+          "@type": "PropertyValue", 
+          "name": "title", 
+          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
+        {
+          "@type": "PropertyValue", 
+          "name": "Unlimited_Dimension", 
+          "value": "time_a"        }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "size", 
+        "value": "17"      }
+    ]
+  },
+  {
+    "@type": "PropertyValue",
+    "name": "lat",
+    "valueReference": [ 
+      {
+        "@type": "PropertyValue", 
+        "name": "units", 
+        "value": "degree North"      }
+    ]
+  }
+  ]
+}
+</script>
    </body>
-   <script>CollapsibleLists.apply(true);</script>
+   <script type="text/javascript">
+                CollapsibleLists.apply(true);
+                initCollapsibles("/opendap/docs");
+            </script>
 </xhtml>

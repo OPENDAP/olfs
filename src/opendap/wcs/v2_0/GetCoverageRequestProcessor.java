@@ -59,10 +59,10 @@ import java.util.*;
 public class GetCoverageRequestProcessor {
 
 
-    private static Logger _log = LoggerFactory.getLogger(GetCoverageRequestProcessor.class);
+    private static final Logger _log = LoggerFactory.getLogger(GetCoverageRequestProcessor.class);
 
 
-    public static String coveragesContentID = "urn:ogc:wcs:1.1:coverages";
+    public static final String COVERAGES_CONTENT_ID = "urn:ogc:wcs:1.1:coverages";
 
 
     /**
@@ -643,7 +643,7 @@ public class GetCoverageRequestProcessor {
             switch (rFormat.type()) {
                 case dap2:
                     besCmd =
-                            besApi.getDap2RequestDocument(
+                            besApi.getDap2RequestDocumentAsync(
                                     opendap.bes.dap2Responders.BesApi.DAP2_DATA,
                                     besDatatsetId,
                                     dap2ce,

@@ -28,6 +28,7 @@ package opendap.wcs.v2_0.http;
 import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
@@ -47,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Date;
 
 /**
  * This class is responsible for processing WCS XML request documents.
@@ -67,15 +69,16 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
     }
-
     public void init(HttpServlet servlet, Element config) throws Exception {
+        init(servlet,config,null);
+    }
+
+    public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
         if (_initialized) return;
 
         //dispatchServlet = servlet;
         _config = config;
-
         ingestPrefix();
-
         _initialized = true;
     }
 
@@ -112,7 +115,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;
+        return new Date().getTime();
     }
 
     public void destroy() {

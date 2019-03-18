@@ -150,3 +150,33 @@ var CollapsibleLists =
       }
 
     }();
+
+
+    function initCollapsibles(docsService){
+
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        //alert("Processing collapsible stuff");
+
+        for (i = 0; i < coll.length ; i++) {
+            //alert("coll["+i+"]: "+coll[i]);
+            coll[i].addEventListener("click",
+                function() {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                        this.innerHTML="<img style=\"padding-right: 3px;\" alt=\"click-to-open\" src=\""+docsService+"/images/button-closed.png\" />member variables";
+                    } else {
+                        content.style.display = "block";
+                        this.innerHTML="<img style=\"padding-right: 3px;\" alt=\"click-to-close\" src=\""+docsService+"/images/button-open.png\" />member variables";
+                    }
+                }
+            );
+        }
+        //alert("done");
+
+    }
+
+    function doNothing(){}

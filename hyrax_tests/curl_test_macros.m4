@@ -13,6 +13,14 @@ AT_ARG_OPTION_ARG([baselines],
     [echo "baselines set to $at_arg_baselines";
      baselines=$at_arg_baselines],[baselines=])
 
+# Run some tests conditionally, depending on how the BES was built. By default,
+# assume we are testing against a developer build of the BES.
+
+AT_ARG_OPTION_ARG([besdev],
+    [--besdev=yes|no   Was the BES built using --enable-developer?],
+    [echo "besdev set to $at_arg_besdev"; besdev=$at_arg_besdev],
+    [besdev=no])
+
 # Usage: _AT_TEST_*(<bescmd source>, <baseline file>, <xpass/xfail> [default is xpass])
 
 dnl Given a filename, remove any date-time string of the form "yyyy-mm-dd hh:mm:ss" 
@@ -23,18 +31,37 @@ dnl
 dnl Note that the macro depends on the baseline being a file.
 dnl
 dnl jhrg 6/3/16
- 
-m4_define([REMOVE_DATE_TIME], [dnl
-    sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\} [[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\( GMT\)*\( Hyrax-[[-0-9a-zA-Z.]]*\)*@removed date-time@g' < $1 > $1.sed
-    dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
-    mv $1.sed $1
+dnl
+dnl The regex was insufficient for time and hyrax version I have improved it.
+dnl Here's the new regex with out the mad escaping.
+dnl
+dnl [0-9]{4}-[0-9]{2}-[0-9]{2}(\s|T)[0-9]{2}:[0-9]{2}:[0-9]{2}(\.\d+)?\s?(((\+|-)\d+)|(\D{1,5}))|(OPeNDAP Hyrax \([@0-9a-zA-Z.]+\))
+dnl
+dnl ndp 09/16/18
+dnl
+dnl sed does not support \d (and decimal digit) or \D (amd non-digit). I also removed the 'OPeNDAP
+dnl Hyrax...' bit since we can use the PATH_HYRAX_RELEASE to remove the release information.
+dnl
+dnl NOTE: This is not currently used. jhrg 9/18/18
+dnl
+dnl m4_define([REMOVE_DATE_TIME], [dnl
+dnl     sed 's@[[0-9]]\{4\}-[[0-9]]\{2\}-[[0-9]]\{2\}\(\s|T\)[[0-9]]\{2\}:[[0-9]]\{2\}:[[0-9]]\{2\}\(\.[[0-9]]+\)?\s?\(\(\(\+|-\)[[0-9]]+\)|\([[^0-9]]\{1,5\}\)\)@removed date-time@g' < $1 > $1.sed
+dnl    dnl ' Added the preceding quote to quiet the Eclipse syntax checker. jhrg 3.2.18
+dnl    mv $1.sed $1
+dnl ])
+dnl
+
+
+m4_define([REMOVE_DATE_HEADER], [dnl
+    sed 's/^Date:.*$/Date: REMOVED/g' < $1 > $1.sed
+    cp $1.sed $1
 ])
 
 dnl The above macro modified to edit the '<h3>OPeNDAP Hyrax (Not.A.Release)' issue
 dnl so that whatever appears in the parens is moot.
 
 m4_define([PATCH_HYRAX_RELEASE], [dnl
-    sed 's@OPeNDAP Hyrax (\(.*\)).*@OPeNDAP Hyrax (Not.A.Release)@g' < $1 > $1.sed
+    sed 's@OPeNDAP Hyrax (.*)\(.*\)@OPeNDAP Hyrax (Not.A.Release)\1@g' < $1 > $1.sed
     mv $1.sed $1
 ])
 
@@ -59,11 +86,11 @@ m4_define([_AT_CURL_TEST], [dnl
         [
         AT_CHECK([curl -K $input], [0], [stdout])
         AT_CHECK([mv stdout $baseline.tmp])
-	PATCH_HYRAX_RELEASE([$baseline.tmp])
+	    PATCH_HYRAX_RELEASE([$baseline.tmp])
         ],
         [
         AT_CHECK([curl -K $input], [0], [stdout])
-	PATCH_HYRAX_RELEASE([stdout])
+	    PATCH_HYRAX_RELEASE([stdout])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
         ])
@@ -170,11 +197,13 @@ m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST], [dnl
     AS_IF([test -n "$baselines" -a x$baselines = xyes],
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
         AT_CHECK([mv stdout $baseline.tmp])
         AT_CHECK([echo "^\c" > $baseline.http_header.tmp; head -1 http_header | sed "s/\./\\\./g" >> $baseline.http_header.tmp])
         ],
         [
         AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
         AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
         AT_CHECK([grep -f $baseline.http_header http_header], [0], [ignore])
         AT_XFAIL_IF([test "$3" = "xfail"])
@@ -183,6 +212,38 @@ m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST], [dnl
     AT_CLEANUP
 ])
 
+
+#--------------------------------------------------------------------------------------
+# 
+# Alternate version of the AT_CURL_HEADER_AND_RESPONSE_TEST for the forced-errors tests
+# ASCII Compare PLUS Check HTTP Header using REGEX
+# The http_header baseline MUST be edited to make a correct regular expression
+#
+m4_define([_AT_CURL_HEADER_AND_RESPONSE_TEST_ERROR], [dnl
+
+    AT_SETUP([CURL $1])
+    AT_KEYWORDS([curl])
+
+    input=$1
+    baseline=$2
+
+    AS_IF([test -n "$baselines" -a x$baselines = xyes],
+        [
+        AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
+        AT_CHECK([mv stdout $baseline.tmp])
+        AT_CHECK([echo "^\c" > $baseline.http_header.tmp; head -1 http_header | sed "s/\./\\\./g" >> $baseline.http_header.tmp])
+        ],
+        [
+        AT_CHECK([curl -D http_header -K $input], [0], [stdout])
+        REMOVE_DATE_HEADER([http_header])
+        AT_CHECK([diff -b -B $baseline stdout], [0], [ignore])
+        AT_CHECK([grep -f $baseline.http_header http_header], [0], [ignore])
+        AT_XFAIL_IF([test "$3" = "xfail" -o x$besdev = xno])
+        ])
+
+    AT_CLEANUP
+])
 
 
 
@@ -206,6 +267,9 @@ m4_define([AT_CURL_RESPONSE_PATTERN_MATCH_TEST],
 
 m4_define([AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST],
 [_AT_CURL_HEADER_AND_RESPONSE_TEST([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
+
+m4_define([AT_CURL_RESPONSE_AND_HTTP_HEADER_TEST_ERROR],
+[_AT_CURL_HEADER_AND_RESPONSE_TEST_ERROR([$abs_srcdir/$1], [$abs_srcdir/$1.baseline], [$2])])
 
 
 #######################################################################################

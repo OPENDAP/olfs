@@ -35,6 +35,7 @@ import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
+import opendap.logging.LogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -44,10 +45,7 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 
 public class Dap2Data extends Dap4Responder {
@@ -97,16 +95,12 @@ public class Dap2Data extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
-
         BesApi besApi = getBesApi();
-
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl,false);
-
         QueryParameters qp = new  QueryParameters(request);
-
+        User user = new User(request);
 
         // Here we must use the ReqInfo.getConstraintExpression() call
         // because tht is where the {}{}{} notation support is located.
@@ -119,11 +113,7 @@ public class Dap2Data extends Dap4Responder {
         //
         String dap2CE = ReqInfo.getConstraintExpression(request);
 
-        User user = new User(request);
-
-
-        log.debug("sendNormativeRepresentation() For: " + resourceID+
-                "    CE: '" + dap2CE + "'");
+        log.debug("resourceID: {}   CE: '{}' ",resourceID, dap2CE );
 
         MediaType responseMediaType =  getNormativeMediaType();
 
@@ -131,30 +121,27 @@ public class Dap2Data extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_data");
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        OutputStream os;
-        ByteArrayOutputStream srr = null;
 
+        DataOutputStream os;
+        ByteArrayOutputStream srr = null;
         if(qp.isStoreResultRequest()){
             srr = new ByteArrayOutputStream();
-            os = srr;
+            os = new DataOutputStream(srr);
         }
         else {
-            os = response.getOutputStream();
+            os = new DataOutputStream(response.getOutputStream());
         }
-
         besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),user.getMaxResponseSize(),os);
-
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }
-
         os.flush();
-        log.info("sendNormativeRepresentation() Sent DAP2 data response.");
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 

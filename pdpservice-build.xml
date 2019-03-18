@@ -334,7 +334,6 @@
 
                 <!-- Exclude Hyrax (for the most part)   -->
                 <exclude name="opendap/hai/**"/>
-                <exclude name="opendap/async/**"/>
                 <exclude name="opendap/bes/**"/>
                 <exclude name="opendap/coreServlet/**"/>
                 <exclude name="opendap/dap/**"/>

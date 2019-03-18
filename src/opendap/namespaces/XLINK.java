@@ -35,6 +35,10 @@ import org.jdom.Namespace;
  * To change this template use File | Settings | File Templates.
  */
 public class XLINK {
+    /**
+     * This class should never be instantiated.
+     */
+    private XLINK(){ throw new IllegalStateException("opendap.namespaces.XLINK class"); }
 
     public static final String NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
     public static final String NAMESPACE_PREFIX = "xlink";

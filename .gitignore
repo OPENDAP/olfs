@@ -30,6 +30,7 @@ Makefile
 Makefile.in
 atlocal
 atconfig
+/conf
 aclocal.m4
 hyrax_tests/conf
 config.log
@@ -45,3 +46,5 @@ foo.*
 /.externalToolBuilders/
 /.settings/
 /bin/
+/conf/
+/.sonar/

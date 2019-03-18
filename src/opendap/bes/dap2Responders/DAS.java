@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextPlain;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -101,22 +102,17 @@ public class DAS extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        OutputStream os = response.getOutputStream();
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDAS(resourceID, constraintExpression, os);
-
-
         os.flush();
-        log.debug("Sent DAP DAS.");
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
-
 }

@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,15 +77,18 @@ public class VersionDispatchHandler implements DispatchHandler {
 
     }
 
+    @Override
     public void init(HttpServlet s, Element config) throws Exception {
+        init(s, config, new BesApi());
+    }
+
+    @Override
+    public void init(HttpServlet s, Element config, BesApi besApi) throws Exception {
 
         if (initialized) return;
 
-
-        _besApi = new BesApi();
-
+        _besApi = besApi;
         initialized = true;
-
         log.info("Initialized.");
     }
 
@@ -104,7 +108,7 @@ public class VersionDispatchHandler implements DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;
+        return new Date().getTime();
     }
 
 

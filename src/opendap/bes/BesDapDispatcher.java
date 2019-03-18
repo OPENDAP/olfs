@@ -117,21 +117,13 @@ public class BesDapDispatcher implements DispatchHandler {
         _besApi = besApi;
     }
 
-    public void init(HttpServlet servlet, Element config) throws Exception {
-
-        BesApi besApi = new BesApi();
-
-        init(servlet, config, besApi);
-
-
-    }
-
 
     private void ingestConfig(Element config) throws Exception {
 
         if(config!=null){
             _config = config;
 
+            /*
             Element besApiImpl = _config.getChild("BesApiImpl");
             if (besApiImpl != null) {
                 String className = besApiImpl.getTextTrim();
@@ -145,8 +137,8 @@ public class BesDapDispatcher implements DispatchHandler {
                     BesApi besApi = (BesApi) classDefinition.newInstance();
                     setBesApi(besApi);
                 }
-
             }
+            */
 
             _log.info("ingestConfig() - Using BES API implementation: "+getBesApi().getClass().getName());
 
@@ -172,27 +164,38 @@ public class BesDapDispatcher implements DispatchHandler {
             }
             _log.info("ingestConfig() - AddFileoutTypeSuffixToDownloadFilename: {}",_addFileoutTypeSuffixToDownloadFilename);
 
-
-            dv = _config.getChild("PostBodyMaxLength");
+            dv = _config.getChild("HttpPost");
             if (dv != null) {
-                try {
-                    int maxLength = Integer.parseInt(dv.getTextTrim());
-                    ReqInfo.setMaxPostBodyLength(maxLength);
-                }
-                catch(NumberFormatException e){
-                    _log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ", dv.getTextTrim());
 
+                String max = dv.getAttributeValue("max");
+                if(max!=null) {
+                    try {
+                        int maxLength = Integer.parseInt(max);
+                        ReqInfo.setMaxPostBodyLength(maxLength);
+                    } catch (NumberFormatException e) {
+                        _log.warn("HttpPost - Unable to parse the value of max! Value: {} ", max);
+
+                    }
                 }
             }
-            _log.info("ingestConfig() - PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
-
+            _log.info("ingestConfig() - HTTP POST max body length is set to: {}", ReqInfo.getPostBodyMaxLength());
         }
-
-
-
-
-
     }
+
+
+    /**
+     *  This method is where the behavior of the BesDapDispatcher is defined. In here the various Responder classes
+     *  are instantiated and loaded in to an ordered list. The types of the responders and their order defines the
+     *  behaviour of the DAP dispatch activity.
+     * @param servlet    The Servlet instance that this dispatcher is running in.
+     * @param config  The configuration element loaded from the olfs.xml file for this dispatcher
+     * @throws Exception  When the bad things happen.
+     */
+    public void init(HttpServlet servlet, Element config) throws Exception {
+        BesApi besApi = new BesApi();
+        init(servlet, config, besApi);
+    }
+
 
     /**
      *  This method is where the behavior of the BesDapDispatcher is defined. In here the various Responder classes
@@ -203,7 +206,7 @@ public class BesDapDispatcher implements DispatchHandler {
      * @param besApi    The BesApi instance to use when servicing requests.
      * @throws Exception  When the bad things happen.
      */
-    protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
+     public void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
 
         if (_initialized) return;
 
@@ -246,11 +249,9 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add( new Netcdf4(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
         _responders.add( new XmlData(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
 
-
         // DAP2 GeoTIFF Response
         Dap4Responder geoTiff = new GeoTiff(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(geoTiff);
-
 
         // DAP2 JPEG2000 Response
         Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
@@ -264,6 +265,9 @@ public class BesDapDispatcher implements DispatchHandler {
         Dap4Responder ijsn = new Ijson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(ijsn);
 
+        // DAP2 Cov-JSON Response
+        Dap4Responder covjson = new CovJson(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
+        _responders.add(covjson);
 
         // DAP2 Metadata responses
         Dap4Responder d4r = new DDX(_systemPath, besApi);
@@ -287,6 +291,9 @@ public class BesDapDispatcher implements DispatchHandler {
             // Add the HTML form conditionally because the ".html" suffix is used
             // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
             // We should make sure that the old HTML ".html" response is available.
+            Dap4Responder ifh = new Dap2IFH(_systemPath, besApi);
+            _responders.add(ifh);
+
             Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
             _responders.add(htmlForm);
 
@@ -389,14 +396,10 @@ public class BesDapDispatcher implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-
-
-        String relativeUrl = ReqInfo.getLocalUrl(req);
-
+         String relativeUrl = ReqInfo.getLocalUrl(req);
 
         if(!_initialized)
-            return -1;
-
+            return new Date().getTime();
 
         for (HttpResponder r : _responders) {
             if (r.matches(relativeUrl)) {
@@ -411,14 +414,14 @@ public class BesDapDispatcher implements DispatchHandler {
 
                 } catch (Exception e) {
                     _log.debug("getLastModified(): Returning: -1");
-                    return -1;
+                    return new Date().getTime();
                 }
 
             }
 
         }
 
-        return -1;
+        return new Date().getTime();
 
 
     }

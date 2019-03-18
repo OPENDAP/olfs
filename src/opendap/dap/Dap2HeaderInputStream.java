@@ -73,16 +73,12 @@ public class Dap2HeaderInputStream extends FilterInputStream {
         lineBuf = new byte[4096];
         bytesRemaining = currentOffset = 0;
         endFound = false;
-
-        //System.out.print("EndSequence: ");
-        //for(int i=0; i<endSequence.length ;i++)
-        //    System.out.print(endSequence[i]+"  ");
-        //System.out.print("\n");
     }
 
     /**
      * Return the number of bytes in the buffer.
      */
+    @Override
     public int available() {
         return bytesRemaining;
     }
@@ -90,6 +86,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
     /**
      * Returns that we don't support the mark() and reset() methods.
      */
+    @Override
     public boolean markSupported() {
         return false;
     }
@@ -97,6 +94,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
     /**
      * Reads a single byte of data
      */
+    @Override
     public int read() throws IOException {
         // if the buffer is empty, get more bytes
         if (bytesRemaining == 0 && !endFound)
@@ -106,7 +104,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
             return -1;
         else {
             bytesRemaining--;
-            return lineBuf[currentOffset++];
+            return lineBuf[currentOffset++]  & 0xFF ; // convert the signed byte to an unsigned byte.
         }
     }
 
@@ -144,6 +142,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
      * Reads up to len bytes of data from this input stream into an array of
      * bytes. This method blocks until some input is availableInChunk.
      */
+    @Override
     public int read(byte b[], int off, int len) throws IOException {
         if (len <= 0) {
             return 0;
@@ -169,6 +168,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
     /**
      * Skips over and discards n bytes of data from the input stream.
      */
+    @Override
     public long skip(long n) {
         if (bytesRemaining >= n) {
             bytesRemaining -= n;

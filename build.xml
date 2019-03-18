@@ -30,7 +30,8 @@
 
 <project
         name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
-        default="all" basedir=".">
+        default="all" basedir="."
+        xmlns:sonar="antlib:org.sonar.ant" >
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -141,7 +142,7 @@
         <echo level="info" message="    build.dir:         ${build.dir}"/>
         <echo level="info" message="    build.classes:     ${build.classes}"/>
         <echo level="info" message="    build.doc:         ${build.docs}"/>
-        <echo level="info" message="    build.resources:   ${build.resources}"/>
+        <echo level="info" message="    build.resources:   ${build.hyrax.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="    ant.file:          ${ant.file}"/>
@@ -177,8 +178,6 @@
     <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
     <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
 
-    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
-
 
     <!-- Build Directories -->
     <property name="build.dir" location="build"/>
@@ -188,9 +187,12 @@
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
-    <property name="build.resources" location="${build.dir}/resources"/>
-    <property name="build.webapp" location="${build.dir}/webapp"/>
 
+    <property name="build.hyrax.resources" location="${build.dir}/resources"/>
+    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+
+    <property name="robotsResources.dir" location="${resources.dir}/robots"/>
+    <property name="build.robots.resources" location="${build.dir}/robots"/>
 
     <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
     <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
@@ -356,7 +358,9 @@
         </junit>
     </target>
 
-
+	<!-- Alias for Travis which expects tests to be run by 'ant test' jhrg 3/14/19 -->
+    <target name="test" depends="check"/>
+	
     <target name="PreProcessSourceCode"
             depends="clean,init"
             description="Moves selected source code from the development tree into
@@ -378,6 +382,8 @@
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
+
+                <exclude name="opendap/cmr/**"/>
 
                 <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
@@ -404,7 +410,7 @@
         </copy>
 
 
-        <copy todir="${build.resources}" filtering="true">
+        <copy todir="${build.hyrax.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
             <fileset dir="${hyraxResources.dir}"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
@@ -415,8 +421,13 @@
                 <exclude name="WEB-INF/urlrewrite.xml"/>
                 <exclude name="WEB-INF/logback.xml"/>
             </fileset>
-
         </copy>
+
+        <copy todir="${build.robots.resources}" filtering="true">
+            <fileset dir="${robotsResources.dir}"/>
+        </copy>
+
+
     </target>
 
 
@@ -559,7 +570,7 @@
             depends="server"
             description="Packages the war file into tar file with a release related name.">
 
-        <copy file="${distributionResources.dir}/WarFileReadMe"
+        <copy file="README.md"
               tofile="${build.dist}/README"/>
 
         <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
@@ -578,7 +589,7 @@
     </target>
 
     <target name="DISTRO"
-            depends="clean,src-dist,doc-dist,server-dist,check"
+            depends="clean,src-dist,doc-dist,server-dist,hyrax-robots-dist,check"
             description="Builds complete distribution"
     >
 
@@ -730,11 +741,11 @@
             description="Performs a clean build of the core software and assembles the WAR file."
     >
         <echo level="info" message="Building Hyrax server war file."/>
-        <echo level="info" message="build.resources: ${build.resources}"/>
+        <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
         <echo level="info" message="build.dist:      ${build.dist}"/>
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${build.resources}/WEB-INF/web.xml"
+             webxml="${build.hyrax.resources}/WEB-INF/web.xml"
         >
 
             <lib dir="${lib.dir}">
@@ -783,7 +794,7 @@
             <classes dir="${build.classes}"/>
 
 
-            <zipfileset dir="${build.resources}" prefix="">
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
@@ -794,7 +805,7 @@
             </zipfileset>
 
 
-            <webinf dir="${build.resources}/WEB-INF">
+            <webinf dir="${build.hyrax.resources}/WEB-INF">
                 <include name="logback-test.xml"/>
                 <include name="logback.xml"/>
                 <include name="urlrewrite.xml"/>
@@ -808,49 +819,138 @@
     </target>
 
 
-    <!-- OS-X stuff -->
+    <target
+            name="robots"
+            depends="compile"
+            description="Performs a clean build of the robots/sitemap service and assembles the WAR file."
+    >
+        <echo level="info" message="Building robots/sitemap ROOT service war file."/>
+        <echo level="info" message="build.robots.resources: ${build.robots.resources}"/>
+        <echo level="info" message="build.dist:      ${build.dist}"/>
 
-    <property name="osx.resources" location="${resources.dir}/osx"/>
-    <property name="build.osx" location="${build.dir}/macosx"/>
-    <property name="packagemaker" location="/Developer/usr/bin/packagemaker"/>
+        <echo level="info" message="Copying: ${build.robots.resources}/robots.jsp To: ${build.robots.resources}/robots.txt"/>
+        <move file="${build.robots.resources}/robots.jsp" tofile="${build.robots.resources}/robots.txt"/>
+
+        <war destfile="${build.dist}/ROOT.war"
+             webxml="${build.robots.resources}/WEB-INF/web.xml"
+        >
+
+            <lib dir="${lib.dir}">
+                <include name="${owasp-encoder}"/>
+                <include name="${owasp-encoder-jsp}"/>
+
+                <include name="${json.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${urlRewrite.lib}"/>
+
+                <include name="${commons-lang.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
+                <include name="${commons-io.lib}"/>
+
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+            </lib>
+
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
+                <include name="WEB-INF/conf/olfs.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${build.robots.resources}" prefix="">
+                <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </zipfileset>
 
 
-    <property name="CATALINA_HOME" value="CATALINA_HOME_IS_NOT_SET"/>
+
+            <zipfileset dir="${doc.dir}" prefix="docs">
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
 
 
-    <target name="osx-package"
-            depends="server"
-            description="Builds OSX package installer for the OLFS">
+            <webinf dir="${build.robots.resources}/WEB-INF">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+                <include name="urlrewrite.xml"/>
+            </webinf>
 
-        <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
-        <copy file="${build.dist}/opendap.war" tofile="${build.osx}${CATALINA_HOME}/webapps/opendap.war"/>
 
-        <copy todir="${build.dir}/osx-resources" filtering="true">
-            <fileset dir="${osx.resources}"/>
-        </copy>
+        </war>
 
-        <chmod file="${build.dir}/osx-resources/InstallationCheck" perm="755"/>
-
-        <exec executable="${packagemaker}">
-            <arg value="--root"/>
-            <arg value="${build.osx}"/>
-            <arg value="--id"/>
-            <arg value="org.opendap.olfs-${OLFS_VERSION}"/>
-            <arg value="--title"/>
-            <arg value="OPeNDAP olfs-${OLFS_VERSION}"/>
-            <arg value="--version"/>
-            <arg value="${OLFS_VERSION}"/>
-            <arg value="--out"/>
-            <arg value="${build.dist}/olfs-${OLFS_VERSION}.pkg"/>
-            <arg value="--resources"/>
-            <arg value="${build.dir}/osx-resources"/>
-        </exec>
-
+        <!-- delete file="${build.dist}/index.html"/ -->
 
     </target>
 
-</project>
+    <target name="hyrax-robots"
+            depends="server,robots"
+            description="Builds the war files for the robots/sitemap and Hyrax's OLFS.">
+    </target>
 
+
+    <target name="hyrax-robots-dist"
+            depends="hyrax-robots"
+            description="Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.">
+
+        <copy file="README.md"
+              tofile="${build.dist}/README"/>
+
+        <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
+             compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
+                <include name="opendap.war"/>
+                <include name="ROOT.war"/>
+                <include name="README"/>
+            </zipfileset>
+
+        </tar>
+        <delete file="${build.dist}/README"/>
+        <delete file="${build.dist}/opendap.war"/>
+        <delete file="${build.dist}/ROOT.war"/>
+    </target>
+
+    <!-- SonarCloud build stuff -->
+	  <!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
+	  <property name="sonar.host.url" value="https://sonarcloud.io" />
+	  <property name="sonar.login" value="ping... ping... ping..." />
+
+	  <!-- Define the SonarQube project properties -->
+	  <property name="sonar.projectKey" value="opendap-olfs" />
+	  <property name="sonar.projectName" value="olfs" />
+	  <property name="sonar.projectVersion" value="${OLFS_VERSION}" />
+	  <property name="sonar.organization" value="opendap" />
+	  <property name="sonar.sources" value="src" />
+	  <property name="sonar.exclusions" value="src/opendap/experiments/**/*.java,src/opendap/metacat/**/*.java,src/opendap/aws/**/*.java,src/opendap/noaa_s3/**/*.java" />
+	  <property name="sonar.java.binaries" value="build" />
+	  <property name="sonar.java.libraries" value="lib/*.jar" />
+
+	  <!-- Define SonarQube Scanner for Ant Target -->
+	  <target name="sonar">
+	      <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+	          <classpath path="resources/sonar/sonarqube-ant-task-2.5.jar" />
+	      </taskdef>
+	      <!-- taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml" / -->
+        <!-- Execute SonarQube Scanner for Ant Analysis -->
+        <sonar:sonar />
+    </target>
+
+</project>
 
 
 

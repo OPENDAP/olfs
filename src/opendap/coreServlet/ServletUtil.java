@@ -41,9 +41,14 @@ import java.util.Enumeration;
 
 public class ServletUtil {
 
-    static private org.slf4j.Logger log = LoggerFactory.getLogger(ServletUtil.class);
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(ServletUtil.class);
 
-    //public static final String DEFAULT_CONTEXT_PATH = "opendap";
+    private static final String VALUE_FRAGMENT = " value: ";
+
+    // We use this to ensure an instance of this collection of "functions" is never instantiated.
+    private ServletUtil(){}
+
+
 
     /**
      * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
@@ -76,38 +81,25 @@ public class ServletUtil {
      *   </ui>
      *
      * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
-     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
-     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
+     * content in this directory be modified before the upgrade can work.) Thus this directory is also referred to
+     * as the "persistent content path" or "persistent content directory" in other parts of the documentation.
      *
      * @param sc  The ServletContext for this servlet that is running.
-     * @return  A String containing the content path (aka the peristent content path) for the web application.
+     * @return  A String containing the content path (aka the persistent content path) for the web application.
      */
     public static String getConfigPath(ServletContext sc) {
 
-        //*
-        String envVarName        = "OLFS_CONFIG_DIR";
         String etcOlfsConfigDir  = "/etc/olfs/";
         String usrShareConfigDir = "/usr/share/olfs/";
         String webappConfDir     = "WEB-INF/conf";
 
-        String envDirName = System.getenv(envVarName);
+        String configMsgBase = "Using config location: {}";
 
-        if(envDirName!=null){
-            // Ah Ha! The environment variable was set. Let's check it out...
-            if (!envDirName.endsWith("/")) {
-                envDirName += "/";
-            }
-            if (pathIsGood(envDirName)) {
-                // It's good so we'll use it.
-                log.info("Using config location: " + envDirName);
-                return envDirName;
-            }
-        }
-        // Nope... Check to see if the /etc/olfs location is available
-        log.debug("The environment variable {} was not set. Trying location: {}",envVarName, etcOlfsConfigDir);
+        // Check to see if the /etc/olfs location is available
+        log.debug("Trying location: {}", etcOlfsConfigDir);
         if (pathIsGood(etcOlfsConfigDir)) {
             // It's good so we'll use it.
-            log.info("Using config location: " + etcOlfsConfigDir);
+            log.info(configMsgBase,  etcOlfsConfigDir);
             return etcOlfsConfigDir;
         }
 
@@ -115,7 +107,7 @@ public class ServletUtil {
         log.debug("The location {} was not available. Trying location: {}",etcOlfsConfigDir,usrShareConfigDir);
         if (pathIsGood(usrShareConfigDir)) {
             // It's good so we'll use it.
-            log.info("Using config location: " + usrShareConfigDir);
+            log.info(configMsgBase, usrShareConfigDir);
             return usrShareConfigDir;
         }
 
@@ -132,9 +124,8 @@ public class ServletUtil {
             // @TODO Understand (again) why the backslash replacement happens below and investigate if asking for a path separator from some java api the way to go.
             configPath = configPath.replace('\\', '/');
         } catch (IOException e) {
-            log.error("Failed to produce a config path! Error: " + e.getMessage());
+            log.error("Failed to produce a config path! Error: {}", e.getMessage());
         }
-
         return configPath;
     }
 
@@ -205,26 +196,10 @@ public class ServletUtil {
      * @return Returns the path to the web applications "context" directory
      */
     public static String getContextPath( ServletContext sc ) {
-/*
-      if ( contextPath == null ) {
-        ServletContext servletContext = servlet.getServletContext();
-        String tmpContextPath = servletContext.getInitParameter( "ContextPath" );
-        if ( tmpContextPath == null )
-            tmpContextPath = DEFAULT_CONTEXT_PATH;
-
-        if(!tmpContextPath.startsWith("/"))
-          contextPath = "/"+tmpContextPath;
-      }
-      return contextPath;
-*/
       String contextPath = sc.getContextPath();
-      log.debug("context path: '"+contextPath+"'");
-
+      log.debug("context path: '{}'",contextPath);
       return contextPath;
     }
-
-
-
 
 
     public static String getSystemPath(HttpServlet servlet, String path) {
@@ -252,15 +227,11 @@ public class ServletUtil {
 
     public static String toString(HttpServlet servlet) {
         StringBuilder s = new StringBuilder("ServletUtil:\n");
-
         s.append("    getContentPath(): ").append(getConfigPath(servlet)).append("\n");
         s.append("    getContextPath(): ").append(getContextPath(servlet)).append("\n");
         s.append("    getRootPath(): ").append(getRootPath(servlet)).append("\n");
         s.append("    getSystemPath(): ").append(getSystemPath(servlet, "/")).append("\n");
-
-
         s.append(probeServlet(servlet));
-
         return s.toString();
     }
 
@@ -271,8 +242,6 @@ public class ServletUtil {
         String pVal;
 
         StringBuilder s = new StringBuilder("HttpServlet:\n");
-
-
         s.append("    getServletInfo(): ").append(servlet.getServletInfo()).append("\n");
         s.append("    getServletName(): ").append(servlet.getServletName()).append("\n");
 
@@ -282,24 +251,18 @@ public class ServletUtil {
             while (e.hasMoreElements()) {
                 pName = (String) e.nextElement();
                 pVal = servlet.getInitParameter(pName);
-                s.append("        name: ").append(pName).append(" value: ").append(pVal).append("\n");
+                s.append("        name: ").append(pName).append(VALUE_FRAGMENT).append(pVal).append("\n");
             }
         } else
             s.append("        No Servlet Parameters Found.\n");
 
-
         ServletConfig scfg = servlet.getServletConfig();
         ServletContext scntxt = servlet.getServletContext();
-
-
         s.append("    HttpServlet.getServletConfig(): ").append(scfg).append("\n");
         s.append(probeServletConfig(scfg));
         s.append("    HttpServlet.ServletContext(): ").append(scntxt).append("\n");
         s.append(probeServletContext(scntxt));
-
-
         return s.toString();
-
     }
 
     public static String probeServletConfig(ServletConfig scfg) {
@@ -315,11 +278,12 @@ public class ServletUtil {
             while(e.hasMoreElements()){
                 pName = (String) e.nextElement();
                 pVal = scfg.getInitParameter(pName);
-                s.append("            name: ").append(pName).append(" value: ").append(pVal).append("\n");
+                s.append("            name: ").append(pName).append(VALUE_FRAGMENT).append(pVal).append("\n");
             }
         }
         else
             s.append("            No Servlet Parameters Found.\n");
+
         ServletContext scntxt = scfg.getServletContext();
         s.append("       ServletConfig.getServletContext(): ").append(scntxt).append("\n");
         s.append(probeServletContext(scntxt));
@@ -349,32 +313,27 @@ public class ServletUtil {
         } else
             s.append("        No Servlet Context Attributes Found.\n");
 
-
         e = sc.getInitParameterNames();
         s.append("       ServletContext Parameters:\n");
         if (e.hasMoreElements()) {
             while (e.hasMoreElements()) {
                 pName = (String) e.nextElement();
                 pVal = sc.getInitParameter(pName);
-                s.append("           name: ").append(pName).append(" value: ").append(pVal).append("\n");
+                s.append("           name: ").append(pName).append(VALUE_FRAGMENT).append(pVal).append("\n");
             }
         } else
             s.append("           No ServletContext Parameters Found.\n");
 
-
         try {
             s.append("       getResource(\"/\"): ").append(sc.getResource("/")).append("\n");
         } catch (MalformedURLException e1) {
-            log.error("Could not perform ServletCOntext.getREsource \"/\". Error Message: " + e1.getMessage());
+            log.error("Could not perform ServletContext.getResource(\"/\"). Error Message: {}", e1.getMessage());
         }
-
 
         s.append("       getMajorVersion(): ").append(sc.getMajorVersion()).append("\n");
         s.append("       getMinorVersion(): ").append(sc.getMinorVersion()).append("\n");
         s.append("       getServerInfo(): ").append(sc.getServerInfo()).append("\n");
-
         return s.toString();
-
     }
 
 
@@ -398,7 +357,6 @@ public class ServletUtil {
         sb.append("    getProtocol():            ").append(req.getProtocol()).append("\n");
         sb.append("    getScheme():              ").append(req.getScheme()).append("\n");
 
-
         sb.append("    getRemoteHost():          ").append(req.getRemoteHost()).append("\n");
         sb.append("    getRemoteUser():          ").append(req.getRemoteUser()).append("\n");
         sb.append("    getRequestURL():          ").append(req.getRequestURL()).append("\n");
@@ -409,7 +367,7 @@ public class ServletUtil {
         sb.append("    getMethod():              ").append(req.getMethod()).append("\n");
         sb.append("    getPathInfo():            ").append(req.getPathInfo()).append("\n");
         sb.append("    getPathTranslated():      ").append(req.getPathTranslated()).append("\n");
-        sb.append("    getRequestedSessionId():  ").append(req.getRequestedSessionId()).append("\n");
+        // We used to ask the request to return the value of getRequestedSessionId() but not so much now, thanks sonar...
 
         sb.append("    getServletPath():         ").append(req.getServletPath()).append("\n");
 
@@ -428,7 +386,6 @@ public class ServletUtil {
             sb.append(value.toString()).append("'\n");
 
         }
-
         sb.append(showSession(req.getSession(true)));
 
         sb.append("  Request Info:\n");
@@ -454,15 +411,12 @@ public class ServletUtil {
     public static String showSession(HttpSession session) {
 
         StringBuilder sb = new StringBuilder();
-
-
         sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
         sb.append("  Session: \n");
         sb.append("    getId():                   ").append(session.getId()).append("\n");
         sb.append("    getCreationTime():         ").append(session.getCreationTime()).append("\n");
         sb.append("    getLastAccessedTime():     ").append(session.getLastAccessedTime()).append("\n");
         sb.append("    getMaxInactiveInterval():  ").append(session.getMaxInactiveInterval()).append("\n");
-
 
         sb.append("    Attributes: \n");
         Enumeration attrNames = session.getAttributeNames();
@@ -473,13 +427,8 @@ public class ServletUtil {
             sb.append(value.toString()).append("\"\n");
 
         }
-
-
         sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
-
-
         return sb.toString();
-
     }
 
 
@@ -498,6 +447,7 @@ public class ServletUtil {
 
         Enumeration e;
         int i;
+        String minorSeparator = ".............................\n";
 
 
         StringBuilder probeMsg = new StringBuilder();
@@ -520,7 +470,7 @@ public class ServletUtil {
             probeMsg.append("    getRequestURL:         ").append(request.getRequestURL()).append("\n");
             probeMsg.append("    getQueryString:        ").append(request.getQueryString()).append("\n");
             probeMsg.append("    getRemoteUser:         ").append(request.getRemoteUser()).append("\n");
-            probeMsg.append("    getRequestedSessionId: ").append(request.getRequestedSessionId()).append("\n");
+
             probeMsg.append("    getRequestURI:         ").append(request.getRequestURI()).append("\n");
             probeMsg.append("    getServletPath:        ").append(request.getServletPath()).append("\n");
             probeMsg.append("    isRequestedSessionIdFromCookie: ").append(request.isRequestedSessionIdFromCookie()).append("\n");
@@ -560,10 +510,8 @@ public class ServletUtil {
             probeMsg.append("    getServerPort:         ").append(request.getServerPort()).append("\n");
             probeMsg.append("    getRemoteAddr:         ").append(request.getRemoteAddr()).append("\n");
             probeMsg.append("    getRemoteHost:         ").append(request.getRemoteHost()).append("\n");
-            //probeMsg.append("    getRealPath:           "+request.getRealPath()).append("\n");
 
-
-            probeMsg.append(".............................").append("\n");
+            probeMsg.append(minorSeparator);
             probeMsg.append("\n");
             i = 0;
             e = request.getAttributeNames();
@@ -572,10 +520,10 @@ public class ServletUtil {
                 i++;
                 String s = (String) e.nextElement();
                 probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
-                probeMsg.append(" Value: ").append(request.getAttribute(s)).append("\n");
+                probeMsg.append(VALUE_FRAGMENT).append(request.getAttribute(s)).append("\n");
             }
 
-            probeMsg.append(".............................").append("\n");
+            probeMsg.append(minorSeparator);
             probeMsg.append("\n");
             i = 0;
             e = request.getParameterNames();
@@ -584,7 +532,7 @@ public class ServletUtil {
                 i++;
                 String s = (String) e.nextElement();
                 probeMsg.append("        Parameter[").append(i).append("]: ").append(s);
-                probeMsg.append(" Value: ").append(request.getParameter(s)).append("\n");
+                probeMsg.append(VALUE_FRAGMENT).append(request.getParameter(s)).append("\n");
             }
 
         }
@@ -627,17 +575,11 @@ public class ServletUtil {
 
             probeMsg.append("    ServletContext.getRealPath(\".\"): ").append(scntxt.getRealPath(".")).append("\n");
             probeMsg.append("    ServletContext.getMajorVersion(): ").append(scntxt.getMajorVersion()).append("\n");
-            //        probeMsg.append("ServletContext.getMimeType():     ").append(scntxt.getMimeType()).append("\n");
             probeMsg.append("    ServletContext.getMinorVersion(): ").append(scntxt.getMinorVersion()).append("\n");
-            //        probeMsg.append("ServletContext.getRealPath(): ").append(sc.getRealPath()).append("\n");
 
-
-            probeMsg.append(".............................").append("\n");
-
-
+            probeMsg.append(minorSeparator);
             probeMsg.append("Servlet Config:").append("\n");
             probeMsg.append("\n");
-
 
             i = 0;
             e = scnfg.getInitParameterNames();
@@ -645,10 +587,9 @@ public class ServletUtil {
             while (e.hasMoreElements()) {
                 String p = (String) e.nextElement();
                 probeMsg.append("        InitParameter[").append(i).append("]: ").append(p);
-                probeMsg.append(" Value: ").append(scnfg.getInitParameter(p)).append("\n");
+                probeMsg.append(VALUE_FRAGMENT).append(scnfg.getInitParameter(p)).append("\n");
                 i++;
             }
-
         }
 
         probeMsg.append("\n");

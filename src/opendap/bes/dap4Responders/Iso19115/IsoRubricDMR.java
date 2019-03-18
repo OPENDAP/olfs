@@ -37,6 +37,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -44,7 +45,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -115,7 +116,7 @@ public class IsoRubricDMR extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -132,7 +133,6 @@ public class IsoRubricDMR extends Dap4Responder {
                 xmlBase,
                 dmr);
 
-        OutputStream os = response.getOutputStream();
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
 
@@ -149,22 +149,22 @@ public class IsoRubricDMR extends Dap4Responder {
         try {
             String xsltDocName = "OPeNDAPDDCount-HTML.xsl";
 
-
             // This Transformer class is an attempt at making the use of the saxon-9 API
             // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
 
-
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+
+            DataOutputStream os = new DataOutputStream(response.getOutputStream());
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(dmr), os);
 
-
             os.flush();
-            log.info("Sent {}", getServiceTitle());
+            LogUtil.setResponseSize(os.size());
+            log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {
             log.debug("Restoring working directory to " + currentDir);

@@ -36,7 +36,7 @@ import java.util.Date;
  */
 public class OAuthAccessToken {
 
-
+    public static final String OAUTH_ACCESS_TOKEN  = "oauth_access_token";
     private String _accessToken;
     private String _endPoint;
     private long _expiresIn;
@@ -47,15 +47,12 @@ public class OAuthAccessToken {
 
 
     public OAuthAccessToken(JsonObject json)  {
-
         _creationTime = new Date();
-
         _accessToken  = json.get("access_token").getAsString();
         _endPoint     = json.get("endpoint").getAsString();
         _expiresIn    = json.get("expires_in").getAsLong();
         _tokenType    = json.get("token_type").getAsString();
         _refreshToken = json.get("refresh_token").getAsString();
-
     }
 
 
@@ -114,6 +111,16 @@ public class OAuthAccessToken {
     }
 
 
+    public String toString(){
+        StringBuilder sb = new StringBuilder(this.getClass().getName()).append("\n");
+        sb.append("  creationTime: ").append(_creationTime).append("\n");
+        sb.append("  accessToken: ").append(_accessToken).append("\n");
+        sb.append("  endPoint: ").append(_endPoint).append("\n");
+        sb.append("  expiresIn: ").append(_expiresIn).append("\n");
+        sb.append("  tokenType: ").append(_tokenType).append("\n");
+        sb.append("  refreshToken: ").append(_refreshToken);
+        return sb.toString();
+    }
 
 
 

@@ -44,6 +44,7 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -179,7 +180,7 @@ public class CatalogManager {
             // get the URL of the catalog.
             href = catRef.getAttributeValue(XLINK.HREF, XLINK.NS);
 
-            if (href.startsWith("http://")) {
+            if (href.startsWith("http://") || href.startsWith("https://")) {
                 _log.info("Found catalogRef that references an external " +
                         "catalog: '"+href+"' Target catalog not processed. The catalogRef element " +
                         "will remain in the catalog and will not be cached.");
@@ -342,17 +343,15 @@ public class CatalogManager {
 
         Catalog cat;
 
-
         try {
             cat = getCatalog(catalogKey);
             if (cat != null)
                 return cat.getLastModified();
         }
-        catch(Exception e){
-            _log.info("No such catalog: {}",catalogKey);
+        catch (SaxonApiException | BESError e) {
+            _log.info("Failed to retrieve catalog: {}  (msg: {})",catalogKey, e.getMessage());
         }
-
-        return -1;
+        return new Date().getTime();
     }
 
     /**

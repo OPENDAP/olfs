@@ -32,13 +32,13 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.http.mediaTypes.TextCsv;
 import opendap.http.mediaTypes.TextPlain;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 /**
@@ -50,14 +50,14 @@ public class Ascii extends Dap4Responder {
     private static String _defaultRequestSuffix = ".ascii";
 
     public Ascii(String sysPath, BesApi besApi) {
-        this(sysPath,null, _defaultRequestSuffix,besApi);
+        this(sysPath, null, _defaultRequestSuffix, besApi);
     }
 
     public Ascii(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
+        this(sysPath, pathPrefix, _defaultRequestSuffix, besApi);
     }
 
-    public Ascii(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public Ascii(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
@@ -73,21 +73,23 @@ public class Ascii extends Dap4Responder {
     }
 
 
-    public boolean isDataResponder(){ return true; }
-    public boolean isMetadataResponder(){ return false; }
+    public boolean isDataResponder() {
+        return true;
+    }
+
+    public boolean isMetadataResponder() {
+        return false;
+    }
 
 
     @Override
-    public boolean matches(String relativeUrl, boolean checkWithBes){
-        return super.matches(relativeUrl,checkWithBes);
+    public boolean matches(String relativeUrl, boolean checkWithBes) {
+        return super.matches(relativeUrl, checkWithBes);
     }
 
 
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-
-        // String context = request.getContextPath();
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
@@ -97,36 +99,25 @@ public class Ascii extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
-
         log.debug("sendASCII() for dataset: " + resourceID);
 
-        MediaType responseMediaType =  getNormativeMediaType();
+        MediaType responseMediaType = getNormativeMediaType();
 
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", "dods_ascii");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-
-
         User user = new User(request);
 
-
-
-        OutputStream os = response.getOutputStream();
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsAscii(resourceID, constraintExpression, user.getMaxResponseSize(), os);
-
         os.flush();
-        log.debug("Sent DAP ASCII data response.");
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
-
 }

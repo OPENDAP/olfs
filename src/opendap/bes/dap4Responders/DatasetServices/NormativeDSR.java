@@ -37,6 +37,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.DSR;
+import opendap.logging.LogUtil;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
 import org.jdom.Document;
@@ -48,6 +49,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
 import java.util.*;
 
 /**
@@ -137,8 +139,10 @@ public class NormativeDSR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(serviceDescription,response.getOutputStream());
-        log.debug("Sent {}",getServiceTitle());
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
+        xmlo.output(serviceDescription,os);
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
 
     }
 

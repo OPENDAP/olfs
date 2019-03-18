@@ -34,6 +34,10 @@ import org.jdom.Namespace;
  */
 public class THREDDS {
 
+    /**
+     * This class should never be instantiated.
+     */
+    private THREDDS(){ throw new IllegalStateException("opendap.namespaces.THREDDS class"); }
 
     public static final String NAMESPACE_STRING = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
     public static final String NAMESPACE_PREFIX = "thredds";
@@ -53,6 +57,7 @@ public class THREDDS {
     public static final String TYPE = "type";
 
     public static final String ACCESS = "access";
+    public static final String URL_PATH = "urlPath";
     public static final String METADATA = "metadata";
 
     public static final String DATASET = "dataset";
@@ -84,10 +89,6 @@ public class THREDDS {
     public static final String LATEST_COMPLETE = "latestComplete";
     public static final String LAST_MODIFIED_LIMIT = "lastModifiedLimit";
     public static final String MODIFIED = "modified";
-
-
-
-
 
     public static final String ADD_TIME_COVERAGE = "addTimeCoverage";
     public static final String DATASET_NAME_MATCH_PATTERN = "datasetNameMatchPattern";

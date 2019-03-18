@@ -26,13 +26,18 @@
 
 package opendap.bes;
 
+import opendap.PathBuilder;
+import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -48,67 +53,62 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class BESManager {
 
-    private static  org.slf4j.Logger _log;
-    private static AtomicBoolean _initialized;
-    private static Vector<BesGroup> _besCollection;
-    private static AtomicBoolean _isConfigured;
-    private static Element _config;
-    private static ReentrantLock _lock;
+    private static final Logger LOG = LoggerFactory.getLogger(BESManager.class);
+    private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
+    private static final Vector<BesGroup> BES_COLLECTION = new Vector<>();
+    private static final AtomicBoolean CONFIGURED = new AtomicBoolean(false);
+    private static final ReentrantLock LOCK = new ReentrantLock() ;
 
-    static {
-        _log = LoggerFactory.getLogger(BESManager.class);
-        _besCollection = new Vector<>();
-        _initialized = new AtomicBoolean(false);
-        _isConfigured = new AtomicBoolean(false);
-        _config = null;
-        _lock = new ReentrantLock();
-
-    }
+    public static final String BES_MANAGER_CONFIG_ELEMENT = "BESManager";
 
 
-    public void init(Element config) throws Exception{
+    private static Element config = null;
+    private static BesGroup rootGroup;
 
-        _lock.lock();
+    /**
+     * This is a singleton class so we make the default constructor private. All of the methods are static and so
+     * nobody ever needs an instance
+     */
+    private BESManager(){}
+
+    public static void init(ServletContext servletContext, Element config) throws BadConfigurationException {
+
+        LOCK.lock();
         try {
-            
-            if (_initialized.get()) return;
+            if (INITIALIZED.get()) return;
 
-            _config = (Element) config.clone();
-            configure(config);
-
-            _log.info("Initialized.");
-
-            _initialized.set(true);
+            BESManager.config = (Element) config.clone();
+            configure(servletContext, config);
+            LOG.info("Initialized.");
+            INITIALIZED.set(true);
         }
         finally {
-            _lock.unlock();
+            LOCK.unlock();
         }
-
     }
 
     public static boolean isInitialized(){
-        return _initialized.get();
+        return INITIALIZED.get();
     }
 
 
 
 
-    public void destroy(){
+    public static void destroy(){
         shutdown();
-        _log.info("Destroy complete.");
-
+        BesNodeCache.destroy();
+        LOG.info("Destroy complete.");
     }
 
 
     public static Element getConfig(){
-        return (Element) _config.clone();
+        return (Element) config.clone();
     }
 
 
-    private void configure(Element besConfiguration) throws Exception {
+    private static void configure(ServletContext servletContext, Element besConfiguration) throws BadConfigurationException {
 
-        if(_isConfigured.get()) return;
-
+        if(CONFIGURED.get()) return;
 
         List besList = besConfiguration.getChildren("BES");
 
@@ -134,15 +134,17 @@ public class BESManager {
             // for the new BES - if it doesn't match the returned group prefix then we need to make a new group.
             if (groupForThisPrefix == null || !groupForThisPrefix.getGroupPrefix().equals(bes.getPrefix())) {
                 groupForThisPrefix = new BesGroup(bes.getPrefix());
-                _besCollection.add(groupForThisPrefix);
+                BES_COLLECTION.add(groupForThisPrefix);
             }
 
 
             groupForThisPrefix.add(bes);
 
 
-            if (groupForThisPrefix.getGroupPrefix().equals("/"))
+            if (groupForThisPrefix.getGroupPrefix().equals("/")) {
+                rootGroup = groupForThisPrefix;
                 foundRootBES = true;
+            }
         }
 
         if (!foundRootBES)
@@ -150,13 +152,39 @@ public class BESManager {
                     "contain at LEAST one BES configuration element. Whose " +
                     "prefix is \"/\". (Why? Think about it...)");
 
-        _isConfigured.set(true);
 
+        Element nodeCache = besConfiguration.getChild(BesNodeCache.NODE_CACHE_ELEMENT_NAME);
+        // If nodeCache is null no action needs to be taken because the NodeCache
+        // will run with default settings
+        if(nodeCache!=null){
+            BesNodeCache.init(nodeCache);
+        }
+
+        Element siteMapCache = besConfiguration.getChild(BesSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
+        // The SiteMap cache is required, so if it's not in the configuration
+        // then we need to gin one up.
+        if(siteMapCache==null) {
+            siteMapCache = new Element(BesSiteMap.SITE_MAP_CACHE_ELEMENT_NAME);
+        }
+        String cacheFile = siteMapCache.getAttributeValue(BesSiteMap.CACHE_FILE_ATTRIBUTE_NAME);
+        if(cacheFile==null) {
+            // Critically, we need to tell the BESSiteMap where to cache so if
+            // the cache file is missing from the configuration we sort that
+            // out using our configuration stack.
+            ServletUtil.getConfigPath(servletContext);
+            String defaultSiteMapCacheFile = PathBuilder.pathConcat(ServletUtil.getConfigPath(servletContext),"cache");
+            defaultSiteMapCacheFile = PathBuilder.pathConcat(defaultSiteMapCacheFile,"SiteMap.cache");
+            siteMapCache.setAttribute(BesSiteMap.CACHE_FILE_ATTRIBUTE_NAME, defaultSiteMapCacheFile);
+        }
+        // We don't need a refresh interval because if it's missing the
+        // default BESSiteMap.DEFAULT_CACHE_REFRESH_INTERVAL will be used
+        BesSiteMap.init(siteMapCache);
+        CONFIGURED.set(true);
 
     }
 
 
-    public static void addBes(BES bes) throws Exception {
+    public static void addBes(BES bes) throws BadConfigurationException {
 
         Iterator<BesGroup> i = BESManager.getBesGroups();
 
@@ -173,13 +201,13 @@ public class BESManager {
         else {
             myGroup = new BesGroup(bes.getPrefix());
             myGroup.add(bes);
-            _besCollection.add(myGroup);
+            BES_COLLECTION.add(myGroup);
         }
     }
 
 
     public static boolean isConfigured(){
-        return _isConfigured.get();
+        return CONFIGURED.get();
     }
 
 
@@ -193,13 +221,13 @@ public class BESManager {
             path = "/";
 
         if(path.indexOf("/")!=0){
-            _log.debug("Pre-pending / to path: "+ path);
+            LOG.debug("Pre-pending / to path: "+ path);
             path = "/"+path;
         }
 
         BesGroup besGroupToServicePath = null;
         String prefix;
-        for(BesGroup besGroup : _besCollection){
+        for(BesGroup besGroup : BES_COLLECTION){
             prefix = besGroup.getGroupPrefix();
 
             if(path.indexOf(prefix) == 0){
@@ -223,7 +251,7 @@ public class BESManager {
 
         if (bes == null) {
             String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(path);
-            _log.error(msg);
+            LOG.error(msg);
             throw new BadConfigurationException(msg);
         }
 
@@ -242,15 +270,14 @@ public class BESManager {
             path = "/";
 
         if(path.indexOf("/")!=0){
-            _log.debug("Pre-pending / to path: "+ path);
+            LOG.debug("Pre-pending / to path: "+ path);
             path = "/"+path;
         }
 
         BesGroup result = null;
         String prefix;
-        for(BesGroup besGroup : _besCollection){
+        for(BesGroup besGroup : BES_COLLECTION){
             prefix = besGroup.getGroupPrefix();
-
             if(path.indexOf(prefix) == 0){
                 if(result == null){
                     result = besGroup;
@@ -259,9 +286,10 @@ public class BESManager {
                     if(prefix.length() > result.getGroupPrefix().length())
                         result = besGroup;
                 }
-
             }
         }
+        if(result == null)
+            result = rootGroup;
 
         return result;
     }
@@ -269,18 +297,18 @@ public class BESManager {
 
     public static Iterator<BesGroup> getBesGroups(){
 
-        return _besCollection.listIterator();
+        return BES_COLLECTION.listIterator();
 
     }
 
 
     public static void shutdown(){
-        for(BesGroup besGroup : _besCollection){
-            _log.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
+        for(BesGroup besGroup : BES_COLLECTION){
+            LOG.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
             besGroup.destroy();
         }
-        _log.debug("All BesGroup's have been shut down.");
-
+        LOG.debug("All BesGroup's have been shut down.");
+        CONFIGURED.set(false);
     }
 
 
@@ -301,7 +329,7 @@ public class BESManager {
         Element besVer;
         Document tmp;
 
-        for(BesGroup besGroup : _besCollection){
+        for(BesGroup besGroup : BES_COLLECTION){
 
             Document besGroupVerDoc = besGroup.getGroupVersion();
             doc.getRootElement().addContent(besGroupVerDoc.detachRootElement());
@@ -332,22 +360,5 @@ public class BESManager {
 
 
     }
-
-
-
-
-
-
-
-//    public static void removeThreadCache(Thread t){
-//        threadCache.remove(t);
-//        _log.info("Removing ThreadCache for thread "+t.getName());
-//    }
-
-
-
-
-
-
 
 }

@@ -59,11 +59,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -74,99 +73,93 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ViewersServlet extends HttpServlet {
 
-    private Logger _log;
+    private static final Logger LOG = LoggerFactory.getLogger(ViewersServlet.class);
 
-    private boolean _webStartDisabled = false;
-    private String _webStartResourcesDirectory;
-    private Document _configDoc;
+    private static final ReentrantLock INIT_LOCK = new ReentrantLock();
+    private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
 
-    private BesApi _besApi;
+    private static final AtomicInteger REQ_NUMBER = new AtomicInteger(0);
+    private static final AtomicBoolean WEB_START_DISABLED = new AtomicBoolean(false);
+    private static final BesApi BES_API = new BesApi();
 
-    private String _configFilename;
+    private static String webStartResourcesDirectory;
+    private static Document configDoc;
+    private static String configFilename = "viewers.xml";
 
-    private static String _serviceId ="/viewers";
+    private static String serviceId ="/viewers";
 
     public static String getServiceId(){
-        return _serviceId;
+        return serviceId;
     }
 
 
-    public ViewersServlet(){
-        _log = LoggerFactory.getLogger(getClass());
-        _configFilename = "viewers.xml"; // Default value
-    }
-
-    //private Document configDoc;
-    private AtomicInteger reqNumber;
-
-
+    /**
+     *
+     * @throws ServletException
+     */
+    @Override
     public void init() throws ServletException {
-        super.init();
+        // Using this lock prevents thread contention when initializing
+        INIT_LOCK.lock();
+        try {
+            if(IS_INITIALIZED.get())
+                return;
 
-        String s = getInitParameter("ConfigFileName");
-        if (s != null) {
-            _configFilename = s;
-            String msg = "Servlet configuration included a parameter called 'ConfigFileName' whose value is '" +
-                    _configFilename + "'\n";
-            _log.info(msg);
-        }
+            super.init();
 
-        PersistentConfigurationHandler.installDefaultConfiguration(this, _configFilename);
+            serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();
+            LOG.debug("serviceId: {}", getServiceId());
 
-
-        _serviceId = this.getServletContext().getContextPath() + "/" + this.getServletName();
-
-        _log.debug(getClass().getSimpleName() + " - serviceId: " + getServiceId());
-
-
-        // log.debug(ServletUtil.probeServlet(this));
-
-        reqNumber = new AtomicInteger(0);
-
-
-        // We look in the configuration directory first. Because if they are using a localized configuration and have
-        // localized the web start options then the JNLP should be available there.
-        String webStartDir = ServletUtil.getConfigPath(this) + "WebStart";
-        _log.info("Checking for WebStart resources Directory: " + webStartDir);
-        File f = new File(webStartDir);
-        if (f.exists() && f.isDirectory()) {
-            _webStartResourcesDirectory = webStartDir;
-            _log.info("Found WebStart resources Directory: " + webStartDir);
-        }
-        else {
-
-            _log.warn("Could not locate WebStart resources Directory: " + webStartDir);
-
-            // We failed to locate a localized WebStart directory, so we will look in our distribution for it.
-            // We find that by asking the servletContext for the real filesystem path of the directory.
-
-            webStartDir = this.getServletContext().getRealPath("WebStart");
-            _log.info("Checking for WebStart resources Directory: " + webStartDir);
-            f = new File(webStartDir);
-            if (f.exists() && f.isDirectory()) {
-                _webStartResourcesDirectory = webStartDir;
-                _log.info("Found resources Directory: " + webStartDir);
-            } else {
-                _webStartDisabled = true;
-                _log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                _log.error("Could not locate WebStart resources Directory: " + webStartDir);
-                _log.error("Java WebStart Disabled!");
-                _log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                _webStartResourcesDirectory = null;
+            String s = getInitParameter("ConfigFileName");
+            if (s != null) {
+                configFilename = s;
+                LOG.info("Servlet configuration included a parameter called 'ConfigFileName' whose value is '{}'",configFilename);
             }
 
+            PersistentConfigurationHandler.installDefaultConfiguration(this, configFilename);
+
+
+            // We look in the configuration directory first. Because if they are using a localized configuration and have
+            // localized the web start options then the JNLP should be available there.
+            String webStartDir = ServletUtil.getConfigPath(this) + "WebStart";
+            LOG.info("Checking for WebStart resources Directory: {}", webStartDir);
+            File f = new File(webStartDir);
+            if (f.exists() && f.isDirectory()) {
+                webStartResourcesDirectory = webStartDir;
+                LOG.info("Found WebStart resources Directory: {}", webStartDir);
+            } else {
+
+                LOG.warn("Could not locate WebStart resources Directory: {}", webStartDir);
+
+                // We failed to locate a localized WebStart directory, so we will look in our distribution for it.
+                // We find that by asking the servletContext for the real filesystem path of the directory.
+
+                webStartDir = this.getServletContext().getRealPath("WebStart");
+                LOG.info("Checking for WebStart resources Directory: {}", webStartDir);
+                f = new File(webStartDir);
+                if (f.exists() && f.isDirectory()) {
+                    webStartResourcesDirectory = webStartDir;
+                    LOG.info("Found resources Directory: {}", webStartDir);
+                } else {
+                    WEB_START_DISABLED.set(true);
+                    LOG.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    LOG.error("Could not locate WebStart resources Directory: {}", webStartDir);
+                    LOG.error("Java WebStart is DISABLED!");
+                    LOG.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                    webStartResourcesDirectory = null;
+                }
+            }
+            configDoc = loadConfig(configFilename);
+
+            buildJwsHandlers(webStartResourcesDirectory, configDoc.getRootElement());
+            buildWebServiceHandlers(webStartResourcesDirectory, configDoc.getRootElement());
+
+            IS_INITIALIZED.set(true);
         }
-
-        _configDoc = loadConfig(_configFilename);
-
-        buildJwsHandlers(_webStartResourcesDirectory,_configDoc.getRootElement());
-        buildWebServiceHandlers(_webStartResourcesDirectory, _configDoc.getRootElement());
-
-        _besApi = new BesApi();
-
-
-
+        finally {
+            INIT_LOCK.unlock();
+        }
     }
 
 
@@ -179,9 +172,10 @@ public class ViewersServlet extends HttpServlet {
      */
     private Document loadConfig(String configFileName) throws ServletException {
 
+        String msgBase = "Dataset Viewers Configuration File";
         Document doc;
         configFileName = Scrub.fileName(ServletUtil.getConfigPath(this) + configFileName);
-        _log.debug("Loading Dataset Viewers Configuration File: " + configFileName);
+        LOG.debug("Loading {}: {}", msgBase, configFileName);
         try {
 
             File confFile = new File(configFileName);
@@ -197,20 +191,20 @@ public class ViewersServlet extends HttpServlet {
             }
 
         } catch (FileNotFoundException e) {
-            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" cannot be found.";
-            _log.error(msg);
+            String msg = msgBase + " \"" + configFileName + "\" cannot be found.";
+            LOG.error(msg);
             throw new ServletException(msg, e);
         } catch (IOException e) {
-            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" is not readable.";
-            _log.error(msg);
+            String msg = msgBase + " \"" + configFileName + "\" is not readable.";
+            LOG.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
-            String msg = "Dataset Viewers Configuration File \"" + configFileName + "\" cannot be parsed.";
-            _log.error(msg);
+            String msg = msgBase + " \"" + configFileName + "\" cannot be parsed.";
+            LOG.error(msg);
             throw new ServletException(msg, e);
         }
 
-        _log.debug("Dataset Viewers Configuration loaded and parsed.");
+        LOG.debug("{} loaded and parsed.",msgBase);
         return doc;
 
     }
@@ -223,18 +217,18 @@ public class ViewersServlet extends HttpServlet {
      * calling their init() methods and passing into them the XML Element
      * that defined them from the config document.
      *
-     * @return A VEector of JwsHandlers that have been intialized and are ready to use.
      * @throws javax.servlet.ServletException When things go poorly
      */
-    private void  buildJwsHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
+    private void  buildJwsHandlers(String resourcesDir, Element webStartConfig)
+            throws ServletException {
 
         String msg;
 
 
-        _log.debug("Building JwsHandlers...");
+        LOG.debug("Building JwsHandlers...");
 
         if(resourcesDir==null){
-            _log.warn("Java WebStart resources directory is 'null'. No Java WebStart service built.");
+            LOG.warn("Java WebStart resources directory is 'null'. No Java WebStart service built.");
             return;
         }
 
@@ -247,40 +241,40 @@ public class ViewersServlet extends HttpServlet {
                 JwsHandler jwsHandler;
                 try {
 
-                    _log.debug("Building Handler: " + className);
+                    LOG.debug("Building Handler: {}", className);
                     Class classDefinition = Class.forName(className);
                     jwsHandler = (JwsHandler) classDefinition.newInstance();
 
                 } catch (ClassNotFoundException e) {
                     msg = "Cannot find class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (InstantiationException e) {
                     msg = "Cannot instantiate class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (IllegalAccessException e) {
                     msg = "Cannot access class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (ClassCastException e) {
                     msg = "Cannot cast class: " + className + " to opendap.webstart.JwsHandler";
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 }
 
-                _log.debug("Initializing Handler: " + className);
+                LOG.debug("Initializing Handler: {}", className);
                 jwsHandler.init(handlerElement, resourcesDir);
 
                 ServicesRegistry.addService(jwsHandler);
                 i++;
             }
             else {
-                _log.error("buildJwsHandlers() - FAILED to locate the required 'className' attribute in JwsHandler element. SKIPPING.");
+                LOG.error("FAILED to locate the required 'className' attribute in JwsHandler element. SKIPPING.");
             }
         }
 
-        _log.debug(i + " JwsHandlers have been built.");
+        LOG.debug("{} JwsHandlers have been built.", i);
 
     }
 
@@ -297,11 +291,7 @@ public class ViewersServlet extends HttpServlet {
     private void buildWebServiceHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
 
         String msg;
-
-
-        _log.debug("Building WebServiceHandlers...");
-
-
+        LOG.debug("Building WebServiceHandlers...");
         int i = 0;
         for (Object o : webStartConfig.getChildren("WebServiceHandler")) {
             Element handlerElement = (Element) ((Element) o).clone();
@@ -310,155 +300,108 @@ public class ViewersServlet extends HttpServlet {
                 WebServiceHandler wsh;
                 try {
 
-                    _log.debug("Building Handler: " + className);
+                    LOG.debug("Building Handler: {}", className);
                     Class classDefinition = Class.forName(className);
                     wsh = (WebServiceHandler) classDefinition.newInstance();
 
                 } catch (ClassNotFoundException e) {
                     msg = "Cannot find class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (InstantiationException e) {
                     msg = "Cannot instantiate class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (IllegalAccessException e) {
                     msg = "Cannot access class: " + className;
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 } catch (ClassCastException e) {
                     msg = "Cannot cast class: " + className + " to opendap.webstart.WebServiceHandler";
-                    _log.error(msg);
+                    LOG.error(msg);
                     throw new ServletException(msg, e);
                 }
 
-                _log.debug("Initializing Handler: " + className);
+                LOG.debug("Initializing Handler: {}", className);
                 wsh.init(this, handlerElement);
 
                 ServicesRegistry.addService(wsh);
                 i++;
             }
             else {
-                _log.error("buildWebServiceHandlers() - FAILED to locate the required 'className' attribute in WebServiceHandler element. SKIPPING.");
+                LOG.error("FAILED to locate the required 'className' attribute in WebServiceHandler element. SKIPPING.");
             }
         }
 
-        _log.debug(i + " WebServiceHandlers have been built.");
+        LOG.debug("{} WebServiceHandlers have been built.", i);
 
     }
 
 
-
-
-
+    /**
+     *
+     * @param req
+     * @return
+     */
+    @Override
     public long getLastModified(HttpServletRequest req) {
 
         long lmt;
-
-        if (_webStartDisabled)
-            return -1;
+        if (WEB_START_DISABLED.get())
+            return new Date().getTime();
 
         String name = Scrub.fileName(getName(req));
-
-
         File f = new File(name);
-
         if (f.exists())
             lmt = f.lastModified();
         else
-            lmt = -1;
-
-
-        //log.debug("getLastModified() - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
+            lmt = new Date().getTime();
 
         return lmt;
-
-
     }
 
 
+    /**
+     *
+     * @param req
+     * @return
+     */
     private String getName(HttpServletRequest req) {
 
         String name = req.getPathInfo();
-
         if (name == null)
             name = "/";
 
-        name = _webStartResourcesDirectory + name;
+        name = webStartResourcesDirectory + name;
         return name;
     }
 
 
-
-    private HashMap<String, String> parseQuery(String query){
-
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        if(query==null){
-            _log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(), Scrub.simpleQueryString(query));
-            return params;
-        }
-
-        String args[] = query.split("&");
-        if (args == null) {
-            _log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(), Scrub.simpleQueryString(query));
-            return params;
-        }
-
-        String[] pairs;
-        for (String arg : args) {
-            pairs = arg.split("=");
-            if (pairs != null) {
-                if (pairs.length == 2) {
-                    params.put(pairs[0], pairs[1]);
-                } else {
-                    _log.error("Parse failed for argument: " + Scrub.simpleQueryString(arg));
-                }
-            }
-        }
-        return params;
-    }
-
+    /**
+     *
+     * @param req
+     * @param resp
+     */
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         RequestCache.openThreadCache();
-
-        LogUtil.logServerAccessStart(req, "WebStartServletAccess", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
-
-
-        _log.debug(ServletUtil.showRequest(req, reqNumber.get()));
-        //log.debug(opendap.coreServlet.AwsUtil.probeRequest(this, req));
-
+        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
+        LOG.debug(ServletUtil.showRequest(req, REQ_NUMBER.get()));
 
         Request dapRequest = new Request(this,req);
-
-
-        String query = req.getQueryString();
-        HashMap<String, String> params;
-
+        String query = Scrub.simpleQueryString(req.getQueryString());
         int request_status = HttpServletResponse.SC_OK;
         try {
-
-
-
-            //if (_webStartDisabled) {
-            //    log.error("Java WebStart is disabled!");
-            //    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            //    return;
-
-            //}
-
-            params = parseQuery(query);
-
-            String dapService = Scrub.fileName(params.get("dapService"));
-            String besDatasetId = Scrub.fileName(params.get("datasetID"));
+            String dapService = Scrub.fileName(req.getParameter("dapService"));
+            String besDatasetId = Scrub.fileName(req.getParameter("datasetID"));
 
             if(dapService==null || besDatasetId==null){
-                String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+  Scrub.simpleQueryString(query) +"'";
-                _log.error("doGet() - {}",msg);
-                throw new BadRequest(msg);
+                String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+ query +"'";
+                LOG.error("{}",msg);
+                request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg),this, resp);
+                return;
             }
-
 
             URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
             String protocol = serviceURL.getProtocol();
@@ -466,21 +409,9 @@ public class ViewersServlet extends HttpServlet {
             int port = serviceURL.getPort();
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
-
-
-
             Document ddx = getDDX(serverURL, dapService, besDatasetId);
 
-            if(ddx == null){
-                String msg = "Failed to locate dataset: " + besDatasetId;
-                _log.error("doGet() - {}", msg);
-                throw new NotFound(msg);
-            }
-
-
             String applicationID = req.getPathInfo();
-                 
-
             // Condition applicationID.
             if (applicationID != null)
             {
@@ -493,22 +424,21 @@ public class ViewersServlet extends HttpServlet {
 
             if(applicationID == null){
                 String msg = "No applicationID found in WebStart request.";
-                _log.error("doGet() - {}", msg);
-                throw new NotFound(msg);
+                LOG.error("{}", msg);
+                request_status = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
+                return;
             }
 
             if (applicationID.equals("viewers")) {
-
+                DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
                 resp.setContentType("text/html");
-                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, resp.getOutputStream());
-                
+                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
+                LogUtil.setResponseSize(dos.size());
             } else {
-
                 String dataAccessURL = serverURL+dapService+besDatasetId;
 
                 // Attempt to locate the application...
                 JwsHandler jwsHandler = ServicesRegistry.getJwsHandlerById(applicationID);
-
                 if (jwsHandler != null) {
 
                     // get the jnlp content
@@ -520,20 +450,19 @@ public class ViewersServlet extends HttpServlet {
                         resp.setContentType(mType);
 
                     // Get the sink
-                    PrintWriter pw = resp.getWriter();
+                    DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
+                    PrintStream ps = new PrintStream(dos);
 
                     // Send the jnlp to the client.
-                    pw.print(jnlpContent);
+                    ps.print(jnlpContent);
+                    LogUtil.setResponseSize(dos.size());
 
                 } else {
-                    String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+Scrub.simpleQueryString(query);
-                    _log.error("doGet() - {}", msg);
-                    throw new NotFound(msg);
+                    String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+query;
+                    LOG.error("{}", msg);
+                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
                 }
-
-
             }
-
         }
         catch (Throwable t){
             try {
@@ -541,11 +470,12 @@ public class ViewersServlet extends HttpServlet {
             }
             catch (Throwable t2) {
                 try {
-                    _log.error("\n########################################################\n" +
+                    String msg = "\n########################################################\n" +
                             "Request proccessing failed.\n" +
                             "Normal Exception handling failed.\n" +
                             "This is the last error log attempt for this request.\n" +
-                            "########################################################\n", t2);
+                            "########################################################\n {}";
+                    LOG.error(msg,t2);
                 }
                 catch (Throwable t3) {
                     // It's boned now.. Leave it be.
@@ -553,37 +483,46 @@ public class ViewersServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "WebStartServletAccess");
+            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
-             this.destroy();
+            // this.destroy(); // I commented this out because: WTF? Why? - ndp 03/05/2019
         }
-
     }
 
-
-
-
-
-
-
-
-    private void sendDatasetPage(String webStartService, String docsService, String dapService, String datasetID, Document ddx, OutputStream os) throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException
+    /**
+     *
+     * @param webStartService
+     * @param docsService
+     * @param dapService
+     * @param datasetID
+     * @param ddx
+     * @param os
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws SaxonApiException
+     * @throws JDOMException
+     */
+    private void sendDatasetPage(
+            String webStartService,
+            String docsService,
+            String dapService,
+            String datasetID,
+            Document ddx,
+            OutputStream os)
+            throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException
     {
 
         String xsltDoc = ServletUtil.getSystemPath(this, "/xsl/webStartDataset.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
-
-
         transformer.setParameter("datasetID",datasetID);
         transformer.setParameter("dapService",dapService);
         transformer.setParameter("docsService",docsService);
         transformer.setParameter("webStartService", webStartService);
 
-
-
         String handlers = getWebStartHandlersParam(datasetID, ddx);
-        _log.debug("WebStart Handlers: " + handlers);
+        LOG.debug("WebStart Handlers: \n{}",  handlers);
         if(handlers!=null){
             ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes(HyraxStringEncoding.getCharset()));
             XdmNode valueNode = transformer.build(new StreamSource(reader));
@@ -591,24 +530,27 @@ public class ViewersServlet extends HttpServlet {
         }
 
         handlers = getWebServicesParam(datasetID, ddx);
-        _log.debug("WebServices: \n" + handlers);
+        LOG.debug("WebServices: \n{}" + handlers);
         if(handlers!=null){
             ByteArrayInputStream reader = new ByteArrayInputStream(handlers.getBytes(HyraxStringEncoding.getCharset()));
             XdmNode valueNode = transformer.build(new StreamSource(reader));
             transformer.setParameter("webServices",valueNode);
         }
-
-
         JDOMSource ddxSource = new JDOMSource(ddx);
         transformer.transform(ddxSource, os);
     }
 
 
-
+    /**
+     *
+     * @param datasetId
+     * @param ddx
+     * @return
+     */
     private Vector<JwsHandler> getWebStartApplicationsForDataset(String datasetId, Document ddx){
+
         Iterator<JwsHandler> e = ServicesRegistry.getJavaWebStartHandlers().values().iterator();
         JwsHandler jwsHandler;
-
         Vector<JwsHandler> canHandleDataset = new Vector<JwsHandler>();
 
         while(e.hasNext()){
@@ -616,35 +558,40 @@ public class ViewersServlet extends HttpServlet {
             if(jwsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.add(jwsHandler);
             }
-
         }
-
         return canHandleDataset;
-
     }
 
+
+    /**
+     *
+     * @param datasetId
+     * @param ddx
+     * @return
+     */
     private TreeMap<String, WebServiceHandler> getWebServicesForDataset(String datasetId, Document ddx){
 
         Iterator<WebServiceHandler> e = ServicesRegistry.getWebServiceHandlers().values().iterator();
         WebServiceHandler wsHandler;
-
         TreeMap<String, WebServiceHandler> canHandleDataset = new TreeMap<>();
-
 
         while(e.hasNext()){
             wsHandler = e.next();
             if(wsHandler.datasetCanBeViewed(datasetId, ddx)){
                 canHandleDataset.put(wsHandler.getName(), wsHandler);
             }
-
         }
-
         return canHandleDataset;
-
     }
 
-    private String getWebStartHandlersParam(String datsetId, Document ddx) {
 
+    /**
+     *
+     * @param datsetId
+     * @param ddx
+     * @return
+     */
+    private String getWebStartHandlersParam(String datsetId, Document ddx) {
 
         Vector<JwsHandler> jwsHandlers =  getWebStartApplicationsForDataset(datsetId, ddx);
 
@@ -655,30 +602,30 @@ public class ViewersServlet extends HttpServlet {
         Element wsElement;
 
         for(JwsHandler jwsh : jwsHandlers){
-
             wsElement = new Element("webStartApp");
             wsElement.setAttribute("id",jwsh.getServiceId());
             wsElement.setAttribute("applicationName",jwsh.getName());
-
             webStartAppsElement.addContent(wsElement);
         }
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(new Document(webStartAppsElement));
-
-
     }
 
+
+    /**
+     *
+     * @param datasetId
+     * @param ddx
+     * @return
+     */
     private String getWebServicesParam(String datasetId, Document ddx) {
 
         TreeMap<String, WebServiceHandler> webServicesForDataset =  getWebServicesForDataset(datasetId, ddx);
-
         if(webServicesForDataset.isEmpty())
             return null;
 
         Element webServicesElement = new Element("WebServices");
         Element wsElement;
-
 
         for(WebServiceHandler wsh: webServicesForDataset.values()){
             wsElement = new Element("webService");
@@ -687,35 +634,37 @@ public class ViewersServlet extends HttpServlet {
             wsElement.setAttribute("serviceUrl",wsh.getServiceLink(datasetId));
 
             webServicesElement.addContent(wsElement);
-
         }
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(new Document(webServicesElement));
-
-
     }
 
 
+    /**
+     *
+     * @param serverURL
+     * @param dapService
+     * @param datasetID
+     * @return
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws BESError
+     * @throws JDOMException
+     */
+    private Document getDDX(String serverURL, String dapService, String datasetID)
+            throws IOException, PPTException, BadConfigurationException, BESError, JDOMException {
 
-
-    public Document getDDX(String serverURL, String dapService, String datasetID) throws IOException, PPTException, BadConfigurationException, BESError, JDOMException {
         String constraintExpression = "";
         String xmlBase = serverURL+dapService+datasetID;
         Document ddx = new Document();
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextHtml());
-        _besApi.getDDXDocument(
+        BES_API.getDDXDocument(
                 datasetID,
                 constraintExpression,
                 xmlBase,
                 ddx);
         return ddx;
     }
-
-
-
-
-
-
 }

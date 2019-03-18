@@ -27,6 +27,7 @@ package opendap.w10n;
 
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
 import opendap.http.error.BadRequest;
@@ -196,18 +197,7 @@ class W10nRequest {
 
     public String getXmlBase(){
 
-        String forwardRequestUri = (String)_request.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = _request.getRequestURL().toString();
-
-
-        if(forwardRequestUri != null){
-            String server = _request.getServerName();
-            int port = _request.getServerPort();
-            String scheme = _request.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
-        }
-
-        String xmlBase = requestUrl;
+        String xmlBase = ReqInfo.getRequestUrlPath(_request);
 
         _log.debug("@xml:base='{}'", xmlBase);
         return xmlBase;

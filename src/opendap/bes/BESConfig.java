@@ -28,9 +28,7 @@ package opendap.bes;
 
 import opendap.coreServlet.Scrub;
 import opendap.io.HyraxStringEncoding;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -79,14 +77,14 @@ public class BESConfig  {
         _BesTimeOut = 300000; // 5 minutes in ms
     }
 
-    public BESConfig(Document besConfiguration) throws Exception{
+    public BESConfig(Document besConfiguration) throws BadConfigurationException {
 
         this();
         configure(besConfiguration);
 
     }
 
-    public BESConfig(Element besConfiguration) throws Exception{
+    public BESConfig(Element besConfiguration) throws BadConfigurationException {
         this();
 
         configure(besConfiguration);
@@ -117,18 +115,18 @@ public class BESConfig  {
      * @param filename The name of the confguration file
      * @throws Exception When bad things happen.
      */
-    public BESConfig(String filename) throws Exception {
+    public BESConfig(String filename) throws BadConfigurationException, IOException, JDOMException {
         this();
 
         File confFile = new File(filename);
 
 
         if(!confFile.exists()){
-            throw new Exception("BES configuration file \""+filename+"\" does not exist.");
+            throw new BadConfigurationException("BES configuration file \""+filename+"\" does not exist.");
         }
 
         if(!confFile.canRead())
-            throw new Exception("BES configuration file \""+filename+"\" is not readable.");
+            throw new BadConfigurationException("BES configuration file \""+filename+"\" is not readable.");
 
 
         // Parse the XML doc into a Document object.
@@ -152,7 +150,7 @@ public class BESConfig  {
 
 
 
-    private void configure(Document olfsConfigurationDoc) throws Exception {
+    private void configure(Document olfsConfigurationDoc) throws BadConfigurationException {
         Element besConfig = olfsConfigurationDoc.getRootElement();
 
         configure(besConfig);
@@ -166,10 +164,10 @@ public class BESConfig  {
 
 
 
-    private void configure(Element besConfig) throws Exception {
+    private void configure(Element besConfig) throws BadConfigurationException {
 
         if( besConfig==null || !besConfig.getName().equals("BES")){
-            throw new Exception("BES configuration document does not contain neccessary content. " +
+            throw new BadConfigurationException("Configuration Element does not contain neccessary content. " +
                     "Missing <BES> element.");
         }
 
@@ -186,7 +184,7 @@ public class BESConfig  {
 
         Element host = besConfig.getChild("host");
         if( host==null ){
-            throw new Exception("OLFS configuration document does not contain neccessary content. " +
+            throw new BadConfigurationException("Configuration Element does not contain neccessary content. " +
                     "<BES> Element is missing <host> element.");
         }
         setHost(host.getTextTrim());
@@ -196,8 +194,8 @@ public class BESConfig  {
 
         Element port = besConfig.getChild("port");
         if( port==null ){
-            throw new Exception("OLFS configuration document does not contain neccessary content. " +
-                    "<BES> Element is missing <prt> element.");
+            throw new BadConfigurationException("Configuration Element does not contain neccessary content. " +
+                    "<BES> Element is missing <port> element.");
 
         }
         setPort(port.getTextTrim());
@@ -227,7 +225,7 @@ public class BESConfig  {
 
 
 
-        //  <ClientPool maximum="10" />
+        //  <ClientPool maximum="10" maxCmds="2000"/>
 
         Element clientPool = besConfig.getChild("ClientPool");
 
@@ -239,10 +237,21 @@ public class BESConfig  {
 
             if(maxClients != null){
                 log.debug("@maximum: {}",maxClients.getValue());
-                int clients = maxClients.getIntValue();
+                int clients;
+
+                try {
+                    clients = maxClients.getIntValue();
+                }
+                catch (DataConversionException e) {
+                    throw new BadConfigurationException("Configuration Element does not " +
+                            "contain correct content. The <ClientPool> element's " +
+                            "Attribute \"maximum\" must evaluate to an integer value. " +
+                            "Found maximum=\""+maxClients.getValue()+"\"");
+                }
+
 
                 if(clients<1){
-                    throw new Exception("OLFS configuration document does not " +
+                    throw new BadConfigurationException("Configuration Element does not " +
                             "contain correct content. The <ClientPool> element " +
                             "MUST contain an Attribute called \"maximum\" whose " +
                             "value MUST be an integer greater than 0 (zero).");
@@ -259,10 +268,20 @@ public class BESConfig  {
 
             if(maxCmds != null){
                 log.debug("@maxCmds: {}",maxCmds);
-                int max = maxCmds.getIntValue();
+
+                int max;
+                try {
+                    max = maxCmds.getIntValue();
+                }
+                catch (DataConversionException e) {
+                    throw new BadConfigurationException("Configuration Element does not " +
+                            "contain correct content. The <ClientPool> element's " +
+                            "Attribute \"maxCmds\" must evaluate to an integer value." +
+                            "Found maxCmds=\""+maxCmds.getValue()+"\"");
+                }
 
                 if(max<0){
-                    throw new Exception("OLFS configuration document does not " +
+                    throw new BadConfigurationException("Configuration Element does not " +
                             "contain correct content. The <ClientPool> element " +
                             "MAY contain an Attribute called \"maxCmds\" whose " +
                             "value is an integer greater than or equal to 0 (zero).");

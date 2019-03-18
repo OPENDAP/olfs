@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextPlain;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,15 +89,12 @@ public class DDS extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
-
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
-
 
         log.debug("Sending DDS for dataset: " + resourceID);
 
@@ -106,22 +104,17 @@ public class DDS extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
 
-        OutputStream os = response.getOutputStream();
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDDS(resourceID, constraintExpression, os);
-
         os.flush();
-        log.debug("Sent DAP DDS.");
-
-
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 }

@@ -32,11 +32,12 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 
@@ -56,6 +57,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
     public DatasetInfoHtmlPage(String sysPath, BesApi besApi) {
         this(sysPath,null, _defaultRequestSuffix,besApi);
     }
+
     public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
@@ -85,7 +87,6 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl, false);
 
-
         BesApi besApi = getBesApi();
 
         log.debug("sendINFO() for dataset: " + resourceID);
@@ -96,22 +97,15 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
         response.setContentType(responseMediaType.getMimeType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "DAP2 Dataset Information Page");
-
         response.setStatus(HttpServletResponse.SC_OK);
 
-        OutputStream os = response.getOutputStream();
-
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2HtmlInfoPage(resourceID, os);
-
-
         os.flush();
-        log.info("Sent DAP Info page.");
-
-
-
-
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 
 }

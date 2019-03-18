@@ -27,10 +27,12 @@
 package opendap.auth;
 
 
+import java.io.IOException;
+
 /**
  * Created by ndp on 9/26/14.
  */
-public class ConfigurationException extends Exception {
+public class ConfigurationException extends IOException {
 
     // jhrg Java complains that this is missing for a thing that is
     // serializable: static final long serialVersionUID;

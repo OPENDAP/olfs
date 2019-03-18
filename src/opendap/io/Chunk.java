@@ -70,7 +70,7 @@ public class Chunk {
     public static final int DEFAULT_SIZE = 65535;
 
 
-    public static final byte[] closingChunk = new byte[HEADER_SIZE];
+    private static final byte[] closingChunk = new byte[HEADER_SIZE];
     static  {
         int i;
         for(i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
@@ -79,15 +79,12 @@ public class Chunk {
         closingChunk[i] = DATA;
     }
 
-
     public static final String STATUS_EXTENSION = "status=";
     public static final String ERROR_STATUS = "error";
     public static final String EMERGENCY_EXIT_STATUS = "exit";
     public static final String EXIT_STATUS = PPTSessionProtocol.PPT_EXIT_NOW;
 
     public static final String COUNT_EXTENSION = "count=";
-
-
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(Chunk.class);
 
