@@ -32,6 +32,6 @@ public class Int32 extends Variable {
 	}
 	public String toString()
 	{
-		return "Variable Type INT 32, name = " + this.getName();
+		return this.getName();
 	}
 }

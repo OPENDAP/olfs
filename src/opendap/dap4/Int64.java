@@ -32,6 +32,6 @@ public class Int64 extends Variable {
 	}
 	public String toString()
 	{
-		return "Variable Type INT 64, name = " + this.getName();
+		return this.getName();
 	}
 }

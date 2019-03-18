@@ -58,10 +58,8 @@ public class Dataset {
     private List<Dimension> dimensions;
     private List<ContainerAttribute> attributes;
 
-    private List<Float64> vars64bitFloats;
-    private List<Float32> vars32bitFloats;
-    private List<Int64> vars64bitIntegers;
-    private List<Int32> vars32bitIntegers;
+    private Vector<Variable> variables;
+
 
     private boolean _checkedForCF;
     private boolean _isCFConvention;
@@ -75,10 +73,21 @@ public class Dataset {
         url = "";
         dimensions = new Vector<>();
         attributes = new Vector<>();
-        vars64bitFloats = new Vector<>();
-        vars32bitFloats = new Vector<>();
-        vars64bitIntegers = new Vector<>();
-        vars32bitIntegers = new Vector<>();
+        float64Vars = new Vector<>();
+        float32Vars = new Vector<>();
+        int64Vars = new Vector<>();
+        int32Vars = new Vector<>();
+        int16Vars = new Vector<>();
+        int8Vars = new Vector<>();
+        uInt64Vars = new Vector<>();
+        uInt32Vars = new Vector<>();
+        uInt16Vars = new Vector<>();
+        uInt8Vars = new Vector<>();
+        byteVars = new Vector<>();
+        charVars = new Vector<>();
+
+        variables = new Vector<>();
+
         _checkedForCF = false;
         _isCFConvention = false;
     }
@@ -100,7 +109,6 @@ public class Dataset {
     public String getUrl() {
         return url;
     }
-
     public void setUrl(String url) {
         this.url = url;
     }
@@ -109,8 +117,6 @@ public class Dataset {
     public List<ContainerAttribute> getAttributes() {
         return attributes;
     }
-
-
     public void setAttributes(List<ContainerAttribute> attributes) {
         this.attributes = attributes;
     }
@@ -119,61 +125,156 @@ public class Dataset {
     public List<Dimension> getDimensions() {
         return dimensions;
     }
-
     public void setDimensions(List<Dimension> dimensions) {
         this.dimensions = dimensions;
-    }
-
-    @XmlElement(name = "Float64")
-    public List<Float64> getVars64bitFloats() {
-        return vars64bitFloats;
-    }
-
-
-    public void setVars64bitFloats(List<Float64> vars64bitFloats) {
-        this.vars64bitFloats = vars64bitFloats;
-    }
-
-    @XmlElement(name = "Float32")
-    public List<Float32> getVars32bitFloats() {
-        return vars32bitFloats;
-    }
-
-
-    public void setVars32bitFloats(List<Float32> vars32bitFloats) {
-        this.vars32bitFloats = vars32bitFloats;
-    }
-
-    @XmlElement(name = "Int32")
-    public List<Int32> getVars32bitIntegers() {
-        return vars32bitIntegers;
-    }
-
-
-    public void setVars32bitIntegers(List<Int32> vars32bitIntegers) {
-        this.vars32bitIntegers = vars32bitIntegers;
-    }
-
-    @XmlElement(name = "Int64")
-    public List<Int64> getVars64bitIntegers() {
-        return vars64bitIntegers;
-    }
-
-    public void setVars64bitIntegers(List<Int64> vars64bitIntegers) {
-        this.vars64bitIntegers = vars64bitIntegers;
     }
 
     public Vector<Variable> getVariables() {
 
         Vector<Variable> vars = new Vector<>();
 
-        vars.addAll(getVars32bitFloats());
-        vars.addAll(getVars64bitFloats());
-        vars.addAll(getVars32bitIntegers());
-        vars.addAll(getVars64bitIntegers());
+        vars.addAll(float64Vars);
+        vars.addAll(float32Vars);
+
+        vars.addAll(int64Vars);
+        vars.addAll(uInt64Vars);
+
+        vars.addAll(int32Vars);
+        vars.addAll(uInt32Vars);
+
+        vars.addAll(int16Vars);
+        vars.addAll(uInt16Vars);
+
+        vars.addAll(int8Vars);
+        vars.addAll(uInt8Vars);
+
+        vars.addAll(byteVars);
+        vars.addAll(charVars);
 
         return vars;
     }
+
+
+
+
+    private List<Float64> float64Vars;
+    @XmlElement(name = "Float64")
+    public List<Float64> getFloat64Vars() {
+        return float64Vars;
+    }
+    public void setFloat64Vars(List<Float64> f64List) {
+        variables.addAll(f64List);
+        this.float64Vars = f64List;
+    }
+
+    private List<Float32> float32Vars;
+    @XmlElement(name = "Float32")
+    public List<Float32> getFloat32Vars() { return float32Vars; }
+    public void setFloat32Vars(List<Float32> f32List) {
+        variables.addAll(f32List);
+        this.float32Vars = f32List;
+    }
+
+    private List<Byte> byteVars;
+    @XmlElement(name = "UInt8")
+    public List<Byte> getByteVars() {
+        return byteVars;
+    }
+    public void setByteVars(List<Byte> byteList) {
+        variables.addAll(byteList);
+        byteVars = byteList;
+    }
+
+    private List<Char> charVars;
+    @XmlElement(name = "Char")
+    public List<Char> getCharVars() {
+        return charVars;
+    }
+    public void setCharVars(List<Char> charList) {
+        variables.addAll(charList);
+        charVars = charList;
+    }
+
+    private List<UInt8> uInt8Vars;
+    @XmlElement(name = "UInt8")
+    public List<UInt8> getUInt8Vars() {
+        return uInt8Vars;
+    }
+    public void setUInt8Vars(List<UInt8> uInt8List) {
+        variables.addAll(uInt8List);
+        uInt8Vars = uInt8List;
+    }
+
+    private List<Int8> int8Vars;
+    @XmlElement(name = "Int8")
+    public List<Int8> getInt8Vars() {
+        return int8Vars;
+    }
+    public void setInt8Vars(List<Int8> int8List) {
+        variables.addAll(int8List);
+        this.int8Vars = int8List;
+    }
+
+    private List<UInt16> uInt16Vars;
+    @XmlElement(name = "Int16")
+    public List<UInt16> getUInt16Vars() {
+        return uInt16Vars;
+    }
+    public void setUInt16Vars(List<UInt16> uInt16List) {
+        variables.addAll(uInt16List);
+        this.uInt16Vars = uInt16List;
+    }
+
+    private List<Int16> int16Vars;
+    @XmlElement(name = "Int16")
+    public List<Int16> getInt16Vars() {
+        return int16Vars;
+    }
+    public void setInt16Vars(List<Int16> int16List) {
+        variables.addAll(int16List);
+        this.int16Vars = int16List;
+    }
+
+    private List<UInt32> uInt32Vars;
+    @XmlElement(name = "UInt32")
+    public List<UInt32> getUInt32Vars() {
+        return uInt32Vars;
+    }
+    public void setUInt32Vars(List<UInt32> uInt32List) {
+        variables.addAll(uInt32List);
+        this.uInt32Vars = uInt32List;
+    }
+
+    private List<Int32> int32Vars;
+    @XmlElement(name = "Int32")
+    public List<Int32> getInt32Vars() {
+        return int32Vars;
+    }
+    public void setInt32Vars(List<Int32> int32List) {
+        variables.addAll(int32List);
+        this.int32Vars = int32List;
+    }
+
+    private List<UInt64> uInt64Vars;
+    @XmlElement(name = "UInt64")
+    public List<UInt64> getUInt64Vars() {
+        return uInt64Vars;
+    }
+    public void setUInt64Vars(List<UInt64> uInt64List) {
+        variables.addAll(uInt64List);
+        this.uInt64Vars = uInt64List;
+    }
+
+    private List<Int64> int64Vars;
+    @XmlElement(name = "Int64")
+    public List<Int64> getInt64Vars() {
+        return int64Vars;
+    }
+    public void setInt64Vars(List<Int64> int64List) {
+        variables.addAll(int64List);
+        this.int64Vars = int64List;
+    }
+
 
     /**
      * This finds the named Dimension if it exists.

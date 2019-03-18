@@ -34,7 +34,7 @@ public class Float32 extends Variable {
 
 	public String toString()
 	{
-		return "Variable Type Float 32, name = " + this.getName();
+		return this.getName();
 	}
 	
 }
