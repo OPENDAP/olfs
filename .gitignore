@@ -30,7 +30,7 @@ Makefile
 Makefile.in
 atlocal
 atconfig
-conf
+/conf
 aclocal.m4
 hyrax_tests/conf
 config.log
