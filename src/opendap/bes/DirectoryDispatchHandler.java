@@ -125,7 +125,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         catch (Exception e) {
             log.debug("getLastModified():  Returning: -1");
-            return -1;
+            return new Date().getTime();
         }
     }
 
@@ -241,7 +241,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             log.debug("Catalog from BES:\n"+xmlo.outputString(showNodeDoc));
         }
         JDOMSource besNode = new JDOMSource(showNodeDoc);
-        AdminInfo adminInfo = new AdminInfo(_besApi,collectionName);
+
+        AdminInfo adminInfo = _besApi.getAdminInfo(collectionName);
         String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";

@@ -90,8 +90,7 @@ public class S3CatalogServlet extends HttpServlet {
         _s3DapDispatcher = new S3DapDispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
         try {
             Element besConfiguration = getBesManagerConfig();
-            BESManager besManager = new BESManager();
-            besManager.init(besConfiguration);
+            BESManager.init(getServletContext(),besConfiguration);
             _s3DapDispatcher.init(this, getDapDispatConfig() );
 
         } catch (Exception e) {
@@ -285,7 +284,7 @@ public class S3CatalogServlet extends HttpServlet {
 
 
     private Element getBesManagerConfig() {
-        Element besManagerConfig = _configDoc.getRootElement().getChild("BESManager");
+        Element besManagerConfig = _configDoc.getRootElement().getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
         if(besManagerConfig==null){
             _log.warn("getBesManagerConfig() - BESManager element not found in configuration file. Using defaults.");
             Element e;
@@ -343,7 +342,7 @@ public class S3CatalogServlet extends HttpServlet {
         Procedure tKey = Timer.start();
         int status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(request, "S3_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, LogUtil.S3_SERVICE_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
             if (!redirectToCatalog(request, response)) {  // Do we send the catalog redirect?
                 String requestURI = request.getRequestURI();
                 String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
@@ -379,32 +378,37 @@ public class S3CatalogServlet extends HttpServlet {
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(status, "S3_ACCESS");
+            LogUtil.logServerAccessEnd(status, LogUtil.S3_SERVICE_ACCESS_LOG_ID);
             Timer.stop(tKey);
         }
     }
 
     public long getLastModified(HttpServletRequest req) {
 
+
         Procedure tKey = Timer.start();
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
         long lmt = new Date().getTime();
 
-        String requestURI = req.getRequestURI();
-        String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
-        String dapServiceContext = S3CatalogManager.theManager().getDapServiceContext();
+        LogUtil.logServerAccessStart(req, LogUtil.S3_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        try {
+            String requestURI = req.getRequestURI();
+            String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
+            String dapServiceContext = S3CatalogManager.theManager().getDapServiceContext();
 
-        if(requestURI.startsWith(catalogServiceContext)){
-            LogUtil.logServerAccessStart(req, "S3_CATALOG_ACCESS", "LastModified", Long.toString(reqno));
-            lmt = getCatalogLastModified(req);
+
+            if (requestURI.startsWith(catalogServiceContext)) {
+                lmt = getCatalogLastModified(req);
+            } else if (requestURI.startsWith(dapServiceContext)) {
+                lmt = _s3DapDispatcher.getLastModified(req);
+            }
+            return lmt;
         }
-        else if (requestURI.startsWith(dapServiceContext)) {
-            LogUtil.logServerAccessStart(req, "S3_DAP_ACCESS", "LastModified", Long.toString(reqno));
-            lmt = _s3DapDispatcher.getLastModified(req);
+        finally {
+            Timer.stop(tKey);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.S3_SERVICE_LAST_MODIFIED_LOG_ID);
         }
-        Timer.stop(tKey);
-        return lmt;
     }
 
 

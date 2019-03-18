@@ -396,14 +396,10 @@ public class BesDapDispatcher implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-
-
-        String relativeUrl = ReqInfo.getLocalUrl(req);
-
+         String relativeUrl = ReqInfo.getLocalUrl(req);
 
         if(!_initialized)
-            return -1;
-
+            return new Date().getTime();
 
         for (HttpResponder r : _responders) {
             if (r.matches(relativeUrl)) {
@@ -418,14 +414,14 @@ public class BesDapDispatcher implements DispatchHandler {
 
                 } catch (Exception e) {
                     _log.debug("getLastModified(): Returning: -1");
-                    return -1;
+                    return new Date().getTime();
                 }
 
             }
 
         }
 
-        return -1;
+        return new Date().getTime();
 
 
     }

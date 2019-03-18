@@ -33,11 +33,12 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -111,7 +112,7 @@ public class XmlData extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsXml(
                 resourceID,
                 constraintExpression,
@@ -120,6 +121,7 @@ public class XmlData extends Dap4Responder {
                 xmlBase,
                 os);
         os.flush();
-        log.info("Sent XML Data response.");
+        LogUtil.setResponseSize(os.size());
+        log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 }

@@ -72,7 +72,6 @@ public class Servlet extends HttpServlet {
     private static final AtomicInteger reqNumber = new AtomicInteger(0);
 
     private static final String DEFAULT_WCS_SERVICE_CONFIG_FILENAME = "wcs_service.xml";
-    private static final String WCS_ACCESS_LOG_ID = "WCS_2.0_ACCESS";
 
     private static final HttpGetHandler httpGetService = new HttpGetHandler();
     private static final FormHandler formService = new FormHandler();
@@ -176,7 +175,7 @@ public class Servlet extends HttpServlet {
             return;
         }
         
-        Element besManagerElement = config.getChild("BESManager");
+        Element besManagerElement = config.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
 
         if (besManagerElement == null) {
             String msg = "Invalid BES configuration. Missing required 'BESManager' element. BES was not initialized!";
@@ -184,10 +183,9 @@ public class Servlet extends HttpServlet {
             return;
         }
 
-        BESManager besManager  = new BESManager();
         if(!BESManager.isInitialized()) {
             try {
-                besManager.init(besManagerElement);
+                BESManager.init(getServletContext(), besManagerElement);
             } catch (Exception e) {
                 String msg = "BESManager initialization was an abject failure. BES was not initialized! " +
                         "Caught "+e.getClass().getName()+ " message: "+e.getMessage();
@@ -204,7 +202,7 @@ public class Servlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(req, LogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -258,7 +256,7 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, WCS_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(request_status, LogUtil.WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
@@ -270,7 +268,7 @@ public class Servlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(req, LogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -306,7 +304,7 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, WCS_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(request_status, LogUtil.WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
@@ -318,11 +316,11 @@ public class Servlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, WCS_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, LogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             return new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, WCS_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID);
         }
 
 

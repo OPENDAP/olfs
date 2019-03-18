@@ -35,12 +35,12 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextXml;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 
 public class XmlDMR extends Dap4Responder {
@@ -106,9 +106,10 @@ public class XmlDMR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
         //response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDMR(resourceID,qp,xmlBase,os);
         os.flush();
-        log.info("Sent {}",getServiceTitle());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 }

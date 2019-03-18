@@ -36,6 +36,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -116,11 +117,12 @@ public class DocServlet extends HttpServlet {
 
         int status = HttpServletResponse.SC_OK;
 
+        int response_size=0;
         try {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
 
-            LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, LogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -165,7 +167,10 @@ public class DocServlet extends HttpServlet {
                                 docString = docString.replace("<CONTEXT_PATH />", contextPath);
                                 docString = docString.replace("<SERVLET_NAME />", servletName);
                                 sos.println(docString);
-                            } else {
+                                response_size = docString.length();
+                            }
+                            else {
+                                DataOutputStream dos  = new DataOutputStream(sos);
                                 try (FileInputStream fis = new FileInputStream(f)) {
                                     byte[] buff = new byte[8192];
                                     int rc;
@@ -175,14 +180,13 @@ public class DocServlet extends HttpServlet {
                                         if (rc < 0) {
                                             doneReading = true;
                                         } else if (rc > 0) {
-                                            sos.write(buff, 0, rc);
+                                            dos.write(buff, 0, rc);
                                         }
 
                                     }
                                 } finally {
-
-                                    if (sos != null)
-                                        sos.flush();
+                                     dos.flush();
+                                    response_size = dos.size();
                                 }
                             }
 
@@ -216,7 +220,7 @@ public class DocServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(status, "HyraxAccess");
+            LogUtil.logServerAccessEnd(status, response_size,  LogUtil.DOCS_ACCESS_LOG_ID);
         }
     }
 

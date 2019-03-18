@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +108,7 @@ public class VersionDispatchHandler implements DispatchHandler {
     }
 
     public long getLastModified(HttpServletRequest req) {
-        return -1;
+        return new Date().getTime();
     }
 
 

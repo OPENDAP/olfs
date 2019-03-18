@@ -12,10 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,9 +87,8 @@ public class BESSiteMapService extends HttpServlet {
                 }
 
                 try {
-                    Element besManagerElement = configElement.getChild("BESManager");
-                    BESManager besManager = new BESManager();
-                    besManager.init(besManagerElement);
+                    Element besManagerElement = configElement.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
+                    BESManager.init(getServletContext(), besManagerElement);
 
                 } catch (Exception e) {
                     throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());
@@ -157,14 +157,14 @@ public class BESSiteMapService extends HttpServlet {
 
 
         int request_status = HttpServletResponse.SC_OK;
-
+        int response_size = -1;
         try {
             Procedure timedProcedure = Timer.start();
             RequestCache.openThreadCache();
             try {
 
                 int reqno = REQ_NUMBER.incrementAndGet();
-                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, LogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
                 LOG.debug(Util.getMemoryReport());
                 LOG.debug(ServletUtil.showRequest(request, reqno));
@@ -184,9 +184,10 @@ public class BESSiteMapService extends HttpServlet {
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'";
                 LOG.debug(msg);
 
-                ServletOutputStream sos = response.getOutputStream();
+                DataOutputStream dos = new DataOutputStream(response.getOutputStream());
+                PrintStream sos = new PrintStream(dos);
 
-                BESSiteMap besSiteMap = new BESSiteMap(dapService);
+                BesSiteMap besSiteMap = new BesSiteMap(dapService);
 
                 if (relativeUrl.equals("/")) {
                     LOG.debug("Just the service endpoint. {}",request.getRequestURI());
@@ -194,7 +195,9 @@ public class BESSiteMapService extends HttpServlet {
                 }
                 else {
                     // If we are here then the request should be asking for a siteMap sub file.
-                    besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);                }
+                    besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);
+                }
+                response_size = dos.size();
             }
             finally {
                 Timer.stop(timedProcedure);
@@ -218,11 +221,11 @@ public class BESSiteMapService extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, "HyraxAccess");
+            LogUtil.logServerAccessEnd(request_status, response_size, LogUtil.SITEMAP_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
-            LOG.info("doGet(): Response completed.\n");
+            LOG.info("Response completed.\n");
         }
-        LOG.info("doGet() - Timing Report: \n{}", Timer.report());
+        LOG.info("Timing Report: \n{}", Timer.report());
         Timer.reset();
     }
 

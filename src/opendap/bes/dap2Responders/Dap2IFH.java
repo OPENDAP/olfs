@@ -36,8 +36,8 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
-import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
+import opendap.logging.LogUtil;
 import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -114,7 +114,7 @@ public class Dap2IFH extends Dap4Responder {
         String supportEmail = besApi.getSupportEmail(requestedResourceId);
         String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
-        _log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        _log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         MediaType responseMediaType = getNormativeMediaType();
 
@@ -132,13 +132,12 @@ public class Dap2IFH extends Dap4Responder {
         besApi.getDDXDocument(resourceID,constraintExpression,"3.2",xmlBase,ddx);
         _log.debug(xmlo.outputString(ddx));
 
-        OutputStream os = response.getOutputStream();
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
         ddx.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it
 
         String jsonLD = getDatasetJsonLD(collectionUrl,ddx);
 
-        _log.error(jsonLD);
+        _log.debug("JsonLD for dataset {}\n{}",requestedResourceId,jsonLD);
 
         String currentDir = System.getProperty("user.dir");
         _log.debug("Cached working directory: "+currentDir);
@@ -166,9 +165,11 @@ public class Dap2IFH extends Dap4Responder {
             AuthenticationControls.setLoginParameters(transformer,request);
 
             // Transform the BES  showCatalog response into a HTML page for the browser
+            DataOutputStream os = new DataOutputStream(response.getOutputStream());
             transformer.transform(new JDOMSource(ddx), os);
             os.flush();
-            _log.info("Sent {}", getServiceTitle());
+            LogUtil.setResponseSize(os.size());
+            _log.info("Sent {} size: {}", getServiceTitle(),os.size());
         }
         finally {
             _log.debug("Restoring working directory to " + currentDir);

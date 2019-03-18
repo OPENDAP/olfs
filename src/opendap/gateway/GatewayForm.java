@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -74,7 +75,7 @@ public class GatewayForm extends HttpResponder {
 
     @Override
     public long getLastModified(HttpServletRequest request) throws Exception {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return new Date().getTime();
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

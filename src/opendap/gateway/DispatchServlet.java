@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: Apr 22, 2008
  * Time: 3:36:36 PM
  */
+@Deprecated
 public class DispatchServlet extends HttpServlet {
 
 
@@ -58,7 +59,6 @@ public class DispatchServlet extends HttpServlet {
     private final AtomicBoolean isInitialized = new AtomicBoolean(false);
     private static final AtomicInteger reqNumber = new AtomicInteger(0);
 
-    private static final String GATEWAY_ACCESS_LOG_ID = "HYRAX_GATEWAY_ACCESS";
 
     private static Element config;
     private static DispatchHandler gatewayDispatchHandler;
@@ -153,7 +153,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, GATEWAY_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, LogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             if (ReqInfo.isServiceOnlyRequest(req))
                 return new Date().getTime();
@@ -161,7 +161,7 @@ public class DispatchServlet extends HttpServlet {
             return gatewayDispatchHandler.getLastModified(req);
         }
         finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, GATEWAY_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -188,7 +188,7 @@ public class DispatchServlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(request, GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, LogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             if (!redirect(request, response)) {
 
                 if(!gatewayDispatchHandler.requestDispatch(request,response,true)){
@@ -206,7 +206,7 @@ public class DispatchServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, GATEWAY_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(request_status, LogUtil.GATEWAY_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }

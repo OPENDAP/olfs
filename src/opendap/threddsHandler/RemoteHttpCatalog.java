@@ -207,7 +207,7 @@ public class RemoteHttpCatalog implements Catalog {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
     public long getLastModified() {
-        return -1;  //To change body of implemented methods use File | Settings | File Templates.
+        return new Date().getTime();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public String getIngestTransformFilename(){

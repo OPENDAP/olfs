@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -108,45 +109,33 @@ public class S3DapDispatchHandler extends BesDapDispatcher {
 
         String relativeURL = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified() - relativeURL: {}",relativeURL);
-
-
-        if(false)
-            return -1;
-
-        long lmt = -1;
+        log.debug("relativeURL: {}",relativeURL);
+        long lmt = new Date().getTime();
 
         for (HttpResponder r : getResponders()) {
-            log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
-
+            log.debug("Checking responder: {} (pathPrefix: {})",r.getClass().getSimpleName(), r.getPathPrefix());
 
            if(r instanceof Dap4Responder) {
                Dap4Responder d4r = (Dap4Responder)r;
-
                Pattern suffixPattern = Pattern.compile(d4r.getCombinedRequestSuffixRegex(), Pattern.CASE_INSENSITIVE);
-
 
                if(Util.matchesSuffixPattern(relativeURL, suffixPattern)) {
 
-                   log.info("The relative URL: " + relativeURL + " matches " +
-                           "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
+                   log.info("The relative URL: {}  matches the pattern: \"{}\"",
+                           relativeURL, r.getRequestMatchRegexString());
 
                    String resourceId = d4r.removeRequestSuffixFromString(relativeURL);
-
                    S3IndexedFile s3if = S3CatalogManager.theManager().getIndexedFile(resourceId);
 
                    if(s3if!=null){
                        lmt = s3if.getLastModified();
-                       log.debug("lastModified() - Returning: {}",lmt);
+                       log.debug("Returning: {}",lmt);
                        return lmt;
                    }
-
                }
-
            }
-
         }
-        log.debug("lastModified() - Returning: {}",lmt);
+        log.debug("Returning: {}",lmt);
         return lmt;
     }
 

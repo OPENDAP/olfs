@@ -20,8 +20,7 @@ notifications:
   email:
     - ndp@opendap.org
     - jgallagher@opendap.org
-    - ukari@opendap.org
-    
+
 # Use this to prepare the system to install prerequisites or dependencies
 #
 # before_install:
