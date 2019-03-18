@@ -175,7 +175,7 @@ public class Servlet extends HttpServlet {
             return;
         }
         
-        Element besManagerElement = config.getChild("BESManager");
+        Element besManagerElement = config.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
 
         if (besManagerElement == null) {
             String msg = "Invalid BES configuration. Missing required 'BESManager' element. BES was not initialized!";
@@ -183,10 +183,9 @@ public class Servlet extends HttpServlet {
             return;
         }
 
-        BESManager besManager  = new BESManager();
         if(!BESManager.isInitialized()) {
             try {
-                besManager.init(besManagerElement);
+                BESManager.init(getServletContext(), besManagerElement);
             } catch (Exception e) {
                 String msg = "BESManager initialization was an abject failure. BES was not initialized! " +
                         "Caught "+e.getClass().getName()+ " message: "+e.getMessage();

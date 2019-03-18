@@ -87,9 +87,8 @@ public class BESSiteMapService extends HttpServlet {
                 }
 
                 try {
-                    Element besManagerElement = configElement.getChild("BESManager");
-                    BESManager besManager = new BESManager();
-                    besManager.init(besManagerElement);
+                    Element besManagerElement = configElement.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
+                    BESManager.init(getServletContext(), besManagerElement);
 
                 } catch (Exception e) {
                     throw new ServletException("Failed to initialize BES.  message: " + e.getMessage());
@@ -188,7 +187,7 @@ public class BESSiteMapService extends HttpServlet {
                 DataOutputStream dos = new DataOutputStream(response.getOutputStream());
                 PrintStream sos = new PrintStream(dos);
 
-                BESSiteMap besSiteMap = new BESSiteMap(dapService);
+                BesSiteMap besSiteMap = new BesSiteMap(dapService);
 
                 if (relativeUrl.equals("/")) {
                     LOG.debug("Just the service endpoint. {}",request.getRequestURI());

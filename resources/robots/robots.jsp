@@ -1,4 +1,5 @@
-<%@ page import="opendap.bes.BESSiteMap" %>
+<%@ page trimDirectiveWhitespaces="true" %>
+<%@ page import="opendap.bes.BesSiteMap" %>
 <%@ page import="opendap.dap.Request" %>
 <%@ page import="opendap.PathBuilder" %>
 <%@ page import="opendap.bes.BESError" %>
@@ -31,24 +32,30 @@
   --%>
 <%@page session="false" %>
 <%
+    String dapServiceContext = "opendap/";
     Request req = new Request(null,request);
     String servicePrefix = req.getWebApplicationUrl();
-    BESSiteMap besSiteMap;
-    try {
-        besSiteMap = new BESSiteMap(servicePrefix);
-    }
-    catch (BESError  e) {
-        e.printStackTrace();
-        return ;
-    }
-    catch (BadConfigurationException e) {
-        e.printStackTrace();
-        return ;
-    } catch ( PPTException e) {
-        e.printStackTrace();
-        return ;
-    }
-    String siteMapServicePrefix = PathBuilder.pathConcat(req.getWebApplicationUrl(),"siteMap");
+    String siteMapServicePrefix = PathBuilder.pathConcat(servicePrefix,"siteMap");
+    String webapp = req.getWebApplicationUrl();
 
+    String dapService;
+    if(getServletConfig().getServletContext().getContextPath().isEmpty()){
+        // If we are running in the ROOT context (no contextPath) then we make the assumption that the DAP
+        // service is located at the _dapServiceContext as set in the configuration parameter DapServiceContext.
+        dapService = PathBuilder.pathConcat(webapp,dapServiceContext);
+    }
+    else {
+        dapService = webapp;
+    }
+
+    BesSiteMap besSiteMap;
+    try {
+        besSiteMap = new BesSiteMap(dapService);
+
+    }
+    catch (Exception e) {
+        e.printStackTrace();
+        return;
+    }
 %>
 <%=besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix)%>
