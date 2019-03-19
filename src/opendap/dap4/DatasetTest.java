@@ -112,7 +112,7 @@ public class DatasetTest {
     public void hasExactlyFiveFloat32Variables() {
         // multiple raw datasets can be tested with _datasetIsRaw, _datasetIsRaw1 etc
         Assume.assumeTrue(_datasetIsNotNull);
-        assertTrue(dataset.getVars32bitFloats().size() == 5);
+        assertTrue(dataset.getFloat32Vars().size() == 5);
     }
 
     @Test
