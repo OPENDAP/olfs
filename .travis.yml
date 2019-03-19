@@ -7,9 +7,12 @@ sudo: false
 
 language: java
 
-jdk:
-  - openjdk7
-  - openjdk8
+# Drop this and use the jdk: ... lines in the jobs: secction below.
+# jhrg 3/19/19
+#
+# jdk:
+#  - openjdk7
+#  - openjdk8
 
 # whitelist
 branches:
