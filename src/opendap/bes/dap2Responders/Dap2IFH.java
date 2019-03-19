@@ -129,7 +129,7 @@ public class Dap2IFH extends Dap4Responder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document ddx = new Document();
-        besApi.getDDXDocument(resourceID,constraintExpression,"3.2",xmlBase,ddx);
+        besApi.getDDXDocument(resourceID,constraintExpression,xmlBase,ddx);
         _log.debug(xmlo.outputString(ddx));
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);

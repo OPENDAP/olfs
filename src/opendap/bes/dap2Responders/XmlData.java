@@ -110,13 +110,10 @@ public class XmlData extends Dap4Responder {
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsXml(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 user.getMaxResponseSize(),
                 xmlBase,
                 os);

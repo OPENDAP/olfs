@@ -109,10 +109,9 @@ public class DDS extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDDS(resourceID, constraintExpression, xdap_accept, os);
+        besApi.writeDDS(resourceID, constraintExpression, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

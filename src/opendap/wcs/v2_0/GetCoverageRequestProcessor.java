@@ -649,7 +649,6 @@ public class GetCoverageRequestProcessor {
                                     dap2ce,
                                     null,
                                     null,
-                                    "3.2",
                                     0,
                                     null,
                                     null,
@@ -663,7 +662,6 @@ public class GetCoverageRequestProcessor {
                                     besDatatsetId,
                                     dap2ce,
                                     req.getCfHistoryAttribute(),
-                                    "3.2",
                                     0);
                     break;
 
@@ -672,7 +670,6 @@ public class GetCoverageRequestProcessor {
                             besApi.getDap2DataAsGeoTiffRequest(
                                     besDatatsetId,
                                     dap2ce,
-                                    "3.2",
                                     0);
                     break;
 
@@ -681,7 +678,6 @@ public class GetCoverageRequestProcessor {
                             besApi.getDap2DataAsGmlJpeg2000Request(
                                     besDatatsetId,
                                     dap2ce,
-                                    "3.2",
                                     0);
                     break;
 

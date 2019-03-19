@@ -70,7 +70,6 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
      * opendap.bes.BesXmlAPI.DDX
      * @param localDataSourceId See opendap.bes.BesXmlAPI.DDX
      * @param ce See opendap.bes.BesXmlAPI
-     * @param xdap_accept See opendap.bes.BesXmlAPI
      * @param xmlBase See opendap.bes.BesXmlAPI
      * @param formURL See opendap.bes.BesXmlAPI
      * @param returnAs See opendap.bes.BesXmlAPI
@@ -83,7 +82,6 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
     public  Document getDap2RequestDocument(String type,
                                             String localDataSourceId,
                                             String ce,
-                                            String xdap_accept,
                                             int maxResponseSize,
                                             String xmlBase,
                                             String formURL,
@@ -100,10 +98,7 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
         request.setAttribute("reqID",reqID);
 
 
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
+        request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 

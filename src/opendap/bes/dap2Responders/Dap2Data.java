@@ -125,7 +125,6 @@ public class Dap2Data extends Dap4Responder {
         response.setHeader("Content-Description", "dods_data");
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
         DataOutputStream os;
         ByteArrayOutputStream srr = null;
@@ -136,7 +135,7 @@ public class Dap2Data extends Dap4Responder {
         else {
             os = new DataOutputStream(response.getOutputStream());
         }
-        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os);
+        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),user.getMaxResponseSize(),os);
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }

@@ -656,21 +656,15 @@ public class ViewersServlet extends HttpServlet {
             throws IOException, PPTException, BadConfigurationException, BESError, JDOMException {
 
         String constraintExpression = "";
-        String xdap_accept = "3.2";
         String xmlBase = serverURL+dapService+datasetID;
         Document ddx = new Document();
-
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextHtml());
-
-
         BES_API.getDDXDocument(
                 datasetID,
                 constraintExpression,
-                xdap_accept,
                 xmlBase,
                 ddx);
-
         return ddx;
     }
 }

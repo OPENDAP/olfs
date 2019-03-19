@@ -40,6 +40,7 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.error.*;
 import opendap.http.mediaTypes.*;
+import opendap.logging.LogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -727,8 +729,7 @@ public class W10nResponder {
                             HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
-        log.debug("sendNetCdf3() - Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
-
+        log.debug("Sending NetCDF-3 for dataset: {}",w10nRequest.getValidResourcePath());
 
         String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType =  new Netcdf3();
@@ -741,21 +742,23 @@ public class W10nResponder {
         String downloadFileName = getDownloadFileName(resourceID);
         downloadFileName += ".nc";
 
-        log.debug("sendNetCdf3() - NetCDF file downloadFileName: {}", downloadFileName );
+        log.debug("NetCDF file downloadFileName: {}", downloadFileName );
 
         String contentDisposition = ATTACHMENT +downloadFileName+"\"";
         response.setHeader(CONTENT_DISPOSITION, contentDisposition);
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf3(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                XDAP_ACCEPT,
                 maxResponseSize,
                 os);
         os.flush();
-        log.debug("sendNetCdf3() - Sent NetCDF-3 for {}",w10nRequest.getValidResourcePath());
+        LogUtil.setResponseSize(os.size());
+        log.debug("Sent NetCDF-3 for {} size: {}",
+                w10nRequest.getValidResourcePath(),
+                os.size());
     }
 
 
@@ -777,7 +780,7 @@ public class W10nResponder {
                             HttpServletResponse response)
                 throws IOException, PPTException, BadConfigurationException, BESError {
 
-        log.debug("sendNetCdf4() - Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
+        log.debug("Sending NetCDF-4 for dataset: {}",w10nRequest.getValidResourcePath());
 
         String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType = new Netcdf4();
@@ -798,17 +801,17 @@ public class W10nResponder {
         String contentDisposition = ATTACHMENT +downloadFileName+"\"";
         response.setHeader(CONTENT_DISPOSITION, contentDisposition);
 
-        OutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf4(
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                XDAP_ACCEPT,
                 maxResponseSize,
                 os);
         os.flush();
-
-        log.debug("sendNetCdf4() - Sent NetCDF-4 for dataset: {}", w10nRequest.getValidResourcePath());
+        LogUtil.setResponseSize(os.size());
+        log.debug("sendNetCdf4() - Sent NetCDF-4 for dataset: {} size: {}",
+                w10nRequest.getValidResourcePath(),os.size());
     }
 
 
@@ -860,7 +863,6 @@ public class W10nResponder {
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
-                "3.2",
                 maxResponseSize,
                 os);
         os.flush();
@@ -885,7 +887,7 @@ public class W10nResponder {
 
         log.debug("sendDap2Data() - Sending DAP2 data response for dataset: {}",w10nRequest.getValidResourcePath());
 
-        ServletOutputStream os = response.getOutputStream();
+        DataOutputStream os = new DataOutputStream(response.getOutputStream());
 
         String resourceID = w10nRequest.getRequestedResourceId();
         MediaType responseMediaType = new Dap2Data();
@@ -900,7 +902,7 @@ public class W10nResponder {
         log.debug("sendDap2Data() - DAP2 Data file downloadFileName: {}", downloadFileName);
 
         response.setHeader(CONTENT_DESCRIPTION, "DAP2 Data Response");
-        besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, "3.2", maxResponseSize, os);
+        besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, maxResponseSize, os);
 
         os.flush();
     }
@@ -1014,7 +1016,6 @@ public class W10nResponder {
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
                 w10nRequest.traverse(),
-                "3.2",
                 maxResponseSize,
                 os);
 
@@ -1041,7 +1042,8 @@ public class W10nResponder {
 
         Document besResponse = new Document();
 
-        besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), "3.2", w10nRequest.getXmlBase(),  besResponse);
+        besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), w10nRequest.getXmlBase(),  besResponse);
+
 
         boolean isNode = true;
 

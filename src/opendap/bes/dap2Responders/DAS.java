@@ -108,10 +108,9 @@ public class DAS extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDAS(resourceID, constraintExpression, xdap_accept, os);
+        besApi.writeDAS(resourceID, constraintExpression, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
