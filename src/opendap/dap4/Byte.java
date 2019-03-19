@@ -26,12 +26,15 @@
 
 package opendap.dap4;
 
-public class Int64 extends Variable {
-	public Int64() {
-		super();
-	}
-	public String toString()
-	{
-		return this.getName();
-	}
+public class Byte  extends Variable {
+
+    public Byte(){
+        super();
+    }
+
+    public String toString()
+    {
+        return "Byte " + this.getName();
+    }
+
 }

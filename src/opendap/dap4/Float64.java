@@ -34,6 +34,6 @@ public class Float64 extends Variable {
 
 	public String toString()
 	{
-		return "Variable Type Float 64, name = " + this.getName();
+		return this.getName();
 	}
 }
