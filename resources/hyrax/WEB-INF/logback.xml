@@ -109,6 +109,10 @@
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
+    
+    <logger name="WCSAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
 
 <!--
     <logger name="HyraxLastModifiedAccess" level="info">
@@ -124,6 +128,32 @@
     <logger name="PDPServiceLastModifiedAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
+
+    <logger name="HyraxGatewayAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxGatewayLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="HyraxAdmindAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxAdminLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="S3ServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="S3ServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="WCSLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
 -->
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
