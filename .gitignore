@@ -5,8 +5,8 @@
 
 ## IDEA files and dirs
 .idea
-olfs.iml
-out
+/*.iml
+/out
 
 ## Build dir
 build
@@ -48,3 +48,4 @@ foo.*
 /bin/
 /conf/
 /.sonar/
+/webapps
