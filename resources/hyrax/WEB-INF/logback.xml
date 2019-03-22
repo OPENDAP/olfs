@@ -109,7 +109,7 @@
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
-    
+
     <logger name="WCSAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
