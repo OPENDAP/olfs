@@ -134,16 +134,20 @@ public class PathBuilder  {
         if(path.equals(separator))
             return path;
 
-        if(leadingSeparator && !path.startsWith(separator)){
-            path = separator + path;
+        if(leadingSeparator){
+            if(!path.startsWith(separator)) {
+                path = separator + path;
+            }
         }
         else {
             if(path.startsWith(separator))
                 path = path.substring(1);
         }
 
-        if(trailingSeparator && !path.endsWith(separator)){
-            path += separator;
+        if(trailingSeparator){
+            if(!path.endsWith(separator)) {
+                path += separator;
+            }
         }
         else {
             if(path.endsWith(separator))
