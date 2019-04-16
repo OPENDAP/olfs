@@ -161,8 +161,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock\n" +
                 "isContainer:   true\n" +
                 "isArray:       false\n" +
                 "myType:        Sequence\n" +
@@ -170,15 +170,15 @@
             );
 
 
-            org_opendap_URI_GSO-Dock = new dap_var("URI_GSO-Dock", "org_opendap_URI_GSO-Dock", false,true);
+            org_opendap_URI_GSO_Dock = new dap_var("URI_GSO-Dock", "org_opendap_URI_GSO_Dock", false,true);
 
             
-                DAP2_URL.add_dap_var(org_opendap_URI_GSO-Dock);
-            org_opendap_URI_GSO-Dock.checkBox = "get_org_opendap_URI_GSO-Dock";
+                DAP2_URL.add_dap_var(org_opendap_URI_GSO_Dock);
+            org_opendap_URI_GSO_Dock.checkBox = "get_org_opendap_URI_GSO_Dock";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_URI_GSO-Dock"
-                               onclick="org_opendap_URI_GSO-Dock.handle_projection_change(get_org_opendap_URI_GSO-Dock)"
+                        <input type="checkbox" id="get_org_opendap_URI_GSO_Dock"
+                               onclick="org_opendap_URI_GSO_Dock.handle_projection_change(get_org_opendap_URI_GSO_Dock)"
                                onfocus="describe_projection()"/>URI_GSO-Dock<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Sequence)
             </span>
                      </div>
@@ -195,28 +195,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Time\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Time\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Time\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Time\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Time\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float64\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Time = new dap_var("URI_GSO-Dock.Time", "org_opendap_URI_GSO-Dock_Time", false,false);
+            org_opendap_URI_GSO_Dock_Time = new dap_var("URI_GSO-Dock.Time", "org_opendap_URI_GSO_Dock_Time", false,false);
 
-            org_opendap_URI_GSO-Dock_Time.checkBox = "get_org_opendap_URI_GSO-Dock_Time";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Time);
-                org_opendap_URI_GSO-Dock_Time.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Time.checkBox = "get_org_opendap_URI_GSO_Dock_Time";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Time);
+                org_opendap_URI_GSO_Dock_Time.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Time"
-                                           onclick="org_opendap_URI_GSO-Dock_Time.handle_projection_change(get_org_opendap_URI_GSO-Dock_Time)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Time"
+                                           onclick="org_opendap_URI_GSO_Dock_Time.handle_projection_change(get_org_opendap_URI_GSO_Dock_Time)"
                                            onfocus="describe_projection()"/>Time<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float64)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Time<select id="org_opendap_URI_GSO-Dock_Time_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Time<select id="org_opendap_URI_GSO_Dock_Time_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -226,13 +226,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Time_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Time_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Time_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Time_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Time.addSelectionClause("org_opendap_URI_GSO-Dock_Time_selection", org_opendap_URI_GSO-Dock_Time_relOpWidget_0,org_opendap_URI_GSO-Dock_Time_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Time.addSelectionClause("org_opendap_URI_GSO_Dock_Time_selection", org_opendap_URI_GSO_Dock_Time_relOpWidget_0,org_opendap_URI_GSO_Dock_Time_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -240,28 +240,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Depth\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Depth\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Depth\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Depth\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Depth\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Depth = new dap_var("URI_GSO-Dock.Depth", "org_opendap_URI_GSO-Dock_Depth", false,false);
+            org_opendap_URI_GSO_Dock_Depth = new dap_var("URI_GSO-Dock.Depth", "org_opendap_URI_GSO_Dock_Depth", false,false);
 
-            org_opendap_URI_GSO-Dock_Depth.checkBox = "get_org_opendap_URI_GSO-Dock_Depth";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Depth);
-                org_opendap_URI_GSO-Dock_Depth.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Depth.checkBox = "get_org_opendap_URI_GSO_Dock_Depth";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Depth);
+                org_opendap_URI_GSO_Dock_Depth.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Depth"
-                                           onclick="org_opendap_URI_GSO-Dock_Depth.handle_projection_change(get_org_opendap_URI_GSO-Dock_Depth)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Depth"
+                                           onclick="org_opendap_URI_GSO_Dock_Depth.handle_projection_change(get_org_opendap_URI_GSO_Dock_Depth)"
                                            onfocus="describe_projection()"/>Depth<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Depth<select id="org_opendap_URI_GSO-Dock_Depth_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Depth<select id="org_opendap_URI_GSO_Dock_Depth_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -272,13 +272,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Depth_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Depth_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Depth_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Depth_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Depth.addSelectionClause("org_opendap_URI_GSO-Dock_Depth_selection", org_opendap_URI_GSO-Dock_Depth_relOpWidget_0,org_opendap_URI_GSO-Dock_Depth_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Depth.addSelectionClause("org_opendap_URI_GSO_Dock_Depth_selection", org_opendap_URI_GSO_Dock_Depth_relOpWidget_0,org_opendap_URI_GSO_Dock_Depth_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -286,28 +286,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Sea_Temp\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Sea_Temp\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Sea_Temp\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Sea_Temp\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Sea_Temp\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Sea_Temp = new dap_var("URI_GSO-Dock.Sea_Temp", "org_opendap_URI_GSO-Dock_Sea_Temp", false,false);
+            org_opendap_URI_GSO_Dock_Sea_Temp = new dap_var("URI_GSO-Dock.Sea_Temp", "org_opendap_URI_GSO_Dock_Sea_Temp", false,false);
 
-            org_opendap_URI_GSO-Dock_Sea_Temp.checkBox = "get_org_opendap_URI_GSO-Dock_Sea_Temp";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Sea_Temp);
-                org_opendap_URI_GSO-Dock_Sea_Temp.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Sea_Temp.checkBox = "get_org_opendap_URI_GSO_Dock_Sea_Temp";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Sea_Temp);
+                org_opendap_URI_GSO_Dock_Sea_Temp.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Sea_Temp"
-                                           onclick="org_opendap_URI_GSO-Dock_Sea_Temp.handle_projection_change(get_org_opendap_URI_GSO-Dock_Sea_Temp)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Sea_Temp"
+                                           onclick="org_opendap_URI_GSO_Dock_Sea_Temp.handle_projection_change(get_org_opendap_URI_GSO_Dock_Sea_Temp)"
                                            onfocus="describe_projection()"/>Sea_Temp<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Sea_Temp<select id="org_opendap_URI_GSO-Dock_Sea_Temp_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Sea_Temp<select id="org_opendap_URI_GSO_Dock_Sea_Temp_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -318,13 +318,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Sea_Temp_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Sea_Temp_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Sea_Temp_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Sea_Temp_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Sea_Temp.addSelectionClause("org_opendap_URI_GSO-Dock_Sea_Temp_selection", org_opendap_URI_GSO-Dock_Sea_Temp_relOpWidget_0,org_opendap_URI_GSO-Dock_Sea_Temp_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Sea_Temp.addSelectionClause("org_opendap_URI_GSO_Dock_Sea_Temp_selection", org_opendap_URI_GSO_Dock_Sea_Temp_relOpWidget_0,org_opendap_URI_GSO_Dock_Sea_Temp_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -332,28 +332,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Salinity\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Salinity\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Salinity\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Salinity\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Salinity\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Salinity = new dap_var("URI_GSO-Dock.Salinity", "org_opendap_URI_GSO-Dock_Salinity", false,false);
+            org_opendap_URI_GSO_Dock_Salinity = new dap_var("URI_GSO-Dock.Salinity", "org_opendap_URI_GSO_Dock_Salinity", false,false);
 
-            org_opendap_URI_GSO-Dock_Salinity.checkBox = "get_org_opendap_URI_GSO-Dock_Salinity";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Salinity);
-                org_opendap_URI_GSO-Dock_Salinity.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Salinity.checkBox = "get_org_opendap_URI_GSO_Dock_Salinity";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Salinity);
+                org_opendap_URI_GSO_Dock_Salinity.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Salinity"
-                                           onclick="org_opendap_URI_GSO-Dock_Salinity.handle_projection_change(get_org_opendap_URI_GSO-Dock_Salinity)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Salinity"
+                                           onclick="org_opendap_URI_GSO_Dock_Salinity.handle_projection_change(get_org_opendap_URI_GSO_Dock_Salinity)"
                                            onfocus="describe_projection()"/>Salinity<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Salinity<select id="org_opendap_URI_GSO-Dock_Salinity_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Salinity<select id="org_opendap_URI_GSO_Dock_Salinity_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -364,13 +364,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Salinity_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Salinity_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Salinity_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Salinity_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Salinity.addSelectionClause("org_opendap_URI_GSO-Dock_Salinity_selection", org_opendap_URI_GSO-Dock_Salinity_relOpWidget_0,org_opendap_URI_GSO-Dock_Salinity_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Salinity.addSelectionClause("org_opendap_URI_GSO_Dock_Salinity_selection", org_opendap_URI_GSO_Dock_Salinity_relOpWidget_0,org_opendap_URI_GSO_Dock_Salinity_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -378,28 +378,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.DO_percent\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_DO_percent\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_DO_percent\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_DO_percent\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_DO_percent\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_DO_percent = new dap_var("URI_GSO-Dock.DO_percent", "org_opendap_URI_GSO-Dock_DO_percent", false,false);
+            org_opendap_URI_GSO_Dock_DO_percent = new dap_var("URI_GSO-Dock.DO_percent", "org_opendap_URI_GSO_Dock_DO_percent", false,false);
 
-            org_opendap_URI_GSO-Dock_DO_percent.checkBox = "get_org_opendap_URI_GSO-Dock_DO_percent";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_DO_percent);
-                org_opendap_URI_GSO-Dock_DO_percent.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_DO_percent.checkBox = "get_org_opendap_URI_GSO_Dock_DO_percent";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_DO_percent);
+                org_opendap_URI_GSO_Dock_DO_percent.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_DO_percent"
-                                           onclick="org_opendap_URI_GSO-Dock_DO_percent.handle_projection_change(get_org_opendap_URI_GSO-Dock_DO_percent)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_DO_percent"
+                                           onclick="org_opendap_URI_GSO_Dock_DO_percent.handle_projection_change(get_org_opendap_URI_GSO_Dock_DO_percent)"
                                            onfocus="describe_projection()"/>DO_percent<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DO_percent<select id="org_opendap_URI_GSO-Dock_DO_percent_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DO_percent<select id="org_opendap_URI_GSO_Dock_DO_percent_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -410,13 +410,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_DO_percent_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_DO_percent_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_DO_percent_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_DO_percent_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_DO_percent.addSelectionClause("org_opendap_URI_GSO-Dock_DO_percent_selection", org_opendap_URI_GSO-Dock_DO_percent_relOpWidget_0,org_opendap_URI_GSO-Dock_DO_percent_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_DO_percent.addSelectionClause("org_opendap_URI_GSO_Dock_DO_percent_selection", org_opendap_URI_GSO_Dock_DO_percent_relOpWidget_0,org_opendap_URI_GSO_Dock_DO_percent_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -424,28 +424,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.pH\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_pH\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_pH\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_pH\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_pH\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_pH = new dap_var("URI_GSO-Dock.pH", "org_opendap_URI_GSO-Dock_pH", false,false);
+            org_opendap_URI_GSO_Dock_pH = new dap_var("URI_GSO-Dock.pH", "org_opendap_URI_GSO_Dock_pH", false,false);
 
-            org_opendap_URI_GSO-Dock_pH.checkBox = "get_org_opendap_URI_GSO-Dock_pH";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_pH);
-                org_opendap_URI_GSO-Dock_pH.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_pH.checkBox = "get_org_opendap_URI_GSO_Dock_pH";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_pH);
+                org_opendap_URI_GSO_Dock_pH.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_pH"
-                                           onclick="org_opendap_URI_GSO-Dock_pH.handle_projection_change(get_org_opendap_URI_GSO-Dock_pH)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_pH"
+                                           onclick="org_opendap_URI_GSO_Dock_pH.handle_projection_change(get_org_opendap_URI_GSO_Dock_pH)"
                                            onfocus="describe_projection()"/>pH<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">pH<select id="org_opendap_URI_GSO-Dock_pH_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">pH<select id="org_opendap_URI_GSO_Dock_pH_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -455,13 +455,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_pH_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_pH_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_pH_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_pH_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_pH.addSelectionClause("org_opendap_URI_GSO-Dock_pH_selection", org_opendap_URI_GSO-Dock_pH_relOpWidget_0,org_opendap_URI_GSO-Dock_pH_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_pH.addSelectionClause("org_opendap_URI_GSO_Dock_pH_selection", org_opendap_URI_GSO_Dock_pH_relOpWidget_0,org_opendap_URI_GSO_Dock_pH_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -469,28 +469,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Turbidity\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Turbidity\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Turbidity\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Turbidity\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Turbidity\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Turbidity = new dap_var("URI_GSO-Dock.Turbidity", "org_opendap_URI_GSO-Dock_Turbidity", false,false);
+            org_opendap_URI_GSO_Dock_Turbidity = new dap_var("URI_GSO-Dock.Turbidity", "org_opendap_URI_GSO_Dock_Turbidity", false,false);
 
-            org_opendap_URI_GSO-Dock_Turbidity.checkBox = "get_org_opendap_URI_GSO-Dock_Turbidity";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Turbidity);
-                org_opendap_URI_GSO-Dock_Turbidity.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Turbidity.checkBox = "get_org_opendap_URI_GSO_Dock_Turbidity";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Turbidity);
+                org_opendap_URI_GSO_Dock_Turbidity.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Turbidity"
-                                           onclick="org_opendap_URI_GSO-Dock_Turbidity.handle_projection_change(get_org_opendap_URI_GSO-Dock_Turbidity)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Turbidity"
+                                           onclick="org_opendap_URI_GSO_Dock_Turbidity.handle_projection_change(get_org_opendap_URI_GSO_Dock_Turbidity)"
                                            onfocus="describe_projection()"/>Turbidity<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Turbidity<select id="org_opendap_URI_GSO-Dock_Turbidity_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Turbidity<select id="org_opendap_URI_GSO_Dock_Turbidity_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -501,13 +501,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Turbidity_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Turbidity_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Turbidity_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Turbidity_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Turbidity.addSelectionClause("org_opendap_URI_GSO-Dock_Turbidity_selection", org_opendap_URI_GSO-Dock_Turbidity_relOpWidget_0,org_opendap_URI_GSO-Dock_Turbidity_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Turbidity.addSelectionClause("org_opendap_URI_GSO_Dock_Turbidity_selection", org_opendap_URI_GSO_Dock_Turbidity_relOpWidget_0,org_opendap_URI_GSO_Dock_Turbidity_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -515,28 +515,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Air_Temp\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Air_Temp\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Air_Temp\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Air_Temp\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Air_Temp\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Air_Temp = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_URI_GSO-Dock_Air_Temp", false,false);
+            org_opendap_URI_GSO_Dock_Air_Temp = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_URI_GSO_Dock_Air_Temp", false,false);
 
-            org_opendap_URI_GSO-Dock_Air_Temp.checkBox = "get_org_opendap_URI_GSO-Dock_Air_Temp";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Air_Temp);
-                org_opendap_URI_GSO-Dock_Air_Temp.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Air_Temp.checkBox = "get_org_opendap_URI_GSO_Dock_Air_Temp";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Air_Temp);
+                org_opendap_URI_GSO_Dock_Air_Temp.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Air_Temp"
-                                           onclick="org_opendap_URI_GSO-Dock_Air_Temp.handle_projection_change(get_org_opendap_URI_GSO-Dock_Air_Temp)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Air_Temp"
+                                           onclick="org_opendap_URI_GSO_Dock_Air_Temp.handle_projection_change(get_org_opendap_URI_GSO_Dock_Air_Temp)"
                                            onfocus="describe_projection()"/>Air_Temp<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Air_Temp<select id="org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Air_Temp<select id="org_opendap_URI_GSO_Dock_Air_Temp_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -547,13 +547,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Air_Temp_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Air_Temp_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Air_Temp_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Air_Temp_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Air_Temp.addSelectionClause("org_opendap_URI_GSO-Dock_Air_Temp_selection", org_opendap_URI_GSO-Dock_Air_Temp_relOpWidget_0,org_opendap_URI_GSO-Dock_Air_Temp_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Air_Temp.addSelectionClause("org_opendap_URI_GSO_Dock_Air_Temp_selection", org_opendap_URI_GSO_Dock_Air_Temp_relOpWidget_0,org_opendap_URI_GSO_Dock_Air_Temp_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -561,28 +561,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Wind_Speed\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Wind_Speed\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Wind_Speed\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Wind_Speed\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Wind_Speed\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Wind_Speed = new dap_var("URI_GSO-Dock.Wind_Speed", "org_opendap_URI_GSO-Dock_Wind_Speed", false,false);
+            org_opendap_URI_GSO_Dock_Wind_Speed = new dap_var("URI_GSO-Dock.Wind_Speed", "org_opendap_URI_GSO_Dock_Wind_Speed", false,false);
 
-            org_opendap_URI_GSO-Dock_Wind_Speed.checkBox = "get_org_opendap_URI_GSO-Dock_Wind_Speed";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Wind_Speed);
-                org_opendap_URI_GSO-Dock_Wind_Speed.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Wind_Speed.checkBox = "get_org_opendap_URI_GSO_Dock_Wind_Speed";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Wind_Speed);
+                org_opendap_URI_GSO_Dock_Wind_Speed.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Wind_Speed"
-                                           onclick="org_opendap_URI_GSO-Dock_Wind_Speed.handle_projection_change(get_org_opendap_URI_GSO-Dock_Wind_Speed)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Wind_Speed"
+                                           onclick="org_opendap_URI_GSO_Dock_Wind_Speed.handle_projection_change(get_org_opendap_URI_GSO_Dock_Wind_Speed)"
                                            onfocus="describe_projection()"/>Wind_Speed<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Wind_Speed<select id="org_opendap_URI_GSO-Dock_Wind_Speed_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Wind_Speed<select id="org_opendap_URI_GSO_Dock_Wind_Speed_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -593,13 +593,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Wind_Speed_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Wind_Speed_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Wind_Speed_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Wind_Speed_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Wind_Speed.addSelectionClause("org_opendap_URI_GSO-Dock_Wind_Speed_selection", org_opendap_URI_GSO-Dock_Wind_Speed_relOpWidget_0,org_opendap_URI_GSO-Dock_Wind_Speed_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Wind_Speed.addSelectionClause("org_opendap_URI_GSO_Dock_Wind_Speed_selection", org_opendap_URI_GSO_Dock_Wind_Speed_relOpWidget_0,org_opendap_URI_GSO_Dock_Wind_Speed_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -607,28 +607,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Wind_Direction\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Wind_Direction\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Wind_Direction\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Wind_Direction\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Wind_Direction\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Wind_Direction = new dap_var("URI_GSO-Dock.Wind_Direction", "org_opendap_URI_GSO-Dock_Wind_Direction", false,false);
+            org_opendap_URI_GSO_Dock_Wind_Direction = new dap_var("URI_GSO-Dock.Wind_Direction", "org_opendap_URI_GSO_Dock_Wind_Direction", false,false);
 
-            org_opendap_URI_GSO-Dock_Wind_Direction.checkBox = "get_org_opendap_URI_GSO-Dock_Wind_Direction";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Wind_Direction);
-                org_opendap_URI_GSO-Dock_Wind_Direction.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Wind_Direction.checkBox = "get_org_opendap_URI_GSO_Dock_Wind_Direction";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Wind_Direction);
+                org_opendap_URI_GSO_Dock_Wind_Direction.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Wind_Direction"
-                                           onclick="org_opendap_URI_GSO-Dock_Wind_Direction.handle_projection_change(get_org_opendap_URI_GSO-Dock_Wind_Direction)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Wind_Direction"
+                                           onclick="org_opendap_URI_GSO_Dock_Wind_Direction.handle_projection_change(get_org_opendap_URI_GSO_Dock_Wind_Direction)"
                                            onfocus="describe_projection()"/>Wind_Direction<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Wind_Direction<select id="org_opendap_URI_GSO-Dock_Wind_Direction_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Wind_Direction<select id="org_opendap_URI_GSO_Dock_Wind_Direction_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -639,14 +639,14 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Wind_Direction_rValueWidget_0"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Wind_Direction_rValueWidget_0"
                                            size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Wind_Direction_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Wind_Direction_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Wind_Direction.addSelectionClause("org_opendap_URI_GSO-Dock_Wind_Direction_selection", org_opendap_URI_GSO-Dock_Wind_Direction_relOpWidget_0,org_opendap_URI_GSO-Dock_Wind_Direction_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Wind_Direction.addSelectionClause("org_opendap_URI_GSO_Dock_Wind_Direction_selection", org_opendap_URI_GSO_Dock_Wind_Direction_relOpWidget_0,org_opendap_URI_GSO_Dock_Wind_Direction_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -654,28 +654,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Barometric_Pres\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Barometric_Pres\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Barometric_Pres\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Barometric_Pres\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Barometric_Pres\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Barometric_Pres = new dap_var("URI_GSO-Dock.Barometric_Pres", "org_opendap_URI_GSO-Dock_Barometric_Pres", false,false);
+            org_opendap_URI_GSO_Dock_Barometric_Pres = new dap_var("URI_GSO-Dock.Barometric_Pres", "org_opendap_URI_GSO_Dock_Barometric_Pres", false,false);
 
-            org_opendap_URI_GSO-Dock_Barometric_Pres.checkBox = "get_org_opendap_URI_GSO-Dock_Barometric_Pres";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Barometric_Pres);
-                org_opendap_URI_GSO-Dock_Barometric_Pres.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Barometric_Pres.checkBox = "get_org_opendap_URI_GSO_Dock_Barometric_Pres";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Barometric_Pres);
+                org_opendap_URI_GSO_Dock_Barometric_Pres.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Barometric_Pres"
-                                           onclick="org_opendap_URI_GSO-Dock_Barometric_Pres.handle_projection_change(get_org_opendap_URI_GSO-Dock_Barometric_Pres)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Barometric_Pres"
+                                           onclick="org_opendap_URI_GSO_Dock_Barometric_Pres.handle_projection_change(get_org_opendap_URI_GSO_Dock_Barometric_Pres)"
                                            onfocus="describe_projection()"/>Barometric_Pres<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Barometric_Pres<select id="org_opendap_URI_GSO-Dock_Barometric_Pres_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Barometric_Pres<select id="org_opendap_URI_GSO_Dock_Barometric_Pres_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -686,14 +686,14 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Barometric_Pres_rValueWidget_0"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Barometric_Pres_rValueWidget_0"
                                            size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Barometric_Pres_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Barometric_Pres_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Barometric_Pres.addSelectionClause("org_opendap_URI_GSO-Dock_Barometric_Pres_selection", org_opendap_URI_GSO-Dock_Barometric_Pres_relOpWidget_0,org_opendap_URI_GSO-Dock_Barometric_Pres_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Barometric_Pres.addSelectionClause("org_opendap_URI_GSO_Dock_Barometric_Pres_selection", org_opendap_URI_GSO_Dock_Barometric_Pres_relOpWidget_0,org_opendap_URI_GSO_Dock_Barometric_Pres_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -701,28 +701,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_GSO-Dock.Solar_Radiation\n" +
-                "myJSVarName:   org_opendap_URI_GSO-Dock_Solar_Radiation\n" +
-                "checkBoxName:  get_org_opendap_URI_GSO-Dock_Solar_Radiation\n" +
+                "myJSVarName:   org_opendap_URI_GSO_Dock_Solar_Radiation\n" +
+                "checkBoxName:  get_org_opendap_URI_GSO_Dock_Solar_Radiation\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Float32\n" +
-                "parentContainer:        org_opendap_URI_GSO-Dock\n"
+                "parentContainer:        org_opendap_URI_GSO_Dock\n"
             );
 
 
-            org_opendap_URI_GSO-Dock_Solar_Radiation = new dap_var("URI_GSO-Dock.Solar_Radiation", "org_opendap_URI_GSO-Dock_Solar_Radiation", false,false);
+            org_opendap_URI_GSO_Dock_Solar_Radiation = new dap_var("URI_GSO-Dock.Solar_Radiation", "org_opendap_URI_GSO_Dock_Solar_Radiation", false,false);
 
-            org_opendap_URI_GSO-Dock_Solar_Radiation.checkBox = "get_org_opendap_URI_GSO-Dock_Solar_Radiation";
-            org_opendap_URI_GSO-Dock.addChildVar(org_opendap_URI_GSO-Dock_Solar_Radiation);
-                org_opendap_URI_GSO-Dock_Solar_Radiation.parentContainer = org_opendap_URI_GSO-Dock;
+            org_opendap_URI_GSO_Dock_Solar_Radiation.checkBox = "get_org_opendap_URI_GSO_Dock_Solar_Radiation";
+            org_opendap_URI_GSO_Dock.addChildVar(org_opendap_URI_GSO_Dock_Solar_Radiation);
+                org_opendap_URI_GSO_Dock_Solar_Radiation.parentContainer = org_opendap_URI_GSO_Dock;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_GSO-Dock_Solar_Radiation"
-                                           onclick="org_opendap_URI_GSO-Dock_Solar_Radiation.handle_projection_change(get_org_opendap_URI_GSO-Dock_Solar_Radiation)"
+                                    <input type="checkbox" id="get_org_opendap_URI_GSO_Dock_Solar_Radiation"
+                                           onclick="org_opendap_URI_GSO_Dock_Solar_Radiation.handle_projection_change(get_org_opendap_URI_GSO_Dock_Solar_Radiation)"
                                            onfocus="describe_projection()"/>Solar_Radiation<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Solar_Radiation<select id="org_opendap_URI_GSO-Dock_Solar_Radiation_relOpWidget_0"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">Solar_Radiation<select id="org_opendap_URI_GSO_Dock_Solar_Radiation_relOpWidget_0"
                                             onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
@@ -733,14 +733,14 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_GSO-Dock_Solar_Radiation_rValueWidget_0"
+                                    <input type="text" id="org_opendap_URI_GSO_Dock_Solar_Radiation_rValueWidget_0"
                                            size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_GSO-Dock_Solar_Radiation_selection"/>
+                                         id="org_opendap_URI_GSO_Dock_Solar_Radiation_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_GSO-Dock_Solar_Radiation.addSelectionClause("org_opendap_URI_GSO-Dock_Solar_Radiation_selection", org_opendap_URI_GSO-Dock_Solar_Radiation_relOpWidget_0,org_opendap_URI_GSO-Dock_Solar_Radiation_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_URI_GSO_Dock_Solar_Radiation.addSelectionClause("org_opendap_URI_GSO_Dock_Solar_Radiation_selection", org_opendap_URI_GSO_Dock_Solar_Radiation_relOpWidget_0,org_opendap_URI_GSO_Dock_Solar_Radiation_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
