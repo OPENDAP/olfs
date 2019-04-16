@@ -642,7 +642,8 @@
                 <xsl:with-param name="separator">_</xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/>
+        <!-- xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/ -->
+        <xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/>
     </xsl:template>
     <!-- ################################################################### -->
 
