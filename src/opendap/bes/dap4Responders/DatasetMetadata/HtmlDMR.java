@@ -327,24 +327,6 @@ public class HtmlDMR extends Dap4Responder {
     }
 
 
-    /**
-     * Minmal JSON text encoder. This method escapes:
-     * <ul>
-     *     <li>The \ (backslash)</li>
-     *     <li>The " (double-quote)</li>
-     * </ul>
-     * @param value The string to encode.
-     * @return The encoded value
-     */
-    private String jsonEncodeString(String value){
-        String str = value.trim();
-        str = str.replace("\\","\\\\");
-        str = str.replace("\"","\\\"");
-        return str;
-    }
-
-
-
     public String dap4AttributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
         @SuppressWarnings("unchecked")
