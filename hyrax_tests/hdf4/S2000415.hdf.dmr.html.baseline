@@ -1190,22 +1190,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_WVC_Lat\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Lat\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Lat\n" +
+            "myJSVarName:   org_opendap_var_1\n" +
+            "checkBoxName:  get_org_opendap_var_1\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_WVC_Lat = new dap_var("NSCAT_Rev_20_WVC_Lat", "org_opendap_NSCAT_Rev_20_WVC_Lat", true,false);
+            org_opendap_var_1 = new dap_var("NSCAT_Rev_20_WVC_Lat", "org_opendap_var_1", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lat);
-            org_opendap_NSCAT_Rev_20_WVC_Lat.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Lat";
+                DAP4_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Lat"
-                               onclick="org_opendap_NSCAT_Rev_20_WVC_Lat.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lat)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lat<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1221,17 +1221,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lat_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lat.addDimension(org_opendap_NSCAT_Rev_20_WVC_Lat_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lat_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lat.addDimension(org_opendap_NSCAT_Rev_20_WVC_Lat_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1301,22 +1299,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_WVC_Lon\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Lon\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Lon\n" +
+            "myJSVarName:   org_opendap_var_2\n" +
+            "checkBoxName:  get_org_opendap_var_2\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_WVC_Lon = new dap_var("NSCAT_Rev_20_WVC_Lon", "org_opendap_NSCAT_Rev_20_WVC_Lon", true,false);
+            org_opendap_var_2 = new dap_var("NSCAT_Rev_20_WVC_Lon", "org_opendap_var_2", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Lon);
-            org_opendap_NSCAT_Rev_20_WVC_Lon.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Lon";
+                DAP4_URL.add_dap_var(org_opendap_var_2);
+            org_opendap_var_2.checkBox = "get_org_opendap_var_2";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Lon"
-                               onclick="org_opendap_NSCAT_Rev_20_WVC_Lon.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lon)"
+                        <input type="checkbox" id="get_org_opendap_var_2"
+                               onclick="org_opendap_var_2.handle_projection_change(get_org_opendap_var_2)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Lon<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1332,17 +1330,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lon_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_2_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lon.addDimension(org_opendap_NSCAT_Rev_20_WVC_Lon_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_2.addDimension(org_opendap_var_2_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Lon_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_2_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Lon.addDimension(org_opendap_NSCAT_Rev_20_WVC_Lon_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_2.addDimension(org_opendap_var_2_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1412,22 +1408,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Sigma0\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Sigma0\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Sigma0\n" +
+            "myJSVarName:   org_opendap_var_3\n" +
+            "checkBoxName:  get_org_opendap_var_3\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Sigma0 = new dap_var("NSCAT_Rev_20_Num_Sigma0", "org_opendap_NSCAT_Rev_20_Num_Sigma0", true,false);
+            org_opendap_var_3 = new dap_var("NSCAT_Rev_20_Num_Sigma0", "org_opendap_var_3", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Sigma0);
-            org_opendap_NSCAT_Rev_20_Num_Sigma0.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Sigma0";
+                DAP4_URL.add_dap_var(org_opendap_var_3);
+            org_opendap_var_3.checkBox = "get_org_opendap_var_3";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Sigma0"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Sigma0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Sigma0)"
+                        <input type="checkbox" id="get_org_opendap_var_3"
+                               onclick="org_opendap_var_3.handle_projection_change(get_org_opendap_var_3)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Sigma0<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1443,17 +1439,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Sigma0_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_3_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Sigma0.addDimension(org_opendap_NSCAT_Rev_20_Num_Sigma0_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_3.addDimension(org_opendap_var_3_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Sigma0_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_3_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Sigma0.addDimension(org_opendap_NSCAT_Rev_20_Num_Sigma0_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_3.addDimension(org_opendap_var_3_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1523,22 +1517,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Beam_12\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_12\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_12\n" +
+            "myJSVarName:   org_opendap_var_4\n" +
+            "checkBoxName:  get_org_opendap_var_4\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Beam_12 = new dap_var("NSCAT_Rev_20_Num_Beam_12", "org_opendap_NSCAT_Rev_20_Num_Beam_12", true,false);
+            org_opendap_var_4 = new dap_var("NSCAT_Rev_20_Num_Beam_12", "org_opendap_var_4", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_12);
-            org_opendap_NSCAT_Rev_20_Num_Beam_12.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_12";
+                DAP4_URL.add_dap_var(org_opendap_var_4);
+            org_opendap_var_4.checkBox = "get_org_opendap_var_4";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_12"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_12.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_12)"
+                        <input type="checkbox" id="get_org_opendap_var_4"
+                               onclick="org_opendap_var_4.handle_projection_change(get_org_opendap_var_4)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_12<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1554,17 +1548,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_12_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_4_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_12.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_12_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_4.addDimension(org_opendap_var_4_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_12_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_4_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_12.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_12_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_4.addDimension(org_opendap_var_4_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1634,22 +1626,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Beam_34\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
+            "myJSVarName:   org_opendap_var_5\n" +
+            "checkBoxName:  get_org_opendap_var_5\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
+            org_opendap_var_5 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_var_5", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
-            org_opendap_NSCAT_Rev_20_Num_Beam_34.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_34";
+                DAP4_URL.add_dap_var(org_opendap_var_5);
+            org_opendap_var_5.checkBox = "get_org_opendap_var_5";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_34"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_34.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_34)"
+                        <input type="checkbox" id="get_org_opendap_var_5"
+                               onclick="org_opendap_var_5.handle_projection_change(get_org_opendap_var_5)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1665,17 +1657,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_5_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_5.addDimension(org_opendap_var_5_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_5_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_5.addDimension(org_opendap_var_5_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1745,22 +1735,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Beam_56\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_56\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_56\n" +
+            "myJSVarName:   org_opendap_var_6\n" +
+            "checkBoxName:  get_org_opendap_var_6\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Beam_56 = new dap_var("NSCAT_Rev_20_Num_Beam_56", "org_opendap_NSCAT_Rev_20_Num_Beam_56", true,false);
+            org_opendap_var_6 = new dap_var("NSCAT_Rev_20_Num_Beam_56", "org_opendap_var_6", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_56);
-            org_opendap_NSCAT_Rev_20_Num_Beam_56.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_56";
+                DAP4_URL.add_dap_var(org_opendap_var_6);
+            org_opendap_var_6.checkBox = "get_org_opendap_var_6";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_56"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_56.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_56)"
+                        <input type="checkbox" id="get_org_opendap_var_6"
+                               onclick="org_opendap_var_6.handle_projection_change(get_org_opendap_var_6)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_56<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1776,17 +1766,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_56_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_6_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_56.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_56_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_6.addDimension(org_opendap_var_6_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_56_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_6_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_56.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_56_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_6.addDimension(org_opendap_var_6_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1856,22 +1844,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Beam_78\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_78\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_78\n" +
+            "myJSVarName:   org_opendap_var_7\n" +
+            "checkBoxName:  get_org_opendap_var_7\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Beam_78 = new dap_var("NSCAT_Rev_20_Num_Beam_78", "org_opendap_NSCAT_Rev_20_Num_Beam_78", true,false);
+            org_opendap_var_7 = new dap_var("NSCAT_Rev_20_Num_Beam_78", "org_opendap_var_7", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_78);
-            org_opendap_NSCAT_Rev_20_Num_Beam_78.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_78";
+                DAP4_URL.add_dap_var(org_opendap_var_7);
+            org_opendap_var_7.checkBox = "get_org_opendap_var_7";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_78"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_78.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_78)"
+                        <input type="checkbox" id="get_org_opendap_var_7"
+                               onclick="org_opendap_var_7.handle_projection_change(get_org_opendap_var_7)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_78<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1887,17 +1875,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_78_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_7_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_78.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_78_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_7.addDimension(org_opendap_var_7_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_78_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_7_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_78.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_78_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_7.addDimension(org_opendap_var_7_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -1967,22 +1953,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_WVC_Quality_Flag\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_WVC_Quality_Flag\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag\n" +
+            "myJSVarName:   org_opendap_var_8\n" +
+            "checkBoxName:  get_org_opendap_var_8\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_WVC_Quality_Flag = new dap_var("NSCAT_Rev_20_WVC_Quality_Flag", "org_opendap_NSCAT_Rev_20_WVC_Quality_Flag", true,false);
+            org_opendap_var_8 = new dap_var("NSCAT_Rev_20_WVC_Quality_Flag", "org_opendap_var_8", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag);
-            org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.checkBox = "get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag";
+                DAP4_URL.add_dap_var(org_opendap_var_8);
+            org_opendap_var_8.checkBox = "get_org_opendap_var_8";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag"
-                               onclick="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag)"
+                        <input type="checkbox" id="get_org_opendap_var_8"
+                               onclick="org_opendap_var_8.handle_projection_change(get_org_opendap_var_8)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_WVC_Quality_Flag<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1998,17 +1984,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_8_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.addDimension(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_8.addDimension(org_opendap_var_8_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_8_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.addDimension(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_8.addDimension(org_opendap_var_8_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2071,22 +2055,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Mean_Wind\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Mean_Wind\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Mean_Wind\n" +
+            "myJSVarName:   org_opendap_var_9\n" +
+            "checkBoxName:  get_org_opendap_var_9\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Mean_Wind = new dap_var("NSCAT_Rev_20_Mean_Wind", "org_opendap_NSCAT_Rev_20_Mean_Wind", true,false);
+            org_opendap_var_9 = new dap_var("NSCAT_Rev_20_Mean_Wind", "org_opendap_var_9", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Mean_Wind);
-            org_opendap_NSCAT_Rev_20_Mean_Wind.checkBox = "get_org_opendap_NSCAT_Rev_20_Mean_Wind";
+                DAP4_URL.add_dap_var(org_opendap_var_9);
+            org_opendap_var_9.checkBox = "get_org_opendap_var_9";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Mean_Wind"
-                               onclick="org_opendap_NSCAT_Rev_20_Mean_Wind.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Mean_Wind)"
+                        <input type="checkbox" id="get_org_opendap_var_9"
+                               onclick="org_opendap_var_9.handle_projection_change(get_org_opendap_var_9)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Mean_Wind<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2102,17 +2086,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Mean_Wind_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_9_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Mean_Wind.addDimension(org_opendap_NSCAT_Rev_20_Mean_Wind_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_9.addDimension(org_opendap_var_9_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Mean_Wind_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_9_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Mean_Wind.addDimension(org_opendap_NSCAT_Rev_20_Mean_Wind_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_9.addDimension(org_opendap_var_9_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2182,22 +2164,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Wind_Speed\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Wind_Speed\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Wind_Speed\n" +
+            "myJSVarName:   org_opendap_var_10\n" +
+            "checkBoxName:  get_org_opendap_var_10\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Wind_Speed = new dap_var("NSCAT_Rev_20_Wind_Speed", "org_opendap_NSCAT_Rev_20_Wind_Speed", true,false);
+            org_opendap_var_10 = new dap_var("NSCAT_Rev_20_Wind_Speed", "org_opendap_var_10", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Speed);
-            org_opendap_NSCAT_Rev_20_Wind_Speed.checkBox = "get_org_opendap_NSCAT_Rev_20_Wind_Speed";
+                DAP4_URL.add_dap_var(org_opendap_var_10);
+            org_opendap_var_10.checkBox = "get_org_opendap_var_10";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Wind_Speed"
-                               onclick="org_opendap_NSCAT_Rev_20_Wind_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Speed)"
+                        <input type="checkbox" id="get_org_opendap_var_10"
+                               onclick="org_opendap_var_10.handle_projection_change(get_org_opendap_var_10)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Speed<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2219,23 +2201,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Speed_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_10_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Speed.addDimension(org_opendap_NSCAT_Rev_20_Wind_Speed_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_10.addDimension(org_opendap_var_10_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Speed_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_10_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Speed.addDimension(org_opendap_NSCAT_Rev_20_Wind_Speed_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_10.addDimension(org_opendap_var_10_dim_2,24);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Speed_dim_3" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_10_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Speed.addDimension(org_opendap_NSCAT_Rev_20_Wind_Speed_dim_3,4);
+                     <script type="text/javascript">org_opendap_var_10.addDimension(org_opendap_var_10_dim_3,4);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2305,22 +2284,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Wind_Dir\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Wind_Dir\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Wind_Dir\n" +
+            "myJSVarName:   org_opendap_var_11\n" +
+            "checkBoxName:  get_org_opendap_var_11\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Wind_Dir = new dap_var("NSCAT_Rev_20_Wind_Dir", "org_opendap_NSCAT_Rev_20_Wind_Dir", true,false);
+            org_opendap_var_11 = new dap_var("NSCAT_Rev_20_Wind_Dir", "org_opendap_var_11", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Wind_Dir);
-            org_opendap_NSCAT_Rev_20_Wind_Dir.checkBox = "get_org_opendap_NSCAT_Rev_20_Wind_Dir";
+                DAP4_URL.add_dap_var(org_opendap_var_11);
+            org_opendap_var_11.checkBox = "get_org_opendap_var_11";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Wind_Dir"
-                               onclick="org_opendap_NSCAT_Rev_20_Wind_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Dir)"
+                        <input type="checkbox" id="get_org_opendap_var_11"
+                               onclick="org_opendap_var_11.handle_projection_change(get_org_opendap_var_11)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Wind_Dir<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2342,23 +2321,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Dir_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_11_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Dir.addDimension(org_opendap_NSCAT_Rev_20_Wind_Dir_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_11.addDimension(org_opendap_var_11_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Dir_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_11_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Dir.addDimension(org_opendap_NSCAT_Rev_20_Wind_Dir_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_11.addDimension(org_opendap_var_11_dim_2,24);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Wind_Dir_dim_3" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_11_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Wind_Dir.addDimension(org_opendap_NSCAT_Rev_20_Wind_Dir_dim_3,4);
+                     <script type="text/javascript">org_opendap_var_11.addDimension(org_opendap_var_11_dim_3,4);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2428,22 +2404,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Error_Speed\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Error_Speed\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Error_Speed\n" +
+            "myJSVarName:   org_opendap_var_12\n" +
+            "checkBoxName:  get_org_opendap_var_12\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Error_Speed = new dap_var("NSCAT_Rev_20_Error_Speed", "org_opendap_NSCAT_Rev_20_Error_Speed", true,false);
+            org_opendap_var_12 = new dap_var("NSCAT_Rev_20_Error_Speed", "org_opendap_var_12", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Speed);
-            org_opendap_NSCAT_Rev_20_Error_Speed.checkBox = "get_org_opendap_NSCAT_Rev_20_Error_Speed";
+                DAP4_URL.add_dap_var(org_opendap_var_12);
+            org_opendap_var_12.checkBox = "get_org_opendap_var_12";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Error_Speed"
-                               onclick="org_opendap_NSCAT_Rev_20_Error_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Speed)"
+                        <input type="checkbox" id="get_org_opendap_var_12"
+                               onclick="org_opendap_var_12.handle_projection_change(get_org_opendap_var_12)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Speed<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2465,23 +2441,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Speed_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_12_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Speed.addDimension(org_opendap_NSCAT_Rev_20_Error_Speed_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_12.addDimension(org_opendap_var_12_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Speed_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_12_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Speed.addDimension(org_opendap_NSCAT_Rev_20_Error_Speed_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_12.addDimension(org_opendap_var_12_dim_2,24);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Speed_dim_3" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_12_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Speed.addDimension(org_opendap_NSCAT_Rev_20_Error_Speed_dim_3,4);
+                     <script type="text/javascript">org_opendap_var_12.addDimension(org_opendap_var_12_dim_3,4);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2551,22 +2524,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Error_Dir\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Error_Dir\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Error_Dir\n" +
+            "myJSVarName:   org_opendap_var_13\n" +
+            "checkBoxName:  get_org_opendap_var_13\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Error_Dir = new dap_var("NSCAT_Rev_20_Error_Dir", "org_opendap_NSCAT_Rev_20_Error_Dir", true,false);
+            org_opendap_var_13 = new dap_var("NSCAT_Rev_20_Error_Dir", "org_opendap_var_13", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Error_Dir);
-            org_opendap_NSCAT_Rev_20_Error_Dir.checkBox = "get_org_opendap_NSCAT_Rev_20_Error_Dir";
+                DAP4_URL.add_dap_var(org_opendap_var_13);
+            org_opendap_var_13.checkBox = "get_org_opendap_var_13";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Error_Dir"
-                               onclick="org_opendap_NSCAT_Rev_20_Error_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Dir)"
+                        <input type="checkbox" id="get_org_opendap_var_13"
+                               onclick="org_opendap_var_13.handle_projection_change(get_org_opendap_var_13)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Error_Dir<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2588,23 +2561,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Dir_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_13_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Dir.addDimension(org_opendap_NSCAT_Rev_20_Error_Dir_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_13.addDimension(org_opendap_var_13_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Dir_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_13_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Dir.addDimension(org_opendap_NSCAT_Rev_20_Error_Dir_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_13.addDimension(org_opendap_var_13_dim_2,24);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Error_Dir_dim_3" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_13_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Error_Dir.addDimension(org_opendap_NSCAT_Rev_20_Error_Dir_dim_3,4);
+                     <script type="text/javascript">org_opendap_var_13.addDimension(org_opendap_var_13_dim_3,4);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2674,22 +2644,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_MLE_Likelihood\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_MLE_Likelihood\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_MLE_Likelihood\n" +
+            "myJSVarName:   org_opendap_var_14\n" +
+            "checkBoxName:  get_org_opendap_var_14\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_MLE_Likelihood = new dap_var("NSCAT_Rev_20_MLE_Likelihood", "org_opendap_NSCAT_Rev_20_MLE_Likelihood", true,false);
+            org_opendap_var_14 = new dap_var("NSCAT_Rev_20_MLE_Likelihood", "org_opendap_var_14", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_MLE_Likelihood);
-            org_opendap_NSCAT_Rev_20_MLE_Likelihood.checkBox = "get_org_opendap_NSCAT_Rev_20_MLE_Likelihood";
+                DAP4_URL.add_dap_var(org_opendap_var_14);
+            org_opendap_var_14.checkBox = "get_org_opendap_var_14";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_MLE_Likelihood"
-                               onclick="org_opendap_NSCAT_Rev_20_MLE_Likelihood.handle_projection_change(get_org_opendap_NSCAT_Rev_20_MLE_Likelihood)"
+                        <input type="checkbox" id="get_org_opendap_var_14"
+                               onclick="org_opendap_var_14.handle_projection_change(get_org_opendap_var_14)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_MLE_Likelihood<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2711,23 +2681,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_14_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_MLE_Likelihood.addDimension(org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_14.addDimension(org_opendap_var_14_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_14_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_MLE_Likelihood.addDimension(org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_14.addDimension(org_opendap_var_14_dim_2,24);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_3" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_14_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_MLE_Likelihood.addDimension(org_opendap_NSCAT_Rev_20_MLE_Likelihood_dim_3,4);
+                     <script type="text/javascript">org_opendap_var_14.addDimension(org_opendap_var_14_dim_3,4);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2790,22 +2757,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         NSCAT_Rev_20_Num_Ambigs\n" +
-            "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Ambigs\n" +
-            "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Ambigs\n" +
+            "myJSVarName:   org_opendap_var_15\n" +
+            "checkBoxName:  get_org_opendap_var_15\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_NSCAT_Rev_20_Num_Ambigs = new dap_var("NSCAT_Rev_20_Num_Ambigs", "org_opendap_NSCAT_Rev_20_Num_Ambigs", true,false);
+            org_opendap_var_15 = new dap_var("NSCAT_Rev_20_Num_Ambigs", "org_opendap_var_15", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Ambigs);
-            org_opendap_NSCAT_Rev_20_Num_Ambigs.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Ambigs";
+                DAP4_URL.add_dap_var(org_opendap_var_15);
+            org_opendap_var_15.checkBox = "get_org_opendap_var_15";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Ambigs"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Ambigs.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Ambigs)"
+                        <input type="checkbox" id="get_org_opendap_var_15"
+                               onclick="org_opendap_var_15.handle_projection_change(get_org_opendap_var_15)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Ambigs<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -2821,17 +2788,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Ambigs_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_15_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Ambigs.addDimension(org_opendap_NSCAT_Rev_20_Num_Ambigs_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_15.addDimension(org_opendap_var_15_dim_1,458);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Ambigs_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_15_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Ambigs.addDimension(org_opendap_NSCAT_Rev_20_Num_Ambigs_dim_2,24);
+                     <script type="text/javascript">org_opendap_var_15.addDimension(org_opendap_var_15_dim_2,24);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -2901,22 +2866,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
-            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
-            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin\n" +
+            "myJSVarName:   org_opendap_var_16\n" +
+            "checkBoxName:  get_org_opendap_var_16\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = new dap_var("vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", "org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", true,false);
+            org_opendap_var_16 = new dap_var("vdata_NSCAT_Rev_20_SwathIndex_vdf_begin", "org_opendap_var_16", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin);
-            org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin";
+                DAP4_URL.add_dap_var(org_opendap_var_16);
+            org_opendap_var_16.checkBox = "get_org_opendap_var_16";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin"
-                               onclick="org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin)"
+                        <input type="checkbox" id="get_org_opendap_var_16"
+                               onclick="org_opendap_var_16.handle_projection_change(get_org_opendap_var_16)"
                                onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_SwathIndex_vdf_begin<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin=
                     </span>
@@ -2926,33 +2891,31 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin_dim_1"
-                            size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_16_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin.addDimension(org_opendap_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin_dim_1,820);
+                     <script type="text/javascript">org_opendap_var_16.addDimension(org_opendap_var_16_dim_1,820);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
-            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
-            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time\n" +
+            "myJSVarName:   org_opendap_var_17\n" +
+            "checkBoxName:  get_org_opendap_var_17\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", true,false);
+            org_opendap_var_17 = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time", "org_opendap_var_17", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time);
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time";
+                DAP4_URL.add_dap_var(org_opendap_var_17);
+            org_opendap_var_17.checkBox = "get_org_opendap_var_17";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time"
-                               onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time)"
+                        <input type="checkbox" id="get_org_opendap_var_17"
+                               onclick="org_opendap_var_17.handle_projection_change(get_org_opendap_var_17)"
                                onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time=
                     </span>
@@ -2962,34 +2925,31 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is String)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time_dim_1"
-                            size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_17_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time.addDimension(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_17.addDimension(org_opendap_var_17_dim_1,458);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
-            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
-            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag\n" +
+            "myJSVarName:   org_opendap_var_18\n" +
+            "checkBoxName:  get_org_opendap_var_18\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", true,false);
+            org_opendap_var_18 = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag", "org_opendap_var_18", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag);
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag";
+                DAP4_URL.add_dap_var(org_opendap_var_18);
+            org_opendap_var_18.checkBox = "get_org_opendap_var_18";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox"
-                               id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag"
-                               onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag)"
+                        <input type="checkbox" id="get_org_opendap_var_18"
+                               onclick="org_opendap_var_18.handle_projection_change(get_org_opendap_var_18)"
                                onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag=
                     </span>
@@ -2999,35 +2959,31 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt32)
             </span>
                      </div>
-                     <input type="text"
-                            id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag_dim_1"
-                            size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_18_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag.addDimension(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_18.addDimension(org_opendap_var_18_dim_1,458);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
-            "myJSVarName:   org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
-            "checkBoxName:  get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag\n" +
+            "myJSVarName:   org_opendap_var_19\n" +
+            "checkBoxName:  get_org_opendap_var_19\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", "org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", true,false);
+            org_opendap_var_19 = new dap_var("vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag", "org_opendap_var_19", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag);
-            org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag.checkBox = "get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag";
+                DAP4_URL.add_dap_var(org_opendap_var_19);
+            org_opendap_var_19.checkBox = "get_org_opendap_var_19";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox"
-                               id="get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag"
-                               onclick="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag.handle_projection_change(get_org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag)"
+                        <input type="checkbox" id="get_org_opendap_var_19"
+                               onclick="org_opendap_var_19.handle_projection_change(get_org_opendap_var_19)"
                                onfocus="describe_projection()"/>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag=
                     </span>
@@ -3037,13 +2993,10 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is UInt32)
             </span>
                      </div>
-                     <input type="text"
-                            id="org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag_dim_1"
-                            size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_19_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag.addDimension(org_opendap_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag_dim_1,458);
+                     <script type="text/javascript">org_opendap_var_19.addDimension(org_opendap_var_19_dim_1,458);
             </script>
                      <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                   </div>
@@ -3115,11 +3068,11 @@
         {
           "@type": "PropertyValue", 
           "name": "SIS_ID", 
-          "value": "597-512-24/1996-07-01"        },
+          "value": "597\-512\-24\/1996\-07\-01"        },
         {
           "@type": "PropertyValue", 
           "name": "Build_ID", 
-          "value": "3.2.1/1996-11-05"        },
+          "value": "3.2.1\/1996\-11\-05"        },
         {
           "@type": "PropertyValue", 
           "name": "ADEOS_Data_Package_ID", 
@@ -3131,7 +3084,7 @@
         {
           "@type": "PropertyValue", 
           "name": "Product_Creation_Time", 
-          "value": "1996-318T01:35:16.000"        },
+          "value": "1996\-318T01:35:16.000"        },
         {
           "@type": "PropertyValue", 
           "name": "Data_Type", 
@@ -3147,7 +3100,7 @@
         {
           "@type": "PropertyValue", 
           "name": "First_Rev_Eq_Crossing_Time", 
-          "value": "1996-259T04:01:28.226"        },
+          "value": "1996\-259T04:01:28.226"        },
         {
           "@type": "PropertyValue", 
           "name": "First_Rev_Eq_Crossing_Lon", 
@@ -3155,11 +3108,11 @@
         {
           "@type": "PropertyValue", 
           "name": "First_Data_Time", 
-          "value": "1996-259T03:43:48.945"        },
+          "value": "1996\-259T03:43:48.945"        },
         {
           "@type": "PropertyValue", 
           "name": "Last_Data_Time", 
-          "value": "1996-259T05:09:48.997"        },
+          "value": "1996\-259T05:09:48.997"        },
         {
           "@type": "PropertyValue", 
           "name": "Num_Expected_Output_Records", 
@@ -3175,11 +3128,11 @@
         {
           "@type": "PropertyValue", 
           "name": "HDF_Build_ID", 
-          "value": "JPL D-xxxxx 12/15/94"        },
+          "value": "JPL D\-xxxxx 12\/15\/94"        },
         {
           "@type": "PropertyValue", 
           "name": "HDF_SIS_ID", 
-          "value": "JPL D-12060 12/15/94"        },
+          "value": "JPL D\-12060 12\/15\/94"        },
         {
           "@type": "PropertyValue", 
           "name": "HDF_Conversion_Organization", 
@@ -3187,7 +3140,7 @@
         {
           "@type": "PropertyValue", 
           "name": "HDF_Conversion_Time", 
-          "value": "1996-320T17:32:34"        },
+          "value": "1996\-320T17:32:34"        },
         {
           "@type": "PropertyValue", 
           "name": "Data_Format_Type", 
@@ -3627,7 +3580,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma-0 measurements"      },
+        "value": "The total number of sigma\-0 measurements"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 
@@ -3665,7 +3618,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma-0s received from beam 1 or 2"      },
+        "value": "The total number of sigma\-0s received from beam 1 or 2"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 
@@ -3703,7 +3656,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma-0s received from beam 3 or 4"      },
+        "value": "The total number of sigma\-0s received from beam 3 or 4"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 
@@ -3741,7 +3694,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma-0s received from beam 5 or 6"      },
+        "value": "The total number of sigma\-0s received from beam 5 or 6"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 
@@ -3779,7 +3732,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma-0s received from beam 7 or 8"      },
+        "value": "The total number of sigma\-0s received from beam 7 or 8"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 
@@ -3855,7 +3808,7 @@
       {
         "@type": "PropertyValue", 
         "name": "units", 
-        "value": "m/s"      },
+        "value": "m\/s"      },
       {
         "@type": "PropertyValue", 
         "name": "scale_factor", 
@@ -3893,7 +3846,7 @@
       {
         "@type": "PropertyValue", 
         "name": "units", 
-        "value": "m/s"      },
+        "value": "m\/s"      },
       {
         "@type": "PropertyValue", 
         "name": "scale_factor", 
@@ -3969,7 +3922,7 @@
       {
         "@type": "PropertyValue", 
         "name": "units", 
-        "value": "m/s"      },
+        "value": "m\/s"      },
       {
         "@type": "PropertyValue", 
         "name": "scale_factor", 

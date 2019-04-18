@@ -177,8 +177,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         u\n" +
-                "myJSVarName:   org_opendap_u\n" +
-                "checkBoxName:  get_org_opendap_u\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Int16\n" +
@@ -186,15 +186,15 @@
             );
 
 
-            org_opendap_u = new dap_var("u", "org_opendap_u", true,false);
+            org_opendap_var_1 = new dap_var("u", "org_opendap_var_1", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_u);
-            org_opendap_u.checkBox = "get_org_opendap_u";
+                DAP2_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_u"
-                               onclick="org_opendap_u.handle_projection_change(get_org_opendap_u)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>u<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">time_a=
                     </span>
@@ -216,20 +216,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_u_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_u.addDimension(org_opendap_u_dim_1,16);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_1,16);
             </script>
-                     <input type="text" id="org_opendap_u_dim_2" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_u.addDimension(org_opendap_u_dim_2,17);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_2,17);
             </script>
-                     <input type="text" id="org_opendap_u_dim_3" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_u.addDimension(org_opendap_u_dim_3,21);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_3,21);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -299,8 +299,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         v\n" +
-                "myJSVarName:   org_opendap_v\n" +
-                "checkBoxName:  get_org_opendap_v\n" +
+                "myJSVarName:   org_opendap_var_2\n" +
+                "checkBoxName:  get_org_opendap_var_2\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Int16\n" +
@@ -308,15 +308,15 @@
             );
 
 
-            org_opendap_v = new dap_var("v", "org_opendap_v", true,false);
+            org_opendap_var_2 = new dap_var("v", "org_opendap_var_2", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_v);
-            org_opendap_v.checkBox = "get_org_opendap_v";
+                DAP2_URL.add_dap_var(org_opendap_var_2);
+            org_opendap_var_2.checkBox = "get_org_opendap_var_2";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_v"
-                               onclick="org_opendap_v.handle_projection_change(get_org_opendap_v)"
+                        <input type="checkbox" id="get_org_opendap_var_2"
+                               onclick="org_opendap_var_2.handle_projection_change(get_org_opendap_var_2)"
                                onfocus="describe_projection()"/>v<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">time_a=
                     </span>
@@ -338,20 +338,20 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int16)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_v_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_2_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_v.addDimension(org_opendap_v_dim_1,16);
+                     <script type="text/javascript">org_opendap_var_2.addDimension(org_opendap_var_2_dim_1,16);
             </script>
-                     <input type="text" id="org_opendap_v_dim_2" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_2_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_v.addDimension(org_opendap_v_dim_2,17);
+                     <script type="text/javascript">org_opendap_var_2.addDimension(org_opendap_var_2_dim_2,17);
             </script>
-                     <input type="text" id="org_opendap_v_dim_3" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_2_dim_3" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_v.addDimension(org_opendap_v_dim_3,21);
+                     <script type="text/javascript">org_opendap_var_2.addDimension(org_opendap_var_2_dim_3,21);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -400,8 +400,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         lat\n" +
-                "myJSVarName:   org_opendap_lat\n" +
-                "checkBoxName:  get_org_opendap_lat\n" +
+                "myJSVarName:   org_opendap_var_3\n" +
+                "checkBoxName:  get_org_opendap_var_3\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Float32\n" +
@@ -409,15 +409,15 @@
             );
 
 
-            org_opendap_lat = new dap_var("lat", "org_opendap_lat", true,false);
+            org_opendap_var_3 = new dap_var("lat", "org_opendap_var_3", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_lat);
-            org_opendap_lat.checkBox = "get_org_opendap_lat";
+                DAP2_URL.add_dap_var(org_opendap_var_3);
+            org_opendap_var_3.checkBox = "get_org_opendap_var_3";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_lat"
-                               onclick="org_opendap_lat.handle_projection_change(get_org_opendap_lat)"
+                        <input type="checkbox" id="get_org_opendap_var_3"
+                               onclick="org_opendap_var_3.handle_projection_change(get_org_opendap_var_3)"
                                onfocus="describe_projection()"/>lat<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">lat=
                     </span>
@@ -427,10 +427,10 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_lat_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_3_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_lat.addDimension(org_opendap_lat_dim_1,17);
+                     <script type="text/javascript">org_opendap_var_3.addDimension(org_opendap_var_3_dim_1,17);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -451,8 +451,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         lon\n" +
-                "myJSVarName:   org_opendap_lon\n" +
-                "checkBoxName:  get_org_opendap_lon\n" +
+                "myJSVarName:   org_opendap_var_4\n" +
+                "checkBoxName:  get_org_opendap_var_4\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Float32\n" +
@@ -460,15 +460,15 @@
             );
 
 
-            org_opendap_lon = new dap_var("lon", "org_opendap_lon", true,false);
+            org_opendap_var_4 = new dap_var("lon", "org_opendap_var_4", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_lon);
-            org_opendap_lon.checkBox = "get_org_opendap_lon";
+                DAP2_URL.add_dap_var(org_opendap_var_4);
+            org_opendap_var_4.checkBox = "get_org_opendap_var_4";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_lon"
-                               onclick="org_opendap_lon.handle_projection_change(get_org_opendap_lon)"
+                        <input type="checkbox" id="get_org_opendap_var_4"
+                               onclick="org_opendap_var_4.handle_projection_change(get_org_opendap_var_4)"
                                onfocus="describe_projection()"/>lon<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">lon=
                     </span>
@@ -478,10 +478,10 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_lon_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_4_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_lon.addDimension(org_opendap_lon_dim_1,21);
+                     <script type="text/javascript">org_opendap_var_4.addDimension(org_opendap_var_4_dim_1,21);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -502,8 +502,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         time\n" +
-                "myJSVarName:   org_opendap_time\n" +
-                "checkBoxName:  get_org_opendap_time\n" +
+                "myJSVarName:   org_opendap_var_5\n" +
+                "checkBoxName:  get_org_opendap_var_5\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Float32\n" +
@@ -511,15 +511,15 @@
             );
 
 
-            org_opendap_time = new dap_var("time", "org_opendap_time", true,false);
+            org_opendap_var_5 = new dap_var("time", "org_opendap_var_5", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_time);
-            org_opendap_time.checkBox = "get_org_opendap_time";
+                DAP2_URL.add_dap_var(org_opendap_var_5);
+            org_opendap_var_5.checkBox = "get_org_opendap_var_5";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_time"
-                               onclick="org_opendap_time.handle_projection_change(get_org_opendap_time)"
+                        <input type="checkbox" id="get_org_opendap_var_5"
+                               onclick="org_opendap_var_5.handle_projection_change(get_org_opendap_var_5)"
                                onfocus="describe_projection()"/>time<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">time=
                     </span>
@@ -529,10 +529,10 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_time_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_5_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_time.addDimension(org_opendap_time_dim_1,16);
+                     <script type="text/javascript">org_opendap_var_5.addDimension(org_opendap_var_5_dim_1,16);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
