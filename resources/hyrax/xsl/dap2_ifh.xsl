@@ -549,13 +549,16 @@
      -
     -->
     <xsl:template match="*" name="computeVarName" mode="computeVarName">
-        <xsl:variable name="myFQFunctionName">
+        <!-- xsl:variable name="myFQFunctionName">
             <xsl:call-template name="computeFQN">
                 <xsl:with-param name="separator">_</xsl:with-param>
             </xsl:call-template>
-        </xsl:variable>
+        </xsl:variable -->
         <!-- xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/ -->
-        <xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/>
+        <!--xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/  -->
+
+        <xsl:value-of select="concat('org_opendap_var_',position())"/>
+
     </xsl:template>
     <!-- ################################################################### -->
 
