@@ -1134,8 +1134,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         NSCAT_Rev_20_Num_Beam_34\n" +
-                "myJSVarName:   org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
-                "checkBoxName:  get_org_opendap_NSCAT_Rev_20_Num_Beam_34\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   false\n" +
                 "isArray:       true\n" +
                 "myType:        Byte\n" +
@@ -1143,15 +1143,15 @@
             );
 
 
-            org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", true,false);
+            org_opendap_var_1 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_var_1", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
-            org_opendap_NSCAT_Rev_20_Num_Beam_34.checkBox = "get_org_opendap_NSCAT_Rev_20_Num_Beam_34";
+                DAP2_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_NSCAT_Rev_20_Num_Beam_34"
-                               onclick="org_opendap_NSCAT_Rev_20_Num_Beam_34.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_34)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1167,17 +1167,15 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_1,46);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_1,46);
             </script>
-                     <input type="text" id="org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2" size="8"
-                            oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_2" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_NSCAT_Rev_20_Num_Beam_34.addDimension(org_opendap_NSCAT_Rev_20_Num_Beam_34_dim_2,6);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_2,6);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">

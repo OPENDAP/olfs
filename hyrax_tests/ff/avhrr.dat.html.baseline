@@ -351,8 +351,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   true\n" +
                 "isArray:       false\n" +
                 "myType:        Sequence\n" +
@@ -360,15 +360,15 @@
             );
 
 
-            org_opendap_URI_Avhrr = new dap_var("URI_Avhrr", "org_opendap_URI_Avhrr", false,true);
+            org_opendap_var_1 = new dap_var("URI_Avhrr", "org_opendap_var_1", false,true);
 
             
-                DAP2_URL.add_dap_var(org_opendap_URI_Avhrr);
-            org_opendap_URI_Avhrr.checkBox = "get_org_opendap_URI_Avhrr";
+                DAP2_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_URI_Avhrr"
-                               onclick="org_opendap_URI_Avhrr.handle_projection_change(get_org_opendap_URI_Avhrr)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>URI_Avhrr<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Sequence)
             </span>
                      </div>
@@ -385,28 +385,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.year\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_year\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_year\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_year = new dap_var("URI_Avhrr.year", "org_opendap_URI_Avhrr_year", false,false);
+            org_opendap_var_1 = new dap_var("URI_Avhrr.year", "org_opendap_var_1", false,false);
 
-            org_opendap_URI_Avhrr_year.checkBox = "get_org_opendap_URI_Avhrr_year";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_year);
-                org_opendap_URI_Avhrr_year.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
+            org_opendap_var_1.addChildVar(org_opendap_var_1);
+                org_opendap_var_1.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_year"
-                                           onclick="org_opendap_URI_Avhrr_year.handle_projection_change(get_org_opendap_URI_Avhrr_year)"
+                                    <input type="checkbox" id="get_org_opendap_var_1"
+                                           onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                            onfocus="describe_projection()"/>year<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">year<select id="org_opendap_URI_Avhrr_year_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">year<select id="org_opendap_var_1_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -416,13 +416,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_year_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_1_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_year_selection"/>
+                                         id="org_opendap_var_1_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_year.addSelectionClause("org_opendap_URI_Avhrr_year_selection", org_opendap_URI_Avhrr_year_relOpWidget_0,org_opendap_URI_Avhrr_year_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_1.addSelectionClause("org_opendap_var_1_selection", org_opendap_var_1_relOpWidget_0,org_opendap_var_1_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -430,28 +430,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.month\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_month\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_month\n" +
+                "myJSVarName:   org_opendap_var_2\n" +
+                "checkBoxName:  get_org_opendap_var_2\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_month = new dap_var("URI_Avhrr.month", "org_opendap_URI_Avhrr_month", false,false);
+            org_opendap_var_2 = new dap_var("URI_Avhrr.month", "org_opendap_var_2", false,false);
 
-            org_opendap_URI_Avhrr_month.checkBox = "get_org_opendap_URI_Avhrr_month";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_month);
-                org_opendap_URI_Avhrr_month.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_2.checkBox = "get_org_opendap_var_2";
+            org_opendap_var_1.addChildVar(org_opendap_var_2);
+                org_opendap_var_2.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_month"
-                                           onclick="org_opendap_URI_Avhrr_month.handle_projection_change(get_org_opendap_URI_Avhrr_month)"
+                                    <input type="checkbox" id="get_org_opendap_var_2"
+                                           onclick="org_opendap_var_2.handle_projection_change(get_org_opendap_var_2)"
                                            onfocus="describe_projection()"/>month<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">month<select id="org_opendap_URI_Avhrr_month_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">month<select id="org_opendap_var_2_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -461,13 +461,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_month_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_2_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_month_selection"/>
+                                         id="org_opendap_var_2_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_month.addSelectionClause("org_opendap_URI_Avhrr_month_selection", org_opendap_URI_Avhrr_month_relOpWidget_0,org_opendap_URI_Avhrr_month_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_2.addSelectionClause("org_opendap_var_2_selection", org_opendap_var_2_relOpWidget_0,org_opendap_var_2_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -475,28 +475,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.day\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_day\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_day\n" +
+                "myJSVarName:   org_opendap_var_3\n" +
+                "checkBoxName:  get_org_opendap_var_3\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_day = new dap_var("URI_Avhrr.day", "org_opendap_URI_Avhrr_day", false,false);
+            org_opendap_var_3 = new dap_var("URI_Avhrr.day", "org_opendap_var_3", false,false);
 
-            org_opendap_URI_Avhrr_day.checkBox = "get_org_opendap_URI_Avhrr_day";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_day);
-                org_opendap_URI_Avhrr_day.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_3.checkBox = "get_org_opendap_var_3";
+            org_opendap_var_1.addChildVar(org_opendap_var_3);
+                org_opendap_var_3.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_day"
-                                           onclick="org_opendap_URI_Avhrr_day.handle_projection_change(get_org_opendap_URI_Avhrr_day)"
+                                    <input type="checkbox" id="get_org_opendap_var_3"
+                                           onclick="org_opendap_var_3.handle_projection_change(get_org_opendap_var_3)"
                                            onfocus="describe_projection()"/>day<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">day<select id="org_opendap_URI_Avhrr_day_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">day<select id="org_opendap_var_3_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -506,13 +506,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_day_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_3_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_day_selection"/>
+                                         id="org_opendap_var_3_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_day.addSelectionClause("org_opendap_URI_Avhrr_day_selection", org_opendap_URI_Avhrr_day_relOpWidget_0,org_opendap_URI_Avhrr_day_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_3.addSelectionClause("org_opendap_var_3_selection", org_opendap_var_3_relOpWidget_0,org_opendap_var_3_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -520,28 +520,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.hours\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_hours\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_hours\n" +
+                "myJSVarName:   org_opendap_var_4\n" +
+                "checkBoxName:  get_org_opendap_var_4\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_hours = new dap_var("URI_Avhrr.hours", "org_opendap_URI_Avhrr_hours", false,false);
+            org_opendap_var_4 = new dap_var("URI_Avhrr.hours", "org_opendap_var_4", false,false);
 
-            org_opendap_URI_Avhrr_hours.checkBox = "get_org_opendap_URI_Avhrr_hours";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_hours);
-                org_opendap_URI_Avhrr_hours.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_4.checkBox = "get_org_opendap_var_4";
+            org_opendap_var_1.addChildVar(org_opendap_var_4);
+                org_opendap_var_4.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_hours"
-                                           onclick="org_opendap_URI_Avhrr_hours.handle_projection_change(get_org_opendap_URI_Avhrr_hours)"
+                                    <input type="checkbox" id="get_org_opendap_var_4"
+                                           onclick="org_opendap_var_4.handle_projection_change(get_org_opendap_var_4)"
                                            onfocus="describe_projection()"/>hours<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">hours<select id="org_opendap_URI_Avhrr_hours_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">hours<select id="org_opendap_var_4_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -551,13 +551,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_hours_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_4_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_hours_selection"/>
+                                         id="org_opendap_var_4_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_hours.addSelectionClause("org_opendap_URI_Avhrr_hours_selection", org_opendap_URI_Avhrr_hours_relOpWidget_0,org_opendap_URI_Avhrr_hours_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_4.addSelectionClause("org_opendap_var_4_selection", org_opendap_var_4_relOpWidget_0,org_opendap_var_4_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -565,28 +565,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.minutes\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_minutes\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_minutes\n" +
+                "myJSVarName:   org_opendap_var_5\n" +
+                "checkBoxName:  get_org_opendap_var_5\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_minutes = new dap_var("URI_Avhrr.minutes", "org_opendap_URI_Avhrr_minutes", false,false);
+            org_opendap_var_5 = new dap_var("URI_Avhrr.minutes", "org_opendap_var_5", false,false);
 
-            org_opendap_URI_Avhrr_minutes.checkBox = "get_org_opendap_URI_Avhrr_minutes";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_minutes);
-                org_opendap_URI_Avhrr_minutes.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_5.checkBox = "get_org_opendap_var_5";
+            org_opendap_var_1.addChildVar(org_opendap_var_5);
+                org_opendap_var_5.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_minutes"
-                                           onclick="org_opendap_URI_Avhrr_minutes.handle_projection_change(get_org_opendap_URI_Avhrr_minutes)"
+                                    <input type="checkbox" id="get_org_opendap_var_5"
+                                           onclick="org_opendap_var_5.handle_projection_change(get_org_opendap_var_5)"
                                            onfocus="describe_projection()"/>minutes<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">minutes<select id="org_opendap_URI_Avhrr_minutes_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">minutes<select id="org_opendap_var_5_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -596,13 +596,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_minutes_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_5_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_minutes_selection"/>
+                                         id="org_opendap_var_5_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_minutes.addSelectionClause("org_opendap_URI_Avhrr_minutes_selection", org_opendap_URI_Avhrr_minutes_relOpWidget_0,org_opendap_URI_Avhrr_minutes_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_5.addSelectionClause("org_opendap_var_5_selection", org_opendap_var_5_relOpWidget_0,org_opendap_var_5_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -610,28 +610,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.seconds\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_seconds\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_seconds\n" +
+                "myJSVarName:   org_opendap_var_6\n" +
+                "checkBoxName:  get_org_opendap_var_6\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        Int32\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_seconds = new dap_var("URI_Avhrr.seconds", "org_opendap_URI_Avhrr_seconds", false,false);
+            org_opendap_var_6 = new dap_var("URI_Avhrr.seconds", "org_opendap_var_6", false,false);
 
-            org_opendap_URI_Avhrr_seconds.checkBox = "get_org_opendap_URI_Avhrr_seconds";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_seconds);
-                org_opendap_URI_Avhrr_seconds.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_6.checkBox = "get_org_opendap_var_6";
+            org_opendap_var_1.addChildVar(org_opendap_var_6);
+                org_opendap_var_6.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_seconds"
-                                           onclick="org_opendap_URI_Avhrr_seconds.handle_projection_change(get_org_opendap_URI_Avhrr_seconds)"
+                                    <input type="checkbox" id="get_org_opendap_var_6"
+                                           onclick="org_opendap_var_6.handle_projection_change(get_org_opendap_var_6)"
                                            onfocus="describe_projection()"/>seconds<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Int32)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">seconds<select id="org_opendap_URI_Avhrr_seconds_relOpWidget_0" onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">seconds<select id="org_opendap_var_6_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -641,13 +641,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_seconds_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_6_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_seconds_selection"/>
+                                         id="org_opendap_var_6_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_seconds.addSelectionClause("org_opendap_URI_Avhrr_seconds_selection", org_opendap_URI_Avhrr_seconds_relOpWidget_0,org_opendap_URI_Avhrr_seconds_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_6.addSelectionClause("org_opendap_var_6_selection", org_opendap_var_6_relOpWidget_0,org_opendap_var_6_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
@@ -655,29 +655,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         URI_Avhrr.DODS_URL\n" +
-                "myJSVarName:   org_opendap_URI_Avhrr_DODS_URL\n" +
-                "checkBoxName:  get_org_opendap_URI_Avhrr_DODS_URL\n" +
+                "myJSVarName:   org_opendap_var_7\n" +
+                "checkBoxName:  get_org_opendap_var_7\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        String\n" +
-                "parentContainer:        org_opendap_URI_Avhrr\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_URI_Avhrr_DODS_URL = new dap_var("URI_Avhrr.DODS_URL", "org_opendap_URI_Avhrr_DODS_URL", false,false);
+            org_opendap_var_7 = new dap_var("URI_Avhrr.DODS_URL", "org_opendap_var_7", false,false);
 
-            org_opendap_URI_Avhrr_DODS_URL.checkBox = "get_org_opendap_URI_Avhrr_DODS_URL";
-            org_opendap_URI_Avhrr.addChildVar(org_opendap_URI_Avhrr_DODS_URL);
-                org_opendap_URI_Avhrr_DODS_URL.parentContainer = org_opendap_URI_Avhrr;
+            org_opendap_var_7.checkBox = "get_org_opendap_var_7";
+            org_opendap_var_1.addChildVar(org_opendap_var_7);
+                org_opendap_var_7.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_URI_Avhrr_DODS_URL"
-                                           onclick="org_opendap_URI_Avhrr_DODS_URL.handle_projection_change(get_org_opendap_URI_Avhrr_DODS_URL)"
+                                    <input type="checkbox" id="get_org_opendap_var_7"
+                                           onclick="org_opendap_var_7.handle_projection_change(get_org_opendap_var_7)"
                                            onfocus="describe_projection()"/>DODS_URL<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is String)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DODS_URL<select id="org_opendap_URI_Avhrr_DODS_URL_relOpWidget_0"
-                                            onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DODS_URL<select id="org_opendap_var_7_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -687,13 +686,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_URI_Avhrr_DODS_URL_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_7_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_URI_Avhrr_DODS_URL_selection"/>
+                                         id="org_opendap_var_7_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_URI_Avhrr_DODS_URL.addSelectionClause("org_opendap_URI_Avhrr_DODS_URL_selection", org_opendap_URI_Avhrr_DODS_URL_relOpWidget_0,org_opendap_URI_Avhrr_DODS_URL_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_7.addSelectionClause("org_opendap_var_7_selection", org_opendap_var_7_relOpWidget_0,org_opendap_var_7_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>

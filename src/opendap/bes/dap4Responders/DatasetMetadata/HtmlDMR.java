@@ -48,6 +48,7 @@ import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
 import org.jdom.transform.JDOMSource;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -326,24 +327,6 @@ public class HtmlDMR extends Dap4Responder {
     }
 
 
-    /**
-     * Minmal JSON text encoder. This method escapes:
-     * <ul>
-     *     <li>The \ (backslash)</li>
-     *     <li>The " (double-quote)</li>
-     * </ul>
-     * @param value The string to encode.
-     * @return The encoded value
-     */
-    private String jsonEncodeString(String value){
-        String str = value.trim();
-        str = str.replace("\\","\\\\");
-        str = str.replace("\"","\\\"");
-        return str;
-    }
-
-
-
     public String dap4AttributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
         @SuppressWarnings("unchecked")
@@ -352,7 +335,9 @@ public class HtmlDMR extends Dap4Responder {
         if(!values.isEmpty()){
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(jsonEncodeString(attribute.getAttributeValue("name"))).append("\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"");
+            sb.append(Encode.forHtml(Encode.forJavaScript(attribute.getAttributeValue("name")))).append("\", \n");
+
             //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
 
             boolean jsEncode = true;
@@ -369,7 +354,7 @@ public class HtmlDMR extends Dap4Responder {
                 Element value = values.get(0);
                 sb.append(indent).append(indent_inc).append("\"value\": \"");
                 if(jsEncode) {
-                    sb.append(jsonEncodeString(value.getTextTrim()));
+                    sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                 }
                 else {
                     sb.append(value.getTextTrim());
@@ -385,7 +370,7 @@ public class HtmlDMR extends Dap4Responder {
                     sb.append("\"");
 
                     if(jsEncode) {
-                        sb.append(jsonEncodeString(value.getTextTrim()));
+                        sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
                     }
                     else {
                         sb.append(value.getTextTrim());
