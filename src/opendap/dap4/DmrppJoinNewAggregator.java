@@ -12,16 +12,15 @@ import org.jdom.output.XMLOutputter;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-public class DmrppAggregator {
+public class DmrppJoinNewAggregator {
 
     private Logger log;
+
 
     public static final String FILE_PROTOCOL = "file://";
 
@@ -34,11 +33,15 @@ public class DmrppAggregator {
     private Document aggDatasetTemplate;
     private String newAggDimensionName;
     private Element newAggDimensionElement;
+    private String aggVarsFileName;
+    private Set<String> aggVarNames;
 
     /**
      *
+      * @param dimName
+     * @param aggVariablesFileName
      */
-    public DmrppAggregator(String dimName){
+    public DmrppJoinNewAggregator(String dimName, String aggVariablesFileName){
         log = (Logger) LoggerFactory.getLogger(this.getClass());
 
         aggFileList = new ArrayList<>();
@@ -47,20 +50,64 @@ public class DmrppAggregator {
         aggVarTemplates = new TreeMap<>();
         aggVarChunkDimSizes = new TreeMap<>();
         aggDatasetTemplate = null;
+        aggVarsFileName = aggVariablesFileName;
+        aggVarNames = new HashSet<>();
 
-        if(dimName!=null){
+        if(dimName==null) {
+            dimName="myNewDim";
+        }
+        newAggDimensionElement = new Element(DAP4.DIMENSION,DAP4.NS);
+        newAggDimensionElement.setAttribute(DAP4.NAME,dimName);
+        newAggDimensionElement.setAttribute(DAP4.SIZE,"0");
 
-            newAggDimensionElement = new Element(DAP4.DIMENSION,DAP4.NS);
-            newAggDimensionElement.setAttribute(DAP4.NAME,dimName);
-            newAggDimensionElement.setAttribute(DAP4.SIZE,"0");
+        // We know we are aggregating the entire dataset so we want to put
+        // the new dimension at the top level. And that means that the FQN will
+        // be the dimension name with a leading slash. (But that's not cool
+        // for the element name.
+        newAggDimensionName = dimName.startsWith("/")?"":"/"+dimName;
 
-            // We know we are aggregating the entire dataset so we want to put
-            // the new dimension at the top level. And that means that the FQN will
-            // be the dimension name with a leading slash. (But that's not cool
-            // for the element name.
-            newAggDimensionName = dimName.startsWith("/")?"":"/"+dimName;
+    }
+
+    /**
+     *
+     * @throws IOException
+     */
+    public void loadAggVarsList() throws IOException {
+        loadListFile(aggVarsFileName,aggVarNames);
+    }
+
+    /**
+     *
+     * @throws IOException
+     */
+    public void loadListFile(String listFileName,  Set<String> list) throws IOException {
+
+        if(listFileName!=null){
+            File listFile  = new File(listFileName);
+            if(!listFile.exists() || !listFile.isFile() || !listFile.canRead()) {
+                throw new IOException("Unable to read listFile: "+listFileName);
+            }
+            else {
+                BufferedReader reader=null;
+                try{
+                    reader = new BufferedReader(new FileReader(listFileName));
+                    String value = reader.readLine();
+                    while(value!=null){
+                        if(!value.isEmpty()) {
+                            log.debug("Loading value: {}", value);
+                            list.add(value);
+                        }
+                        value = reader.readLine();
+                    }
+                }
+                finally {
+                    if(reader!=null)
+                        reader.close();
+                }
+            }
         }
     }
+
 
     /**
      *
@@ -68,7 +115,7 @@ public class DmrppAggregator {
      * @throws MalformedURLException
      * @throws BadConfigurationException
      */
-    public void loadDmrppList(String[] args) throws MalformedURLException, BadConfigurationException {
+    public void loadDmrppList(String[] args) throws IOException, BadConfigurationException {
 
         if(args.length>1) {
             for (String s : args) {
@@ -93,15 +140,46 @@ public class DmrppAggregator {
                 }
             }
         }
+        else if(args.length==1){
+            File arg0 = new File(args[0]);
+            if(!arg0.exists())
+                throw new BadConfigurationException("Unable to locate file: "+arg0);
+
+            if(arg0.isDirectory()) {
+                File[] contents = arg0.listFiles();
+                for (File f : contents) {
+                    aggFileList.add(f.toURI().toURL());
+                }
+            }
+            else if(arg0.isFile()){
+
+                HashSet<String> aggFileNames = new HashSet<>();
+                loadListFile(arg0.getAbsolutePath(),aggFileNames);
+                for(String aggFileName:aggFileNames){
+                    URL aggFileURL;
+                    if(aggFileName.startsWith("http://") ||
+                            aggFileName.startsWith("https://") ||
+                            aggFileName.startsWith("file://")
+                            ){
+                        aggFileURL = new URL(aggFileName);
+                    }
+                    else {
+                        File aggFile = new File(aggFileName);
+                        if (!aggFile.exists() || !aggFile.isFile() || !aggFile.canRead()) {
+                            throw new IOException("Unable to read aggFile: " + aggFile);
+                        }
+                        aggFileURL = aggFile.toURI().toURL();
+                    }
+                    log.debug("Adding aggFile: {}", aggFileURL);
+                    aggFileList.add(aggFileURL);
+                }
+            }
+            else {
+                throw new BadConfigurationException("The named file is neither a file or a dir: "+arg0);
+            }
+        }
         else {
-            File aggDir = new File(args[0]);
-            if(!aggDir.isDirectory()) {
-                throw new BadConfigurationException("A single parameter must be a directory name that contains the files to agg.");
-            }
-            File[] contents = aggDir.listFiles();
-            for(File f:contents){
-                aggFileList.add(f.toURI().toURL());
-            }
+            throw new BadConfigurationException("This business won't work if you don't provide some dmr++ files my friend.");
         }
     }
 
@@ -133,10 +211,10 @@ public class DmrppAggregator {
         }
 
         for(String aggVarName:aggVarTemplates.keySet()){
+
             Element aggVarElement = aggVarTemplates.get(aggVarName);
 
             // Update Chunk dimension size for this variable.
-            aggVarChunkDimSizes.get(aggVarName);
             Element chunks = aggVarElement.getChild(DMRPP.CHUNKS,DMRPP.NS);
             if(chunks==null)
                 throw new BadConfigurationException("Variable "+aggVarName+" is missing the dmrpp:chunks element.");
@@ -289,25 +367,23 @@ public class DmrppAggregator {
                                 }
                             }
 
+                            // Add the new dimension to the CHUNK_POSITION_IN_ARRAY
+                            @SuppressWarnings("unchecked")
+                            List<Element> vChunkElements = vChunksElement.getChildren(DMRPP.CHUNK, DMRPP.NS);
 
-                            if (isJoinNew()) {
-                                // Add the new dimension to the CHUNK_POSITION_IN_ARRAY
-                                @SuppressWarnings("unchecked")
-                                List<Element> vChunkElements = vChunksElement.getChildren(DMRPP.CHUNK, DMRPP.NS);
+                            for (Element vChunkElement : vChunkElements) {
+                                String chunkPositionInArray = vChunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
+                                chunkPositionInArray = chunkPositionInArray.replaceFirst("\\[", "[" + chunkIndex + ",");
+                                Element chunk = (Element) vChunkElement.clone();
+                                chunk.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY,chunkPositionInArray);
 
-                                for (Element vChunkElement : vChunkElements) {
-                                    String chunkPositionInArray = vChunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
-                                    chunkPositionInArray = chunkPositionInArray.replaceFirst("\\[", "[" + chunkIndex + ",");
-                                    Element chunk = (Element) vChunkElement.clone();
-                                    chunk.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY,chunkPositionInArray);
+                                String href = chunk.getAttributeValue(DMRPP.HREF);
+                                if(href==null)
+                                    chunk.setAttribute(DMRPP.HREF,dataURL.toString());
 
-                                    String href = chunk.getAttributeValue(DMRPP.HREF);
-                                    if(href==null)
-                                        chunk.setAttribute(DMRPP.HREF,dataURL.toString());
-
-                                    tChunksElement.addContent(chunk);
+                                tChunksElement.addContent(chunk);
                                 }
-                            }
+
                         }
                     }
                 }
@@ -338,6 +414,38 @@ public class DmrppAggregator {
         return cds;
     }
 
+    /**
+     * If the user has specified a subset of the variables to be aggregated this
+     * will "prune" the non aggregated variables from the result document. It checks
+     * to be sure NOT to drop coordinate dimension variables (which are not
+     * aggregated but need to be kept because, well... coordinate vars, right?
+     */
+    public void pruneAggTree(){
+
+        if(aggVarNames.isEmpty())
+            return;
+
+        Map<String,Element> dropList = new HashMap<>();
+
+        for(Map.Entry<String,Element> entry: aggVarTemplates.entrySet()){
+            log.debug("aggVar - name: {} type: {}",entry.getKey(), entry.getValue().getName());
+
+            String varFQN = entry.getKey();
+            Element varElement = entry.getValue();
+
+            if(!aggVarNames.contains(varFQN) && !coordinateVars.containsKey(varFQN)){
+                dropList.put(varFQN,varElement);
+            }
+        }
+        for(Map.Entry<String,Element> entry: dropList.entrySet()) {
+            String name = entry.getKey();
+            Element varElement = entry.getValue();
+            aggVarChunkDimSizes.remove(name);
+            aggVarTemplates.remove(name);
+            varElement.detach();
+        }
+
+    }
 
     /**
      *
@@ -358,23 +466,22 @@ public class DmrppAggregator {
             dataURL = new URL(s);
         ingestContainerTemplate(dataset, dataURL);
         locateCoordinates();
-
-
-
-        for(Map.Entry<String,Element> entry : dimensions.entrySet()){
-            log.debug("Dimension: {}",entry.getKey(), entry.getValue().getName());
-        }
-
-        for(Map.Entry<String,Element> entry: coordinateVars.entrySet()){
-            log.debug("coordinateVar: {}",entry.getKey());
-        }
-
-        for(Map.Entry<String,Element> entry: aggVarTemplates.entrySet()){
-            log.debug("aggVar - name: {} type: {}",entry.getKey(), entry.getValue().getName());
-        }
+        pruneAggTree();
 
         if(newAggDimensionElement!=null) {
             newAggDimensionElement.setAttribute(DAP4.SIZE, "1");
+        }
+
+        if(log.isDebugEnabled()) {
+            for (Map.Entry<String, Element> entry : dimensions.entrySet()) {
+                log.debug("Dimension: {}", entry.getKey(), entry.getValue().getName());
+            }
+            for (Map.Entry<String, Element> entry : coordinateVars.entrySet()) {
+                log.debug("coordinateVar: {}", entry.getKey());
+            }
+            for (Map.Entry<String, Element> entry : aggVarTemplates.entrySet()) {
+                log.debug("aggVar - name: {} type: {}", entry.getKey(), entry.getValue().getName());
+            }
         }
 
     }
@@ -405,22 +512,25 @@ public class DmrppAggregator {
      * @param container
      * @throws IOException
      */
-    private void ingestContainerTemplate(Element container, URL dataURL ) throws IOException {
+    private List<Element> ingestContainerTemplate(Element container, URL dataURL ) throws IOException {
 
+        ArrayList<Element> dropList = new ArrayList<>();
         @SuppressWarnings("unchecked")
         List<Element> topKids = container.getChildren();
         for(Element kid:topKids){
+            String varFQN = getFQN(kid);
+
             if (kid.getName().equals(DAP4.GROUP)){
-                ingestContainerTemplate(kid,dataURL);
+                dropList.addAll(ingestContainerTemplate(kid,dataURL));
             }
             else if(kid.getName().equals(DAP4.DIMENSION)){
-                dimensions.put(getFQN(kid),kid);
+                dimensions.put(varFQN,kid);
             }
             else if (kid.getName().equals(DAP4.STRUCTURE)){
-                ingestContainerTemplate(kid,dataURL);
+                dropList.addAll(ingestContainerTemplate(kid,dataURL));
             }
             else if (kid.getName().equals(DAP4.SEQUENCE)){
-                ingestContainerTemplate(kid,dataURL);
+                dropList.addAll(ingestContainerTemplate(kid,dataURL));
             }
             else if (kid.getName().equals(DAP4.INT8)   |
                     kid.getName().equals(DAP4.UINT8)   |
@@ -440,40 +550,39 @@ public class DmrppAggregator {
                     kid.getName().equals(DAP4.OPAQUE)
                     ){
 
+
                 @SuppressWarnings("unchecked")
                 List<Element> dims = kid.getChildren(DAP4.DIM,DAP4.NS);
                 boolean isArray = dims.size()>0;
 
                 if(isArray){
                     @SuppressWarnings("unchecked")
-                    Element chunksElement = kid.getChild(DMRPP.CHUNKS,DMRPP.NS);
-                    if(chunksElement != null){
-                        String aggVarName = getFQN(kid);
-                        Element tChunkDimSizesElement = chunksElement.getChild(DMRPP.CHUNK_DIMENSION_SIZES,DMRPP.NS);
+                    Element chunksElement = kid.getChild(DMRPP.CHUNKS, DMRPP.NS);
+                    if (chunksElement != null) {
+                        Element tChunkDimSizesElement = chunksElement.getChild(DMRPP.CHUNK_DIMENSION_SIZES, DMRPP.NS);
                         if (tChunkDimSizesElement == null) {
                             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                             log.error(xmlo.outputString(chunksElement));
 
-                            throw new IOException("The template variable '" + aggVarName + "' has no dmrpp:"+
-                                    DMRPP.CHUNK_DIMENSION_SIZES+" element!");
+                            throw new IOException("The template variable '" + varFQN + "' has no dmrpp:" +
+                                    DMRPP.CHUNK_DIMENSION_SIZES + " element!");
                         }
-                        if(isJoinNew()) {
-                            // If it's a joinNew we add the new dimension to the CHUNK_DIMENSION_SIZES
-                            aggVarChunkDimSizes.put(aggVarName,"1 "+tChunkDimSizesElement.getTextTrim());
+                        // Since this is a joinNew we add the new dimension to the CHUNK_DIMENSION_SIZES
+                        aggVarChunkDimSizes.put(varFQN, "1 " + tChunkDimSizesElement.getTextTrim());
 
-                            // And add the new dimension to the CHUNK_POSITION_IN_ARRAY attribute in each chunk.
-                            @SuppressWarnings("unchecked")
-                            List<Element> chunkElements = chunksElement.getChildren(DMRPP.CHUNK, DMRPP.NS);
-                            for (Element chunkElement : chunkElements) {
-                                String chunkPositionInArray = chunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
-                                chunkElement.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY,chunkPositionInArray.replaceFirst("\\[", "[0,"));
+                        // And add the new dimension to the CHUNK_POSITION_IN_ARRAY attribute in each chunk.
+                        @SuppressWarnings("unchecked")
+                        List<Element> chunkElements = chunksElement.getChildren(DMRPP.CHUNK, DMRPP.NS);
+                        for (Element chunkElement : chunkElements) {
+                            String chunkPositionInArray = chunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
+                            chunkElement.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY, chunkPositionInArray.replaceFirst("\\[", "[0,"));
 
-                                String href = chunkElement.getAttributeValue(DMRPP.HREF);
-                                if(href==null)
-                                    chunkElement.setAttribute(DMRPP.HREF,dataURL.toString());
-                            }
+                            String href = chunkElement.getAttributeValue(DMRPP.HREF);
+                            if (href == null)
+                                chunkElement.setAttribute(DMRPP.HREF, dataURL.toString());
                         }
-                        aggVarTemplates.put(aggVarName,kid);
+
+                        aggVarTemplates.put(varFQN, kid);
                     }
                 }
             }
@@ -485,16 +594,10 @@ public class DmrppAggregator {
             }
 
         }
+        return dropList;
     }
 
 
-    /**
-     *
-     * @return
-     */
-    public boolean isJoinNew(){
-        return true;
-    }
 
 
     /**
@@ -533,19 +636,26 @@ public class DmrppAggregator {
     public static void main(String[] args) throws Exception {
 
         String outfile = null;
-
+        String joinNewDimName = null;
+        Level debugLevel = Level.OFF;
+        String aggVarsFile = null;
+        //----------------------------------------------------------------------
         Options options = createCmdLineOptions();
-
         CommandLineParser parser = new PosixParser();
         CommandLine cmd = parser.parse(options, args);
 
         //---------------------------
-        // Command File
+        // Usage/Help
         if (cmd.hasOption("h")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setWidth(120);
             formatter.printHelp( "DmrppAggregator", options );
             return;
+        }
+        //---------------------------
+        // Debug control
+        if (cmd.hasOption("d")) {
+            debugLevel = Level.ALL;
         }
 
         //---------------------------
@@ -554,19 +664,31 @@ public class DmrppAggregator {
             outfile = cmd.getOptionValue("o");
         }
 
+        //---------------------------
+        // aggregation files
         if (cmd.hasOption("a")) {
             args = cmd.getOptionValues("a");
         }
 
-        String joinNewDimName = "z";
-        if (cmd.hasOption("d")) {
-            joinNewDimName = cmd.getOptionValue("d");
+        //---------------------------
+        // Name of the joinNew Dimension
+        if (cmd.hasOption("n")) {
+            joinNewDimName = cmd.getOptionValue("n");
         }
 
-        DmrppAggregator dAgg = new DmrppAggregator(joinNewDimName);
-        dAgg.log.setLevel(Level.OFF);
+        //---------------------------
+        // Name of the variables file
+        if (cmd.hasOption("v")) {
+            aggVarsFile = cmd.getOptionValue("v");
+        }
 
+        //----------------------------------------------------------------------
+        //----------------------------------------------------------------------
+
+        DmrppJoinNewAggregator dAgg = new DmrppJoinNewAggregator(joinNewDimName, aggVarsFile);
+        dAgg.log.setLevel(debugLevel);
         dAgg.loadDmrppList(args);
+        dAgg.loadAggVarsList();
         Document aggDataset = dAgg.agg();
 
 
@@ -584,16 +706,14 @@ public class DmrppAggregator {
     private static Options createCmdLineOptions(){
 
         Options options = new Options();
-
-        options.addOption("o", "output",  true, "File into which the output will be written.");
         options.addOption("h", "help",    false, "Print this usage statement.");
+        options.addOption("d", "debug",   false, "Turn on debug output.");
+        options.addOption("o", "output",  true, "File into which the output will be written.");
         options.addOption("a", "aggFile", true, "One or more files to add.");
-        options.addOption("t", "aggType", true, "joinNew | joinExisting");
-        options.addOption("d", "dimName", true, "joinNew dimension name");
-
-
+        options.addOption("n", "dimName", true, "joinNew dimension name");
+        options.addOption("v", "variablesFile", true, "A file containing a list of the " +
+                "names of the variables to be aggregated.");
         return options;
-
     }
 
 
