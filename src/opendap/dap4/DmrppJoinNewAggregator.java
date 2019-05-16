@@ -88,7 +88,7 @@ public class DmrppJoinNewAggregator {
         // We know we are aggregating the entire dataset so we want to put
         // the new dimension at the top level. And that means that the FQN will
         // be the dimension name with a leading slash. (But that's not cool
-        // for the element name.
+        // for the value of newAggDimensionElement@name.)
         newAggDimensionName = dimName.startsWith("/")?"":"/"+dimName;
 
     }
