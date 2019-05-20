@@ -42,7 +42,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-public class DmrppJoinNewAggregator {
+public class DmrppJoinExistingAggregator {
 
     private Logger log;
 
@@ -55,7 +55,6 @@ public class DmrppJoinNewAggregator {
     private Map<String, Element> dimensions;
     private Map<String,Element> coordinateVars;
     private Map<String,Element> aggVarTemplates;
-    private Map<String,String> aggVarChunkDimSizes;
 
     private Document aggDatasetTemplate;
     private String newAggDimensionName;
@@ -65,17 +64,16 @@ public class DmrppJoinNewAggregator {
 
     /**
      *
-      * @param dimName
+     * @param dimName
      * @param aggVariablesFileName
      */
-    public DmrppJoinNewAggregator(String dimName, String aggVariablesFileName){
+    public DmrppJoinExistingAggregator(String dimName, String aggVariablesFileName){
         log = (Logger) LoggerFactory.getLogger(this.getClass());
 
         aggFileList = new ArrayList<>();
         dimensions = new TreeMap<>();
         coordinateVars = new TreeMap<>();
         aggVarTemplates = new TreeMap<>();
-        aggVarChunkDimSizes = new TreeMap<>();
         aggDatasetTemplate = null;
         aggVarsFileName = aggVariablesFileName;
         aggVarNames = new HashSet<>();
@@ -237,26 +235,6 @@ public class DmrppJoinNewAggregator {
             }
         }
 
-        for(String aggVarName:aggVarTemplates.keySet()){
-
-            Element aggVarElement = aggVarTemplates.get(aggVarName);
-
-            // Update Chunk dimension size for this variable.
-            Element chunks = aggVarElement.getChild(DMRPP.CHUNKS,DMRPP.NS);
-            if(chunks==null)
-                throw new BadConfigurationException("Variable "+aggVarName+" is missing the dmrpp:chunks element.");
-            Element chunkDimSizes = chunks.getChild(DMRPP.CHUNK_DIMENSION_SIZES,DMRPP.NS);
-            chunkDimSizes.setText(aggVarChunkDimSizes.get(aggVarName));
-
-            // Now add the Dim reference to the joinNew Dimension.
-            if(newAggDimensionElement!=null){
-                Element newDim = new Element(DAP4.DIM,DAP4.NS);
-                newDim.setAttribute(DAP4.NAME,newAggDimensionName);
-                aggVarElement.addContent(0,newDim);
-            }
-
-        }
-
         if(log.isDebugEnabled()) {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             for (String aggVarName : aggVarTemplates.keySet()) {
@@ -409,7 +387,7 @@ public class DmrppJoinNewAggregator {
                                     chunk.setAttribute(DMRPP.HREF,dataURL.toString());
 
                                 tChunksElement.addContent(chunk);
-                                }
+                            }
 
                         }
                     }
@@ -447,18 +425,33 @@ public class DmrppJoinNewAggregator {
      * to be sure NOT to drop coordinate dimension variables (which are not
      * aggregated but need to be kept because, well... coordinate vars, right?
      */
-    public void pruneAggTree(){
+    public void pruneAggTree() throws IOException {
 
         if(aggVarNames.isEmpty())
             return;
 
         Map<String,Element> dropList = new HashMap<>();
+        HashMap<String,List<String>> outerDims = new HashMap<>();
+
 
         for(Map.Entry<String,Element> entry: aggVarTemplates.entrySet()){
             log.debug("aggVar - name: {} type: {}",entry.getKey(), entry.getValue().getName());
 
             String varFQN = entry.getKey();
             Element varElement = entry.getValue();
+
+            Element outerDim = varElement.getChild(DAP4.DIM,DAP4.NS);
+            if(outerDim==null)
+                throw new IOException("OUCH! The aggVarTemplate variable "+varFQN+" has no "+DAP4.DIM+" elements.");
+
+            String outerDimName = outerDim.getAttributeValue(DAP4.NAME);
+
+            List<String> matchingVars = outerDims.get(outerDimName);
+            if(matchingVars==null) {
+                matchingVars = new ArrayList<>();
+                outerDims.put(outerDimName,matchingVars);
+            }
+            matchingVars.add(outerDimName);
 
             if(!aggVarNames.contains(varFQN) && !coordinateVars.containsKey(varFQN)){
                 dropList.put(varFQN,varElement);
@@ -467,7 +460,6 @@ public class DmrppJoinNewAggregator {
         for(Map.Entry<String,Element> entry: dropList.entrySet()) {
             String name = entry.getKey();
             Element varElement = entry.getValue();
-            aggVarChunkDimSizes.remove(name);
             aggVarTemplates.remove(name);
             varElement.detach();
         }
@@ -483,9 +475,6 @@ public class DmrppJoinNewAggregator {
 
         aggDatasetTemplate = templateDoc;
         Element dataset = templateDoc.getRootElement();
-        if(newAggDimensionElement!=null) {
-            dataset.addContent(0,newAggDimensionElement);
-        }
 
         String s = dataset.getAttributeValue(DMRPP.HREF,DMRPP.NS);
         URL dataURL = null;
@@ -593,8 +582,6 @@ public class DmrppJoinNewAggregator {
                             throw new IOException("The template variable '" + varFQN + "' has no dmrpp:" +
                                     DMRPP.CHUNK_DIMENSION_SIZES + " element!");
                         }
-                        // Since this is a joinNew we add the new dimension to the CHUNK_DIMENSION_SIZES
-                        aggVarChunkDimSizes.put(varFQN, "1 " + tChunkDimSizesElement.getTextTrim());
 
                         // And add the new dimension to the CHUNK_POSITION_IN_ARRAY attribute in each chunk.
                         @SuppressWarnings("unchecked")
@@ -712,7 +699,7 @@ public class DmrppJoinNewAggregator {
             //----------------------------------------------------------------------
             //----------------------------------------------------------------------
 
-            DmrppJoinNewAggregator dAgg = new DmrppJoinNewAggregator(joinNewDimName, aggVarsFile);
+            DmrppJoinExistingAggregator dAgg = new DmrppJoinExistingAggregator(joinNewDimName, aggVarsFile);
             dAgg.log.setLevel(debugLevel);
             dAgg.loadDmrppList(args);
             dAgg.loadAggVarsList();
@@ -720,11 +707,12 @@ public class DmrppJoinNewAggregator {
             Document aggDatasetDoc = dAgg.aggregate();
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            if (outfile != null) {
+            if(outfile!=null){
                 try (FileOutputStream fos = new FileOutputStream(outfile)) {
                     xmlo.output(aggDatasetDoc, fos);
                 }
-            } else {
+            }
+            else {
                 System.out.println(xmlo.outputString(aggDatasetDoc));
             }
         }
