@@ -58,6 +58,8 @@ import java.io.DataOutputStream;
 import java.util.List;
 import java.util.Vector;
 
+import static opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR.encodeStringForJsInHtml;
+
 
 public class Dap2IFH extends Dap4Responder {
 
@@ -353,19 +355,13 @@ public class Dap2IFH extends Dap4Responder {
 
             if(values.size()==1){
                 Element value = values.get(0);
-                sb.append(indent).append(indent_inc).append("\"value\": \"");
+                sb.append(indent).append(indent_inc).append("\"value\": ");
                 if(jsEncode) {
-                    String val = value.getTextTrim();
-                    String jsVal = Encode.forJavaScript(val);
-                    String htmlJsVal = Encode.forHtml(jsVal);
-                    htmlJsVal = htmlJsVal.replaceAll("\\\\-","-");
-                    sb.append(htmlJsVal);
-                    //sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
+                    sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                 }
                 else {
-                    sb.append(value.getTextTrim());
+                    sb.append("\"").append(value.getTextTrim()).append("\"");
                 }
-                sb.append("\"");
             }
             else {
                 sb.append(indent).append(indent_inc).append("\"value\": [ ");
@@ -373,20 +369,13 @@ public class Dap2IFH extends Dap4Responder {
                 for(Element value : values){
                     if(!first)
                         sb.append(", ");
-                    sb.append("\"");
 
                     if(jsEncode) {
-                        String val = value.getTextTrim();
-                        String jsVal = Encode.forJavaScript(val);
-                        String htmlJsVal = Encode.forHtml(jsVal);
-                        htmlJsVal = htmlJsVal.replaceAll("\\\\-","-");
-                        sb.append(htmlJsVal);
-                        // sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
+                        sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                     }
                     else {
-                        sb.append(value.getTextTrim());
+                        sb.append("\"").append(value.getTextTrim()).append("\"");
                     }
-                    sb.append("\"");
                     first = false;
                 }
                 sb.append(" ]");
