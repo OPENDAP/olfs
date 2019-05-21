@@ -230,8 +230,8 @@
     <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="owasp-encoder" value="encoder-1.2.1.jar"/>
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar"/>
+    <property name="owasp-encoder" value="encoder-1.2.2.jar"/>
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar"/>
 
     <!-- Library (class)paths -->
     <path id="compile.classpath">
