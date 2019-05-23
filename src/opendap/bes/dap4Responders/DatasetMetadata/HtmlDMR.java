@@ -326,6 +326,12 @@ public class HtmlDMR extends Dap4Responder {
         return sb.toString();
     }
 
+    public static  String encodeStringForJsInHtml(String val){
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        String jsVal = gson.toJson(val);
+        String htmlJsVal = Encode.forHtml(jsVal);
+        return htmlJsVal;
+    }
 
     public String dap4AttributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
@@ -352,14 +358,13 @@ public class HtmlDMR extends Dap4Responder {
             }
             if(values.size()==1){
                 Element value = values.get(0);
-                sb.append(indent).append(indent_inc).append("\"value\": \"");
+                sb.append(indent).append(indent_inc).append("\"value\": ");
                 if(jsEncode) {
-                    sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
+                    sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                 }
                 else {
-                    sb.append(value.getTextTrim());
+                    sb.append("\"").append(value.getTextTrim()).append("\"");
                 }
-                sb.append("\"");
             }
             else {
                 sb.append(indent).append(indent_inc).append("\"value\": [ ");
@@ -367,15 +372,13 @@ public class HtmlDMR extends Dap4Responder {
                 for(Element value : values){
                     if(!first)
                         sb.append(", ");
-                    sb.append("\"");
 
                     if(jsEncode) {
-                        sb.append(Encode.forHtml(Encode.forJavaScript(value.getTextTrim())));
+                        sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                     }
                     else {
-                        sb.append(value.getTextTrim());
+                        sb.append("\"").append(value.getTextTrim()).append("\"");
                     }
-                    sb.append("\"");
                     first = false;
                 }
                 sb.append(" ]");
