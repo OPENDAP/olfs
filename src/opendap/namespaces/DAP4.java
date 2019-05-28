@@ -47,7 +47,31 @@ public class DAP4 {
 
     public static final String ERROR = "Error";
 
-
+    public static final String DATASET = "Dataset";
+    public static final String GROUP = "Group";
+    public static final String DIMENSION = "Dimension";
+    public static final String ENUMERATION = "Enumeration";
+    public static final String INT8   = "Int8";
+    public static final String UINT8  = "UInt8";
+    public static final String BYTE   = "Byte";
+    public static final String CHAR   = "Char";
+    public static final String INT16  = "Int16";
+    public static final String UINT16 = "UInt16";
+    public static final String INT32  = "Int32";
+    public static final String UINT32 = "UInt32";
+    public static final String INT64  = "Int64";
+    public static final String UINT64 = "UInt64";
+    public static final String FLOAT32 = "Float32";
+    public static final String FLOAT64 = "Float64";
+    public static final String STRING  = "String";
+    public static final String D_URI   = "URI";
+    public static final String OPAQUE = "Opaque";
+    public static final String ENUM = "Enum";
+    public static final String STRUCTURE = "Structure";
+    public static final String SEQUENCE = "Sequence";
+    public static final String DIM = "Dim";
+    public static final String NAME = "name";
+    public static final String SIZE = "size";
 
 
 }

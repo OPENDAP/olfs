@@ -25,6 +25,8 @@
  */
 package opendap.xml;
 
+import opendap.logging.Procedure;
+import opendap.logging.Timer;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -49,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.regex.Pattern;
 
 /**
@@ -92,12 +95,27 @@ public class Util {
             throw new IOException(msg);
         }
         SAXBuilder sb = new SAXBuilder();
-        return sb.build(f);
+        Procedure saxParserProc = Timer.start();
+        Document doc = sb.build(f);
+        Timer.stop(saxParserProc);
+        return doc;
     }
 
     public static Document getDocument(InputStream f)throws IOException, JDOMException{
         SAXBuilder sb = new SAXBuilder();
-        return sb.build(f);
+        Procedure saxParserProc = Timer.start();
+        Document doc = sb.build(f);
+        Timer.stop(saxParserProc);
+        return doc;
+    }
+
+
+    public static Document getDocument(URL url)throws IOException, JDOMException {
+        SAXBuilder sb = new SAXBuilder();
+        Procedure saxParserProc = Timer.start();
+        Document doc = sb.build(url);
+        Timer.stop(saxParserProc);
+        return doc;
     }
 
 
@@ -245,6 +263,8 @@ public class Util {
         return s;
     }
 
+
+
     /**
      * Returns a "safe" javax.xml.stream.XMLInputFactory.
      * Because parsing "untrusted" XML document with external entities and DTD's enabled can can allow attackers to
@@ -316,15 +336,37 @@ public class Util {
 
     public static void main(String[] args) {
 
-        Logger log = LoggerFactory.getLogger(Util.class);
+        ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Util.class);
 
-        String[]  ncNameConversionTests = {
-                "jhbwf", "2ljhb", "kbwv::(&^", "kbwv::(&^bartmight","238kbwv::(&^bartmight" };
+        Timer.enable();
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        ch.qos.logback.classic.Level debugLevel = ch.qos.logback.classic.Level.INFO;
 
-        for(String testStr: ncNameConversionTests)
-            log.info("{} --> {}",testStr, convertToNCNAME(testStr));
+        log.setLevel(debugLevel);
+
+        int reps= 10;
+
+
+        for(String fileName: args){
+
+            try {
+                for(int rep=0; rep<reps; rep++) {
+                    Document doc = getDocument(fileName);
+                    log.debug(xmlo.outputString(doc));
+                }
+            }
+            catch (JDOMException | IOException e) {
+                log.error("Failed to parse XML document {}. Error Message: {}",
+                        fileName,e.getMessage());
+            }
+
+        }
+
+        log.info("Timer Report:\n{}",Timer.report());
 
     }
+
+
 
 
 }

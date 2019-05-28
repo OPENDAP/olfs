@@ -198,8 +198,8 @@
 
 
 
-    <property name="owasp-encoder"     value="encoder-1.2.1.jar" />
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.1.jar" />
+    <property name="owasp-encoder"     value="encoder-1.2.2.jar" />
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar" />
 
 
 

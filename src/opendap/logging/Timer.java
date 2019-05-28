@@ -42,6 +42,11 @@ public class Timer {
     private static boolean enabled = false;
 
     /**
+     * Private because this is a singleton
+     */
+    private Timer(){}
+
+    /**
      * Turn on the Timer.
      */
     public static void enable(){
