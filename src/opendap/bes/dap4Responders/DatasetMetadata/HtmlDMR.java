@@ -326,6 +326,11 @@ public class HtmlDMR extends Dap4Responder {
         return sb.toString();
     }
 
+    /**
+     *
+     * @param val
+     * @return
+     */
     public static  String encodeStringForJsInHtml(String val){
         com.google.gson.Gson gson = new com.google.gson.Gson();
         String jsVal = gson.toJson(val);
