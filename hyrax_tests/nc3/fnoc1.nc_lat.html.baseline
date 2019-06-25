@@ -278,11 +278,11 @@
         {
           "@type": "PropertyValue", 
           "name": "base_time", 
-          "value": "88\- 10\-00:00:00"        },
+          "value": "88- 10-00:00:00"        },
         {
           "@type": "PropertyValue", 
           "name": "title", 
-          "value": "FNOC UV wind components from 1988\- 10 to 1988\- 13."        },
+          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
         {
           "@type": "PropertyValue", 
           "name": "Unlimited_Dimension", 

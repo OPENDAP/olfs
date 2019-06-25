@@ -1311,11 +1311,11 @@
         {
           "@type": "PropertyValue", 
           "name": "SIS_ID", 
-          "value": "597\-512\-24\/1996\-07\-01"        },
+          "value": "597-512-24/1996-07-01"        },
         {
           "@type": "PropertyValue", 
           "name": "Build_ID", 
-          "value": "3.2.1\/1996\-11\-05"        },
+          "value": "3.2.1/1996-11-05"        },
         {
           "@type": "PropertyValue", 
           "name": "ADEOS_Data_Package_ID", 
@@ -1327,7 +1327,7 @@
         {
           "@type": "PropertyValue", 
           "name": "Product_Creation_Time", 
-          "value": "1996\-318T01:35:16.000"        },
+          "value": "1996-318T01:35:16.000"        },
         {
           "@type": "PropertyValue", 
           "name": "Data_Type", 
@@ -1343,7 +1343,7 @@
         {
           "@type": "PropertyValue", 
           "name": "First_Rev_Eq_Crossing_Time", 
-          "value": "1996\-259T04:01:28.226"        },
+          "value": "1996-259T04:01:28.226"        },
         {
           "@type": "PropertyValue", 
           "name": "First_Rev_Eq_Crossing_Lon", 
@@ -1351,11 +1351,11 @@
         {
           "@type": "PropertyValue", 
           "name": "First_Data_Time", 
-          "value": "1996\-259T03:43:48.945"        },
+          "value": "1996-259T03:43:48.945"        },
         {
           "@type": "PropertyValue", 
           "name": "Last_Data_Time", 
-          "value": "1996\-259T05:09:48.997"        },
+          "value": "1996-259T05:09:48.997"        },
         {
           "@type": "PropertyValue", 
           "name": "Num_Expected_Output_Records", 
@@ -1371,11 +1371,11 @@
         {
           "@type": "PropertyValue", 
           "name": "HDF_Build_ID", 
-          "value": "JPL D\-xxxxx 12\/15\/94"        },
+          "value": "JPL D-xxxxx 12/15/94"        },
         {
           "@type": "PropertyValue", 
           "name": "HDF_SIS_ID", 
-          "value": "JPL D\-12060 12\/15\/94"        },
+          "value": "JPL D-12060 12/15/94"        },
         {
           "@type": "PropertyValue", 
           "name": "HDF_Conversion_Organization", 
@@ -1383,7 +1383,7 @@
         {
           "@type": "PropertyValue", 
           "name": "HDF_Conversion_Time", 
-          "value": "1996\-320T17:32:34"        },
+          "value": "1996-320T17:32:34"        },
         {
           "@type": "PropertyValue", 
           "name": "Data_Format_Type", 
@@ -1677,7 +1677,7 @@
       {
         "@type": "PropertyValue", 
         "name": "long_name", 
-        "value": "The total number of sigma\-0s received from beam 3 or 4"      },
+        "value": "The total number of sigma-0s received from beam 3 or 4"      },
       {
         "@type": "PropertyValue", 
         "name": "units", 

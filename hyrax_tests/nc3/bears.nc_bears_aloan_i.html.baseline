@@ -441,7 +441,7 @@
         {
           "@type": "PropertyValue", 
           "name": "history", 
-          "value": "This is an example of a multi\-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."        },
+          "value": "This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."        },
         {
           "@type": "PropertyValue", 
           "name": "Unlimited_Dimension", 
