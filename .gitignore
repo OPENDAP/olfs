@@ -48,4 +48,5 @@ foo.*
 /bin/
 /conf/
 /.sonar/
+/.scannerwork/
 /webapps
