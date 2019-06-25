@@ -136,7 +136,7 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="HyraxAdmindAccess" level="info">
+    <logger name="HyraxAdminAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
     <logger name="HyraxAdminLastModifiedAccess" level="info">
