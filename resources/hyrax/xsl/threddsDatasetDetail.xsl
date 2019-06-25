@@ -30,6 +30,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:hyrax="http://xml.opendap.org/ns/hyrax/1.0#"
 
                 >
     <xsl:import href="version.xsl"/>
@@ -56,6 +57,26 @@
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
     <xsl:key name="service-by-type" match="//thredds:service" use="lower-case(@serviceType)"/>
 
+    <!--***********************************************
+    -
+    - FUNCTION: bes:path_concat()
+    -
+    - Concatenates the string members of the passed
+    - sequence parameter using a default delimiter
+    - of slash "/".  This is a brute force method
+    - that first makes the concatenation and then
+    - uses a regex to replace any multiple consecutive occurrence
+    - of the delimiter with a single occurrence
+    -
+    - TODO - Have slash be the default and add a second param for supplying other delimiters.
+    -
+    -
+    -->
+    <xsl:function name="hyrax:path_concat">
+        <xsl:param name="sseq"/>
+        <xsl:value-of select="replace(replace(string-join($sseq,'/'),'[/]+','/'),'[/]+$','')" />
+    </xsl:function>
+    <!--*********************************************** -->
 
 
     <xsl:template match="thredds:catalog">
@@ -1239,20 +1260,24 @@
                 -->
                 <xsl:when test="$dap4">
                     <xsl:if test="$debug">DAP4:</xsl:if>
-                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap4/@base"/><xsl:value-of select="$urlPath"/>
+                    <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap4/@base"/><xsl:value-of select="$urlPath"/ -->
+                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap4/@base,$urlPath))"/>
+
                 </xsl:when>
 
                 <!-- If we can deal with the native data type then we broker that, and we test this by
                 seeing if an HTTP acces is available and if the name matches the BES typeMatch -->
                 <xsl:when test="$httpServer and matches($urlPath,$typeMatch)">
                     <xsl:if test="$debug">MATCH:</xsl:if>
-                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/>
+                    <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/ -->
+                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$httpServer/@base,$urlPath))"/>
                 </xsl:when>
 
                 <!-- Otherwise we'll use DAP2 if we can get it -->
                 <xsl:when test="$dap2">
                     <xsl:if test="$debug">DAP2:</xsl:if>
-                    <xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap2/@base"/><xsl:value-of select="$urlPath"/>
+                    <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap2/@base"/><xsl:value-of select="$urlPath"/ -->
+                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap2/@base,$urlPath))"/>
                 </xsl:when>
 
                 <!-- HTTP services only make sense if we know if the data type can be ingested. -->

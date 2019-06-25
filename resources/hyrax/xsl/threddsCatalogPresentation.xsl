@@ -63,8 +63,8 @@
     - sequence parameter using a default delimiter
     - of slash "/".  This is a brute force method
     - that first makes the concatenation and then
-    - uses a regexto replace any multiple occurance
-    - of the delimiter with a single occurance
+    - uses a regex to replace any multiple consecutive occurrence
+    - of the delimiter with a single occurrence
     -
     - TODO - Have slash be the default and add a second param for supplying other delimiters.
     -
@@ -80,12 +80,15 @@
     <xsl:template match="thredds:catalog">
         <html>
             <head>
-                <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
-                <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/>
+                <link rel='stylesheet' href="{hyrax:path_concat(($docsService, 'css','contents.css'))}" type='text/css'/>
+                <link rel='stylesheet' href="{hyrax:path_concat(($docsService, 'css','treeView.css'))}" type='text/css'/>
+                <!-- link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
+                <link rel="stylesheet" href="{$docsService}/css/treeView.css" type="text/css"/ -->
                 <!-- script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js"><xsl:value-of select="' '"/></script -->
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    <xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute>
+                    <!-- xsl:attribute name="src"><xsl:value-of select="$serviceContext"/>/js/CollapsibleLists.js</xsl:attribute -->
+                    <xsl:attribute name="src"><xsl:value-of select="hyrax:path_concat(($serviceContext, 'js','CollapsibleLists.js'))"/></xsl:attribute>
                     <xsl:value-of select="' '"/>
                 </xsl:element>
                 <title>
@@ -132,7 +135,8 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="Logo" src='{$docsService}/images/logo.png'/>
+                <!-- img alt="Logo" src='{$docsService}/images/logo.png'/-->
+                <img alt="Logo" src="{hyrax:path_concat(($docsService, 'images','logo.png'))}"/>
                 <h1>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left" style="padding-bottom: 2px;">
