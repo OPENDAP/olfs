@@ -1,3 +1,6 @@
+<a href="https://travis-ci.org/OPENDAP/olfs">
+  <img alt="TravisCI" src="https://travis-ci.org/OPENDAP/olfs.svg?branch=master"/>
+</a>
 
 # Hyrax/OLFS
 
