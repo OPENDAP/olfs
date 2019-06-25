@@ -148,7 +148,7 @@ public class BotBlocker implements DispatchHandler {
 
         if(ipAddresses.contains(remoteAddr)){
             log.info("The ip address: {} is " +
-                    "on the list of blocked addresses",LogUtil.scrub_entry(request.getRemoteAddr()));
+                    "on the list of blocked addresses",LogUtil.scrub_entry(remoteAddr));
 
             if(responseFiltering)
                 return isResponseBlocked(request);
@@ -156,7 +156,7 @@ public class BotBlocker implements DispatchHandler {
 
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
-                log.info("The ip address: {} matches the pattern: \"{}\"",request.getRemoteAddr(),p.pattern());
+                log.info("The ip address: {} matches the pattern: \"{}\"",LogUtil.scrub_entry(remoteAddr),p.pattern());
 
                 if(responseFiltering)
                     return isResponseBlocked(request);
