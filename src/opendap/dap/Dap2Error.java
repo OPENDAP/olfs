@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Java-DAP" project, a Java implementation
+// This file is part of the "Hyrax" project, a server implementation
 // of the OPeNDAP Data Access Protocol.
 //
 // Copyright (c) 2010, OPeNDAP, Inc.

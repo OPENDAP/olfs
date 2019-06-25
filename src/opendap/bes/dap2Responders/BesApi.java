@@ -118,7 +118,7 @@ public class BesApi implements Cloneable {
 
 
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
-    public static final String DEFAULT_XDAP_ACCEPT = "2.0";
+    public static final String DEFAULT_XDAP_ACCEPT = "3.2";
 
     public static final String EXPLICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
 
@@ -222,7 +222,6 @@ public class BesApi implements Cloneable {
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param xmlBase The request URL.
      * @param os                   The Stream to which to write the response.
      * @throws opendap.bes.BadConfigurationException .
@@ -232,14 +231,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDDX(String dataSource,
                                 String constraintExpression,
-                                String xdap_accept,
                                 String xmlBase,
                                 OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDDXRequest(dataSource, constraintExpression, xdap_accept, xmlBase),
+                getDDXRequest(dataSource, constraintExpression, xmlBase),
                 os);
     }
 
@@ -302,7 +300,6 @@ public class BesApi implements Cloneable {
 
     public void getDDXDocument(String dataSource,
                                   String constraintExpression,
-                                  String xdap_accept,
                                   String xmlBase,
                                   Document response)
             throws PPTException,
@@ -314,7 +311,7 @@ public class BesApi implements Cloneable {
         ByteArrayOutputStream ddxString = new ByteArrayOutputStream();
 
 
-        writeDDX(dataSource,constraintExpression,xdap_accept,xmlBase,ddxString);
+        writeDDX(dataSource,constraintExpression,xmlBase,ddxString);
 
 
         SAXBuilder sb = new SAXBuilder();
@@ -379,7 +376,6 @@ public class BesApi implements Cloneable {
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request.
-     * @param xdap_accept The version of the DAP the BES is to use to package the
      * reponse.
      * @param os                   The Stream to which to write the response.
      * @throws BadConfigurationException .
@@ -389,7 +385,6 @@ public class BesApi implements Cloneable {
      */
     public void writeDDS(String dataSource,
                             String constraintExpression,
-                            String xdap_accept,
                             OutputStream os)
             throws BadConfigurationException,
             BESError,
@@ -398,7 +393,7 @@ public class BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getDDSRequest(dataSource, constraintExpression, xdap_accept),
+                getDDSRequest(dataSource, constraintExpression),
                 os);
     }
 
@@ -436,7 +431,6 @@ public class BesApi implements Cloneable {
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os                   The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError              .
@@ -445,7 +439,6 @@ public class BesApi implements Cloneable {
      */
     public void writeDAS(String dataSource,
                             String constraintExpression,
-                            String xdap_accept,
                             OutputStream os)
             throws BadConfigurationException,
             BESError,
@@ -454,7 +447,7 @@ public class BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getDASRequest(dataSource,constraintExpression,xdap_accept),
+                getDASRequest(dataSource,constraintExpression),
                 os);
     }
 
@@ -468,7 +461,6 @@ public class BesApi implements Cloneable {
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os                   The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError              .
@@ -479,7 +471,6 @@ public class BesApi implements Cloneable {
                                      String constraintExpression,
                                      String async,
                                      String storeResult,
-                                     String xdap_accept,
                                      int maxResponseSize,
                                      OutputStream os)
             throws BadConfigurationException,
@@ -490,7 +481,7 @@ public class BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getDap2RequestDocumentAsync(DAP2_DATA, dataSource, constraintExpression, async, storeResult, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS),
+                getDap2RequestDocumentAsync(DAP2_DATA, dataSource, constraintExpression, async, storeResult, maxResponseSize, null, null, null, XML_ERRORS),
                 os);
     }
 
@@ -502,7 +493,6 @@ public class BesApi implements Cloneable {
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
      * @param cf_history_entry The entry to add to the CF "history" attribute in the resulting NetCDF file..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
@@ -513,14 +503,13 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsNetcdf3(String dataSource,
                                        String constraintExpression,
                                        String cf_history_entry,
-                                          String xdap_accept,
                                           int maxResponseSize,
                                           OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf3Request(dataSource, constraintExpression, cf_history_entry, xdap_accept, maxResponseSize),
+                getDap2DataAsNetcdf3Request(dataSource, constraintExpression, cf_history_entry, maxResponseSize),
                 os);
     }
 
@@ -559,7 +548,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
@@ -570,14 +558,13 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsNetcdf4(String dataSource,
                                           String constraintExpression,
                                           String cf_history_entry,
-                                          String xdap_accept,
                                           int maxResponseSize,
                                           OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf4Request(dataSource, constraintExpression, cf_history_entry, xdap_accept, maxResponseSize),
+                getDap2DataAsNetcdf4Request(dataSource, constraintExpression, cf_history_entry, maxResponseSize),
                 os);
     }
 
@@ -615,7 +602,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param xmlBase The request URL.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
@@ -625,7 +611,6 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsXml(String dataSource,
                                       String constraintExpression,
-                                      String xdap_accept,
                                       int maxResponseSize,
                                       String xmlBase,
                                       OutputStream os)
@@ -633,7 +618,7 @@ public class BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getXmlDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize,xmlBase),
+                getXmlDataRequest(dataSource,constraintExpression,maxResponseSize,xmlBase),
                 os);
     }
 
@@ -646,7 +631,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -655,14 +639,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsGmlJpeg2000(String dataSource,
                                               String constraintExpression,
-                                              String xdap_accept,
                                               int maxResponseSize,
                                               OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsGmlJpeg2000Request(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2DataAsGmlJpeg2000Request(dataSource, constraintExpression, maxResponseSize),
                 os);
     }
 
@@ -946,7 +929,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -955,14 +937,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsIjsn(String dataSource,
                                             String constraintExpression,
-                                            String xdap_accept,
                                             int maxResponseSize,
                                             OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2IjsnDataRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2IjsnDataRequest(dataSource, constraintExpression, maxResponseSize),
             os);
     }
 
@@ -974,7 +955,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -983,14 +963,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2MetadataAsIjsn(String dataSource,
                                            String constraintExpression,
-                                           String xdap_accept,
                                            int maxResponseSize,
                                            OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
-                getDap2IjsnMetadataRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2IjsnMetadataRequest(dataSource, constraintExpression, maxResponseSize),
                 os);
     }
 
@@ -1001,7 +980,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1009,15 +987,14 @@ public class BesApi implements Cloneable {
      * @throws PPTException              .
      */
     public void writeDap2DataAsJson(String dataSource,
-                                    String constraintExpression,
-                                    String xdap_accept,
-                                    int maxResponseSize,
-                                    OutputStream os)
+                                       String constraintExpression,
+                                       int maxResponseSize,
+                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsJsonRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2DataAsJsonRequest(dataSource, constraintExpression, maxResponseSize),
                 os);
     }
 
@@ -1029,7 +1006,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1038,7 +1014,6 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsCovJson(String dataSource,
                                     String constraintExpression,
-                                    String xdap_accept,
                                     int maxResponseSize,
                                     OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
@@ -1048,7 +1023,6 @@ public class BesApi implements Cloneable {
                 getDap2DataAsCovJsonRequest(
                         dataSource,
                         constraintExpression,
-                        xdap_accept,
                         maxResponseSize),
                         os);
     }
@@ -1061,7 +1035,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1070,14 +1043,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2MetadataAsJson(String dataSource,
                                            String constraintExpression,
-                                           String xdap_accept,
                                            int maxResponseSize,
                                            OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
-                getDap2MetadataAsJsonRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2MetadataAsJsonRequest(dataSource, constraintExpression, maxResponseSize),
                 os);
     }
 
@@ -1089,7 +1061,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1101,14 +1072,13 @@ public class BesApi implements Cloneable {
                                        String w10nMeta,
                                        String w10nCallback,
                                        boolean w10nFlatten,
-                                       String xdap_accept,
                                        int maxResponseSize,
                                        OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
-                getDap2DataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, xdap_accept, maxResponseSize),
+                getDap2DataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, maxResponseSize),
                 os);
     }
 
@@ -1120,7 +1090,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1133,14 +1102,13 @@ public class BesApi implements Cloneable {
                                            String w10nCallback,
                                            boolean w10nFlatten,
                                            boolean w10nTraverse,
-                                           String xdap_accept,
                                            int maxResponseSize,
                                            OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
-                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, w10nTraverse, xdap_accept, maxResponseSize),
+                getDap2MetadataAsW10nJsonRequest(dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, w10nTraverse, maxResponseSize),
                 os);
     }
 
@@ -1152,7 +1120,6 @@ public class BesApi implements Cloneable {
      * @param dataSource The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError                  .
@@ -1161,14 +1128,13 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsGeoTiff(String dataSource,
                                           String constraintExpression,
-                                          String xdap_accept,
                                           int maxResponseSize,
                                           OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
-            getDap2DataAsGeoTiffRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+            getDap2DataAsGeoTiffRequest(dataSource, constraintExpression, maxResponseSize),
             os);
     }
 
@@ -1180,7 +1146,6 @@ public class BesApi implements Cloneable {
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os                   The Stream to which to write the response.
      * @throws BadConfigurationException .
      * @throws BESError              .
@@ -1189,7 +1154,6 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsAscii(String dataSource,
                                         String constraintExpression,
-                                        String xdap_accept,
                                         int maxResponseSize,
                                         OutputStream os)
             throws BadConfigurationException,
@@ -1199,7 +1163,7 @@ public class BesApi implements Cloneable {
 
          besTransaction(
                 dataSource,
-                getDap2DataAsAsciiRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                getDap2DataAsAsciiRequest(dataSource, constraintExpression, maxResponseSize),
                 os);
     }
 
@@ -1237,7 +1201,6 @@ public class BesApi implements Cloneable {
      * dataSource to the passed stream.
      *
      * @param dataSource The requested DataSource
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param url The URL to refernence in the HTML form.
      * @param os  The Stream to which to write the response.
      * @throws BadConfigurationException .
@@ -1246,7 +1209,6 @@ public class BesApi implements Cloneable {
      * @throws BESError              .
      */
     public void writeDap2DataRequestForm(String dataSource,
-                                            String xdap_accept,
                                             String url,
                                             OutputStream os)
             throws BadConfigurationException,
@@ -1256,7 +1218,7 @@ public class BesApi implements Cloneable {
 
          besTransaction(
                  dataSource,
-                 getHtmlFormRequest(dataSource,xdap_accept,url),
+                 getHtmlFormRequest(dataSource,url),
                  os);
     }
 
@@ -1266,7 +1228,6 @@ public class BesApi implements Cloneable {
      * stream.
      *
      * @param dataSource The requested DataSource
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param os         The Stream to which to write the response.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
@@ -1275,13 +1236,12 @@ public class BesApi implements Cloneable {
      * @throws PPTException              .
      */
     public void writeDap2HtmlInfoPage(String dataSource,
-                                         String xdap_accept,
                                          OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
-                getHtmlInfoPageRequest(dataSource,xdap_accept),
+                getHtmlInfoPageRequest(dataSource),
                 os);
     }
 
@@ -1542,8 +1502,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDX is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the dap that should be used to build the
-     * response.
      * @param xmlBase The request URL.
      * @return The DDX request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1551,11 +1509,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDDXRequest(String dataSource,
                                   String ce,
-                                  String xdap_accept,
                                   String xmlBase)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, 0, xmlBase, null, null, XML_ERRORS);
+        return getDap2RequestDocument(DDX, dataSource, ce, 0, xmlBase, null, null, XML_ERRORS);
 
     }
 
@@ -1634,39 +1591,31 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public Document getDDSRequest(String dataSource,
-                                  String ce,
-                                  String xdap_accept)
+    public Document getDDSRequest(String dataSource, String ce)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DDS, dataSource, ce, xdap_accept, 0, null, null, null, XML_ERRORS);
+        return getDap2RequestDocument(DDS, dataSource, ce, 0, null, null, null, XML_ERRORS);
 
     }
 
 
-    public Document getDASRequest(String dataSource,
-                                         String ce,
-                                         String xdap_accept)
-            throws BadConfigurationException {
+    public Document getDASRequest(String dataSource, String ce) throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAS, dataSource, ce, xdap_accept, 0, null, null, null, XML_ERRORS);
+        return getDap2RequestDocument(DAS, dataSource, ce, 0, null, null, null, XML_ERRORS);
 
     }
 
 
     public Document getDap2DataAsAsciiRequest(String dataSource,
                                               String ce,
-                                              String xdap_accept,
                                               int maxResponseSize)
             throws BadConfigurationException {
 
-        // return getDap2RequestDocument(ASCII, dataSource, ce, xdap_accept, maxResponseSize, null, null, null, XML_ERRORS);
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, ASCII, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, ASCII, XML_ERRORS);
 
     }
 
@@ -1680,35 +1629,31 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Document getHtmlFormRequest(String dataSource,
-                                              String xdap_accept,
-                                              String URL)
-            throws BadConfigurationException {
+    public Document getHtmlFormRequest(String dataSource, String URL) throws BadConfigurationException {
 
-        return getDap2RequestDocument(HTML_FORM, dataSource, null, xdap_accept, 0, null, URL, null, XML_ERRORS);
+        return getDap2RequestDocument(HTML_FORM, dataSource, null, 0, null, URL, null, XML_ERRORS);
 
     }
 
-    public Document getStreamRequest(String dataSource)
-            throws BadConfigurationException{
+    public Document getStreamRequest(String dataSource) throws BadConfigurationException {
 
-        return getDap2RequestDocument(STREAM, dataSource, null, null, 0, null, null, null, XML_ERRORS);
+        return getDap2RequestDocument(STREAM, dataSource, null, 0, null, null, null, XML_ERRORS);
 
     }
 
 
-    public Document getHtmlInfoPageRequest(String dataSource, String xdap_accept)
+    public Document getHtmlInfoPageRequest(String dataSource)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(INFO_PAGE, dataSource, null, xdap_accept, 0, null, null, null, XML_ERRORS);
+        return getDap2RequestDocument(INFO_PAGE, dataSource, null, 0, null, null, null, XML_ERRORS);
 
     }
 
-    public Document getDap2DataAsNetcdf3Request(String dataSource, String ce, String cf_history_entry, String xdap_accept, int maxResponseSize)
+    public Document getDap2DataAsNetcdf3Request(String dataSource, String ce, String cf_history_entry, int maxResponseSize)
             throws BadConfigurationException {
 
 
-        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
+        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, NETCDF_3, XML_ERRORS);
 
         if(cf_history_entry!=null) {
             Element root = besRequest.getRootElement();
@@ -1737,10 +1682,10 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Document getDap2DataAsNetcdf4Request(String dataSource, String ce, String cf_history_entry, String xdap_accept, int maxResponseSize)
+    public Document getDap2DataAsNetcdf4Request(String dataSource, String ce, String cf_history_entry, int maxResponseSize)
             throws BadConfigurationException {
 
-        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
+        Document besRequest = getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, NETCDF_4, XML_ERRORS);
 
         if(cf_history_entry!=null) {
             Element root = besRequest.getRootElement();
@@ -1777,7 +1722,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1785,12 +1729,11 @@ public class BesApi implements Cloneable {
      */
     public Document getXmlDataRequest(String dataSource,
                                          String ce,
-                                         String xdap_accept,
                                          int maxResponseSize,
                                          String xmlBase)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(XML_DATA, dataSource, ce, xdap_accept, maxResponseSize, xmlBase, null, null, XML_ERRORS);
+        return getDap2RequestDocument(XML_DATA, dataSource, ce, maxResponseSize, xmlBase, null, null, XML_ERRORS);
 
     }
 
@@ -1800,7 +1743,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1808,11 +1750,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2DataAsGmlJpeg2000Request(String dataSource,
                                                     String ce,
-                                                    String xdap_accept,
                                                     int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, GMLJP2, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, GMLJP2, XML_ERRORS);
 
     }
 
@@ -1822,7 +1763,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1830,11 +1770,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2DataAsGeoTiffRequest(String dataSource,
                                                 String ce,
-                                                String xdap_accept,
                                                 int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, GEOTIFF, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, GEOTIFF, XML_ERRORS);
 
     }
 
@@ -1889,7 +1828,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1897,11 +1835,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2DataAsJsonRequest(String dataSource,
                                              String ce,
-                                             String xdap_accept,
                                              int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, JSON, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, JSON, XML_ERRORS);
 
     }
     /**
@@ -1909,7 +1846,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1917,11 +1853,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2DataAsCovJsonRequest(String dataSource,
                                              String ce,
-                                             String xdap_accept,
                                              int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, COVJSON, XML_ERRORS);
+        return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, COVJSON, XML_ERRORS);
 
     }
     /**
@@ -1936,12 +1871,11 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2MetadataAsJsonRequest(String dataSource,
                                                  String ce,
-                                                 String xdap_accept,
                                              int maxResponseSize
     )
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, JSON, XML_ERRORS);
+        return getDap2RequestDocument(DDX, dataSource, ce, maxResponseSize, null, null, JSON, XML_ERRORS);
 
 
     }
@@ -1953,7 +1887,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -1964,11 +1897,10 @@ public class BesApi implements Cloneable {
                                            String w10nMeta,
                                            String w10nCallback,
                                            boolean w10nFlatten,
-                                           String xdap_accept,
                                            int maxResponseSize)
             throws BadConfigurationException {
 
-        Document requestDoc =  getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, XML_ERRORS);
+        Document requestDoc =  getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, W10N, XML_ERRORS);
 
 
         if(w10nMeta!=null)
@@ -1999,12 +1931,11 @@ public class BesApi implements Cloneable {
                                                  String w10nCallback,
                                                  boolean w10nFlatten,
                                                  boolean w10nTraverse,
-                                                 String xdap_accept,
                                              int maxResponseSize
     )
             throws BadConfigurationException {
 
-        Document requestDoc = getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, W10N, XML_ERRORS);
+        Document requestDoc = getDap2RequestDocument(DDX, dataSource, ce, maxResponseSize, null, null, W10N, XML_ERRORS);
 
 
         if(w10nMeta!=null)
@@ -2140,7 +2071,6 @@ public class BesApi implements Cloneable {
       *  using the passed constraint expression.
       * @param dataSource The data set whose DDS is being requested
       * @param ce The constraint expression to apply.
-      * @param xdap_accept The version of the DAP to use in building the response.
       * @param maxResponseSize Maximum allowable response size.
       * @return The DDS request document.
       * @throws BadConfigurationException When no BES can be found to
@@ -2148,11 +2078,10 @@ public class BesApi implements Cloneable {
       */
      public Document getDap2IjsnDataRequest(String dataSource,
                                             String ce,
-                                            String xdap_accept,
                                             int maxResponseSize)
              throws BadConfigurationException {
 
-         return getDap2RequestDocument(DAP2_DATA, dataSource, ce, xdap_accept, maxResponseSize, null, null, IJSON, XML_ERRORS);
+         return getDap2RequestDocument(DAP2_DATA, dataSource, ce, maxResponseSize, null, null, IJSON, XML_ERRORS);
 
      }
 
@@ -2162,7 +2091,6 @@ public class BesApi implements Cloneable {
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -2170,11 +2098,10 @@ public class BesApi implements Cloneable {
      */
     public Document getDap2IjsnMetadataRequest(String dataSource,
                                                String ce,
-                                               String xdap_accept,
                                                int maxResponseSize)
             throws BadConfigurationException {
 
-        return getDap2RequestDocument(DDX, dataSource, ce, xdap_accept, maxResponseSize, null, null, IJSON, XML_ERRORS);
+        return getDap2RequestDocument(DDX, dataSource, ce, maxResponseSize, null, null, IJSON, XML_ERRORS);
 
     }
 
@@ -2185,7 +2112,6 @@ public class BesApi implements Cloneable {
      * @param type
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the DAP to use in building the response.
      * @param maxResponseSize Maximum allowable response size.
      * @param xmlBase
      * @param formURL
@@ -2197,7 +2123,6 @@ public class BesApi implements Cloneable {
     public  Document getDap2RequestDocument(String type,
                                             String dataSource,
                                             String ce,
-                                            String xdap_accept,
                                             int maxResponseSize,
                                             String xmlBase,
                                             String formURL,
@@ -2207,7 +2132,16 @@ public class BesApi implements Cloneable {
 
 
 
-        return getDap2RequestDocumentAsync(type, dataSource,ce, null, null, xdap_accept, maxResponseSize, xmlBase, formURL, returnAs, errorContext);
+        return getDap2RequestDocumentAsync(
+                type,
+                dataSource,ce,
+                null,
+                null,
+                maxResponseSize,
+                xmlBase,
+                formURL,
+                returnAs,
+                errorContext);
 
     }
 
@@ -2217,7 +2151,6 @@ public class BesApi implements Cloneable {
                                             String ce,
                                             String async,
                                             String storeResult,
-                                            String xdap_accept,
                                             int maxResponseSize,
                                             String xmlBase,
                                             String formURL,
@@ -2233,10 +2166,7 @@ public class BesApi implements Cloneable {
         request.setAttribute(REQUEST_ID,getRequestIdBase());
 
 
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
+        request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 

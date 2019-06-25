@@ -111,11 +111,8 @@ public class RDF extends Dap4Responder {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
 
-        String xdap_accept = "3.2";
-
         Document ddx = new Document();
-
-        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);
+        besApi.getDDXDocument(resourceID, constraintExpression, xmlBase, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 

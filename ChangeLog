@@ -1,3 +1,360 @@
+2019-03-19  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #69 from OPENDAP/dap3.2
+	Dap3.2
+
+	Merge branch 'master' into dap3.2
+
+	Merge pull request #70 from OPENDAP/wcs_redux
+	Wcs redux
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Copyright injection
+
+	olfs: Added the rest of the atomic types for WCS (yeesh...)
+
+	olfs: Added the rest of the atomic types for WCS (yeesh...)
+
+	merged master to dap3.2
+
+2019-03-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #67 from OPENDAP/travis-sonar-scan
+	Travis sonar scan
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Adding cache dir to conf profile.
+
+2019-03-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' into travis-sonar-scan
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #66 from OPENDAP/bes_node_cache
+	Bes node cache
+
+	olfs: Documentation. destroy methods.
+
+2019-03-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Documentation. destroy methods.
+
+2019-03-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Cleaned up BesNodeCache API. Made sure the BesNodeCache can be disabled by omitting its configuration element from the olfs.xml file Simplified NodeTransaction
+
+	olfs: Comments to new sections of olfs.xml Reduced default refresh interval for BesNodeCache to 60 seconds
+
+	olfs: Retired old BesNodeCache and NodeTransaction. Renamed new NodeCache to BesNodeCache Reduced size of locked block in (Bes)NodeTransaction. Dropped unused code from NodeTransaction.
+
+	olfs: Simplified locking strategy
+
+	olfs: Reimplmented BesNodeCache using a modified LinkedHashMap with LRU ejection.
+
+	olfs: Reimplmented BesNodeCache using a modified LinkedHashMap with LRU ejection.
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	sync
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Done - leaving the extra tests in here - will hear from travis HQ soon
+
+	Done for now - only run the scan on the master branch
+
+	Still cannot get rid of the extra tests - I asked travis support
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	more travis hacking
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Another try
+
+	another try
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	YATH
+
+	hack travis; no default script for java
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Problem with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	More travis hackery - use the default script 'ant test' to run the tests
+
+	attempt to fix the errant 'ant test' default script for Travis
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More fiddling with the locks...
+
+	olfs: More fiddling with the locks...
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Must build the code before running sonar scan
+
+	Merge branch 'master' into travis-sonar-scan
+
+	Modify the travis.yml to run the scan for a PR
+
+	Added the sonar build
+	Modified build.xml and .travis.yml
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: test target change
+
+	olfs: Concurrency bug patch for cache purge activity.
+
+	More node request grinding
+
+2019-03-13  James Gallagher  <jgallagher@opendap.org>
+
+	Syntax fix in travis.yml
+
+	Partially-complete update to .travis.yml
+	Needs password info and to be merged with a branch that has the ant
+	target for sonar.
+
+2019-03-13  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into bes_node_cache
+
+	olfs: Change method name of readability/clarity
+
+	olfs: Cleaning up logging output for understandability.
+
+	olfs: Cleaning up logging output for understandability.
+
+	olfs: Cleaning up logging output for understandability.
+
+	updating nodecache test harness
+
+	olfs: Dropping jsp file back to Java 7
+
+	olfs: Comments.
+
+	olfs: Fixed BesNodeCache so it self initializes with default values if its init() method(s) have not been run.
+
+	olfs: Renamed BESSiteMap to (the more conformant) BesSiteMap
+
+	olfs: Updated default olfs.xml file with default/example configuration elements for BesNodeCache and BESSiteMap
+
+	olfs: Updated the configuration code for BESSiteMap and BesNodeCache so that they are "immune" to the configuration omitting their respective configuration parameters
+
+2019-03-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed BESManager.config() API so that the ServletContext is passed into the configuration method. This was needed to allow the BESManager to determine the location of the configuration directory.
+
+	olfs: Added directive to robots.jsp to trim leading whitespace from response document.
+
+	olfs: Revised locking strategy fo rBesNodeCache.
+
+2019-03-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Sync check in. Code is working but lock usage is sloppy and requires refactor. This code appears to be working correctly (surpising, actually...)
+
+	olfs: Test harness improvements: - Save robots.txt - Check for http errors when asking for catalogs and datasets.
+
+	olfs: Fixed robots.jsp to correctly condition teh SiteMap.
+
+	olfs: Fixed problem with .gitignore that was causing parts of the hyrax web application resources to be excluded from git management.
+
+	olfs: Fleshing out tests code for BesNodeCache
+
+	olfs: Converted BESSiteMap to use Read/Write locks for higher throughput and a more sensible locking strategy.
+
+	olfs: Consolidated exception catching in robots.jsp
+
+2019-03-08  Nathan Potter  <ndp@opendap.org>
+
+	dropping gsoc adoc that jhrg didn't like
+
+	olfs: More updates to GSOC proposal
+
+	sync
+
+2019-03-08  James Gallagher  <jgallagher@opendap.org>
+
+	Update ifh.adoc
+
+	Update ifh.md
+
+2019-03-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More updates to GSOC proposal
+
+	olfs: Drafting test script for BesNodeCache
+
+	olfs: Comments and javadoc in BesNodeCache code.
+
+2019-03-07  Nathan Potter  <ndp@opendap.org>
+
+	fixed syntax issue and spelling.
+
+	Fixed broken link syntax in ifh.md
+
+2019-03-07  James Gallagher  <jgallagher@opendap.org>
+
+	Added md version so links will work
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+2019-03-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: GSOC 2019 1st draft
+
+	olfs: Javadoc, scope changes, etc.
+
+	olfs: Made the BesNodeCache self-contained with a single public method  "getNode()" (Well the "init()" methods are also public but...) Calling  getNode() does all of the lifting of retrieving, caching, and otherwise  managing the BES showNode command activity. In doing so some of the  simple doument production methods in BesAPI had to become static as well  as the getBES() method.
+
+2019-03-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed excessive whitespace from Timer class
+
+	olfs: Added initialization call to BesNodeCache to BESManager. Reworked BESManager to be a true singleton. Modified various users of BESManager to reflect these changes.
+
+	olfs: Added NodeCache configuration element to olfs.xml
+
+	olfs: Retired CatalogCacheUpdater (too much thread fuss)
+
+	olfs: Re-retired BesResponseCache
+
+	olfs: Retired BesCatalogCache
+
+	olfs: Updated BEsAPI by removing dperecated getCatalog() method and adding calls to BesNodeCache to the getNode() method.
+
+	olfs: First functional draft of an in memory cache for BES node responses
+
+2019-03-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #65 from OPENDAP/respponse_logging_2
+	Respponse logging 2
+
+	olfs: Reworked logging so that it's easier to control what goes into the various logs based on the component services. Added log IDs to LogUtil, and added log appenders to the logback.xml for default access logging (no LastModified logging) and all appenders to logback-test.xml
+
+	olfs: Added response size logging to the DAP i INFO response (missed it earlier)
+
+	olfs: Fixed logback.xml and logback-test.xml to correct a missed change
+
+	Merge pull request #64 from OPENDAP/response_size_logging
+	Response size logging
+
+	olfs: Added response size logging to DAP4 metadata responses.
+
+	olfs: Added response size logging to DAP2 metadata responses.
+
+	olfs: Improved RequestCache.closeThreadCache() by adding code to explicitly wipe the Thread's cache item content.
+
+	olfs: Added response size reporting to DAP4 data responses.
+
+	olfs: Updated logback configuration with  response size output.
+
+	olfs: Added cleanup code for the log4j MDC object which prevents stale values from leaking across requests. Add LogUtil.setResponseSize() method to assist in response size reporting.
+
+	olfs: Added cleanup code for the log4j MDC object which prevents stale values from leaking accross requests. Add LogUtil.setResponseSize() method to assist in response size reporting.
+
+	olfs: Simplified response size API usage.
+
+2019-03-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added response size reporting to SiteMap activity
+
+	olfs: Added code to capture size of response and add it to the HraxAccess log. All DAP2 data responses
+
+	olfs: Adding https as a viable thredds:catalogRef@href protocol to the opendap.thredds.CatalogManager"
+
+	Merge branch 'master' into response_size_logging
+
+	olfs: This commit repairs the broken HyraxAccess log by changing the name back to what the downstream code expects.
+
+	Merge branch 'master' into response_size_logging
+
+	Merge pull request #63 from OPENDAP/lazy_admin_info_retrieval
+	Lazy admin info retrieval
+
+	olfs: Renamed private member variables. Initialized uninitialized memeber variable.
+
+	Merge branch 'master' into response_size_logging
+
+2019-03-03  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved thread synchronization in the assignment of AdminInfo and SupportEmail member variables.
+
+	olfs: Refactored the way that AdministratorInformation and SupportEmail values are retrieved. Before this every time and error page or directory page was built the underlying BES was queired for these values. I moved this activity in to the BES object and made them lazy evaluations: The first time either is requested (for a given BES) the value is retrieved from the BES and cached in the BES object. Subsequent requests are fulfilled using the in-memory cached values. This limits the querying activity to a single pass for each BES until Tomcat is restarted.
+
+2019-03-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Switched non-error related calls to log.error() to log.debug()
+
+	olfs: Dropped method from non-debug logging format because they can create performance degradation.
+
+	olfs: Updated logging format to include method names
+
+	olfs: Added total bytes per message counter and log result statement to ChunkedInputStream
+
+	Merge branch 'master' into response_size_logging
+
+2019-03-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed unused (and logically empty) file
+
+	olfs: Cleaned up configuration processing logic.
+
+	olfs: Cleaned up configuration processing logic.
+
+	olfs: Deprecated unused code.
+
+	olfs: Dropped fired employee from .travis.yml notifications list.
+
+2019-02-23  Nathan Potter  <ndp@opendap.org>
+
+	Fixed typo in README.md
+
+	Update README.md with release DOI and correctional edits.
+
+2019-02-20  Nathan Potter  <ndp@opendap.org>
+
+	Fixed typos in NEWS
 2019-02-19  Nathan Potter  <ndp@opendap.org>
 	
 	olfs: Cleaned up code and exception handling. Added main to 

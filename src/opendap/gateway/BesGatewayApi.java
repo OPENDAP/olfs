@@ -82,7 +82,6 @@ public class BesGatewayApi extends BesApi implements Cloneable {
      * opendap.bes.BesXmlAPI.DDX
      * @param remoteDataSourceUrl See opendap.bes.BesXmlAPI.DDX
      * @param ce See opendap.bes.BesXmlAPI
-     * @param xdap_accept See opendap.bes.BesXmlAPI
      * @param xmlBase See opendap.bes.BesXmlAPI
      * @param formURL See opendap.bes.BesXmlAPI
      * @param returnAs See opendap.bes.BesXmlAPI
@@ -117,7 +116,6 @@ public class BesGatewayApi extends BesApi implements Cloneable {
                                            String ce,
                                            String async,
                                            String storeResult,
-                                           String xdap_accept,
                                            int maxResponseSize,
                                            String xmlBase,
                                            String formURL,
@@ -133,11 +131,6 @@ public class BesGatewayApi extends BesApi implements Cloneable {
                 Thread.currentThread().getId()+":gateway_request]";
         request.setAttribute("reqID",reqID);
 
-
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -334,7 +327,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
                                        String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, xdap_accept, maxResponseSize, xmlBase, null, null, XML_ERRORS);
+        Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, maxResponseSize, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
         if(req==null)
@@ -348,11 +341,9 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         e.setText(contentID);
         getReq.addContent(e);
 
-
         e = new Element("mimeBoundary",BES.BES_NS);
         e.setText(mimeBoundary);
         getReq.addContent(e);
-
 
         return reqDoc;
 

@@ -142,8 +142,7 @@ public class QueryParameters {
      */
     public void ingestDap4Query(HttpServletRequest req) throws IOException {
 
-        Map<String,String[]> params = new HashMap<>();
-        params.putAll(req.getParameterMap());
+        Map<String, String[]> params = new HashMap<>(req.getParameterMap());
 
         if(!params.isEmpty()){
             String asyncHttpHeader = req.getHeader("X-DAP-Async-Accept");

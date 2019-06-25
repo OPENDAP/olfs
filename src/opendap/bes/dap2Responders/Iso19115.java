@@ -110,17 +110,11 @@ public class Iso19115 extends Dap4Responder {
         Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description","ISO 19115 Metadata");
 
-
-
-        String xdap_accept = "3.2";
-
         Document ddx = new Document();
-
 
         besApi.getDDXDocument(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 xmlBase,
                 ddx);
 

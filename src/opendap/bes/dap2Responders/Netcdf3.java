@@ -127,10 +127,8 @@ public class Netcdf3 extends Dap4Responder {
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
-        String xdap_accept = "3.2";
-
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, cf_history_entry, xdap_accept, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsNetcdf3(resourceID, constraintExpression, cf_history_entry, user.getMaxResponseSize(), os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());

@@ -126,7 +126,7 @@
     
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
     <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
-    <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
+    <!-- logger name="opendap.coreServlet.DispatchServlet"    level="all"/ -->
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
     <logger name="opendap.coreServlet.BotBlocker"         level="all"/>

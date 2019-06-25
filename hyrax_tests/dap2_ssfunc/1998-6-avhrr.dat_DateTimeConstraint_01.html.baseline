@@ -221,8 +221,8 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         GSO_AVHRR\n" +
-                "myJSVarName:   org_opendap_GSO_AVHRR\n" +
-                "checkBoxName:  get_org_opendap_GSO_AVHRR\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   true\n" +
                 "isArray:       false\n" +
                 "myType:        Sequence\n" +
@@ -230,15 +230,15 @@
             );
 
 
-            org_opendap_GSO_AVHRR = new dap_var("GSO_AVHRR", "org_opendap_GSO_AVHRR", false,true);
+            org_opendap_var_1 = new dap_var("GSO_AVHRR", "org_opendap_var_1", false,true);
 
             
-                DAP2_URL.add_dap_var(org_opendap_GSO_AVHRR);
-            org_opendap_GSO_AVHRR.checkBox = "get_org_opendap_GSO_AVHRR";
+                DAP2_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_GSO_AVHRR"
-                               onclick="org_opendap_GSO_AVHRR.handle_projection_change(get_org_opendap_GSO_AVHRR)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>GSO_AVHRR<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Sequence)
             </span>
                      </div>
@@ -255,29 +255,28 @@
                                  <script type="text/javascript">
             if(DEBUG.enabled()) alert(
                 "myFQN:         GSO_AVHRR.DODS_URL\n" +
-                "myJSVarName:   org_opendap_GSO_AVHRR_DODS_URL\n" +
-                "checkBoxName:  get_org_opendap_GSO_AVHRR_DODS_URL\n" +
+                "myJSVarName:   org_opendap_var_1\n" +
+                "checkBoxName:  get_org_opendap_var_1\n" +
                 "isContainer:   false\n" +
                 "isArray:       false\n" +
                 "myType:        String\n" +
-                "parentContainer:        org_opendap_GSO_AVHRR\n"
+                "parentContainer:        org_opendap_var_1\n"
             );
 
 
-            org_opendap_GSO_AVHRR_DODS_URL = new dap_var("GSO_AVHRR.DODS_URL", "org_opendap_GSO_AVHRR_DODS_URL", false,false);
+            org_opendap_var_1 = new dap_var("GSO_AVHRR.DODS_URL", "org_opendap_var_1", false,false);
 
-            org_opendap_GSO_AVHRR_DODS_URL.checkBox = "get_org_opendap_GSO_AVHRR_DODS_URL";
-            org_opendap_GSO_AVHRR.addChildVar(org_opendap_GSO_AVHRR_DODS_URL);
-                org_opendap_GSO_AVHRR_DODS_URL.parentContainer = org_opendap_GSO_AVHRR;
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
+            org_opendap_var_1.addChildVar(org_opendap_var_1);
+                org_opendap_var_1.parentContainer = org_opendap_var_1;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_GSO_AVHRR_DODS_URL"
-                                           onclick="org_opendap_GSO_AVHRR_DODS_URL.handle_projection_change(get_org_opendap_GSO_AVHRR_DODS_URL)"
+                                    <input type="checkbox" id="get_org_opendap_var_1"
+                                           onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                            onfocus="describe_projection()"/>DODS_URL<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is String)
             </span>
                                  </div>
-                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DODS_URL<select id="org_opendap_GSO_AVHRR_DODS_URL_relOpWidget_0"
-                                            onfocus="describe_selection()"
+                                 <div class="medium" style="margin-left: 10px;padding: 1px;">DODS_URL<select id="org_opendap_var_1_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP2_URL.update_url()">
                                        <option value="=" selected="">=</option>
                                        <option value="!=">!=</option>
@@ -287,13 +286,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_GSO_AVHRR_DODS_URL_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_1_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP2_URL.update_url()"/>
                                     <img style="width: 30px;" src="/opendap/docs/images/filter-inactive.png"
-                                         id="org_opendap_GSO_AVHRR_DODS_URL_selection"/>
+                                         id="org_opendap_var_1_selection"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_GSO_AVHRR_DODS_URL.addSelectionClause("org_opendap_GSO_AVHRR_DODS_URL_selection", org_opendap_GSO_AVHRR_DODS_URL_relOpWidget_0,org_opendap_GSO_AVHRR_DODS_URL_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_1.addSelectionClause("org_opendap_var_1_selection", org_opendap_var_1_relOpWidget_0,org_opendap_var_1_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>

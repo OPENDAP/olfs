@@ -197,22 +197,22 @@
                      <script type="text/javascript">
             if(DEBUG.enabled()) alert(
             "myFQN:         lat\n" +
-            "myJSVarName:   org_opendap_lat\n" +
-            "checkBoxName:  get_org_opendap_lat\n" +
+            "myJSVarName:   org_opendap_var_1\n" +
+            "checkBoxName:  get_org_opendap_var_1\n" +
             "isContainer:   false\n" +
             "isArray:       true\n" +
             "(parent) container: \n"
             );
 
-            org_opendap_lat = new dap_var("lat", "org_opendap_lat", true,false);
+            org_opendap_var_1 = new dap_var("lat", "org_opendap_var_1", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_lat);
-            org_opendap_lat.checkBox = "get_org_opendap_lat";
+                DAP4_URL.add_dap_var(org_opendap_var_1);
+            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_lat"
-                               onclick="org_opendap_lat.handle_projection_change(get_org_opendap_lat)"
+                        <input type="checkbox" id="get_org_opendap_var_1"
+                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
                                onfocus="describe_projection()"/>lat<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">lat=
                     </span>
@@ -222,10 +222,10 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_lat_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_1_dim_1" size="8" oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_lat.addDimension(org_opendap_lat_dim_1,17);
+                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_1,17);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
@@ -296,11 +296,11 @@
         {
           "@type": "PropertyValue", 
           "name": "base_time", 
-          "value": "88- 10-00:00:00"        },
+          "value": "88\- 10\-00:00:00"        },
         {
           "@type": "PropertyValue", 
           "name": "title", 
-          "value": "FNOC UV wind components from 1988- 10 to 1988- 13."        },
+          "value": "FNOC UV wind components from 1988\- 10 to 1988\- 13."        },
         {
           "@type": "PropertyValue", 
           "name": "Unlimited_Dimension", 

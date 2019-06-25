@@ -1,3 +1,26 @@
+# OLFS Version 1.18.4 (25 March 2019)
+
+## Features
+
+- Added in mempory LRU cache for BES showNode responses. This is a performance
+  enhancement. (HK-366)
+
+- Added a site map cache file so that site maps for large instances of 
+  Hyrax(>500k datasets) can be navigated in a few seconds and not hours. 
+  (HK-375)
+
+- Updated Docker containers so that Tomcat is producing compressed responses 
+  when the requesting client indicates that this is acceptable. (HK-329)
+
+- Added response size logging to all metadata and data responses. Error 
+  responses do not have ssociated response size values in the log.
+  
+## Bug Fixes
+
+- Added missing code to support all DAP2/4 atomic numeric types in WCS-2.0 
+  (HK-372)
+
+
 # OLFS Version 1.18.3 (25 February 2019)
 
 ## Features:

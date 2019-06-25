@@ -102,11 +102,10 @@ public class CsvData extends Dap4Responder {
         Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
-        String xdap_accept = "3.2";
         User user = new User(request);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, user.getMaxResponseSize(), os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());

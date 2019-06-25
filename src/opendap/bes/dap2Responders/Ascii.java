@@ -111,12 +111,11 @@ public class Ascii extends Dap4Responder {
         response.setHeader("Content-Description", "dods_ascii");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
 
         User user = new User(request);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, user.getMaxResponseSize(), os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

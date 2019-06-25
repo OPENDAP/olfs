@@ -114,12 +114,10 @@ public class Iso19115Rubric extends Dap4Responder {
         response.setHeader("Content-Description", "ISO19115 Metadata Compliance Report");
 
 
-        String xdap_accept = "3.2";
         Document ddx = new Document();
         besApi.getDDXDocument(
                 resourceID,
                 constraintExpression,
-                xdap_accept,
                 xmlBase,
                 ddx);
 

@@ -48,6 +48,7 @@ import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
 import org.jdom.transform.JDOMSource;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -325,24 +326,17 @@ public class HtmlDMR extends Dap4Responder {
         return sb.toString();
     }
 
-
     /**
-     * Minmal JSON text encoder. This method escapes:
-     * <ul>
-     *     <li>The \ (backslash)</li>
-     *     <li>The " (double-quote)</li>
-     * </ul>
-     * @param value The string to encode.
-     * @return The encoded value
+     *
+     * @param val
+     * @return
      */
-    private String jsonEncodeString(String value){
-        String str = value.trim();
-        str = str.replace("\\","\\\\");
-        str = str.replace("\"","\\\"");
-        return str;
+    public static  String encodeStringForJsInHtml(String val){
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        String jsVal = gson.toJson(val);
+        String htmlJsVal = Encode.forHtml(jsVal);
+        return htmlJsVal;
     }
-
-
 
     public String dap4AttributeToPropertyValue(Element attribute, String indent){
         StringBuilder sb = new StringBuilder();
@@ -352,7 +346,9 @@ public class HtmlDMR extends Dap4Responder {
         if(!values.isEmpty()){
             sb.append(indent).append("{\n");
             sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(jsonEncodeString(attribute.getAttributeValue("name"))).append("\", \n");
+            sb.append(indent).append(indent_inc).append("\"name\": \"");
+            sb.append(Encode.forHtml(Encode.forJavaScript(attribute.getAttributeValue("name")))).append("\", \n");
+
             //sb.append(indent).append(indent_inc).append("\"type\": \"").append(Encode.forJavaScript(attribute.getAttributeValue("type"))).append("\", \n");
 
             boolean jsEncode = true;
@@ -367,14 +363,13 @@ public class HtmlDMR extends Dap4Responder {
             }
             if(values.size()==1){
                 Element value = values.get(0);
-                sb.append(indent).append(indent_inc).append("\"value\": \"");
+                sb.append(indent).append(indent_inc).append("\"value\": ");
                 if(jsEncode) {
-                    sb.append(jsonEncodeString(value.getTextTrim()));
+                    sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                 }
                 else {
-                    sb.append(value.getTextTrim());
+                    sb.append("\"").append(value.getTextTrim()).append("\"");
                 }
-                sb.append("\"");
             }
             else {
                 sb.append(indent).append(indent_inc).append("\"value\": [ ");
@@ -382,15 +377,13 @@ public class HtmlDMR extends Dap4Responder {
                 for(Element value : values){
                     if(!first)
                         sb.append(", ");
-                    sb.append("\"");
 
                     if(jsEncode) {
-                        sb.append(jsonEncodeString(value.getTextTrim()));
+                        sb.append(encodeStringForJsInHtml(value.getTextTrim()));
                     }
                     else {
-                        sb.append(value.getTextTrim());
+                        sb.append("\"").append(value.getTextTrim()).append("\"");
                     }
-                    sb.append("\"");
                     first = false;
                 }
                 sb.append(" ]");

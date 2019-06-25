@@ -155,7 +155,7 @@ public class BESManager {
 
         Element nodeCache = besConfiguration.getChild(BesNodeCache.NODE_CACHE_ELEMENT_NAME);
         // If nodeCache is null no action needs to be taken because the NodeCache
-        // will run with default settings
+        // will simply be disabled
         if(nodeCache!=null){
             BesNodeCache.init(nodeCache);
         }
