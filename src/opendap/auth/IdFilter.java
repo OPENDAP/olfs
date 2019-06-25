@@ -31,6 +31,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,7 +412,7 @@ public class IdFilter implements Filter {
         out.println("<hr/>");
 
         if(request.getRemoteUser()!=null || request.getUserPrincipal()!=null) {
-            out.println("<p>request.getRemoteUser(): " + (request.getRemoteUser()==null?"not set":request.getRemoteUser()) + "</p>");
+            out.println("<p>request.getRemoteUser(): " + (request.getRemoteUser()==null?"not set": Encode.forHtml(request.getRemoteUser())) + "</p>");
             if (request.getUserPrincipal() != null) {
                 out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
 
