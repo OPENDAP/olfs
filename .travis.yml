@@ -4,7 +4,6 @@
 
 dist: trusty
 
-
 # Use the docker container-based build systems
 sudo: false
 

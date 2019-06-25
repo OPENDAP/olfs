@@ -943,7 +943,7 @@
 	  <!-- Define SonarQube Scanner for Ant Target -->
 	  <target name="sonar">
 	      <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
-	          <classpath path="resources/sonar/sonarqube-ant-task-2.5.jar" />
+	          <classpath path="resources/sonar/sonarqube-ant-task-2.6.0.1426.jar" />
 	      </taskdef>
 	      <!-- taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml" / -->
         <!-- Execute SonarQube Scanner for Ant Analysis -->
