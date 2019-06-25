@@ -129,7 +129,7 @@ public class ApacheIdP extends IdProvider {
             // We have a user - so let's make sure they have a profile,
             // and then we just try to bounce them back to IdFilter.RETURN_TO_URL
 
-            _log.info("doLogin() - User has uid: {}", LogUtil.scrub_entry(uid));
+            _log.info("doLogin() - User has uid: {}", LogUtil.scrubEntry(uid));
             /*
 
             // Do they have a profile?

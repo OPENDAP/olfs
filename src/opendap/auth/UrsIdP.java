@@ -197,13 +197,13 @@ public class UrsIdP extends IdProvider{
             String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 "&response_type=code&redirect_uri=" + request.getRequestURL();
 
-            _log.info("URS Code Request URL: {}",LogUtil.scrub_entry(url));
+            _log.info("URS Code Request URL: {}",LogUtil.scrubEntry(url));
             response.sendRedirect(url);
 
             return false;
         }
 
-        _log.info("URS Code: {}",LogUtil.scrub_entry(code));
+        _log.info("URS Code: {}",LogUtil.scrubEntry(code));
 
         /**
          * If we get here, the the user was redirected by URS back to our application,
@@ -221,7 +221,7 @@ public class UrsIdP extends IdProvider{
         headers.put("Authorization", authHeader );
 
         _log.info("URS Token Request URL: {}",url);
-        _log.info("URS Token Request POST data: {}",LogUtil.scrub_entry(post_data));
+        _log.info("URS Token Request POST data: {}",LogUtil.scrubEntry(post_data));
         _log.info("URS Token Request Authorization Header: {}",authHeader);
 
         String contents = Util.submitHttpRequest(url, headers, post_data);

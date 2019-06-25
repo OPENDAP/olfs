@@ -396,7 +396,7 @@ public class LogUtil {
         if(log.isInfoEnabled()) {
             StringBuilder startMsg = new StringBuilder();
             startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(LogUtil.scrub_entry(req.getRemoteHost())).append("' ");
+            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
             startMsg.append("RequestedResource: '").append(resourceID).append("' ");
             startMsg.append("QueryString: '").append(query).append("' ");
             startMsg.append("AccessLog: ").append(logName);
@@ -501,7 +501,7 @@ public class LogUtil {
      * @param s String to prep for log.
      * @return String ready for log.
      */
-    public static String scrub_entry(String s){
+    public static String scrubEntry(String s){
         char[] disallowedChars = {'\r','\n', 0x08, '<', '>', '&', '\"', '\''} ;
         // Grind out a char by char replacement.
         for(char badChar: disallowedChars){
