@@ -9,7 +9,7 @@ sudo: false
 
 language: java
 
-# Drop this and use the jdk: ... lines in the jobs: secction below.
+# Drop this and use the jdk: ... lines in the jobs: section below.
 # jhrg 3/19/19
 #
 # jdk:

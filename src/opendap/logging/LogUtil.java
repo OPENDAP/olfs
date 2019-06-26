@@ -30,7 +30,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -394,7 +393,15 @@ public class LogUtil {
         query = (query == null) ? "" : query;
         MDC.put(QUERY_STRING_KEY, query);
 
-        log.info("REQUEST START - Remote host: " + req.getRemoteHost() + " - RequestedResource: '" + resourceID + "'  QueryString: '" + query +"' Access_Log: "+logName);
+        if(log.isInfoEnabled()) {
+            StringBuilder startMsg = new StringBuilder();
+            startMsg.append("REQUEST START - ");
+            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
+            startMsg.append("RequestedResource: '").append(resourceID).append("' ");
+            startMsg.append("QueryString: '").append(query).append("' ");
+            startMsg.append("AccessLog: ").append(logName);
+            log.info(startMsg.toString());
+        }
     }
 
 
@@ -487,6 +494,20 @@ public class LogUtil {
         MDC.remove(RESPONSE_SIZE_KEY);
         MDC.remove(HTTP_STATUS_KEY);
 
+    }
+
+    /**
+     * https://affinity-it-security.com/how-to-prevent-log-injection/
+     * @param s String to prep for log.
+     * @return String ready for log.
+     */
+    public static String scrubEntry(String s){
+        char[] disallowedChars = {'\r','\n', 0x08, '<', '>', '&', '\"', '\''} ;
+        // Grind out a char by char replacement.
+        for(char badChar: disallowedChars){
+            s = s.replace(badChar,'_');
+        }
+        return s;
     }
 
 

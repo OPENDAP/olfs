@@ -320,7 +320,6 @@ public class DmrppJoinNewAggregator {
             }
             else if (kid.getName().equals(DAP4.INT8)   |
                     kid.getName().equals(DAP4.UINT8)   |
-                    kid.getName().equals(DAP4.UINT8)   |
                     kid.getName().equals(DAP4.BYTE)    |
                     kid.getName().equals(DAP4.CHAR)    |
                     kid.getName().equals(DAP4.INT16)   |
@@ -559,7 +558,6 @@ public class DmrppJoinNewAggregator {
                 ingestContainerTemplate(kid,dataURL);
             }
             else if (kid.getName().equals(DAP4.INT8)   |
-                    kid.getName().equals(DAP4.UINT8)   |
                     kid.getName().equals(DAP4.UINT8)   |
                     kid.getName().equals(DAP4.BYTE)    |
                     kid.getName().equals(DAP4.CHAR)    |
