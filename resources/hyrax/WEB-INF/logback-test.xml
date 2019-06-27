@@ -27,6 +27,24 @@
 
 <configuration>
 
+    <!--
+        Key To Format Fields Used By The Appenders.
+
+        [%X{host}]        - Requesting client's host name or ip address
+        [%X{UserAgent}]   - The value of the HTTP request header 'UserAgent'
+        [%X{ident}]       - The session id if present.
+        [%X{userid}]      - If the user is authenticated then their user id will appear here.
+        [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] - Date and time of request.
+        [%8X{duration}]   - time to service request.
+        [%X{http_status}] - http status returned to client.
+        [%8X{ID}]         - Request ID. This is, in practice, a hit counter since the server was last started.
+        [%X{SOURCE}]      - The Source HTTP verb for the request, GET, POST, etc.
+        [%X{resourceID}]  - The local name/path/id of the requested object
+        [%X{query}]       - The query string submitted by the client.
+        [%X{size}]        - Size of the response
+        %n                - newline
+    -->
+
 
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M\\(\\) - %m%n" />
 
