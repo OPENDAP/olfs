@@ -1,3 +1,145 @@
+2019-06-27  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: - Added explanatory key for the varoius format fields 
+	used by the loggin appenders.
+	
+2019-06-26  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #78 from OPENDAP/sonar
+	Sonar
+	
+2019-06-25  Nathan Potter  <ndp@opendap.org>
+	
+	more sonar issues
+	
+	more sonar issues
+	
+	Resolving logging indormation management issues.
+	
+	olfs: - Removed identical subexpression cruft from dmr++ 
+	aggregation code.
+	
+	Merge pull request #77 from OPENDAP/hk-338
+	Hk 338
+	
+	Merge pull request #76 from OPENDAP/json-ld-baselines
+	Patching regresion test baselines for changes caused by a 
+	change in t…
+	
+	Patching regresion test baselines for changes caused by a 
+	change in the JSON-LD encoding.
+	
+	Added path_concat function to the 
+	threddsCatalogPresentation.xsl and threddsDatasetDetail.xsl in order to 
+	drop instances of multiple consecutive '/' characters in page link URLs.
+	
+	Merge branch 'master' into hk-338
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Misspelling: [skip ci]
+	
+	Update README.md
+	
+	Updated sonarcube-ant-task to version 2.6.0.1426
+	
+2019-06-24  Nathan Potter  <ndp@opendap.org>
+	
+	Switched travis dist to trusty
+	
+2019-06-21  Nathan Potter  <ndp@opendap.org>
+	
+	Minor debug configuratoin change + code comments
+	
+2019-05-28  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #75 from OPENDAP/dmrpp_agg
+	Dmrpp agg
+	
+	olfs: - Added private default constructor to Timer class. - 
+	Added Timer calls to the XML parsing in the Util class
+	
+2019-05-23  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #74 from OPENDAP/json-ld
+	Json ld
+	
+2019-05-21  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: Reworked, again, the JSON-LD string encoding. Dropped the 
+	suprisingly broken OWASP encoder in favor of Gson.
+	
+	Switched to owasp encoder 1.2.2 add deubgging
+	
+2019-05-20  Nathan Potter  <ndp@opendap.org>
+	
+	SYnc commit. Problems not features.
+	
+2019-05-16  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: comments
+	
+	olfs: Copyright.
+	
+	olfs: First full joinNew dmr++ agregator. w00t!
+	
+2019-04-19  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #73 from OPENDAP/ifh_var_names
+	Added filter to make javascript variables
+	
+2019-04-19  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #73 from OPENDAP/ifh_var_names
+	Added filter to make javascript variables
+	
+2019-04-18  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: Dropped now unused jsonEncodeString() method.
+	
+	Update baselines for change in IFH form content.
+	
+	olfs: Made the generated javascript variable names in the 
+	DAP2/4 IFH egneric. Basically var_1, var_2, etc. This removes the 
+	collision between DAP Variable and Attribute names and the allowed 
+	character space for javascript variable names which we had previously.
+	
+	olfs: Fixed bug in DAP4 IFH where Attribute values being added 
+	to the JSON-LD content was not correctly dual encoded - first to json 
+	and then to HTML. Now this mimics the DAP2 IFH.
+	
+2019-04-16  Nathan Potter  <ndp@opendap.org>
+	
+	Updated baselines for IFH responses accessing gsodock.dat. 
+	These were affected by the changes made to IFH javascript generation.
+	
+	Added filter to make javascript variables names safe from crazy 
+	DAP var names.
+	
+	Merge pull request #72 from OPENDAP/httpd_catalog_bug
+	olfs: Fixing bug that was breaking the httpd_catalog.
+	
+2019-04-04  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: Fixing bug that was breaking the httpd_catalog.
+	
+2019-03-25  Nathan Potter  <ndp@opendap.org>
+	
+	Fixed incorrect comment
+	
+2019-03-21  Nathan Potter  <ndp@opendap.org>
+	
+	olfs: Updated DOI in README.md
+	
+	olfs: Updated DOI in README.md
+	
+	Updated default log configuration to include WCS access.
+	
+	Updating .gitignore to ignore devloper cruft
+	
+	HYRAX-1.15.4, OLFS-1.18.4
+	
+	olfs: sonar
 2019-03-19  Nathan Potter  <ndp@opendap.org>
 
 	Merge pull request #69 from OPENDAP/dap3.2
