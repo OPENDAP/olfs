@@ -1,3 +1,17 @@
+2019-07-09  Nathan Potter  <ndp@opendap.org>
+
+        Dropping accidental file.
+
+        Dropping accidental file.
+
+2019-07-01  Nathan Potter  <ndp@opendap.org>
+
+        Updated ChangeLog
+
+2019-06-27  Nathan Potter  <ndp@opendap.org>
+
+        olfs: - Added explanatory key for the varoius format fields used by the loggin appenders.
+
 2019-06-27  Nathan Potter  <ndp@opendap.org>
 	
 	olfs: - Added explanatory key for the varoius format fields 

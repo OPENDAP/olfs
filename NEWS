@@ -1,3 +1,20 @@
+# OLFS Version 1.18.5 (08 July 2019)
+
+## DMR++ Aggregations
+
+## Bug Fixes
+
+OPeNDAP Data Request Forms and catalgo pages.
+ - Corrected JSON-LD encoding in the IFH generated pages.
+ - Corrected javascript code generation problems.
+
+Path construction bug (causing double "/" characters) in THREDDS catalog
+presentation pages. (HK-338)
+
+Security analysis and response.
+ - Sonar Scan
+ - Coverity Scan
+
 # OLFS Version 1.18.4 (25 March 2019)
 
 ## Features
