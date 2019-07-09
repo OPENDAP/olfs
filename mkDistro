@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "Building OLFS distribution."
+# Get OLFS Version
+olfs_version=`git describe --match "olfs-*" --abbrev=4 HEAD`
+echo "olfs_version: $olfs_version"
+
+# Get Hyrax Version
+hyrax_version=`git describe --match "hyrax-*" --abbrev=4 HEAD`
+echo "hyrax_version: $hyrax_version"
+
+ant -DHYRAX_VERSION=$bes_version -DOLFS_VERSION=$olfs_version DISTRO
+
+for i in build/dist/*.tgz
+do 
+    gpg --detach-sign --verbose --local-user security@opendap.org $i
+done
+
+

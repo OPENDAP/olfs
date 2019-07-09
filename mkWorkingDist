@@ -1,7 +1,7 @@
 #!/bin/bash
 
 bes_location=$1
-bes_location=${bes_location:-.}
+bes_location=${bes_location:-../bes}
 
 bes_version="bes_"`cd $bes_location; git branch | grep "*" | awk '{print $2}' -`"_"`cd $bes_location; git log | head -1 | awk '{print $2}' -`
 echo $bes_version
