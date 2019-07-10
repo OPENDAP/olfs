@@ -116,7 +116,7 @@ curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/
 ```
 It's not clear at this point if Google will actually ingest a `robots.txt` file via
 their ping interface, but it is clear that it will ingest the site map files.
-So, to be certain, goto the siteMap service (http://your_server/opendap/siteMap/ 
+So, to be certain, goto the siteMap service (`http://your_server/opendap/siteMap/` 
 )and submit each site map file listed to the Google:
 ```
 curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_0.txt
