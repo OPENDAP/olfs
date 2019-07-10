@@ -2,16 +2,16 @@
 
 ## Overview
 
-Hyrax produces embedded json-ld metadata in every "navigable catalog" page 
+Hyrax produces embedded JSON-LD metadata in every "navigable catalog" page 
 (aka pages that match: `*/contents.html`) and in every Data Request Form page. 
 The `contents.html` pages each contain list of datasets linked to by that page.
 The Data Request Form pages contain all of the Dataset metadata transformed into
-json-ld.
+JSON-LD.
 
 Additionally the server is now able to produce SiteMap files which are crucial
 to publishing/submitting a particular site to search engines.
 
-### What is json-ld?
+### What is JSON-LD?
 
 JSON-LD (JavaScript Object Notation for Linked Data), is a method of encoding 
 Linked Data using JSON.
@@ -20,9 +20,9 @@ Hyrax embeds JSON-LD content in every catalog and every Data Request Form page
 produced by the server.
 
 ### robots.txt
-Web site owners use the /robots.txt file to give instructions about their site 
-to web robots/crawlers. It matters in this discussion because it can be the 
-primary mechanism for robots/crawlers to discover site map content. 
+Web site owners use the `/robots.txt` file to give instructions about their site 
+to web robots/crawlers. The `robots.txt` file matters in this discussion because 
+it can be the primary mechanism for robots/crawlers to discover site map content. 
 
 A simple `robots.txt` file might look like something like this:
 ```
