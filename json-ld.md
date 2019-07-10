@@ -8,7 +8,7 @@ The `contents.html` pages each contain list of datasets linked to by that page.
 The Data Request Form pages contain all of the Dataset metadata transformed into
 JSON-LD.
 
-Additionally the server is now able to produce SiteMap files which are crucial
+Additionally, the server is now able to produce SiteMap files which are crucial
 to publishing/submitting a particular site to search engines.
 
 ### What is JSON-LD?
@@ -29,14 +29,14 @@ A simple `robots.txt` file might look like something like this:
 User-agent: *
 Disallow: /private
 ```
-However it is possible to explicitly specify one (or more) site map files 
+However, it is possible to explicitly specify one (or more) site map files 
 in the robots.txt file like this:
 ```
 sitemap: http://test.opendap.org:8080/opendap/siteMap/smap_0.txt
 sitemap: http://test.opendap.org:8080/opendap/siteMap/smap_1.txt
 ```
-Hyrax will dynamically generate both the sitemap files and, if you wish, the 
-`robots.txt` file dynamically.
+Hyrax will generate both the sitemap files and, if you wish, the 
+`robots.txt` file, dynamically.
 
 ### Site Maps
 
@@ -82,22 +82,22 @@ crawlers will be the best path forward.
 
 ## GeoCODES and p418
 
-GeoCODES is the new name of Project 418. We worked with them while developing
-our JSON-LD content and they have an engine to ingest JSON-LD for the purposes
-of data discovery. Our JSON-LD works here too!
+GeoCODES is the new name for the NSF EarthCube's Project 418. We worked with them while developing
+our JSON-LD content and they have a search engine to ingest JSON-LD for the purposes
+of data discovery.
 
 ### Submit your SiteMap to GeoCODES
 TBD
 
 ## Google and [Google Dataset Search](https://toolbox.google.com/datasetsearch)
-[Google Dataset Search](https://toolbox.google.com/datasetsearch) is Googles 
-data centric search system. Very Nice. Our JSON-LD works there as well with the 
+[Google Dataset Search](https://toolbox.google.com/datasetsearch) is Google's 
+data-centric search system (very nice). Our JSON-LD works there as well with the 
 caveat that if the metadata for a particular dataset causes the Data Request 
-Form page to exceed 2.5MB Google will ignore it. THis can be a real issue for 
+Form page to exceed 2.5MB Google will ignore it. This can be a real issue for 
 some data providers. (You _know_ who you are...)
 
 ### Submit your sitemap to Google 
-Google provides nice instructions for
+Google provides instructions for
 [Building and submiting a sitemap](https://support.google.com/webmasters/answer/183668?hl=en)
 but since Hyrax builds the site map files(s) for you all you really need to do
 it submit your site map which can be done very easily using curl:
@@ -116,8 +116,8 @@ curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/
 ```
 It's not clear at this point if Google will actually ingest a `robots.txt` file via
 their ping interface, but it is clear that it will ingest the site map files.
-So, to be certain, goto the siteMap service (`http://your_server/opendap/siteMap/` 
-)and submit each site map file listed to the Google:
+So, to be certain, goto the siteMap service (`http://your_server/opendap/siteMap/`)
+and submit each site map file listed to the Google:
 ```
 curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_0.txt
 curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_1.txt
