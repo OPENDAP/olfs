@@ -82,8 +82,8 @@ crawlers will be the best path forward.
 
 ## GeoCODES and p418
 
-GeoCODES is the new name of Project 418. We worked with them while developing
-our JSON-LD content and they have an engine to ingest JSON-LD for the purposes
+GeoCODES is the new name for NSF EarthCube's Project 418. We worked with them while developing
+our JSON-LD content and they have a search engine to ingest JSON-LD for the purposes
 of data discovery. Our JSON-LD works here too!
 
 ### Submit your SiteMap to GeoCODES
