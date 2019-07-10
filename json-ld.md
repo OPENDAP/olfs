@@ -1,6 +1,18 @@
 # Hyrax and JSON-LD
 
 ## Overview
+> Linked Data is about using the Web to connect related data that wasn't 
+previously linked, or using the Web to lower the barriers to linking data 
+currently linked using other methods ([linkeddata.org](http://linkeddata.org))
+
+
+### What is JSON-LD?
+
+JSON-LD (JavaScript Object Notation for [Linked Data](http://linkeddata.org)), 
+is a method of encoding [Linked Data](http://linkeddata.org) using JSON.
+
+Hyrax embeds JSON-LD content in every catalog and every Data Request Form page 
+produced by the server.
 
 Hyrax produces embedded JSON-LD metadata in every "navigable catalog" page 
 (aka pages that match: `*/contents.html`) and in every Data Request Form page. 
@@ -9,15 +21,8 @@ The Data Request Form pages contain all of the Dataset metadata transformed into
 JSON-LD.
 
 Additionally, the server is now able to produce SiteMap files which are crucial
-to publishing/submitting a particular site to search engines.
-
-### What is JSON-LD?
-
-JSON-LD (JavaScript Object Notation for Linked Data), is a method of encoding 
-Linked Data using JSON.
-
-Hyrax embeds JSON-LD content in every catalog and every Data Request Form page 
-produced by the server.
+to publishing/submitting a particular site to search engines, which is how 
+[Linked Data](http://linkeddata.org) is propogated.
 
 ### robots.txt
 Web site owners use the `/robots.txt` file to give instructions about their site 
