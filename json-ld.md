@@ -8,7 +8,7 @@ The `contents.html` pages each contain list of datasets linked to by that page.
 The Data Request Form pages contain all of the Dataset metadata transformed into
 JSON-LD.
 
-Additionally the server is now able to produce SiteMap files which are crucial
+Additionally, the server is now able to produce SiteMap files which are crucial
 to publishing/submitting a particular site to search engines.
 
 ### What is JSON-LD?
@@ -29,14 +29,14 @@ A simple `robots.txt` file might look like something like this:
 User-agent: *
 Disallow: /private
 ```
-However it is possible to explicitly specify one (or more) site map files 
+However, it is possible to explicitly specify one (or more) site map files 
 in the robots.txt file like this:
 ```
 sitemap: http://test.opendap.org:8080/opendap/siteMap/smap_0.txt
 sitemap: http://test.opendap.org:8080/opendap/siteMap/smap_1.txt
 ```
-Hyrax will dynamically generate both the sitemap files and, if you wish, the 
-`robots.txt` file dynamically.
+Hyrax will generate both the sitemap files and, if you wish, the 
+`robots.txt` file, dynamically.
 
 ### Site Maps
 
