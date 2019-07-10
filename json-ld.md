@@ -125,6 +125,6 @@ curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/
 ```
 etc.
 
-Reap the rewards of the search!!
+Now prepare to reap the rewards of the search!!
 
 
