@@ -2,18 +2,18 @@
 
 echo "Building OLFS distribution."
 # Get OLFS Version
-olfs_version=`git describe --match "olfs-*" --abbrev=4 HEAD`
-echo "olfs_version: $olfs_version"
+olfs_version=`git describe --match "olfs-*" --abbrev=4 HEAD | sed -e "s/olfs-//g" | awk '{split($0,s,"-"); print s[1];}' -`
+echo "olfs_version: ${olfs_version}"
 
 # Get Hyrax Version
-hyrax_version=`git describe --match "hyrax-*" --abbrev=4 HEAD`
-echo "hyrax_version: $hyrax_version"
+hyrax_version=`git describe --match "hyrax-*" --abbrev=4 HEAD | sed -e "s/hyrax-//g" | awk '{split($0,s,"-"); print s[1];}' -`
+echo "hyrax_version: ${hyrax_version}"
 
-ant -DHYRAX_VERSION=$bes_version -DOLFS_VERSION=$olfs_version DISTRO
+ant -DHYRAX_VERSION=$hyrax_version -DOLFS_VERSION=$olfs_version DISTRO
 
-for i in build/dist/*.tgz
+for dist_file in build/dist/*.tgz
 do 
-    gpg --detach-sign --verbose --local-user security@opendap.org $i
+    echo "Signing ${dist_file}"
+    gpg --detach-sign --verbose --local-user security@opendap.org ${dist_file}
 done
-
 
