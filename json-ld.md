@@ -28,7 +28,6 @@ A simple `robots.txt` file might look like something like this:
 ```
 User-agent: *
 Disallow: /private
-
 ```
 However it is possible to explicitly specify one (or more) site map files 
 in the robots.txt file like this:
@@ -81,12 +80,51 @@ easily locate the site map content automatically. If your site already utilizes
 a `ROOT` application for Tomcat then submitting the siteMap service to the various
 crawlers will be the best path forward.
 
-## Project 419(??)
+## GeoCODES and p418
 
-### Submit your SiteMap to project419
+GeoCODES is the new name of Project 418. We worked with them while developing
+our JSON-LD content and they have an engine to ingest JSON-LD for the purposes
+of data discovery. Our JSON-LD works here too!
 
-## Google and Google Dataset Search
+### Submit your SiteMap to GeoCODES
+TBB
+
+## Google and [Google Dataset Search](https://toolbox.google.com/datasetsearch)
+[Google Dataset Search](https://toolbox.google.com/datasetsearch) is Googles 
+data centric search system. Very Nice. Our JSON-LD works there as well with the 
+caveat that if the metadata for a particular dataset causes the Data Request 
+Form page to exceed 2.5MB Google will ignore it. THis can be a real issue for 
+some data providers. (You _know_ who you are...)
 
 ### Submit your sitemap to Google 
+Google as nice instructions for
+[Building and submiting a sitemap](https://support.google.com/webmasters/answer/183668?hl=en)
+but since Hyrax does all the building for you all you really need to do is 
+submit your site map which can be done very easily using curl:
 
-[Google: Build and submit a sitemap](https://support.google.com/webmasters/answer/183668?hl=en)
+`curl http://www.google.com/ping?sitemap=<complete_url_of_sitemap>`
+
+So, for tjhe OPeNDAP test server one could imagine that submitting the 
+`robots.txt` should produce the desired result. 
+```
+curl http://www.google.com/ping?sitemap=http://test.opendap.org/robots.txt
+```
+If you are are not able to utilize the `ROOT` web application you can still
+submit your site map by using the sitMap service directly:
+```
+curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/
+```
+It's not clear at this if Google will actually ingest a `robots.txt` file via
+their ping interface, but it is clear that it will ingest the site map files.
+So, to be certain, goto the siteMap service (http://yourserver/opendap/siteMap/ 
+)and submit each site map file listed to the Google:
+```
+curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_0.txt
+curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_1.txt
+curl http://www.google.com/ping?sitemap=http://test.opendap.org/opendap/siteMap/smap_2.txt
+```
+etc.
+
+
+
+
