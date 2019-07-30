@@ -2,17 +2,15 @@
   <img alt="TravisCI" src="https://travis-ci.org/OPENDAP/olfs.svg?branch=master"/>
 </a>
 
-# Hyrax/OLFS
+# Hyrax/OLFS [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3355422.svg)](https://doi.org/10.5281/zenodo.3355422)
 
 Hyrax Version 1.16.0  (08 July 2019)    
-OLFS  Version 1.18.5  (08 July 2019)    
-<!-- UPDATE [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2602169.svg)](https://doi.org/10.5281/zenodo.2602169) -->
-
+OLFS  Version 1.18.5  (08 July 2019) 
 
 
 ### OLFS-1.18.5 requires
-* BES Version 3.xx.yy <!-- UPDATE [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2602168.svg)](https://doi.org/10.5281/zenodo.2602168) -->
-* libdap Version 3.xx.yy <!-- UPDATE [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2566512.svg)](https://doi.org/10.5281/zenodo.2566512) -->
+* **[BES version 3.20.5](https://github.com/OPENDAP/bes/releases/tag/version-3.20.5)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3279223.svg)](https://doi.org/10.5281/zenodo.3279223)
+* **[libdap version 3.20.4 ](https://github.com/OPENDAP/libdap4/releases/tag/version-3.20.4)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3267984.svg)](https://doi.org/10.5281/zenodo.3267984)
 
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
