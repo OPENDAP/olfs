@@ -494,7 +494,12 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 
         if (DEBUG.enabled()) alert(this.name + " Handling projection change.\n" +
             "isContainer(): " + this.isContainer + "\n" +
-            "isArray(): " + this.isArray + "\n");
+            "isArray(): " + this.isArray + "\n" +
+            "check_box: \n" +
+            "  instanceOf: " + check_box + "\n" +
+            "  checked:    " + check_box.checked+ "\n" +
+            "  id:         " + check_box.id + "\n");
+
 
         this.setProjected(check_box.checked);
 

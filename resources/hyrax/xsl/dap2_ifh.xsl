@@ -210,10 +210,10 @@
 
 
 
-    
 
 
-    
+
+
     <!-- ######################################## -->
     <!--            ATOMIC TYPES               -->
     <!-- INTEGER TYPES -->
@@ -353,19 +353,19 @@
                 <xsl:otherwise><xsl:value-of select="name(.)"/></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:comment>
+            "myFQN:         <xsl:value-of select="$myFQN"/>
+            "myJSVarName:   <xsl:value-of select="$myJSVarName"/>
+            "checkBoxName:  <xsl:value-of select="$checkBoxName"/>
+            "isContainer:   <xsl:value-of select="$isContainer"/>
+            "isArray:       <xsl:value-of select="$isArray"/>
+            "myType:        <xsl:value-of select="$myType"/>
+            "position:      <xsl:value-of select="position()"/>
+            "parentContainer:        <xsl:value-of select="$parentContainer"/>
+        </xsl:comment>
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            if(DEBUG.enabled()) alert(
-                "myFQN:         <xsl:value-of select="$myFQN"/>\n" +
-                "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n" +
-                "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
-                "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
-                "isArray:       <xsl:value-of select="$isArray"/>\n" +
-                "myType:        <xsl:value-of select="$myType"/>\n" +
-                "parentContainer:        <xsl:value-of select="$parentContainer"/>\n"
-            );
-
 
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
@@ -382,8 +382,10 @@
         </xsl:element>
 
         <div style="color: black;margin-left:-20px;margin-top:10px">
-            <input type="checkbox" id="{$checkBoxName}"
-                   onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})" onfocus="describe_projection()"/>
+            <input type="checkbox"
+                   id="{$checkBoxName}"
+                   onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})"
+                   onfocus="describe_projection()"/>
             <xsl:value-of select="@name"/>
 
             <!--span class="small">
@@ -729,7 +731,7 @@
     </xsl:template>
 
 
-    
+
 
 
     <!-- ######################################## -->
@@ -769,7 +771,7 @@
     <!-- ################################################################### -->
     <!-- ################################################################### -->
     <!-- ################################################################### -->
-    <!-- 
+    <!--
       -  Specialized Machinery For Grid data type
       -
       -
@@ -925,7 +927,7 @@
                     <xsl:call-template name="VariableWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
-                </li>                
+                </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="VariableWorker"/>
@@ -939,8 +941,8 @@
     <!-- ################################################################### -->
     <!-- ################################################################### -->
     <!-- ################################################################### -->
-    
-    
+
+
 
 
 </xsl:stylesheet>
