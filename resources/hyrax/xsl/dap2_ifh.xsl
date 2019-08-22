@@ -354,6 +354,7 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:comment>
+-----------
             myFQN:        <xsl:value-of select="$myFQN"/>
             myJSVarName:  <xsl:value-of select="$myJSVarName"/>
             checkBoxName: <xsl:value-of select="$checkBoxName"/>
@@ -362,7 +363,11 @@
             myType:       <xsl:value-of select="$myType"/>
             position:     <xsl:value-of select="position()"/>
             parent:       <xsl:value-of select="$parentContainer"/>
+            docAddr:      <xsl:apply-templates select="." mode="moo"/>
+-----------
         </xsl:comment>
+
+
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -777,72 +782,6 @@
       -
       -
      -->
-    <xsl:template match="dap:Gwrid">
-        <xsl:param name="parentContainer"/>
-
-        <xsl:variable name="myFQN">
-            <xsl:call-template name="computeFQN"><xsl:with-param name="separator">.</xsl:with-param></xsl:call-template>
-        </xsl:variable>
-
-        <xsl:variable name="myJSVarName"><xsl:call-template name="computeVarName"/></xsl:variable>
-
-        <xsl:variable name="isContainer">true</xsl:variable>
-
-        <xsl:variable name="checkBoxName" select="concat('get_',$myJSVarName)"/>
-
-        <xsl:variable name="gridArray" select="dap:Array"/>
-
-        <xsl:variable name="myType" select="$gridArray" />
-
-
-        <xsl:element name="script">
-            <xsl:attribute name="type">text/javascript</xsl:attribute>
-            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",false,false);
-
-            <xsl:if test="parent::dap:Dataset">
-                DAP2_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
-            </xsl:if>
-
-            <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
-            <xsl:if test="$parentContainer">
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
-                <xsl:comment>Added by dap:Grid because test="$parentContainer" is true.</xsl:comment>
-                <xsl:value-of select="$parentContainer"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
-                <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$parentContainer"/>;
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
-            </xsl:if>
-        </xsl:element>
-
-
-
-        <div style="color: black;margin-left:-15px;margin-top:10px">
-            <input type="checkbox" id="{$checkBoxName}" onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})"  onfocus="describe_projection()" />
-            <xsl:value-of select="@name"/>
-
-            <!-- span class="small">
-                <xsl:if test="$container">
-                    (child of <xsl:value-of select="$container"/>)
-                </xsl:if>
-            </span -->
-            <xsl:apply-templates select="$gridArray">
-                <xsl:with-param name="parentContainer"><xsl:call-template name="computeVarName"/></xsl:with-param>
-            </xsl:apply-templates>
-            <!-- xsl:call-template name="DimHeader" / -->
-            <span class="small" style="vertical-align: 15%;"> (Type is <xsl:value-of select ="$myType"/>)</span>
-        </div>
-
-        <!-- xsl:call-template name="DimSlicing">
-            <xsl:with-param name="myJSVarName" select="$myJSVarName"/>
-        </xsl:call-template -->
-
-
-    </xsl:template>
-
-
-
-
-
-
 
 
     <xsl:template match="dap:Grid">
@@ -943,6 +882,41 @@
     <!-- ################################################################### -->
 
 
+    <xsl:template match="dap:foobar">
+        <xsl:param name="parent" />
+        ------------------------------------------------------------------------------
+        Element:  <xsl:value-of select="name()" />
+        name:   <xsl:value-of select="./@name" />
+        position(): <xsl:value-of select="position()" />
+        parent:  <xsl:value-of select="$parent" />
+
+        <xsl:if test="$parent">
+            value:  "<xsl:value-of select="normalize-space(string())" />"
+        </xsl:if>
+
+        <xsl:apply-templates select="*[not(/text())]">
+            <xsl:with-param name="parent" select="./@name" />
+        </xsl:apply-templates>
+
+    </xsl:template>
+
+
+    <xsl:template match="*" mode="moo">
+        ********
+        Starting moo
+        Element: <xsl:value-of select="name()" />
+        <xsl:choose>
+            <xsl:when test="parent::dap:Dataset">
+                parent_is_dataset (should be 1): "_<xsl:value-of select="position()"/>"
+            </xsl:when>
+            <xsl:otherwise >
+                calling template on parent
+                <xsl:apply-templates select=".." mode="moo" />
+                otherwise: "_<xsl:value-of select="position()"/>"
+            </xsl:otherwise>
+        </xsl:choose>
+        ********
+    </xsl:template>
 
 
 </xsl:stylesheet>
