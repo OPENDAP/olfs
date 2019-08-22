@@ -240,8 +240,6 @@
 
     <xsl:template match="dap:*" name="dapObj">
         <xsl:param name="parentContainer"/>
-
-
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
@@ -273,9 +271,6 @@
 
     <xsl:template match="dap:Structure | dap:Sequence" name="ContainerTypes">
         <xsl:param name="parentContainer"/>
-
-
-
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
@@ -364,14 +359,14 @@
         </xsl:variable>
         <xsl:comment>
 -----------
-            myFQN:          <xsl:value-of select="$myFQN"/>
-            myJSVarName:    <xsl:value-of select="$myJSVarName"/>
-            checkBoxName:   <xsl:value-of select="$checkBoxName"/>
-            isContainer:    <xsl:value-of select="$isContainer"/>
-            isArray:        <xsl:value-of select="$isArray"/>
-            myType:         <xsl:value-of select="$myType"/>
-            position:       <xsl:value-of select="position()"/>
-            parent:         <xsl:value-of select="$parentContainer"/>
+            myFQN:           <xsl:value-of select="$myFQN"/>
+            myJSVarName:     <xsl:value-of select="$myJSVarName"/>
+            checkBoxName:    <xsl:value-of select="$checkBoxName"/>
+            isContainer:     <xsl:value-of select="$isContainer"/>
+            isArray:         <xsl:value-of select="$isArray"/>
+            myType:          <xsl:value-of select="$myType"/>
+            position:        <xsl:value-of select="position()"/>
+            parentContainer: <xsl:value-of select="$parentContainer"/>
 -----------
         </xsl:comment>
 
