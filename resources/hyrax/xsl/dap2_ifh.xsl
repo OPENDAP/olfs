@@ -823,17 +823,6 @@
 
         <!-- script type="text/javascript">DEBUG.myCheckBox.checked=true;</script -->
 
-        <xsl:element name="script">
-        <xsl:attribute name="type">text/javascript</xsl:attribute>
-        if(DEBUG.enabled()) alert("dap:Grid()\n "+
-        "myFQN:         <xsl:value-of select="$myFQN"/>\n " +
-        "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n " +
-        "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n " +
-            "type:        <xsl:value-of select="$myDapType"/>\n " +
-            "gridDataType:        <xsl:value-of select="$gridDataType"/>\n " +
-        "parentContainer:        <xsl:value-of select="$parentContainer"/>\n"
-        );
-        </xsl:element>
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -884,7 +873,6 @@
 
     <xsl:template match="dap:Map | dap:Array">
         <xsl:param name="parentContainer"/>
-
 
         <xsl:choose>
             <xsl:when test="$parentContainer">
