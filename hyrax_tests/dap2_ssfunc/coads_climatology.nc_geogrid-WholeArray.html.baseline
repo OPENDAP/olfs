@@ -133,27 +133,27 @@
                   </div>
                </td>
                <td>
-                  <div style="margin-left:25px;">
-                     <script type="text/javascript">
-        if(DEBUG.enabled()) alert("dap:Grid()\n "+
-        "myFQN:         SST\n " +
-        "myJSVarName:   org_opendap_var_1\n " +
-        "checkBoxName:  get_org_opendap_var_1\n " +
-            "type:        Grid\n " +
-            "gridDataType:        Float32\n " +
-        "parentContainer:        \n"
-        );
-        </script>
-                     <script type="text/javascript">org_opendap_var_1 = new dap_var("SST", "org_opendap_var_1",true,false);
+                  <div style="margin-left:25px;"><!--
+            - - - - - - - - - - -
+            myFQN:        SST
+            myJSVarName:  org_opendap_var_d6e3
+            checkBoxName: get_org_opendap_var_d6e3
+            isContainer:  Yup. This is a Grid
+            isArray:      No.  It's a Grid
+            myType:       Grid
+            position:     1
+            parent:       
+            - - - - - - - - - - -
+        --><script type="text/javascript">org_opendap_var_d6e3 = new dap_var("SST", "org_opendap_var_d6e3",true,false);
 
 
             
-                DAP2_URL.add_dap_var(org_opendap_var_1);
-            org_opendap_var_1.checkBox = "get_org_opendap_var_1";
+                DAP2_URL.add_dap_var(org_opendap_var_d6e3);
+            org_opendap_var_d6e3.checkBox = "get_org_opendap_var_d6e3";
             </script>
                      <div style="color: black;margin-left:-15px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_var_1"
-                               onclick="org_opendap_var_1.handle_projection_change(get_org_opendap_var_1)"
+                        <input type="checkbox" id="get_org_opendap_var_d6e3"
+                               onclick="org_opendap_var_d6e3.handle_projection_change(get_org_opendap_var_d6e3)"
                                onfocus="describe_projection()"/>SST<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">TIME=
                     </span>
@@ -174,20 +174,23 @@
             </span>
                         <span class="small" style="vertical-align: 15%;"> (Grid of Float32 values)</span>
                      </div>
-                     <input type="text" id="org_opendap_var_1_dim_1" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_d6e3_dim_1" size="8"
+                            oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_1,12);
+                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_1,12);
             </script>
-                     <input type="text" id="org_opendap_var_1_dim_2" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_d6e3_dim_2" size="8"
+                            oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_2,46);
+                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_2,46);
             </script>
-                     <input type="text" id="org_opendap_var_1_dim_3" size="8" oninput="autoResize(event)"
+                     <input type="text" id="org_opendap_var_d6e3_dim_3" size="8"
+                            oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_1.addDimension(org_opendap_var_1_dim_3,90);
+                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_3,90);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">

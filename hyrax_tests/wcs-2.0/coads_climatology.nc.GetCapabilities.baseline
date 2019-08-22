@@ -1,60 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wcs:Capabilities xmlns:wcs="http://www.opengis.net/wcs/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wcseo="http://www.opengis.net/wcs/wcseo/1.0" xsi:schemaLocation="http://www.opengis.net/ows/2.0  http://schemas.opengis.net/ows/2.0/owsAll.xsd http://www.opengis.net/wcs/2.0  http://schemas.opengis.net/wcs/2.0/wcsAll.xsd" updateSequence="SomethingBetterWillBeUsedSoon" version="2.0.1">
-  <ows:ServiceIdentification>
-    <ows:Title>OPeNDAP WCS 2.0 Service</ows:Title>
-    <ows:Abstract>A WCS 2.0 service under development as a part of the OPeNDAP Hyrax server.</ows:Abstract>
+  <ows:ServiceIdentification xmlns:ows="http://www.opengis.net/ows/1.1">
+    <ows:Title>OPeNDAP WCS Service</ows:Title>
+    <ows:Abstract>A WCS server intended to provide WCS 1.1 (1.1.2) access to DAP datasets</ows:Abstract>
     <ows:Keywords>
       <ows:Keyword>Web Coverage Service</ows:Keyword>
       <ows:Keyword>OPeNDAP</ows:Keyword>
-      <ows:Keyword>NetCDF</ows:Keyword>
+      <ows:Keyword>nectcdf</ows:Keyword>
+      <ows:Keyword>DAP</ows:Keyword>
     </ows:Keywords>
     <ows:ServiceType>WCS</ows:ServiceType>
-    <ows:ServiceTypeVersion>2.0.1</ows:ServiceTypeVersion>
-    <ows:Profile>http://www.opengis.net/spec/WCS_protocol-binding_soap/1.0/conf/soap</ows:Profile>
-    <ows:Profile>http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/1.0/conf/netcdf</ows:Profile>
-    <ows:Profile>http://www.opengis.net/spec/WCS_service-model_transaction/1.0/conf/transaction</ows:Profile>
+    <ows:ServiceTypeVersion>1.1.2</ows:ServiceTypeVersion>
     <ows:Fees>NONE</ows:Fees>
     <ows:AccessConstraints>NONE</ows:AccessConstraints>
   </ows:ServiceIdentification>
-  <ows:ServiceProvider xmlns:xlink="http://www.w3.org/1999/xlink">
-    <ows:ProviderName>Your Organization</ows:ProviderName>
-    <ows:ProviderSite xlink:href="http://your.organizations.website.org" />
+  <ows:ServiceProvider xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ows:ProviderName>OPeNDAP Inc.</ows:ProviderName>
+    <ows:ProviderSite xlink:href="http://www.opendap.org" />
     <ows:ServiceContact>
-      <ows:IndividualName>Someone Helpful</ows:IndividualName>
-      <ows:PositionName>Support Guru</ows:PositionName>
+      <ows:IndividualName>Anonymous Smith</ows:IndividualName>
+      <ows:PositionName>Sys. Admin.</ows:PositionName>
       <ows:ContactInfo>
         <ows:Phone>
-          <ows:Voice>401-555-7890</ows:Voice>
-          <ows:Facsimile>401-555-8901</ows:Facsimile>
+          <ows:Voice>123-456-7890</ows:Voice>
+          <ows:Facsimile>234-567-8901</ows:Facsimile>
         </ows:Phone>
         <ows:Address>
-          <ows:DeliveryPoint>Some Dr.</ows:DeliveryPoint>
-          <ows:City>Happy Valley</ows:City>
+          <ows:DeliveryPoint>165 Fictitious Dr.</ows:DeliveryPoint>
+          <ows:City>AnywhereButHere</ows:City>
           <ows:AdministrativeArea>Rhode Island</ows:AdministrativeArea>
           <ows:PostalCode>02882</ows:PostalCode>
           <ows:Country>USA</ows:Country>
-          <ows:ElectronicMailAddress>support[at]yourinst[dot]org</ows:ElectronicMailAddress>
+          <ows:ElectronicMailAddress>support[a.t]opendap[d.o.t]org</ows:ElectronicMailAddress>
         </ows:Address>
-        <ows:OnlineResource xlink:href="http://www.opendap.org/support/index.html" />
+        <ows:OnlineResource xlink:href="http://your.domain.org/" />
         <ows:HoursOfService>24x7x365</ows:HoursOfService>
         <ows:ContactInstructions>email</ows:ContactInstructions>
       </ows:ContactInfo>
-      <ows:Role>Support</ows:Role>
+      <ows:Role>Developer</ows:Role>
     </ows:ServiceContact>
   </ows:ServiceProvider>
-  <ows:OperationsMetadata xmlns="http://www.opengis.net/wcs/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <ows:OperationsMetadata xmlns:ows="http://www.opengis.net/ows/1.1" xmlns="http://www.opengis.net/wcs/1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
     <ows:Operation name="GetCapabilities">
       <ows:DCP>
         <ows:HTTP>
-          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+          <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?" />
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>XML</ows:Value>
               </ows:AllowedValues>
             </ows:Constraint>
           </ows:Post>
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>SOAP</ows:Value>
@@ -63,24 +61,19 @@
           </ows:Post>
         </ows:HTTP>
       </ows:DCP>
-      <ows:Parameter name="Format">
-        <ows:AllowedValues>
-          <ows:Value>text/xml</ows:Value>
-        </ows:AllowedValues>
-      </ows:Parameter>
     </ows:Operation>
     <ows:Operation name="GetCoverage">
       <ows:DCP>
         <ows:HTTP>
-          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+          <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?" />
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>XML</ows:Value>
               </ows:AllowedValues>
             </ows:Constraint>
           </ows:Post>
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>SOAP</ows:Value>
@@ -90,26 +83,21 @@
         </ows:HTTP>
       </ows:DCP>
       <ows:Parameter name="Format">
-        <ows:AllowedValues>
-          <ows:Value>dap2</ows:Value>
-          <ows:Value>netcdf</ows:Value>
-          <ows:Value>jpeg2000</ows:Value>
-          <ows:Value>geotiff</ows:Value>
-        </ows:AllowedValues>
+        <ows:AllowedValues />
       </ows:Parameter>
     </ows:Operation>
     <ows:Operation name="DescribeCoverage">
       <ows:DCP>
         <ows:HTTP>
-          <ows:Get xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc" />
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/post">
+          <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?" />
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>XML</ows:Value>
               </ows:AllowedValues>
             </ows:Constraint>
           </ows:Post>
-          <ows:Post xlink:href="http://localhost:8080/opendap/wcs/coads/data/nc/coads_climatology.nc/soap">
+          <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
             <ows:Constraint name="PostEncoding">
               <ows:AllowedValues>
                 <ows:Value>SOAP</ows:Value>
@@ -124,10 +112,6 @@
         </ows:AllowedValues>
       </ows:Parameter>
     </ows:Operation>
-    <ows:Constraint name="CountDefault">
-      <ows:NoValues />
-      <ows:DefaultValue>1000</ows:DefaultValue>
-    </ows:Constraint>
   </ows:OperationsMetadata>
   <wcs:ServiceMetadata>
     <wcs:formatSupported>application/octet-stream</wcs:formatSupported>

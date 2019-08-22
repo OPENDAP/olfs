@@ -253,25 +253,27 @@
     -->
 
     <xsl:template match="dap:*" name="dapObj">
-        <xsl:param name="container"/>
+        <xsl:param name="parentContainer"/>
         <xsl:choose>
-            <xsl:when test="$container">
+            <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="VariableWorker">
-                        <xsl:with-param name="container" select="$container"/>
+                        <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="VariableWorker"/>
+                <xsl:call-template name="VariableWorker">
+                    <xsl:with-param name="parentContainer" />
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="VariableWorker">
-        <xsl:param name="container"/>
+        <xsl:param name="parentContainer"/>
         <xsl:call-template name="VariableHeader">
-            <xsl:with-param name="container" select="$container"/>
+            <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
         <xsl:call-template name="AttributesPresentation"/>
     </xsl:template>
@@ -281,27 +283,28 @@
     <!--            CONTAINER TYPES               -->
 
     <xsl:template match="dap:Structure | dap:Sequence | dap:Group" name="ContainerTypes">
-        <xsl:param name="container"/>
+        <xsl:param name="parentContainer"/>
         <xsl:choose>
-            <xsl:when test="$container">
+            <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="ContainerTypeWorker">
-                        <xsl:with-param name="container" select="$container"/>
+                        <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="ContainerTypeWorker">
+                    <xsl:with-param name="parentContainer" />
                 </xsl:call-template>
         </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="ContainerTypeWorker">
-        <xsl:param name="container"/>
+        <xsl:param name="parentContainer"/>
 
         <xsl:call-template name="VariableHeader">
-            <xsl:with-param name="container" select="$container"/>
+            <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
         <xsl:call-template name="AttributesPresentation"/>
 
@@ -321,7 +324,7 @@
                     <xsl:choose>
                         <xsl:when test="true()">
                             <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
-                                <xsl:with-param name="container">
+                                <xsl:with-param name="parentContainer">
                                     <xsl:call-template name="computeVarName"/>
                                 </xsl:with-param>
                             </xsl:apply-templates>
@@ -346,7 +349,7 @@
      -
     -->
     <xsl:template name="VariableHeader">
-        <xsl:param name="container"/>
+        <xsl:param name="parentContainer"/>
 
 
         <xsl:variable name="myFQN">
@@ -373,18 +376,21 @@
             </xsl:choose>
         </xsl:variable>
 
+        <xsl:comment>
+            -----------
+            myFQN:           <xsl:value-of select="$myFQN"/>
+            myJSVarName:     <xsl:value-of select="$myJSVarName"/>
+            checkBoxName:    <xsl:value-of select="$checkBoxName"/>
+            isContainer:     <xsl:value-of select="$isContainer"/>
+            isArray:         <xsl:value-of select="$isArray"/>
+            position:        <xsl:value-of select="position()"/>
+            parentContainer: <xsl:value-of select="$parentContainer"/>
+            -----------
+        </xsl:comment>
+
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            if(DEBUG.enabled()) alert(
-            "myFQN:         <xsl:value-of select="$myFQN"/>\n" +
-            "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n" +
-            "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
-            "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
-            "isArray:       <xsl:value-of select="$isArray"/>\n" +
-            "(parent) container: <xsl:value-of select="$container"/>\n"
-            );
-
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
@@ -393,9 +399,9 @@
             </xsl:if>
 
             <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
-            <xsl:if test="$container">
-                <xsl:value-of select="$container"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
-                <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$container"/>;
+            <xsl:if test="$parentContainer">
+                <xsl:value-of select="$parentContainer"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
+                <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$parentContainer"/>;
             </xsl:if>
         </xsl:element>
 
@@ -404,11 +410,6 @@
                    onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})" onfocus="describe_projection()"/>
             <xsl:value-of select="@name"/>
 
-            <!--span class="small">
-                <xsl:if test="$container">
-                    (child of <xsl:value-of select="$container"/>)
-                </xsl:if>
-            </span-->
             <xsl:call-template name="DimHeader"/>
             <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is <xsl:value-of select="name(.)"/>)
             </span>
@@ -637,15 +638,8 @@
      -
     -->
     <xsl:template match="*" name="computeVarName" mode="computeVarName">
-        <!--xsl:variable name="myFQFunctionName">
-            <xsl:call-template name="computeFQN">
-                <xsl:with-param name="separator">_</xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable -->
-        <!-- xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/ -->
-        <!-- xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/ -->
 
-        <xsl:value-of select="concat('org_opendap_var_',position())"/>
+        <xsl:value-of select="concat('org_opendap_var_',generate-id())"/>
 
     </xsl:template>
     <!-- ################################################################### -->

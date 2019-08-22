@@ -210,10 +210,10 @@
 
 
 
-    
 
 
-    
+
+
     <!-- ######################################## -->
     <!--            ATOMIC TYPES               -->
     <!-- INTEGER TYPES -->
@@ -249,13 +249,16 @@
                 </li>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="VariableWorker"/>
+                <xsl:call-template name="VariableWorker">
+                    <xsl:with-param name="parentContainer" />
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="VariableWorker">
         <xsl:param name="parentContainer"/>
+
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
@@ -278,6 +281,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="ContainerTypeWorker">
+                    <xsl:with-param name="parentContainer" />
                 </xsl:call-template>
         </xsl:otherwise>
         </xsl:choose>
@@ -300,7 +304,8 @@
                         <xsl:when test="true()">
                             <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
                                 <xsl:with-param name="parentContainer">
-                                    <xsl:call-template name="computeVarName"/>
+                                    <xsl:call-template name="computeVarName">
+                                    </xsl:call-template>
                                 </xsl:with-param>
                             </xsl:apply-templates>
                         </xsl:when>
@@ -321,7 +326,6 @@
     -->
     <xsl:template name="VariableHeader">
         <xsl:param name="parentContainer"/>
-
 
         <xsl:variable name="myFQN">
             <xsl:call-template name="computeFQN">
@@ -353,19 +357,23 @@
                 <xsl:otherwise><xsl:value-of select="name(.)"/></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:comment>
+-----------
+            myFQN:           <xsl:value-of select="$myFQN"/>
+            myJSVarName:     <xsl:value-of select="$myJSVarName"/>
+            checkBoxName:    <xsl:value-of select="$checkBoxName"/>
+            isContainer:     <xsl:value-of select="$isContainer"/>
+            isArray:         <xsl:value-of select="$isArray"/>
+            myType:          <xsl:value-of select="$myType"/>
+            position:        <xsl:value-of select="position()"/>
+            parentContainer: <xsl:value-of select="$parentContainer"/>
+-----------
+        </xsl:comment>
+
+
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
-            if(DEBUG.enabled()) alert(
-                "myFQN:         <xsl:value-of select="$myFQN"/>\n" +
-                "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n" +
-                "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n" +
-                "isContainer:   <xsl:value-of select="$isContainer"/>\n" +
-                "isArray:       <xsl:value-of select="$isArray"/>\n" +
-                "myType:        <xsl:value-of select="$myType"/>\n" +
-                "parentContainer:        <xsl:value-of select="$parentContainer"/>\n"
-            );
-
 
             <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
@@ -382,8 +390,10 @@
         </xsl:element>
 
         <div style="color: black;margin-left:-20px;margin-top:10px">
-            <input type="checkbox" id="{$checkBoxName}"
-                   onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})" onfocus="describe_projection()"/>
+            <input type="checkbox"
+                   id="{$checkBoxName}"
+                   onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})"
+                   onfocus="describe_projection()"/>
             <xsl:value-of select="@name"/>
 
             <!--span class="small">
@@ -549,15 +559,8 @@
      -
     -->
     <xsl:template match="*" name="computeVarName" mode="computeVarName">
-        <!-- xsl:variable name="myFQFunctionName">
-            <xsl:call-template name="computeFQN">
-                <xsl:with-param name="separator">_</xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable -->
-        <!-- xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/ -->
-        <!--xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/  -->
 
-        <xsl:value-of select="concat('org_opendap_var_',position())"/>
+        <xsl:value-of select="concat('org_opendap_var_',generate-id())"/>
 
     </xsl:template>
     <!-- ################################################################### -->
@@ -729,7 +732,7 @@
     </xsl:template>
 
 
-    
+
 
 
     <!-- ######################################## -->
@@ -769,106 +772,52 @@
     <!-- ################################################################### -->
     <!-- ################################################################### -->
     <!-- ################################################################### -->
-    <!-- 
+    <!--
       -  Specialized Machinery For Grid data type
       -
       -
       -
      -->
-    <xsl:template match="dap:Gwrid">
-        <xsl:param name="parentContainer"/>
-
-        <xsl:variable name="myFQN">
-            <xsl:call-template name="computeFQN"><xsl:with-param name="separator">.</xsl:with-param></xsl:call-template>
-        </xsl:variable>
-
-        <xsl:variable name="myJSVarName"><xsl:call-template name="computeVarName"/></xsl:variable>
-
-        <xsl:variable name="isContainer">true</xsl:variable>
-
-        <xsl:variable name="checkBoxName" select="concat('get_',$myJSVarName)"/>
-
-        <xsl:variable name="gridArray" select="dap:Array"/>
-
-        <xsl:variable name="myType" select="$gridArray" />
-
-
-        <xsl:element name="script">
-            <xsl:attribute name="type">text/javascript</xsl:attribute>
-            <xsl:value-of select="$myJSVarName"/> = new dap_var("<xsl:value-of select="$myFQN"/>", "<xsl:value-of select="$myJSVarName"/>",false,false);
-
-            <xsl:if test="parent::dap:Dataset">
-                DAP2_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
-            </xsl:if>
-
-            <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
-            <xsl:if test="$parentContainer">
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
-                <xsl:comment>Added by dap:Grid because test="$parentContainer" is true.</xsl:comment>
-                <xsl:value-of select="$parentContainer"/>.addChildVar(<xsl:value-of select="$myJSVarName"/>);
-                <xsl:value-of select="$myJSVarName"/>.parentContainer = <xsl:value-of select="$parentContainer"/>;
-                <xsl:comment>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</xsl:comment>
-            </xsl:if>
-        </xsl:element>
-
-
-
-        <div style="color: black;margin-left:-15px;margin-top:10px">
-            <input type="checkbox" id="{$checkBoxName}" onclick="{$myJSVarName}.handle_projection_change({$checkBoxName})"  onfocus="describe_projection()" />
-            <xsl:value-of select="@name"/>
-
-            <!-- span class="small">
-                <xsl:if test="$container">
-                    (child of <xsl:value-of select="$container"/>)
-                </xsl:if>
-            </span -->
-            <xsl:apply-templates select="$gridArray">
-                <xsl:with-param name="parentContainer"><xsl:call-template name="computeVarName"/></xsl:with-param>
-            </xsl:apply-templates>
-            <!-- xsl:call-template name="DimHeader" / -->
-            <span class="small" style="vertical-align: 15%;"> (Type is <xsl:value-of select ="$myType"/>)</span>
-        </div>
-
-        <!-- xsl:call-template name="DimSlicing">
-            <xsl:with-param name="myJSVarName" select="$myJSVarName"/>
-        </xsl:call-template -->
-
-
-    </xsl:template>
-
-
-
-
-
-
 
 
     <xsl:template match="dap:Grid">
         <xsl:param name="parentContainer"/>
 
-        <!-- script type="text/javascript">DEBUG.myCheckBox.checked=true;</script -->
-
         <xsl:variable name="gridArray" select="dap:Array"/>
-        <xsl:variable name="myFQN">
-            <xsl:call-template name="computeFQN"><xsl:with-param name="separator">.</xsl:with-param></xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="myJSVarName"><xsl:call-template name="computeVarName"/></xsl:variable>
-        <xsl:variable name="checkBoxName" select="concat('get_',$myJSVarName)"/>
 
-        <xsl:variable name="type">Grid</xsl:variable>
+        <xsl:variable name="myFQN">
+            <xsl:call-template name="computeFQN">
+                <xsl:with-param name="separator">.</xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="myJSVarName">
+            <xsl:call-template name="computeVarName">
+            </xsl:call-template>
+        </xsl:variable>
+
+
+        <xsl:variable name="checkBoxName" select="concat('get_',$myJSVarName)"/>
+        <xsl:variable name="myDapType">Grid</xsl:variable>
         <xsl:variable name="gridDataType" select="name($gridArray/*[not(self::dap:Attribute) and not(self::dap:dimension)])"/>
 
-        <xsl:element name="script">
-        <xsl:attribute name="type">text/javascript</xsl:attribute>
-        if(DEBUG.enabled()) alert("dap:Grid()\n "+
-        "myFQN:         <xsl:value-of select="$myFQN"/>\n " +
-        "myJSVarName:   <xsl:value-of select="$myJSVarName"/>\n " +
-        "checkBoxName:  <xsl:value-of select="$checkBoxName"/>\n " +
-            "type:        <xsl:value-of select="$type"/>\n " +
-            "gridDataType:        <xsl:value-of select="$gridDataType"/>\n " +
-        "parentContainer:        <xsl:value-of select="$parentContainer"/>\n"
-        );
-        </xsl:element>
+
+        <xsl:comment>
+            -----------
+            myFQN:        <xsl:value-of select="$myFQN"/>
+            myJSVarName:  <xsl:value-of select="$myJSVarName"/>
+            checkBoxName: <xsl:value-of select="$checkBoxName"/>
+            isContainer:  Yup. This is a Grid
+            isArray:      No.  It's a Grid
+            myType:       <xsl:value-of select="$myDapType"/>
+            position:     <xsl:value-of select="position()"/>
+            parent:       <xsl:value-of select="$parentContainer"/>
+            -----------
+        </xsl:comment>
+
+
+        <!-- script type="text/javascript">DEBUG.myCheckBox.checked=true;</script -->
+
 
         <xsl:element name="script">
             <xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -919,16 +868,19 @@
 
     <xsl:template match="dap:Map | dap:Array">
         <xsl:param name="parentContainer"/>
+
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="VariableWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
                     </xsl:call-template>
-                </li>                
+                </li>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="VariableWorker"/>
+                <xsl:call-template name="VariableWorker">
+                    <xsl:with-param name="parentContainer"/>
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -939,8 +891,6 @@
     <!-- ################################################################### -->
     <!-- ################################################################### -->
     <!-- ################################################################### -->
-    
-    
 
 
 </xsl:stylesheet>
