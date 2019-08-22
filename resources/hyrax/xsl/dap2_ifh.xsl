@@ -240,33 +240,19 @@
 
     <xsl:template match="dap:*" name="dapObj">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="parentNodeAddr"/>
 
-        <xsl:variable name="myNodeAddr">
-            <xsl:choose>
-                <xsl:when test="not($parentNodeAddr='')"><xsl:value-of select="concat($parentNodeAddr,'_',position())"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="position()"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
-        <xsl:comment>
-            parent node address: <xsl:value-of select="$parentNodeAddr" />
-            my     node address: <xsl:value-of select="$myNodeAddr" />
-        </xsl:comment>
 
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="VariableWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
-                        <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="VariableWorker">
                     <xsl:with-param name="parentContainer" />
-                    <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
@@ -274,11 +260,9 @@
 
     <xsl:template name="VariableWorker">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="nodeAddr"/>
-        
+
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
-            <xsl:with-param name="nodeAddr" select="$nodeAddr"/>
         </xsl:call-template>
         <xsl:call-template name="AttributesPresentation"/>
     </xsl:template>
@@ -289,33 +273,20 @@
 
     <xsl:template match="dap:Structure | dap:Sequence" name="ContainerTypes">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="parentNodeAddr"/>
 
-        <xsl:variable name="myNodeAddr">
-            <xsl:choose>
-                <xsl:when test="$parentNodeAddr"><xsl:value-of select="concat($parentNodeAddr,'_',position())"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="position()"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
 
-        <xsl:comment>
-            parent node address: <xsl:value-of select="$parentNodeAddr" />
-            my     node address: <xsl:value-of select="$myNodeAddr" />
-        </xsl:comment>
 
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="ContainerTypeWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
-                        <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="ContainerTypeWorker">
                     <xsl:with-param name="parentContainer" />
-                    <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                 </xsl:call-template>
         </xsl:otherwise>
         </xsl:choose>
@@ -323,11 +294,9 @@
 
     <xsl:template name="ContainerTypeWorker">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="nodeAddr"/>
 
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
-            <xsl:with-param name="nodeAddr" select="$nodeAddr"/>
         </xsl:call-template>
         <xsl:call-template name="AttributesPresentation"/>
         <div class="tightView">
@@ -341,10 +310,8 @@
                             <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
                                 <xsl:with-param name="parentContainer">
                                     <xsl:call-template name="computeVarName">
-                                        <xsl:with-param name="nodeAddr" select="$nodeAddr" />
                                     </xsl:call-template>
                                 </xsl:with-param>
-                                <xsl:with-param name="parentNodeAddr" select="$nodeAddr" />
                             </xsl:apply-templates>
                         </xsl:when>
                         <xsl:otherwise><li>no members shown</li></xsl:otherwise>
@@ -364,7 +331,6 @@
     -->
     <xsl:template name="VariableHeader">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="nodeAddr"/>
 
         <xsl:variable name="myFQN">
             <xsl:call-template name="computeFQN">
@@ -373,9 +339,7 @@
         </xsl:variable>
 
         <xsl:variable name="myJSVarName">
-            <xsl:call-template name="computeVarName">
-                <xsl:with-param name="nodeAddr" select="$nodeAddr" />
-            </xsl:call-template>
+            <xsl:call-template name="computeVarName"/>
         </xsl:variable>
 
         <xsl:variable name="isContainer">
@@ -408,7 +372,6 @@
             myType:         <xsl:value-of select="$myType"/>
             position:       <xsl:value-of select="position()"/>
             parent:         <xsl:value-of select="$parentContainer"/>
-            nodeAddr:       <xsl:value-of select="$nodeAddr"/>
 -----------
         </xsl:comment>
 
@@ -601,16 +564,8 @@
      -
     -->
     <xsl:template match="*" name="computeVarName" mode="computeVarName">
-        <xsl:param name="nodeAddr" />
-        <!-- xsl:variable name="myFQFunctionName">
-            <xsl:call-template name="computeFQN">
-                <xsl:with-param name="separator">_</xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable -->
-        <!-- xsl:value-of select="concat('org_opendap_',$myFQFunctionName)"/ -->
-        <!--xsl:value-of select="concat('org_opendap_',translate($myFQFunctionName,' +-/=*^!@#%&amp;()[],&lt;.&gt;/?;:|~','__________________________'))"/  -->
 
-        <xsl:value-of select="concat('org_opendap_var_',$nodeAddr)"/>
+        <xsl:value-of select="concat('org_opendap_var_',generate-id())"/>
 
     </xsl:template>
     <!-- ################################################################### -->
@@ -832,14 +787,6 @@
 
     <xsl:template match="dap:Grid">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="parentNodeAddr"/>
-
-        <xsl:variable name="myNodeAddr">
-            <xsl:choose>
-                <xsl:when test="not($parentNodeAddr='')"><xsl:value-of select="concat($parentNodeAddr,'_',position())"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="position()"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
 
         <xsl:variable name="gridArray" select="dap:Array"/>
 
@@ -851,7 +798,6 @@
 
         <xsl:variable name="myJSVarName">
             <xsl:call-template name="computeVarName">
-                <xsl:with-param name="nodeAddr" select="$myNodeAddr" />
             </xsl:call-template>
         </xsl:variable>
 
@@ -871,7 +817,6 @@
             myType:       <xsl:value-of select="$myDapType"/>
             position:     <xsl:value-of select="position()"/>
             parent:       <xsl:value-of select="$parentContainer"/>
-            nodeAddr:     <xsl:value-of select="$myNodeAddr"/>
             -----------
         </xsl:comment>
 
@@ -939,28 +884,19 @@
 
     <xsl:template match="dap:Map | dap:Array">
         <xsl:param name="parentContainer"/>
-        <xsl:param name="parentNodeAddr"/>
 
-        <xsl:variable name="myNodeAddr">
-            <xsl:choose>
-                <xsl:when test="not($parentNodeAddr='')"><xsl:value-of select="concat($parentNodeAddr,'_',position())"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="position()"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
 
         <xsl:choose>
             <xsl:when test="$parentContainer">
                 <li>
                     <xsl:call-template name="VariableWorker">
                         <xsl:with-param name="parentContainer" select="$parentContainer"/>
-                        <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                     </xsl:call-template>
                 </li>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="VariableWorker">
                     <xsl:with-param name="parentContainer"/>
-                    <xsl:with-param name="nodeAddr" select="$myNodeAddr"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
