@@ -43,6 +43,8 @@ env:
      - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
    # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
      - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
+     - SNAP_TAG="snapshot-"`date +%s`
+
 
 stages:
 - name: build
@@ -74,4 +76,19 @@ jobs:
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
         - ant sonar -Dsonar.login=$SONAR_LOGIN
-  
+
+before_deploy:
+- test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+- ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot 
+- cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
+        
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: opendap.travis.build
+  skip_cleanup: true
+  local_dir: $TRAVIS_BUILD_DIR/package
+  on:
+    branch: master
+
