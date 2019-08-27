@@ -83,7 +83,10 @@ before_deploy:
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot DISTRO
 - pwd; 
 - ls -l build/dist
-- cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
+- cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
+- echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
+- ls -l ${TRAVIS_BUILD_DIR}/package/
+- echo "- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -"    
         
 deploy:
   provider: s3

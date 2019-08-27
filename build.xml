@@ -497,7 +497,7 @@
 
     </target>
 
-
+<!--
     <target
             name="javaDoc"
             depends="clean,PreProcessSourceCode,IsJavaDocUpToDate"
@@ -521,7 +521,6 @@
 
     </target>
 
-
     <target name="doc-dist"
             depends="clean,javaDoc"
             description="Builds documentation distribution"
@@ -534,6 +533,7 @@
         </tar>
 
     </target>
+-->
 
 
     <target name="src-dist"
@@ -589,7 +589,7 @@
     </target>
 
     <target name="DISTRO"
-            depends="clean,src-dist,doc-dist,server-dist,hyrax-robots-dist,check"
+            depends="clean,src-dist,server-dist,hyrax-robots-dist,check"
             description="Builds complete distribution"
     >
 
