@@ -80,8 +80,8 @@ jobs:
 before_deploy:
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot 
-- pwd; ls -l
-- cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
+- pwd; ls -l build/dist
+# - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
         
 deploy:
   provider: s3
