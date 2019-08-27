@@ -80,7 +80,7 @@ jobs:
 
 before_deploy:
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-- ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot DISTRO
+- ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=olfs-snapshot DISTRO
 - pwd; 
 - ls -l build/dist
 - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
