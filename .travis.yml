@@ -43,7 +43,8 @@ env:
      - secure: "IrgvTLC1I3GKe1bFiNNXBYqwqy72+26IchD7MvHg762OhAu/Ftit9Sw5aYd5ccqDY6CgfUzQ9gJemoABodMZ4iKeYti7snlRsxo+Kv2H5kJFLRwHYPfSu2wFLcy7Spi0w8Gt2OL/DN39nUAlYvnechu9XgNalMHN4M411ZfubG8="
    # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
      - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
-     - SNAP_TAG="snapshot-"`date +%s`
+     - SNAP_TAG="snapshot-"`date +%s`; 
+     - echo "SNAP_TAG: ${SNAP_TAG}"
 
 
 stages:
@@ -79,9 +80,9 @@ jobs:
 
 before_deploy:
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-- ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot 
+- ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DWEBAPP_DIST=snapshot DISTRO
 - pwd; ls -l build/dist
-# - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
+- cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;         
         
 deploy:
   provider: s3
