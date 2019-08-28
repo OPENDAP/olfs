@@ -51,6 +51,7 @@ env:
     - echo "SNAP_TAG: ${SNAP_TAG}"
 
 
+
 stages:
 - name: build
   if:  branch = master
@@ -84,6 +85,7 @@ jobs:
 
 before_deploy:
 - echo "- -- -- -- -- -- BEGIN before_deploy -- -- -- -- -- -"    
+- pip install --user awscli
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DOLFS_DIST_BASE=olfs-snapshot DISTRO
 - pwd; 
