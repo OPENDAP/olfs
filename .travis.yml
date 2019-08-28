@@ -79,6 +79,7 @@ jobs:
         - ant sonar -Dsonar.login=$SONAR_LOGIN
 
 before_deploy:
+- echo "- -- -- -- -- -- BEGIN before_deploy -- -- -- -- -- -"    
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DOLFS_DIST_BASE=olfs-snapshot DISTRO
 - pwd; 
@@ -86,7 +87,7 @@ before_deploy:
 - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
 - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
 - ls -l ${TRAVIS_BUILD_DIR}/package/
-- echo "- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -"    
+- echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
   provider: s3
