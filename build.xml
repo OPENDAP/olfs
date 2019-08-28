@@ -53,10 +53,12 @@
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
     <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
-    <property name="WEBAPP_DIST" value="olfs-${OLFS_VERSION}-webapp"/>
-    <property name="SRC_DIST" value="olfs-${OLFS_VERSION}-src"/>
-    <property name="DOC_DIST" value="olfs-${OLFS_VERSION}-doc"/>
-    <property name="OLFS_LIB" value="olfs-${OLFS_VERSION}"/>
+
+    <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
+    <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
+    <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
+    <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
+    <property name="OLFS_LIB" value="${OLFS_DIST_BASE}"/>
 
 
     <!-- Compiler Settings -->
