@@ -51,12 +51,9 @@ env:
     # AWS_SECRET_ACCESS_KEY
     - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
     # DOCKER_USERNAME for our DockerHub account
-    -  secure: "TLVlBckzrmIpqtidfy4PmG344x0vGqpjKCgvu69gsWrfIrWq2GBpo+76xFwcWEjLU4DG0H79a13Pqdmu2bnsLoIQlBr5G+0MqG0tVq99moJM72hDueKVnOt/UIcDMsysxEMsJApYto3ezceDckbunQ5wVLgD6lTu2x37F+bqgkI="
+    - secure: "ggFsbNBXzdtoqlrr8ZrSOM3N9pjoS8TuxfERkTx7j+dTYMWMi+QVAuHDyYYdFoU0Iu95ijmWVpcVHgudPV3mjEmmI8n82HBszFNDeRzy74XFEMq8C9bD428V+iqw1kXSGNw2+k0rzjDKI6bJFGJmQ0bkZHrWPmvr/3QQXJrR45A="
     # DOCKER_PASSWORD for our DockerHub account
-    -  secure: "h0F90jCMDsoz1z7nOOXl1HoQx+rVhGY+cyipprcFms6nVRyM3bNLEUJfdJVwS6CUzlyiIluzhQLUzlacdslpl2+qcmvTUP/NcleHYlexxtYsNuoSyUfOWAkBV1nBSCHAeMw0CNuCnEIofQMHAOS5dNgzjS+AkbSd72/wQQTDkDE="
-    # Snapshot "version" number used for the OLFS and Hyrx versions
-    # - SNAP_TAG="snapshot-"`date +%s`; 
-
+    - secure: "j5Mrp59JJqUPn3DcfLp6LUAUY8OIx9eB3AOtI0YaVgP6W+JFWyz1MH02AYOU+RQ8A54AV6ob7ULSA5nnSkg+khTLCJsqT/rlrbVELUPUbhCxP9aH3wME3iTjSaxAirm2Uio8yrIu5BmuYclyDIq90es4dxFeKd3Nib0NxQN2rNU="
 
 
 stages:
@@ -94,8 +91,8 @@ before_deploy:
 - echo "- -- -- -- -- -- BEGIN before_deploy -- -- -- -- -- -"    
 - pip install --user awscli
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+# Snapshot "version" number used for the OLFS and Hyrx versions
 - export snap_tag="snapshot-"`date +%s`;
-- echo "snap_tag"
 - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
 - pwd; 
 - ls -l build/dist
@@ -111,6 +108,8 @@ before_deploy:
 - docker build --build-arg RELEASE_DATE=`date +%s` -t "opendap/olfs:snapshot" olfs
 - docker image ls -a
 - docker container ls -a
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+- docker push opendap/hyrax
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
