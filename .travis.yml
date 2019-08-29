@@ -96,13 +96,13 @@ before_deploy:
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DOLFS_DIST_BASE=olfs-snapshot DISTRO
 - pwd; 
-- ls -l build/dist
+- ls -l build/distr
 - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
 - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
 - ls -l ${TRAVIS_BUILD_DIR}/package/
 - git clone https://github.com/opendap/hyrax-docker 
 - ls -l hyrax-docker
-- docker build --build-arg RELEASE_DATE=`date +%s` -t opendap/olfs:snapshot hyrax-docker/hyrax-snapsht/olfs
+- docker build --build-arg RELEASE_DATE=`date +%s` -t opendap/olfs:snapshot hyrax-docker/hyrax-snapshot/olfs
 - docker images
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
