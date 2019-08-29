@@ -9,6 +9,9 @@ sudo: false
 
 language: java
 
+services:
+    - docker
+    
 # Drop this and use the jdk: ... lines in the jobs: section below.
 # jhrg 3/19/19
 #
@@ -49,7 +52,6 @@ env:
     - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
     # Snapshot "version" number used for the OLFS and Hyrx versions
     - SNAP_TAG="snapshot-"`date +%s`; 
-    - echo "SNAP_TAG: ${SNAP_TAG}"
     # DOCKER_USERNAME for our DockerHub account
     -  secure: "TLVlBckzrmIpqtidfy4PmG344x0vGqpjKCgvu69gsWrfIrWq2GBpo+76xFwcWEjLU4DG0H79a13Pqdmu2bnsLoIQlBr5G+0MqG0tVq99moJM72hDueKVnOt/UIcDMsysxEMsJApYto3ezceDckbunQ5wVLgD6lTu2x37F+bqgkI="
     # DOCKER_PASSWORD for our DockerHub account
@@ -90,6 +92,7 @@ jobs:
 
 before_deploy:
 - echo "- -- -- -- -- -- BEGIN before_deploy -- -- -- -- -- -"    
+- echo "SNAP_TAG: ${SNAP_TAG}"
 - pip install --user awscli
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DOLFS_DIST_BASE=olfs-snapshot DISTRO
@@ -100,6 +103,8 @@ before_deploy:
 - ls -l ${TRAVIS_BUILD_DIR}/package/
 - git clone https://github.com/opendap/hyrax-docker 
 - ls -l hyrax-docker
+- docker build --build-arg RELEASE_DATE=`date +%s` -t opendap/olfs:snapshot hyrax-docker/hyrax-snapsht/olfs
+- docker images
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
