@@ -109,7 +109,7 @@ before_deploy:
 - docker image ls -a
 - docker container ls -a
 - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-- docker push opendap/olfs
+- docker push opendap/olfs:snapshot
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
