@@ -107,7 +107,8 @@ before_deploy:
 - ls -l
 - cd hyrax-snapshot 
 - docker build --build-arg RELEASE_DATE=`date +%s` -t opendap/olfs:snapshot olfs
-- docker images
+- docker image ls -a
+- docker containers ls -a
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
