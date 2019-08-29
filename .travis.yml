@@ -47,8 +47,13 @@ env:
     - secure: "MB2g7wf6e2Dt5so1Ek6zoAP04L/8GjKxbOlHQKgTa+Luw30Oa7ndqrG9gc0FX/K3dr03WOjEnO6lZmL9ZMwK7Q2FadrzYO0Ym8ZkruOFMFZxrpRnUX30yQFz6zgY9zGe0PiCNdO7++wYXOaP5xGi6UVyMsfhfWtY3p5Aq9qyU8c="
     # AWS_SECRET_ACCESS_KEY
     - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
+    # Snapshot "version" number used for the OLFS and Hyrx versions
     - SNAP_TAG="snapshot-"`date +%s`; 
     - echo "SNAP_TAG: ${SNAP_TAG}"
+    # DOCKER_USERNAME for our DockerHub account
+    -  secure: "TLVlBckzrmIpqtidfy4PmG344x0vGqpjKCgvu69gsWrfIrWq2GBpo+76xFwcWEjLU4DG0H79a13Pqdmu2bnsLoIQlBr5G+0MqG0tVq99moJM72hDueKVnOt/UIcDMsysxEMsJApYto3ezceDckbunQ5wVLgD6lTu2x37F+bqgkI="
+    # DOCKER_PASSWORD for our DockerHub account
+    -  secure: "h0F90jCMDsoz1z7nOOXl1HoQx+rVhGY+cyipprcFms6nVRyM3bNLEUJfdJVwS6CUzlyiIluzhQLUzlacdslpl2+qcmvTUP/NcleHYlexxtYsNuoSyUfOWAkBV1nBSCHAeMw0CNuCnEIofQMHAOS5dNgzjS+AkbSd72/wQQTDkDE="
 
 
 
@@ -85,7 +90,6 @@ jobs:
 
 before_deploy:
 - echo "- -- -- -- -- -- BEGIN before_deploy -- -- -- -- -- -"    
-#- pip install --upgrade pip
 - pip install --user awscli
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - ant -DHYRAX_VERSION=$SNAP_TAG -DOLFS_VERSION=$SNAP_TAG -DOLFS_DIST_BASE=olfs-snapshot DISTRO
@@ -94,6 +98,8 @@ before_deploy:
 - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
 - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
 - ls -l ${TRAVIS_BUILD_DIR}/package/
+- git clone https://github.com/opendap/hyrax-docker 
+- ls -l hyrax-docker
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
 deploy:
