@@ -95,7 +95,7 @@ before_deploy:
 - pip install --user awscli
 - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
 - export snap_tag="snapshot-"`date +%s`;
-- echo "snap_tag: ${snap_tag}"
+- echo "snap_tag"
 - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
 - pwd; 
 - ls -l build/dist
