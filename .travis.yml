@@ -109,7 +109,7 @@ before_deploy:
 - docker build --build-arg RELEASE_DATE=`date +%s` -t "opendap/olfs:snapshot" olfs
 - docker image ls -a
 - echo $BOO
-- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin hub.docker.com
+- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin https://registry.hub.docker.com
 - docker push ndpndp/olfs:snapshot
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
         
