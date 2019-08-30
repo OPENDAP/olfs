@@ -54,8 +54,9 @@ env:
     - secure: "HTL65S/ozFnuPj5+8VcCuPCAJPpLN1mx+NHFc+4VBZZmZE8ge7nkttCNdI8pLPgkMuC2hbIgehyIDbqLLWDku071iZn6GAy5MB0CkxhzUr/n4HprysjU2FbBtk44a1oT8FyLNdIAzp2dYCBsh9u031Pb7QTU8vD9F4SRQOT9ZNY="
     # DOCKER_PASSWORD for our DockerHub account
     - secure: "MWLkkI48jx6kQSGWu6rwDMiuxOVYd++AChw5DbiSQS0VkOcp2iegR7TAc0m4VPTjtQ1wmYPPHF4mVnw+5g+CrSSlgx3+1irDX8Og06CspEfXULaj2X/U4GKDPD3/aF1tt4NQ++WcI9m49PgF4JuQayN8JQi+XY39+9VW9Goy7Sg="
-
-
+    #BOO
+    - secure: "RRqld4/dWZVhAF1esurfijeMytefe165Nio0q3SKLxXAA63gub3nYDY9V22UuZgGt+wy+gqRejknvmhnL7hSSTPKd9bW541+Lq7DZDioYxPOG4tF/aBx7L+CaJW75wglt4EgXWww2H7cuGGhJNsivTemaA/MbxAHUvE8nleyk90="
+    
 stages:
 - name: build
   if:  branch = master
@@ -107,6 +108,7 @@ before_deploy:
 - cd hyrax-snapshot 
 - docker build --build-arg RELEASE_DATE=`date +%s` -t "opendap/olfs:snapshot" olfs
 - docker image ls -a
+- echo $BOO
 - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin hub.docker.com
 - docker push ndpndp/olfs:snapshot
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
