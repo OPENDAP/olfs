@@ -53,7 +53,7 @@ env:
     # DOCKER_USERNAME for our DockerHub account
     - secure: "ZUmiZ6domiRQHAtPmt78BHrNX2FGjaNugB8gojR7Jlo+ol/rOoKzGCW4BoaVCnaa6yvyT2Suo8xIscC4KKxms6sOLq9mAgwvcd+E+Xot8JaH67Ls0q5aYr7KJC0v54dvh6+PXHUxrutyqg8VMThqIyrNs10dyhxllpxMeI+jph0="
     # DOCKER_PASSWORD for our DockerHub account
-    - secure: "a0Fb01TL4h0wuDe89pd2i6u6iIh1r/D5LNzODjbKHd4/ySQBS0EGSXEulwwD6QYAvkeEqqrEULbSCqveH1p0fwmVT3l56wSB3w+EK4caG8WukS2GBldtD2BI7dWdtfsHmvczStMMaTE8V2haorie+jRBlnBjP4m+9EFlaKCxFB4="
+    - secure: "XLaZdQReaxwej5NeGrdz3kOfQge8ghR8b6KQnEyAgNFJauf1tgMKImJ5vAO6VKAOcSyIKvKj+BLCFHgPE0oF3BlTjlAbLug3h+gJtkUtoK8MuXx2CZ6LDnQ+IAxF29WtA4v1r4U9KRzO/96kKzcDdbvvkMytpPimJF8rJATQmKM="
     #BOO
     - secure: "RRqld4/dWZVhAF1esurfijeMytefe165Nio0q3SKLxXAA63gub3nYDY9V22UuZgGt+wy+gqRejknvmhnL7hSSTPKd9bW541+Lq7DZDioYxPOG4tF/aBx7L+CaJW75wglt4EgXWww2H7cuGGhJNsivTemaA/MbxAHUvE8nleyk90="
     
@@ -108,7 +108,6 @@ before_deploy:
 - cd hyrax-snapshot 
 - docker build --build-arg RELEASE_DATE=`date +%s` -t "opendap/olfs:snapshot" olfs
 - docker image ls -a
-- echo $BOO
 - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin https://registry.hub.docker.com
 - docker push ndpndp/olfs:snapshot
 - echo "- -- -- -- -- -- END before_deploy -- -- -- -- -- -"    
