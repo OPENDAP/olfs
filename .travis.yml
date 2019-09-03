@@ -12,13 +12,6 @@ language: java
 services:
     - docker
     
-# Drop this and use the jdk: ... lines in the jobs: section below.
-# jhrg 3/19/19
-#
-# jdk:
-#  - openjdk7
-#  - openjdk8
-
 # whitelist
 branches:
   only:
@@ -31,14 +24,6 @@ notifications:
     - jgallagher@opendap.org
 
 addons:
-  coverity_scan:
-    project:
-      name: "OPENDAP/olfs"
-      description: "Build submitted via Travis CI"
-    notification_email: ndp@opendap.org
-    build_command_prepend: "ant clean"
-    build_command:   "ant server -DHYRAX_VERSION=Coverity_Build -DOLFS_VERSION=Coverity_Build"
-    branch_pattern: coverity_scan
   apt:
     packages:
       - awscli
@@ -115,8 +100,8 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-      branch:
-        - master
+      branch: 
+      - master
         condition: $STAGE =~ ^snapshot$
 
 
