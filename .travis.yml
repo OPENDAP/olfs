@@ -51,9 +51,9 @@ env:
     # AWS_SECRET_ACCESS_KEY
     - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
     # DOCKER_USERNAME for our DockerHub account
-    - secure: "ZUmiZ6domiRQHAtPmt78BHrNX2FGjaNugB8gojR7Jlo+ol/rOoKzGCW4BoaVCnaa6yvyT2Suo8xIscC4KKxms6sOLq9mAgwvcd+E+Xot8JaH67Ls0q5aYr7KJC0v54dvh6+PXHUxrutyqg8VMThqIyrNs10dyhxllpxMeI+jph0="
+    - secure: "I31cY6mPuQVYQZSXnXzJfsG7I3Ed/LU7YMCoJJNcYy07A+v7xwTWTozDqqWn3jW5GSznRnRXJAs8OJETLnjQqPp2U7eN/KCJ4cMg+uTm50VJqop/BazozEvGYH8mTzHuexhLhqAMV/VJ1xXPtROqT24yNCoeCsg1txixzfFfIPY="
     # DOCKER_PASSWORD for our DockerHub account
-    - secure: "W6/kiK8E3SL8zmd3uWcccA5ltjvUmoyVI2F5JDaIlp2FmEI6wWI4dPGxwW6z0U1HeEjnq0eZ1SZqvr7sYeK55XV9rmNyXnHTPP+7/6z1yPa1SnfLpZnwV47qoNzr1+5KK2eMnzFnRLrKRXVQqVOqb+lYMWuDa6dlXGLknv+fgIY="
+    - secure: "e85309WOWZiwolrOgKg0C/N57YZ3nTQ8VxaFsRFIN6DhhOjcCAsRd2yyYbTqnl15UXbQAchX785ZnKZXRsmUdkOG6XPC7UAFM8At8y1FF96WnqhX4MdbxmyOFNWzeZB2gs7+/eKlWgy3Uu0DxqNDIxKthFrXHfMLWgslov91zq0="
     #BOO
     - secure: "RRqld4/dWZVhAF1esurfijeMytefe165Nio0q3SKLxXAA63gub3nYDY9V22UuZgGt+wy+gqRejknvmhnL7hSSTPKd9bW541+Lq7DZDioYxPOG4tF/aBx7L+CaJW75wglt4EgXWww2H7cuGGhJNsivTemaA/MbxAHUvE8nleyk90="
     
