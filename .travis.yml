@@ -93,7 +93,6 @@ jobs:
     - stage: dockertime
       script:
         - echo "- -- -- -- -- -- BEGIN Dockertime -- -- -- -- -- -"    
-        - pip install --user awscli
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         # Snapshot "version" number used for the OLFS and Hyrx versions
         - export snap_tag="snapshot-"`date +%s`;
