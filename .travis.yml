@@ -65,7 +65,7 @@ stages:
 - name: scan
   if:  branch = master AND NOT type = pull_request
 - name: snapshot
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = master
 
 jobs:
   include:
@@ -89,6 +89,7 @@ jobs:
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
         - ant sonar -Dsonar.login=$SONAR_LOGIN
+
 
     - stage: snapshot
         jdk: openjdk8
