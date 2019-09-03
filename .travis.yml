@@ -91,12 +91,10 @@ jobs:
         - ant sonar -Dsonar.login=$SONAR_LOGIN
 
     - stage: dockertime
-      addons: 
-        sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
       jdk: openjdk8
       script:
-        - export snap_tag="snapshot-"`date +%s`;
+        - export snap_tag="snapshot-"`date +%s`
+        - pwd
         - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - git clone https://github.com/opendap/hyrax-docker 
         - ls -l hyrax-docker
