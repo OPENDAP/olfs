@@ -27,12 +27,12 @@
 package opendap.coreServlet;
 
 
-import opendap.bes.BESManager;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.BESManager;
 import opendap.http.error.NotFound;
 import opendap.logging.LogUtil;
-import opendap.logging.Timer;
 import opendap.logging.Procedure;
+import opendap.logging.Timer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -48,7 +48,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,7 +68,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * the olfs.xml configuration file. The olfs.xml file is identified in the
  * servlets web.xml file. The olfs.xml file is typically located in
  * $CATALINE_HOME/content/opendap.
- *
+ * <p>
  * <p/>
  * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
  * the location of the olfs.xml file.</p>
@@ -74,7 +77,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  */
 public class DispatchServlet extends HttpServlet {
-
 
 
     /**
@@ -106,7 +108,7 @@ public class DispatchServlet extends HttpServlet {
     public void init() throws ServletException {
         INIT_LOCK.lock();
         try {
-            if(IS_INITIALIZED.get())
+            if (IS_INITIALIZED.get())
                 return;
 
             super.init();
@@ -173,17 +175,15 @@ public class DispatchServlet extends HttpServlet {
             RequestCache.closeThreadCache();
             IS_INITIALIZED.set(true);
             log.info("END");
-        }
-        finally {
+        } finally {
             INIT_LOCK.unlock();
         }
     }
 
 
-
-    private void initAuthenticationControls()  {
+    private void initAuthenticationControls() {
         Element authControlElem = configDoc.getRootElement().getChild(AuthenticationControls.CONFIG_ELEMENT);
-        AuthenticationControls.init(authControlElem,getServletContext().getContextPath());
+        AuthenticationControls.init(authControlElem, getServletContext().getContextPath());
     }
 
 
@@ -209,9 +209,8 @@ public class DispatchServlet extends HttpServlet {
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
                 configDoc = sb.build(fis);
-            }
-            finally {
-            	fis.close();
+            } finally {
+                fis.close();
             }
 
         } catch (FileNotFoundException e) {
@@ -235,73 +234,72 @@ public class DispatchServlet extends HttpServlet {
 
     private void initBesManager() throws ServletException {
         Element besManagerElement = configDoc.getRootElement().getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
-        if(besManagerElement ==  null){
+        if (besManagerElement == null) {
             String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
             log.error(msg);
             throw new ServletException(msg);
         }
         try {
             BESManager.init(getServletContext(), besManagerElement);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             throw new ServletException(e);
         }
     }
 
 
     /**
-     *             <Handler className="opendap.bes.VersionDispatchHandler" />
-     *
-     *             <!-- Bot Blocker
-     *                - This handler can be used to block access from specific IP addresses
-     *                - and by a range of IP addresses using a regular expression.
-     *               -->
-     *             <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-     *                 <!-- <IpAddress>127.0.0.1</IpAddress> -->
-     *                 <!-- This matches all IPv4 addresses, work yours out from here.... -->
-     *                 <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-     *                 <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-     *                 <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-     *             <!-- </Handler>  -->
-     *             <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
-     *             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
-     *                 <prefix>thredds</prefix>
-     *                 <useMemoryCache>true</useMemoryCache>
-     *             </Handler>
-     *             <Handler className="opendap.gateway.DispatchHandler">
-     *                 <prefix>gateway</prefix>
-     *                 <UseDAP2ResourceUrlResponse />
-     *             </Handler>
-     *             <Handler className="opendap.bes.BesDapDispatcher" >
-     *                 <!-- AllowDirectDataSourceAccess
-     *                   - If this element is present then the server will allow users to request
-     *                   - the data source (file) directly. For example a user could just get the
-     *                   - underlying NetCDF files located on the server without using the OPeNDAP
-     *                   - request interface.
-     *                   -->
-     *                 <!-- AllowDirectDataSourceAccess / -->
-     *                 <!--
-     *                   By default, the server will provide a DAP2-style response
-     *                   to requests for a dataset resource URL. Commenting out the
-     *                   "UseDAP2ResourceUrlResponse" element will cause the server
-     *                   to return the DAP4 DSR response when a dataset resource URL
-     *                   is requested.
-     *                 -->
-     *                 <UseDAP2ResourceUrlResponse />
-     *             </Handler>
-     *             <Handler className="opendap.bes.DirectoryDispatchHandler" />
-     *             <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
-     *             <Handler className="opendap.bes.FileDispatchHandler" />
+     * <Handler className="opendap.bes.VersionDispatchHandler" />
+     * <p>
+     * <!-- Bot Blocker
+     * - This handler can be used to block access from specific IP addresses
+     * - and by a range of IP addresses using a regular expression.
+     * -->
+     * <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
+     * <!-- <IpAddress>127.0.0.1</IpAddress> -->
+     * <!-- This matches all IPv4 addresses, work yours out from here.... -->
+     * <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
+     * <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
+     * <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+     * <!-- </Handler>  -->
+     * <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
+     * <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
+     * <prefix>thredds</prefix>
+     * <useMemoryCache>true</useMemoryCache>
+     * </Handler>
+     * <Handler className="opendap.gateway.DispatchHandler">
+     * <prefix>gateway</prefix>
+     * <UseDAP2ResourceUrlResponse />
+     * </Handler>
+     * <Handler className="opendap.bes.BesDapDispatcher" >
+     * <!-- AllowDirectDataSourceAccess
+     * - If this element is present then the server will allow users to request
+     * - the data source (file) directly. For example a user could just get the
+     * - underlying NetCDF files located on the server without using the OPeNDAP
+     * - request interface.
+     * -->
+     * <!-- AllowDirectDataSourceAccess / -->
+     * <!--
+     * By default, the server will provide a DAP2-style response
+     * to requests for a dataset resource URL. Commenting out the
+     * "UseDAP2ResourceUrlResponse" element will cause the server
+     * to return the DAP4 DSR response when a dataset resource URL
+     * is requested.
+     * -->
+     * <UseDAP2ResourceUrlResponse />
+     * </Handler>
+     * <Handler className="opendap.bes.DirectoryDispatchHandler" />
+     * <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
+     * <Handler className="opendap.bes.FileDispatchHandler" />
      */
-    private void loadHyraxServiceHandlers(List<DispatchHandler> handlers, Element config ) throws Exception {
+    private void loadHyraxServiceHandlers(List<DispatchHandler> handlers, Element config) throws Exception {
 
-        if(config==null)
+        if (config == null)
             throw new ServletException("Bad configuration! The configuration element was NULL");
 
         Element botBlocker = config.getChild("BotBlocker");
 
         handlers.add(new opendap.bes.VersionDispatchHandler());
-        if(botBlocker != null)
+        if (botBlocker != null)
             handlers.add(new opendap.coreServlet.BotBlocker());
         handlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
@@ -311,8 +309,8 @@ public class DispatchServlet extends HttpServlet {
         handlers.add(new opendap.bes.BESThreddsDispatchHandler());
         handlers.add(new opendap.bes.FileDispatchHandler());
 
-        for(DispatchHandler dh:handlers){
-            dh.init(this,config);
+        for (DispatchHandler dh : handlers) {
+            dh.init(this, config);
         }
     }
 
@@ -333,10 +331,6 @@ public class DispatchServlet extends HttpServlet {
         }
 
     }
-
-
-
-
 
 
     /**
@@ -372,7 +366,6 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         int request_status = HttpServletResponse.SC_OK;
@@ -384,18 +377,18 @@ public class DispatchServlet extends HttpServlet {
 
             try {
 
-                if(LicenseManager.isExpired(request)){
-                    LicenseManager.sendLicenseExpiredPage(request,response);
+                if (LicenseManager.isExpired(request)) {
+                    LicenseManager.sendLicenseExpiredPage(request, response);
                     return;
                 }
 
                 int reqno = reqNumber.incrementAndGet();
                 LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
-                if(redirectForServiceOnlyRequest(request,response))
+                if (redirectForServiceOnlyRequest(request, response))
                     return;
 
-                if(log.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                     log.debug(Util.getMemoryReport());
                     log.debug(ServletUtil.showRequest(request, reqno));
                     log.debug(ServletUtil.probeRequest(this, request));
@@ -415,31 +408,26 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: "+relativeUrl), this, response);
+                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
                 }
-            }
-            finally {
+            } finally {
                 Timer.stop(timedProcedure);
             }
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             try {
                 request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
-            }
-            catch(Throwable t2) {
-            	try {
-            		log.error("\n########################################################\n" +
-                                "Request processing failed.\n" +
-                                "Normal Exception handling failed.\n" +
-                                "This is the last error log attempt for this request.\n" +
-                                "########################################################\n", t2);
-            	}
-            	catch(Throwable t3){
+            } catch (Throwable t2) {
+                try {
+                    log.error("\n########################################################\n" +
+                            "Request processing failed.\n" +
+                            "Normal Exception handling failed.\n" +
+                            "This is the last error log attempt for this request.\n" +
+                            "########################################################\n", t2);
+                } catch (Throwable t3) {
                     // It's boned now.. Leave it be.
-            	}
+                }
             }
-        }
-        finally {
+        } finally {
             LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             log.info("Response completed.\n");
@@ -451,14 +439,13 @@ public class DispatchServlet extends HttpServlet {
     //**************************************************************************
 
 
-
     private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
             throws IOException {
 
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
-            String newURI = reqURI+"/";
+            String newURI = reqURI + "/";
             res.sendRedirect(Scrub.urlContent(newURI));
             log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
                     "context to a URL that ends in a '/' character!");
@@ -466,7 +453,7 @@ public class DispatchServlet extends HttpServlet {
         }
         return false;
     }
-    
+
 
     /**
      * @param request  .
@@ -489,7 +476,7 @@ public class DispatchServlet extends HttpServlet {
 
                 LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
 
-                if(log.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                     log.debug(ServletUtil.showRequest(request, reqno));
                     String msg = "Requested relative URL: '" + relativeUrl +
                             "' suffix: '" + ReqInfo.getRequestSuffix(request) +
@@ -506,33 +493,28 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    httpStatus = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: "+relativeUrl), this, response);
+                    httpStatus = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
                 }
 
-            }
-            finally {
+            } finally {
                 log.info("doPost(): Response completed.\n");
             }
 
         } catch (Throwable t) {
             try {
                 httpStatus = OPeNDAPException.anyExceptionHandler(t, this, response);
+            } catch (Throwable t2) {
+                try {
+                    log.error("BAD THINGS HAPPENED!", t2);
+                } catch (Throwable t3) {
+                    // It's boned now.. Leave it be.
+                }
             }
-            catch(Throwable t2) {
-            	try {
-            		log.error("BAD THINGS HAPPENED!", t2);
-            	}
-            	catch(Throwable t3){
-            		// It's boned now.. Leave it be.
-            	}
-            }
-        }
-        finally{
+        } finally {
             LogUtil.logServerAccessEnd(httpStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
-
 
 
     /**
@@ -543,7 +525,7 @@ public class DispatchServlet extends HttpServlet {
      * @param dhvec   A Vector of DispatchHandlers that will be asked if they can
      *                handle the request.
      * @return The IsoDispatchHandler that can handle the request, null if no
-     *         handler claims the request.
+     * handler claims the request.
      * @throws Exception For bad behaviour.
      */
     private DispatchHandler getDispatchHandler(HttpServletRequest request, List<DispatchHandler> dhvec) throws Exception {
@@ -563,7 +545,7 @@ public class DispatchServlet extends HttpServlet {
      *
      * @param req The current request
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
-     *         since midnight January 1, 1970 GMT
+     * since midnight January 1, 1970 GMT
      */
     @Override
     protected long getLastModified(HttpServletRequest req) {
@@ -589,7 +571,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            log.error("Caught: {}  Message: {} ",e.getClass().getName(), e.getMessage());
+            log.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
@@ -597,8 +579,6 @@ public class DispatchServlet extends HttpServlet {
         }
         return lmt;
     }
-
-
 
 
     @Override
@@ -613,8 +593,6 @@ public class DispatchServlet extends HttpServlet {
         BESManager.destroy();
         super.destroy();
     }
-
-
 
 
 }
