@@ -107,13 +107,12 @@ deploy:
         condition: $STAGE =~ ^snappah$
 
 after_deploy:
-  script:
-    - git clone https://github.com/opendap/hyrax-docker 
+    - git clone https://github.com/opendap/hyrax-docker;
     - cd hyrax-docker; 
     - git checkout snapshot;
-    - cd hyrax-snapshot 
-    - date +%s > snapshot.time
-    - git commit -am "Triggering snapshot."
-    - git push
+    - cd hyrax-snapshot;
+    - date +%s > snapshot.time;
+    - git commit -am "Triggering snapshot.";
+    - git push;
 
     
