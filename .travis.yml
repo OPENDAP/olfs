@@ -108,14 +108,12 @@ deploy:
 
 after_deploy:
   script:
-    - echo "- -- -- -- -- -- BEGIN after_deploy -- -- -- -- -- -"    
     - git clone https://github.com/opendap/hyrax-docker 
     - cd hyrax-docker; 
     - git checkout snapshot;
     - cd hyrax-snapshot 
     - date +%s > snapshot.time
-    - git commit -am "Triggering snapshot: "`cat snapshot.time`
+    - git commit -am "Triggering snapshot."
     - git push
-    - echo "- -- -- -- -- -- END after_deploy -- -- -- -- -- -"    
 
     
