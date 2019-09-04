@@ -78,6 +78,7 @@ deploy:
     bucket: opendap.travis.build
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
+    script: echo "stage: $STAGE"
     on:
         branch: master
         condition: $STAGE =~ ^scan$
