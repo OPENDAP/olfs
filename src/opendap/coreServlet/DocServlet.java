@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This mini servlet provides access to distributed or, if it exists, persistent documentation in the
  * content directory.
- *
  */
 public class DocServlet extends HttpServlet {
 
@@ -77,7 +76,7 @@ public class DocServlet extends HttpServlet {
         long lmt = new Date().getTime(); // time is now...
 
         String name = Scrub.fileName(getName(req));
-        if(name!=null) {
+        if (name != null) {
             File f = new File(name);
             if (f.exists())
                 lmt = f.lastModified();
@@ -117,7 +116,7 @@ public class DocServlet extends HttpServlet {
 
         int status = HttpServletResponse.SC_OK;
 
-        int response_size=0;
+        int response_size = 0;
         try {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
@@ -130,11 +129,10 @@ public class DocServlet extends HttpServlet {
 
                 log.debug("DocServlet - The client requested this: {}", name);
 
-                if(name == null){
+                if (name == null) {
                     // throw new NotFound("Unable to locate: "+name)
-                    status = OPeNDAPException.anyExceptionHandler(new NotFound("Unable to locate: "+name), this,  response);
-                }
-                else {
+                    status = OPeNDAPException.anyExceptionHandler(new NotFound("Unable to locate: " + name), this, response);
+                } else {
                     File f = new File(name);
                     if (f.exists()) {
                         log.debug("   Requested item exists.");
@@ -168,9 +166,8 @@ public class DocServlet extends HttpServlet {
                                 docString = docString.replace("<SERVLET_NAME />", servletName);
                                 sos.println(docString);
                                 response_size = docString.length();
-                            }
-                            else {
-                                DataOutputStream dos  = new DataOutputStream(sos);
+                            } else {
+                                DataOutputStream dos = new DataOutputStream(sos);
                                 try (FileInputStream fis = new FileInputStream(f)) {
                                     byte[] buff = new byte[8192];
                                     int rc;
@@ -185,7 +182,7 @@ public class DocServlet extends HttpServlet {
 
                                     }
                                 } finally {
-                                     dos.flush();
+                                    dos.flush();
                                     response_size = dos.size();
                                 }
                             }
@@ -207,10 +204,9 @@ public class DocServlet extends HttpServlet {
                     }
                 }
             }
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             try {
-                status = OPeNDAPException.anyExceptionHandler(t, this,  response);
+                status = OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
@@ -218,16 +214,15 @@ public class DocServlet extends HttpServlet {
                     // Never mind we can't manage anything sensible at this point....
                 }
             }
-        }
-        finally {
-            LogUtil.logServerAccessEnd(status, response_size,  LogUtil.DOCS_ACCESS_LOG_ID);
+        } finally {
+            LogUtil.logServerAccessEnd(status, response_size, LogUtil.DOCS_ACCESS_LOG_ID);
         }
     }
 
 
     private static String readFileAsString(File file) throws IOException {
 
-        Scanner scanner = new Scanner(file,  HyraxStringEncoding.getCharset().name());
+        Scanner scanner = new Scanner(file, HyraxStringEncoding.getCharset().name());
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
@@ -239,7 +234,6 @@ public class DocServlet extends HttpServlet {
         }
         return stringBuilder.toString();
     }
-
 
 
 }
