@@ -80,6 +80,6 @@ deploy:
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
         branch: master
-    
+        condition: $STAGE =~ ^scan$
     
     
