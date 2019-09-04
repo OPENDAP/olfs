@@ -61,7 +61,7 @@ jobs:
       script: ant check
     
     - stage: scan
-      script: export STAGE=scan; echo "STAGE: $STAGE";
+      script: export STAGE=scan
       addons: 
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
