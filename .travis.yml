@@ -70,7 +70,6 @@ jobs:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
         - ant sonar -Dsonar.login=$SONAR_LOGIN
     
-    
 
 deploy:
     provider: s3
@@ -80,11 +79,7 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-      branch: 
-      - master
-        condition: $STAGE =~ ^snapshot$
-
-
-
-
-
+        branch: master
+    
+    
+    
