@@ -35,16 +35,10 @@ env:
     - secure: "MB2g7wf6e2Dt5so1Ek6zoAP04L/8GjKxbOlHQKgTa+Luw30Oa7ndqrG9gc0FX/K3dr03WOjEnO6lZmL9ZMwK7Q2FadrzYO0Ym8ZkruOFMFZxrpRnUX30yQFz6zgY9zGe0PiCNdO7++wYXOaP5xGi6UVyMsfhfWtY3p5Aq9qyU8c="
     # AWS_SECRET_ACCESS_KEY
     - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
-    # GIT_UID
+    # GIT_UID for travis-ci-opendap
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
-    # GIT_PSWD
+    # GIT_PSWD for travis-ci-opendap
     - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
-
-
-
-
-
-
 
     
 stages:
@@ -53,6 +47,8 @@ stages:
 - name: test
   if:  branch = master
 - name: scan
+  if:  branch = master AND NOT type = pull_request
+- name: snappah
   if:  branch = master AND NOT type = pull_request
 
 jobs:
@@ -94,8 +90,6 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-
-
 deploy:
     provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
@@ -115,7 +109,7 @@ after_deploy:
     - git checkout snapshot;
     - cd hyrax-snapshot;
     - date +%s > snapshot.time;
-    - git commit -am "Triggering snapshot.";
+    - git commit -am "Triggering snapshot build.";
     - git status;
     - git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all 
 
