@@ -1,0 +1,91 @@
+
+# Initial Travic-CI control file. 6.11.15 jhrg
+# Added sonar scan 3.12.19 jhrg 
+
+dist: trusty
+
+# Use the docker container-based build systems
+sudo: false
+
+language: java
+
+services:
+    - docker
+    
+# whitelist
+branches:
+  only:
+    - master
+
+notifications:
+  email:
+    - ndp@opendap.org
+    - jgallagher@opendap.org
+
+addons:
+  apt:
+    packages:
+      - awscli
+
+env:
+  global:
+    # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
+    - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
+    # AWS_ACCESS_KEY_ID for the user 'travis'
+    - secure: "MB2g7wf6e2Dt5so1Ek6zoAP04L/8GjKxbOlHQKgTa+Luw30Oa7ndqrG9gc0FX/K3dr03WOjEnO6lZmL9ZMwK7Q2FadrzYO0Ym8ZkruOFMFZxrpRnUX30yQFz6zgY9zGe0PiCNdO7++wYXOaP5xGi6UVyMsfhfWtY3p5Aq9qyU8c="
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
+    
+stages:
+- name: build
+  if:  branch = master
+- name: test
+  if:  branch = master
+- name: scan
+  if:  branch = master AND NOT type = pull_request
+- name: snapshot
+  if:  branch = master
+
+jobs:
+  include:
+    - stage: build
+      script: export STAGE=build
+      jdk: openjdk7
+      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    - jdk: openjdk8
+      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: test
+      script: export STAGE=test
+      jdk: openjdk7
+      script: ant check
+      jdk: openjdk8
+      script: ant check
+    
+    - stage: scan
+      script: export STAGE=scan
+      addons: 
+        sonarcloud:
+      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+      jdk: openjdk8
+      script:
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
+        - ant sonar -Dsonar.login=$SONAR_LOGIN
+    
+
+deploy:
+    provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: opendap.travis.build
+    skip_cleanup: true
+    local_dir: $TRAVIS_BUILD_DIR/package
+    on:
+      branch: 
+      - master
+        condition: $STAGE =~ ^scan$
+
+
+
+
+
