@@ -39,8 +39,11 @@ env:
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
     # GIT_PSWD for travis-ci-opendap
     - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
+    # WOO_UID for travis
+    - secure: "RauYRgdFbcZrkVfUTMkha+miOEXL73mMz0Zm3MhbVY1qPZSDjbdLOPKmOYCbe4Ije8lWT9k5YsCPt2KpiNLiEJA2gCEZpmcgleo1u7npKAx8SPozc3yqZIMeUb9s+jw4XQ01SkBWP6XNlJK0vfbWwGNKdyjTPseWmdh6I5qriUw="
+    # WOO_PSWD for travis
+    - secure: "Lqmp1h9p0dMB2GTWxXiXD/CE+mmi4E6nrD2XBCDiSOI3mShGONlGNwPkF99hLVuuRkTUrMcIvlC+xCBKJzlFd2Vl1+1evRzhKRHG2W/yBYful+nSamOqwz9ky74caWj56RMGEo0MFujFVhVnrM6/zEeQLS9MQRIX0HyU913uG54="
 
-    
 stages:
 - name: build
   if:  branch = master
@@ -89,7 +92,8 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-
+        
+# The deploy section copies the snapshot build product our S3 bucket
 deploy:
     provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
@@ -100,8 +104,12 @@ deploy:
     on:
         branch: master
         condition: $STAGE =~ ^snappah$
-
+        
+# The after_deploy section grabs the hyrax-docker project, sets the current snapshot time 
+# and pushes the result to GitHub. This push triggers TravisCI to build the Docker containers
+# for all of the Hyrax snapshot products. 
 after_deploy:
+    - scp ${TRAVIS_BUILD_DIR}/package/* https://$WOO_UID:$WOO_PSWD@www.opendap.org/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
     - git config --global user.name "The-Robot-Travis"
     - git config --global user.email "npotter@opendap.org"
