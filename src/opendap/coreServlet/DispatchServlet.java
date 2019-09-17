@@ -297,6 +297,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException("Bad configuration! The configuration element was NULL");
 
         Element botBlocker = config.getChild("BotBlocker");
+        Element noDynamicNavigation = config.getChild("NoDynamicNavigation");
 
         handlers.add(new opendap.bes.VersionDispatchHandler());
         if (botBlocker != null)
@@ -305,8 +306,18 @@ public class DispatchServlet extends HttpServlet {
         handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         handlers.add(new opendap.gateway.DispatchHandler());
         handlers.add(new opendap.bes.BesDapDispatcher());
-        handlers.add(new opendap.bes.DirectoryDispatchHandler());
-        handlers.add(new opendap.bes.BESThreddsDispatchHandler());
+
+        if(noDynamicNavigation!=null) {
+            log.info("Dynamic Site Navigation Has Been Disabled. " +
+                    "Only user supplied static THREDDS catalogs will be available" +
+                    "for content navigation and discovery.");
+        }
+        else {
+            // Load the dynamic catalog reponse handlers.
+            handlers.add(new opendap.bes.DirectoryDispatchHandler());
+            handlers.add(new opendap.bes.BESThreddsDispatchHandler());
+        }
+
         handlers.add(new opendap.bes.FileDispatchHandler());
 
         for (DispatchHandler dh : handlers) {
