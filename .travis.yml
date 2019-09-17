@@ -44,7 +44,6 @@ env:
     - secure: "RauYRgdFbcZrkVfUTMkha+miOEXL73mMz0Zm3MhbVY1qPZSDjbdLOPKmOYCbe4Ije8lWT9k5YsCPt2KpiNLiEJA2gCEZpmcgleo1u7npKAx8SPozc3yqZIMeUb9s+jw4XQ01SkBWP6XNlJK0vfbWwGNKdyjTPseWmdh6I5qriUw="
     # WOO_PSWD for travis
     - secure: "Lqmp1h9p0dMB2GTWxXiXD/CE+mmi4E6nrD2XBCDiSOI3mShGONlGNwPkF99hLVuuRkTUrMcIvlC+xCBKJzlFd2Vl1+1evRzhKRHG2W/yBYful+nSamOqwz9ky74caWj56RMGEo0MFujFVhVnrM6/zEeQLS9MQRIX0HyU913uG54="
-
     # WOO
     secure: "PvPepI/kl/FrE9NW8De+sR7oy88idQuEwNSSN/sMvPyrwiUrboOr+TdAvSoxGx6UHiux7lLluoSXdgq8VhsIVyjQGpciJFv1i0+pkgLl5+itCwq974e0924/gklCSmE7/LPRL/EIVtCW9G5kfmYlZLKMx/eUKTmZF6ZS9RpHsdI="
     #WOOKEY_ONE
@@ -118,10 +117,11 @@ deploy:
 after_deploy:
     - ls -l ${TRAVIS_BUILD_DIR}/package/*
     - mkdir -p ~/.ssh
+    - touch ~/.ssh/known_hosts
     - chmod 700 ~/.ssh
-    - echo "{$WOO}${WOOKEY_ONE}${WOOKEY_TWO}" > ~/.ssh/known_hosts
-    - chmod 600 .ssh/known_hosts
-    - ls -la .ssh/known_hosts
+    - chmod 600 ~/.ssh/known_hosts
+    # - echo "{$WOO}${WOOKEY_ONE}${WOOKEY_TWO}" > ~/.ssh/known_hosts
+    - ls -la ~/.ssh/known_hosts
     - echo $"$WOO_PSWD" | sshpass scp -v ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
 #    - echo $"$WOO_PSWD" | sshpass scp -v -o StrictHostKeyChecking=no ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
