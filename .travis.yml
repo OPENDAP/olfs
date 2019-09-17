@@ -110,7 +110,7 @@ deploy:
 # for all of the Hyrax snapshot products. 
 after_deploy:
     - ls -l ${TRAVIS_BUILD_DIR}/package/*
-    - sshpass -v -p "$WOO_PSWD" scp -v ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/pub/olfs
+    - echo $"$WOO_PSWD" | sshpass scp -v ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
     - git config --global user.name "The-Robot-Travis"
     - git config --global user.email "npotter@opendap.org"
