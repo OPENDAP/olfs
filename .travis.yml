@@ -109,7 +109,7 @@ deploy:
 # and pushes the result to GitHub. This push triggers TravisCI to build the Docker containers
 # for all of the Hyrax snapshot products. 
 after_deploy:
-    - scp ${TRAVIS_BUILD_DIR}/package/* https://$WOO_UID:$WOO_PSWD@www.opendap.org/pub/olfs
+    - scp ${TRAVIS_BUILD_DIR}/package/* $WOO_UID:$WOO_PSWD@www.opendap.org/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
     - git config --global user.name "The-Robot-Travis"
     - git config --global user.email "npotter@opendap.org"
