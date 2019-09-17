@@ -121,8 +121,8 @@ after_deploy:
     - touch ~/.ssh/known_hosts
     - chmod 700 ~/.ssh
     - chmod 600 ~/.ssh/known_hosts
-    - echo "{$WOO}${WOOKEY_ONE}${WOOKEY_TWO}" > ~/.ssh/known_hosts
-    - cat ~/.ssh/known_hosts
+    # - echo "{$WOO}${WOOKEY_ONE}${WOOKEY_TWO}" > ~/.ssh/known_hosts
+    # - cat ~/.ssh/known_hosts
     - echo $"$WOO_PSWD" | sshpass scp -v ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
 #    - echo $"$WOO_PSWD" | sshpass scp -v -o StrictHostKeyChecking=no ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
