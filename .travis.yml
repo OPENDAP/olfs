@@ -112,7 +112,10 @@ after_deploy:
     - ls -l ${TRAVIS_BUILD_DIR}/package/*
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - echo $"$WOO_PSWD" | sshpass scp -v -o StrictHostKeyChecking=no ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
+    - echo "www.opendap.org,70.32.88.112 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCczjESuqPOyOnANqTW2KJzXe35HWeGkVl2yx+7+dUf6Bg3zbpxOshnWbtznuTsruQVVQMt3SMFXVpgluK0Rbko=" > .ssh/known_hosts
+    - chmod 600 .ssh/known_hosts
+    - echo $"$WOO_PSWD" | sshpass scp -v ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
+#    - echo $"$WOO_PSWD" | sshpass scp -v -o StrictHostKeyChecking=no ${TRAVIS_BUILD_DIR}/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs
     - git clone https://github.com/opendap/hyrax-docker;
     - git config --global user.name "The-Robot-Travis"
     - git config --global user.email "npotter@opendap.org"
