@@ -98,17 +98,22 @@
 
     <!-- AddFileoutTypeSuffixToDownloadFilename / -->
     <!-- AllowDirectDataSourceAccess / -->
-    <!-- PreloadNcmlIntoBes -->
+
 
     <!--
-         NoDynamicNavigation
+     NoDynamicNavigation
 
-         This is an "alpha" feature that disables dynamic navigation/catalog
-         content generation. When enabled, the static (user supplied) THREDDS
-         catalogs will still work. All of the regular dynamic catalog/contents
-         pages will not.
+     This is an "alpha" feature that disables dynamic navigation/catalog
+     content generation. When enabled, the static (user supplied) THREDDS
+     catalogs will still work. All of the regular dynamic catalog/contents
+     pages will not.
     -->
-    <NoDynamicNavigation />
+    <!-- NoDynamicNavigation /-->
+
+
+
+    <!-- PreloadNcmlIntoBes -->
+
 
     <!--
        'Bot Blocker' is used to block access from specific IP addresses
