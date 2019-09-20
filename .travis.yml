@@ -41,6 +41,8 @@ env:
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
     # GIT_PSWD for travis-ci-opendap
     - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
+    # WOO_UID for travis
+    - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
 
 stages:
 - name: build
