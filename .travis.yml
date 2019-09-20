@@ -126,7 +126,7 @@ deploy:
       - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
     on:
       branch: master
-      condition: $BES_BUILD =~ ^snappah$
+      condition: $STAGE =~ ^snappah$
        
 # The after_deploy section sends the snapshots to www.opendap.org and then
 # grabs the hyrax-docker project, sets the current snapshot time 
