@@ -63,10 +63,10 @@ jobs:
 
     - stage: test
       script: export STAGE=test
-      - jdk: openjdk7
-        script: ant check
-      - jdk: openjdk8
-        script: ant check
+      jdk: openjdk7
+      script: ant check
+    - jdk: openjdk8
+      script: ant check
     
     - stage: scan
       addons: 
