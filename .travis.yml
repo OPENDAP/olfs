@@ -44,13 +44,13 @@ env:
 
 stages:
 - name: build
-  if:  branch = master
+  if:  branch = foo
 - name: test
   if:  branch = master
 - name: scan
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = foo AND NOT type = pull_request
 - name: snappah
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = foo AND NOT type = pull_request
 
 jobs:
   include:
@@ -63,10 +63,10 @@ jobs:
 
     - stage: test
       script: export STAGE=test
-      jdk: openjdk7
-      script: ant check
-      jdk: openjdk8
-      script: ant check
+      - jdk: openjdk7
+        script: ant check
+      - jdk: openjdk8
+        script: ant check
     
     - stage: scan
       addons: 
