@@ -92,6 +92,8 @@ public class LogUtil {
     private static final AtomicBoolean isLogInit = new AtomicBoolean(false);
     private static final ReentrantLock initLock =  new ReentrantLock();
 
+    private static AtomicBoolean useCombinedLog = new AtomicBoolean(false);
+
     private static Logger log;
     static{
         System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
@@ -429,25 +431,29 @@ public class LogUtil {
      *
      * @return The BESlog formatted log line for this request
      */
-    public static String getBesLogEntry(){
+    public static String getLogEntryForBesLog(){
+
 
         StringBuilder alb = new StringBuilder();
-        String sep = "|&|";
+        if(useCombinedLog.get()) {
+            String sep = "|&|";
 
-        alb.append(MDC.get(HOST_KEY)).append(sep);
-        alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
-        alb.append(MDC.get(IDENT_KEY)).append(sep);
-        alb.append(MDC.get(USER_ID_KEY)).append(sep);
-        alb.append(MDC.get(START_TIME_KEY)).append(sep);
-        alb.append(MDC.get(ID_KEY)).append(sep);
-        alb.append(MDC.get(SOURCE_KEY)).append(sep);
-        alb.append(MDC.get(RESOURCE_ID_KEY)).append(sep);
+            alb.append(MDC.get(HOST_KEY)).append(sep);
+            alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
+            alb.append(MDC.get(IDENT_KEY)).append(sep);
+            alb.append(MDC.get(USER_ID_KEY)).append(sep);
+            alb.append(MDC.get(START_TIME_KEY)).append(sep);
+            alb.append(MDC.get(ID_KEY)).append(sep);
+            alb.append(MDC.get(SOURCE_KEY)).append(sep);
+            alb.append(MDC.get(RESOURCE_ID_KEY)).append(sep);
 
-        String ce = MDC.get(QUERY_STRING_KEY);
-        if(ce ==null || !ce.isEmpty())
-            ce="-";
+            String ce = MDC.get(QUERY_STRING_KEY);
+            if(ce == null || ce.isEmpty()) {
+                ce = "-";
+            }
 
-        alb.append(ce);
+            alb.append(ce);
+        }
 
         return alb.toString();
     }
@@ -560,4 +566,7 @@ public class LogUtil {
 
 
 
+    public static void useCombinedLog(boolean value) {
+        useCombinedLog.set(value);
+    }
 }

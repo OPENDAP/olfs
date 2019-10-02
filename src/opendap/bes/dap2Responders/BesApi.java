@@ -110,7 +110,7 @@ public class BesApi implements Cloneable {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
-    public static final String LOG_CONTEXT  = "olfsLog";
+    public static final String OLFS_LOG_CONTEXT = "olfsLog";
     public static final String ERRORS_CONTEXT  = "errors";
     public static final String XML_ERRORS      = "xml";
 
@@ -2174,7 +2174,9 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        request.addContent(setContextElement(LOG_CONTEXT,LogUtil.getBesLogEntry()));
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
@@ -2257,7 +2259,10 @@ public class BesApi implements Cloneable {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-        request.addContent(setContextElement(LOG_CONTEXT,LogUtil.getBesLogEntry()));
+
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
