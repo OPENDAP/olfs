@@ -370,17 +370,14 @@ public class LogUtil {
      *
      * @param req     the current HttpServletRequest.
      * @param logName Name of Logger to write stuff.
-     * @param httpVerb The HTTP verb initiating the request - GET, POST, LastModifed, etc.
-     * @param reqID The request ID, implemented as the request number.
-     *
      */
-    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
+    public static void logServerAccessStart(HttpServletRequest req, String logName,  String reqSource, String reqID) {
 
         HttpSession session = req.getSession(false);
 
 
         MDC.put(ID_KEY, reqID);
-        MDC.put(SOURCE_KEY, httpVerb);
+        MDC.put(SOURCE_KEY, reqSource);
         MDC.put(HOST_KEY, req.getRemoteHost());
         MDC.put(IDENT_KEY, (session == null) ? "-" : session.getId());
         MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
@@ -405,51 +402,6 @@ public class LogUtil {
             startMsg.append("AccessLog: ").append(logName);
             log.info(startMsg.toString());
         }
-    }
-
-    /**
-     *  Bsed on the HyraxAccess.log pattern:
-     *  <pattern>
-     *  [%X{host}]
-     *  [%X{UserAgent}]
-     *  [%X{ident}]
-     *  [%X{userid}]
-     *  [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}]
-     *  [%8X{duration}]
-     *  [%X{http_status}]
-     *  [%8X{ID}]
-     *  [%X{SOURCE}]
-     *  [%X{resourceID}]
-     *  [%X{query}]
-     *  [%X{size}]%n
-     *  </pattern>
-     *  Example:
-     *  [0:0:0:0:0:0:0:1] [curl/7.54.0] [-] [-] [2019-09-16T14:20:58.028 -0700] [       4] [200] [      25]
-     *  [LastModified] [/opendap/hyrax/data/nc/fnoc1.nc.dmr] [dap4.ce=lat] []
-     *
-     * @return The BESlog formatted log line for this request
-     */
-    public static String getBesLogEntry(){
-
-        StringBuilder alb = new StringBuilder();
-        String sep = "|&|";
-
-        alb.append(MDC.get(HOST_KEY)).append(sep);
-        alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
-        alb.append(MDC.get(IDENT_KEY)).append(sep);
-        alb.append(MDC.get(USER_ID_KEY)).append(sep);
-        alb.append(MDC.get(START_TIME_KEY)).append(sep);
-        alb.append(MDC.get(ID_KEY)).append(sep);
-        alb.append(MDC.get(SOURCE_KEY)).append(sep);
-        alb.append(MDC.get(RESOURCE_ID_KEY)).append(sep);
-
-        String ce = MDC.get(QUERY_STRING_KEY);
-        if(ce ==null || !ce.isEmpty())
-            ce="-";
-
-        alb.append(ce);
-
-        return alb.toString();
     }
 
 
