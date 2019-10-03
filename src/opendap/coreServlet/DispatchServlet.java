@@ -138,6 +138,11 @@ public class DispatchServlet extends HttpServlet {
 
             Element config = configDoc.getRootElement();
 
+            Element enableCombinedLog = config.getChild("EnableCombinedLog");
+            if(enableCombinedLog!=null){
+                LogUtil.useCombinedLog(true);
+            }
+
             boolean enablePost = false;
             Element postConfig = config.getChild("HttpPost");
             if (postConfig != null) {

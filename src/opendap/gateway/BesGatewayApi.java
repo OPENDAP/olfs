@@ -34,6 +34,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap4.QueryParameters;
+import opendap.logging.LogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.Header;
@@ -136,6 +137,10 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
+
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
@@ -203,6 +208,10 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
+
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
