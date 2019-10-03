@@ -50,3 +50,6 @@ foo.*
 /.sonar/
 /.scannerwork/
 /webapps
+
+# travis sec key (never gonna check it in)
+travis/woo_deploy_rsa
