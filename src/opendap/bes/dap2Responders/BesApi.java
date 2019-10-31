@@ -31,6 +31,7 @@ import opendap.bes.*;
 import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap4.QueryParameters;
+import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import opendap.ppt.PPTException;
@@ -109,6 +110,7 @@ public class BesApi implements Cloneable {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
+    public static final String OLFS_LOG_CONTEXT = "olfsLog";
     public static final String ERRORS_CONTEXT  = "errors";
     public static final String XML_ERRORS      = "xml";
 
@@ -2172,6 +2174,10 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
+
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
@@ -2253,6 +2259,10 @@ public class BesApi implements Cloneable {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
+
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));

@@ -29,6 +29,7 @@ package opendap.ncml;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
+import opendap.logging.LogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -103,6 +104,10 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
+
+        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
