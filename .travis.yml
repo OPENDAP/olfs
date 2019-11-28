@@ -34,9 +34,10 @@ env:
     # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
     - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
     # AWS_ACCESS_KEY_ID for the user 'travis'
-    - secure: "MB2g7wf6e2Dt5so1Ek6zoAP04L/8GjKxbOlHQKgTa+Luw30Oa7ndqrG9gc0FX/K3dr03WOjEnO6lZmL9ZMwK7Q2FadrzYO0Ym8ZkruOFMFZxrpRnUX30yQFz6zgY9zGe0PiCNdO7++wYXOaP5xGi6UVyMsfhfWtY3p5Aq9qyU8c="
+    - secure: "R3WDBwYdDEij0RYsKv1tgigQcBmQDPWGaygJAM/niG/T9ptm4hQb1orbeQEb5YbiMlEgRV3mvR930ypN7J1L3u0Sm4BXLQBBsS9xUr1LAluKyV9Gopot5jr8lr3zxxQ9B/YxsVxBVuJ+kyjO3Fi2Efbhv7Y7oX9FjV9wqsuRfc0="
+    # old "MB2g7wf6e2Dt5so1Ek6zoAP04L/8GjKxbOlHQKgTa+Luw30Oa7ndqrG9gc0FX/K3dr03WOjEnO6lZmL9ZMwK7Q2FadrzYO0Ym8ZkruOFMFZxrpRnUX30yQFz6zgY9zGe0PiCNdO7++wYXOaP5xGi6UVyMsfhfWtY3p5Aq9qyU8c="
     # AWS_SECRET_ACCESS_KEY
-    - secure: "aLQeyAMzLydF6mK3Qpy0RewpD3VjzzFbQZhD0m/esLercK4tYHj3F4RlLNqCnKSBnrJcIvvFrEHad15B1XLNVTKCjbyobZEzMNGviiHkx7Vgqx6+BRJqg1uNFGOYmZJrnf4ZTCaqpvykXUs+CZGw3YC7VvWvUKiyzv5fmqE3A8I="
+    - secure: "hZI7Epe/KoftSwRhu+CNyQwFcvu3DWaWif7P15jVcxNVwnU30qnbdO2fjEbZH7eQgapXGKnNUMWstPZNDd0PQFG0Er1Qxae8HvEsOYnjg8L0qGyCJIEJ9shkkzVtfPcwhoVJtBsSJEMi4vBmpd0E5a50B1CLDRqqvfyMX7/q17Y="
     # GIT_UID for travis-ci-opendap
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
     # GIT_PSWD for travis-ci-opendap
