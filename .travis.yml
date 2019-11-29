@@ -23,7 +23,7 @@ notifications:
     - jgallagher@opendap.org
 
 addons:
-  ssh_known_hosts: www.opendap.org
+  # ssh_known_hosts: www.opendap.org
   apt:
     packages:
       - awscli
