@@ -95,17 +95,17 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
         
 
-before_deploy:
+# before_deploy:
 #
 # Get creds for pushing snapshots to w.o.o.
-- if  test "$STAGE" = "snappah"; 
-    then
-        ls -l ./travis;
-        openssl aes-256-cbc -K $encrypted_fa37b851f33a_key -iv $encrypted_fa37b851f33a_iv -in ./travis/woo_deploy_rsa_enc -out /tmp/woo_deploy_rsa -d;
-        eval "$(ssh-agent -s)";
-        chmod 600 /tmp/woo_deploy_rsa;
-        ssh-add /tmp/woo_deploy_rsa;
-    fi
+#- if  test "$STAGE" = "snappah";
+#    then
+#        ls -l ./travis;
+#        openssl aes-256-cbc -K $encrypted_fa37b851f33a_key -iv $encrypted_fa37b851f33a_iv -in ./travis/woo_deploy_rsa_enc -out /tmp/woo_deploy_rsa -d;
+#        eval "$(ssh-agent -s)";
+#        chmod 600 /tmp/woo_deploy_rsa;
+#        ssh-add /tmp/woo_deploy_rsa;
+#    fi
 
 # The deploy section copies the snapshot build product our S3 bucket
 deploy:
@@ -120,13 +120,13 @@ deploy:
       condition: $STAGE =~ ^snappah$
 
   # Push snapshot files to w.o.o
-  - provider: script
-    skip_cleanup: true
-    script: 
-      - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
-    on:
-      branch: master
-      condition: $STAGE =~ ^snappah$
+  # - provider: script
+  #  skip_cleanup: true
+  #  script:
+  #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
+  #  on:
+  #    branch: master
+  #    condition: $STAGE =~ ^snappah$
        
 # The after_deploy section grabs the hyrax-docker project, sets the current 
 # snapshot time and pushes the result to GitHub. This push triggers TravisCI 
