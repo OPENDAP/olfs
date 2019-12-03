@@ -33,7 +33,7 @@
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/nc/fnoc1.nc");
                     DEBUG = new debug_obj();
-                    var es = "true";
+                    var es = "false";
                     enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>DAP4 Data Request Form (beta)fnoc1.nc</title>

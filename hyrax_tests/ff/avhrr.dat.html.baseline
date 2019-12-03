@@ -36,7 +36,7 @@
       <script type="text/javascript">
                     DAP2_URL = new dap2_url("http://localhost:8080/opendap/data/ff/avhrr.dat");
                     DEBUG = new debug_obj();
-                    var es = "true";
+                    var es = "false";
                     enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>OPeNDAP Data Access Form for  avhrr.dat</title>
