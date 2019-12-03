@@ -61,18 +61,17 @@ public class HtmlDMR extends Dap4Responder {
 
     private Logger log;
     private static String defaultRequestSuffix = ".html";
+    private boolean _enforceRequiredUserSelection;
 
-    public HtmlDMR(String sysPath, BesApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+
+    public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, enforceRequiredUserSelection);
     }
 
-    public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
-
-    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean enforceRequiredUserSelection) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        _enforceRequiredUserSelection = enforceRequiredUserSelection;
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("HTML representation of the DMR.");
@@ -88,6 +87,10 @@ public class HtmlDMR extends Dap4Responder {
 
     public boolean isDataResponder(){ return false; }
     public boolean isMetadataResponder(){ return true; }
+
+    public boolean enforceRequiredUserSelection() {
+        return _enforceRequiredUserSelection;
+    }
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -150,6 +153,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
+            transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 

@@ -44,25 +44,23 @@ import java.io.DataOutputStream;
 
 
 public class NormativeDMR extends Dap4Responder {
-
-
-
     private Logger log;
     private static String defaultRequestSuffix = ".dmr";
 
 
-    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
-        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
+    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename, boolean enforceRequiredUserSelection) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename,enforceRequiredUserSelection);
     }
 
-    public NormativeDMR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
-    }
-
-    public NormativeDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean addFileoutTypeSuffixToDownloadFilename) {
+    public NormativeDMR(
+            String sysPath,
+            String pathPrefix,
+            String requestSuffix,
+            BesApi besApi,
+            boolean addFileoutTypeSuffixToDownloadFilename,
+            boolean enforceRequiredUserSelection) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
 
         addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
@@ -73,7 +71,7 @@ public class NormativeDMR extends Dap4Responder {
         setNormativeMediaType(new DMR(getRequestSuffix()));
 
         addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
-        addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi));
+        addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi, enforceRequiredUserSelection));
         addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
@@ -87,7 +85,6 @@ public class NormativeDMR extends Dap4Responder {
 
     public boolean isDataResponder(){ return false; }
     public boolean isMetadataResponder(){ return true; }
-
 
 
 

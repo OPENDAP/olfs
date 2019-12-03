@@ -2,56 +2,30 @@ function make_a_selection(){
     alert("Please select one or more variables before attempting to download/access data.");
 }
 
-function csv_button() {
+function getAs_button_runner(type_name, suffix) {
     var url = new String(document.forms[0].url.value);
 
     var url_parts = url.split("?");
     /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var csv_url = url_parts[0] + ".dap.csv?" + url_parts[1];
-    } else {
+    if (url_parts[1] != null && url_parts[1].length>0) {
+        var get_as_url = url_parts[0] + suffix + "?" + url_parts[1];
+    } else if(enforce_selection) {
         make_a_selection();
         return;
-        // var csv_url = url_parts[0] + ".dap.csv?";
     }
+    else {
+        var get_as_url = url_parts[0] +  suffix + "?";
+    }
+    window.open(encodeURI(get_as_url),type_name);
+}
 
-    window.open(encodeURI(csv_url), "CSV_Data");
+
+function csv_button() {
+    getAs_button_runner("CSV_Data",".dap.csv");
 }
 
 function covjson_button() {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var covjson_url = url_parts[0] + ".dap.covjson?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var covjson_url = url_parts[0] + ".dap.covjson?";
-    }
-
-    window.open(encodeURI(covjson_url), "CoverageJSON Data");
-}
-
-/* The netcdf_button handler loads the data to the current window. Since it
-is netcdf/binary, Netscape will ask the user for a filename and save the data
-to that file. The parameter 'ext' should be 'nc'. */
-
-function netcdf_button(ext) {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var binary_url = url_parts[0] + ".dap." + ext + "?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var binary_url = url_parts[0] + ".dap." + ext + "?";
-    }
-
-    window.location = encodeURI(binary_url);
+    getAs_button_runner("CovJSON_Data",".dap.covjson");
 }
 
 /* The binary_button handler loads the data to the current window. Since it
@@ -59,19 +33,7 @@ is binary, Netscape will ask the user for a filename and save the data
 to that file. */
 
 function binary_button(ext) {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var binary_url = url_parts[0] + "." + ext + "?";
-    }
-
-    window.location = encodeURI(binary_url);
+    getAs_button_runner(ext, "." + ext);
 }
 
 var help = 0;

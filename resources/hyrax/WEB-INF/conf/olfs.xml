@@ -96,8 +96,19 @@
     <UseDAP2ResourceUrlResponse />
     <HttpPost enabled="true" max="2000000"/>
 
+    <!--
+        'RequireUserSelection' - When enabled this will cause both the DAP2
+        and DAP4 Data Request Forms to require the users to choose one or more
+        variables before they may utilize the 'Get As X' buttons in the UI. This
+        effectively prevents users from inadvertently asking that the entire
+        dataset be converted into NetCDF (for example) when all they actually
+        require are one or two variables. If not enabled the Data Request Forms
+        will not require the user to make a selection.
+    -->
+    <!-- RequireUserSelection /-->
 
-    <!-- 
+
+    <!--
         'AllowDirectDataSourceAccess' - When enabled users will be able to use
         Hyrax as a file server and download the underlying data files/granules/objects
         directly, without utilizing the DAP APIs.

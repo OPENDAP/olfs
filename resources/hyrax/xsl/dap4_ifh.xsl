@@ -36,6 +36,7 @@
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
+    <xsl:param name="enforceSelection" />
 
     <xsl:variable name="debug" select="false()"/>
 
@@ -69,6 +70,8 @@
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
                     DEBUG = new debug_obj();
+                    var es = "<xsl:value-of select="$enforceSelection"/>";
+                    enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
                 <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>

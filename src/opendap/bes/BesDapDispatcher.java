@@ -73,6 +73,7 @@ public class BesDapDispatcher implements DispatchHandler {
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
     private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
+    private static boolean _enforceRequiredUserSelection = false;
 
 
     private BesApi _besApi;
@@ -123,23 +124,6 @@ public class BesDapDispatcher implements DispatchHandler {
         if(config!=null){
             _config = config;
 
-            /*
-            Element besApiImpl = _config.getChild("BesApiImpl");
-            if (besApiImpl != null) {
-                String className = besApiImpl.getTextTrim();
-                _log.debug("Building BesApi: " + className);
-                Class classDefinition = Class.forName(className);
-
-                Object classInstance = classDefinition.newInstance();
-
-                if (classInstance instanceof BesApi) {
-                    _log.debug("Loading BesApi from configuration.");
-                    BesApi besApi = (BesApi) classDefinition.newInstance();
-                    setBesApi(besApi);
-                }
-            }
-            */
-
             _log.info("ingestConfig() - Using BES API implementation: "+getBesApi().getClass().getName());
 
             _allowDirectDataSourceAccess = false;
@@ -149,6 +133,12 @@ public class BesDapDispatcher implements DispatchHandler {
             }
             _log.info("ingestConfig() - AllowDirectDataSourceAccess: {}",_allowDirectDataSourceAccess);
 
+            _enforceRequiredUserSelection = false;
+            dv = _config.getChild("RequireUserSelection");
+            if (dv != null) {
+                _enforceRequiredUserSelection = true;
+            }
+            _log.info("ingestConfig() - RequireUserSelection: {}",_enforceRequiredUserSelection);
 
             _useDAP2ResourceUrlResponse = false;
             dv = _config.getChild("UseDAP2ResourceUrlResponse");
@@ -226,7 +216,7 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add(ndsr);
 
         _responders.add(new NormativeDR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
-        _responders.add(new NormativeDMR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
+        _responders.add(new NormativeDMR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename, _enforceRequiredUserSelection));
         _responders.add(new IsoDMR(_systemPath, besApi));
 
         _responders.add(new Version(_systemPath, besApi));
@@ -291,7 +281,7 @@ public class BesDapDispatcher implements DispatchHandler {
             // Add the HTML form conditionally because the ".html" suffix is used
             // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
             // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder ifh = new Dap2IFH(_systemPath, besApi);
+            Dap4Responder ifh = new Dap2IFH(_systemPath, besApi,_enforceRequiredUserSelection);
             _responders.add(ifh);
 
             Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
