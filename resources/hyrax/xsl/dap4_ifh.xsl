@@ -733,13 +733,13 @@
             </td>
             <td>
                 <div style="width:100%;margin-left:10px;">
-                    <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
+                    <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
                     <!-- CoverageJSON needs a DAP4 implementation in the BES -->
                     <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
-                    <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
-                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
-                    <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
-                    <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
+                    <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                    <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
+                    <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
+                    <input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>

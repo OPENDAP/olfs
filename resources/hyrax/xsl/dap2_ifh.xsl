@@ -654,11 +654,11 @@
             </td>
             <td>
                 <div style="width:100%;margin-left:10px;">
-                    <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
-                    <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
-                    <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
-                    <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
+                    <input type="button" value="Get as ASCII" onclick="getAs_button_action('ASCII Data','.ascii')"/>
+                    <input type="button" value="Get as CoverageJSON" onclick="getAs_button_action('CoverageJSON Data', '.covjson')"/>
+                    <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.nc')"/>
+                    <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.nc4')"/>
+                    <input type="button" value="Binary (DAP) Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>
