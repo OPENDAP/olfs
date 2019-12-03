@@ -33,6 +33,8 @@
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/ff/gsodock.dat");
                     DEBUG = new debug_obj();
+                    var es = "true";
+                    enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>DAP4 Data Request Form (beta)gsodock.dat</title>
    </head>
@@ -65,11 +67,16 @@
                </td>
                <td>
                   <div style="width:100%;margin-left:10px;">
-                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
-                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
-                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
-                     <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Get as CSV"
+                            onclick="getAs_button_action('CSV Data','.dap.csv')"/>
+                     <input type="button" value="Get as NetCDF 3"
+                            onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                     <input type="button" value="Get as NetCDF 4"
+                            onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
+                     <input type="button" value="DAP4 Binary Object"
+                            onclick="getAs_button_action('DAP4 Data', '.dap')"/>
+                     <input type="button" value="DAP2 Binary Object"
+                            onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
                </td>
@@ -173,22 +180,22 @@
                   <div style="margin-left:25px;"><!--
             - - - - - - - - - - -
             myFQN:           URI_GSO-Dock
-            myJSVarName:     org_opendap_var_d6e3
-            checkBoxName:    get_org_opendap_var_d6e3
+            myJSVarName:     org_opendap_var_d7e3
+            checkBoxName:    get_org_opendap_var_d7e3
             isContainer:     true
             isArray:         false
             position:        1
             parentContainer: 
             - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e3 = new dap_var("URI_GSO-Dock", "org_opendap_var_d6e3", false,true);
+        --><script type="text/javascript">org_opendap_var_d7e3 = new dap_var("URI_GSO-Dock", "org_opendap_var_d7e3", false,true);
 
             
-                DAP4_URL.add_dap_var(org_opendap_var_d6e3);
-            org_opendap_var_d6e3.checkBox = "get_org_opendap_var_d6e3";
+                DAP4_URL.add_dap_var(org_opendap_var_d7e3);
+            org_opendap_var_d7e3.checkBox = "get_org_opendap_var_d7e3";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_var_d6e3"
-                               onclick="org_opendap_var_d6e3.handle_projection_change(get_org_opendap_var_d6e3)"
+                        <input type="checkbox" id="get_org_opendap_var_d7e3"
+                               onclick="org_opendap_var_d7e3.handle_projection_change(get_org_opendap_var_d7e3)"
                                onfocus="describe_projection()"/>URI_GSO-Dock<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Sequence)
             </span>
                      </div>
@@ -203,27 +210,27 @@
                               <li><!--
             - - - - - - - - - - -
             myFQN:           URI_GSO-Dock.Depth
-            myJSVarName:     org_opendap_var_d6e5
-            checkBoxName:    get_org_opendap_var_d6e5
+            myJSVarName:     org_opendap_var_d7e5
+            checkBoxName:    get_org_opendap_var_d7e5
             isContainer:     false
             isArray:         false
             position:        1
-            parentContainer: org_opendap_var_d6e3
+            parentContainer: org_opendap_var_d7e3
             - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e5 = new dap_var("URI_GSO-Dock.Depth", "org_opendap_var_d6e5", false,false);
+        --><script type="text/javascript">org_opendap_var_d7e5 = new dap_var("URI_GSO-Dock.Depth", "org_opendap_var_d7e5", false,false);
 
-            org_opendap_var_d6e5.checkBox = "get_org_opendap_var_d6e5";
-            org_opendap_var_d6e3.addChildVar(org_opendap_var_d6e5);
-                org_opendap_var_d6e5.parentContainer = org_opendap_var_d6e3;
+            org_opendap_var_d7e5.checkBox = "get_org_opendap_var_d7e5";
+            org_opendap_var_d7e3.addChildVar(org_opendap_var_d7e5);
+                org_opendap_var_d7e5.parentContainer = org_opendap_var_d7e3;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_var_d6e5"
-                                           onclick="org_opendap_var_d6e5.handle_projection_change(get_org_opendap_var_d6e5)"
+                                    <input type="checkbox" id="get_org_opendap_var_d7e5"
+                                           onclick="org_opendap_var_d7e5.handle_projection_change(get_org_opendap_var_d7e5)"
                                            onfocus="describe_projection()"/>Depth<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
                                  <div class="medium" style="margin-left: 10px;padding: 1px;"
-                                      id="org_opendap_var_d6e5_selection">Depth<select id="org_opendap_var_d6e5_relOpWidget_0" onfocus="describe_selection()"
+                                      id="org_opendap_var_d7e5_selection">Depth<select id="org_opendap_var_d7e5_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP4_URL.update_url()">
                                        <option value="==" selected="">==</option>
                                        <option value="!=">!=</option>
@@ -233,40 +240,40 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_var_d6e5_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_d7e5_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP4_URL.update_url()"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_var_d6e5.addSelectionClause("org_opendap_var_d6e5_selection",
-            org_opendap_var_d6e5_relOpWidget_0,
-            org_opendap_var_d6e5_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_d7e5.addSelectionClause("org_opendap_var_d7e5_selection",
+            org_opendap_var_d7e5_relOpWidget_0,
+            org_opendap_var_d7e5_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>
                               <li><!--
             - - - - - - - - - - -
             myFQN:           URI_GSO-Dock.Air_Temp
-            myJSVarName:     org_opendap_var_d6e7
-            checkBoxName:    get_org_opendap_var_d6e7
+            myJSVarName:     org_opendap_var_d7e7
+            checkBoxName:    get_org_opendap_var_d7e7
             isContainer:     false
             isArray:         false
             position:        2
-            parentContainer: org_opendap_var_d6e3
+            parentContainer: org_opendap_var_d7e3
             - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e7 = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_var_d6e7", false,false);
+        --><script type="text/javascript">org_opendap_var_d7e7 = new dap_var("URI_GSO-Dock.Air_Temp", "org_opendap_var_d7e7", false,false);
 
-            org_opendap_var_d6e7.checkBox = "get_org_opendap_var_d6e7";
-            org_opendap_var_d6e3.addChildVar(org_opendap_var_d6e7);
-                org_opendap_var_d6e7.parentContainer = org_opendap_var_d6e3;
+            org_opendap_var_d7e7.checkBox = "get_org_opendap_var_d7e7";
+            org_opendap_var_d7e3.addChildVar(org_opendap_var_d7e7);
+                org_opendap_var_d7e7.parentContainer = org_opendap_var_d7e3;
             </script>
                                  <div style="color: black;margin-left:-20px;margin-top:10px">
-                                    <input type="checkbox" id="get_org_opendap_var_d6e7"
-                                           onclick="org_opendap_var_d6e7.handle_projection_change(get_org_opendap_var_d6e7)"
+                                    <input type="checkbox" id="get_org_opendap_var_d7e7"
+                                           onclick="org_opendap_var_d7e7.handle_projection_change(get_org_opendap_var_d7e7)"
                                            onfocus="describe_projection()"/>Air_Temp<span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                                  </div>
                                  <div class="medium" style="margin-left: 10px;padding: 1px;"
-                                      id="org_opendap_var_d6e7_selection">Air_Temp<select id="org_opendap_var_d6e7_relOpWidget_0" onfocus="describe_selection()"
+                                      id="org_opendap_var_d7e7_selection">Air_Temp<select id="org_opendap_var_d7e7_relOpWidget_0" onfocus="describe_selection()"
                                             onchange="DAP4_URL.update_url()">
                                        <option value="==" selected="">==</option>
                                        <option value="!=">!=</option>
@@ -276,13 +283,13 @@
                                        <option value="&gt;=">&gt;=</option>
                                        <option value="-">--</option>
                                     </select>
-                                    <input type="text" id="org_opendap_var_d6e7_rValueWidget_0" size="6"
+                                    <input type="text" id="org_opendap_var_d7e7_rValueWidget_0" size="6"
                                            onFocus="describe_selection()"
                                            onChange="DAP4_URL.update_url()"/>
                                  </div>
-                                 <script type="text/javascript">org_opendap_var_d6e7.addSelectionClause("org_opendap_var_d6e7_selection",
-            org_opendap_var_d6e7_relOpWidget_0,
-            org_opendap_var_d6e7_rValueWidget_0);
+                                 <script type="text/javascript">org_opendap_var_d7e7.addSelectionClause("org_opendap_var_d7e7_selection",
+            org_opendap_var_d7e7_relOpWidget_0,
+            org_opendap_var_d7e7_rValueWidget_0);
         </script>
                                  <div class="small_italic" style="color:#B0C6EB;">no attributes</div>
                               </li>

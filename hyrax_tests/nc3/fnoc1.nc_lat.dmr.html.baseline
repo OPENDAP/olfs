@@ -33,6 +33,8 @@
       <script type="text/javascript">
                     DAP4_URL = new dap4_url("http://localhost:8080/opendap/data/nc/fnoc1.nc");
                     DEBUG = new debug_obj();
+                    var es = "true";
+                    enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>DAP4 Data Request Form (beta)fnoc1.nc</title>
    </head>
@@ -65,11 +67,16 @@
                </td>
                <td>
                   <div style="width:100%;margin-left:10px;">
-                     <input type="button" value="Get as CSV" onclick="binary_button('dap.csv')"/>
-                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('dap.nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('dap.nc4')"/>
-                     <input type="button" value="DAP4 Binary Object" onclick="binary_button('dap')"/>
-                     <input type="button" value="DAP2 Binary Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Get as CSV"
+                            onclick="getAs_button_action('CSV Data','.dap.csv')"/>
+                     <input type="button" value="Get as NetCDF 3"
+                            onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                     <input type="button" value="Get as NetCDF 4"
+                            onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
+                     <input type="button" value="DAP4 Binary Object"
+                            onclick="getAs_button_action('DAP4 Data', '.dap')"/>
+                     <input type="button" value="DAP2 Binary Object"
+                            onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
                </td>
@@ -196,22 +203,22 @@
                   <div style="margin-left:25px;"><!--
             - - - - - - - - - - -
             myFQN:           lat
-            myJSVarName:     org_opendap_var_d6e5
-            checkBoxName:    get_org_opendap_var_d6e5
+            myJSVarName:     org_opendap_var_d7e5
+            checkBoxName:    get_org_opendap_var_d7e5
             isContainer:     false
             isArray:         true
             position:        1
             parentContainer: 
             - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e5 = new dap_var("lat", "org_opendap_var_d6e5", true,false);
+        --><script type="text/javascript">org_opendap_var_d7e5 = new dap_var("lat", "org_opendap_var_d7e5", true,false);
 
             
-                DAP4_URL.add_dap_var(org_opendap_var_d6e5);
-            org_opendap_var_d6e5.checkBox = "get_org_opendap_var_d6e5";
+                DAP4_URL.add_dap_var(org_opendap_var_d7e5);
+            org_opendap_var_d7e5.checkBox = "get_org_opendap_var_d7e5";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_var_d6e5"
-                               onclick="org_opendap_var_d6e5.handle_projection_change(get_org_opendap_var_d6e5)"
+                        <input type="checkbox" id="get_org_opendap_var_d7e5"
+                               onclick="org_opendap_var_d7e5.handle_projection_change(get_org_opendap_var_d7e5)"
                                onfocus="describe_projection()"/>lat<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">lat=
                     </span>
@@ -221,11 +228,11 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Float32)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_var_d6e5_dim_1" size="8"
+                     <input type="text" id="org_opendap_var_d7e5_dim_1" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP4_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e5.addDimension(org_opendap_var_d6e5_dim_1,17);
+                     <script type="text/javascript">org_opendap_var_d7e5.addDimension(org_opendap_var_d7e5_dim_1,17);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">
