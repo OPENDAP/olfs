@@ -36,6 +36,8 @@
       <script type="text/javascript">
                     DAP2_URL = new dap2_url("http://localhost:8080/opendap/data/hdf4/S2000415.HDF.gz");
                     DEBUG = new debug_obj();
+                    var es = "false";
+                    enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>OPeNDAP Data Access Form for  S2000415.HDF</title>
    </head>
@@ -72,11 +74,16 @@
                </td>
                <td>
                   <div style="width:100%;margin-left:10px;">
-                     <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
-                     <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
-                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
-                     <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Get as ASCII"
+                            onclick="getAs_button_action('ASCII Data','.ascii')"/>
+                     <input type="button" value="Get as CoverageJSON"
+                            onclick="getAs_button_action('CoverageJSON Data', '.covjson')"/>
+                     <input type="button" value="Get as NetCDF 3"
+                            onclick="getAs_button_action('NetCDF-3 Data', '.nc')"/>
+                     <input type="button" value="Get as NetCDF 4"
+                            onclick="getAs_button_action('NetCDF-4 Data', '.nc4')"/>
+                     <input type="button" value="Binary (DAP) Object"
+                            onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
                </td>
@@ -1133,23 +1140,23 @@
                   <div style="margin-left:25px;"><!--
 - - - - - - - - - - -
             myFQN:           NSCAT_Rev_20_Num_Beam_34
-            myJSVarName:     org_opendap_var_d6e689
-            checkBoxName:    get_org_opendap_var_d6e689
+            myJSVarName:     org_opendap_var_d7e689
+            checkBoxName:    get_org_opendap_var_d7e689
             isContainer:     false
             isArray:         true
             myType:          Byte
             position:        1
             parentContainer: 
 - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e689 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_var_d6e689", true,false);
+        --><script type="text/javascript">org_opendap_var_d7e689 = new dap_var("NSCAT_Rev_20_Num_Beam_34", "org_opendap_var_d7e689", true,false);
 
             
-                DAP2_URL.add_dap_var(org_opendap_var_d6e689);
-            org_opendap_var_d6e689.checkBox = "get_org_opendap_var_d6e689";
+                DAP2_URL.add_dap_var(org_opendap_var_d7e689);
+            org_opendap_var_d7e689.checkBox = "get_org_opendap_var_d7e689";
             </script>
                      <div style="color: black;margin-left:-20px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_var_d6e689"
-                               onclick="org_opendap_var_d6e689.handle_projection_change(get_org_opendap_var_d6e689)"
+                        <input type="checkbox" id="get_org_opendap_var_d7e689"
+                               onclick="org_opendap_var_d7e689.handle_projection_change(get_org_opendap_var_d7e689)"
                                onfocus="describe_projection()"/>NSCAT_Rev_20_Num_Beam_34<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">row=
                     </span>
@@ -1165,17 +1172,17 @@
                         <span class="small" style="vertical-align: 15%; font-size: 25%;">(Type is Byte)
             </span>
                      </div>
-                     <input type="text" id="org_opendap_var_d6e689_dim_1" size="8"
+                     <input type="text" id="org_opendap_var_d7e689_dim_1" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e689.addDimension(org_opendap_var_d6e689_dim_1,46);
+                     <script type="text/javascript">org_opendap_var_d7e689.addDimension(org_opendap_var_d7e689_dim_1,46);
             </script>
-                     <input type="text" id="org_opendap_var_d6e689_dim_2" size="8"
+                     <input type="text" id="org_opendap_var_d7e689_dim_2" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e689.addDimension(org_opendap_var_d6e689_dim_2,6);
+                     <script type="text/javascript">org_opendap_var_d7e689.addDimension(org_opendap_var_d7e689_dim_2,6);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">

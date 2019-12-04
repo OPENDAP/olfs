@@ -66,19 +66,16 @@ public class Dap2IFH extends Dap4Responder {
     private Logger _log;
     private static String _defaultRequestSuffix = ".html";
 
+    private boolean _enforceRequiredUserSelection;
 
-    public Dap2IFH(String sysPath, BesApi besApi) {
-        this(sysPath,null, _defaultRequestSuffix,besApi);
+    public Dap2IFH(String sysPath, BesApi besApi, boolean enforceRequiredUserSelection) {
+        this(sysPath,null, _defaultRequestSuffix, besApi, enforceRequiredUserSelection);
     }
 
-    public Dap2IFH(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
-    }
-
-
-    public Dap2IFH(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+    public Dap2IFH(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean enforceRequiredUserSelection) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         _log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        _enforceRequiredUserSelection = enforceRequiredUserSelection;
 
         setServiceRoleId("http://services.opendap.org/dap2/data_request_form");
         setServiceTitle("DAP2 Dataset Form IFH");
@@ -95,6 +92,9 @@ public class Dap2IFH extends Dap4Responder {
     public boolean isMetadataResponder(){ return true; }
 
 
+    public boolean enforceRequiredUserSelection() {
+        return _enforceRequiredUserSelection;
+    }
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -163,6 +163,7 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
             transformer.setParameter("JsonLD", jsonLD);
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
+            transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 

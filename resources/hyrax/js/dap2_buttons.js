@@ -1,77 +1,23 @@
+var enforce_selection;
 
 function make_a_selection(){
     alert("Please select one or more variables before attempting to download/access data.");
 }
-
-function ascii_button() {
+function getAs_button_action(type_name, suffix) {
     var url = new String(document.forms[0].url.value);
 
     var url_parts = url.split("?");
     /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var ascii_url = url_parts[0] + ".ascii?" + url_parts[1];
-    } else {
+    if (url_parts[1] != null && url_parts[1].length>0) {
+        var get_as_url = url_parts[0] + suffix + "?" + url_parts[1];
+    } else if(enforce_selection) {
         make_a_selection();
         return;
-        // var ascii_url = url_parts[0] + ".ascii?";
     }
-
-    window.open(encodeURI(ascii_url), "ASCII_Data");
-}
-function covjson_button() {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var covjson_url = url_parts[0] + ".covjson?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var covjson_url = url_parts[0] + ".covjson?";
+    else {
+        var get_as_url = url_parts[0] +  suffix + "?";
     }
-
-    window.open(encodeURI(covjson_url), "CoverageJSON Data");
-}
-
-/* The netcdf_button handler loads the data to the current window. Since it
-is netcdf/binary, Netscape will ask the user for a filename and save the data
-to that file. The parameter 'ext' should be 'nc'. */
-
-function netcdf_button(ext) {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var binary_url = url_parts[0] + "." + ext + "?";
-    }
-
-    window.location = encodeURI(binary_url);
-}
-
-/* The binary_button handler loads the data to the current window. Since it
-is binary, Netscape will ask the user for a filename and save the data
-to that file. */
-
-function binary_button(ext) {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
-    /* handle case where constraint is null. */
-    if (url_parts[1] != null) {
-        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
-    } else {
-        make_a_selection();
-        return;
-        // var binary_url = url_parts[0] + "." + ext + "?";
-    }
-
-    window.location = encodeURI(binary_url);
+    window.open(encodeURI(get_as_url),type_name);
 }
 
 var help = 0;

@@ -36,6 +36,8 @@
       <script type="text/javascript">
                     DAP2_URL = new dap2_url("http://localhost:8080/opendap/data/nc/coads_climatology.nc");
                     DEBUG = new debug_obj();
+                    var es = "false";
+                    enforce_selection = es.localeCompare("true")==0;
                 </script>
       <title>OPeNDAP Data Access Form for  function_result_coads_climatology.nc</title>
    </head>
@@ -72,11 +74,16 @@
                </td>
                <td>
                   <div style="width:100%;margin-left:10px;">
-                     <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
-                     <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
-                     <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                     <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
-                     <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
+                     <input type="button" value="Get as ASCII"
+                            onclick="getAs_button_action('ASCII Data','.ascii')"/>
+                     <input type="button" value="Get as CoverageJSON"
+                            onclick="getAs_button_action('CoverageJSON Data', '.covjson')"/>
+                     <input type="button" value="Get as NetCDF 3"
+                            onclick="getAs_button_action('NetCDF-3 Data', '.nc')"/>
+                     <input type="button" value="Get as NetCDF 4"
+                            onclick="getAs_button_action('NetCDF-4 Data', '.nc4')"/>
+                     <input type="button" value="Binary (DAP) Object"
+                            onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                      <input type="button" value="Show Help" onclick="help_button()"/>
                   </div>
                </td>
@@ -136,24 +143,24 @@
                   <div style="margin-left:25px;"><!--
             - - - - - - - - - - -
             myFQN:        SST
-            myJSVarName:  org_opendap_var_d6e3
-            checkBoxName: get_org_opendap_var_d6e3
+            myJSVarName:  org_opendap_var_d7e3
+            checkBoxName: get_org_opendap_var_d7e3
             isContainer:  Yup. This is a Grid
             isArray:      No.  It's a Grid
             myType:       Grid
             position:     1
             parent:       
             - - - - - - - - - - -
-        --><script type="text/javascript">org_opendap_var_d6e3 = new dap_var("SST", "org_opendap_var_d6e3",true,false);
+        --><script type="text/javascript">org_opendap_var_d7e3 = new dap_var("SST", "org_opendap_var_d7e3",true,false);
 
 
             
-                DAP2_URL.add_dap_var(org_opendap_var_d6e3);
-            org_opendap_var_d6e3.checkBox = "get_org_opendap_var_d6e3";
+                DAP2_URL.add_dap_var(org_opendap_var_d7e3);
+            org_opendap_var_d7e3.checkBox = "get_org_opendap_var_d7e3";
             </script>
                      <div style="color: black;margin-left:-15px;margin-top:10px">
-                        <input type="checkbox" id="get_org_opendap_var_d6e3"
-                               onclick="org_opendap_var_d6e3.handle_projection_change(get_org_opendap_var_d6e3)"
+                        <input type="checkbox" id="get_org_opendap_var_d7e3"
+                               onclick="org_opendap_var_d7e3.handle_projection_change(get_org_opendap_var_d7e3)"
                                onfocus="describe_projection()"/>SST<span class="medium">[
                 <span class="small" style="vertical-align: 15%;">TIME=
                     </span>
@@ -174,23 +181,23 @@
             </span>
                         <span class="small" style="vertical-align: 15%;"> (Grid of Float32 values)</span>
                      </div>
-                     <input type="text" id="org_opendap_var_d6e3_dim_1" size="8"
+                     <input type="text" id="org_opendap_var_d7e3_dim_1" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_1,2);
+                     <script type="text/javascript">org_opendap_var_d7e3.addDimension(org_opendap_var_d7e3_dim_1,2);
             </script>
-                     <input type="text" id="org_opendap_var_d6e3_dim_2" size="8"
+                     <input type="text" id="org_opendap_var_d7e3_dim_2" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_2,13);
+                     <script type="text/javascript">org_opendap_var_d7e3.addDimension(org_opendap_var_d7e3_dim_2,13);
             </script>
-                     <input type="text" id="org_opendap_var_d6e3_dim_3" size="8"
+                     <input type="text" id="org_opendap_var_d7e3_dim_3" size="8"
                             oninput="autoResize(event)"
                             onfocus="describe_index()"
                             onChange="DAP2_URL.update_url()"/>
-                     <script type="text/javascript">org_opendap_var_d6e3.addDimension(org_opendap_var_d6e3_dim_3,33);
+                     <script type="text/javascript">org_opendap_var_d7e3.addDimension(org_opendap_var_d7e3_dim_3,33);
             </script>
                      <div class="tightView">
                         <ul class="collapsibleList">

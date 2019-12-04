@@ -36,6 +36,7 @@
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
+    <xsl:param name="enforceSelection" />
 
     <xsl:variable name="debug" select="false()"/>
 
@@ -72,6 +73,8 @@
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP2_URL = new dap2_url("<xsl:value-of select="$datasetUrl"/>");
                     DEBUG = new debug_obj();
+                    var es = "<xsl:value-of select="$enforceSelection"/>";
+                    enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
 
@@ -651,11 +654,11 @@
             </td>
             <td>
                 <div style="width:100%;margin-left:10px;">
-                    <input type="button" value="Get as ASCII" onclick="ascii_button()"/>
-                    <input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/>
-                    <input type="button" value="Get as NetCDF 3" onclick="binary_button('nc')"/>
-                    <input type="button" value="Get as NetCDF 4" onclick="binary_button('nc4')"/>
-                    <input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')"/>
+                    <input type="button" value="Get as ASCII" onclick="getAs_button_action('ASCII Data','.ascii')"/>
+                    <input type="button" value="Get as CoverageJSON" onclick="getAs_button_action('CoverageJSON Data', '.covjson')"/>
+                    <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.nc')"/>
+                    <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.nc4')"/>
+                    <input type="button" value="Binary (DAP) Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>
