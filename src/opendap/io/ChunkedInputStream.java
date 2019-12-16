@@ -199,7 +199,7 @@ public class ChunkedInputStream  {
 
         while(moreData && !isClosed){
 
-            if(availableInChunk()<=0){
+            if(availableInChunk() <= 0){
 
                 ret = readChunkHeader();
 
