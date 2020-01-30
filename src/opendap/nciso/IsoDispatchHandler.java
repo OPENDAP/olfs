@@ -30,6 +30,7 @@ import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -221,7 +222,9 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         ServletOutputStream os = response.getOutputStream();
 
         Document ddx = new Document();
+        User user = new User(request);
         _besApi.getDDXDocument(
+                user,
                 dataSourceId,
                 constraintExpression,
                 xmlBase,

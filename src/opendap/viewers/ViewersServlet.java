@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.http.error.BadRequest;
 import opendap.http.error.NotFound;
 import opendap.http.mediaTypes.TextHtml;
@@ -390,6 +391,8 @@ public class ViewersServlet extends HttpServlet {
         LOG.debug(ServletUtil.showRequest(req, REQ_NUMBER.get()));
 
         Request dapRequest = new Request(this,req);
+        User user = new User(req);
+
         String query = Scrub.simpleQueryString(req.getQueryString());
         int request_status = HttpServletResponse.SC_OK;
         try {
@@ -409,7 +412,7 @@ public class ViewersServlet extends HttpServlet {
             int port = serviceURL.getPort();
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
-            Document ddx = getDDX(serverURL, dapService, besDatasetId);
+            Document ddx = getDDX(user, serverURL, dapService, besDatasetId);
 
             String applicationID = req.getPathInfo();
             // Condition applicationID.
@@ -652,7 +655,7 @@ public class ViewersServlet extends HttpServlet {
      * @throws BESError
      * @throws JDOMException
      */
-    private Document getDDX(String serverURL, String dapService, String datasetID)
+    private Document getDDX(User user, String serverURL, String dapService, String datasetID)
             throws IOException, PPTException, BadConfigurationException, BESError, JDOMException {
 
         String constraintExpression = "";
@@ -661,6 +664,7 @@ public class ViewersServlet extends HttpServlet {
         // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
         RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextHtml());
         BES_API.getDDXDocument(
+                user,
                 datasetID,
                 constraintExpression,
                 xmlBase,

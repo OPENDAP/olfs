@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.jdom.Element;
 
 import java.util.Collection;
@@ -39,27 +40,27 @@ public class DummyCatalog implements WcsCatalog {
     }
 
     @Override
-    public boolean hasCoverage(String coverageId) throws InterruptedException {
+    public boolean hasCoverage(User user, String coverageId) throws InterruptedException {
         return false;
     }
 
     @Override
-    public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException {
+    public CoverageDescription getCoverageDescription(User user, String coverageId) throws InterruptedException, WcsException {
         return null;
     }
 
     @Override
-    public Element getCoverageDescriptionElement(String coverageId) throws InterruptedException, WcsException {
+    public Element getCoverageDescriptionElement(User user, String coverageId) throws InterruptedException, WcsException {
         return null;
     }
 
     @Override
-    public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException {
+    public Element getCoverageSummaryElement(User user, String coverageId) throws InterruptedException, WcsException {
         return null;
     }
 
     @Override
-    public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException {
+    public Collection<Element> getCoverageSummaryElements(User user) throws InterruptedException, WcsException {
         return new Vector<>();
     }
 

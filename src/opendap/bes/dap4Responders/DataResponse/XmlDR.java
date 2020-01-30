@@ -117,7 +117,7 @@ public class XmlDR extends Dap4Responder{
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsXml(resourceID,qp,user.getMaxResponseSize(),xmlBase,os);
+        besApi.writeDap4DataAsXml(user, resourceID,qp, xmlBase,os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());

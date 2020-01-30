@@ -34,6 +34,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.RDF;
 import opendap.io.HyraxStringEncoding;
@@ -130,8 +131,9 @@ public class RdfDMR extends Dap4Responder {
 
         Document dmr = new Document();
 
+        User user = new User(request);
 
-        besApi.getDMRDocument(resourceID,qp,xmlBase, dmr);
+        besApi.getDMRDocument(user, resourceID,qp,xmlBase, dmr);
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
 

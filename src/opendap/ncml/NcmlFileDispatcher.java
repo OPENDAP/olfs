@@ -33,6 +33,7 @@ import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
@@ -202,8 +203,10 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         String name = ReqInfo.getLocalUrl(request);
 
+        User user = new User(request);
 
-        Document ncml = getNcmlDocument(name);
+
+        Document ncml = getNcmlDocument(user, name);
 
         String besPrefix = _besApi.getBESprefix(name);
 
@@ -241,7 +244,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    private Document getNcmlDocument(String name)
+    private Document getNcmlDocument(User user, String name)
             throws BESError, IOException, BadConfigurationException, PPTException, JDOMException {
 
         SAXBuilder sb = new SAXBuilder();
@@ -250,7 +253,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        _besApi.writeFile(name, baos);
+        _besApi.writeFile(user, name, baos);
 
         ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 

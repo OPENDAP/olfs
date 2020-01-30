@@ -31,6 +31,7 @@ import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.Util;
 import opendap.ppt.PPTException;
@@ -208,7 +209,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
 
-    private Element getDmrFromBes(String besDatasource, String datasetUrl)
+    private Element getDmrFromBes(User user, String besDatasource, String datasetUrl)
             throws WcsException, IOException, JDOMException {
 
         if(!BESManager.isInitialized())
@@ -218,7 +219,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         QueryParameters qp = new QueryParameters();
         try {
             Document dmrDoc = new Document();
-            besApi.getDMRDocument(besDatasource, qp, datasetUrl, dmrDoc);
+            besApi.getDMRDocument(user, besDatasource, qp, datasetUrl, dmrDoc);
             return dmrDoc.detachRootElement();
         } catch (BadConfigurationException | PPTException | BESError error) {
             String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
@@ -229,7 +230,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
-    private void writeDmrFromBes(String besDatasource, String datasetUrl, OutputStream fos)
+    private void writeDmrFromBes(User user, String besDatasource, String datasetUrl, OutputStream fos)
             throws WcsException, IOException {
         
         if(!BESManager.isInitialized())
@@ -238,7 +239,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         BesApi besApi = new BesApi();
         QueryParameters qp = new QueryParameters();
         try {
-            besApi.writeDMR(besDatasource, qp, datasetUrl, fos);
+            besApi.writeDMR(user, besDatasource, qp, datasetUrl, fos);
         } catch (BadConfigurationException | PPTException | BESError error) {
             String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
                     " Message: " + error.getMessage();
@@ -257,7 +258,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
      * @throws InterruptedException
      * @throws WcsException
      */
-    private Element getDMR(String coverageId)
+    private Element getDMR(User user, String coverageId)
             throws IOException, JDOMException, InterruptedException, WcsException {
         _log.debug("getDMR() - BEGIN coverageId: {}", coverageId);
 
@@ -278,7 +279,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             // Build the BES Data Source name from the datasetUrl by stripping the protocol part.
             String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
             // Get the DMR element for the besDatasource from the BES.
-            Element dmrElement = getDmrFromBes(besDatasource, datasetUrl);
+            Element dmrElement = getDmrFromBes(user, besDatasource, datasetUrl);
             dmrElement.setAttribute("name", coverageId);
             // Throw a ref to it in the per-thread request cache so we don't do this again within a request
             RequestCache.put(responseCacheKey,dmrElement);
@@ -325,16 +326,12 @@ public class DynamicServiceCatalog implements WcsCatalog{
      * @return
      */
 
-    private Element getCachedDMR(String coverageId) throws IOException, JDOMException, InterruptedException, WcsException {
+    private Element getCachedDMR(User user, String coverageId) throws IOException, JDOMException, InterruptedException, WcsException {
 
         _log.debug("getCachedDMR() - BEGIN coverageId: {}",coverageId);
 
         String _cacheDir = "/tmp";
         ReentrantReadWriteLock _cacheLock = new ReentrantReadWriteLock();
-
-
-
-
 
         String datasetUrl = getDapDatsetUrl(coverageId);
         _log.debug("getCachedDMR() - DAP Dataset URL: {}",datasetUrl);
@@ -366,7 +363,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
                 try {
                     if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
                         String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
-                        writeDmrFromBes(besDatasource,datasetUrl,fos);
+                        writeDmrFromBes(user, besDatasource,datasetUrl,fos);
                     } else if (datasetUrl.startsWith(Util.HTTP_PROTOCOL) || datasetUrl.startsWith(Util.HTTPS_PROTOCOL)) {
                         String dmrUrl = datasetUrl + ".dmr.xml";
                         _log.debug("getCachedDMR() - DMR URL: {}",dmrUrl);
@@ -395,9 +392,9 @@ public class DynamicServiceCatalog implements WcsCatalog{
 
 
     @Override
-    public boolean hasCoverage(String coverageId) throws InterruptedException {
+    public boolean hasCoverage(User user, String coverageId) throws InterruptedException {
         try {
-            if(getDMR(coverageId) != null)
+            if(getDMR(user, coverageId) != null)
                 return true;
 
         } catch (IOException | JDOMException | WcsException e) {
@@ -415,7 +412,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
      * @throws WcsException
      */
     @Override
-    public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException {
+    public CoverageDescription getCoverageDescription(User user, String coverageId) throws InterruptedException, WcsException {
 
         try {
             // Have we been here before in this thread/request?
@@ -426,7 +423,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
             if(coverageDescription!=null)
                 return coverageDescription;
 
-            Element dmr = getDMR(coverageId);
+            Element dmr = getDMR(user, coverageId);
             if(dmr==null)
                 return null;
 
@@ -449,14 +446,14 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
     @Override
-    public Element getCoverageDescriptionElement(String coverageId) throws InterruptedException, WcsException {
-        return getCoverageDescription(coverageId).getCoverageDescriptionElement();
+    public Element getCoverageDescriptionElement(User user, String coverageId) throws InterruptedException, WcsException {
+        return getCoverageDescription(user, coverageId).getCoverageDescriptionElement();
     }
 
 
     @Override
-    public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException {
-        CoverageDescription cDesc = getCoverageDescription(coverageId);
+    public Element getCoverageSummaryElement(User user, String coverageId) throws InterruptedException, WcsException {
+        CoverageDescription cDesc = getCoverageDescription(user, coverageId);
         if(cDesc!=null){
 
             return cDesc.getCoverageSummary();
@@ -474,10 +471,10 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
     @Override
-    public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException {
+    public Collection<Element> getCoverageSummaryElements(User user ) throws InterruptedException, WcsException {
 
         Vector<Element> results = new Vector<>();
-        CoverageDescription cDesc = getCoverageDescription("foo");
+        CoverageDescription cDesc = getCoverageDescription(user, "foo");
         if (cDesc != null) {
 
 

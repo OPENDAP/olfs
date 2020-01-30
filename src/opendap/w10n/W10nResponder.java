@@ -274,7 +274,7 @@ public class W10nResponder {
                 if(isFile) {
                     // And then we to send the response, using the MediaType to determine what to
                     // send back.
-                    sendW10nMetaResponseForDap2Metadata(w10nRequest, user.getMaxResponseSize(), response);
+                    sendW10nMetaResponseForDap2Metadata(user, w10nRequest, user.getMaxResponseSize(), response);
                 }
                 else {
                     // It's not a file! That's a BAD THING.
@@ -314,7 +314,7 @@ public class W10nResponder {
                 }
                 else {
                     // Fine, let's just send them the thang.
-                    sendFile(request,response);
+                    sendFile(user, request,response);
                 }
             }
             else if(remainder.length()==0 ){
@@ -327,7 +327,7 @@ public class W10nResponder {
                 w10nRequest.setBestMediaType(defaultDataMediaType, supportedDataMediaTypes);
                 log.debug("sendW10NResponse() - Sending w10n data response for resource: {} Response type: {}",w10nRequest.getRequestedResourceId(),w10nRequest.getBestMediaType().getMimeType());
                 setResponseHeaders(request,w10nRequest.getRequestedResourceId(), w10nRequest.getBestMediaType(), response);
-                sendW10nDataResponse(w10nRequest, user.getMaxResponseSize(), response);
+                sendW10nDataResponse(user, w10nRequest, response);
             }
         }
         log.debug("sendW10NResponse() - END.");
@@ -667,8 +667,9 @@ public class W10nResponder {
      *
      * Sends the w10n data response using the client/server negotiated media type.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
@@ -676,8 +677,8 @@ public class W10nResponder {
      * @throws BESError
      */
     private void sendW10nDataResponse(
+            User user,
             W10nRequest w10nRequest,
-            int maxResponseSize,
             HttpServletResponse response)
             throws IOException, OPeNDAPException {
 
@@ -690,22 +691,22 @@ public class W10nResponder {
 
         // Call the best responder for the requested media type
         if(mt.getName().equalsIgnoreCase(Json.NAME)) {
-            sendDap2DataAsW10nJson(w10nRequest, maxResponseSize, response);
+            sendDap2DataAsW10nJson(user, w10nRequest, response);
             return;
         }
 
         if(mt.getName().equalsIgnoreCase(Dap2Data.NAME)) {
-            sendDap2Data(w10nRequest, maxResponseSize, response);
+            sendDap2Data(user, w10nRequest, response);
             return;
         }
 
         if(mt.getName().equalsIgnoreCase(Netcdf3.NAME)) {
-            sendNetCdf3(w10nRequest, maxResponseSize, response);
+            sendNetCdf3(user, w10nRequest, response);
             return;
         }
 
         if(mt.getName().equalsIgnoreCase(Netcdf4.NAME)) {
-            sendNetCdf4(w10nRequest, maxResponseSize, response);
+            sendNetCdf4(user, w10nRequest, response);
             return;
         }
         throw new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of "+ mt.getMimeType());
@@ -716,16 +717,17 @@ public class W10nResponder {
      * Utilizes the BesApi and the BES fileout_netcdf handler to transmit the requested variable
      * as NetCDF-3 encoded data.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws BESError
      */
-    public void sendNetCdf3(W10nRequest w10nRequest,
-                            int maxResponseSize,
+    public void sendNetCdf3(User user,
+                            W10nRequest w10nRequest,
                             HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -749,10 +751,10 @@ public class W10nResponder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf3(
+                user,
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                maxResponseSize,
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());
@@ -767,16 +769,17 @@ public class W10nResponder {
      * Utilizes the BesApi and the BES fileout_netcdf handler to transmit the requested variable
      * as NetCDF-4 encoded data.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws BESError
      */
-    public void sendNetCdf4(W10nRequest w10nRequest,
-                            int maxResponseSize,
+    public void sendNetCdf4(User user,
+                            W10nRequest w10nRequest,
                             HttpServletResponse response)
                 throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -803,10 +806,10 @@ public class W10nResponder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf4(
+                user,
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
-                maxResponseSize,
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());
@@ -818,16 +821,17 @@ public class W10nResponder {
     /**
      * Utilizes the BesApi and the BES w10n_handler to transmit the DAP2 data encoded as w10n JSON.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void sendDap2DataAsW10nJson(W10nRequest w10nRequest,
-                                        int maxResponseSize,
+    private void sendDap2DataAsW10nJson(User user,
+                                        W10nRequest w10nRequest,
                                         HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -858,12 +862,12 @@ public class W10nResponder {
 
         ServletOutputStream os = response.getOutputStream();
         besApi.writeDap2DataAsW10nJson(
+                user,
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
-                maxResponseSize,
                 os);
         os.flush();
     }
@@ -872,16 +876,17 @@ public class W10nResponder {
      *
      * Sends a DAP2 data response for the requested variable.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void sendDap2Data(W10nRequest w10nRequest,
-                              int maxResponseSize,
+    private void sendDap2Data(User user,
+                              W10nRequest w10nRequest,
                               HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -902,7 +907,7 @@ public class W10nResponder {
         log.debug("sendDap2Data() - DAP2 Data file downloadFileName: {}", downloadFileName);
 
         response.setHeader(CONTENT_DESCRIPTION, "DAP2 Data Response");
-        besApi.writeDap2Data(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, maxResponseSize, os);
+        besApi.writeDap2Data(user, w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, os);
 
         os.flush();
     }
@@ -911,6 +916,8 @@ public class W10nResponder {
     /**
      * Transmits a non-data file from the BES to the requesting client.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param req
      * @param response
      * @throws IOException
@@ -918,7 +925,8 @@ public class W10nResponder {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    public void sendFile(HttpServletRequest req,
+    public void sendFile( User user,
+                          HttpServletRequest req,
                          HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -937,7 +945,7 @@ public class W10nResponder {
             }
         }
         ServletOutputStream sos = response.getOutputStream();
-        besApi.writeFile(name, sos);
+        besApi.writeFile(user, name, sos);
         sos.flush();
     }
 
@@ -947,6 +955,8 @@ public class W10nResponder {
      * Sends the w10n meta response using the client/server negotiated media type.
      *
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
      * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
@@ -957,7 +967,8 @@ public class W10nResponder {
      * @throws JDOMException
      * @throws SaxonApiException
      */
-    private void sendW10nMetaResponseForDap2Metadata(W10nRequest w10nRequest,
+    private void sendW10nMetaResponseForDap2Metadata(User user,
+                                                     W10nRequest w10nRequest,
                                                     int maxResponseSize,
                                                     HttpServletResponse response)
             throws OPeNDAPException, IOException, JDOMException, SaxonApiException {
@@ -971,12 +982,12 @@ public class W10nResponder {
         response.setContentType(mt.getMimeType());
 
         if(mt.getName().equalsIgnoreCase(TextHtml.NAME)){
-            sendDap2MetadataAsW10nHtml(w10nRequest, response);
+            sendDap2MetadataAsW10nHtml(user,w10nRequest, response);
             return;
         }
 
         if(mt.getName().equalsIgnoreCase(Json.NAME)){
-            sendDap2MetadataAsW10nJson(w10nRequest,maxResponseSize,response);
+            sendDap2MetadataAsW10nJson(user, w10nRequest,maxResponseSize,response);
             return;
         }
         throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
@@ -987,6 +998,8 @@ public class W10nResponder {
      *
      * Utilizes the BesApi and the BES w10n_handler to transmit the DAP2 metadata encoded as w10n JSON.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
      * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
@@ -995,7 +1008,10 @@ public class W10nResponder {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void sendDap2MetadataAsW10nJson(W10nRequest w10nRequest, int maxResponseSize, HttpServletResponse response)
+    private void sendDap2MetadataAsW10nJson(User user,
+                                            W10nRequest w10nRequest,
+                                            int maxResponseSize,
+                                            HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
         Gson gs = new Gson();
@@ -1010,13 +1026,13 @@ public class W10nResponder {
         ServletOutputStream os = response.getOutputStream();
 
         besApi.writeDap2MetadataAsW10nJson(
+                user,
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
                 w10nRequest.traverse(),
-                maxResponseSize,
                 os);
 
         os.flush();
@@ -1037,12 +1053,14 @@ public class W10nResponder {
      * @throws JDOMException
      * @throws SaxonApiException
      */
-    private void sendDap2MetadataAsW10nHtml(W10nRequest w10nRequest,  HttpServletResponse response)
+    private void sendDap2MetadataAsW10nHtml(User user,
+                                            W10nRequest w10nRequest,
+                                            HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError, JDOMException, SaxonApiException {
 
         Document besResponse = new Document();
 
-        besApi.getDDXDocument(w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), w10nRequest.getXmlBase(),  besResponse);
+        besApi.getDDXDocument(user, w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), w10nRequest.getXmlBase(),  besResponse);
 
 
         boolean isNode = true;

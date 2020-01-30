@@ -117,9 +117,9 @@ public class GmlJpeg2000DR extends Dap4Responder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsGmlJpeg2000(
+                user,
             resourceID,
             qp,
-            user.getMaxResponseSize(),
             os);
         os.flush();
         LogUtil.setResponseSize(os.size());

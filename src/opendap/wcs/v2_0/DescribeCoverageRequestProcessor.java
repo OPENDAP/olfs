@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -37,7 +38,7 @@ import org.jdom.Element;
  */
 public class DescribeCoverageRequestProcessor {
 
-    public static Document processDescribeCoveragesRequest(DescribeCoverageRequest req)  throws InterruptedException, WcsException {
+    public static Document processDescribeCoveragesRequest(User user, DescribeCoverageRequest req)  throws InterruptedException, WcsException {
 
 
         Element coverageDescriptions = new Element("CoverageDescriptions",WCS.WCS_NS);
@@ -62,7 +63,7 @@ public class DescribeCoverageRequestProcessor {
         if(ids!=null && ids.length>0){
             for(String id: ids){
                 WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(id);
-                cd = wcsCatalog.getCoverageDescription(id);
+                cd = wcsCatalog.getCoverageDescription(user,id);
                 coverageDescriptions.addContent(cd.getCoverageDescriptionElement());
             }
         }

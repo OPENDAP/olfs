@@ -115,9 +115,9 @@ public class JsonDR extends Dap4Responder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsJson(
+                user,
                 resourceID,
                 qp,
-                user.getMaxResponseSize(),
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());

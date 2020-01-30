@@ -34,6 +34,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
@@ -115,7 +116,9 @@ public class Iso19115Rubric extends Dap4Responder {
 
 
         Document ddx = new Document();
+        User user = new User(request);
         besApi.getDDXDocument(
+                user,
                 resourceID,
                 constraintExpression,
                 xmlBase,

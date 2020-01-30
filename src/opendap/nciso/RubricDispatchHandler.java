@@ -32,6 +32,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.http.mediaTypes.TextXml;
 import opendap.xml.Transformer;
@@ -194,6 +195,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
             throws Exception {
 
 
+        User user = new User(request);
         Request oreq = new Request(null,request);
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
@@ -223,6 +225,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         Document ddx = new Document();
         _besApi.getDDXDocument(
+                user,
                 dataSourceId,
                 constraintExpression,
                 xmlBase,

@@ -109,9 +109,9 @@ public class Ijson extends Dap4Responder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsIjsn(
+                user,
                 resourceID,
                 constraintExpression,
-                user.getMaxResponseSize(),
                 os);
 
         os.flush();

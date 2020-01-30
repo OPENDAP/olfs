@@ -30,6 +30,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.http.error.Forbidden;
 import opendap.io.HyraxStringEncoding;
 import opendap.services.FileService;
@@ -176,6 +177,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         String name = ReqInfo.getLocalUrl(req);
 
+        User user= new User(req);
 
         log.debug("sendFile(): Sending file \"" + name + "\"");
 
@@ -200,7 +202,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        _besApi.writeFile(name, sos);
+        _besApi.writeFile(user, name, sos);
 
         sos.flush();
     }

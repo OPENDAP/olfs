@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.jdom.Document;
 
 /**
@@ -36,7 +37,7 @@ import org.jdom.Document;
  * To change this template use File | Settings | File Templates.
  */
 public interface WcsResponder {
-        Document getCapabilities(GetCapabilitiesRequest gcr, String serviceUrl) throws WcsException, InterruptedException;
-        Document describeCoverage(DescribeCoverageRequest dcr) throws WcsException, InterruptedException;
+        Document getCapabilities(User user, GetCapabilitiesRequest gcr, String serviceUrl) throws WcsException, InterruptedException;
+        Document describeCoverage(User user, DescribeCoverageRequest dcr) throws WcsException, InterruptedException;
 
 }

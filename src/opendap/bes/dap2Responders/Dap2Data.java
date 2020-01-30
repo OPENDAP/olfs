@@ -135,7 +135,7 @@ public class Dap2Data extends Dap4Responder {
         else {
             os = new DataOutputStream(response.getOutputStream());
         }
-        besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),user.getMaxResponseSize(),os);
+        besApi.writeDap2Data(user, resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),os);
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }

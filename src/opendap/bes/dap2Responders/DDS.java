@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextPlain;
 import opendap.logging.LogUtil;
 import org.slf4j.Logger;
@@ -111,7 +112,8 @@ public class DDS extends Dap4Responder {
 
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDDS(resourceID, constraintExpression, os);
+        User user = new User(request);
+        besApi.writeDDS(user, resourceID, constraintExpression, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

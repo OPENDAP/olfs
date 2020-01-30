@@ -148,9 +148,9 @@ public class NormativeDR extends Dap4Responder {
             os = new DataOutputStream(response.getOutputStream());
         }
         besApi.writeDap4Data(
+                user,
                 resourceID,
                 qp,
-                user.getMaxResponseSize(),
                 xmlBase,
                 startID,
                 mb.getBoundary(),

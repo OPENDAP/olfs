@@ -112,9 +112,9 @@ public class XmlData extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsXml(
+                user,
                 resourceID,
                 constraintExpression,
-                user.getMaxResponseSize(),
                 xmlBase,
                 os);
         os.flush();

@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.logging.LogUtil;
 import org.slf4j.Logger;
@@ -107,7 +108,8 @@ public class DDX extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDDX(resourceID,constraintExpression,xmlBase,os);
+        User user = new User(request);
+        besApi.writeDDX(user, resourceID,constraintExpression,xmlBase,os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
