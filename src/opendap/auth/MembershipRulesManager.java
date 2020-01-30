@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  */
 public class MembershipRulesManager {
 
-    private static ConcurrentHashMap<String, Group> _groups;
+    private static ConcurrentHashMap<String, AuthGroup> _groups;
     private static ConcurrentHashMap<String, HashSet<String>> _roles;
     private static ReentrantLock _configLock;
     static {
@@ -74,8 +74,8 @@ public class MembershipRulesManager {
             throw new ConfigurationException("init() - Every <group> MUST have an \"id\" attribute.");
         }
 
-        _groups.putIfAbsent(gid, new Group(gid));
-        Group group = _groups.get(gid);
+        _groups.putIfAbsent(gid, new AuthGroup(gid));
+        AuthGroup authGroup = _groups.get(gid);
 
         Iterator userItr = groupElem.getChildren("user").iterator();
         if(!userItr.hasNext()){
@@ -108,7 +108,7 @@ public class MembershipRulesManager {
                 // interpreted as a pattern...
                 authContextPatternStr = Pattern.quote(authContext);
             }
-            group.addUserPattern(uidPatternStr,authContextPatternStr);
+            authGroup.addUserPattern(uidPatternStr,authContextPatternStr);
         }
     }
 
@@ -141,9 +141,9 @@ public class MembershipRulesManager {
 
     private static Vector<String> getUserGroups(String uid, String authContext){
         Vector<String> groupMemberships = new Vector<>();
-        for(Group group: _groups.values()){
-            if(group.isMember(uid, authContext)){
-                groupMemberships.add(group.name());
+        for(AuthGroup authGroup : _groups.values()){
+            if(authGroup.isMember(uid, authContext)){
+                groupMemberships.add(authGroup.name());
             }
         }
         return groupMemberships;

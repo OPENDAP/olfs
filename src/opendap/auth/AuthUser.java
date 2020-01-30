@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  * Every user has a user ID and an authentication context from which the user ID was
  * derived/acquired.
  */
-class User {
+class AuthUser {
 
     private String _uidPatternString;
     private Pattern _uidPattern;
@@ -14,7 +14,7 @@ class User {
     private String _authContextPatternString;
     private Pattern _authContextPattern;
 
-    public User(String uidPatternString, String authContextPatternString){
+    public AuthUser(String uidPatternString, String authContextPatternString){
         _uidPatternString = uidPatternString;
         _uidPattern = Pattern.compile(_uidPatternString);
         _authContextPatternString = authContextPatternString;
