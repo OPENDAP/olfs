@@ -35,6 +35,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.LogUtil;
@@ -126,8 +127,10 @@ public class IsoRubricDMR extends Dap4Responder {
 
         Document dmr = new Document();
 
+        User user = new User(request);
 
         besApi.getDMRDocument(
+                user,
                 resourceID,
                 qp,
                 xmlBase,

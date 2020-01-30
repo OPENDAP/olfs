@@ -29,6 +29,7 @@ package opendap.ncml;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
+import opendap.dap.User;
 import opendap.logging.LogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
@@ -80,10 +81,10 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
      * @see opendap.bes.dap2Responders.BesApi
      */
     @Override
-    public  Document getDap2RequestDocument(String type,
+    public  Document getDap2RequestDocument(User user,
+                                            String type,
                                             String localDataSourceId,
                                             String ce,
-                                            int maxResponseSize,
                                             String xmlBase,
                                             String formURL,
                                             String returnAs,
@@ -112,8 +113,8 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
-        if(maxResponseSize>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+        if(user.getMaxResponseSize()>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
         Element ncmlDatasetContainer =  NcmlManager.getNcmlDatasetContainer(localDataSourceId);
 

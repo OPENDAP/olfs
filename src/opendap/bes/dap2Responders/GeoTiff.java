@@ -109,9 +109,9 @@ public class GeoTiff extends Dap4Responder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsGeoTiff(
+                user,
                 resourceID,
                 constraintExpression,
-                user.getMaxResponseSize(),
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());

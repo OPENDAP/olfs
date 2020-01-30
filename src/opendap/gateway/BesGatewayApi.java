@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.LogUtil;
 import opendap.namespaces.BES;
@@ -112,12 +113,12 @@ public class BesGatewayApi extends BesApi implements Cloneable {
      * @see opendap.bes.dap2Responders.BesApi
      */
     @Override
-    public Document getDap2RequestDocumentAsync(String type,
+    public Document getDap2RequestDocumentAsync(User user,
+                                                String type,
                                            String remoteDataSourceUrl,
                                            String ce,
                                            String async,
                                            String storeResult,
-                                           int maxResponseSize,
                                            String xmlBase,
                                            String formURL,
                                            String returnAs,
@@ -144,8 +145,8 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
-        if(maxResponseSize>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+        if(user.getMaxResponseSize()>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
@@ -175,10 +176,10 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
 
     @Override
-    public  Document getDap4RequestDocument(String type,
+    public  Document getDap4RequestDocument(User user,
+                                            String type,
                                             String remoteDataSourceUrl,
                                             QueryParameters qp,
-                                            int maxResponseSize,
                                             String xmlBase,
                                             String formURL,
                                             String returnAs,
@@ -216,8 +217,8 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
-        if(maxResponseSize>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+        if(user.getMaxResponseSize()>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
@@ -317,9 +318,6 @@ public class BesGatewayApi extends BesApi implements Cloneable {
      *  Returns the DDX request document for the passed dataSource
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDX is being requested
-     * @param ce The constraint expression to apply.
-     * @param xdap_accept The version of the dap that should be used to build the
-     * response.
      * @param xmlBase The request URL.
      * @param contentID contentID of the first MIME part.
      * @param mimeBoundary The MIME boundary to use in the response..
@@ -327,16 +325,16 @@ public class BesGatewayApi extends BesApi implements Cloneable {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public Document getDap4DataRequest(String dataSource,
-                                       String ce,
-                                       String xdap_accept,
-                                       int maxResponseSize,
+    @Override
+    public Document getDap4DataRequest(User user,
+                                       String dataSource,
+                                       QueryParameters qp,
                                        String xmlBase,
                                        String contentID,
                                        String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, maxResponseSize, xmlBase, null, null, XML_ERRORS);
+        Document reqDoc = getDap4RequestDocument(user, DataDDX, dataSource, qp, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
         if(req==null)

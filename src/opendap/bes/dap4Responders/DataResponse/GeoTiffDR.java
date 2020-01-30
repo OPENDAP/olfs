@@ -113,10 +113,9 @@ public class GeoTiffDR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsGeoTiff(
+        besApi.writeDap4DataAsGeoTiff(user,
             resourceID,
             qp,
-            user.getMaxResponseSize(),
             os);
         os.flush();
         LogUtil.setResponseSize(os.size());

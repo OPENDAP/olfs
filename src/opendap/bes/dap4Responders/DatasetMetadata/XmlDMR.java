@@ -33,6 +33,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextXml;
 import opendap.logging.LogUtil;
@@ -107,7 +108,8 @@ public class XmlDMR extends Dap4Responder {
         //response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDMR(resourceID,qp,xmlBase,os);
+        User user = new User(request);
+        besApi.writeDMR(user,resourceID,qp,xmlBase,os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

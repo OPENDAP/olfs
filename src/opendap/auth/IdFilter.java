@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 public class IdFilter implements Filter {
@@ -447,10 +446,10 @@ public class IdFilter implements Filter {
                 }
                 out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
 
-                OAuthAccessToken oaToken = (OAuthAccessToken) session.getAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN);
+                OAuth2AccessToken oaToken = (OAuth2AccessToken) session.getAttribute(OAuth2AccessToken.OAUTH_ACCESS_TOKEN);
 
                 if(oaToken != null){
-                    out.println("<dt><b>"+OAuthAccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
+                    out.println("<dt><b>"+OAuth2AccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
 
                 }
                 out.println("</dl>");

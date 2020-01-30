@@ -116,10 +116,11 @@ public class IjsonDMR extends Dap4Responder {
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
+
         besApi.writeDap4MetadataAsIjsn(
+                user,
                 resourceID,
                 qp,
-                user.getMaxResponseSize(),
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());

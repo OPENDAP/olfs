@@ -34,9 +34,15 @@ import java.util.Date;
 /**
  * Created by ndp on 9/24/14.
  */
-public class OAuthAccessToken {
+public class OAuth2AccessToken {
 
     public static final String OAUTH_ACCESS_TOKEN  = "oauth_access_token";
+    public static final String ACCESS_TOKEN  = "access_token";
+    public static final String ENDPOINT  = "endpoint";
+    public static final String EXPIRES_IN  = "expires_in";
+    public static final String TOKEN_TYPE  = "token_type";
+    public static final String REFRESH_TOKEN  = "refresh_token";
+
     private String _accessToken;
     private String _endPoint;
     private long _expiresIn;
@@ -46,15 +52,33 @@ public class OAuthAccessToken {
 
 
 
-    public OAuthAccessToken(JsonObject json)  {
+    public OAuth2AccessToken(JsonObject json)  {
         _creationTime = new Date();
-        _accessToken  = json.get("access_token").getAsString();
-        _endPoint     = json.get("endpoint").getAsString();
-        _expiresIn    = json.get("expires_in").getAsLong();
-        _tokenType    = json.get("token_type").getAsString();
-        _refreshToken = json.get("refresh_token").getAsString();
+        _accessToken  = json.get(ACCESS_TOKEN).getAsString();
+        _endPoint     = json.get(ENDPOINT).getAsString();
+        _expiresIn    = json.get(EXPIRES_IN).getAsLong();
+        _tokenType    = json.get(TOKEN_TYPE).getAsString();
+        _refreshToken = json.get(REFRESH_TOKEN).getAsString();
     }
 
+
+    public OAuth2AccessToken(OAuth2AccessToken oat)  {
+        _creationTime = oat._creationTime;
+        _accessToken  = oat._accessToken;
+        _endPoint     = oat._endPoint;
+        _expiresIn    = oat._expiresIn;
+        _tokenType    = oat._tokenType;
+        _refreshToken = oat._refreshToken;
+    }
+    public OAuth2AccessToken() {
+        _creationTime = new Date();
+        _accessToken  = "ASPECIALURSACCESSTOKENSTRING";
+        _endPoint     = "http://endpoint.url";
+        _expiresIn    = 3600;
+        _tokenType    = "token_type";
+        _refreshToken = "ASPECIALURSREFRESHTOKEN";
+
+    }
 
 
     public String getAccessToken(){
@@ -109,16 +133,22 @@ public class OAuthAccessToken {
         return _expiresIn - (now.getTime() - _creationTime.getTime());
 
     }
+    public String toString() {
+        return toString("","    ");
 
+    }
 
-    public String toString(){
-        StringBuilder sb = new StringBuilder(this.getClass().getName()).append("\n");
-        sb.append("  creationTime: ").append(_creationTime).append("\n");
-        sb.append("  accessToken: ").append(_accessToken).append("\n");
-        sb.append("  endPoint: ").append(_endPoint).append("\n");
-        sb.append("  expiresIn: ").append(_expiresIn).append("\n");
-        sb.append("  tokenType: ").append(_tokenType).append("\n");
-        sb.append("  refreshToken: ").append(_refreshToken);
+    public String toString(String indent, String indent_inc){
+        StringBuilder sb = new StringBuilder();
+        String l1i = indent +indent_inc;
+        sb.append(indent).append("\"").append(this.getClass().getName()).append("\" : {\n");
+        sb.append(l1i).append("\"creationTime\" : \"").append(_creationTime).append("\",\n");
+        sb.append(l1i).append("\"").append(ACCESS_TOKEN).append("\" : \"").append(_accessToken).append("\",\n");
+        sb.append(l1i).append("\"").append(ENDPOINT).append("\" : \"").append(_endPoint).append("\",\n");
+        sb.append(l1i).append("\"").append(EXPIRES_IN).append("\" : \"").append(_expiresIn).append("\",\n");
+        sb.append(l1i).append("\"").append(TOKEN_TYPE).append("\" : \"").append(_tokenType).append("\",\n");
+        sb.append(l1i).append("\"").append(REFRESH_TOKEN).append("\" : \"").append(_refreshToken).append("\"\n");
+        sb.append(indent).append("}\n");
         return sb.toString();
     }
 

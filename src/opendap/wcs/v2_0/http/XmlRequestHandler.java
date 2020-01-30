@@ -30,6 +30,7 @@ import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
@@ -60,7 +61,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     //protected HttpServlet dispatchServlet;
 
     protected boolean _initialized;
-    protected String _prefix;
+    private String _prefix;
 
     protected Element _config;
 
@@ -83,9 +84,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
 
-    private void ingestPrefix() throws Exception{
-
-        String msg;
+    private void ingestPrefix() {
 
         Element e = _config.getChild("prefix");
         if(e!=null)
@@ -158,8 +157,9 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
 
-    public void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws WcsException, InterruptedException {
+    private void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws WcsException, InterruptedException {
 
+        User user = new User(request);
         BufferedReader sis = getRequestReader(request);
         String encoding = getEncoding(request);
 
@@ -170,33 +170,33 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
         String requestUrl=HttpGetHandler.getRequestUrlWithQuery(request);
 
-        handleWcsRequest(wcsRequest,serviceUrl,requestUrl, response);
+        handleWcsRequest(user, wcsRequest,serviceUrl,requestUrl, response);
 
 
 
     }
 
-    public void handleWcsRequest(Element wcsRequest, String serviceUrl, String requestUrl, HttpServletResponse response) throws WcsException, InterruptedException {
+    private void handleWcsRequest(User user, Element wcsRequest, String serviceUrl, String requestUrl, HttpServletResponse response) throws WcsException, InterruptedException {
 
         Document wcsResponse;
         switch (getRequestType(wcsRequest)) {
 
             case GET_CAPABILITIES:
                 GetCapabilitiesRequest getCapabilitiesRequest = new  GetCapabilitiesRequest(wcsRequest);
-                wcsResponse = getCapabilities(getCapabilitiesRequest, serviceUrl);
+                wcsResponse = getCapabilities(user, getCapabilitiesRequest, serviceUrl);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
             case DESCRIBE_COVERAGE:
                 DescribeCoverageRequest wcsDCR = new DescribeCoverageRequest(wcsRequest);
-                wcsResponse = describeCoverage(wcsDCR);
+                wcsResponse = describeCoverage(user, wcsDCR);
                 sendWcsResponse(wcsResponse,response);
                 break;
 
             case GET_COVERAGE:
-                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(requestUrl,wcsRequest);
+                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(user, requestUrl,wcsRequest);
                 try {
-                    sendCoverageResponse(getCoverageRequest, response);
+                    sendCoverageResponse(user, getCoverageRequest, response);
                 } catch (IOException | PPTException | BadConfigurationException | BESError e) {
                     throw new WcsException("FAILED to complete the GetCoverage operation, :(  Caught "+
                     e.getClass().getName()+ "  message: "+ e.getMessage(),WcsException.NO_APPLICABLE_CODE);
@@ -213,7 +213,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
     }
 
-    public void handleWcsError(WcsExceptionReport er, HttpServletResponse response) {
+    private void handleWcsError(WcsExceptionReport er, HttpServletResponse response) {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         try {
             ServletOutputStream os = response.getOutputStream();
@@ -228,7 +228,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
 
 
-    public void sendWcsResponse(Document wcsResponse, HttpServletResponse response) throws WcsException {
+    private void sendWcsResponse(Document wcsResponse, HttpServletResponse response) throws WcsException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         try {
@@ -311,15 +311,15 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
 
 
-    public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
+    public Document getCapabilities(User user, GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
 
-        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(user, wcsRequest, serviceUrl);
     }
 
 
-    public Document describeCoverage(DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
+    public Document describeCoverage(User user, DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
 
-        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
+        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(user, wcsRequest);
     }
 
 
@@ -331,15 +331,15 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      * @throws WcsException  When bad things happen.
      * @throws InterruptedException When it gets interrupted.
      */
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
+    public void sendCoverageResponse(User user, GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
-        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequestProcessor.sendCoverageResponse(user, req, response, false );
 
     }
 
 
 
-    public static WCS.REQUEST getRequestType(Element req) throws WcsException{
+    private static WCS.REQUEST getRequestType(Element req) throws WcsException{
         if(req == null){
             throw new WcsException("Poorly formatted WCS request. Missing " +
                     "root element of document.",

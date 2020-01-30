@@ -115,7 +115,7 @@ public class Ascii extends Dap4Responder {
         User user = new User(request);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsAscii(resourceID, constraintExpression, user.getMaxResponseSize(), os);
+        besApi.writeDap2DataAsAscii(user, resourceID, constraintExpression, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

@@ -33,6 +33,7 @@ import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.auth.AuthenticationControls;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
 import opendap.http.error.BadGateway;
 import opendap.http.error.BadRequest;
@@ -147,6 +148,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         Procedure timedProc = Timer.start();
         try {
+            User user = new User(request);
 
             String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(request));
             String requestSuffix = ReqInfo.getRequestSuffix(request);
@@ -164,12 +166,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 if(!_allowRemoteCatalogTraversal)
                     throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
 
-                browseRemoteCatalog(orq, response, query);
+                browseRemoteCatalog(user, orq, response, query);
             }
             else if (query != null && query.startsWith("browseDataset=")) {
                 if(!_allowRemoteCatalogTraversal)
                     throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
-                browseRemoteDataset(orq, response, query);
+                browseRemoteDataset(user, orq, response, query);
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -245,7 +247,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void browseRemoteDataset(Request oRequest,
+    private void browseRemoteDataset(User user,
+                                     Request oRequest,
                                      HttpServletResponse response,
                                      String query)
             throws IOException, BadRequest, BadGateway, JDOMException, BadConfigurationException, PPTException, BESError {
@@ -290,7 +293,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besApi.writeFile(remoteCatalog,baos);
+        besApi.writeFile(user, remoteCatalog,baos);
         ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();
@@ -359,7 +362,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
      * @throws IOException
      * @throws JDOMException
      */
-    private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
+    private void browseRemoteCatalog(User user, Request oRequest, HttpServletResponse response,
                                      String query) throws OPeNDAPException, IOException, JDOMException {
 
 
@@ -392,7 +395,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besApi.writeFile(remoteCatalog,baos);
+        besApi.writeFile(user, remoteCatalog,baos);
         ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();

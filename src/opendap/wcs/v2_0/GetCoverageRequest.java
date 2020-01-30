@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -91,7 +92,7 @@ public class GetCoverageRequest {
      * @throws WcsException
      * @throws InterruptedException
      */
-    public GetCoverageRequest(String requestUrl, Map<String,String[]> kvp)
+    public GetCoverageRequest(User user, String requestUrl, Map<String,String[]> kvp)
             throws WcsException, InterruptedException {
 
         this();
@@ -134,7 +135,7 @@ public class GetCoverageRequest {
         _coverageID = Util.stripQuotes(s[0]);
 
         WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(_coverageID);
-        CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(_coverageID);
+        CoverageDescription cvrgDscrpt = wcsCatalog.getCoverageDescription(user, _coverageID);
 
         if(cvrgDscrpt==null){
             throw new WcsException("No such _coverageID: '"+ _coverageID +"'",
@@ -197,7 +198,9 @@ public class GetCoverageRequest {
      * @throws WcsException
      * @throws InterruptedException
      */
-    public GetCoverageRequest(String requestUrl, Element getCoverageRequestElem)
+    public GetCoverageRequest(User user,
+                              String requestUrl,
+                              Element getCoverageRequestElem)
             throws WcsException, InterruptedException {
 
         this();
@@ -231,7 +234,7 @@ public class GetCoverageRequest {
 
         // This call checks that there is a coverage matching the requested ID and it will
         // throw a WcsException if no such coverage is available.
-        CoverageDescription cvrDsc = wcsCatalog.getCoverageDescription(_coverageID);
+        CoverageDescription cvrDsc = wcsCatalog.getCoverageDescription(user,_coverageID);
 
 
         ingestDimensionSubset(getCoverageRequestElem, cvrDsc);

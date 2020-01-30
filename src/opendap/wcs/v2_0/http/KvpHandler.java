@@ -29,6 +29,7 @@ import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.ppt.PPTException;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
@@ -70,7 +71,10 @@ public class KvpHandler {
 
     }
 
-    public static void processKvpWcsRequest(HttpServletRequest request, HttpServletResponse response) throws InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
+    public static void processKvpWcsRequest(HttpServletRequest request, HttpServletResponse response)
+            throws InterruptedException, IOException, PPTException, BadConfigurationException, BESError {
+
+        User user= new User(request);
         Map<String,String[]> keyValuePairs  =  getKVP(request);
         Document wcsResponse;
         ServletOutputStream os  = null;
@@ -84,13 +88,13 @@ public class KvpHandler {
                     String baseServiceUrl = Util.getServiceUrl(request);
                     String relativeURL = ReqInfo.getLocalUrl(request);
                     String wcsServiceUrl = PathBuilder.pathConcat(baseServiceUrl,relativeURL);
-                    wcsResponse = getCapabilities(keyValuePairs, wcsServiceUrl);
+                    wcsResponse = getCapabilities(user, keyValuePairs, wcsServiceUrl);
                     response.setContentType("text/xml");
                     transmitXML(wcsResponse,os);
                     break;
 
                 case DESCRIBE_COVERAGE:
-                    wcsResponse = describeCoverage(keyValuePairs);
+                    wcsResponse = describeCoverage(user, keyValuePairs);
                     response.setContentType("text/xml");
                     transmitXML(wcsResponse,os);
                     break;
@@ -141,11 +145,14 @@ public class KvpHandler {
      * @param keyValuePairs   Key Value Pairs from WCS URL
      * @throws WcsException When bad things happen.
      */
-    public static Document getCapabilities(Map<String,String[]> keyValuePairs, String serviceUrl)  throws InterruptedException, WcsException {
+    public static Document getCapabilities(User user,
+                                           Map<String,String[]> keyValuePairs,
+                                           String serviceUrl)
+            throws InterruptedException, WcsException {
 
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
 
-        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return GetCapabilitiesRequestProcessor.processGetCapabilitiesRequest(user, wcsRequest, serviceUrl);
     }
 
 
@@ -154,11 +161,13 @@ public class KvpHandler {
      * @param keyValuePairs     Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document describeCoverage(Map<String,String[]> keyValuePairs )  throws InterruptedException, WcsException {
+    public static Document describeCoverage(User user,
+                                            Map<String,String[]> keyValuePairs )
+            throws InterruptedException, WcsException {
 
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
 
-        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
+        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(user, wcsRequest);
     }
 
 
@@ -185,11 +194,11 @@ public class KvpHandler {
      */
     public static void getCoverage(HttpServletRequest request, Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
+        User user= new User(request);
         String requestUrl = HttpGetHandler.getRequestUrlWithQuery(request);
-        GetCoverageRequest req = new GetCoverageRequest(requestUrl, keyValuePairs);
-
-        req.setCfHistoryAttribute(ReqInfo.getCFHistoryEntry(request));
-        GetCoverageRequestProcessor.sendCoverageResponse(req, response, false );
+        GetCoverageRequest coverageRequest = new GetCoverageRequest(user,requestUrl, keyValuePairs);
+        coverageRequest.setCfHistoryAttribute(ReqInfo.getCFHistoryEntry(request));
+        GetCoverageRequestProcessor.sendCoverageResponse(user, coverageRequest, response, false );
 
     }
 

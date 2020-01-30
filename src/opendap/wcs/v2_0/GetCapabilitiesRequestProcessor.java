@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public class GetCapabilitiesRequestProcessor {
      * @return The complete wcs:Capabilities document, suitable for serialization to a requesting client.
      * @throws WcsException When bad things happen.
      */
-    public static Document getFullCapabilitiesDocument(String serviceUrl, String[] cids)  throws InterruptedException, WcsException {
+    public static Document getFullCapabilitiesDocument(User user, String serviceUrl, String[] cids)  throws InterruptedException, WcsException {
 
         Element capabilities = new Element("Capabilities", WCS.WCS_NS);
 
@@ -71,7 +72,7 @@ public class GetCapabilitiesRequestProcessor {
 
         //log.debug(xmlo.outputString(capabilities));
 
-        capabilities.addContent(getContents(true,true,true,GetCapabilitiesRequest.DEFAULT_MAX_CONTENTS_SECTIONS_COUNT,cids));
+        capabilities.addContent(getContents(user, true,true,true,GetCapabilitiesRequest.DEFAULT_MAX_CONTENTS_SECTIONS_COUNT,cids));
 
         return new Document(capabilities);
 
@@ -91,7 +92,7 @@ public class GetCapabilitiesRequestProcessor {
      * @return The wcs:Capabilities document with the componets requested by the client.
      * @throws WcsException  When bad things happen.
      */
-    public static Document processGetCapabilitiesRequest(GetCapabilitiesRequest req, String serviceUrl)  throws InterruptedException, WcsException {
+    public static Document processGetCapabilitiesRequest(User user, GetCapabilitiesRequest req, String serviceUrl)  throws InterruptedException, WcsException {
 
 
         Element capabilities = new Element("Capabilities",WCS.WCS_NS);
@@ -160,6 +161,7 @@ public class GetCapabilitiesRequestProcessor {
                     req.hasSection(GetCapabilitiesRequest.COVERAGE_SUMMARY)){
 
                 capabilities.addContent(getContents(
+                        user,
                         all || req.hasSection(GetCapabilitiesRequest.CONTENTS),
                         req.hasSection(GetCapabilitiesRequest.DATASET_SERIES_SUMMARY),
                         req.hasSection(GetCapabilitiesRequest.COVERAGE_SUMMARY),
@@ -192,6 +194,7 @@ public class GetCapabilitiesRequestProcessor {
      * @throws InterruptedException
      */
     public static Element getContents(
+            User user,
             boolean allContent,
             boolean dataset_series_summary,
             boolean coverage_summary,
@@ -211,7 +214,7 @@ public class GetCapabilitiesRequestProcessor {
                 log.info("getContents() Building contents from supplied list of coverageIds");
                 for(String coverageId:coverageIds) {
                     WcsCatalog wcsCatalog = WcsServiceManager.getCatalog(coverageId);
-                    Element coverageSummaryElement = wcsCatalog.getCoverageSummaryElement(coverageId);
+                    Element coverageSummaryElement = wcsCatalog.getCoverageSummaryElement(user, coverageId);
                     log.debug("coverageId: {} coverageSummaryElement: {}",coverageId, coverageSummaryElement);
                     if(coverageSummaryElement!=null){
                         contentsElement.addContent(coverageSummaryElement);
@@ -232,7 +235,7 @@ public class GetCapabilitiesRequestProcessor {
             else {
                 log.info("getContents() Building contents from the default WcsCatalog");
                 WcsCatalog defaultWcsCatalog = WcsServiceManager.getDefaultCatalog();
-                Iterator i = defaultWcsCatalog.getCoverageSummaryElements().iterator();
+                Iterator i = defaultWcsCatalog.getCoverageSummaryElements(user).iterator();
                 if (i.hasNext()) {
                     Element cs;
                     while (i.hasNext()) {

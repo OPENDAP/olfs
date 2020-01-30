@@ -107,9 +107,9 @@ public class Json extends Dap4Responder {
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsJson(
+                user,
                 resourceID,
                 constraintExpression,
-                user.getMaxResponseSize(),
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());

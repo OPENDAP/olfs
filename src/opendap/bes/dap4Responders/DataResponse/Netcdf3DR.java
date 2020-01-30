@@ -140,7 +140,7 @@ public class Netcdf3DR extends Dap4Responder{
         response.setHeader("Content-Disposition", contentDisposition);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsNetcdf3(resourceID, qp, cf_history_entry, user.getMaxResponseSize(), os);
+        besApi.writeDap4DataAsNetcdf3(user, resourceID, qp, cf_history_entry, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());

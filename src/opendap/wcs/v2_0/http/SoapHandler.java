@@ -28,6 +28,7 @@ package opendap.wcs.v2_0.http;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.DispatchServlet;
+import opendap.dap.User;
 import opendap.namespaces.NS;
 import opendap.namespaces.SOAP;
 import opendap.ppt.PPTException;
@@ -105,26 +106,26 @@ public class SoapHandler extends XmlRequestHandler {
 
 
     @Override
-    public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
+    public Document getCapabilities(User user, GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
 
-        return wrapDocumentInSoapEnvelope(super.getCapabilities(wcsRequest, serviceUrl));
+        return wrapDocumentInSoapEnvelope(super.getCapabilities(user, wcsRequest, serviceUrl));
 
     }
 
 
     @Override
-    public Document describeCoverage(DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
+    public Document describeCoverage(User user, DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
 
-        return wrapDocumentInSoapEnvelope(super.describeCoverage(wcsRequest));
+        return wrapDocumentInSoapEnvelope(super.describeCoverage(user,wcsRequest));
 
     }
 
 
 
     @Override
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
+    public void sendCoverageResponse(User user, GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException, PPTException, BadConfigurationException, BESError {
 
-        GetCoverageRequestProcessor.sendCoverageResponse(req, response, true );
+        GetCoverageRequestProcessor.sendCoverageResponse(user, req, response, true );
 
     }
 

@@ -36,6 +36,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.LogUtil;
 import opendap.namespaces.DAP;
@@ -131,7 +132,8 @@ public class Dap2IFH extends Dap4Responder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document ddx = new Document();
-        besApi.getDDXDocument(resourceID,constraintExpression,xmlBase,ddx);
+        User user = new User(request);
+        besApi.getDDXDocument(user, resourceID,constraintExpression,xmlBase,ddx);
         _log.debug(xmlo.outputString(ddx));
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);

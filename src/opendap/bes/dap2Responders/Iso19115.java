@@ -33,6 +33,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
@@ -111,8 +112,9 @@ public class Iso19115 extends Dap4Responder {
         response.setHeader("Content-Description","ISO 19115 Metadata");
 
         Document ddx = new Document();
-
+        User user = new User(request);
         besApi.getDDXDocument(
+                user,
                 resourceID,
                 constraintExpression,
                 xmlBase,

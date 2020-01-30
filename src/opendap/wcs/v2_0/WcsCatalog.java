@@ -25,6 +25,7 @@
  */
 package opendap.wcs.v2_0;
 
+import opendap.dap.User;
 import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 
@@ -62,7 +63,7 @@ public interface WcsCatalog {
      * @param serviceContextPath The service context, should be /context/servlet
      * @throws Exception When the bad things happen.
      */
-    public void init(Element config, String cacheDir, String serviceContextPath) throws Exception;
+     void init(Element config, String cacheDir, String serviceContextPath) throws Exception;
 
 
 
@@ -75,7 +76,7 @@ public interface WcsCatalog {
      * @return true if the catalog contains the a wcs:Coverage wher the
      * value wcs:Identifer is equal to the passed string.
      */
-    public boolean hasCoverage(String coverageId) throws InterruptedException;
+     boolean hasCoverage(User user, String coverageId) throws InterruptedException;
 
 
 
@@ -90,7 +91,7 @@ public interface WcsCatalog {
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
      */
-    public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException;
+     CoverageDescription getCoverageDescription(User user, String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -106,7 +107,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    public Element getCoverageDescriptionElement(String coverageId) throws InterruptedException,  WcsException;
+     Element getCoverageDescriptionElement(User user, String coverageId) throws InterruptedException,  WcsException;
 
 
 
@@ -148,7 +149,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
+      Element getCoverageSummaryElement(User user, String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -168,7 +169,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-     public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
+      Collection<Element> getCoverageSummaryElements(User user) throws InterruptedException, WcsException;
 
 
 

@@ -26,12 +26,17 @@
 
 package opendap.dap;
 
+import opendap.auth.IdFilter;
+import opendap.auth.UserProfile;
 import opendap.bes.BES;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.coreServlet.ReqInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,27 +47,48 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class User {
 
+    private Logger log;
+    private UserProfile userProfile;
+    private HttpServletRequest request;
 
-    String userName;
-    String relativeUrl;
 
+    public User(HttpServletRequest req){
 
-    public User(HttpServletRequest request){
+        log = LoggerFactory.getLogger(this.getClass());
+        request = req;
 
-        userName = request.getRemoteUser();
-        relativeUrl = ReqInfo.getLocalUrl(request);
+        HttpSession session = request.getSession(false);
+        if(session!=null) {
+            userProfile= (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            if(userProfile!=null)
+                log.debug(userProfile.toString());
+        }
 
+    }
+
+    public UserProfile profile(){
+        return userProfile;
+    }
+
+    public String getUID(){
+        if(userProfile!=null){
+            return userProfile.getUID();
+        }
+        return request.getRemoteUser();
+    }
+
+    public String getRelativeUrl(){
+        return ReqInfo.getLocalUrl(request);
     }
 
 
     public int getMaxResponseSize(){
 
-
-        if(userName==null) {
+        if(getUID()==null) {
 
             BES bes;
             try {
-                bes = BESManager.getBES(relativeUrl);
+                bes = BESManager.getBES(getRelativeUrl());
             } catch (BadConfigurationException e) {
                 return 0;
             }

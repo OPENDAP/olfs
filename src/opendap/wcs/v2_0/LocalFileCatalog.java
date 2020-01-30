@@ -27,6 +27,7 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
+import opendap.dap.User;
 import org.apache.http.client.CredentialsProvider;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -417,7 +418,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     @Override
-    public boolean hasCoverage(String id) {
+    public boolean hasCoverage(User user, String id) {
 
         log.debug("Looking for a coverage with ID: " + id);
 
@@ -434,7 +435,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     @Override
-    public Element getCoverageDescriptionElement(String id) throws WcsException {
+    public Element getCoverageDescriptionElement(User user, String id) throws WcsException {
 
         CoverageDescription coverage = _coveragesMap.get(id);
 
@@ -449,7 +450,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
     @Override
-    public CoverageDescription getCoverageDescription(String id) throws WcsException {
+    public CoverageDescription getCoverageDescription(User user, String id) throws WcsException {
 
         CoverageDescription cd = _coveragesMap.get(id);
         if (cd == null)
@@ -461,13 +462,14 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
-    public Element getCoverageSummaryElement(String id) throws WcsException {
+    @Override
+    public Element getCoverageSummaryElement(User user, String id) throws WcsException {
         CoverageDescription cd = _coveragesMap.get(id);
         return cd==null?null:cd.getCoverageSummary();
     }
 
     @Override
-    public Collection<Element> getCoverageSummaryElements() throws WcsException {
+    public Collection<Element> getCoverageSummaryElements(User user) throws WcsException {
 
         TreeMap<String, Element> coverageSummaries = new TreeMap<>();
         Enumeration e = _coveragesMap.elements();

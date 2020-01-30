@@ -36,6 +36,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.LogUtil;
@@ -122,8 +123,10 @@ public class HtmlDMR extends Dap4Responder {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
         // XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        User user = new User(request);
         Document dmr = new Document();
         besApi.getDMRDocument(
+                user,
                 resourceID,
                 qp,
                 xmlBase,

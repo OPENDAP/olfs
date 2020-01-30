@@ -35,6 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
+import opendap.dap.User;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 // import org.apache.commons.httpclient.HttpStatus;
@@ -102,8 +103,7 @@ public class FileAccess extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
-
-
+        User user = new User(req);
 
         BesApi besApi = getBesApi();
 
@@ -113,7 +113,7 @@ public class FileAccess extends Dap4Responder {
                 if (dsi.sourceIsAccesible()) {
                     if (dsi.isDataset()) {
                         if (allowDirectDataSourceAccess()) {
-                            sendDatasetFile(resourceID, response);
+                            sendDatasetFile(user, resourceID, response);
 
                         }
                         else {
@@ -154,7 +154,7 @@ public class FileAccess extends Dap4Responder {
 
     }
 
-    private void sendDatasetFile(String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
+    private void sendDatasetFile(User user, String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
         log.debug("sendDatasetFile() - Sending dataset file \"" + dataSourceId + "\"");
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(dataSourceId)+"\"");
@@ -173,7 +173,7 @@ public class FileAccess extends Dap4Responder {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        besApi.writeFile(dataSourceId, sos);
+        besApi.writeFile(user, dataSourceId, sos);
 
         sos.flush();
 

@@ -110,7 +110,7 @@ public class CsvDR extends Dap4Responder {
         User user = new User(request);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsCsv(resourceID, qp, user.getMaxResponseSize(),os);
+        besApi.writeDap4DataAsCsv(user, resourceID, qp,os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {}  size: {}",getServiceTitle(),os.size());

@@ -31,6 +31,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
 import org.slf4j.Logger;
 
@@ -101,7 +102,8 @@ public class DatasetHtmlForm extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
-        besApi.writeDap2DataRequestForm(resourceID, xmlBase, os);
+        User user = new User(request);
+        besApi.writeDap2DataRequestForm(user, resourceID, xmlBase, os);
         os.flush();
         log.info("Sent DAP2 Dataset HTML Form page.");
     }

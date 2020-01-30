@@ -34,6 +34,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextXml;
 import opendap.logging.LogUtil;
@@ -192,8 +193,10 @@ public class IsoDMR extends Dap4Responder {
 
         Document dmr = new Document();
 
+        User user = new User(request);
 
         besApi.getDMRDocument(
+                user,
                 resourceID,
                 qp,
                 xmlBase,

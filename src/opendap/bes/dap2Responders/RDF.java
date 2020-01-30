@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
@@ -112,7 +113,8 @@ public class RDF extends Dap4Responder {
         response.setHeader("Content-Description", "RDF Encoding of DAP2 DDX");
 
         Document ddx = new Document();
-        besApi.getDDXDocument(resourceID, constraintExpression, xmlBase, ddx);
+        User user = new User(request);
+        besApi.getDDXDocument(user, resourceID, constraintExpression, xmlBase, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
