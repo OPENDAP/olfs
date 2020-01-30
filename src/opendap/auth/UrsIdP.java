@@ -186,10 +186,8 @@ public class UrsIdP extends IdProvider{
         HttpSession session = request.getSession();
 
 
-        /**
-         * Check to see if we have a code returned from URS. If not, we must
-         * redirect the user to URS to start the authentication process.
-         */
+        // Check to see if we have a code returned from URS. If not, we must
+        // redirect the user to URS to start the authentication process.
         String code = request.getParameter("code");
 
         if( code == null )
@@ -205,11 +203,9 @@ public class UrsIdP extends IdProvider{
 
         _log.info("URS Code: {}",LogUtil.scrubEntry(code));
 
-        /**
-         * If we get here, the the user was redirected by URS back to our application,
-         * and we have a code. We now exchange the code for a token, which is
-         * returned as a json document.
-         */
+        // If we get here, the the user was redirected by URS back to our application,
+        // and we have a code. We now exchange the code for a token, which is
+        // returned as a json document.
         String url = getUrsUrl() + "/oauth/token";
 
         String post_data = "grant_type=authorization_code&code=" + code +
@@ -229,19 +225,16 @@ public class UrsIdP extends IdProvider{
         _log.info("URS Token: {}",contents);
 
 
-        /**
-         * Parse the json to extract the token.
-         */
+        // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
         JsonObject json = jparse.parse(contents).getAsJsonObject();
 
 
         OAuthAccessToken oat = new OAuthAccessToken(json);
 
-        /**
-         * Now that we have an access token, we can retrieve the user profile. This
-         * is returned as a JSON document.
-         */
+
+        // Now that we have an access token, we can retrieve the user profile. This
+        // is returned as a JSON document.
         url = _ursUrl + oat.getEndPoint();
         authHeader = oat.getTokenType()+ " " + oat.getAccessToken();
         headers.put("Authorization", authHeader);
@@ -257,13 +250,12 @@ public class UrsIdP extends IdProvider{
 
         userProfile.setIdP(this);
 
+        userProfile.setOAuthToken(oat);
+        //session.setAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN, oat);
+
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
-        session.setAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN, oat);
 
-        /**
-         * Finally, redirect the user back to the their original requested resource.
-         */
-
+        //Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
 
         if(redirectUrl==null){
