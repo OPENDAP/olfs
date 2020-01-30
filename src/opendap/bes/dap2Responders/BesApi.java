@@ -27,6 +27,8 @@
 package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
+import opendap.auth.OAuth2AccessToken;
+import opendap.auth.UserProfile;
 import opendap.bes.*;
 import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
@@ -2264,6 +2266,13 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        UserProfile profile = user.profile();
+        if(profile!=null){
+            OAuth2AccessToken oat = profile.getOAuth2Token();
+            if(oat!=null){
+                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
+            }
+        }
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
@@ -2349,6 +2358,16 @@ public class BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
+        UserProfile profile = user.profile();
+        if(profile!=null){
+            OAuth2AccessToken oat = profile.getOAuth2Token();
+            if(oat!=null){
+                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
+            }
+        }
+
 
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));

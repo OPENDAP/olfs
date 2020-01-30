@@ -230,7 +230,7 @@ public class UrsIdP extends IdProvider{
         JsonObject json = jparse.parse(contents).getAsJsonObject();
 
 
-        OAuthAccessToken oat = new OAuthAccessToken(json);
+        OAuth2AccessToken oat = new OAuth2AccessToken(json);
 
 
         // Now that we have an access token, we can retrieve the user profile. This
@@ -250,7 +250,7 @@ public class UrsIdP extends IdProvider{
 
         userProfile.setIdP(this);
 
-        userProfile.setOAuthToken(oat);
+        userProfile.setOAuth2Token(oat);
         //session.setAttribute(OAuthAccessToken.OAUTH_ACCESS_TOKEN, oat);
 
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);

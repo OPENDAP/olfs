@@ -34,7 +34,7 @@ import java.util.Date;
 /**
  * Created by ndp on 9/24/14.
  */
-public class OAuthAccessToken {
+public class OAuth2AccessToken {
 
     public static final String OAUTH_ACCESS_TOKEN  = "oauth_access_token";
     public static final String ACCESS_TOKEN  = "access_token";
@@ -52,7 +52,7 @@ public class OAuthAccessToken {
 
 
 
-    public OAuthAccessToken(JsonObject json)  {
+    public OAuth2AccessToken(JsonObject json)  {
         _creationTime = new Date();
         _accessToken  = json.get(ACCESS_TOKEN).getAsString();
         _endPoint     = json.get(ENDPOINT).getAsString();
@@ -62,7 +62,7 @@ public class OAuthAccessToken {
     }
 
 
-    public OAuthAccessToken(OAuthAccessToken oat)  {
+    public OAuth2AccessToken(OAuth2AccessToken oat)  {
         _creationTime = oat._creationTime;
         _accessToken  = oat._accessToken;
         _endPoint     = oat._endPoint;
@@ -70,7 +70,7 @@ public class OAuthAccessToken {
         _tokenType    = oat._tokenType;
         _refreshToken = oat._refreshToken;
     }
-    public OAuthAccessToken() {
+    public OAuth2AccessToken() {
         _creationTime = new Date();
         _accessToken  = "ASPECIALURSACCESSTOKENSTRING";
         _endPoint     = "http://endpoint.url";

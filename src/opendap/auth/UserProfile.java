@@ -47,7 +47,7 @@ public class UserProfile {
 
     protected IdProvider _idp;
 
-    protected OAuthAccessToken _token;
+    protected OAuth2AccessToken _token;
 
 
     public UserProfile() {
@@ -74,8 +74,12 @@ public class UserProfile {
 
     }
 
-    public void setOAuthToken(OAuthAccessToken oat){
-        _token = new OAuthAccessToken(oat);
+    public void setOAuth2Token(OAuth2AccessToken oat){
+        _token = new OAuth2AccessToken(oat);
+    }
+
+    public OAuth2AccessToken getOAuth2Token(){
+        return new OAuth2AccessToken(_token);
     }
 
 
@@ -235,7 +239,7 @@ public class UserProfile {
         String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
 
         UserProfile up = new UserProfile(ursUserProfile);
-        up.setOAuthToken(new OAuthAccessToken());
+        up.setOAuth2Token(new OAuth2AccessToken());
         System.out.println(up.toString());
 
     }
