@@ -306,11 +306,11 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSinglePlainGranule(String granule, OutputStream os)
+    private void writeSinglePlainGranule(User user, String granule, OutputStream os)
             throws IOException, BadConfigurationException {
     	
         try {
-            _besApi.writeFile(granule, os);
+            _besApi.writeFile(user, granule, os);
         }
         catch (BESError | PPTException | IOException | BadConfigurationException e) {
             String msg = e.getMessage();
@@ -332,6 +332,8 @@ public class AggregationServlet extends HttpServlet {
 
         Map<String, String[]> queryParameters = request.getParameterMap();
 
+        User user = new User(request);
+
         response.setContentType("application/x-zip-compressed");
         response.setHeader("Content-Disposition", "attachment; filename=file.zip");
 
@@ -344,7 +346,7 @@ public class AggregationServlet extends HttpServlet {
             String granuleName = getNameForZip(basename(granule)[1], ResponseFormat.plain);
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
-                writeSinglePlainGranule(granule, zos);
+                writeSinglePlainGranule(user, granule, zos);
                 zos.closeEntry();
             }
             catch (ZipException ze) {
@@ -362,18 +364,22 @@ public class AggregationServlet extends HttpServlet {
      * returned by the BES, use the value of the error message as the file
      * contents.
      *
+     * @param user The User profile and tokens that may be required to complete
+     *            downstream transactions.
      * @param granule The granule name in the BES's data tree
      * @param ce Apply this CE to the granule
      * @param os Write the result to this stream
-     * @param maxResponseSize Use a value >0 to indicate an upper limit on
-     *                        response sizes.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSingleFormattedGranule(String granule, String ce, OutputStream os, int maxResponseSize,
-                                             ResponseFormat format)
+    private void writeSingleFormattedGranule(
+            User user,
+            String granule,
+            String ce,
+            OutputStream os,
+            ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
 
@@ -383,17 +389,17 @@ public class AggregationServlet extends HttpServlet {
             case netcdf3:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
-                _besApi.writeDap2DataAsNetcdf3(granule,  ce, cf_history_entry, maxResponseSize, os);
+                _besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cf_history_entry, os);
                 break;
             case netcdf4:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
-                _besApi.writeDap2DataAsNetcdf4(granule, ce, cf_history_entry, maxResponseSize, os);
+                _besApi.writeDap2DataAsNetcdf4(user, granule, ce, cf_history_entry, os);
                 break;
             case ascii:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextPlain());
-                _besApi.writeDap2DataAsAscii(granule, ce, maxResponseSize, os);
+                _besApi.writeDap2DataAsAscii(user, granule, ce, os);
                 break;
             default:
             	break;
@@ -428,7 +434,6 @@ public class AggregationServlet extends HttpServlet {
         response.setHeader("Content-Disposition", "attachment; filename=netcdf3.zip");
 
         User user = new User(request);
-        int maxResponse = user.getMaxResponseSize();
 
         ZipOutputStream zos = new ZipOutputStream(out);
 
@@ -438,7 +443,7 @@ public class AggregationServlet extends HttpServlet {
 
             try {
                 zos.putNextEntry(new ZipEntry(getNameForZip(basename(granule)[1], format)));
-                writeSingleFormattedGranule(granule, ce, zos, maxResponse, format);
+                writeSingleFormattedGranule(user, granule, ce, zos, format);
                 zos.closeEntry();
             } catch (ZipException ze) {
                 out.println("Aggregation Error: " + ze.getMessage());
@@ -469,7 +474,6 @@ public class AggregationServlet extends HttpServlet {
         response.setContentType("text/plain");
 
         User user = new User(request);
-        int maxResponse = user.getMaxResponseSize();
 
         FilterAsciiHeaderStream filter = new FilterAsciiHeaderStream(out);
         filter.set(false);// let the first set of header lines through
@@ -479,7 +483,7 @@ public class AggregationServlet extends HttpServlet {
             String ce = params.getTableCE(i);
 
             try {
-                writeSingleFormattedGranule(granule, ce, filter, maxResponse, ResponseFormat.ascii);
+                writeSingleFormattedGranule(user, granule, ce, filter, ResponseFormat.ascii);
                 filter.set(true);// filter out all the remaining header lines
             } catch (IOException ioe) {
                 out.println("Aggregation error building table of values: " + ioe.getMessage());
