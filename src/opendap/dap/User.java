@@ -60,9 +60,14 @@ public class User {
         HttpSession session = request.getSession(false);
         if(session!=null) {
             userProfile= (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
-            log.debug(userProfile.toString());
+            if(userProfile!=null)
+                log.debug(userProfile.toString());
         }
 
+    }
+
+    public UserProfile profile(){
+        return userProfile;
     }
 
     public String getUID(){
