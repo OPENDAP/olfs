@@ -39,15 +39,15 @@ import java.util.*;
  */
 public class UserProfile {
 
-    protected Date   _objectCreationTime;
-    protected String _jsonStr;
-    protected JsonObject _profile;
-    protected HashSet<String> _groups;
-    protected HashSet<String> _roles;
+    private Date   _objectCreationTime;
+    private String _jsonStr;
+    private JsonObject _profile;
+    private HashSet<String> _groups;
+    private HashSet<String> _roles;
 
-    protected IdProvider _idp;
+    private IdProvider _idp;
 
-    protected OAuth2AccessToken _token;
+    private OAuth2AccessToken _token;
 
 
     public UserProfile() {
