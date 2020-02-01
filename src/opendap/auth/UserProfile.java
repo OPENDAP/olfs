@@ -103,7 +103,7 @@ public class UserProfile {
     }
 
     public String getUID() {
-        return (String) _profile.get("uid").getAsString();
+        return _profile.get("uid").getAsString();
     }
 
     public IdProvider getIdP(){
