@@ -2266,6 +2266,7 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
         UserProfile profile = user.profile();
         if(profile!=null){
             OAuth2AccessToken oat = profile.getOAuth2Token();
