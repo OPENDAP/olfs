@@ -49,13 +49,13 @@ import java.net.URISyntaxException;
 public class RemotePDP extends PolicyDecisionPoint {
 
     public static final String DEFAULT_PDP_SERVICE = "http://localhost:8080/opendap/pdpService";
-    private Logger _log;
-    private URI _pdpServiceEndpoint;
+    private Logger log;
+    private URI pdpServiceEndpoint;
 
 
     RemotePDP() {
-        _log = LoggerFactory.getLogger(this.getClass());
-        _pdpServiceEndpoint = null;
+        log = LoggerFactory.getLogger(this.getClass());
+        pdpServiceEndpoint = null;
     }
 
 
@@ -78,21 +78,21 @@ public class RemotePDP extends PolicyDecisionPoint {
 
         if(config==null) {
             msg = "Configuration MAY NOT be null!.";
-            _log.error("init() - {}",msg);
+            log.error("init() - {}",msg);
             throw new ConfigurationException(msg);
         }
 
         try {
-            _pdpServiceEndpoint = new URI(DEFAULT_PDP_SERVICE);
+            pdpServiceEndpoint = new URI(DEFAULT_PDP_SERVICE);
             e = config.getChild("PDPServiceEndpoint");
             if (e != null) {
                 URI uri = new URI(e.getTextTrim());
                 if(!uri.getScheme().equalsIgnoreCase("https")){
-                    _log.warn("init() - RemotePDP connection is not using https.");
+                    log.warn("init() - RemotePDP connection is not using https.");
                 }
-                _pdpServiceEndpoint = uri;
+                pdpServiceEndpoint = uri;
             }
-            _log.debug("init() - RemotePDP URL: {}",_pdpServiceEndpoint);
+            log.debug("init() - RemotePDP URL: {}", pdpServiceEndpoint);
         } catch (URISyntaxException e1) {
             throw new ConfigurationException(e1);
         }
@@ -121,7 +121,7 @@ public class RemotePDP extends PolicyDecisionPoint {
         try {
 
             StringBuilder requestUrl = new StringBuilder();
-            requestUrl.append(_pdpServiceEndpoint);
+            requestUrl.append(pdpServiceEndpoint);
             requestUrl.append("?uid=").append(userId);
             requestUrl.append("?authContext=").append(authContext);
             requestUrl.append("&resourceId=").append(resourceId);
@@ -130,7 +130,7 @@ public class RemotePDP extends PolicyDecisionPoint {
 
             HttpGet httpget = new HttpGet(requestUrl.toString());
 
-            _log.debug("evaluate() - Executing HTTP request: " + httpget.getRequestLine());
+            log.debug("evaluate() - Executing HTTP request: " + httpget.getRequestLine());
 
 
             // ----------- Create a custom response handler ----------
@@ -143,7 +143,7 @@ public class RemotePDP extends PolicyDecisionPoint {
 
 
                         HttpEntity entity = response.getEntity();
-                        _log.debug(entity != null ? EntityUtils.toString(entity) : "null");
+                        log.debug(entity != null ? EntityUtils.toString(entity) : "null");
 
                         return true;
                     } else {
@@ -156,12 +156,12 @@ public class RemotePDP extends PolicyDecisionPoint {
 
             result = httpclient.execute(httpget, responseHandler);
         } catch (Exception e) {
-            _log.error("evaluate() - Caught {} Message: {}",e.getClass().getName(),e.getMessage() );
+            log.error("evaluate() - Caught {} Message: {}",e.getClass().getName(),e.getMessage() );
         } finally {
             try {
                 httpclient.close();
             } catch (IOException e) {
-                _log.error("evaluate() - Caught {} Message: {}",e.getClass().getName(),e.getMessage() );
+                log.error("evaluate() - Caught {} Message: {}",e.getClass().getName(),e.getMessage() );
                 // oh well...
             }
         }

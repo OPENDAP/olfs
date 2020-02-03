@@ -47,33 +47,32 @@ import java.security.Principal;
  */
 public class PEPFilter implements Filter {
 
-    private Logger _log;
-    private PolicyDecisionPoint _pdp;
-    private boolean _everyOneMustHaveUid;
-    private String _unauthorizedMsg = "We don't know who you are! Login and let us know, and then maybe you can have what you want.";
+    private Logger log;
+    private PolicyDecisionPoint pdp;
+    private boolean everyOneMustHaveUid;
+    private String unauthorizedMsg = "We don't know who you are! Login and let us know, and then maybe you can have what you want.";
 
-    private boolean _is_initialized;
-    private FilterConfig _filterConfig;
-    //private String _defaultLogingEndpoint;
-    private static final String _configParameterName = "config";
-    private static final String _defaultConfigFileName = "user-access.xml";
+    private boolean isInitialized;
+    private FilterConfig filterConfig;
+
+    private static final String configParameterName = "config";
+    private static final String defaultConfigFileName = "user-access.xml";
 
     public PEPFilter() {
-        _everyOneMustHaveUid = false;
-        //_defaultLogingEndpoint=null;
-        _is_initialized = false;
+        everyOneMustHaveUid = false;
+        isInitialized = false;
     }
 
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        _filterConfig = filterConfig;
-        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
+        this.filterConfig = filterConfig;
+        log = LoggerFactory.getLogger(this.filterConfig.getFilterName());
         try {
             init();
         }
         catch (IOException | JDOMException se){
-            _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE PEPFilter! " +
+            log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE PEPFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
 
         }
@@ -81,34 +80,34 @@ public class PEPFilter implements Filter {
     }
     public void init() throws IOException, JDOMException, ConfigurationException {
 
-        if(_is_initialized)
+        if(isInitialized)
             return;
-        _log.info("init() - Initializing PEPFilter...");
+        log.info("init() - Initializing PEPFilter...");
 
-        String configFileName = _filterConfig.getInitParameter(_configParameterName);
+        String configFileName = filterConfig.getInitParameter(configParameterName);
         if(configFileName==null){
-            configFileName = _defaultConfigFileName;
+            configFileName = defaultConfigFileName;
             String msg = "init() - The web.xml configuration for "+getClass().getName()+
-                    " does not contain an init-parameter named \""+_configParameterName+"\" " +
+                    " does not contain an init-parameter named \""+ configParameterName +"\" " +
                     "Using the DEFAULT name: "+configFileName;
-            _log.warn(msg);
+            log.warn(msg);
         }
 
-        String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
+        String configDirName = ServletUtil.getConfigPath(filterConfig.getServletContext());
         File configFile = new File(configDirName,configFileName);
         Element config;
         config = opendap.xml.Util.getDocumentRoot(configFile);
 
         Element e = config.getChild("PolicyDecisionPoint");
-        _pdp = PolicyDecisionPoint.pdpFactory(e);
+        pdp = PolicyDecisionPoint.pdpFactory(e);
 
         e = config.getChild("EveryOneMustHaveId");
         if(e !=null){
-            _everyOneMustHaveUid = true;
+            everyOneMustHaveUid = true;
         }
 
-        _is_initialized = true;
-        _log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
+        isInitialized = true;
+        log.info("init() - PEPFilter HAS BEEN INITIALIZED!");
     }
 
 
@@ -120,14 +119,14 @@ public class PEPFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws  ServletException {
 
-        if(!_is_initialized) {
+        if(!isInitialized) {
             try {
                 init();
             }
             catch (IOException | JDOMException  e){
                 String msg = "doFilter() - PEPFilter INITIALIZATION HAS FAILED! " +
                         "Caught "+ e.getClass().getName() + " Message: " + e.getMessage();
-                _log.error(msg);
+                log.error(msg);
                 OPeNDAPException.setCachedErrorMessage(msg);
                 throw new ServletException(msg,e);
             }
@@ -165,11 +164,11 @@ public class PEPFilter implements Filter {
 
         try {
             // So - Do they have to be authenticated?
-            if (userId == null && _everyOneMustHaveUid) {
+            if (userId == null && everyOneMustHaveUid) {
                 if (IdPManager.hasDefaultProvider()) {
                     hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
                 } else {
-                    OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                    OPeNDAPException.setCachedErrorMessage(unauthorizedMsg);
                     hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 }
                 return;
@@ -185,7 +184,7 @@ public class PEPFilter implements Filter {
                     if (IdPManager.hasDefaultProvider()) {
                         hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
                     } else {
-                        OPeNDAPException.setCachedErrorMessage(_unauthorizedMsg);
+                        OPeNDAPException.setCachedErrorMessage(unauthorizedMsg);
                         hsRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     }
                 } else {
@@ -203,7 +202,7 @@ public class PEPFilter implements Filter {
 
     @Override
     public void destroy() {
-        _log = null;
+        log = null;
     }
 
 
@@ -218,7 +217,7 @@ public class PEPFilter implements Filter {
             queryString = "";
         }
         String action       = request.getMethod();
-        return _pdp.evaluate(userId, authContext, resourceId,queryString,action);
+        return pdp.evaluate(userId, authContext, resourceId,queryString,action);
     }
 
 }

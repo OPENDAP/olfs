@@ -42,12 +42,12 @@ import java.util.Vector;
  */
 public class SimplePDP extends PolicyDecisionPoint {
 
-    private Logger _log;
-    private Vector<Policy> _policies;
+    private Logger log;
+    private Vector<Policy> policies;
 
     public SimplePDP(){
-        _log = LoggerFactory.getLogger(this.getClass());
-        _policies = new Vector<>();
+        log = LoggerFactory.getLogger(this.getClass());
+        policies = new Vector<>();
     }
 
     private Policy policyFactory(Element policyDef) throws ConfigurationException {
@@ -56,11 +56,11 @@ public class SimplePDP extends PolicyDecisionPoint {
         String policyImplementation = policyDef.getAttributeValue("class");
         if(policyImplementation == null){
             msg = "Policy definitions must contain a \"class\" attribute that defines the name of the Policy implementation class that is to be instantiated.";
-            _log.error("policyFactory(): {}",msg);
+            log.error("policyFactory(): {}",msg);
             throw new ConfigurationException(msg);
         }
         try {
-            _log.debug("Building Policy: " + policyImplementation);
+            log.debug("Building Policy: " + policyImplementation);
             Class classDefinition = Class.forName(policyImplementation);
             Policy policy = (Policy) classDefinition.newInstance();
             policy.init(policyDef);
@@ -68,7 +68,7 @@ public class SimplePDP extends PolicyDecisionPoint {
 
         } catch (Exception e) {
             msg = "Unable to manufacture a new "+policyImplementation+" instance.  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-            _log.error("policyFactory(): {}",msg);
+            log.error("policyFactory(): {}",msg);
             throw new ConfigurationException(msg, e);
         }
     }
@@ -89,7 +89,7 @@ public class SimplePDP extends PolicyDecisionPoint {
         String msg;
         if(config==null) {
             msg = "Configuration MAY NOT be null!.";
-            _log.error("init() - {}",msg);
+            log.error("init() - {}",msg);
             throw new ConfigurationException(msg);
         }
 
@@ -109,14 +109,14 @@ public class SimplePDP extends PolicyDecisionPoint {
     @Override
     public boolean addPolicy(Policy policy) {
 
-        _log.debug("addPolicy() - Adding Policy {}",policy.toString());
-        return _policies.add(policy);
+        log.debug("addPolicy() - Adding Policy {}",policy.toString());
+        return policies.add(policy);
     }
 
     @Override
     public boolean removePolicy(Policy policy) {
-        _log.debug("removePolicy() - Removing Policy {}",policy.toString());
-        return _policies.remove(policy);
+        log.debug("removePolicy() - Removing Policy {}",policy.toString());
+        return policies.remove(policy);
     }
 
 
@@ -128,7 +128,7 @@ public class SimplePDP extends PolicyDecisionPoint {
             String queryString,
             String httpMethod) {
 
-        _log.debug("evaluate() - { " +
+        log.debug("evaluate() - { " +
                 "userId: \""+userId+"\", " +
                 "authContext: \""+authContext+"\" "+
                 "resourceId: \""+resourceId +"\", " +
@@ -141,15 +141,15 @@ public class SimplePDP extends PolicyDecisionPoint {
             userRoles.add("");
         }
         for(String userInRole: userRoles){
-            for(Policy policy: _policies){
-                _log.debug("evaluate() - Evaluating Policy {}",policy.toString());
+            for(Policy policy: policies){
+                log.debug("evaluate() - Evaluating Policy {}",policy.toString());
                 if(policy.evaluate(userInRole,resourceId,queryString, httpMethod)) {
-                    _log.debug("evaluate() - END <**MATCH**>");
+                    log.debug("evaluate() - END <**MATCH**>");
                     return true;
                 }
             }
         }
-        _log.debug("evaluate() - END [NO MATCH])");
+        log.debug("evaluate() - END [NO MATCH])");
         return false;
     }
 

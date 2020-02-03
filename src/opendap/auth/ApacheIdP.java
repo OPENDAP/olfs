@@ -55,23 +55,23 @@ public class ApacheIdP extends IdProvider {
      */
     public static final String DEFAULT_LOGIN_LOCATION = "/Login";
 
-    private String _loginEndpoint;
-    private String _logoutEndpoint;
+    private String loginEndpoint;
+    private String logoutEndpoint;
 
 
 
-    private Logger _log;
+    private Logger log;
 
 
     public ApacheIdP(){
         super();
-        _log = LoggerFactory.getLogger(this.getClass());
+        log = LoggerFactory.getLogger(this.getClass());
 
         setAuthContext(DEFAULT_AUTHENTICATION_CONTEXT);
         setDescription("Apache Identity Provider");
 
-        _loginEndpoint = DEFAULT_LOGIN_LOCATION;
-        _logoutEndpoint = DEFAULT_LOGOUT_LOCATION;
+        loginEndpoint = DEFAULT_LOGIN_LOCATION;
+        logoutEndpoint = DEFAULT_LOGOUT_LOCATION;
 
     }
 
@@ -83,12 +83,12 @@ public class ApacheIdP extends IdProvider {
 
         Element e = config.getChild("login");
         if(e!=null){
-            _loginEndpoint= e.getTextTrim();
+            loginEndpoint = e.getTextTrim();
         }
 
         e = config.getChild("logout");
         if(e!=null){
-            _logoutEndpoint = e.getTextTrim();
+            logoutEndpoint = e.getTextTrim();
         }
     }
 
@@ -121,7 +121,7 @@ public class ApacheIdP extends IdProvider {
                     .append("result of a failed Security configuration element in Apache."
                     );
 
-            _log.error("doLogin() - OUCH! {}",msg.toString());
+            log.error("doLogin() - OUCH! {}",msg.toString());
             OPeNDAPException.setCachedErrorMessage(msg.toString());
             throw new ConfigurationException(msg.toString());
         }
@@ -129,7 +129,7 @@ public class ApacheIdP extends IdProvider {
             // We have a user - so let's make sure they have a profile,
             // and then we just try to bounce them back to IdFilter.RETURN_TO_URL
 
-            _log.info("doLogin() - User has uid: {}", LogUtil.scrubEntry(uid));
+            log.info("doLogin() - User has uid: {}", LogUtil.scrubEntry(uid));
             /*
 
             // Do they have a profile?
@@ -148,7 +148,7 @@ public class ApacheIdP extends IdProvider {
         if(redirectUrl==null){
             redirectUrl = request.getContextPath();
         }
-        _log.info("doLogin(): redirecting to {}",redirectUrl);
+        log.info("doLogin(): redirecting to {}",redirectUrl);
         response.sendRedirect(redirectUrl);
         return true;
     }
@@ -177,13 +177,13 @@ public class ApacheIdP extends IdProvider {
 
     @Override
     public String getLoginEndpoint(){
-        return _loginEndpoint;
+        return loginEndpoint;
     }
 
 
     @Override
     public String getLogoutEndpoint() {
-        return _logoutEndpoint;
+        return logoutEndpoint;
     }
 
 

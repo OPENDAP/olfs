@@ -8,24 +8,24 @@ import java.util.regex.Pattern;
  */
 class AuthUser {
 
-    private String _uidPatternString;
-    private Pattern _uidPattern;
+    private String uidPatternString;
+    private Pattern uidPattern;
 
-    private String _authContextPatternString;
-    private Pattern _authContextPattern;
+    private String authContextPatternString;
+    private Pattern authContextPattern;
 
     public AuthUser(String uidPatternString, String authContextPatternString){
-        _uidPatternString = uidPatternString;
-        _uidPattern = Pattern.compile(_uidPatternString);
-        _authContextPatternString = authContextPatternString;
-        _authContextPattern = Pattern.compile(authContextPatternString);
+        this.uidPatternString = uidPatternString;
+        uidPattern = Pattern.compile(this.uidPatternString);
+        this.authContextPatternString = authContextPatternString;
+        authContextPattern = Pattern.compile(authContextPatternString);
     }
 
     public boolean matches(String userId, String authContext ){
-        return _uidPattern.matcher(userId).matches() && _authContextPattern.matcher(authContext).matches();
+        return uidPattern.matcher(userId).matches() && authContextPattern.matcher(authContext).matches();
     }
 
     public boolean isSamePattern(String uidPatternString, String authContextPatternString ){
-        return _uidPatternString.equals(uidPatternString) && _authContextPatternString.equals(authContextPatternString);
+        return this.uidPatternString.equals(uidPatternString) && this.authContextPatternString.equals(authContextPatternString);
     }
 }

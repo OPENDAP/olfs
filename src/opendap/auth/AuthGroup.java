@@ -6,18 +6,18 @@ import java.util.Vector;
  *
  */
 public class AuthGroup {
-    private String _name;
-    private Vector<AuthUser> _users;
+    private String name;
+    private Vector<AuthUser> users;
 
     public AuthGroup(String name){
-        _name = name;
-        _users = new Vector<>();
+        this.name = name;
+        users = new Vector<>();
     }
 
-    public String name(){ return _name; }
+    public String name(){ return name; }
 
     public boolean isMember(String userId, String authContext){
-        for(AuthUser authUser : _users){
+        for(AuthUser authUser : users){
             if(authUser.matches(userId, authContext))
                 return true;
         }
@@ -29,11 +29,11 @@ public class AuthGroup {
         if(containsUserPattern(uidPatternString,authContextPatternString)) {
             return;
         }
-        _users.add(new AuthUser(uidPatternString,authContextPatternString));
+        users.add(new AuthUser(uidPatternString,authContextPatternString));
     }
 
     private boolean containsUserPattern(String uidPatternString, String authContextPatternString){
-        for(AuthUser authUser : _users){
+        for(AuthUser authUser : users){
             if(authUser.isSamePattern(uidPatternString,authContextPatternString))
                 return true;
         }

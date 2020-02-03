@@ -36,20 +36,20 @@ import java.security.Principal;
 
 public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
 
-    private String _uid;
+    private String uid;
 
     public AuthenticatedHttpRequest(HttpServletRequest request) {
         super(request);
     }
 
     public void setUid(String uid){
-        _uid = uid;
+        this.uid = uid;
     }
 
 
     @Override
     public String getRemoteUser(){
-        return _uid;
+        return uid;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class AuthenticatedHttpRequest extends HttpServletRequestWrapper {
         return new Principal() {
             @Override
             public String getName() {
-                return _uid;
+                return uid;
             }
         };
     }

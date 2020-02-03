@@ -39,22 +39,22 @@ import java.util.regex.Pattern;
  */
 public class RegexPolicy implements Policy {
 
-    private Logger _log;
+    private Logger log;
 
     public static final String MATCH_ALL = "^.*$";
 
-    private Pattern _rolePattern;
-    private Pattern _resourcePattern;
-    private Pattern _queryStringPattern;
+    private Pattern rolePattern;
+    private Pattern resourcePattern;
+    private Pattern queryStringPattern;
 
-    private Vector<HTTP_METHOD> _allowedActions;
+    private Vector<HTTP_METHOD> allowedActions;
 
     public RegexPolicy(){
-        _log = LoggerFactory.getLogger(this.getClass().getName());
-        _rolePattern = null;
-        _resourcePattern = null;
-        _queryStringPattern = null;
-        _allowedActions = new Vector<>();
+        log = LoggerFactory.getLogger(this.getClass().getName());
+        rolePattern = null;
+        resourcePattern = null;
+        queryStringPattern = null;
+        allowedActions = new Vector<>();
 
 
     }
@@ -62,12 +62,12 @@ public class RegexPolicy implements Policy {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder(getClass().getName()).append("={");
-        sb.append("rolePattern: \"").append(_rolePattern.pattern()).append("\", ");
-        sb.append("resourcePattern: \"").append(_resourcePattern.pattern()).append("\", ");
-        sb.append("queryStringPattern: \"").append(_queryStringPattern.pattern()).append("\", ");
+        sb.append("rolePattern: \"").append(rolePattern.pattern()).append("\", ");
+        sb.append("resourcePattern: \"").append(resourcePattern.pattern()).append("\", ");
+        sb.append("queryStringPattern: \"").append(queryStringPattern.pattern()).append("\", ");
         sb.append("allowedActions: [");
         boolean first = true;
-        for(HTTP_METHOD method: _allowedActions) {
+        for(HTTP_METHOD method: allowedActions) {
             sb.append(first?"\"":",\"").append(method).append("\"");
             first = false;
         }
@@ -84,26 +84,26 @@ public class RegexPolicy implements Policy {
         if(e==null)
             throw new ConfigurationException("You must supply a \"role\" element whose value is a regex string used" +
                     " to match the users roles.");
-        _rolePattern = Pattern.compile(e.getTextTrim());
+        rolePattern = Pattern.compile(e.getTextTrim());
 
 
         e = config.getChild("resource");
         if(e==null)
             throw new ConfigurationException("You must supply a \"resource\" element whose value is a regex " +
                     "string used to match the resource Id.");
-        _resourcePattern = Pattern.compile(e.getTextTrim());
+        resourcePattern = Pattern.compile(e.getTextTrim());
 
 
 
         e = config.getChild("query");
         if(e!=null){
-            _queryStringPattern = Pattern.compile(e.getTextTrim());
+            queryStringPattern = Pattern.compile(e.getTextTrim());
         }
         else {
             /**
              * By default, if no query regex is offered, we match any query.
              */
-            _queryStringPattern = Pattern.compile(MATCH_ALL);
+            queryStringPattern = Pattern.compile(MATCH_ALL);
 
         }
 
@@ -114,7 +114,7 @@ public class RegexPolicy implements Policy {
 
         for(Object o:  allowedActions){
             Element allowedAction = (Element)o;
-            _allowedActions.add(HTTP_METHOD.valueOf(allowedAction.getTextTrim()));
+            this.allowedActions.add(HTTP_METHOD.valueOf(allowedAction.getTextTrim()));
         }
 
 
@@ -125,21 +125,21 @@ public class RegexPolicy implements Policy {
     public boolean evaluate(String roleId, String resourceId, String queryString, String httpMethod) {
 
         if(roleId==null || resourceId==null || queryString == null || httpMethod == null) {
-            _log.error("evaluate() - Passing null values is not allowed. RETURNING FALSE");
+            log.error("evaluate() - Passing null values is not allowed. RETURNING FALSE");
             return false;
         }
 
-        if(_rolePattern.matcher(roleId).matches()){
-            if(_resourcePattern.matcher(resourceId).matches()){
-                if(_queryStringPattern.matcher(queryString).matches()) {
-                    if (_allowedActions.contains(HTTP_METHOD.valueOf(httpMethod))) {
-                        _log.info("evaluate() - Policy Matched! RETURNING TRUE");
+        if(rolePattern.matcher(roleId).matches()){
+            if(resourcePattern.matcher(resourceId).matches()){
+                if(queryStringPattern.matcher(queryString).matches()) {
+                    if (allowedActions.contains(HTTP_METHOD.valueOf(httpMethod))) {
+                        log.info("evaluate() - Policy Matched! RETURNING TRUE");
                         return true;
                     }
                 }
             }
         }
-        _log.info("evaluate() - Policy Did Not Match! RETURNING FALSE");
+        log.info("evaluate() - Policy Did Not Match! RETURNING FALSE");
         return false;
 
     }

@@ -42,24 +42,24 @@ public class AuthenticationControls {
 
     public static final String CONFIG_ELEMENT = "EnableAuthenticationControls";
 
-    private static Logger _log;
-    private static boolean _initialized ;
+    private static Logger log;
+    private static boolean initialized;
 
-    private static String _loginPath;
-    private static String _logoutPath;
-    private static String _defaultLoginPath;
-    private static String _defaultLogoutPath;
+    private static String loginPath;
+    private static String logoutPath;
+    private static String defaultLoginPath;
+    private static String defaultLogoutPath;
 
-    private static String _loginBanner;
+    private static String loginBanner;
 
     static {
-        _log = LoggerFactory.getLogger(AuthenticationControls.class);
-        _loginPath = null;
-        _logoutPath = null;
-        _initialized = false;
-        _defaultLoginPath = "/login";
-        _defaultLogoutPath = "/logout";
-        _loginBanner = "Welcome To The Burrow!";
+        log = LoggerFactory.getLogger(AuthenticationControls.class);
+        loginPath = null;
+        logoutPath = null;
+        initialized = false;
+        defaultLoginPath = "/login";
+        defaultLogoutPath = "/logout";
+        loginBanner = "Welcome To The Burrow!";
     }
 
     private AuthenticationControls() {
@@ -67,7 +67,7 @@ public class AuthenticationControls {
 
 
     public static boolean isIntitialized(){
-        return _initialized;
+        return initialized;
     }
 
 
@@ -90,8 +90,8 @@ public class AuthenticationControls {
      */
     public static void init(Element config, String contextPath) {
 
-       if(_initialized) {
-           _log.warn("init() - AuthenticationControls have ALREADY been initialized. " +
+       if(initialized) {
+           log.warn("init() - AuthenticationControls have ALREADY been initialized. " +
                    "This subsequent attempt at initialization and the concomitant configuration have been ignored!");
            return;
        }
@@ -99,57 +99,57 @@ public class AuthenticationControls {
         if (config != null) {
             if(config.getName().equals(CONFIG_ELEMENT)) {
 
-                _loginPath = _defaultLoginPath;
+                loginPath = defaultLoginPath;
                 Element e = config.getChild("login");
                 if (e != null) {
-                    _loginPath = e.getTextTrim();
+                    loginPath = e.getTextTrim();
                 }
-                _loginPath = PathBuilder.pathConcat(contextPath,_loginPath);
-                _log.info("init() - Login Path: {}",_loginPath);
+                loginPath = PathBuilder.pathConcat(contextPath, loginPath);
+                log.info("init() - Login Path: {}", loginPath);
 
-                _logoutPath = _defaultLogoutPath;
+                logoutPath = defaultLogoutPath;
                 e = config.getChild("logout");
                 if (e != null) {
-                    _logoutPath = e.getTextTrim();
+                    logoutPath = e.getTextTrim();
                 }
-                _logoutPath = PathBuilder.pathConcat(contextPath,_logoutPath);
-                _log.info("init() - Logout Path: {}",_logoutPath);
+                logoutPath = PathBuilder.pathConcat(contextPath, logoutPath);
+                log.info("init() - Logout Path: {}", logoutPath);
 
 
                 // Init the Login Banner
                 e = config.getChild("LoginBanner");
                 if(e!=null){
-                    _loginBanner = e.getTextTrim();
+                    loginBanner = e.getTextTrim();
                 }
-                _log.info("init() - Login Banner: {}",_loginBanner);
+                log.info("init() - Login Banner: {}", loginBanner);
 
-                _initialized = true;
+                initialized = true;
             }
         }
         else {
            // Despite The AuthenticationControls not being initialized we still need these values to be valid.
-            _loginPath = PathBuilder.pathConcat(contextPath,_defaultLoginPath);
-            _logoutPath = PathBuilder.pathConcat(contextPath,_defaultLogoutPath);
+            loginPath = PathBuilder.pathConcat(contextPath, defaultLoginPath);
+            logoutPath = PathBuilder.pathConcat(contextPath, defaultLogoutPath);
         }
 
     }
 
     public static String getLoginBanner(){
-        return _loginBanner;
+        return loginBanner;
     }
 
     public static String getLogoutEndpoint(){
-        return _logoutPath;
+        return logoutPath;
     }
 
     public static String getLoginEndpoint() {
-        return _loginPath;
+        return loginPath;
     }
 
 
     public static void setLoginParameters(Transformer transformer, HttpServletRequest request) throws SaxonApiException {
 
-        if(_initialized) {
+        if(initialized) {
             String userId = null;
             Principal userPrinciple = request.getUserPrincipal();
             if (request.getRemoteUser() != null) {
@@ -159,21 +159,21 @@ public class AuthenticationControls {
                 userId = userPrinciple.getName();
             }
 
-            _log.debug("xsltDir() - UserId: {}", userId);
+            log.debug("xsltDir() - UserId: {}", userId);
             if (userId != null) {
                 transformer.setParameter("userId", userId);
             }
-            _log.debug("xsltDir() - _loginPath: {}", _loginPath);
-            if (_loginPath != null) {
-                transformer.setParameter("loginLink", _loginPath);
+            log.debug("xsltDir() - loginPath: {}", loginPath);
+            if (loginPath != null) {
+                transformer.setParameter("loginLink", loginPath);
             }
-            _log.debug("xsltDir() - _logoutPath: {}", _logoutPath);
-            if (_logoutPath != null) {
-                transformer.setParameter("logoutLink", _logoutPath);
+            log.debug("xsltDir() - logoutPath: {}", logoutPath);
+            if (logoutPath != null) {
+                transformer.setParameter("logoutLink", logoutPath);
             }
         }
         else {
-            _log.debug("setLoginParameters() - AuthenticationControls have not been initialized. " +
+            log.debug("setLoginParameters() - AuthenticationControls have not been initialized. " +
                     "No Parameters Will Be Set.");
         }
 

@@ -45,12 +45,12 @@ public class TomcatRealmIdP extends IdProvider implements Serializable {
     public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
-    private Logger _log;
+    private Logger log;
 
 
     public TomcatRealmIdP(){
         super();
-        _log = LoggerFactory.getLogger(this.getClass());
+        log = LoggerFactory.getLogger(this.getClass());
 
         setAuthContext(DEFAULT_AUTHENICATION_CONTEXT);
         setDescription("Tomcat Realm Authentication");
@@ -81,7 +81,7 @@ public class TomcatRealmIdP extends IdProvider implements Serializable {
             redirectUrl = redirectUrl.replace("http://","https://");
             redirectUrl = redirectUrl.replace(":8080/",":8443/");
         }
-        _log.info("doLogin() - redirectURL: {}",redirectUrl);
+        log.info("doLogin() - redirectURL: {}",redirectUrl);
 
         response.sendRedirect(redirectUrl);
         return true;
