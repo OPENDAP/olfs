@@ -59,7 +59,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -553,7 +552,7 @@ public class ViewersServlet extends HttpServlet {
 
         Iterator<JwsHandler> e = ServicesRegistry.getJavaWebStartHandlers().values().iterator();
         JwsHandler jwsHandler;
-        Vector<JwsHandler> canHandleDataset = new Vector<JwsHandler>();
+        Vector<JwsHandler> canHandleDataset = new Vector<>();
 
         while(e.hasNext()){
             jwsHandler = e.next();
