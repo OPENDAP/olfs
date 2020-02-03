@@ -59,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -84,7 +85,6 @@ public class ViewersServlet extends HttpServlet {
     private static final BesApi BES_API = new BesApi();
 
     private static String webStartResourcesDirectory;
-    private static Document configDoc;
     private static String configFilename = "viewers.xml";
 
     private static String serviceId ="/viewers";
@@ -151,8 +151,7 @@ public class ViewersServlet extends HttpServlet {
                     webStartResourcesDirectory = null;
                 }
             }
-            configDoc = loadConfig(configFilename);
-
+            Document configDoc = loadConfig(configFilename);
             buildJwsHandlers(webStartResourcesDirectory, configDoc.getRootElement());
             buildWebServiceHandlers(webStartResourcesDirectory, configDoc.getRootElement());
 
@@ -394,7 +393,7 @@ public class ViewersServlet extends HttpServlet {
         User user = new User(req);
 
         String query = Scrub.simpleQueryString(req.getQueryString());
-        int request_status = HttpServletResponse.SC_OK;
+        int requestStatus = HttpServletResponse.SC_OK;
         try {
             String dapService = Scrub.fileName(req.getParameter("dapService"));
             String besDatasetId = Scrub.fileName(req.getParameter("datasetID"));
@@ -402,7 +401,7 @@ public class ViewersServlet extends HttpServlet {
             if(dapService==null || besDatasetId==null){
                 String msg =  "Incorrect parameters sent to '" +  getClass().getName() + "' query: '"+ query +"'";
                 LOG.error("{}",msg);
-                request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg),this, resp);
+                requestStatus = OPeNDAPException.anyExceptionHandler(new BadRequest(msg),this, resp);
                 return;
             }
 
@@ -428,7 +427,7 @@ public class ViewersServlet extends HttpServlet {
             if(applicationID == null){
                 String msg = "No applicationID found in WebStart request.";
                 LOG.error("{}", msg);
-                request_status = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
+                requestStatus = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
                 return;
             }
 
@@ -463,15 +462,15 @@ public class ViewersServlet extends HttpServlet {
                 } else {
                     String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+query;
                     LOG.error("{}", msg);
-                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
+                    requestStatus = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
                 }
             }
         }
-        catch (Throwable t){
+        catch (IOException | PPTException | BESError | JDOMException | SaxonApiException | BadConfigurationException e) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, resp);
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
             }
-            catch (Throwable t2) {
+            catch (Exception t2) {
                 try {
                     String msg = "\n########################################################\n" +
                             "Request proccessing failed.\n" +
@@ -486,7 +485,7 @@ public class ViewersServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
+            LogUtil.logServerAccessEnd(requestStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             // this.destroy(); // I commented this out because: WTF? Why? - ndp 03/05/2019
         }

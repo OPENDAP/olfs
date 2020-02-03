@@ -26,6 +26,8 @@
 
 package opendap.aggregation;
 
+import opendap.http.error.BadRequest;
+
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -74,7 +76,7 @@ public class AggregationParams {
      *                        object.
      * @throws Exception If 'file' is missing.
      */
-    public AggregationParams(Map<String, String[]> queryParameters) throws Exception {
+    public AggregationParams(Map<String, String[]> queryParameters) throws  BadRequest{
         _queryParameters = queryParameters;
 
         N = validateParams();
@@ -91,31 +93,31 @@ public class AggregationParams {
      * 'file' param.
      *
      * @return How many 'file' values are there?
-     * @throws Exception Throw if there are any number of fails in the parameter
+     * @throws BadRequest Throw if there are any number of fails in the parameter
      * list.
      */
-    private int validateParams() throws Exception
+    private int validateParams() throws BadRequest
     {
 
         if (_queryParameters.get("file") == null)
-            throw new Exception("There must be at least one instance of the 'file' parameter when calling this service.");
+            throw new BadRequest("There must be at least one instance of the 'file' parameter when calling this service.");
 
         if (_queryParameters.get("var") == null)
-            throw new Exception("There must be at least one instance of the 'var' parameter when calling this service.");
+            throw new BadRequest("There must be at least one instance of the 'var' parameter when calling this service.");
 
         int N = _queryParameters.get("file").length;
 
          _one_var = _queryParameters.get("var").length == 1;
 
         if (!(_one_var || _queryParameters.get("var").length == N))
-            throw new Exception("Incorrect number of 'var' parameters (found " + N + " instances of 'file' and "
+            throw new BadRequest("Incorrect number of 'var' parameters (found " + N + " instances of 'file' and "
                     + _queryParameters.get("var").length + " of 'var').");
 
         _has_bbox = _queryParameters.get("bbox") != null;
         // one_bbox = _has_bbox && _queryParameters.get("bbox").length == 1;
 
         if (_has_bbox && _queryParameters.get("bbox").length != _queryParameters.get("var").length)
-            throw new Exception("Incorrect number of 'bbox' parameters (found " + _queryParameters.get("bbox").length
+            throw new BadRequest("Incorrect number of 'bbox' parameters (found " + _queryParameters.get("bbox").length
                     + " instances of 'bbox' and " + _queryParameters.get("var").length + " of 'var' - they should match).");
 
         return N;
@@ -207,7 +209,7 @@ public class AggregationParams {
      * @param bbox The bbox parameter value to be parsed.
      * @return The bbox expression.
      */
-    private String parseBBox(String bbox, BBoxConstraintBuilder builder) throws Exception {
+    private String parseBBox(String bbox, BBoxConstraintBuilder builder) throws  BadRequest {
         if (bbox.isEmpty())
             return "";
 
@@ -286,7 +288,7 @@ public class AggregationParams {
                     break;
 
                 case error:
-                    throw new Exception("The value of the parameter 'bbox' does not parse: '" + bbox + "'");
+                    throw new BadRequest("The value of the parameter 'bbox' does not parse: '" + bbox + "'");
 
                 case rbracket:
                     ++bboxNumber;// track the number of bbox() calls
@@ -357,7 +359,7 @@ public class AggregationParams {
      * @param i Build the CE for the ith file/granule
      * @return The correct BES/DAP CE
      */
-    public String getArrayCE(int i) throws Exception {
+    public String getArrayCE(int i) throws BadRequest {
         // Simple case first...
         if (_one_var) {
             // If the field '_ce' is empty, compute. reuse on subsequent calls
@@ -393,7 +395,7 @@ public class AggregationParams {
      * @param i Build the CE for the ith file/granule
      * @return The correct BES/DAP CE
      */
-    public String getTableCE(int i) throws Exception {
+    public String getTableCE(int i) throws BadRequest {
         // Simple case first...
         if (_one_var) {
             // If the field '_ce' is empty, compute. reuse on subsequent calls
