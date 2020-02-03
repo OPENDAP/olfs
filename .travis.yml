@@ -47,13 +47,13 @@ env:
 
 stages:
 - name: build
-  if:  branch = master
+  if:  branch = moo
 - name: test
-  if:  branch = master
+  if:  branch = moo
 - name: scan
   if:  branch = master AND NOT type = pull_request
 - name: snappah
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = moo AND NOT type = pull_request
 
 jobs:
   include:

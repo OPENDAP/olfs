@@ -40,11 +40,11 @@ import java.util.*;
  */
 public class UserProfile implements Serializable {
 
-    private Date   _objectCreationTime;
-    private String _jsonStr;
-    private JsonObject _profile;
-    private HashSet<String> _groups;
-    private HashSet<String> _roles;
+    private Date objectCreationTime;
+    private String jsonStr;
+    private JsonObject profile;
+    private HashSet<String> groups;
+    private HashSet<String> roles;
 
     private IdProvider _idp;
 
@@ -52,10 +52,10 @@ public class UserProfile implements Serializable {
 
 
     public UserProfile() {
-        _objectCreationTime = new Date();
-        _profile = new JsonObject();
-        _groups = new HashSet<>();
-        _roles = new HashSet<>();
+        objectCreationTime = new Date();
+        profile = new JsonObject();
+        groups = new HashSet<>();
+        roles = new HashSet<>();
         _idp  = null;
         _token = null;
     }
@@ -70,8 +70,8 @@ public class UserProfile implements Serializable {
     public UserProfile(String jsonStr){
         this();
         JsonParser jparse = new JsonParser();
-        _profile = jparse.parse(jsonStr).getAsJsonObject();
-        _jsonStr = jsonStr;
+        profile = jparse.parse(jsonStr).getAsJsonObject();
+        this.jsonStr = jsonStr;
 
     }
 
@@ -85,26 +85,26 @@ public class UserProfile implements Serializable {
 
 
     public String getAttribute(String attrName){
-        JsonElement val =  _profile.get(attrName);
+        JsonElement val =  profile.get(attrName);
         if(val==null)
             return null;
         return val.toString();
     }
 
     public void setAttribute(String attrName, String value){
-         _profile.add(attrName, new JsonPrimitive(value));
+        profile.add(attrName, new JsonPrimitive(value));
     }
 
     public Vector<String> getAttributeNames(){
         Vector<String> keys = new Vector<>();
-        for(Map.Entry<String,JsonElement> e: _profile.entrySet()){
+        for(Map.Entry<String,JsonElement> e: profile.entrySet()){
             keys.add(e.getKey());
         }
         return keys;
     }
 
     public String getUID() {
-        return _profile.get("uid").getAsString();
+        return profile.get("uid").getAsString();
     }
 
     public IdProvider getIdP(){
@@ -116,31 +116,31 @@ public class UserProfile implements Serializable {
 
 
     public void addGroups(HashSet<String> groupMemberships){
-        _groups.addAll(groupMemberships);
+        groups.addAll(groupMemberships);
 
     }
 
     public void addGroup(String group){
-        _groups.add(group);
+        groups.add(group);
 
     }
 
     public void addRoles(HashSet<String> roles){
-        _roles.addAll(roles);
+        this.roles.addAll(roles);
 
     }
     public void addRole(String role){
-        _roles.add(role);
+        roles.add(role);
 
     }
 
 
     public HashSet<String> getGroups(){
-        return new HashSet<String>(_groups);
+        return new HashSet<String>(groups);
     }
 
     public HashSet<String> getRoles(){
-        return new HashSet<String>(_roles);
+        return new HashSet<String>(roles);
     }
 
 
@@ -221,7 +221,7 @@ public class UserProfile implements Serializable {
         sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
 
         boolean comma = false;
-        for(Map.Entry<String,JsonElement> e: _profile.entrySet()) {
+        for(Map.Entry<String,JsonElement> e: profile.entrySet()) {
             sb.append(comma?",\n":"\n");
             sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
             comma =true;

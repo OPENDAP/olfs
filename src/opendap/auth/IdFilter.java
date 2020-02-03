@@ -264,7 +264,7 @@ public class IdFilter implements Filter {
 
         log.info("doLogout() - BEGIN");
         log.info("doLogout() - Retrieving session...");
-        String redirectUrl  = request.getContextPath();;
+        String redirectUrl  = request.getContextPath();
         HttpSession session = request.getSession(false);
         if (session != null) {
             log.info("doLogout() - Got session...");
@@ -359,6 +359,9 @@ public class IdFilter implements Filter {
     {
         HttpSession session = request.getSession();
         log.debug("doLandingPage() - Building noProfile String.");
+
+        String dtb = "<dt><b>";
+
         StringBuilder noProfile = new StringBuilder();
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
@@ -384,7 +387,7 @@ public class IdFilter implements Filter {
             String origUrl = (String) session.getAttribute(RETURN_TO_URL);
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append("<dt><b>").append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
+                noProfile.append(dtb).append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
         }
@@ -442,14 +445,14 @@ public class IdFilter implements Filter {
 
                 out.println("<dl>");
                 if(origUrl!=null){
-                    out.println("<dt><b>"+ RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                    out.println(dtb + RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
-                out.println("<dt><b>"+USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
+                out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
 
                 OAuth2AccessToken oaToken = (OAuth2AccessToken) session.getAttribute(OAuth2AccessToken.OAUTH_ACCESS_TOKEN);
 
                 if(oaToken != null){
-                    out.println("<dt><b>"+OAuth2AccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
+                    out.println(dtb + OAuth2AccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
 
                 }
                 out.println("</dl>");

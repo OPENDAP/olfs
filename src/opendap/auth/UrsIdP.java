@@ -55,7 +55,7 @@ public class UrsIdP extends IdProvider{
     private String clientAppId;
     private String clientAppAuthCode;
 
-    private static final String errPrfx = "ERROR! msg: ";
+    private static final String ERR_PRFX = "ERROR! msg: ";
 
 
     public UrsIdP(){
@@ -110,7 +110,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsUrl(String ursUrl) throws ServletException{
         if(ursUrl == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a URS Service URL. (urs_url)";
-            log.error("{}{}",errPrfx,msg);
+            log.error("{}{}", ERR_PRFX,msg);
             throw new ServletException(msg);
         }
 
@@ -128,7 +128,7 @@ public class UrsIdP extends IdProvider{
 
         if(ursClientApplicationId == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Application ID. (client_id)";
-            log.error("{}{}",errPrfx,msg);
+            log.error("{}{}", ERR_PRFX,msg);
             throw new ServletException(msg);
         }
         clientAppId = ursClientApplicationId;
@@ -143,7 +143,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsClientAppAuthCode(String ursClientAppAuthCode) throws ServletException {
         if(ursClientAppAuthCode == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Authorization Code. (client_auth_code)";
-            log.error("{}{}",errPrfx,msg);
+            log.error("{}{}", ERR_PRFX,msg);
             throw new ServletException(msg);
         }
 
