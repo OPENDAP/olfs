@@ -47,34 +47,34 @@ import java.util.Enumeration;
 
 public class IdFilter implements Filter {
 
-    private Logger _log;
+    private Logger log;
 
     public static final String RETURN_TO_URL      = "return_to_url";
     public static final String USER_PROFILE       = "user_profile";
     public static final String IDENTITY_PROVIDER  = "identity_provider";
 
-    private boolean _is_initialized;
-    private FilterConfig _filterConfig;
+    private boolean isInitialized;
+    private FilterConfig filterConfig;
 
-    private static final String _configParameterName = "config";
-    private static final String _defaultConfigFileName = "user-access.xml";
+    private static final String CONFIG_PARAMETER_NAME = "config";
+    private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
 
-    private String _guest_endpoint;
-    private boolean _enableGuestProfile;
+    private String guestEndpoint;
+    private boolean enableGuestProfile;
 
     public IdFilter(){
-        _is_initialized = false;
+        isInitialized = false;
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
-        _filterConfig = filterConfig;
-        _log = LoggerFactory.getLogger(_filterConfig.getFilterName());
+        this.filterConfig = filterConfig;
+        log = LoggerFactory.getLogger(this.filterConfig.getFilterName());
         try {
             init();
         }
         catch (IOException | JDOMException se){
-            _log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
+            log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
                     "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
         }
 
@@ -82,22 +82,22 @@ public class IdFilter implements Filter {
 
     public void init() throws IOException, JDOMException {
 
-        if(_is_initialized)
+        if(isInitialized)
             return;
-        _log.info("init() - Initializing IdFilter...");
+        log.info("init() - Initializing IdFilter...");
 
-        String context = _filterConfig.getServletContext().getContextPath();
+        String context = filterConfig.getServletContext().getContextPath();
 
-        String configFileName = _filterConfig.getInitParameter(_configParameterName);
+        String configFileName = filterConfig.getInitParameter(CONFIG_PARAMETER_NAME);
         if(configFileName==null){
-            configFileName = _defaultConfigFileName;
+            configFileName = DEFAULT_CONFIG_FILE_NAME;
             String msg = "init() - The web.xml configuration for "+getClass().getName()+
-                    " does not contain an init-parameter named \""+_configParameterName+"\" " +
+                    " does not contain an init-parameter named \""+ CONFIG_PARAMETER_NAME +"\" " +
                     "Using the DEFAULT name: "+configFileName;
-            _log.warn(msg);
+            log.warn(msg);
         }
 
-        String configDirName = ServletUtil.getConfigPath(_filterConfig.getServletContext());
+        String configDirName = ServletUtil.getConfigPath(filterConfig.getServletContext());
         File configFile = new File(configDirName,configFileName);
 
         // Load Config File
@@ -107,10 +107,10 @@ public class IdFilter implements Filter {
 
         Element e = config.getChild("EnableGuestProfile");
         if(e!=null){
-            _enableGuestProfile = true;
-            _guest_endpoint = PathBuilder.pathConcat(context, "guest");
+            enableGuestProfile = true;
+            guestEndpoint = PathBuilder.pathConcat(context, "guest");
         }
-        _log.info("init() - Guest Profile {}", _enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
+        log.info("init() - Guest Profile {}", enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
 
         // Set up authentication controls. If the configuration element is missing that's fine
         // because we know that it will still configure the login/logout endpoint values.
@@ -122,20 +122,20 @@ public class IdFilter implements Filter {
             Element idpConfig = (Element) o;
             IdPManager.addProvider(idpConfig);
         }
-        _is_initialized = true;
-        _log.info("init() - IdFilter HAS BEEN INITIALIZED!");
+        isInitialized = true;
+        log.info("init() - IdFilter HAS BEEN INITIALIZED!");
     }
 
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        if (!_is_initialized) {
+        if (!isInitialized) {
             try {
                 init();
             } catch (IOException | JDOMException e) {
                 String msg = "doFilter() - IdFilter INITIALIZATION HAS FAILED! " +
                         "Caught " + e.getClass().getName() + " Message: " + e.getMessage();
-                _log.error(msg);
+                log.error(msg);
                 OPeNDAPException.setCachedErrorMessage(msg);
                 throw new ServletException(msg,e);
             }
@@ -160,7 +160,7 @@ public class IdFilter implements Filter {
         } else if (AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
             doLandingPage(hsReq, hsRes);
             return;
-        } else if (_enableGuestProfile && requestURI.equals(_guest_endpoint)) {
+        } else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
             doGuestLogin(hsReq, hsRes);
             return;
         } else {
@@ -194,7 +194,7 @@ public class IdFilter implements Filter {
                         String msg = "Your Login Transaction FAILED!   " +
                                      "Authentication Context: '"+idProvider.getAuthContext()+
                                      "'   Message: "+ e.getMessage();
-                        _log.error("doFilter() - " + msg);
+                        log.error("doFilter() - {}", msg);
                         OPeNDAPException.setCachedErrorMessage(msg);
                         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
                         return;
@@ -224,7 +224,7 @@ public class IdFilter implements Filter {
     }
 
     public void destroy() {
-        _log = null;
+        log = null;
     }
 
 
@@ -262,32 +262,32 @@ public class IdFilter implements Filter {
     private void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException {
 
-        _log.info("doLogout() - BEGIN");
-        _log.info("doLogout() - Retrieving session...");
+        log.info("doLogout() - BEGIN");
+        log.info("doLogout() - Retrieving session...");
         String redirectUrl  = request.getContextPath();;
         HttpSession session = request.getSession(false);
         if (session != null) {
-            _log.info("doLogout() - Got session...");
+            log.info("doLogout() - Got session...");
             String href = (String) session.getAttribute(RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
 
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if (up != null) {
-                _log.info("doLogout() - Logging out user '{}'", up.getUID());
+                log.info("doLogout() - Logging out user '{}'", up.getUID());
                 IdProvider idProvider = up.getIdP();
                 if (idProvider != null) {
-                    _log.info("doLogout() - Calling '{}' logout handler.", idProvider.getAuthContext());
+                    log.info("doLogout() - Calling '{}' logout handler.", idProvider.getAuthContext());
                     // Redirect to RETURN_TO_URL is done by idProvider
                     idProvider.doLogout(request, response);
-                    _log.info("doLogout() - END");
+                    log.info("doLogout() - END");
                     return;
                 }
             } else {
-                _log.info("doLogout() - Missing UserProfile object....");
+                log.info("doLogout() - Missing UserProfile object....");
             }
         }
-        _log.info("doLogout() - redirectUrl: {}", redirectUrl);
-        _log.info("doLogout() - Punting with session.invalidate()");
+        log.info("doLogout() - redirectUrl: {}", redirectUrl);
+        log.info("doLogout() - Punting with session.invalidate()");
         // This is essentially a "punt" since things aren't as expected.
         if(session!=null)
             session.invalidate();
@@ -299,7 +299,7 @@ public class IdFilter implements Filter {
             OPeNDAPException.setCachedErrorMessage(e.getMessage());
             throw e;
         }
-        _log.info("doLogout() - END");
+        log.info("doLogout() - END");
     }
 
 
@@ -327,10 +327,10 @@ public class IdFilter implements Filter {
             redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
             session.invalidate();
         }
-        HttpSession guest_session = request.getSession(true);
-        synchronized (guest_session) {
-            guest_session.setAttribute(RETURN_TO_URL, redirectUrl);
-            guest_session.setAttribute(USER_PROFILE, new GuestProfile());
+        HttpSession guestSession = request.getSession(true);
+        synchronized (guestSession) {
+            guestSession.setAttribute(RETURN_TO_URL, redirectUrl);
+            guestSession.setAttribute(USER_PROFILE, new GuestProfile());
         }
 
         //
@@ -358,7 +358,7 @@ public class IdFilter implements Filter {
 	        throws IOException
     {
         HttpSession session = request.getSession();
-        _log.debug("doLandingPage() - Building noProfile String.");
+        log.debug("doLandingPage() - Building noProfile String.");
         StringBuilder noProfile = new StringBuilder();
 
         noProfile.append("<p><b>You are not currently logged on.</b></p><br />");
@@ -374,7 +374,7 @@ public class IdFilter implements Filter {
             noProfile.append("</a><br/><br/></li>");
         }
         noProfile.append("</ul>");
-        if(_enableGuestProfile) {
+        if(enableGuestProfile) {
             noProfile.append("<i>Or you may:</i><br />");
             noProfile.append("<ul>");
             noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
@@ -390,12 +390,12 @@ public class IdFilter implements Filter {
         }
 
 
-        _log.debug("doLandingPage() - Setting Response Headers...");
+        log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "Login Page");
         response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-        _log.debug("doLandingPage() - Writing page contents.");
+        log.debug("doLandingPage() - Writing page contents.");
 
         // Generate the html page header
         PrintWriter out;
@@ -413,7 +413,7 @@ public class IdFilter implements Filter {
         if(request.getRemoteUser()!=null || request.getUserPrincipal()!=null) {
             out.println("<p>request.getRemoteUser(): " + (request.getRemoteUser()==null?"not set": Encode.forHtml(request.getRemoteUser())) + "</p>");
             if (request.getUserPrincipal() != null) {
-                out.println("<p>request.getUserPrincipal().getName(): " + request.getUserPrincipal().getName() + "</p>");
+                out.println("<p>request.getUserPrincipal().getName(): " + Encode.forHtml(request.getUserPrincipal().getName()) + "</p>");
 
             }
             out.println("<hr/>");
@@ -425,18 +425,18 @@ public class IdFilter implements Filter {
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                String first_name = userProfile.getAttribute("first_name");
-                if(first_name!=null)
-                    first_name = first_name.replaceAll("\"","");
+                String firstName = userProfile.getAttribute("first_name");
+                if(firstName!=null)
+                    firstName = firstName.replaceAll("\"","");
 
-                String last_name =  userProfile.getAttribute("last_name");
-                if(last_name!=null)
-                    last_name = last_name.replaceAll("\"","");
+                String lastName =  userProfile.getAttribute("last_name");
+                if(lastName!=null)
+                    lastName = lastName.replaceAll("\"","");
 
-    		    out.println("<p>Greetings " + first_name + " " + last_name + ", this is your profile.</p>");
+    		    out.println("<p>Greetings " + firstName + " " + lastName + ", this is your profile.</p>");
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
     		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
-                out.println("<h3>"+first_name+"'s Profile</h3>");
+                out.println("<h3>"+firstName+"'s Profile</h3>");
 
                 String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
@@ -464,7 +464,6 @@ public class IdFilter implements Filter {
                 if(attrNames.hasMoreElements()){
                     while(attrNames.hasMoreElements()){
                         String attrName = attrNames.nextElement().toString();
-                        // String attrValue = session.getAttribute(attrName).toString();
                         out.print("\""+attrName+"\"");
                         out.print((attrNames.hasMoreElements()?", ":""));
                     }
@@ -472,8 +471,8 @@ public class IdFilter implements Filter {
                 out.println(" ]</pre>");
                 out.println("<hr />");
             }
-            else if(request.getUserPrincipal() !=null){
-                out.println("<p>Welcome " + request.getUserPrincipal().getName() + "</p>");
+            else if(request.getUserPrincipal() != null){
+                out.println("<p>Welcome " + Encode.forHtml(request.getUserPrincipal().getName()) + "</p>");
                 out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
             }
             else {

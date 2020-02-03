@@ -32,37 +32,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created by ndp on 9/24/14.
  */
-public abstract class  IdProvider {
+public abstract class  IdProvider implements Serializable {
 
 
-    protected String _authContext;
-    private String _description;
-    protected String _serviceContext;
+    protected String authContext;
+    private String description;
+    protected String serviceContext;
 
-    private boolean _isDefaultProvider;
+    private boolean isDefaultProvider;
 
 
     public IdProvider(){
-        _authContext = null;
-        _description = "Abstract Identification Service Provider";
-        _isDefaultProvider = false;
-        _serviceContext = null;
+        authContext = null;
+        description = "Abstract Identification Service Provider";
+        isDefaultProvider = false;
+        serviceContext = null;
     }
 
-    public boolean isDefault(){ return _isDefaultProvider; }
+    public boolean isDefault(){ return isDefaultProvider; }
 
-    public  String getAuthContext(){ return _authContext; }
-    public  void setAuthContext(String authContext){ _authContext = authContext; }
+    public  String getAuthContext(){ return authContext; }
+    public  void setAuthContext(String authContext){ this.authContext = authContext; }
 
-    public  String getDescription(){ return _description; }
-    public  void setDescription(String d){ _description = d; }
+    public  String getDescription(){ return description; }
+    public  void setDescription(String d){ description = d; }
 
-    public String getServiceContext(){ return _serviceContext;}
-    public void setServiceContext(String sc){ _serviceContext = sc;}
+    public String getServiceContext(){ return serviceContext;}
+    public void setServiceContext(String sc){ serviceContext = sc;}
 
 
     public abstract String getLoginEndpoint();
@@ -86,10 +87,10 @@ public abstract class  IdProvider {
 
         e = config.getChild("isDefault");
         if(e!=null){
-            _isDefaultProvider = true;
+            isDefaultProvider = true;
         }
 
-        _serviceContext = serviceContext;
+        this.serviceContext = serviceContext;
     }
 
     /**
