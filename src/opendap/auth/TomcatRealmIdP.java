@@ -39,7 +39,7 @@ import java.io.Serializable;
 /**
  * Created by ndp on 10/7/14.
  */
-public class TomcatRealmIdP extends IdProvider implements Serializable {
+public class TomcatRealmIdP extends IdProvider {
 
 
     public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
