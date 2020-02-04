@@ -59,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -404,13 +405,28 @@ public class ViewersServlet extends HttpServlet {
                 return;
             }
 
-            URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
+            URL serviceURL;
+            try {
+                serviceURL = new URL(ReqInfo.getServiceUrl(req));
+            }
+            catch (MalformedURLException e){
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                return;
+            }
+
             String protocol = serviceURL.getProtocol();
             String host = serviceURL.getHost();
             int port = serviceURL.getPort();
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
-            Document ddx = getDDX(user, serverURL, dapService, besDatasetId);
+
+            Document ddx;
+            try {
+                ddx = getDDX(user, serverURL, dapService, besDatasetId);
+            } catch (IOException | PPTException |BESError | JDOMException| BadConfigurationException e) {
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                return;
+            }
 
             String applicationID = req.getPathInfo();
             // Condition applicationID.
@@ -431,9 +447,22 @@ public class ViewersServlet extends HttpServlet {
             }
 
             if (applicationID.equals("viewers")) {
-                DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
+                DataOutputStream dos;
+                try {
+                    dos = new DataOutputStream(resp.getOutputStream());
+                } catch (IOException e) {
+                    requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                    return;
+                }
+
                 resp.setContentType("text/html");
-                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
+                try {
+                    sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
+                } catch (IOException | PPTException | JDOMException| BadConfigurationException | SaxonApiException e) {
+                    requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                    return;
+                }
+
                 LogUtil.setResponseSize(dos.size());
             } else {
                 String dataAccessURL = serverURL+dapService+besDatasetId;
@@ -451,7 +480,13 @@ public class ViewersServlet extends HttpServlet {
                         resp.setContentType(mType);
 
                     // Get the sink
-                    DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
+                    DataOutputStream dos = null;
+                    try {
+                        dos = new DataOutputStream(resp.getOutputStream());
+                    } catch (IOException e) {
+                        requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                        return;
+                    }
                     PrintStream ps = new PrintStream(dos);
 
                     // Send the jnlp to the client.
@@ -465,7 +500,7 @@ public class ViewersServlet extends HttpServlet {
                 }
             }
         }
-        catch (IOException | PPTException | BESError | JDOMException | SaxonApiException | BadConfigurationException e) {
+        catch (Exception e) {
             try {
                 requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
             }

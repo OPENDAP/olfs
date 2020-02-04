@@ -27,13 +27,9 @@
 package opendap.auth;
 
 import com.google.gson.*;
-//import org.json.simple.JSONObject;
-
 import java.io.Serializable;
 import java.util.*;
 
-//import org.json.simple.JSONObject;
-// import java.util.ArrayList;
 
 /**
  * Created by ndp on 9/25/14.
