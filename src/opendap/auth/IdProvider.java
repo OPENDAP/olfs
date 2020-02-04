@@ -36,7 +36,7 @@ import java.io.IOException;
 /**
  * Created by ndp on 9/24/14.
  */
-public abstract class  IdProvider {
+public abstract class IdProvider {
 
 
     protected String authContext;
