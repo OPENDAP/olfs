@@ -412,8 +412,23 @@ public class ViewersServlet extends HttpServlet {
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
 
-            Document ddx = getDDX(user, serverURL, dapService, besDatasetId);
+            Document ddx;
+            try {
+                ddx = getDDX(user, serverURL, dapService, besDatasetId);
+            }
+            catch(PPTException e){
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                return;
+            }
+            catch(BadConfigurationException e){
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                return;
+            }
+            catch(BESError e){
+                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
+                return;
 
+            }
             String applicationID = req.getPathInfo();
             // Condition applicationID.
             if (applicationID != null)
@@ -471,7 +486,7 @@ public class ViewersServlet extends HttpServlet {
                 }
             }
         }
-        catch ( BESError | IOException | PPTException | JDOMException | BadConfigurationException | SaxonApiException e) {
+        catch (  IOException | PPTException | JDOMException | BadConfigurationException | SaxonApiException e) {
             try {
                 requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
             }
