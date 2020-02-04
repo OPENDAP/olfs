@@ -405,28 +405,14 @@ public class ViewersServlet extends HttpServlet {
                 return;
             }
 
-            URL serviceURL;
-            try {
-                serviceURL = new URL(ReqInfo.getServiceUrl(req));
-            }
-            catch (MalformedURLException e){
-                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
-                return;
-            }
-
+            URL serviceURL = new URL(ReqInfo.getServiceUrl(req));
             String protocol = serviceURL.getProtocol();
             String host = serviceURL.getHost();
             int port = serviceURL.getPort();
             String serverURL = protocol+"://" + host + ":" + (port==-1 ? "" : port);
 
 
-            Document ddx;
-            try {
-                ddx = getDDX(user, serverURL, dapService, besDatasetId);
-            } catch (IOException | PPTException |BESError | JDOMException| BadConfigurationException e) {
-                requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
-                return;
-            }
+            Document ddx = getDDX(user, serverURL, dapService, besDatasetId);
 
             String applicationID = req.getPathInfo();
             // Condition applicationID.
@@ -447,24 +433,14 @@ public class ViewersServlet extends HttpServlet {
             }
 
             if (applicationID.equals("viewers")) {
-                DataOutputStream dos;
-                try {
-                    dos = new DataOutputStream(resp.getOutputStream());
-                } catch (IOException e) {
-                    requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
-                    return;
-                }
+                DataOutputStream dos = new DataOutputStream(resp.getOutputStream());
 
                 resp.setContentType("text/html");
-                try {
-                    sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
-                } catch (IOException | PPTException | JDOMException| BadConfigurationException | SaxonApiException e) {
-                    requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
-                    return;
-                }
+                sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
 
                 LogUtil.setResponseSize(dos.size());
-            } else {
+            }
+            else {
                 String dataAccessURL = serverURL+dapService+besDatasetId;
 
                 // Attempt to locate the application...
@@ -480,27 +456,22 @@ public class ViewersServlet extends HttpServlet {
                         resp.setContentType(mType);
 
                     // Get the sink
-                    DataOutputStream dos = null;
-                    try {
-                        dos = new DataOutputStream(resp.getOutputStream());
-                    } catch (IOException e) {
-                        requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
-                        return;
-                    }
+                    DataOutputStream dos  = new DataOutputStream(resp.getOutputStream());
                     PrintStream ps = new PrintStream(dos);
 
                     // Send the jnlp to the client.
                     ps.print(jnlpContent);
                     LogUtil.setResponseSize(dos.size());
 
-                } else {
+                }
+                else {
                     String msg = "Unable to locate a Java WebStart handler to respond to: "+Scrub.simpleString(applicationID)+"?"+query;
                     LOG.error("{}", msg);
                     requestStatus = OPeNDAPException.anyExceptionHandler(new NotFound(msg),this, resp);
                 }
             }
         }
-        catch (Exception e) {
+        catch ( BESError | IOException | PPTException | JDOMException | BadConfigurationException | SaxonApiException e) {
             try {
                 requestStatus = OPeNDAPException.anyExceptionHandler(e, this, resp);
             }
