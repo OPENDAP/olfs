@@ -1,3 +1,540 @@
+2020-02-04  ndp-opendap  <ndp@opendap.org>
+
+	olfs: MOre serialization management
+
+	olfs: Dropped Serializable interface from auth objects.
+
+	olfs: SonarCloud reverting failed changes
+
+	olfs: SonarCloud 07
+
+2020-02-03  ndp-opendap  <ndp@opendap.org>
+
+	olfs: SonarCloud w00t 007
+
+	olfs: SonarCloud w00t 06
+
+	olfs: SonarCloud w00t 05
+
+	olfs: SonarCLoud w00t 05
+
+	olfs: SonarCloud w00t 04
+
+	olfs: SonarCloud w00t 03
+
+	olfs: SonarCloud w00t
+
+	olfs: SonarCloud w00t
+
+2020-02-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added uid to dap2 bes request docs.
+
+	olfs: Removed redundant cast.
+
+2020-01-30  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #84 from OPENDAP/ngap-53
+	Ngap 53
+
+2020-01-30  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Reducing variable access.
+
+	olfs: Renames OAuthAccessToken to OAuth2Access token, plus ripple effects. 
+	Also first pass at transmitting session data to the bes
+
+	olfs: Renames OAuthAccessToken to OAuth2Access token, plus ripple effects. 
+	Also first pass at transmitting session data to the bes
+
+	olfs: Added the User object to the bulk of the BesApi calls. This had wide
+	spread effects with more the 50 class affected. This commit passes all of 
+	the regression tests against the current bes/libdap  master branches.
+
+	olfs: Added the User object to the bulk of the BesApi calls. This had wide 
+	spread effects with more the 50 class affected. This commit passes all of 
+	the regression tests against the current bes/libdap  master branches.
+
+	olfs: Renamed opendap.auth.User to opendap.auth.AuthUser  and 
+	opendap.auth.Group to opendap.auth.AuthGroup to distinguish them  
+	other components in the ecosystem.
+
+2020-01-29  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Worked on UserProfile and OAuth2AccessToken. added an optional 
+	instance of the latter to the former. The toString() methods in both 
+	are update to produce json.
+
+2020-01-09  ndp-opendap  <ndp@opendap.org>
+
+	updating aws keys for travis
+
+	updating aws keys for travis
+
+2019-12-16  The-Robot-Travis  <npotter@opendap.org>
+
+	Typo
+
+	Typo
+
+	tweaks
+
+	Typo
+
+2019-12-04  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #83 from OPENDAP/selection_required
+	Selection required
+
+2019-12-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Updated baselines so that the output represents enforce user selection disabled.
+
+	Updated baselines for HTML DataREquest Forms to reflect changes caused 
+	by the user selection required configuration activity.
+
+	Merge branch 'master' into selection_required
+
+	olfs: Consolidated the implementation of the various "Get As X" buttons 
+	in the IFHs so that there is a single underlying javascript method to 
+	service the lot of them, and not unique ones for every single button.
+
+	olfs: First draft of a configuration control to toggle the Data Request 
+	Forms requirement that the user select one or more variables for download 
+	before using the "Get As ..." buttons.
+
+	olfs: First draft of a configuration control to toggle the Data Request 
+	Forms requirement that the user select one or more variables for download 
+	before using the "Get As ..." buttons.
+
+2019-12-02  James Gallagher  <jgallagher@opendap.org>
+
+	Removed the source push to www.o.o
+
+	Key update
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2019-11-28  James Gallagher  <jgallagher@opendap.org>
+
+	travis.yml syntax fix
+
+2019-11-27  James Gallagher  <jgallagher@opendap.org>
+
+	Updated AWS keys
+
+	New Aws Keys
+
+2019-11-12  The-Robot-Travis  <npotter@opendap.org>
+
+	Updated baselines for IFH pages (dropped beta designation from title)
+
+2019-11-09  The-Robot-Travis  <npotter@opendap.org>
+
+	Switching to human readable snapshot time
+
+	Dropping beta label from IFH
+
+2019-10-30  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Minor edit to NEWS to trigger a travis build
+
+2019-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #82 from OPENDAP/combined_log
+	Combined log
+
+2019-10-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' into combined_log
+
+	Updates to root olfs.xml
+
+2019-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #81 from OPENDAP/combined_log
+	Combined log
+
+2019-10-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' into combined_log
+
+	Updating git ignore to skip private keys
+
+2019-10-02  The-Robot-Travis  <npotter@opendap.org>
+
+	Combined logging step 2, the format
+
+	First pass at combining OLFS and BES logs.
+
+	Revert "First pass at combining OLFS and BES logs."
+	This reverts commit e811432198c3ae591ebcf341e625c790ee9cead3.
+
+	First pass at combining OLFS and BES logs.
+
+2019-09-20  The-Robot-Travis  <npotter@opendap.org>
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encryooted woo creds for snapshot push
+
+2019-09-17  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #80 from OPENDAP/no_nav
+	No navigation "feature" w00t! Here ya go Brooks!
+
+2019-09-17  The-Robot-Travis  <npotter@opendap.org>
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Added snapshot push to www.o.o/pub/olfs
+
+	Added snapshot push to www.o.o/pub/olfs
+
+	olfs: Comments etc
+
+2019-09-16  The-Robot-Travis  <npotter@opendap.org>
+
+	dropping file
+
+	olfs: Adding a trail configuration parameter <NoDynamicNavigation /> 
+	that shuts off all of the dynamically generated catalog/navigation 
+	pages. When enable the user must either supply and maintain THREDDS 
+	catalogs to be read by the server, or they have to provide their 
+	own system of navigation and discovery.
+
+	olfs: Adding a trail configuration parameter <NoDynamicNavigation /> 
+	that shuts off all of the dynamically generated catalog/navigation 
+	pages. When enable the user must either supply and maintain THREDDS 
+	catalogs to be read by the server, or they have to provide their 
+	own system of navigation and discovery.
+
+2019-09-11  The-Robot-Travis  <npotter@opendap.org>
+
+	Drop snapshot branch form docker construction
+
+2019-09-05  Nathan Potter  <ndp@opendap.org>
+
+	Working out commit trigger for docker builds.
+
+	Working out commit trigger for docker builds.
+
+2019-09-04  Nathan Potter  <ndp@opendap.org>
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	more ci faffing
+
+	more ci faffing
+
+2019-09-03  Nathan Potter  <ndp@opendap.org>
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci issues
+
+	Tyring to get the CI to run now.
+
+	more ci
+
+	more ci
+
+	more ci
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	New crednentials
+
+	New crednentials
+
+2019-08-30  Nathan Potter  <ndp@opendap.org>
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+2019-08-29  Nathan Potter  <ndp@opendap.org>
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	Adding docker build for olfs to CO.
+
+2019-08-28  Nathan Potter  <ndp@opendap.org>
+
+	Working up Docker container build in .travis.yml
+
+	updating aws keys
+
+2019-08-27  Nathan Potter  <ndp@opendap.org>
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+2019-08-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #79 from OPENDAP/hk-458
+	Hk 458
+
+	Updated test baselines gor changes made to IFH
+
+	w00t! And now it's working for dap4.
+
+	w00t! Works for DAP2
+
+	w00t! Works for DAP2
+
+	Seems like it might be working
+
+	checkpoint
+
+2019-08-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Debugging variable naming issue in IFH
+
+	olfs: Debugging variable naming issue in IFH
+
+2019-07-30  Nathan Potter  <ndp@opendap.org>
+
+	Updated README with DOI's for latest release.
+
+2019-07-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	olfs: More out content for json-ld.md
+
+2019-07-10  James Gallagher  <jgallagher@opendap.org>
+
+	Update json-ld.md
+	more edits
+	[skip ci]
+
+	Update json-ld.md
+	minor edits
+	[skip ci]
+
+	Update json-ld.md
+	minor edits
+	[skip ci]
+
+	Update json-ld.md
+	Minor edits
+
+2019-07-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: - fleshing out json-ld.md
+
+	Adding json-ld.md plceholder. Fixes to mkDistro
+
 2019-07-09  Nathan Potter  <ndp@opendap.org>
 
         Dropping accidental file.

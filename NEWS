@@ -1,4 +1,40 @@
 
+# OLFS Version 1.18.6 (10 February 2020)
+
+## Features
+
+* Added (alpha) support support for server authentication credentials
+  * Environment injection support for besstandalone and besd
+  * A credentials configuration file for multiple sets, in which credentials are
+  associated with URL prefixes and multiple credentials can be defined in a
+  bes.conf environment.
+
+* Combined Logs: The server can now be configured to add the OLFS request log content to the BES log.
+
+* Earthdata Login User Authentication Support
+
+* The Data Request Form requires data selection is now a configuration parameter,
+    &lt;RequireUserSelection /&gt;  in the olfs.xml file.
+
+* NoDynamicNavigation - Added a trial configuration parameter &lt;NoDynamicNavigation/&gt;
+	to the olfs.xml file. If this element is uncommented in the olfs.xml file then
+	all of the dynamically generated catalog/navigation pages will be disabled.
+	When enabled the server admin must either supply and maintain THREDDS
+	catalogs to be read by the server, or they have to provide their
+	own system of navigation and discovery to generate links to the
+	dataset endpoints (ex. Data Request Form)
+
+## Performance Improvements
+* No DAS construction for data response.
+
+## Bugs Fixed
+* Memory leak fixed and unneeded copy removed in awsv4 code
+* CovJson patch.
+* ncml_handler: When an NCML aggregation named a dataset that the server could not read... crsh. Fixed..
+* Server cache stabilization
+* hdf4_handler: Fixed memory leaks
+* hdf5_handler: Fixed memory leaks
+
 # OLFS Version 1.18.5 (08 July 2019)
 
 ## DMR++ Aggregations

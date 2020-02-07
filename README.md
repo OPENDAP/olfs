@@ -4,19 +4,20 @@
 
 # Hyrax/OLFS [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3355422.svg)](https://doi.org/10.5281/zenodo.3355422)
 
-Hyrax Version 1.16.0  (08 July 2019)    
-OLFS  Version 1.18.5  (08 July 2019) 
+Hyrax Version 1.16.1  (10 February 2020)    
+OLFS  Version 1.18.6  (10 February 2020) 
 
 
 ### OLFS-1.18.5 requires
-* **[BES version 3.20.5](https://github.com/OPENDAP/bes/releases/tag/version-3.20.5)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3279223.svg)](https://doi.org/10.5281/zenodo.3279223)
-* **[libdap version 3.20.4 ](https://github.com/OPENDAP/libdap4/releases/tag/version-3.20.4)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3267984.svg)](https://doi.org/10.5281/zenodo.3267984)
+* **bes-3.20.6** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3659278.svg)](https://doi.org/10.5281/zenodo.3659278)
+* **libdap4-3.20.5** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3641778.svg)](https://doi.org/10.5281/zenodo.3641778)
 
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
 ### First:
 
-Build and install the [`libdap4`](https://github.com/OPENDAP/libdap4) and [`bes`](https://github.com/OPENDAP/bes) projects.
+Build and install the [`libdap4`](https://github.com/OPENDAP/libdap4) and 
+[`bes`](https://github.com/OPENDAP/bes) projects.
 
 Launch the bes (you can use `besctl` to do that). 
 
