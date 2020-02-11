@@ -42,14 +42,11 @@ import org.w3c.dom.Document;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.*;
 
 import static java.lang.Double.NaN;
