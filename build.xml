@@ -806,14 +806,6 @@
                 <exclude name="src.distribution.readme"/>
             </zipfileset>
 
-
-            <!-- webinf dir="${build.hyrax.resources}/WEB-INF">
-                <include name="logback-test.xml"/>
-                <include name="logback.xml"/>
-                <include name="urlrewrite.xml"/>
-            </webinf -->
-
-
         </war>
 
         <delete file="${build.dist}/index.html"/>
