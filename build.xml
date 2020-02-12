@@ -807,11 +807,11 @@
             </zipfileset>
 
 
-            <webinf dir="${build.hyrax.resources}/WEB-INF">
+            <!-- webinf dir="${build.hyrax.resources}/WEB-INF">
                 <include name="logback-test.xml"/>
                 <include name="logback.xml"/>
                 <include name="urlrewrite.xml"/>
-            </webinf>
+            </webinf -->
 
 
         </war>
