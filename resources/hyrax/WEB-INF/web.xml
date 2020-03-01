@@ -224,12 +224,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ngap</servlet-name>
-        <servlet-class>opendap.ngap.NgapServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>aggregation</servlet-name>
         <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -341,12 +335,7 @@
         <servlet-name>w10n</servlet-name>
         <url-pattern>/w10n/*</url-pattern>
     </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>ngap</servlet-name>
-        <url-pattern>/ngap/*</url-pattern>
-    </servlet-mapping>
-
+    
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>
         <url-pattern>/wcs/*</url-pattern>

@@ -97,50 +97,29 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         boolean isMyRequest = true;
         //boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
         //boolean itsJustThePrefix = _prefix.equals(relativeURL);
-        //boolean startsWithPrefix = relativeURL.startsWith(_prefix);
-        /*
-        if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash) {
-            isMyRequest = true;
-        */
+        boolean startsWithPrefix = relativeURL.startsWith(_prefix);
 
+
+        isMyRequest = startsWithPrefix;
+        // || itsJustThePrefixWithoutTheSlash;
+
+        if(isMyRequest) {
             if (sendResponse) {
                 log.info("Sending NGAP Response");
-/*
-                if(itsJustThePrefixWithoutTheSlash ){
-                    *//*response.sendRedirect(_prefix);
-                    log.debug("Sent redirect to service prefix: "+_prefix);*//*
-                    String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NGAP_BesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                    throw new opendap.http.error.BadRequest("The requested DAP response '"+
-                            relativeURL.substring(s.length())+"' is not recognized by this server.");
-                }
-                */
-            /*
-                else if(itsJustThePrefix || relativeURL.toLowerCase().endsWith("contents.html")){
-                    *//*_ngapForm.respondToHttpGetRequest(request,response);
-                    log.info("Sent NGAP Access Form");*//*
-                    String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NGAP_BesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                    throw new opendap.http.error.BadRequest("The requested DAP response '"+
-                            relativeURL.substring(s.length())+"' is not recognized by this server.");
-                }
-                */
-                /*else {*/
-                    if(!super.requestDispatch(request,response, true)){
-                        if( !response.isCommitted()) {
-                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '"+
-                                    relativeURL.substring(s.length())+"' is not recognized by this server.");
-                        }
-                        else {
-                            isMyRequest = false;
-                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                        }
+                if (!super.requestDispatch(request, response, true)) {
+                    if (!response.isCommitted()) {
+                        String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                        throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
+                                relativeURL.substring(s.length()) + "' is not recognized by this server.");
+                    } else {
+                        isMyRequest = false;
+                        log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
                     }
-                    /*else
-                        log.info("Sent DAP NGAP Response.");*/
-                /*}*/
+                }
+                log.info("Sent DAP NGAP Response.");
             }
-        /*}*/
 
+        }
         return isMyRequest;
     }
 
