@@ -62,17 +62,17 @@ import java.util.regex.Pattern;
  * Cloned from: opendap.gateway
  * To change this template use File | Settings | File Templates.
  */
-public class NGAP_BesApi extends BesApi implements Cloneable {
+public class NgapBesApi extends BesApi implements Cloneable {
 
 
     private Logger log;
     private String _servicePrefix;
 
-    public NGAP_BesApi() {
+    public NgapBesApi() {
         this("");
     }
 
-    public NGAP_BesApi(String servicePrefix) {
+    public NgapBesApi(String servicePrefix) {
         super();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _servicePrefix = servicePrefix;

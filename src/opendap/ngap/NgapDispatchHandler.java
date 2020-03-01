@@ -47,15 +47,15 @@ import java.util.regex.Pattern;
  * Cloned from: opendap.gateway
  * To change this template use File | Settings | File Templates.
  */
-public class NGAP_DispatchHandler extends BesDapDispatcher {
+public class NgapDispatchHandler extends BesDapDispatcher {
 
     private Logger log;
     private boolean _initialized;
     private String _prefix = "ngap/";
-    private NGAP_BesApi _besApi;
+    private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
 
-    public NGAP_DispatchHandler() {
+    public NgapDispatchHandler() {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
@@ -76,7 +76,7 @@ public class NGAP_DispatchHandler extends BesDapDispatcher {
 
         ingestPrefix(config);
 
-        _besApi = new NGAP_BesApi(_prefix);
+        _besApi = new NgapBesApi(_prefix);
         super.init(servlet, config, _besApi);
         //_ngapForm  =  new NGAPForm(getSystemPath(), _prefix);
         _initialized=true;
@@ -126,7 +126,7 @@ public class NGAP_DispatchHandler extends BesDapDispatcher {
                 /*else {*/
                     if(!super.requestDispatch(request,response, true)){
                         if( !response.isCommitted()) {
-                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NGAP_BesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
                             throw new opendap.http.error.BadRequest("The requested DAP response suffix of '"+
                                     relativeURL.substring(s.length())+"' is not recognized by this server.");
                         }

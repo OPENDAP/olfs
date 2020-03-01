@@ -36,7 +36,6 @@ import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
-import opendap.services.ServicesRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class NgapServlet extends HttpServlet   {
 
     private static final Logger LOG = LoggerFactory.getLogger(NgapServlet.class);
-    private static NGAP_DispatchHandler ngapDispatchHandler;
+    private static NgapDispatchHandler ngapDispatchHandler;
 
 
     /**
@@ -76,7 +75,7 @@ public class NgapServlet extends HttpServlet   {
     @Override
     public void init() throws ServletException {
         super.init();
-        ngapDispatchHandler = new NGAP_DispatchHandler();
+        ngapDispatchHandler = new NgapDispatchHandler();
         /*NGAP_RESPONDER.setSystemPath(ServletUtil.getSystemPath(this,""));*/
 
     }
