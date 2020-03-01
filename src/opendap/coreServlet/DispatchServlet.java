@@ -94,7 +94,7 @@ public class DispatchServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchServlet.class);
 
-    private static Document configDoc;
+    protected static Document configDoc;
 
     /**
      * ************************************************************************

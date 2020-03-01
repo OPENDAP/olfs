@@ -25,14 +25,7 @@
  */
 package opendap.ngap;
 
-import opendap.coreServlet.ServletUtil;
-import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.LicenseManager;
-import opendap.coreServlet.Util;
-import opendap.coreServlet.Debug;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -40,12 +33,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -53,11 +47,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 
-public class NgapServlet extends HttpServlet   {
+public class NgapServlet extends DispatchServlet   {
 
     private static final Logger LOG = LoggerFactory.getLogger(NgapServlet.class);
     private static NgapDispatchHandler ngapDispatchHandler;
-
 
     /**
      * ************************************************************************
@@ -76,7 +69,12 @@ public class NgapServlet extends HttpServlet   {
     public void init() throws ServletException {
         super.init();
         ngapDispatchHandler = new NgapDispatchHandler();
-        /*NGAP_RESPONDER.setSystemPath(ServletUtil.getSystemPath(this,""));*/
+
+        try {
+            ngapDispatchHandler.init(this,super.configDoc.getRootElement());
+        } catch (Exception e) {
+            throw new ServletException(e.getMessage());
+        }
 
     }
 
