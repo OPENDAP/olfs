@@ -75,6 +75,9 @@ public class LogUtil {
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
+    public static final String NGAP_ACCESS_LOG_ID = "HyraxNGAPAccess";
+    public static final String NGAP_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxNGAPLastModifiedAccess";
+
     private static final String ID_KEY = "ID";
     private static final String SOURCE_KEY = "SOURCE";
     private static final String HOST_KEY = "host";
