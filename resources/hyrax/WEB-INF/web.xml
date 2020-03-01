@@ -192,7 +192,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>false</param-value>
+            <param-value>true</param-value>
         </init-param>
 
         <init-param>
@@ -220,6 +220,12 @@
     <servlet>
         <servlet-name>w10n</servlet-name>
         <servlet-class>opendap.w10n.W10nServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ngap</servlet-name>
+        <servlet-class>opendap.ngap.NgapServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -334,6 +340,11 @@
     <servlet-mapping>
         <servlet-name>w10n</servlet-name>
         <url-pattern>/w10n/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ngap</servlet-name>
+        <url-pattern>/ngap/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
