@@ -555,7 +555,7 @@ public class AggregationServlet extends HttpServlet {
                     writeGranulesSingleTable(request, response, out);
                     break;
                 default:
-                    throw new ServletException(INVOCATION_ERROR + requestKind);
+                    throw new BadRequest(INVOCATION_ERROR + requestKind);
             }
             out.flush();
         }
