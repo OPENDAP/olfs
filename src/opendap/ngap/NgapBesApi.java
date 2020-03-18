@@ -26,6 +26,8 @@
 
 package opendap.ngap;
 
+import opendap.auth.OAuth2AccessToken;
+import opendap.auth.UserProfile;
 import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
@@ -64,6 +66,8 @@ import java.util.regex.Pattern;
  */
 public class NgapBesApi extends BesApi implements Cloneable {
 
+    public static final String UID_CONTEXT  = "uid";
+    public static final String ACCESS_TOKEN_CONTEXT  = "access_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -149,6 +153,8 @@ public class NgapBesApi extends BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        addEdlAuthToken(request,user);
+
 
         request.addContent(setContainerElement("ngapContainer","ngap",remoteDataSourceUrl,type));
 
@@ -174,6 +180,21 @@ public class NgapBesApi extends BesApi implements Cloneable {
     }
 
 
+    private void addEdlAuthToken(Element request, User user){
+        UserProfile up = user.profile();
+        if(up!=null){
+            String uid = up.getUID();
+            if(!uid.isEmpty())
+                request.addContent(setContextElement(UID_CONTEXT,uid));
+            OAuth2AccessToken oat = up.getOAuth2Token();
+            if(oat!=null){
+                String accessToken = oat.getAccessToken();
+                if(!accessToken.isEmpty())
+                    request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT,accessToken));
+            }
+        }
+
+    }
 
 
     @Override
@@ -212,6 +233,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        addEdlAuthToken(request,user);
 
         request.addContent(setContainerElement("ngapContainer","ngap",remoteDataSourceUrl,type));
 
