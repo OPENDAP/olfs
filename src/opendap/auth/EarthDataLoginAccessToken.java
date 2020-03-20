@@ -34,9 +34,8 @@ import java.util.Date;
 /**
  * Created by ndp on 9/24/14.
  */
-public class OAuth2AccessToken {
+public class EarthDataLoginAccessToken {
 
-    public static final String OAUTH_ACCESS_TOKEN  = "oauth_access_token";
     public static final String ACCESS_TOKEN  = "access_token";
     public static final String ENDPOINT  = "endpoint";
     public static final String EXPIRES_IN  = "expires_in";
@@ -52,7 +51,7 @@ public class OAuth2AccessToken {
 
 
 
-    public OAuth2AccessToken(JsonObject json)  {
+    public EarthDataLoginAccessToken(JsonObject json)  {
         creationTime = new Date();
         accessToken = json.get(ACCESS_TOKEN).getAsString();
         endPoint = json.get(ENDPOINT).getAsString();
@@ -62,7 +61,7 @@ public class OAuth2AccessToken {
     }
 
 
-    public OAuth2AccessToken(OAuth2AccessToken oat)  {
+    public EarthDataLoginAccessToken(EarthDataLoginAccessToken oat)  {
         creationTime = oat.creationTime;
         accessToken = oat.accessToken;
         endPoint = oat.endPoint;
@@ -70,7 +69,7 @@ public class OAuth2AccessToken {
         tokenType = oat.tokenType;
         refreshToken = oat.refreshToken;
     }
-    public OAuth2AccessToken() {
+    public EarthDataLoginAccessToken() {
         creationTime = new Date();
         accessToken = "ASPECIALURSACCESSTOKENSTRING";
         endPoint = "http://endpoint.url";

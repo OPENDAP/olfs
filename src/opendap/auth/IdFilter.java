@@ -449,14 +449,13 @@ public class IdFilter implements Filter {
                 }
                 out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
 
-                OAuth2AccessToken oaToken = (OAuth2AccessToken) session.getAttribute(OAuth2AccessToken.OAUTH_ACCESS_TOKEN);
+                EarthDataLoginAccessToken edlaToken = userProfile.getEDLAuthToken();
 
-                if(oaToken != null){
-                    out.println(dtb + OAuth2AccessToken.OAUTH_ACCESS_TOKEN+"</b></dt><dd><pre>"+oaToken+"</pre></dd>");
+                if(edlaToken != null){
+                    out.println(dtb + "EarthDataLoginAccessToken"+"</b></dt><dd><pre>"+edlaToken+"</pre></dd>");
 
                 }
                 out.println("</dl>");
-
 
 
                 out.println("<hr />");

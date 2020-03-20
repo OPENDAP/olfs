@@ -26,7 +26,7 @@
 
 package opendap.ngap;
 
-import opendap.auth.OAuth2AccessToken;
+import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
 import opendap.bes.BESError;
 import opendap.bes.BESResource;
@@ -67,7 +67,7 @@ import java.util.regex.Pattern;
 public class NgapBesApi extends BesApi implements Cloneable {
 
     public static final String UID_CONTEXT  = "uid";
-    public static final String ACCESS_TOKEN_CONTEXT  = "access_token";
+    public static final String ACCESS_TOKEN_CONTEXT  = "edl_auth_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -155,7 +155,6 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         addEdlAuthToken(request,user);
 
-
         request.addContent(setContainerElement("ngapContainer","ngap",remoteDataSourceUrl,type));
 
         Element def = defineElement("d1","default");
@@ -180,17 +179,36 @@ public class NgapBesApi extends BesApi implements Cloneable {
     }
 
 
+    /**
+     * Adds the user id and/or the associated EDL auth token to the request
+     * element. If either parameter is the empty string it is omitted.
+     *
+     * Constructs the EDL/URS auth token for Hyrax to utilize when connecting to
+     * NGAP infrstructure (like cumulus and CMR) The token is made from the
+     * EDL access_token returned for the user and the server's EDL Application
+     * Client-Id.
+     *
+     *    auth_token = access_token:Client-Id
+     *
+     * @param request The BES request in which to set the UID_CONTEXT and
+     *                ACCESS_TOKEN_CONTEXT from the user object.
+     * @param user The instance of User from which to get the uid, the
+     *             auth_token, and the EDL Application Client-Id..
+     */
     private void addEdlAuthToken(Element request, User user){
         UserProfile up = user.profile();
         if(up!=null){
             String uid = up.getUID();
             if(!uid.isEmpty())
                 request.addContent(setContextElement(UID_CONTEXT,uid));
-            OAuth2AccessToken oat = up.getOAuth2Token();
+            EarthDataLoginAccessToken oat = up.getEDLAuthToken();
             if(oat!=null){
                 String accessToken = oat.getAccessToken();
-                if(!accessToken.isEmpty())
-                    request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT,accessToken));
+                if(!accessToken.isEmpty()) {
+                    String echo_token = accessToken + ":" +up.getEDLClientAppId();
+                    request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT, echo_token));
+
+                }
             }
         }
 

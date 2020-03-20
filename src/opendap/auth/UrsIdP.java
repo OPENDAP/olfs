@@ -226,13 +226,13 @@ public class UrsIdP extends IdProvider{
         JsonObject json = jparse.parse(contents).getAsJsonObject();
 
 
-        OAuth2AccessToken oat = new OAuth2AccessToken(json);
+        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json);
 
 
         // Now that we have an access token, we can retrieve the user profile. This
         // is returned as a JSON document.
-        url = ursUrl + oat.getEndPoint();
-        authHeader = oat.getTokenType()+ " " + oat.getAccessToken();
+        url = ursUrl + edlat.getEndPoint() +"?client_id=" + getUrsClientAppId();
+        authHeader = edlat.getTokenType()+ " " + edlat.getAccessToken();
         headers.put("Authorization", authHeader);
 
         log.info("URS User Profile Request URL: {}",url);
@@ -247,11 +247,14 @@ public class UrsIdP extends IdProvider{
         userProfile.setIdP(this);
 
         // Add the OAuth stuff to the user profile.
-        userProfile.setOAuth2Token(oat);
+        userProfile.setEDLAuthToken(edlat);
+        userProfile.setEDLClientAppId(getUrsClientAppId());
 
+        // Add the user profile to the session for retrieval down stream on this
+        // request.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
-        //Finally, redirect the user back to the their original requested resource.
+        // Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
 
         if(redirectUrl==null){

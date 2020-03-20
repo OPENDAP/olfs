@@ -27,7 +27,7 @@
 package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
-import opendap.auth.OAuth2AccessToken;
+import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
 import opendap.bes.*;
 import opendap.bes.caching.BesNodeCache;
@@ -2269,7 +2269,7 @@ public class BesApi implements Cloneable {
         request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
         UserProfile profile = user.profile();
         if(profile!=null){
-            OAuth2AccessToken oat = profile.getOAuth2Token();
+            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
             if(oat!=null){
                 request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
             }
@@ -2363,7 +2363,7 @@ public class BesApi implements Cloneable {
         request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
         UserProfile profile = user.profile();
         if(profile!=null){
-            OAuth2AccessToken oat = profile.getOAuth2Token();
+            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
             if(oat!=null){
                 request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
             }
