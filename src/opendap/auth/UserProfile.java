@@ -43,7 +43,9 @@ public class UserProfile {
 
     private IdProvider _idp;
 
-    private OAuth2AccessToken _token;
+    private EarthDataLoginAccessToken _token;
+
+    private String edlClientAppId;
 
 
     public UserProfile() {
@@ -53,6 +55,7 @@ public class UserProfile {
         roles = new HashSet<>();
         _idp  = null;
         _token = null;
+        edlClientAppId ="";
     }
 
     /**
@@ -70,12 +73,19 @@ public class UserProfile {
 
     }
 
-    public void setOAuth2Token(OAuth2AccessToken oat){
-        _token = new OAuth2AccessToken(oat);
+    public void setEDLAuthToken(EarthDataLoginAccessToken oat){
+        _token = new EarthDataLoginAccessToken(oat);
     }
 
-    public OAuth2AccessToken getOAuth2Token(){
-        return new OAuth2AccessToken(_token);
+    public void setEDLClientAppId(String clientAppId){
+        edlClientAppId = clientAppId;
+    }
+    public String getEDLClientAppId(){
+        return edlClientAppId;
+    }
+
+    public EarthDataLoginAccessToken getEDLAuthToken(){
+        return new EarthDataLoginAccessToken(_token);
     }
 
 
@@ -235,7 +245,7 @@ public class UserProfile {
         String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
 
         UserProfile up = new UserProfile(ursUserProfile);
-        up.setOAuth2Token(new OAuth2AccessToken());
+        up.setEDLAuthToken(new EarthDataLoginAccessToken());
         System.out.println(up.toString());
 
     }

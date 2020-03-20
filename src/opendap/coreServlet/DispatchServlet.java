@@ -94,7 +94,7 @@ public class DispatchServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchServlet.class);
 
-    private static Document configDoc;
+    protected static Document configDoc;
 
     /**
      * ************************************************************************
@@ -310,6 +310,7 @@ public class DispatchServlet extends HttpServlet {
         handlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         handlers.add(new opendap.gateway.DispatchHandler());
+        handlers.add(new opendap.ngap.NgapDispatchHandler());
         handlers.add(new opendap.bes.BesDapDispatcher());
 
         if(noDynamicNavigation!=null) {

@@ -31,12 +31,10 @@ import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.ppt.PPTException;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
@@ -46,12 +44,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 
 /**
