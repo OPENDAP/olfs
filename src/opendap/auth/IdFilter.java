@@ -448,15 +448,7 @@ public class IdFilter implements Filter {
                     out.println(dtb + RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
                 out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
-
-                EarthDataLoginAccessToken edlaToken = userProfile.getEDLAuthToken();
-
-                if(edlaToken != null){
-                    out.println(dtb + "EarthDataLoginAccessToken"+"</b></dt><dd><pre>"+edlaToken+"</pre></dd>");
-
-                }
                 out.println("</dl>");
-
 
                 out.println("<hr />");
                 out.println("<pre>");
