@@ -35,8 +35,7 @@
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="<%= contextPath %>/docs/images/logo.png" alt="Logo" width="206" height="93"
-                                      border="0"/></a>
+<a href="http://www.opendap.org"><img src="<%= contextPath %>/docs/images/logo.png"/></a>
 
 <h1 align="left">Hyrax</h1>
 <hr size="1" noshade="noshade"/>
