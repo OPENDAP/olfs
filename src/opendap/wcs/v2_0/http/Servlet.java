@@ -97,6 +97,7 @@ public class Servlet extends HttpServlet {
             String servletName = getServletName();
 
             contextPath = PathBuilder.pathConcat(contextPath, servletName);
+            contextPath = PathBuilder.normalizePath(contextPath,true,false);
 
             String resourcePath = ServletUtil.getSystemPath(this, "/");
             log.info("resourcePath: {}", resourcePath);
