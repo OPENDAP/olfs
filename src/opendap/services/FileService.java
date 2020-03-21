@@ -57,7 +57,7 @@ public class FileService implements WebServiceHandler {
     @Override
     public void init(HttpServlet servlet, Element config) {
         String base = PathBuilder.pathConcat(servlet.getServletContext().getContextPath(),servlet.getServletName());
-        if(!base.endsWith("/")) base += "/";
+        base = PathBuilder.normalizePath(base, true, true);
         setBase(base);
     }
 
