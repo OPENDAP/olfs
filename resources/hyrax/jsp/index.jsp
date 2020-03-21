@@ -97,39 +97,35 @@
 
 <p>There you will find:</p>
 <dl>
-    <dt><a href="http://docs.opendap.org/index.php/Hyrax">Hyrax Documentation </a></dt>
+    <dt><a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html">Hyrax Documentation </a></dt>
     <dd>
         <ul>
-            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Installation_Instructions">Installation instructions</a></li>
-            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Configuration">Configuration information</a></li>
+            <li><a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html#Download_and_Install_Hyrax">Installation instructions</a></li>
+            <li><a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html#Hyrax_Configuration">Configuration information</a></li>
             <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Logging_Configuration">Logging configuration information</a>
             </li>
-            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Apache_Integration">Apache integration instructions <br/>
-                <br/>
+            <li><a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html#apache-integration">Apache integration instructions <br/>
                 <br/>
             </a></li>
-            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Release_Notes">Release Notes</a><br/>
+            <li>
+                Source Code and Release Notes<br/>
+                <span class="small_italic">Hyrax is composed of 3 major components each of which has its own
+                GitHub project. In each project's GitHub page you can find the source code for the project, releases,
+                release notes, and DOIs for the releases.</span>
+                <ul>
+                    <li><a href="https://github.com/OPENDAP/bes/">BES Project</a><br/></li>
+                    <li><a href="https://github.com/OPENDAP/olfs/">OLFS Project</a><br/></li>
+                    <li><a href="https://github.com/OPENDAP/libdap4/">Libdap Project</a><br/><br/></li>
+                </ul>
             </li>
-            <li><a href="http://docs.opendap.org/index.php/Hyrax#For_Developers:">Instructions for developers.</a><br/>
-                <br/>
-            </li>
+            <li><a href="https://docs.opendap.org/index.php?title=Developer_Info">Instructions for developers.</a><br/></li>
         </ul>
     </dd>
 </dl>
 
 <h3>THREDDS Support </h3>
-<p>Hyrax supports THREDDS catalogs, look <a href="http://docs.opendap.org/index.php/Hyrax_-_THREDDS_Configuration">here
+<p>Hyrax supports THREDDS catalogs, look <a href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html#THREDDS-config">here
     for configuration details</a>. </p>
-
-<h3>SOAP Support </h3>
-<p>Hyrax supports SOAP requests.</p>
-
-<p>A prototype SOAP interface is included with this release of Hyrax. It is discussed in the
-    <a href="http://rsg.opendap.org:8090/server-4/templates/soapAPI.html"> RSG template pages here</a>.
-    Example client code can be found distributed at our
-    <a href="http://www.opendap.org/download/hyrax.html">web site</a>, and can
-    be found in our <a href="http://scm.opendap.org:8090/trac/browser/tags/SoapTestClient/0.1.4">Subversion
-        archive here</a>. </p>
 
 <h3>Thanks!</h3>
 
@@ -141,16 +137,13 @@
 <p> Technical Support: <a href="mailto:support@opendap.org">support@opendap.org</a></p>
 
 <p>&nbsp;</p>
-
-<p>Hyrax Java Development: </p>
+<p>Hyrax Development: </p>
 <blockquote>
-    <p><strong>OLFS</strong>: ndp &lt;AT&gt; opendap &lt;DOT&gt; org </p>
-</blockquote>
-<p>Hyrax C++ Development: </p>
-<blockquote>
-    <p><strong>BES</strong>: pwest &lt;AT&gt; ucar &lt;DOT&gt; edu </p>
-
-    <p><strong>Libdap</strong>: jgallagher &lt;AT&gt; opendap &lt;DOT&gt; org </p>
+    <p>danh &lt;AT&gt; opendap &lt;DOT&gt; org </p>
+    <p>jgallagher &lt;AT&gt; opendap &lt;DOT&gt; org </p>
+    <p>kneumiller &lt;AT&gt; opendap &lt;DOT&gt; org </p>
+    <p>ndp &lt;AT&gt; opendap &lt;DOT&gt; org </p>
+    <p>slloyd &lt;AT&gt; opendap &lt;DOT&gt; org </p>
 </blockquote>
 <p>&nbsp;</p>
 <br/>
