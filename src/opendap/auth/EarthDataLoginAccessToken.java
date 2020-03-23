@@ -29,12 +29,13 @@ package opendap.auth;
 
 import com.google.gson.JsonObject;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by ndp on 9/24/14.
  */
-public class EarthDataLoginAccessToken {
+public class EarthDataLoginAccessToken implements Serializable {
 
     public static final String ACCESS_TOKEN  = "access_token";
     public static final String ENDPOINT  = "endpoint";
