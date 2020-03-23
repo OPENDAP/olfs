@@ -47,15 +47,13 @@ env:
 
 stages:
 - name: build
-    if:  branch = master
+    if:  branch = moo
 - name: test
-    if:  branch = master
+    if:  branch = moo
 - name: scan
     if:  branch = master OR branch = session_serialization
 - name: package
     if:  branch = master OR branch = travis
-
-
 
 
 jobs:
