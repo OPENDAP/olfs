@@ -43,9 +43,9 @@ public class UserProfile implements Serializable {
     private HashSet<String> groups; // Serializable.
     private HashSet<String> roles;  // Serializable.
 
-    private IdProvider _idp;
+    private IdProvider _idp; //Serializable
 
-    private EarthDataLoginAccessToken _token;
+    private EarthDataLoginAccessToken _token; // Serializable
 
     private String edlClientAppId; // Serializable.
 

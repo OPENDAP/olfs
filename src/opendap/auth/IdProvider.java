@@ -47,7 +47,7 @@ public abstract class IdProvider implements Serializable {
     private boolean isDefaultProvider;
 
 
-    public IdProvider(){
+    public IdProvider() {
         authContext = null;
         description = "Abstract Identification Service Provider";
         isDefaultProvider = false;
