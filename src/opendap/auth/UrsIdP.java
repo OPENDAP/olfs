@@ -50,10 +50,14 @@ public class UrsIdP extends IdProvider implements Serializable {
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
 
+    /* @serial */
     private Logger log;
 
+    /* @serial */
     private String ursUrl;
+    /* @serial */
     private String clientAppId;
+    /* @serial */
     private String clientAppAuthCode;
 
     private static final String ERR_PRFX = "ERROR! msg: ";

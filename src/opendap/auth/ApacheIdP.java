@@ -56,7 +56,9 @@ public class ApacheIdP extends IdProvider implements Serializable {
      */
     public static final String DEFAULT_LOGIN_LOCATION = "/Login";
 
+    /* @serial */
     private String loginEndpoint;
+    /* @serial */
     private String logoutEndpoint;
 
 

@@ -37,16 +37,24 @@ import java.util.*;
  */
 public class UserProfile implements Serializable {
 
+    /* @serial */
     private Date objectCreationTime; // Serializable.
+    /* @serial */
     private String jsonStr; // Serializable.
+    /* @serial */
     private JsonObject profile;   // NOT Serializable?
+    /* @serial */
     private HashSet<String> groups; // Serializable.
+    /* @serial */
     private HashSet<String> roles;  // Serializable.
 
+    /* @serial */
     private IdProvider _idp; //Serializable
 
+    /* @serial */
     private EarthDataLoginAccessToken _token; // Serializable
 
+    /* @serial */
     private String edlClientAppId; // Serializable.
 
 

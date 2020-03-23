@@ -40,10 +40,14 @@ import java.io.Serializable;
 public abstract class IdProvider implements Serializable {
 
 
+    /* @serial */
     protected String authContext;
+    /* @serial */
     private String description;
+    /* @serial */
     protected String serviceContext;
 
+    /* @serial */
     private boolean isDefaultProvider;
 
 

@@ -43,11 +43,17 @@ public class EarthDataLoginAccessToken implements Serializable {
     public static final String TOKEN_TYPE  = "token_type";
     public static final String REFRESH_TOKEN  = "refresh_token";
 
+    /* @serial */
     private String accessToken;
+    /* @serial */
     private String endPoint;
+    /* @serial */
     private long expiresIn;
+    /* @serial */
     private String tokenType;
+    /* @serial */
     private String refreshToken;
+    /* @serial */
     private Date creationTime;
 
 

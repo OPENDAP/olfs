@@ -45,6 +45,7 @@ public class TomcatRealmIdP extends IdProvider implements Serializable {
     public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
+    /* @serial */
     private Logger log;
 
 
