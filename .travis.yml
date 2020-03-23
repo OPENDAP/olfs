@@ -51,7 +51,7 @@ stages:
 - name: test
   if:  branch = moo
 - name: scan
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = master OR session_serialiation AND NOT type = pull_request
 - name: snappah
   if:  branch = moo AND NOT type = pull_request
 

@@ -35,17 +35,17 @@ import java.util.*;
  */
 public class UserProfile {
 
-    private Date objectCreationTime;
-    private String jsonStr;
-    private JsonObject profile;
-    private HashSet<String> groups;
-    private HashSet<String> roles;
+    private Date objectCreationTime; // Serializable.
+    private String jsonStr; // Serializable.
+    private JsonObject profile;   // NOT Serializable
+    private HashSet<String> groups; // Serializable.
+    private HashSet<String> roles;  // Serializable.
 
     private IdProvider _idp;
 
     private EarthDataLoginAccessToken _token;
 
-    private String edlClientAppId;
+    private String edlClientAppId; // Serializable.
 
 
     public UserProfile() {

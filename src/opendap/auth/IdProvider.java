@@ -32,11 +32,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created by ndp on 9/24/14.
  */
-public abstract class IdProvider {
+public abstract class IdProvider implements Serializable {
 
 
     protected String authContext;
