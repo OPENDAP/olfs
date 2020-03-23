@@ -47,14 +47,13 @@ env:
 
 stages:
 - name: build
-    if:  branch = moo
+  if:  branch = master
 - name: test
-    if:  branch = moo
+  if:  branch = master
 - name: scan
-    if:  branch = master OR branch = session_serialization
-- name: package
-    if:  branch = master OR branch = travis
-
+  if:  branch = master AND NOT type = pull_request
+- name: snappah
+  if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
