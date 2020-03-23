@@ -39,7 +39,7 @@ public class UserProfile implements Serializable {
 
     private Date objectCreationTime; // Serializable.
     private String jsonStr; // Serializable.
-    private JsonObject profile;   // NOT Serializable
+    private JsonObject profile;   // NOT Serializable?
     private HashSet<String> groups; // Serializable.
     private HashSet<String> roles;  // Serializable.
 
