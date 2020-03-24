@@ -73,10 +73,10 @@ public class UrsIdP extends IdProvider implements Serializable {
 
     @Override
     public void init(Element config, String serviceContext) throws ConfigurationException {
+        
         super.init(config, serviceContext);
 
         Element e;
-
         e = getConfigElement(config,"UrsUrl");
         ursUrl = e.getTextTrim();
 
@@ -85,7 +85,6 @@ public class UrsIdP extends IdProvider implements Serializable {
 
         e = getConfigElement(config,"UrsClientAuthCode");
         clientAppAuthCode = e.getTextTrim();
-
     }
 
 
