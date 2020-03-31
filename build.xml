@@ -193,6 +193,9 @@
     <property name="build.hyrax.resources" location="${build.dir}/resources"/>
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
 
+    <!-- property name="build.ngap.resources" location="${build.dir}/resources/ngap"/ -->
+    <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
+
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
 
@@ -943,5 +946,102 @@
         <!-- Execute SonarQube Scanner for Ant Analysis -->
         <sonar:sonar />
     </target>
+
+
+
+
+
+    <target
+            name="ngap"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the WAR file."
+    >
+        <echo level="info" message="Building Hyrax NGAP server war file."/>
+        <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="ngapResources.dir:     ${ngapResources.dir}"/>
+        <echo level="info" message="build.dist:            ${build.dist}"/>
+
+        <!--
+        Here we:
+         - Set the ware file name to ROOT.war to deploy in the root, aka "/",
+           deployment context.
+         - Utilize a special NGAP web.xml that deploys with the Hyrax
+           authentication and authorization filters enabled
+        -->
+        <war destfile="${build.dist}/ROOT.war"
+             webxml="${ngapResources.dir}/web.xml"
+        >
+
+            <lib dir="${lib.dir}">
+                <include name="${owasp-encoder}"/>
+                <include name="${owasp-encoder-jsp}"/>
+
+                <include name="${json.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${urlRewrite.lib}"/>
+
+                <include name="${commons-lang.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
+                <include name="${commons-io.lib}"/>
+
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+            </lib>
+            <lib dir="${wcs.lib.dir}">
+                <include name="${ogc-wcs.lib}"/>
+                <include name="${ogc-gml.lib}"/>
+                <include name="${ogc-swe.lib}"/>
+                <include name="${ogc-gmlcov.lib}"/>
+                <include name="${ogc-ows.lib}"/>
+                <include name="${ogc-jaxb.lib}"/>
+                <include name="${jaxb-core.lib}"/>
+                <include name="${jaxb-impl.lib}"/>
+                <include name="${xlink.lib}"/>
+            </lib>
+
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
+                <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+            </zipfileset>
+
+            <!--
+            Special urlrewrite.xml that shunts requests to the ngap
+            service endpoint if they are not explicitly for the hyrax, wcs
+            or some other service endpoint.
+            -->
+            <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF">
+                <include name="urlrewrite.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${doc.dir}" prefix="docs">
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
+
+    </target>
+
+
 
 </project>
