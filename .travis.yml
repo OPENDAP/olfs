@@ -53,7 +53,7 @@ stages:
 - name: scan
   if:  branch = master AND NOT type = pull_request
 - name: snappah
-  if:  branch = master
+  if:  branch = master OR branch = ngap-production
 
 jobs:
   include:
