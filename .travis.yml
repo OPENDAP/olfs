@@ -131,6 +131,17 @@ deploy:
       branch: master
       condition: $STAGE =~ ^snappah$
 
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: opendap.travis.build
+    skip_cleanup: true
+    local_dir: $TRAVIS_BUILD_DIR/package
+    on:
+      branch: ngap-production
+      condition: $STAGE =~ ^snappah$
+
   # Push snapshot files to w.o.o
   # - provider: script
   #  skip_cleanup: true

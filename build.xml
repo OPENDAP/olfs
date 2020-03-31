@@ -911,7 +911,7 @@
     </target>
 
 
-    <property name="NGAP_DIST" value="ngap-${OLFS_VERSION}-webapp"/>
+    <property name="NGAP_DIST" value="ngap-snapshot-webapp"/>
 
     <target name="ngap-dist"
         depends="ngap"
