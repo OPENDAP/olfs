@@ -53,9 +53,7 @@ stages:
 - name: scan
   if:  branch = master AND NOT type = pull_request
 - name: snappah
-  if:  branch = master OR branch = ngap-production
-
-  #AND NOT type = pull_request
+  if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
@@ -130,6 +128,7 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
+      branch: master
       condition: $STAGE =~ ^snappah$
 
 
