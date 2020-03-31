@@ -461,8 +461,7 @@
             description="Compiles the OLFS."
     >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message="java.home (ant):       ${java.home}"/>
         <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
         <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
@@ -875,14 +874,13 @@
 
         <!--
         Here we:
-         - Set the ware file name to ROOT.war to deploy in the root, aka "/",
+         - Set the WAR file name to ROOT.war to deploy in the root, aka "/",
            deployment context.
          - Utilize a special NGAP web.xml that deploys with the Hyrax
            authentication and authorization filters enabled
         -->
         <war destfile="${build.dist}/ROOT.war"
-             webxml="${ngapResources.dir}/web.xml"
-        >
+             webxml="${ngapResources.dir}/web.xml">
 
             <lib  refid="hyrax-libs"/>
             <lib  refid="wcs-libs"/>
