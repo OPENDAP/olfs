@@ -56,6 +56,7 @@
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
+
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
     <property name="OLFS_LIB" value="${OLFS_DIST_BASE}"/>
@@ -863,10 +864,10 @@
 
 
     <target
-            name="ngap"
-            depends="clean,compile"
-            description="Performs a clean build of the core software and assembles the WAR file."
-    >
+        name="ngap"
+        depends="clean,compile"
+        description="Performs a clean build of the core software and assembles the WAR file.">
+
         <echo level="info" message="Building Hyrax NGAP server war file."/>
         <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
         <echo level="info" message="ngapResources.dir:     ${ngapResources.dir}"/>
@@ -905,11 +906,23 @@
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
             </zipfileset>
-
         </war>
-
         <delete file="${build.dist}/index.html"/>
+    </target>
 
+
+    <property name="NGAP_DIST" value="ngap-${OLFS_VERSION}-webapp"/>
+
+    <target name="ngap-dist"
+        depends="ngap"
+        description="Packages the NGAP war file (ROOT.war) into a gzipped tar file with a release related name.">
+
+        <tar destfile="${build.dist}/${NGAP_DIST}.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${NGAP_DIST}">
+                <include name="ROOT.war"/>
+            </zipfileset>
+        </tar>
+        <delete file="${build.dist}/ROOT.war"/>
     </target>
 
 
