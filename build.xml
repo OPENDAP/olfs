@@ -890,6 +890,7 @@
 
             <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="**/*"/>
+                <exclude name="WEB-INF/conf/olfs.xml"/>
                 <exclude name="WEB-INF/web.xml"/>
                 <exclude name="WEB-INF/urlrewrite.xml"/>
             </zipfileset>
@@ -902,6 +903,11 @@
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
             </zipfileset>
+
+            <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF/conf">
+                <include name="olfs.xml"/>
+            </zipfileset>
+
 
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
