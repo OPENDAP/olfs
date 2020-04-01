@@ -43,9 +43,9 @@
     <IdProvider class="opendap.auth.UrsIdP">
         <authContext>urs</authContext>
         <isDefault />
-        <UrsClientId>iPlEjZjMvrdwLUlnbaKxWQ</UrsClientId>
-        <UrsClientAuthCode>aVBsRWpaak12cmR3TFVsbmJhS3hXUTpKSEdqa2hmZzY3OA==</UrsClientAuthCode>
-        <UrsUrl>https://uat.urs.earthdata.nasa.gov</UrsUrl>
+        <UrsClientId>EDL_CLIENT_ID</UrsClientId>
+        <UrsClientAuthCode>EDL_CLIENT_AUTH_CODE</UrsClientAuthCode>
+        <UrsUrl>EDL_SSO_ENDPOINT_URL</UrsUrl>
     </IdProvider>
 
 
@@ -63,7 +63,7 @@
             <queryString>.*$</queryString>
             <allowedAction>GET</allowedAction>
         </Policy>
-        <Policy class="opendap.auth.RegexPolicy">
+        <Policy class="opendap.auth.RegexPolicy">≠
             <role>users</role>
             <resource>.*$</resource>
             <queryString>.*$</queryString>
