@@ -36,7 +36,7 @@
     <!-- Global Properties for Java-OPeNDAP software development -->
 
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
-
+    <property name="NGAP_DEPLOYMENT_CONTEXT" value="opendap"/>
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
@@ -875,12 +875,12 @@
 
         <!--
         Here we:
-         - Set the WAR file name to ROOT.war to deploy in the root, aka "/",
-           deployment context.
+         - Set the WAR file name to ${NGAP_DEPLOYMENT_CONTEXT}.war (A value of
+           ROOT will deploy to "/".)
          - Utilize a special NGAP web.xml that deploys with the Hyrax
            authentication and authorization filters enabled
         -->
-        <war destfile="${build.dist}/ROOT.war"
+        <war destfile="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"
              webxml="${ngapResources.dir}/web.xml">
 
             <lib  refid="hyrax-libs"/>
@@ -921,14 +921,14 @@
 
     <target name="ngap-dist"
         depends="ngap"
-        description="Packages the NGAP war file (ROOT.war) into a gzipped tar file with a release related name.">
+        description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
         <tar destfile="${build.dist}/${NGAP_DIST}.tgz" compression="gzip">
             <zipfileset dir="${build.dist}" prefix="${NGAP_DIST}">
-                <include name="ROOT.war"/>
+                <include name="${NGAP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
         </tar>
-        <delete file="${build.dist}/ROOT.war"/>
+        <delete file="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"/>
     </target>
 
 
