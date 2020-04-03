@@ -36,7 +36,7 @@
     <!-- Global Properties for Java-OPeNDAP software development -->
 
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
-    <property name="NGAP_DEPLOYMENT_CONTEXT" value="opendap"/>
+    <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
