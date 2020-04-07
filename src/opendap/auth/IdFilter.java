@@ -257,7 +257,8 @@ public class IdFilter implements Filter {
         if(requestURI.startsWith(docsPath) ||
                 requestURI.startsWith(xslPath) ||
                 requestURI.startsWith(jsPath)  ||
-                requestURI.startsWith(webStartPath)
+                requestURI.startsWith(webStartPath) ||
+                requestURI.equalsIgnoreCase("favicon.ico")
                 ){
             log.debug("Not caching request url: {}",requestUrl);
             return;
