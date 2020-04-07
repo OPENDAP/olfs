@@ -54,6 +54,7 @@
     <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
         <MaxSize>512</MaxSize>
     </appender>
+    
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -68,6 +69,7 @@
             <pattern>${FORMAT}</pattern>
         </encoder>
     </appender>
+    
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -79,17 +81,7 @@
             <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
         </encoder>
     </appender>
-    <appender name="AnonymousAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/AnonymousAccess.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/HyraxAnonymousAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
-            <!-- keep 30 days worth of history -->
-            <MaxHistory>30</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%X{UserAgent}] [%X{ident}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
-        </encoder>
-    </appender>
+        
     <appender name="BESCommandLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/BESCommands.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -101,20 +93,24 @@
             <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}] [%X{resourceID}] [%X{query}] %m</pattern>
         </encoder>
     </appender>
-    <appender name="NodeCacheLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/NodeCache.log</File>
+    
+
+    
+    <appender name="DebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/debug.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/NodeCache.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/debug.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] %M\(\) - %m%n</pattern>
+            <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
         </encoder>
     </appender>
+
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
-        <appender-ref ref="stdout"/>
+        <appender-ref ref="DebugLog"/>
     </logger>
     <logger name="opendap.bes.caching" level="error"/>
     <logger name="opendap.bes.dap2Responders.BesApi" level="error"/>
@@ -248,7 +244,7 @@
     </logger>
     -->
     <logger name="NodeCache" level="all">
-        <appender-ref ref="NodeCacheLogger"/>
+        <appender-ref ref="DebugLog"/>
     </logger>
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
@@ -296,6 +292,7 @@
         <appender-ref ref="BESCommandLogAppender"/>
         <!-- appender-ref ref="stdout"/ -->
     </logger>
+    
     <root level="error">
         <!--
             This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface

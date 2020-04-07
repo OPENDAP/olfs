@@ -262,8 +262,9 @@ public class IdFilter implements Filter {
             log.debug("Not caching request url: {}",requestUrl);
             return;
         }
-        log.debug("Caching request URL in session RETURN_TO_URL({}) to: {}",RETURN_TO_URL,requestUrl);
+        log.debug("Caching request URL as session Attribute with key RETURN_TO_URL({}) to: {}",RETURN_TO_URL,requestUrl);
         session.setAttribute(RETURN_TO_URL,requestUrl);
+        log.debug("Sanity check session.getAttribute(RETURN_TO_URL) returns {}",session.getAttribute(RETURN_TO_URL));
     }
 
 

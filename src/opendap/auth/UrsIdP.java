@@ -231,7 +231,7 @@ public class UrsIdP extends IdProvider{
 
         // Now that we have an access token, we can retrieve the user profile. This
         // is returned as a JSON document.
-        url = ursUrl + edlat.getEndPoint() +"?client_id=" + getUrsClientAppId();
+        url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
         authHeader = edlat.getTokenType()+ " " + edlat.getAccessToken();
         headers.put("Authorization", authHeader);
 
