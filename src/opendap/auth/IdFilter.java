@@ -29,6 +29,7 @@ package opendap.auth;
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
+import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.owasp.encoder.Encode;
@@ -69,7 +70,6 @@ public class IdFilter implements Filter {
 
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
-        log = LoggerFactory.getLogger(this.filterConfig.getFilterName());
         try {
             init();
         }
@@ -80,10 +80,12 @@ public class IdFilter implements Filter {
 
     }
 
-    public void init() throws IOException, JDOMException {
+    private void init() throws IOException, JDOMException {
 
         if(isInitialized)
             return;
+        LogUtil.initLogging(filterConfig.getServletContext());
+        log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing IdFilter...");
 
         String context = filterConfig.getServletContext().getContextPath();
@@ -170,9 +172,14 @@ public class IdFilter implements Filter {
                 String loginEndpoint = idProvider.getLoginEndpoint();
                 if(requestURI.equals(loginEndpoint)) {
                     synchronized (session) {
+                        // Check the RETURN_TO_URL and if it's the login endpoint
+                        // return to the root dir of the web application after
+                        // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
-                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint))
+                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
+                            log.debug("Setting session RETURN_TO_URL({}) to: {}", RETURN_TO_URL, contextPath);
                             session.setAttribute(RETURN_TO_URL, contextPath);
+                        }
                     }
                     try {
                         //
@@ -243,13 +250,19 @@ public class IdFilter implements Filter {
         String jsPath = PathBuilder.pathConcat(contextPath,"js");
         String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
 
+        log.debug("requestURI:  {}",requestURI);
+        log.debug("requestUrl:  {}",requestUrl);
+        log.debug("contextPath: {}",contextPath);
+
         if(requestURI.startsWith(docsPath) ||
                 requestURI.startsWith(xslPath) ||
                 requestURI.startsWith(jsPath)  ||
                 requestURI.startsWith(webStartPath)
                 ){
+            log.debug("Not caching request url: {}",requestUrl);
             return;
         }
+        log.debug("Caching request URL in session RETURN_TO_URL({}) to: {}",RETURN_TO_URL,requestUrl);
         session.setAttribute(RETURN_TO_URL,requestUrl);
     }
 

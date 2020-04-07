@@ -30,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import opendap.PathBuilder;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,17 +134,20 @@ public class LogUtil {
      */
     public static void initLogging(HttpServlet servlet) {
 
-        initLock.lock();
-        try {
+        //initLock.lock();
+        //try {
             // Initialize logging if not already done.
-            if (isLogInit.get())
-                return;
+            //if (isLogInit.get())
+            //    return;
 
             log.info("BEGIN servlet name: {}  class: {}", servlet.getServletName(), servlet.getClass().getCanonicalName());
-            ServletContext servletContext = servlet.getServletContext();
+
+           // ServletContext servletContext = servlet.getServletContext();
 
             String configPath = ServletUtil.getConfigPath(servlet);
 
+            initLogging(configPath);
+            /*
             // set up the log path
             String logPath = configPath + "logs";
             File logPathFile = new File(logPath);
@@ -183,13 +187,18 @@ public class LogUtil {
             } else {
                 log.info("Logback configuration using logback's default configuration mechanism");
             }
+            */
+            //isLogInit.set(true);
+            //log.info("END Logback is configured.");
+        //}
+        //finally {
+        //    initLock.unlock();
+        //}
+    }
 
-            isLogInit.set(true);
-            log.info("END Logback is configured.");
-        }
-        finally {
-            initLock.unlock();
-        }
+    public static void initLogging(ServletContext sc) {
+        String configPath = ServletUtil.getConfigPath(sc);
+        initLogging(configPath);
     }
 
 
@@ -218,42 +227,37 @@ public class LogUtil {
             log.info("BEGIN path='{}'", path);
 
             // set up the log path
-            if (!path.endsWith("/"))
-                path += "/";
-            String logPath = path + "logs";
+            String logPath = PathBuilder.pathConcat(path ,"logs");
             File logPathFile = new File(logPath);
             if (!logPathFile.exists()) {
                 log.info("Creating log dir: {}", logPath);
                 if (!logPathFile.mkdirs()) {
                     throw new RuntimeException("Creation of logfile directory failed." + logPath);
                 }
-            } else {
-                log.info("Found log dir: {} ", logPath);
-
             }
-
             log.info("Using log dir: {}", logPath);
 
             // read in Log4J config file
             System.setProperty("logdir", logPath); // variable substitution
-
-            String logbackConfig = path + "logback-test.xml";
-            File f = new File(logbackConfig);
+            String logbackTestConfig="logback-test.xml";
+            String logbackConfig="logback.xml";
+            String logbackFile = PathBuilder.pathConcat(path,logbackTestConfig);
+            File f = new File(logbackFile);
             if (!f.exists()) {
-                log.info("Unable to locate logback configuration: {}", logbackConfig);
-                logbackConfig = path + "logback.xml";
-                f = new File(logbackConfig);
+                log.info("Did not locate logback configuration: {}", logbackFile);
+                logbackFile = PathBuilder.pathConcat(path,logbackConfig);
+                f = new File(logbackFile);
                 if (!f.exists()) {
-                    log.info("Unable to locate logback configuration: {}", logbackConfig);
-                    logbackConfig = null;
+                    log.info("Unable to locate logback configuration: {}", logbackFile);
+                    logbackFile = null;
                 }
 
             }
 
-            if (logbackConfig != null) {
-                log.info("Logback configuration using: {}", logbackConfig);
+            if (logbackFile != null) {
+                log.info("Logback configuration using: {}", logbackFile);
                 LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-                attemptJoranConfiguration(logbackConfig, lc);
+                attemptJoranConfiguration(logbackFile, lc);
                 StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 
             } else {
