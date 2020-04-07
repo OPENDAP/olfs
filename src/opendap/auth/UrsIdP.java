@@ -256,11 +256,12 @@ public class UrsIdP extends IdProvider{
 
         // Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+        log.debug("session.getAttribute(RETURN_TO_URL): {}",redirectUrl);
 
         if(redirectUrl==null){
             redirectUrl = serviceContext;
         }
-        log.info("doLogin() - redirectURL: {}",redirectUrl);
+        log.info("USING redirectURL: {}",redirectUrl);
 
         response.sendRedirect(redirectUrl);
 
