@@ -873,6 +873,7 @@
         <echo level="info" message="ngapResources.dir:     ${ngapResources.dir}"/>
         <echo level="info" message="build.dist:            ${build.dist}"/>
 
+        <copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/>
         <!--
         Here we:
          - Set the WAR file name to ${NGAP_DEPLOYMENT_CONTEXT}.war (A value of
@@ -905,6 +906,10 @@
                 <include name="logback-ngap.xml"/>
             </zipfileset>
 
+            <zipfileset dir="${build.dist}" prefix="WEB-INF">
+                <include name="logback-test.xml"/>
+            </zipfileset>
+
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF/conf">
                 <include name="olfs.xml"/>
             </zipfileset>
@@ -915,6 +920,7 @@
             </zipfileset>
         </war>
         <delete file="${build.dist}/index.html"/>
+        <delete file="${build.dist}/logback-test.xml"/>
     </target>
 
 
