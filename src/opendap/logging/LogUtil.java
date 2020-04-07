@@ -197,7 +197,7 @@ public class LogUtil {
     }
 
     public static void initLogging(ServletContext sc) {
-        String configPath = ServletUtil.getConfigPath(sc);
+        String configPath = ServletUtil.getSystemPath(sc,"WEB-INF");
         initLogging(configPath);
     }
 
