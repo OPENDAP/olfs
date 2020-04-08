@@ -38,6 +38,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -108,7 +109,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         String relativeURL = ReqInfo.getLocalUrl(request);
         log.debug("relativeURL:    "+relativeURL);
 
-        if(relativeURL.startsWith("/"))
+        while(relativeURL.startsWith("/") && relativeURL.length()>1)
             relativeURL = relativeURL.substring(1,relativeURL.length());
         boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
         boolean itsJustThePrefix = _prefix.equals(relativeURL);
@@ -125,18 +126,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
                 reqCounter.incrementAndGet();
                 if(itsJustThePrefix){
-                    // This could be made a real page, but having something
-                    // Should reduce problems with health check clients
-                    // beating on the endpoint.
-                    ServletOutputStream sos = response.getOutputStream();
-                    sos.println("-------------------------------------");
-                    sos.println("      NGAP Service Endpoint");
-                    sos.println(". . . . . . . . . . . . . . . . . . .");
-                    sos.println("       This page: " + ngapServiceEndpointCounter.incrementAndGet());
-                    sos.println("NGAP DAP Service: " + dapServiceCounter.get());
-                    sos.println("    All Requests: " + reqCounter.get());
-                    sos.println("-------------------------------------");
-                    sos.flush();
+                    sendNgapLandingPage(response);
                 }
                 else {
                     log.info("Sending NGAP Response");
@@ -189,6 +179,34 @@ public class NgapDispatchHandler extends BesDapDispatcher {
             _prefix = _prefix.substring(1);
 
         log.info("Using prefix=" + _prefix);
+
+    }
+
+
+    void sendNgapLandingPage(HttpServletResponse response) throws IOException {
+        // This could be made a real page, but having something
+        // Should reduce problems with health check clients
+        // beating on the endpoint.
+        ServletOutputStream sos = response.getOutputStream();
+        sos.println("<html>");
+        sos.println("<head><title>OPeNDAP Hyrax: NGAP Service</title></head>");
+        sos.println("<body>");
+        sos.print("<p style='");
+        sos.print("font-family: Courier; ");
+        sos.print("text-align: center; ");
+        sos.print("transform: translate(0px, 100px); ");
+        sos.println("'>");
+        sos.println("-------------------------------------<br/>");
+        sos.println("      NGAP Service Endpoint<br/>");
+        sos.println(". . . . . . . . . . . . . . . . .<br/>");
+        sos.println("All Requests: " + reqCounter.get() + "<br/>");
+        sos.println("DAP Service: " + dapServiceCounter.get() + "<br/>");
+        sos.println("This page: " + ngapServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("-------------------------------------<br/>");
+        sos.println("</p>");
+        sos.println("</body>");
+        sos.println("</html>");
+        sos.flush();
 
     }
 
