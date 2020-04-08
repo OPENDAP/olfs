@@ -38,6 +38,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 /**
@@ -49,6 +50,21 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class NgapDispatchHandler extends BesDapDispatcher {
+
+    private static final AtomicLong ngapServiceEndpointCounter;
+    static {
+        ngapServiceEndpointCounter = new AtomicLong(0);
+    }
+
+    private static final AtomicLong dapServiceCounter;
+    static {
+        dapServiceCounter = new AtomicLong(0);
+    }
+
+    private static final AtomicLong reqCounter;
+    static {
+        reqCounter = new AtomicLong(0);
+    }
 
     private Logger log;
     private boolean _initialized;
@@ -104,13 +120,22 @@ public class NgapDispatchHandler extends BesDapDispatcher {
                 if(itsJustThePrefixWithoutTheSlash ){
                     response.sendRedirect(_prefix);
                     log.debug("Sent redirect to service prefix: "+_prefix);
+                    return true;
                 }
-                else if(itsJustThePrefix){
+
+                reqCounter.incrementAndGet();
+                if(itsJustThePrefix){
                     // This could be made a real page, but having something
                     // Should reduce problems with health check clients
                     // beating on the endpoint.
                     ServletOutputStream sos = response.getOutputStream();
-                    sos.println("NGAP Service Endpoint");
+                    sos.println("-------------------------------------");
+                    sos.println("      NGAP Service Endpoint");
+                    sos.println("-   -   -   -   -   -   -   -   -   -");
+                    sos.println("       This page: " + ngapServiceEndpointCounter.incrementAndGet());
+                    sos.println("NGAP DAP Service: " + dapServiceCounter.get());
+                    sos.println("    All Requests: " + reqCounter.get());
+                    sos.println("-------------------------------------");
                     sos.flush();
                 }
                 else {
@@ -126,6 +151,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
                         }
                     }
                     log.info("Sent DAP NGAP Response.");
+                    dapServiceCounter.incrementAndGet();
                 }
             }
 
