@@ -34,6 +34,7 @@ import opendap.coreServlet.Util;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,30 +94,39 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
-
-        boolean isMyRequest = true;
-        //boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
-        //boolean itsJustThePrefix = _prefix.equals(relativeURL);
-        boolean startsWithPrefix = relativeURL.startsWith(_prefix);
-
-
-        isMyRequest = startsWithPrefix;
-        // || itsJustThePrefixWithoutTheSlash;
+        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
+        boolean itsJustThePrefix = _prefix.equals(relativeURL);
+        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || relativeURL.startsWith(_prefix);
 
         if(isMyRequest) {
             if (sendResponse) {
-                log.info("Sending NGAP Response");
-                if (!super.requestDispatch(request, response, true)) {
-                    if (!response.isCommitted()) {
-                        String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                        throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
-                                relativeURL.substring(s.length()) + "' is not recognized by this server.");
-                    } else {
-                        isMyRequest = false;
-                        log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                    }
+
+                if(itsJustThePrefixWithoutTheSlash ){
+                    response.sendRedirect(_prefix);
+                    log.debug("Sent redirect to service prefix: "+_prefix);
                 }
-                log.info("Sent DAP NGAP Response.");
+                else if(itsJustThePrefix){
+                    // This could be made a real page, but having something
+                    // Should reduce problems with health check clients
+                    // beating on the endpoint.
+                    ServletOutputStream sos = response.getOutputStream();
+                    sos.println("NGAP Service Endpoint");
+                    sos.flush();
+                }
+                else {
+                    log.info("Sending NGAP Response");
+                    if (!super.requestDispatch(request, response, true)) {
+                        if (!response.isCommitted()) {
+                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
+                                    relativeURL.substring(s.length()) + "' is not recognized by this server.");
+                        } else {
+                            isMyRequest = false;
+                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
+                        }
+                    }
+                    log.info("Sent DAP NGAP Response.");
+                }
             }
 
         }
