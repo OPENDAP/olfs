@@ -183,10 +183,10 @@ public class NgapDispatchHandler extends BesDapDispatcher {
     }
 
 
-    void sendNgapLandingPage(HttpServletResponse response) throws IOException {
-        // This could be made a real page, but having something
-        // Should reduce problems with health check clients
-        // beating on the endpoint.
+    private void sendNgapLandingPage(HttpServletResponse response) throws IOException {
+        // This could be made a real page (JSP?), but having something
+        // simple in place should reduce problems caused by ELB health
+        // check clients beating on the endpoint.
         ServletOutputStream sos = response.getOutputStream();
         sos.println("<html>");
         sos.println("<head><title>OPeNDAP Hyrax: NGAP Service</title></head>");

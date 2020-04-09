@@ -201,7 +201,6 @@
     <property name="build.robots.resources" location="${build.dir}/robots"/>
 
     <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
-    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
     <property name="json.lib" value="gson-2.3.1.jar"/>
@@ -291,9 +290,8 @@
         <include name="${logback-classic.lib}"/>
 
         <include name="${urlRewrite.lib}"/>
-    </fileset>
 
-    <fileset id="wcs-libs" dir="${wcs.lib.dir}">
+        <!--    WCS-2.0 Libs   -->
         <include name="${ogc-wcs.lib}"/>
         <include name="${ogc-gml.lib}"/>
         <include name="${ogc-swe.lib}"/>
@@ -302,9 +300,8 @@
         <include name="${ogc-jaxb.lib}"/>
         <include name="${jaxb-core.lib}"/>
         <include name="${jaxb-impl.lib}"/>
+        <include name="${xlink.lib}"/>
     </fileset>
-
-
 
 
     <!-- Library (class)paths -->
@@ -320,7 +317,6 @@
             <include name="${servlet-api.lib}"/>
         </fileset>
         <fileset refid="hyrax-libs" />
-        <fileset refid="wcs-libs" />
     </path>
 
 
@@ -353,6 +349,7 @@
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
+        <echo message="hyrax-libs: ${toString:hyrax-libs}"/>
     </target>
 
 
@@ -524,6 +521,9 @@
 
 
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target name="src-dist"
             depends="clean,PreProcessSourceCode"
             description="Builds source distribution"
@@ -554,6 +554,9 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target name="server-dist"
             depends="server"
             description="Packages the war file into tar file with a release related name.">
@@ -583,6 +586,9 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target name="IsJavaDocUpToDate"
             description="Checks to see if the JavaDoc is out of date."
     >
@@ -595,6 +601,9 @@
         </uptodate>
 
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="BESclient"
             depends="olfs-lib"
@@ -612,6 +621,9 @@
 
 
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="hexEncoderApp"
             depends="clean,compile"
@@ -640,6 +652,9 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target name="NcmlDispatchHandler"
             depends="clean,compile"
             description="Builds jar file for the NcML Dispatch Handler">
@@ -652,6 +667,9 @@
         </jar>
 
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="GatewayDispatchHandler"
             depends="clean,compile"
@@ -668,6 +686,9 @@
         </jar>
 
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="validatorApp"
             depends="clean,compile"
@@ -694,6 +715,9 @@
         </jar>
 
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="XSLTransformer"
             depends="clean,compile"
@@ -722,6 +746,8 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target
             name="server"
@@ -737,7 +763,6 @@
         >
 
             <lib refid="hyrax-libs" />
-            <lib refid="wcs-libs" />
 
             <classes dir="${build.classes}"/>
 
@@ -758,6 +783,8 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target
             name="robots"
@@ -808,6 +835,9 @@
 
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target name="hyrax-robots"
             depends="server,robots"
             description="Builds the war files for the robots/sitemap and Hyrax's OLFS.">
@@ -834,6 +864,9 @@
         <delete file="${build.dist}/opendap.war"/>
         <delete file="${build.dist}/ROOT.war"/>
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <!-- SonarCloud build stuff -->
     <!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
@@ -862,7 +895,8 @@
 
 
 
-
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <target
         name="ngap"
         depends="clean,compile"
@@ -885,7 +919,6 @@
              webxml="${ngapResources.dir}/web.xml">
 
             <lib  refid="hyrax-libs"/>
-            <lib  refid="wcs-libs"/>
 
             <classes dir="${build.classes}"/>
 
@@ -923,9 +956,10 @@
         <delete file="${build.dist}/logback-test.xml"/>
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <property name="NGAP_DIST" value="ngap-snapshot-webapp"/>
-
     <target name="ngap-dist"
         depends="ngap"
         description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
@@ -938,6 +972,8 @@
         <delete file="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"/>
     </target>
 
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
 
 </project>
