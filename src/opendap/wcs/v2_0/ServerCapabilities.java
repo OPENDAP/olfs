@@ -29,10 +29,8 @@ import opendap.wcs.v2_0.formats.*;
 import org.jdom.Element;
 
 import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,9 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerCapabilities {
 
-    private static ConcurrentHashMap<String, WcsResponseFormat> _responseFormats;
+    private static ConcurrentSkipListMap<String, WcsResponseFormat> _responseFormats;
     static {
-        _responseFormats = new ConcurrentHashMap<>();
+        _responseFormats = new ConcurrentSkipListMap<>();
         WcsResponseFormat rf;
 
         rf = new NetCdfFormat();
@@ -62,16 +60,15 @@ public class ServerCapabilities {
     }
 
 
-
-
     /**
      * Returns the names of the supported formats as the appear in the OperationsMetadata for GetCoverage.
      * @return
      * @param dapServer
      */
     public static Vector<String> getSupportedFormatNames(URL dapServer){
-        Vector<String> supportedFormatNames = new Vector<>();
-        supportedFormatNames.addAll(Collections.list(_responseFormats.keys())); // Confines use of ConcurrentHashMap to Map Interface and is compatible with Java-7 jre
+        Vector<String> supportedFormatNames;
+        supportedFormatNames = new Vector<>(_responseFormats.keySet()); // Confines use of ConcurrentHashMap to Map Interface and is compatible with Java-7 jre
+        // supportedFormatNames.addAll(Collections.list(_responseFormats.keys())); // Confines use of ConcurrentHashMap to Map Interface and is compatible with Java-7 jre
         // supportedFormatNames.addAll(_responseFormats.keySet()); // Utilizes Java-8 call that borks this when run on Java 7 JRE
         return supportedFormatNames;
     }
