@@ -44,6 +44,7 @@
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
+    
     <xsl:key name="DimensionNames" match="dap:Dimension" use="@name"/>
 
     <xsl:template match="dap:Dataset">
