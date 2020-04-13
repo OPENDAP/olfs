@@ -91,7 +91,6 @@ public class ServletUtil {
 
         String etcOlfsConfigDir  = "/etc/olfs/";
         String usrShareConfigDir = "/usr/share/olfs/";
-        String webappConfDir     = "WEB-INF/conf";
 
         String configMsgBase = "Using config location: {}";
 
@@ -114,7 +113,7 @@ public class ServletUtil {
         // And NOPE.
         // The default locations and the environment defined location did not work out so we fall back to the
         // default configuration location in the web application deployment directory.
-        String configDirName = sc.getRealPath(webappConfDir);
+        String configDirName = getDefaultConfigPath(sc);
         log.warn("Failed to locate localized configuration directory. Falling back to bundled application config in: {}", configDirName);
         String configPath="FAILED_To_Determine_Config_Path!";
 
@@ -127,6 +126,12 @@ public class ServletUtil {
             log.error("Failed to produce a config path! Error: {}", e.getMessage());
         }
         return configPath;
+    }
+
+    public static String getDefaultConfigPath(ServletContext sc){
+        String webappConfDir = "WEB-INF/conf";
+        String configDirName = sc.getRealPath(webappConfDir);
+        return configDirName;
     }
 
     private static boolean pathIsGood(String path){
