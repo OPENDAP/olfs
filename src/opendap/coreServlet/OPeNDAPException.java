@@ -27,7 +27,6 @@
 package opendap.coreServlet;
 
 
-import opendap.PathBuilder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
@@ -329,12 +328,9 @@ public class OPeNDAPException extends Exception {
 
 
 
-    public int setHttpStatusCode(int code){
+    public void setHttpStatusCode(int code){
         //@TODO Make this thing look at the code and QC it's HTTP codyness.
-
         _httpStatusCode = code;
-        return getHttpStatusCode();
-
     }
 
 
@@ -377,7 +373,7 @@ public class OPeNDAPException extends Exception {
         sos.println(";");
 
         sos.print("    message = \"");
-        sos.print(Encode.forXmlContent(getMessage()));
+        sos.print(getMessage());
         sos.println("\";");
         sos.println("}");
 
@@ -423,7 +419,7 @@ public class OPeNDAPException extends Exception {
         ServletOutputStream sos = response.getOutputStream();
         sos.println("Dataset: ERROR");
         sos.println("status, " + getHttpStatusCode());
-        sos.println("message, \""+Encode.forXmlContent(getMessage())+"\"");
+        sos.println("message, \""+getMessage()+"\"");
     }
 
 
@@ -490,7 +486,7 @@ public class OPeNDAPException extends Exception {
         // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
         // public method for retrieving the message is tied to the thread of execution and it removes the
         // message from the cache (clears the cache for the thread) once it is retrieved.
-        _errorMessageCache.put(Thread.currentThread(), Encode.forHtml(getMessage()));
+        _errorMessageCache.put(Thread.currentThread(), getMessage());
 
         // Invokes the appropriate JSP page.
         response.sendError(httpStatus);
@@ -502,8 +498,7 @@ public class OPeNDAPException extends Exception {
      * @return  The (any?) error message associated with the current thread.
      */
     public static String getAndClearCachedErrorMessage(){
-        String msg = _errorMessageCache.remove(Thread.currentThread());
-        return Encode.forHtml(msg);
+        return  _errorMessageCache.remove(Thread.currentThread());
     }
 
     public static void setCachedErrorMessage(String s){
