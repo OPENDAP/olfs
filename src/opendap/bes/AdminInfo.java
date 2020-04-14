@@ -166,6 +166,10 @@ public class AdminInfo {
 
 
     /**
+     *
+     * The output if this method depends on configuration content and NOT
+     * on user submitted inputs.
+     *
      *  <pre>
      *      "publisher": {
      *          "@type": "Organization",
