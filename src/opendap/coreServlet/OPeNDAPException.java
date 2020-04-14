@@ -495,17 +495,31 @@ public class OPeNDAPException extends Exception {
 
     /**
      *
-     * @return  The (any?) error message associated with the current thread.
+     * @return  The error message cached by the current thread. This message is
+     * not encoded for inclusion in a particular message type (such as HTML)
+     * encoding is left to the receiver.
      */
     public static String getAndClearCachedErrorMessage(){
         return  _errorMessageCache.remove(Thread.currentThread());
     }
 
-    public static void setCachedErrorMessage(String s){
-        _errorMessageCache.put(Thread.currentThread(),s);
+    /**
+     * Adds the passed string to the error message cache for the current thread.
+     * @param errMsg The error message.
+     */
+    public static void setCachedErrorMessage(String errMsg){
+        _errorMessageCache.put(Thread.currentThread(),errMsg);
     }
 
 
+    /**
+     * Builds the mailto link to be utilized in various form , error, and directory pages
+     * @param request
+     * @param http_status
+     * @param errorMessage
+     * @param adminEmail
+     * @return The support mailto link, encoded forHtmlAttribute
+     */
     public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
 
         StringBuilder sb = new StringBuilder();
@@ -554,7 +568,11 @@ public class OPeNDAPException extends Exception {
         }
         sb.append("# status: ").append(http_status).append("%0A");
         if(http_status !=200) {
-            sb.append("# message: ").append(errorMessage).append("%0A");
+            sb.append("# message: ");
+            if(errorMessage!=null)
+                sb.append(errorMessage).append("%0A");
+            else
+                sb.append("no_error_message_found").append("%0A");
         }
         sb.append("# %0A");
         sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");

@@ -2,6 +2,7 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -31,21 +32,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@page session="false" %>
 <%
+    int status = 501;
+    String title = "Hyrax - No Such Service ("+status+")";
+
     String contextPath = request.getContextPath();
     String localUrl = ReqInfo.getLocalUrl(request);
-
     BesApi besApi = new BesApi();
-    String supportEmail = besApi.getSupportEmail(localUrl);
+    String supportEmail;
+    try {
+        supportEmail = besApi.getSupportEmail(localUrl);
+    } catch (BadConfigurationException e) {
+        supportEmail=null;
+    }
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    message = Encode.forHtml(message);
     String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,501,message,supportEmail);
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css' />
-<title>Hyrax:  ERROR</title>
+<title><%=title%></title>
 <style type="text/css">
 <!--
 .style1 {
@@ -58,7 +65,7 @@
 
 <body>
 <p>&nbsp;</p>
-<h1 align="center">Hyrax Error - No Such Service (501)</h1>
+<h1 align="center"><%=title%></h1>
 <hr size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
@@ -67,20 +74,24 @@
              alt="That's not going to work..."
              title="That's not going to work..."
              width="350" height="313" /><
-        /td>
+    </td>
     <td><p align="left" class="style1">Hmmmm...</p>
       <p align="left">You asked for a service that is not provided here.</p>
       <% if (message != null) { %>
       <p align="left">The specific error message associated with your request was:</p>
-      <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
+        <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
+      <% } %>
+        <% if(supportEmail!=null){ %>
+      <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
+          then please contact the OPeNDAP user support coordinator at:
+          <a href="<%=mailtoHrefAttributeValue%>"><%= supportEmail %></a>
+      </p>
       <% } %>
 
-    <p align="left">If you think that the server is broken (that the URL you submitted should have
-        worked), then please contact the OPeNDAP user support coordinator at:
-        <a href="<%= mailtoHrefAttributeValue %>"><%= supportEmail %></a></p></td>
+    </td>
   </tr>
 </table>
 <hr size="1" noshade="noshade" />
-<h1 align="center">Hyrax Error - No Such Service (501)</h1>
+<h1 align="center"><%=title%></h1>
 </body>
 </html>

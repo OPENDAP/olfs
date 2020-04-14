@@ -1,5 +1,8 @@
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="opendap.bes.dap2Responders.BesApi" %>
+<%@ page import="opendap.coreServlet.ReqInfo" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -30,21 +33,33 @@
 
 <%@page session="false" %>
 <%
+    int status = 401;
+    String title = "Hyrax - Unauthorized ("+status+")";
+
     String contextPath = request.getContextPath();
+    String localUrl = ReqInfo.getLocalUrl(request);
+    BesApi besApi = new BesApi();
+    String supportEmail;
+    try {
+        supportEmail = besApi.getSupportEmail(localUrl);
+    } catch (BadConfigurationException e) {
+        supportEmail=null;
+    }
+
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    message = Encode.forHtml(message);
+    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,401,message,supportEmail);
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css' />
-<title>Hyrax:  Unauthorized</title>
+<title><%=title%></title>
 </head>
 
 <body>
 <p align="left">&nbsp;</p>
-<h1 align="center">Hyrax - Unauthorized (401) </h1>
+<h1 align="center"><%=title%></h1>
 <hr align="left" size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
@@ -53,14 +68,21 @@
         <p align="left">You must be identified to access the resource you requested.</p>
         <p align="left">Currently you are not authenticated at all, or authenticated incorrectly.</p>
         <p align="left">Please re-authenticate and try again. </p>
-            <% if (message != null) { %>
+        <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
-            <% } %>
+            <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
+        <% } %>
+        <% if(supportEmail!=null){ %>
+            <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
+                then please contact the OPeNDAP user support coordinator at:
+                <a href="<%=mailtoHrefAttributeValue%>"><%= supportEmail %></a>
+            </p>
+        <% } %>
+    </td>
 
   </tr>
 </table>
 <hr align="left" size="1" noshade="noshade" />
-<h1 align="center">Hyrax - Unauthorized (401) </h1>
+<h1 align="center"><%=title%></h1>
 </body>
 </html>
