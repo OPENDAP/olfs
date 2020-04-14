@@ -191,55 +191,6 @@ public class OPeNDAPException extends Exception {
     }
 
 
-    public static String getDap2Error(int code, String errorMessage) {
-
-        StringBuilder err = new StringBuilder("Error {\n");
-        err.append("     code = ").append(code).append(";\n");
-
-
-        // If the error message is wrapped in double quotes, print it, else,
-        // add wrapping double quotes.
-        if ((errorMessage != null) && (errorMessage.charAt(0) == '"'))
-            err.append("    message = ").append(errorMessage).append(";\n");
-        else
-            err.append("    message = \"").append(errorMessage).append("\";\n");
-
-
-        err.append("};\n");
-
-        return err.toString();
-
-    }
-
-    /**
-     * Print the DAP2 Error object on the given <code>PrintWriter</code>.
-     * This code can be used by servlets to throw an OPeNDAPException to a client.
-     *
-     * @param os the <code>PrintWriter</code> to use for output.
-     */
-    public void print(PrintStream os) {
-
-        os.println(getDap2Error(-1,_errorMessage));
-    }
-
-    /**
-     * Print the DAP2 Error object on the given <code>OutputStream</code>.
-     *
-     * @param os the <code>OutputStream</code> to use for output.
-     */
-    public final void print(OutputStream os) {
-        try {
-            PrintStream pw;
-            pw = new PrintStream(os, true,  HyraxStringEncoding.getCharset().name());
-            print(pw);
-            pw.flush();
-        } catch (UnsupportedEncodingException e) {
-            // Oh well...
-            _log.error("Unable to print error because the character set '{}' is an unsupported encoding. msg: {}",
-                    HyraxStringEncoding.getCharset().displayName(), e.getMessage());
-        }
-    }
-
 
     /**
      * ************************************************************************
@@ -366,39 +317,13 @@ public class OPeNDAPException extends Exception {
                 return;
             }
 
-
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(RDF.SUB_TYPE)) {
+                sendAsDap4Error(response);
+                return;
+            }
         }
         sendAsHtmlErrorPage(response);
-
     }
-
-
-
-    /*
-    public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
-        String template = readFileAsString(htmlTemplateFile);
-        template = template.replaceAll("<CONTEXT />",context);
-        return template;
-    }
-
-
-
-
-    public static String readFileAsString(String fileName) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
-
-        try {
-            while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine()).append("\n");
-            }
-        } finally {
-            scanner.close();
-        }
-        return stringBuilder.toString();
-    }
-      */
-
 
 
 
@@ -452,7 +377,7 @@ public class OPeNDAPException extends Exception {
         sos.println(";");
 
         sos.print("    message = \"");
-        sos.print(getMessage());
+        sos.print(Encode.forXmlContent(getMessage()));
         sos.println("\";");
         sos.println("}");
 
@@ -470,7 +395,7 @@ public class OPeNDAPException extends Exception {
 
         opendap.dap4.Dap4Error d4e = new opendap.dap4.Dap4Error();
         d4e.setHttpStatusCode(getHttpStatusCode());
-        d4e.setMessage(getMessage());
+        d4e.setMessage(Encode.forXmlContent(getMessage()));
 
         response.setContentType(d4e.getMediaType().getMimeType());
         response.setHeader("Content-Description", "DAP4 Error Object");
@@ -498,7 +423,7 @@ public class OPeNDAPException extends Exception {
         ServletOutputStream sos = response.getOutputStream();
         sos.println("Dataset: ERROR");
         sos.println("status, " + getHttpStatusCode());
-        sos.println("message, \""+getMessage()+"\"");
+        sos.println("message, \""+Encode.forXmlContent(getMessage())+"\"");
     }
 
 
@@ -535,7 +460,7 @@ public class OPeNDAPException extends Exception {
         sos.println("      \"type\":  =  \"String\",");
         sos.println("      \"attributes\":  =  \"[]\",");
         sos.print("      \"data\":  =  \"");
-        sos.print(getMessage());
+        sos.print(Encode.forJavaScriptBlock(getMessage()));
         sos.println("\"");
         sos.println("    },");
         sos.println("      \"name\":  =  \"HttpStatus\",");
@@ -565,7 +490,7 @@ public class OPeNDAPException extends Exception {
         // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
         // public method for retrieving the message is tied to the thread of execution and it removes the
         // message from the cache (clears the cache for the thread) once it is retrieved.
-        _errorMessageCache.put(Thread.currentThread(), getMessage());
+        _errorMessageCache.put(Thread.currentThread(), Encode.forHtml(getMessage()));
 
         // Invokes the appropriate JSP page.
         response.sendError(httpStatus);
@@ -616,11 +541,13 @@ public class OPeNDAPException extends Exception {
             sb.append("# -- -- -- hyrax location info, please include -- -- --%0A");
         }
         sb.append("# %0A");
-        sb.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
+        sb.append("# request_url: ");
+        sb.append(request.getRequestURL().toString()).append("%0A");
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
         sb.append("# server: ").append(request.getServerName()).append("%0A");
         sb.append("# port: ").append(request.getServerPort()).append("%0A");
-        sb.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+        sb.append("# javax.servlet.forward.request_uri: ");
+        sb.append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
 
         sb.append("# query_string: ");
         String queryString = request.getQueryString();
