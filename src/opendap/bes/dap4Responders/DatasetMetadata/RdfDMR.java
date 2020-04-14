@@ -36,6 +36,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.http.error.InternalError;
 import opendap.http.mediaTypes.RDF;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
@@ -45,7 +46,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
@@ -189,8 +189,16 @@ public class RdfDMR extends Dap4Responder {
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
         } catch (Exception e) {
-            sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("I'm sorry. ");
+            errorMessage.append("You requested the RDF representation of the metadata for the dataset: ");
+            errorMessage.append(resourceID).append(" ");
+            errorMessage.append("The server attempted to transform the metadata in the dataset, ");
+            errorMessage.append("represented as a DAP4 DMR document, into an RDF representation. ");
+            errorMessage.append( "The transform failed, and returned this error message: \"");
+            errorMessage.append(e.getMessage()).append("\"");
+            throw new InternalError(errorMessage.toString());
         }
         os.flush();
         LogUtil.setResponseSize(os.size());
@@ -198,21 +206,6 @@ public class RdfDMR extends Dap4Responder {
     }
 
 
-    public void sendRdfErrorResponse(Exception e, String dataSource, String docsService, HttpServletResponse response) throws Exception {
-
-        String errorMessage =
-                        "<p align=\"center\">I'm sorry.</p>\n" +
-                        "<p align=\"center\">You requested the RDF representation of the metadata for the dataset:</p>\n" +
-                        "<p align=\"center\" class=\"bold\">"+dataSource+" </p>\n" +
-                        "<p align=\"center\">The server attempted to transform the metadata in the dataset, " +
-                                "represented as a DDX document, into an RDF representation.</p>\n" +
-                        "<p align=\"center\">The transform failed, and returned this specific error message:</p>\n" +
-                        "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
-
-
-        sendHttpErrorResponse(500, errorMessage, docsService, response);
-
-    }
 
 
 

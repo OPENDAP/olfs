@@ -153,25 +153,36 @@ public class LogUtil {
      *           location.
      */
     public static void initLogging(ServletContext sc) {
-        // The config path could resolve to one of several places
-        String configPath = ServletUtil.getConfigPath(sc);
+        initLock.lock();
+        try {
+            if(isLogInit.get()) {
+                return;
+            }
+            // The config path could resolve to one of several places
+            String configPath = ServletUtil.getConfigPath(sc);
 
-        // Make sure the logger has a place to write.
-        setupLoggingPath(configPath);
+            // Make sure the logger has a place to write.
+            setupLoggingPath(configPath);
 
-        // The default configuration is always in the distribution:
-        // $CATALINA_HOME/webapps/$CONTEXT/WEB-INF/conf directory
-        String defaultConfigPath = ServletUtil.getDefaultConfigPath(sc);
+            // The default configuration is always in the distribution:
+            // $CATALINA_HOME/webapps/$CONTEXT/WEB-INF/conf directory
+            String defaultConfigPath = ServletUtil.getDefaultConfigPath(sc);
 
-        // Find a logback(-test).xml config file in the config path.
-        String logbackFile = locateLogbackFile(configPath);
-        // Did ya find it?
-        if(logbackFile==null){
-            // Nope. Better try the distribution files.
-            logbackFile = locateLogbackFile(defaultConfigPath);
+            // Find a logback(-test).xml config file in the config path.
+            String logbackFile = locateLogbackFile(configPath);
+            // Did ya find it?
+            if (logbackFile == null) {
+                // Nope. Better try the distribution files.
+                logbackFile = locateLogbackFile(defaultConfigPath);
+            }
+            // Ingest the possibly found file (null tolerant)
+            ingestLogbackFile(logbackFile);
+
+            isLogInit.set(true);
         }
-        // Ingest the possibly found file (null tolerant)
-        ingestLogbackFile(logbackFile);
+        finally {
+            initLock.unlock();
+        }
     }
 
     /**

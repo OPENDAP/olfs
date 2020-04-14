@@ -77,7 +77,10 @@ public class BESSiteMapService extends HttpServlet {
 
 
             if (!BESManager.isInitialized()) {
-                String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
+                String configFilename = "olfs.xml";
+                PersistentConfigurationHandler.installDefaultConfiguration(this, configFilename);
+
+                String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), configFilename);
                 Element configElement;
                 try {
                     configElement = opendap.xml.Util.getDocumentRoot(filename);

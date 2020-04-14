@@ -25,16 +25,13 @@
  */
 package opendap.coreServlet;
 
-import opendap.PathBuilder;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,10 +54,12 @@ public abstract class HttpResponder {
 
 
 
-    private HttpResponder(){}
+    private HttpResponder(){
+        super();
+    }
 
     protected HttpResponder(String sysPath, String pathPrefix, String regexPattern){
-        super();
+        this();
         _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
 
         while(sysPath.endsWith("/") && sysPath.length()>0)
@@ -106,36 +105,6 @@ public abstract class HttpResponder {
         response.getWriter().append("POST is not implemented by this Responder");
     }
 
-
-
-    public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
-        String errorPageTemplate = new PathBuilder(_systemPath).pathAppend("error").pathAppend("error.html.proto").toString();
-
-        sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
-    }
-
-
-    public static void sendHttpErrorResponse(int httpStatus, String errorMessage, String errorPageTemplate, String context,  HttpServletResponse response) throws Exception {
-
-        String template = loadHtmlTemplate(errorPageTemplate, context);
-
-        template = template.replaceAll("<ERROR_MESSAGE />",errorMessage);
-        template = template.replaceAll("<ERROR_CODE />",Integer.toString(httpStatus));
-
-        log.debug("respondToHttpGetRequest(): Sending Error Page ");
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "error_page");
-        response.setStatus(httpStatus);
-
-        ServletOutputStream sos  = response.getOutputStream();
-
-        sos.println(template);
-
-    }
-
-
-
     public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
         String template = readFileAsString(htmlTemplateFile);
         template = template.replaceAll("<CONTEXT />",context);
@@ -145,25 +114,9 @@ public abstract class HttpResponder {
 
 
 
-
     public static String readFileAsString(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
-
-        try {
-            while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine() + "\n");
-            }
-        } finally {
-            scanner.close();
-        }
-        return stringBuilder.toString();
-    }
-
-
-    public static String streamToString(InputStream is) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(is, HyraxStringEncoding.getCharset().name());
 
         try {
             while (scanner.hasNextLine()) {
