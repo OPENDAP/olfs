@@ -1,6 +1,7 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -38,6 +39,7 @@
     String supportEmail = besApi.getSupportEmail(localUrl);
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
+    message = Encode.forHtml(message);
     String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,400,message,supportEmail);
 
 %>

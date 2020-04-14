@@ -1,4 +1,5 @@
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -31,6 +32,7 @@
     String contextPath = request.getContextPath();
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
+    message = Encode.forHtml(message);
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
