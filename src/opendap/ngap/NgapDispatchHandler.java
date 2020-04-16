@@ -189,7 +189,10 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         // check clients beating on the endpoint.
         ServletOutputStream sos = response.getOutputStream();
         sos.println("<html>");
-        sos.println("<head><title>OPeNDAP Hyrax: NGAP Service</title></head>");
+        sos.println("<head>");
+        sos.println("<meta http-equiv=\"refresh\" content=\"60\">");
+        sos.println("<title>OPeNDAP Hyrax: NGAP Service</title>");
+        sos.println("</head>");
         sos.println("<body>");
         sos.print("<p style='");
         sos.print("font-family: Courier; ");
