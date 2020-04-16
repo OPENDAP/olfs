@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -520,7 +521,7 @@ public class OPeNDAPException extends Exception {
      * @param adminEmail
      * @return The support mailto link, encoded forHtmlAttribute
      */
-    public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
+    public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail) throws UnsupportedEncodingException {
 
         StringBuilder sb = new StringBuilder();
         if(http_status!=200){
@@ -555,13 +556,25 @@ public class OPeNDAPException extends Exception {
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
         sb.append("# server: ").append(request.getServerName()).append("%0A");
         sb.append("# port: ").append(request.getServerPort()).append("%0A");
+
+        String cleanUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+        if(cleanUri!=null){
+            cleanUri = URLDecoder.decode(cleanUri, HyraxStringEncoding.getCharset().name());
+            cleanUri = Scrub.urlContent(cleanUri);
+        }
+        else {
+            cleanUri = "null";
+        }
+
         sb.append("# javax.servlet.forward.request_uri: ");
-        sb.append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+        sb.append(cleanUri);
+
+        sb.append("%0A");
 
         sb.append("# query_string: ");
         String queryString = request.getQueryString();
         if(queryString!=null && !queryString.isEmpty()){
-            sb.append(queryString).append("%0A");
+            sb.append(Scrub.simpleQueryString(queryString)).append("%0A");
         }
         else {
             sb.append("n/a%0A");

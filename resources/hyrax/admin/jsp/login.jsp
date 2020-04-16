@@ -59,7 +59,7 @@
 
 
 
-<form method="POST" action="j_security_check">
+<form method="POST" action="j_security_check" autocomplete="off">
 <table>
 	<tr>
 		<td>Name:</td>
