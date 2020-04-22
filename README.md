@@ -2,10 +2,13 @@
   <img alt="TravisCI" src="https://travis-ci.org/OPENDAP/olfs.svg?branch=master"/>
 </a>
 
-# Hyrax/OLFS _DOI TAG FOR OLFS-1.18.7_
+# Hyrax/OLFS [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3762740.svg)](https://doi.org/10.5281/zenodo.3762740)
+             
 
-Hyrax Version 1.16.2  (27 April 2020)    
-OLFS  Version 1.18.7  (27 April 2020) 
+
+**_Hyrax Version 1.16.2  (27 April 2020)_**
+
+**_OLFS  Version 1.18.7  (27 April 2020)_** 
 
 
 ### OLFS-1.18.7 requires
