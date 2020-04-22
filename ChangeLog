@@ -1,3 +1,287 @@
+2020-04-22  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Fixes a hard coded deployment context in FileAccess.java.
+	
+	Cleaning up retired code
+	
+2020-04-16  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: This commit refines the output scrubbing in the mailto 
+	link content and disallows autocomplete in the HAI password field.
+	
+	olfs: Added auto refresh to NGAP landing page.
+	
+2020-04-14  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #92 from OPENDAP/scrubby
+	Scrubby
+	
+2020-04-14  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Makes jsp error pages more consistent w.r.t. message 
+	handling and user support email inclusion.
+	
+	olfs: This commit drops multiple html encoding (ouch) and also 
+	special encoding calls for text/plain error responses (DAP2 errors) and 
+	CSV responses.
+	
+	olfs: Added an informational comment...
+	
+	olfs: This adds error message scrubbing/encoding to the jsp 
+	error pages.
+	
+	 DAP2/4 error responses and to the requested resourceId 
+	transmitted  in the mailto links.
+	
+	olfs: This commit makes the LogUtil.init() method thread safe 
+	and run once per deployment.
+	
+	olfs: This commit retires the (ancient) error.html.proto file 
+	in lieu of the newer centrial error handling that relays on the 
+	OPeNDAPException.anyExceptionHandler() and the various error---.jsp 
+	files to build error responses.
+	
+	olfs: This commit retires the (ancient) error.html.proto file 
+	in lieu of the newer centrial error handling that relays on the 
+	OPeNDAPException.anyExceptionHandler() and the various error---.jsp 
+	files to build error responses.
+	
+	olfs: This commit retires the (ancient) error.html.proto file 
+	in lieu of the newer centrial error handling that relays on the 
+	OPeNDAPException.anyExceptionHandler() and the various error---.jsp 
+	files to build error responses.
+	
+	olfs: This commit repairs a boot strapping problem in which the 
+	BESSiteMapService failed to install the default configuration in a 
+	newly available local location prior to attemting to read the 
+	configuration from said location.
+	
+	olfs: This commit retires a number of unused xsl files.
+	
+2020-04-14  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #91 from OPENDAP/log_config
+	Logging Configuration Repairs.
+	
+2020-04-13  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: This commit returns log configuration priority to the 
+	logback.xml instead of the logback-test.xml file. It makes the software 
+	correctly locate the logback files by first checking in the current 
+	configuration directory, and if neither Logback file is found there 
+	then the default configuration directory:     
+	$CATALINA_HOME/webapps/DEPLOYMENT_CONTEXT/WEB-INF/conf Is searched for 
+	the two files.
+	
+2020-04-11  ndp-opendap  <ndp@opendap.org>
+	
+	tweaking for travis
+	
+2020-04-09  ndp-opendap  <ndp@opendap.org>
+	
+	olfs:  This commit fixes a problem in wcs response formats 
+	where being listed in arbitrary order, breaking regression tests. Yay 
+	for ConcurrentSkipListMap!
+	
+	olfs:  This commit fixes a problem in which WCS library 
+	dependencies were not being correctly included in the war files for the 
+	servers. Most of the change is in moving said libs onto the main lib 
+	dir.
+	
+2020-04-08  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Switched NGAP landing page to html
+	
+	olfs: formatting output
+	
+	olfs: Add simple hit counter to ngap service endpoint.
+	
+	olfs: Added a bare bones bgap service endpoint page for health 
+	check clients.
+	
+2020-04-07  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Adding favicon.ico to list of things not to return to in 
+	an auth process.
+	
+	olfs: Fixed bad FORMAT foe debug logging.
+	
+	olfs: Mapped an ngap specific logback config into the 
+	logback-test.xml
+	
+	olfs: Fixed bug in Log init path determination.
+	
+	olfs: Debug grooming.
+	
+2020-04-07  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #90 from OPENDAP/auth_logging
+	Auth logging
+	
+2020-04-07  ndp-opendap  <ndp@opendap.org>
+	
+	Adding logback-ngap.xml file to ngap package
+	
+	olfs: Repairing race condition in logging initialization. 
+	Fixing auth filters so they correctly init logging.
+	
+2020-04-03  ndp-opendap  <ndp@opendap.org>
+	
+	Making the default ngap deployment context be named ngap (i.e. 
+	ngap.war)
+	
+2020-04-02  ndp-opendap  <ndp@opendap.org>
+	
+	Switch NGAP deployment context back to opendap from ROOT
+	
+2020-04-01  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Added customized olfs.xml to ngap resources.
+	
+	olfs: Templated EDL information in user-access.xml
+	
+2020-03-31  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #89 from OPENDAP/ngap-production
+	Ngap production - merging to master to see if deploy works. 
+	Couldn't get it to ignore the no deploy form PR rule.
+	
+2020-03-31  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Can't get past the pull request block on deploy. Setting 
+	rules to normative set and now I'm a gonna merge to master.
+	
+	Tweaking travisCI to build a snapshot for this branch
+	
+	Tweaking travisCI to build a snapshot for this branch
+	
+	Tweaking travisCI to build a snapshot for this branch
+	
+	Tweaking travisCI to build a snapshot for this branch
+	
+	Tweaking travisCI to build a snapshot for this branch
+	
+	Added new travis snappah stage for ngap., should deploy to S3
+	
+	Added ngap-dist build target
+	
+2020-03-31  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #88 from OPENDAP/ngap-only
+	Ngap only
+	
+2020-03-31  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Tidy. So tidy,
+	
+	Reduced redundancy in build.xml while also creating a single 
+	source of truth for hyrax lib dependencies.
+	
+	Fixed! This check-in adds: - Customized web.xml for NGAP that 
+	be default enables authentication. - A customized urlrewrite.xml that 
+	routes all traffic not specifcally   destined for on of the various 
+	service endpoints (hyrax, wcs, etc)   to the NGAP service endpoint - A 
+	new build target for the NGAP service that utlizes the above to   build 
+	a ROOT.war file for deployment into the root (aka /) context   for 
+	Tomcat.
+	
+2020-03-30  ndp-opendap  <ndp@opendap.org>
+	
+	Adding NgapServlet
+	
+2020-03-23  ndp-opendap  <ndp@opendap.org>
+	
+	Turning full Travis back on
+	
+2020-03-21  ndp-opendap  <ndp@opendap.org>
+	
+	Updated default Hyrax page with links and names and goodness.
+	
+	olfs: Fixes poor logo display style in index.jsp
+	
+	olfs: This change makes the default index.html file redirect to 
+	the jsp/index.jsp file by using a relative path, "../jsp/infex.jsp" 
+	rather than previosuly which baked the context name into the path like: 
+	"/opendap/jsp/index.jsp"
+	
+	olfs: Fixing brojken reference to logo. This code was still 
+	using logo.gif and everything should have transitioned to logo.png by 
+	now."
+	
+	olfs: This small change allows the FileService links to be 
+	properly constructed on the viewers page when the hyrax application is 
+	running in the ROOT context (aka default, or "", or the context with no 
+	name)
+	
+	olfs: This small change allows the WCS links to be properly 
+	constructed on the viewers page when the hyrax application is running 
+	in the ROOT (aka default, or "", or the context with no name)
+	
+	olfs: Dropping unused code copied from gateway.
+	
+2020-03-20  ndp-opendap  <ndp@opendap.org>
+	
+	Dropped redundant output from profile page
+	
+2020-03-20  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #85 from OPENDAP/ngap-service
+	Ngap service
+	
+2020-03-20  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Added code to produce and inject the uid and EDL auth 
+	tokens to the BES DAP requests in NgapBesApi.java.
+	
+2020-03-18  ndp-opendap  <ndp@opendap.org>
+	
+	The ngap code now transmits the uid and EDL auth token if they 
+	are available
+	
+2020-03-17  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' into ngap-service
+	
+2020-03-06  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing Error page in aggservlet
+	
+2020-03-01  ndp-opendap  <ndp@opendap.org>
+	
+	dropped NgapServlet because using it will create issues 
+	downstream. Primarily it will be hard to turn it on and off and by 
+	Adding it to the collaction of DispatchHandlers instantiated by 
+	opendap.coreServlet.Dispatch servlet we can add configuration canges to 
+	switch it on/off.
+	
+	olfs: Added code to initialize the NgapDispatchHandler
+	
+	Filenames, removing unused
+	
+2020-03-01  danh_opendap  <dholloway@opendap.org>
+	
+	Added ngap service end-point
+	
+	Added ngap service
+	
+	Added ngap service end-point
+	
+	Initial source file upload.
+	
+2020-02-12  ndp-opendap  <ndp@opendap.org>
+	
+	Removed offending copy from buid.xml
+	
+	Fixed packaging redundancy that was breaking docker builds.
+	
+2020-02-11  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Dropped unused imports
+	
+2020-02-07  ndp-opendap  <ndp@opendap.org>
+	
+	Updating version in release files, ChangeLog etc.
+
 2020-02-04  ndp-opendap  <ndp@opendap.org>
 
 	olfs: MOre serialization management

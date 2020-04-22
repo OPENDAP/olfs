@@ -1,4 +1,15 @@
 
+# OLFS Version 1.18.7 (27 April 2020)
+
+## Features
+* Added an ngap service endpoint in support of the NASA NGAP project.
+
+## Bugs Fixed
+* Improved content encoding/scrubbing on outbound error messages.
+* Fixed bugs in bootstrap init and init for all the various init() components.
+* Stabilized the order of output in WCS-2.0
+
+
 # OLFS Version 1.18.6 (10 February 2020)
 
 ## Features
