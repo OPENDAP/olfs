@@ -108,19 +108,35 @@
         </encoder>
     </appender>
 
-    <logger name="opendap" level="error">
-        <appender-ref ref="ErrorLog"/>
+    <appender name="DebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/debug.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/debug.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="AuthenticationLog" level="info">
         <appender-ref ref="DebugLog"/>
     </logger>
-    <logger name="opendap.bes.caching" level="error"/>
-    <logger name="opendap.bes.dap2Responders.BesApi" level="error"/>
+
     <logger name="opendap.dap.User" level="info"/>
-    <logger name="opendap.auth.IdFilter" level="all" />
-    <logger name="opendap.auth.UrsIdp" level="all"/>
     <logger name="opendap.auth" level="all"/>
     <logger name="opendap.auth.Util" level="all"/>
     <logger name="opendap.ngap" level="info"/>
-    
+
+
+    <logger name="opendap" level="error">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
     <!-- 
     <logger name="opendap.coreServlet.DispatchServlet" level="error"/>
     <logger name="opendap.bes.BESSiteMap" level="all"/>

@@ -44,11 +44,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class IdFilter implements Filter {
 
     private Logger log;
+    private static final String logName = "AuthenticationLog";
+    private AtomicLong counter;
 
     public static final String RETURN_TO_URL      = "return_to_url";
     public static final String USER_PROFILE       = "user_profile";
@@ -84,6 +87,8 @@ public class IdFilter implements Filter {
 
         if(isInitialized)
             return;
+
+        counter = new AtomicLong(0);
         LogUtil.initLogging(filterConfig.getServletContext());
         log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing IdFilter...");
@@ -129,8 +134,9 @@ public class IdFilter implements Filter {
     }
 
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
+        HttpServletRequest request = (HttpServletRequest) sreq;
         if (!isInitialized) {
             try {
                 init();
@@ -142,7 +148,8 @@ public class IdFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
-
+        String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
+        LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
         HttpServletRequest hsReq = (HttpServletRequest) request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
@@ -228,6 +235,7 @@ public class IdFilter implements Filter {
             cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
         }
         filterChain.doFilter(hsReq, hsRes);
+        LogUtil.logServerAccessEnd(200,logName);
     }
 
     public void destroy() {
