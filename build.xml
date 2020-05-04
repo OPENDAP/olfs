@@ -934,7 +934,7 @@
 
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
-                <include name="logback-ngap.xml"/>
+                <include name="logback.xml"/>
             </zipfileset>
 
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF/conf">
