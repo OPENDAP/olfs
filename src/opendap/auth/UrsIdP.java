@@ -180,7 +180,7 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
-
+        log.debug("BEGIN (session: {})",session);
 
         // Check to see if we have a code returned from URS. If not, we must
         // redirect the user to URS to start the authentication process.
@@ -194,6 +194,7 @@ public class UrsIdP extends IdProvider{
             log.info("URS Code Request URL: {}",LogUtil.scrubEntry(url));
             response.sendRedirect(url);
 
+            log.debug("END (session: {})",session);
             return false;
         }
 
@@ -256,15 +257,16 @@ public class UrsIdP extends IdProvider{
 
         // Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-        log.debug("session.getAttribute(RETURN_TO_URL): {}",redirectUrl);
+        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})",redirectUrl, session);
 
         if(redirectUrl==null){
-            redirectUrl = serviceContext;
+            redirectUrl = PathBuilder.normalizePath(serviceContext,true,false);
         }
         log.info("USING redirectURL: {}",redirectUrl);
 
         response.sendRedirect(redirectUrl);
 
+        log.debug("END (session: {})",session);
         return true;
 
 	}

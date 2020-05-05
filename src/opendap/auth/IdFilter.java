@@ -136,7 +136,6 @@ public class IdFilter implements Filter {
 
     public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        HttpServletRequest request = (HttpServletRequest) sreq;
         if (!isInitialized) {
             try {
                 init();
@@ -148,19 +147,21 @@ public class IdFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
+        HttpServletRequest request = (HttpServletRequest) sreq;
+        HttpServletRequest hsReq = request;
+
+        // Get session, make new as needed.
+        HttpSession session = hsReq.getSession(true);
+        log.debug("BEGIN (session: {})",session);
+
         String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
         LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
-        HttpServletRequest hsReq = (HttpServletRequest) request;
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
 
         String query = hsReq.getQueryString();
         String requestUrl = hsReq.getRequestURL().toString() + ((query != null) ? ("?" + query) : "");
-
-
-        // Get session, make new as needed.
-        HttpSession session = hsReq.getSession(true);
 
         // Intercept login/logout requests
         if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
@@ -184,8 +185,13 @@ public class IdFilter implements Filter {
                         // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
                         if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
-                            log.debug("Setting session RETURN_TO_URL({}) to: {}", RETURN_TO_URL, contextPath);
+                            String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
+                            msg += " (session: "+session+")";
+                            log.debug(msg);
                             session.setAttribute(RETURN_TO_URL, contextPath);
+                        }
+                        else {
+                            log.debug("Recovered returnToUrl: {} (session: {})",returnToUrl,session);
                         }
                     }
                     try {
@@ -202,6 +208,7 @@ public class IdFilter implements Filter {
                         // completed send a 302 redirect to the client. Thus we want the process to stop here until
                         // login is completed
                         //
+                        log.debug("END (session: {})",session);
                         return;
 
                     } catch (IOException e) {
@@ -211,6 +218,7 @@ public class IdFilter implements Filter {
                         log.error("doFilter() - {}", msg);
                         OPeNDAPException.setCachedErrorMessage(msg);
                         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                        log.debug("END (session: {})",session);
                         return;
                     }
                 }
@@ -235,6 +243,7 @@ public class IdFilter implements Filter {
             cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
         }
         filterChain.doFilter(hsReq, hsRes);
+        log.debug("END (session: {})",session);
         LogUtil.logServerAccessEnd(200,logName);
     }
 
