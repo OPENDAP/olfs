@@ -442,6 +442,7 @@
                 <exclude name="WEB-INF/web.xml"/>
                 <exclude name="WEB-INF/urlrewrite.xml"/>
                 <exclude name="WEB-INF/logback.xml"/>
+                <exclude name="WEB-INF/logback-test.xml"/>
             </fileset>
         </copy>
 
@@ -935,12 +936,13 @@
 
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
-                <include name="logback.xml"/>
             </zipfileset>
 
             <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF/conf">
+                <include name="logback.xml"/>
                 <include name="olfs.xml"/>
             </zipfileset>
+
 
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
