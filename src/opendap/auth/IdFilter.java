@@ -151,11 +151,12 @@ public class IdFilter implements Filter {
         HttpServletRequest hsReq = request;
 
         // Get session, make new as needed.
+        String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
+        LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
+
         HttpSession session = hsReq.getSession(true);
         log.debug("BEGIN (session: {})",session);
 
-        String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
-        LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
@@ -189,9 +190,6 @@ public class IdFilter implements Filter {
                             msg += " (session: "+session+")";
                             log.debug(msg);
                             session.setAttribute(RETURN_TO_URL, contextPath);
-                        }
-                        else {
-                            log.debug("Recovered returnToUrl: {} (session: {})",returnToUrl,session);
                         }
                     }
                     try {
@@ -280,9 +278,14 @@ public class IdFilter implements Filter {
             log.debug("Not caching request url: {}",requestUrl);
             return;
         }
-        log.debug("Caching request URL as session Attribute with key RETURN_TO_URL({}) to: {}",RETURN_TO_URL,requestUrl);
+        if(log.isDebugEnabled()){
+            String msg ="Caching request URL as session Attribute with key '"+RETURN_TO_URL+"' ";
+            msg += "and value: " + requestUrl;
+            msg += "(session: "+session+")";
+            log.debug(msg);
+        }
         session.setAttribute(RETURN_TO_URL,requestUrl);
-        log.debug("Sanity check session.getAttribute(RETURN_TO_URL) returns {}",session.getAttribute(RETURN_TO_URL));
+        log.debug("Sanity check session.getAttribute(RETURN_TO_URL) returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session);
     }
 
 
