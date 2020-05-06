@@ -191,7 +191,7 @@ public class UrsIdP extends IdProvider{
             String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 "&response_type=code&redirect_uri=" + request.getRequestURL();
 
-            log.info("URS Code Request URL: {}",LogUtil.scrubEntry(url));
+            log.info("Redirecting client to URS SSO. URS Code Request URL: {}",LogUtil.scrubEntry(url));
             response.sendRedirect(url);
 
             log.debug("END (session: {})",session);
@@ -262,7 +262,7 @@ public class UrsIdP extends IdProvider{
         if(redirectUrl==null){
             redirectUrl = PathBuilder.normalizePath(serviceContext,true,false);
         }
-        log.info("USING redirectURL: {}",redirectUrl);
+        log.info("Authentication Completed. Redirecting client to redirectUrl: {}",redirectUrl);
 
         response.sendRedirect(redirectUrl);
 

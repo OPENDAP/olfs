@@ -155,7 +155,7 @@ public class IdFilter implements Filter {
         LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
         HttpSession session = hsReq.getSession(true);
-        log.debug("BEGIN (session: {})",session);
+        log.debug("BEGIN (requestId: {} session: {})",requestId, session);
 
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
@@ -185,6 +185,7 @@ public class IdFilter implements Filter {
                         // return to the root dir of the web application after
                         // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
+                        log.debug("Retrieved RETURN_TO_URL: {} from session: {}",returnToUrl,session);
                         if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
                             String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
                             msg += " (session: "+session+")";
