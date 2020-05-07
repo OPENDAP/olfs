@@ -188,8 +188,14 @@ public class UrsIdP extends IdProvider{
 
         if( code == null )
         {
-            String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
-                "&response_type=code&redirect_uri=" + request.getRequestURL();
+            //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
+             //   "&response_type=code&redirect_uri=" + request.getRequestURL();
+
+            String url;
+            url = PathBuilder.pathConcat(getUrsUrl(),"/oauth/authorize?");
+            url += "client_id=" + getUrsClientAppId();
+            url += "&";
+            url += "response_type=code&redirect_uri=" + request.getRequestURL();
 
             log.info("Redirecting client to URS SSO. URS Code Request URL: {}",LogUtil.scrubEntry(url));
             response.sendRedirect(url);
