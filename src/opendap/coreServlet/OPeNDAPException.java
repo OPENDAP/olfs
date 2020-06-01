@@ -255,8 +255,7 @@ public class OPeNDAPException extends Exception {
             return oe.getHttpStatusCode();
 
         } catch (Throwable ioe) {
-            log.error("Bad things happened! Cannot process incoming " +
-                    "exception! New Exception thrown: " + ioe);
+            log.error("Bad things happened! Cannot process incoming exception! New Exception thrown: {}" , ioe);
         }
 
         return -1;
