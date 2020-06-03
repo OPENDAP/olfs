@@ -188,7 +188,7 @@ public class ChunkedInputStream  {
      * @throws IOException When there are problems reading from or interpreting
      * the chunked message stream.
      */
-    public boolean readChunkedMessage(OutputStream dStream, OutputStream errStream) throws IOException {
+    public boolean readChunkedMessage(OutputStream dStream, OutputStream errStream) throws  IOException {
 
         int ret;
         int bytesReceived;
@@ -197,11 +197,21 @@ public class ChunkedInputStream  {
         String extensionContent;
         long totalBytesReadInMessage = 0;
 
+        log.debug("BEGIN");
+
         while(moreData && !isClosed){
 
             if(availableInChunk() <= 0){
 
-                ret = readChunkHeader();
+                ret = -1;
+                try {
+                    ret = readChunkHeader();
+                } catch (IOException e) {
+                    String msg = "ERROR! Failed to read ChunkHeader. msg: "+e.getMessage();
+                    log.error(msg);
+                    throw new IOException(msg,e);
+                }
+
 
                 if(ret == -1 || isLastChunk()){
                     moreData = false;
@@ -232,8 +242,14 @@ public class ChunkedInputStream  {
             }
             else {
 
-                // read the chunk body
-                bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
+                try {
+                    // read the chunk body
+                    bytesReceived = Chunk.readFully(is, chunkBuffer, 0, availableInChunk());
+                } catch (IOException e) {
+                    String msg = "ERROR! Failed to read ChunkBody. msg: "+e.getMessage();
+                    log.error(msg);
+                    throw new IOException(msg,e);
+                }
 
                 log.debug("CurrentChunksize: "+ currentChunkDataSize+ " bytesReceived: "+ bytesReceived);
                 
@@ -248,8 +264,14 @@ public class ChunkedInputStream  {
                     case Chunk.DATA:
                         // write the data out to the appropriate stream,
                         // depending on the error status.
-                        (isError?errStream:dStream).write(chunkBuffer,0,bytesReceived);
-                        (isError?errStream:dStream).flush();
+                        try {
+                            (isError ? errStream : dStream).write(chunkBuffer, 0, bytesReceived);
+                            (isError ? errStream : dStream).flush();
+                        } catch (IOException e) {
+                            String msg = "ERROR! Failed to write to target OutputStream. msg: "+e.getMessage();
+                            log.error(msg);
+                            throw new IOException(msg,e);
+                        }
                         break;
 
                     case Chunk.EXTENSION:
@@ -258,11 +280,17 @@ public class ChunkedInputStream  {
                         extensionContent =  new String(chunkBuffer,0,bytesReceived,HyraxStringEncoding.getCharset());
 
                         // Process the extension content & preserve any previously encountered errors found in the message.
-                        isError = processExtensionContent(extensionContent) || isError;
+                        try {
+                            isError = processExtensionContent(extensionContent) || isError;
+                        } catch (IOException e) {
+                            String msg = "ERROR! Failed to correctly process ChunkExtension content. msg: "+e.getMessage();
+                            log.error(msg);
+                            throw new IOException(msg,e);
+                        }
                         break;
 
                     default:
-                        throw new IOException("Unknown Chunk Type.");
+                        throw new IOException("ERROR! Unknown Chunk Type.");
 
                 }
 
@@ -270,7 +298,7 @@ public class ChunkedInputStream  {
 
         }
 
-        log.info("readChunkedMessage() - Message contained {} bytes. (status:{})",totalBytesReadInMessage,isError?"ERROR":"SUCCESS");
+        log.info("END: Message contained {} bytes. (status:{})",totalBytesReadInMessage,isError?"ERROR":"SUCCESS");
         return !isError;
     }
 
