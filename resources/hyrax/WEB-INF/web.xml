@@ -150,6 +150,7 @@
 
     <!-- Uncomment These two filters to enable access control. -->
 
+    <!--
     <filter>
         <filter-name>IdP</filter-name>
         <filter-class>opendap.auth.IdFilter</filter-class>
@@ -158,6 +159,10 @@
         <filter-name>IdP</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
+
+
+    <!--
     <filter>
         <filter-name>PEP</filter-name>
         <filter-class>opendap.auth.PEPFilter</filter-class>
@@ -166,6 +171,9 @@
         <filter-name>PEP</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
+
+
 
     <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         Catalog Response Cache Updater (worker thread)
