@@ -250,12 +250,20 @@ public class OPeNDAPException extends Exception {
             }
             else {
                 oe.sendAsDap2Error(response);
+                /*
+                try {
+                    oe.sendAsDap2Error(response);
+                }
+                catch(IOException ioe){
+                    log.error("Failed to transmit error object to requesting client. Message: {}", ioe.getMessage());
+                }
+                */
             }
 
             return oe.getHttpStatusCode();
 
         } catch (Throwable ioe) {
-            log.error("Bad things happened! Cannot process incoming exception! New Exception thrown: {}" , ioe);
+            log.error("Bad things happened! Cannot process incoming exception! New Exception thrown: {}" , ioe.getMessage());
         }
 
         return -1;
