@@ -878,7 +878,6 @@ public class BES {
             } finally {
                 returnClient(oc, besTrouble);
                 Timer.stop(timedProc);
-                log.debug("besTransaction() -  END.");
             }
         }
         while(besTrouble && attempts < MAX_COMMAND_ATTEMPTS);
