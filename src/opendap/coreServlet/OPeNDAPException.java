@@ -239,23 +239,34 @@ public class OPeNDAPException extends Exception {
 
             }
 
-
             if(!response.isCommitted()){
 
                 response.reset();
 
                 oe.setSystemPath(ServletUtil.getSystemPath(servlet,""));
-
-                oe.sendHttpErrorResponse(response);
+                try {
+                    oe.sendHttpErrorResponse(response);
+                }
+                catch(IOException ioe){
+                    log.error("Failed to transmit http error response to " +
+                            "requesting client. Caught {} Message: {}", ioe.getClass().getName(),ioe.getMessage());
+                }
             }
             else {
-                oe.sendAsDap2Error(response);
+                try {
+                    oe.sendAsDap2Error(response);
+                }
+                catch(IOException ioe){
+                    log.error("Failed to transmit DAP2 error object to " +
+                            "requesting client. Caught {} Message: {}", ioe.getClass().getName(),ioe.getMessage());
+                }
             }
 
             return oe.getHttpStatusCode();
 
-        } catch (Throwable ioe) {
-            log.error("Bad things happened! Cannot process incoming exception! New Exception thrown: {}" , ioe);
+        } catch (Throwable moreT) {
+            log.error("The Bad Things have happened! A new {} was thrown while " +
+                    "processing a prior exception. message: {}" , moreT.getClass().getName(), moreT.getMessage());
         }
 
         return -1;
