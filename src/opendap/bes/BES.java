@@ -785,6 +785,9 @@ public class BES {
             besTrouble = false;
             pptException = null;
             besFatalError = null;
+            attempts++;
+
+            log.debug("This is attempt: {}",attempts);
 
             OPeNDAPClient oc = getClient();
 
@@ -866,11 +869,9 @@ public class BES {
                 }
             } catch (PPTException e) {
                 besTrouble = true;
-                log.debug("OLFS Encountered a PPT Problem!", e);
+                log.debug("OLFS Encountered a PPT Problem! Transaction attempt: {}  Message: {}", attempts, e.getMessage());
                 String msg = "Problem with OPeNDAPClient. OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-
                 log.error(msg);
-
                 e.setErrorMessage(msg);
                 pptException = e;
 
@@ -917,6 +918,9 @@ public class BES {
             besTrouble = false;
             pptException = null;
             besFatalError = null;
+            attempts++;
+
+            log.debug("This is attempt: {}",attempts);
 
             OPeNDAPClient oc = getClient();
             if(oc==null){
@@ -962,6 +966,7 @@ public class BES {
                 }
             } catch (PPTException e) {
                 besTrouble = true;
+                log.debug("OLFS Encountered a PPT Problem! Transaction attempt: {}  Message: {}", attempts, e.getMessage());
                 String msg = "Problem encountered with BES connection. Message: '" + e.getMessage() + "' " +
                         "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
                 log.error(msg);
