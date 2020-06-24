@@ -86,8 +86,6 @@ public class BES {
     private static final String BES_ADMIN_SET_CONFIG = "SetConfig";
     private static final String BES_ADMIN_TAIL_LOG = "TailLog";
 
-    private int MAX_COMMAND_ATTEMPTS = 2;
-
 
     public BES(BESConfig config) {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -108,6 +106,15 @@ public class BES {
 
         log.debug("BES built with configuration:\n{}", this.config);
 
+    }
+
+    /**
+     * Returns the number of times to retry a command transaction.
+     * Set dynamically to the number of client connections plus 2.
+     * @return
+     */
+    int getMaxCommandAttempts(){
+        return getBesClientCount() + 2;
     }
 
 
@@ -880,7 +887,7 @@ public class BES {
                 Timer.stop(timedProc);
             }
         }
-        while(besTrouble && attempts < MAX_COMMAND_ATTEMPTS);
+        while(besTrouble && attempts < getMaxCommandAttempts());
 
         if(besTrouble){
             if(besFatalError != null)
@@ -977,7 +984,7 @@ public class BES {
             }
             attempts++;
         }
-        while(besTrouble && attempts < MAX_COMMAND_ATTEMPTS);
+        while(besTrouble && attempts < getMaxCommandAttempts());
 
         if(besTrouble){
             if(besFatalError != null)
