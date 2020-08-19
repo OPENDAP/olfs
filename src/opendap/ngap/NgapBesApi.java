@@ -68,6 +68,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
     public static final String UID_CONTEXT  = "uid";
     public static final String ACCESS_TOKEN_CONTEXT  = "edl_auth_token";
+    public static final String AUTHORIZATION_TOKEN_CONTEXT = "edl_authorization_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -207,6 +208,8 @@ public class NgapBesApi extends BesApi implements Cloneable {
                 if(!accessToken.isEmpty()) {
                     String echo_token = accessToken + ":" +up.getEDLClientAppId();
                     request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT, echo_token));
+		    String authorization_token = "Authorization: Bearer "+ accessToken;
+		    request.addContent(setContextElement(AUTHORIZATION_TOKEN_CONTEXT,authorization_token));
 
                 }
             }
