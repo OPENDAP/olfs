@@ -138,7 +138,6 @@ public class NgapBesApi extends BesApi implements Cloneable {
                 Thread.currentThread().getId()+":ngap_request]";
         request.setAttribute("reqID",reqID);
 
-
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
