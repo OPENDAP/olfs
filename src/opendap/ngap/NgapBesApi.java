@@ -215,6 +215,19 @@ public class NgapBesApi extends BesApi implements Cloneable {
     }
 
 
+    /**
+     *
+     * @param user
+     * @param type
+     * @param remoteDataSourceUrl
+     * @param qp
+     * @param xmlBase
+     * @param formURL
+     * @param returnAs
+     * @param errorContext
+     * @return
+     * @throws BadConfigurationException
+     */
     @Override
     public  Document getDap4RequestDocument(User user,
                                             String type,
