@@ -133,6 +133,8 @@ public class BesApi implements Cloneable {
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
 
+    // public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
+
 
     /**
      * This specifies that the default BES "space" name is "catalog".
@@ -2267,13 +2269,14 @@ public class BesApi implements Cloneable {
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
         request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
-        UserProfile profile = user.profile();
-        if(profile!=null){
-            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
-            if(oat!=null){
-                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
-            }
-        }
+
+        //UserProfile profile = user.profile();
+        //if(profile!=null){
+        //    EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
+        //    if(oat!=null){
+        //        request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT,oat.getAccessToken()));
+        //    }
+        //}
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
@@ -2361,13 +2364,14 @@ public class BesApi implements Cloneable {
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
         request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
-        UserProfile profile = user.profile();
-        if(profile!=null){
-            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
-            if(oat!=null){
-                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
-            }
-        }
+
+        //UserProfile profile = user.profile();
+        //if (profile != null) {
+        //    EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
+        //    if (oat != null) {
+        //        request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAccessToken()));
+        //    }
+        //}
 
 
 

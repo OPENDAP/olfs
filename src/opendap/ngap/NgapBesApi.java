@@ -67,8 +67,8 @@ import java.util.regex.Pattern;
 public class NgapBesApi extends BesApi implements Cloneable {
 
     public static final String UID_CONTEXT  = "uid";
-    public static final String ACCESS_TOKEN_CONTEXT  = "edl_auth_token";
-    public static final String AUTHORIZATION_TOKEN_CONTEXT = "edl_authorization_token";
+    public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
+    public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -184,33 +184,41 @@ public class NgapBesApi extends BesApi implements Cloneable {
      * Adds the user id and/or the associated EDL auth token to the request
      * element. If either parameter is the empty string it is omitted.
      *
-     * Constructs the EDL/URS auth token for Hyrax to utilize when connecting to
-     * NGAP infrstructure (like cumulus and CMR) The token is made from the
+     * Constructs the EDL/URS Echo-Token and Authorization headers for use
+     * when connecting to NGAP infrstructure (like cumulus and CMR) The
+     * Echo-Token is made from the
      * EDL access_token returned for the user and the server's EDL Application
      * Client-Id.
      *
-     *    auth_token = access_token:Client-Id
+     *    Echo-Token: µedl_access_token:Client-Id
+     *
+     * The Authorization header is made of the sting:
+     *
+     *    Authorization: Bearer edl_access_token
+     *
      *
      * @param request The BES request in which to set the UID_CONTEXT and
-     *                ACCESS_TOKEN_CONTEXT from the user object.
+     *                EDL_AUTH_TOKEN_CONTEXT from the user object.
      * @param user The instance of User from which to get the uid, the
      *             auth_token, and the EDL Application Client-Id..
      */
-    private void addEdlAuthToken(Element request, User user){
+    private void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
-        if(up!=null){
+        if (up != null) {
             String uid = up.getUID();
-            if(!uid.isEmpty())
-                request.addContent(setContextElement(UID_CONTEXT,uid));
+            if (!uid.isEmpty())
+                request.addContent(setContextElement(UID_CONTEXT, uid));
             EarthDataLoginAccessToken oat = up.getEDLAuthToken();
-            if(oat!=null){
+            if (oat != null) {
                 String accessToken = oat.getAccessToken();
-                if(!accessToken.isEmpty()) {
-                    String echo_token = accessToken + ":" +up.getEDLClientAppId();
-                    request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT, echo_token));
-		    String authorization_token = "Authorization: Bearer "+ accessToken;
-		    request.addContent(setContextElement(AUTHORIZATION_TOKEN_CONTEXT,authorization_token));
+                if (!accessToken.isEmpty()) {
 
+                    // Make and add the @deprecated Echo-Token
+                    String echo_token = accessToken + ":" + up.getEDLClientAppId();
+                    request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, echo_token));
+
+                    // Add the new service chaining Authorization header
+                    request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, accessToken));
                 }
             }
         }
