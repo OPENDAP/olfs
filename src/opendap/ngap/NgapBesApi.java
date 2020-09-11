@@ -202,24 +202,20 @@ public class NgapBesApi extends BesApi implements Cloneable {
      * @param user The instance of User from which to get the uid, the
      *             auth_token, and the EDL Application Client-Id..
      */
-    private void addEdlAuthToken(Element request, User user) {
+    public static void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
         if (up != null) {
             String uid = up.getUID();
             if (!uid.isEmpty())
                 request.addContent(setContextElement(UID_CONTEXT, uid));
-            EarthDataLoginAccessToken oat = up.getEDLAuthToken();
+            EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
-                String accessToken = oat.getAccessToken();
-                if (!accessToken.isEmpty()) {
 
-                    // Make and add the @deprecated Echo-Token
-                    String echo_token = accessToken + ":" + up.getEDLClientAppId();
-                    request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, echo_token));
+                // Make and add the @deprecated Echo-Token value
+                request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, oat.getEchoTokenValue()));
 
-                    // Add the new service chaining Authorization header
-                    request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, accessToken));
-                }
+                // Add the new service chaining Authorization header value
+                request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAuthorizationHeaderValue()));
             }
         }
 

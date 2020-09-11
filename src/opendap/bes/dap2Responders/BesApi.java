@@ -2272,11 +2272,20 @@ public class BesApi implements Cloneable {
 
         //UserProfile profile = user.profile();
         //if(profile!=null){
-        //    EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
+        //    EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
         //    if(oat!=null){
         //        request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT,oat.getAccessToken()));
         //    }
         //}
+
+        UserProfile profile = user.profile();
+        if (profile != null) {
+            EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
+            if (oat != null) {
+                opendap.ngap.NgapBesApi.addEdlAuthToken(request,user);
+            }
+        }
+
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
@@ -2340,14 +2349,14 @@ public class BesApi implements Cloneable {
 
         request.setAttribute(REQUEST_ID,getRequestIdBase());
 
-        /**----------------------------------------------------------------------
-         * Added this bit for the cloudy dap experiment - ndp 1/19/17
-         */
+        //----------------------------------------------------------------------
+        // Added this bit for the cloudy dap experiment - ndp 1/19/17
+        //
         String cloudyDap = qp.getCloudyDap();
         if(cloudyDap!=null){
             request.addContent(setContextElement(CLOUDY_DAP_CONTEXT,cloudyDap));
         }
-        /**----------------------------------------------------------------------*/
+        //----------------------------------------------------------------------
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -2365,13 +2374,13 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
 
-        //UserProfile profile = user.profile();
-        //if (profile != null) {
-        //    EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
-        //    if (oat != null) {
-        //        request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAccessToken()));
-        //    }
-        //}
+        UserProfile profile = user.profile();
+        if (profile != null) {
+            EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
+            if (oat != null) {
+                opendap.ngap.NgapBesApi.addEdlAuthToken(request,user);
+            }
+        }
 
 
 
