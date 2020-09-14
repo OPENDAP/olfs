@@ -120,6 +120,7 @@ public class BesApi implements Cloneable {
     public static final String XMLBASE_CONTEXT = "xml:base";
 
     public static final String STORE_RESULT_CONTEXT  = "store_result";
+    public static final String UID_CONTEXT  = "uid";
 
 
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
@@ -2268,7 +2269,7 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
-        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
+        request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
         //UserProfile profile = user.profile();
         //if(profile!=null){
@@ -2372,7 +2373,7 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
-        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
+        request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
         UserProfile profile = user.profile();
         if (profile != null) {

@@ -171,7 +171,6 @@ public class UrsIdP extends IdProvider{
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.
-
      *
      * @param request
      * @param response
@@ -181,14 +180,14 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
-        log.debug("BEGIN (session: {})",session);
+        log.debug("BEGIN (session: {})",session.getId());
 
         UserProfile userProfile = new UserProfile();
         userProfile.setIdP(this);
+
         // Add the this instance of UserProfile to the session for retrieval
         // down stream on this request.
         // We set the state of the instance of userProfile below.
-
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -216,7 +215,7 @@ public class UrsIdP extends IdProvider{
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);
 
-                log.debug("END (session: {})", session);
+                log.debug("END (session: {})", session.getId());
                 return false;
             }
 
@@ -270,7 +269,7 @@ public class UrsIdP extends IdProvider{
 
         // Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session);
+        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
@@ -279,7 +278,7 @@ public class UrsIdP extends IdProvider{
 
         response.sendRedirect(redirectUrl);
 
-        log.debug("END (session: {})", session);
+        log.debug("END (session: {})", session.getId());
         return true;
 
 	}

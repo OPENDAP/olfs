@@ -195,7 +195,7 @@ public class EarthDataLoginAccessToken {
     }
 
     public String getAuthorizationHeaderValue(){
-        return  BEARER_TOKEN_TYPE + " " + getAccessToken();
+        return  getTokenType() + " " + getAccessToken();
     }
 
 

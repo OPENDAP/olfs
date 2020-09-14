@@ -66,7 +66,6 @@ import java.util.regex.Pattern;
  */
 public class NgapBesApi extends BesApi implements Cloneable {
 
-    public static final String UID_CONTEXT  = "uid";
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
     public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
 
@@ -209,9 +208,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
     public static void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
         if (up != null) {
-            String uid = up.getUID();
-            if (!uid.isEmpty())
-                request.addContent(setContextElement(UID_CONTEXT, uid));
+
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
 

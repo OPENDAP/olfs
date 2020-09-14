@@ -42,20 +42,23 @@ public class UserProfile {
     private HashSet<String> roles;
 
     private IdProvider idp;
-
     private EarthDataLoginAccessToken edlAccessToken;
+
+    private String uid;
 
     // private String edlClientAppId;
 
 
     public UserProfile() {
         objectCreationTime = new Date();
-        profile = new JsonObject();
         groups = new HashSet<>();
         roles = new HashSet<>();
+
+        profile = null;
         idp = null;
         edlAccessToken = null;
         // edlClientAppId ="";
+        uid = null;
     }
 
     /**
@@ -68,14 +71,13 @@ public class UserProfile {
     public UserProfile(String jsonStr){
         this();
         ingestJsonProfileString(jsonStr);
-
     }
 
     void ingestJsonProfileString(String jsonStr){
         JsonParser jparse = new JsonParser();
         profile = jparse.parse(jsonStr).getAsJsonObject();
         this.jsonStr = jsonStr;
-
+        uid = profile.get("uid").getAsString();
     }
 
     public void setEDLAccessToken(EarthDataLoginAccessToken oat){
@@ -111,7 +113,7 @@ public class UserProfile {
     }
 
     public String getUID() {
-        return profile.get("uid").getAsString();
+        return uid;
     }
 
     public IdProvider getIdP(){
