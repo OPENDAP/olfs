@@ -196,6 +196,10 @@ public class NgapBesApi extends BesApi implements Cloneable {
      *
      *    Authorization: Bearer edl_access_token
      *
+     * From a bes command:
+     *   <bes:setContext name="uid">ndp_opendap</bes:setContext>
+     *   <bes:setContext name="edl_echo_token">anecho:tokenvalue</bes:setContext>
+     *    <bes:setContext name="edl_auth_token">Bearer Abearertokenvalue</bes:setContext>
      *
      * @param request The BES request in which to set the UID_CONTEXT and
      *                EDL_AUTH_TOKEN_CONTEXT from the user object.
