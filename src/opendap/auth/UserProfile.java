@@ -94,26 +94,37 @@ public class UserProfile {
 
 
     public String getAttribute(String attrName){
-        JsonElement val =  profile.get(attrName);
-        if(val==null)
-            return null;
-        return val.toString();
+        if(profile !=null) {
+            JsonElement val = profile.get(attrName);
+            if (val == null)
+                return null;
+            return val.toString();
+        }
+        return null;
     }
 
     public void setAttribute(String attrName, String value){
-        profile.add(attrName, new JsonPrimitive(value));
+        if(profile!=null) {
+            profile.add(attrName, new JsonPrimitive(value));
+        }
     }
 
     public Vector<String> getAttributeNames(){
         Vector<String> keys = new Vector<>();
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()){
-            keys.add(e.getKey());
+        if(profile!=null) {
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                keys.add(e.getKey());
+            }
         }
         return keys;
     }
 
     public String getUID() {
         return uid;
+    }
+
+    public void setUID(String user_id) {
+        uid = user_id;
     }
 
     public IdProvider getIdP(){
@@ -229,13 +240,15 @@ public class UserProfile {
 
         sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
 
-        boolean comma = false;
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()) {
-            sb.append(comma?",\n":"\n");
-            sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
-            comma =true;
+        if(profile != null) {
+            boolean comma = false;
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                sb.append(comma ? ",\n" : "\n");
+                sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                comma = true;
+            }
+            sb.append(indent).append("\n");
         }
-        sb.append(indent).append("\n");
         if(edlAccessToken !=null){
             sb.append(edlAccessToken.toString(l1i,indent_inc));
         }
