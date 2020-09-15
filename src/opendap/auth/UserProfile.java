@@ -89,6 +89,9 @@ public class UserProfile {
     // public String getEDLClientAppId(){ return edlClientAppId; }
 
     public EarthDataLoginAccessToken getEDLAccessToken(){
+        if(edlAccessToken==null)
+            return null;
+
         return new EarthDataLoginAccessToken(edlAccessToken);
     }
 
