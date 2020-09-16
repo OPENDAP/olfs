@@ -48,6 +48,7 @@ import java.util.Map;
 public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
+    public static final String AUTHORIZATION_HEADER_KEY="Authorization";
 
     private Logger log;
 
@@ -170,7 +171,6 @@ public class UrsIdP extends IdProvider{
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.
-
      *
      * @param request
      * @param response
@@ -180,99 +180,105 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
-        log.debug("BEGIN (session: {})",session);
+        log.debug("BEGIN (session: {})",session.getId());
 
-        // Check to see if we have a code returned from URS. If not, we must
-        // redirect the user to URS to start the authentication process.
-        String code = request.getParameter("code");
-
-        if( code == null )
-        {
-            //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
-             //   "&response_type=code&redirect_uri=" + request.getRequestURL();
-
-            String url;
-            url = PathBuilder.pathConcat(getUrsUrl(),"/oauth/authorize?");
-            url += "client_id=" + getUrsClientAppId();
-            url += "&";
-            url += "response_type=code&redirect_uri=" + request.getRequestURL();
-
-            log.info("Redirecting client to URS SSO. URS Code Request URL: {}",LogUtil.scrubEntry(url));
-            response.sendRedirect(url);
-
-            log.debug("END (session: {})",session);
-            return false;
-        }
-
-        log.info("URS Code: {}",LogUtil.scrubEntry(code));
-
-        // If we get here, the the user was redirected by URS back to our application,
-        // and we have a code. We now exchange the code for a token, which is
-        // returned as a json document.
-        String url = getUrsUrl() + "/oauth/token";
-
-        String postData = "grant_type=authorization_code&code=" + code +
-            "&redirect_uri=" + request.getRequestURL();
-
-        Map<String, String> headers = new HashMap<>();
-
-        String authHeader = "Basic " + getUrsClientAppAuthCode();
-        headers.put("Authorization", authHeader );
-
-        log.info("URS Token Request URL: {}",url);
-        log.info("URS Token Request POST data: {}",LogUtil.scrubEntry(postData));
-        log.info("URS Token Request Authorization Header: {}",authHeader);
-
-        String contents = Util.submitHttpRequest(url, headers, postData);
-
-        log.info("URS Token: {}",contents);
-
-
-        // Parse the json to extract the token.
-        JsonParser jparse = new JsonParser();
-        JsonObject json = jparse.parse(contents).getAsJsonObject();
-
-
-        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json);
-
-
-        // Now that we have an access token, we can retrieve the user profile. This
-        // is returned as a JSON document.
-        url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
-        authHeader = edlat.getTokenType()+ " " + edlat.getAccessToken();
-        headers.put("Authorization", authHeader);
-
-        log.info("URS User Profile Request URL: {}",url);
-        log.info("URS User Profile Request Authorization Header: {}",authHeader);
-
-        contents = Util.submitHttpRequest(url, headers, null);
-
-        log.info("URS User Profile: {}",contents);
-
-        UserProfile userProfile = new UserProfile(contents);
-
+        UserProfile userProfile = new UserProfile();
         userProfile.setIdP(this);
 
-        // Add the OAuth stuff to the user profile.
-        userProfile.setEDLAuthToken(edlat);
-        userProfile.setEDLClientAppId(getUrsClientAppId());
-
-        // Add the user profile to the session for retrieval down stream on this
-        // request.
+        // Add the this instance of UserProfile to the session for retrieval
+        // down stream on this request.
+        // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+
+        String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
+        if(authorization_header_value != null){
+
+            if(EarthDataLoginAccessToken.checkAuthorizationHeader(authorization_header_value)){
+                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
+                userProfile.setEDLAccessToken(edlat);
+            }
+        }
+        else {
+            // Check to see if we have a code returned from URS. If not, we must
+            // redirect the user to URS to start the authentication process.
+            String code = request.getParameter("code");
+            if (code == null) {
+                //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
+                //   "&response_type=code&redirect_uri=" + request.getRequestURL();
+
+                String url;
+                url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
+                url += "client_id=" + getUrsClientAppId();
+                url += "&";
+                url += "response_type=code&redirect_uri=" + request.getRequestURL();
+
+                log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
+                response.sendRedirect(url);
+
+                log.debug("END (session: {})", session.getId());
+                return false;
+            }
+
+            log.info("URS Code: {}", LogUtil.scrubEntry(code));
+
+            // If we get here, the the user was redirected by URS back to our application,
+            // and we have a code. We now exchange the code for a token, which is
+            // returned as a json document.
+            String url = getUrsUrl() + "/oauth/token";
+
+            String postData = "grant_type=authorization_code&code=" + code +
+                    "&redirect_uri=" + request.getRequestURL();
+
+            Map<String, String> headers = new HashMap<>();
+
+            String authHeader = "Basic " + getUrsClientAppAuthCode();
+            headers.put("Authorization", authHeader);
+
+            log.info("URS Token Request URL: {}", url);
+            log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
+            log.info("URS Token Request Authorization Header: {}", authHeader);
+
+            String contents = Util.submitHttpRequest(url, headers, postData);
+
+            log.info("URS Token: {}", contents);
+
+
+            // Parse the json to extract the token.
+            JsonParser jparse = new JsonParser();
+            JsonObject json = jparse.parse(contents).getAsJsonObject();
+
+
+            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
+            userProfile.setEDLAccessToken(edlat);
+
+            // Now that we have an access token, we can retrieve the user profile. This
+            // is returned as a JSON document.
+            url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
+            authHeader = edlat.getTokenType() + " " + edlat.getAccessToken();
+            headers.put("Authorization", authHeader);
+
+            log.info("URS User Profile Request URL: {}", url);
+            log.info("URS User Profile Request Authorization Header: {}", authHeader);
+
+            contents = Util.submitHttpRequest(url, headers, null);
+
+            log.info("URS User Profile: {}", contents);
+
+            userProfile.ingestJsonProfileString(contents);
+        }
 
         // Finally, redirect the user back to the their original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})",redirectUrl, session);
+        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
 
-        if(redirectUrl==null){
-            redirectUrl = PathBuilder.normalizePath(serviceContext,true,false);
+        if (redirectUrl == null) {
+            redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
-        log.info("Authentication Completed. Redirecting client to redirectUrl: {}",redirectUrl);
+        log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
 
         response.sendRedirect(redirectUrl);
 
-        log.debug("END (session: {})",session);
+        log.debug("END (session: {})", session.getId());
         return true;
 
 	}

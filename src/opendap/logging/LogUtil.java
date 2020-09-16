@@ -82,7 +82,7 @@ public class LogUtil {
     private static final String ID_KEY = "ID";
     private static final String SOURCE_KEY = "SOURCE";
     private static final String HOST_KEY = "host";
-    private static final String IDENT_KEY = "ident";
+    private static final String SESSION_ID_KEY = "ident";
     private static final String USER_ID_KEY = "userid";
     private static final String USER_AGENT_KEY = "UserAgent";
     private static final String START_TIME_KEY = "startTime";
@@ -367,7 +367,7 @@ public class LogUtil {
         MDC.put(ID_KEY, reqID);
         MDC.put(SOURCE_KEY, httpVerb);
         MDC.put(HOST_KEY, req.getRemoteHost());
-        MDC.put(IDENT_KEY, (session == null) ? "-" : session.getId());
+        MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
         MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
 
@@ -423,7 +423,7 @@ public class LogUtil {
 
             alb.append(MDC.get(HOST_KEY)).append(sep);
             alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
-            alb.append(MDC.get(IDENT_KEY)).append(sep);
+            alb.append(MDC.get(SESSION_ID_KEY)).append(sep);
             alb.append(MDC.get(USER_ID_KEY)).append(sep);
             alb.append(MDC.get(START_TIME_KEY)).append(sep);
             alb.append(MDC.get(ID_KEY)).append(sep);
@@ -514,7 +514,7 @@ public class LogUtil {
         MDC.remove(ID_KEY);
         MDC.remove(SOURCE_KEY);
         MDC.remove(HOST_KEY);
-        MDC.remove(IDENT_KEY);
+        MDC.remove(SESSION_ID_KEY);
         MDC.remove(USER_ID_KEY);
         MDC.remove(START_TIME_KEY);
 

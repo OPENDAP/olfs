@@ -41,21 +41,24 @@ public class UserProfile {
     private HashSet<String> groups;
     private HashSet<String> roles;
 
-    private IdProvider _idp;
+    private IdProvider idp;
+    private EarthDataLoginAccessToken edlAccessToken;
 
-    private EarthDataLoginAccessToken _token;
+    private String uid;
 
-    private String edlClientAppId;
+    // private String edlClientAppId;
 
 
     public UserProfile() {
         objectCreationTime = new Date();
-        profile = new JsonObject();
         groups = new HashSet<>();
         roles = new HashSet<>();
-        _idp  = null;
-        _token = null;
-        edlClientAppId ="";
+
+        profile = null;
+        idp = null;
+        edlAccessToken = null;
+        // edlClientAppId ="";
+        uid = null;
     }
 
     /**
@@ -67,56 +70,71 @@ public class UserProfile {
      */
     public UserProfile(String jsonStr){
         this();
+        ingestJsonProfileString(jsonStr);
+    }
+
+    void ingestJsonProfileString(String jsonStr){
         JsonParser jparse = new JsonParser();
         profile = jparse.parse(jsonStr).getAsJsonObject();
         this.jsonStr = jsonStr;
-
+        uid = profile.get("uid").getAsString();
     }
 
-    public void setEDLAuthToken(EarthDataLoginAccessToken oat){
-        _token = new EarthDataLoginAccessToken(oat);
+    public void setEDLAccessToken(EarthDataLoginAccessToken oat){
+        edlAccessToken = new EarthDataLoginAccessToken(oat);
     }
 
-    public void setEDLClientAppId(String clientAppId){
-        edlClientAppId = clientAppId;
-    }
-    public String getEDLClientAppId(){
-        return edlClientAppId;
-    }
+    // public void setEDLClientAppId(String clientAppId){ edlClientAppId = clientAppId; }
 
-    public EarthDataLoginAccessToken getEDLAuthToken(){
-        return new EarthDataLoginAccessToken(_token);
+    // public String getEDLClientAppId(){ return edlClientAppId; }
+
+    public EarthDataLoginAccessToken getEDLAccessToken(){
+        if(edlAccessToken==null)
+            return null;
+
+        return new EarthDataLoginAccessToken(edlAccessToken);
     }
 
 
     public String getAttribute(String attrName){
-        JsonElement val =  profile.get(attrName);
-        if(val==null)
-            return null;
-        return val.toString();
+        if(profile !=null) {
+            JsonElement val = profile.get(attrName);
+            if (val == null)
+                return null;
+            return val.toString();
+        }
+        return null;
     }
 
     public void setAttribute(String attrName, String value){
-        profile.add(attrName, new JsonPrimitive(value));
+        if(profile!=null) {
+            profile.add(attrName, new JsonPrimitive(value));
+        }
     }
 
     public Vector<String> getAttributeNames(){
         Vector<String> keys = new Vector<>();
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()){
-            keys.add(e.getKey());
+        if(profile!=null) {
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                keys.add(e.getKey());
+            }
         }
         return keys;
     }
 
     public String getUID() {
-        return profile.get("uid").getAsString();
+        return uid;
+    }
+
+    public void setUID(String user_id) {
+        uid = user_id;
     }
 
     public IdProvider getIdP(){
-        return _idp;
+        return idp;
     }
     public void setIdP(IdProvider idProvider){
-        _idp = idProvider;
+        idp = idProvider;
     }
 
 
@@ -225,15 +243,17 @@ public class UserProfile {
 
         sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
 
-        boolean comma = false;
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()) {
-            sb.append(comma?",\n":"\n");
-            sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
-            comma =true;
+        if(profile != null) {
+            boolean comma = false;
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                sb.append(comma ? ",\n" : "\n");
+                sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                comma = true;
+            }
+            sb.append(indent).append("\n");
         }
-        sb.append(indent).append("\n");
-        if(_token!=null){
-            sb.append(_token.toString(l1i,indent_inc));
+        if(edlAccessToken !=null){
+            sb.append(edlAccessToken.toString(l1i,indent_inc));
         }
         sb.append(indent).append("}\n");
         return sb.toString();
@@ -245,7 +265,7 @@ public class UserProfile {
         String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
 
         UserProfile up = new UserProfile(ursUserProfile);
-        up.setEDLAuthToken(new EarthDataLoginAccessToken());
+        up.setEDLAccessToken(new EarthDataLoginAccessToken());
         System.out.println(up.toString());
 
     }

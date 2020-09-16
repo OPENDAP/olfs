@@ -155,7 +155,7 @@ public class IdFilter implements Filter {
         LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
         HttpSession session = hsReq.getSession(true);
-        log.debug("BEGIN (requestId: {} session: {})",requestId, session);
+        log.debug("BEGIN (requestId: {} session: {})",requestId, session.getId());
 
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
@@ -185,10 +185,10 @@ public class IdFilter implements Filter {
                         // return to the root dir of the web application after
                         // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
-                        log.debug("Retrieved RETURN_TO_URL: {} from session: {}",returnToUrl,session);
+                        log.debug("Retrieved RETURN_TO_URL: {} from session: {}",returnToUrl,session.getId());
                         if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
                             String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
-                            msg += " (session: "+session+")";
+                            msg += " (session: "+session.getId()+")";
                             log.debug(msg);
                             session.setAttribute(RETURN_TO_URL, contextPath);
                         }
@@ -207,7 +207,7 @@ public class IdFilter implements Filter {
                         // completed send a 302 redirect to the client. Thus we want the process to stop here until
                         // login is completed
                         //
-                        log.debug("END (session: {})",session);
+                        log.debug("END (session: {})",session.getId());
                         return;
 
                     } catch (IOException e) {
@@ -217,7 +217,7 @@ public class IdFilter implements Filter {
                         log.error("doFilter() - {}", msg);
                         OPeNDAPException.setCachedErrorMessage(msg);
                         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
-                        log.debug("END (session: {})",session);
+                        log.debug("END (session: {})",session.getId());
                         return;
                     }
                 }
@@ -242,7 +242,7 @@ public class IdFilter implements Filter {
             cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
         }
         filterChain.doFilter(hsReq, hsRes);
-        log.debug("END (session: {})",session);
+        log.debug("END (session: {})",session.getId());
         LogUtil.logServerAccessEnd(200,logName);
     }
 

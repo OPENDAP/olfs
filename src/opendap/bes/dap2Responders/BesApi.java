@@ -120,6 +120,7 @@ public class BesApi implements Cloneable {
     public static final String XMLBASE_CONTEXT = "xml:base";
 
     public static final String STORE_RESULT_CONTEXT  = "store_result";
+    public static final String UID_CONTEXT  = "uid";
 
 
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
@@ -132,6 +133,8 @@ public class BesApi implements Cloneable {
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
+
+    // public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
 
 
     /**
@@ -2266,14 +2269,16 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
-        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
+        request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
+
         UserProfile profile = user.profile();
-        if(profile!=null){
-            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
-            if(oat!=null){
-                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
+        if (profile != null) {
+            EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
+            if (oat != null) {
+                opendap.ngap.NgapBesApi.addEdlAuthToken(request,user);
             }
         }
+
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
@@ -2337,14 +2342,14 @@ public class BesApi implements Cloneable {
 
         request.setAttribute(REQUEST_ID,getRequestIdBase());
 
-        /**----------------------------------------------------------------------
-         * Added this bit for the cloudy dap experiment - ndp 1/19/17
-         */
+        //----------------------------------------------------------------------
+        // Added this bit for the cloudy dap experiment - ndp 1/19/17
+        //
         String cloudyDap = qp.getCloudyDap();
         if(cloudyDap!=null){
             request.addContent(setContextElement(CLOUDY_DAP_CONTEXT,cloudyDap));
         }
-        /**----------------------------------------------------------------------*/
+        //----------------------------------------------------------------------
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -2360,12 +2365,13 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
-        request.addContent(setContextElement("uid",user.getUID()==null?"not_logged_in":user.getUID()));
+        request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
+
         UserProfile profile = user.profile();
-        if(profile!=null){
-            EarthDataLoginAccessToken oat = profile.getEDLAuthToken();
-            if(oat!=null){
-                request.addContent(setContextElement("oauth2_access_token",oat.getAccessToken()));
+        if (profile != null) {
+            EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
+            if (oat != null) {
+                opendap.ngap.NgapBesApi.addEdlAuthToken(request,user);
             }
         }
 

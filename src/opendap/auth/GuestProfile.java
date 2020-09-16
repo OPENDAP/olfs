@@ -35,7 +35,7 @@ public class GuestProfile extends UserProfile {
 
     public GuestProfile(){
         super();
-        setAttribute("uid", "GUEST");
+        setUID("GUEST");
         setAttribute("first_name", "Guest");
         setAttribute("last_name", "Profile");
         setAttribute("email_address", "guest_profile@opendap.org");
