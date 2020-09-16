@@ -84,6 +84,7 @@ public class ReqInfo {
 
     public static final int DEFAULT_POST_BODY_MAX_LENGTH  =  2000000;
     public static final int ABSOLUTE_MAX_POST_BODY_LENGTH = 10000000;
+    public static final String  HTTP_POST = "POST";
 
     private static Logger log;
     static {
@@ -247,7 +248,7 @@ public class ReqInfo {
     private static StringBuilder getPostBodyCE(HttpServletRequest req) throws IOException {
 
         StringBuilder bodyCE = new StringBuilder();
-        if(req.getMethod().equalsIgnoreCase("POST")){
+        if(req.getMethod().equalsIgnoreCase(HTTP_POST)){
             if(req.getContentLength()> getPostBodyMaxLength()) {
                 throw new IOException("POST body content length is longer than maximum allowed by service.");
             }

@@ -2271,14 +2271,6 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
-        //UserProfile profile = user.profile();
-        //if(profile!=null){
-        //    EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
-        //    if(oat!=null){
-        //        request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT,oat.getAccessToken()));
-        //    }
-        //}
-
         UserProfile profile = user.profile();
         if (profile != null) {
             EarthDataLoginAccessToken oat = profile.getEDLAccessToken();
