@@ -183,16 +183,25 @@ public class UrsIdP extends IdProvider{
      */
     String getEdlUserId(String accessToken) throws IOException {
 
-        StringBuilder post_body= new StringBuilder();
-        post_body.append("token=").append(accessToken).append("&");
-        post_body.append("client_id=").append(getUrsClientAppId());
         Map<String, String> headers = new HashMap<>();
         String url = PathBuilder.pathConcat(getUrsUrl(),OAUTH_USER_ID_ENDPOINT_PATH);
 
-        log.debug("url: {} post_body: {}",url,post_body.toString());
+        StringBuilder post_body= new StringBuilder();
+        post_body.append("token=").append(accessToken);
+        String auth_header_value="Basic "+ getUrsClientAppAuthCode();
+        headers.put("Authorization",auth_header_value);
+
+        log.debug("UID request: url: {} post_body: {}",url,post_body.toString());
 
         String contents = Util.submitHttpRequest(url, headers, post_body.toString());
-        return contents;
+
+        JsonParser jparse = new JsonParser();
+        JsonObject profile = jparse.parse(contents).getAsJsonObject();
+        String uid = profile.get("uid").getAsString();
+
+        log.debug("uid: {}",uid);
+
+        return uid;
     }
 
 
