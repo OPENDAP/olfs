@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ import java.util.Map;
 public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
-    public static final String AUTHORIZATION_HEADER_KEY="Authorization";
+    public static final String AUTHORIZATION_HEADER_KEY="authorization";
 
     private Logger log;
 
@@ -153,8 +154,46 @@ public class UrsIdP extends IdProvider{
 
 
 
+    void getEDLUserProfile(UserProfile userProfile, String endpoint, String tokenType, String accessToken ) throws IOException {
+        Map<String, String> headers = new HashMap<>();
+        // Now that we have an access token, we can retrieve the user profile. This
+        // is returned as a JSON document.
+        String url = PathBuilder.pathConcat(ursUrl, endpoint) + "?client_id=" + getUrsClientAppId();
+        String authHeader = tokenType + " " + accessToken;
+        headers.put("Authorization", authHeader);
 
+        log.info("URS User Profile Request URL: {}", url);
+        log.info("URS User Profile Request Authorization Header: {}", authHeader);
 
+        String contents = Util.submitHttpRequest(url, headers, null);
+
+        log.info("URS User Profile: {}", contents);
+
+        userProfile.ingestJsonProfileString(contents);
+    }
+
+// curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+
+    public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
+    /**
+     * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+     *
+     * @param accessToken
+     * @return
+     */
+    String getEdlUserId(String accessToken) throws IOException {
+
+        StringBuilder post_body= new StringBuilder();
+        post_body.append("token=").append(accessToken).append("&");
+        post_body.append("client_id=").append(getUrsClientAppId());
+        Map<String, String> headers = new HashMap<>();
+        String url = PathBuilder.pathConcat(getUrsUrl(),OAUTH_USER_ID_ENDPOINT_PATH);
+
+        log.debug("url: {} post_body: {}",url,post_body.toString());
+
+        String contents = Util.submitHttpRequest(url, headers, post_body.toString());
+        return contents;
+    }
 
 
     /**
@@ -190,12 +229,31 @@ public class UrsIdP extends IdProvider{
         // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
+        Enumeration<String> h = request.getHeaderNames();
+
+        if(log.isDebugEnabled()){
+            StringBuilder sb = new StringBuilder();
+
+            while(h.hasMoreElements()){
+                String name = h.nextElement();
+                Enumeration<String> v = request.getHeaders(name);
+                while(v.hasMoreElements()){
+                    String value = v.nextElement();
+                    sb.append(name).append(": ").append(value).append("\n");
+                }
+            }
+            log.debug("Request Headers:\n{}",sb.toString());
+        }
+
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authorization_header_value != null){
 
             if(EarthDataLoginAccessToken.checkAuthorizationHeader(authorization_header_value)){
+
                 EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
                 userProfile.setEDLAccessToken(edlat);
+                String uid = getEdlUserId(edlat.getAccessToken());
+                userProfile.setUID(uid);
             }
         }
         else {
@@ -250,21 +308,8 @@ public class UrsIdP extends IdProvider{
 
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
+            getEDLUserProfile(userProfile,edlat.getEndPoint(),edlat.getTokenType(),edlat.getAccessToken());
 
-            // Now that we have an access token, we can retrieve the user profile. This
-            // is returned as a JSON document.
-            url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
-            authHeader = edlat.getTokenType() + " " + edlat.getAccessToken();
-            headers.put("Authorization", authHeader);
-
-            log.info("URS User Profile Request URL: {}", url);
-            log.info("URS User Profile Request Authorization Header: {}", authHeader);
-
-            contents = Util.submitHttpRequest(url, headers, null);
-
-            log.info("URS User Profile: {}", contents);
-
-            userProfile.ingestJsonProfileString(contents);
         }
 
         // Finally, redirect the user back to the their original requested resource.
