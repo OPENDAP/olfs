@@ -103,7 +103,7 @@ public class EarthDataLoginAccessToken {
         if(auth_header_value!=null) {
             String[] tokens = auth_header_value.split(" ");
             if(tokens.length == 2){
-                retVal = tokens[1].equalsIgnoreCase(BEARER_TOKEN_TYPE);
+                retVal = tokens[0].equalsIgnoreCase(BEARER_TOKEN_TYPE);
             }
         }
         return retVal;
