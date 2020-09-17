@@ -50,6 +50,7 @@ public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
     public static final String AUTHORIZATION_HEADER_KEY="authorization";
+    public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
     private Logger log;
 
@@ -174,9 +175,16 @@ public class UrsIdP extends IdProvider{
 
 // curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
 
-    public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
+
+
+
     /**
+     * Old Way:
      * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+     *
+     * New Way:
+     * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’ https://urs.earthdata.nasa.gov/oauth/tokens/user
+     *
      *
      * @param accessToken
      * @return
@@ -194,6 +202,7 @@ public class UrsIdP extends IdProvider{
         log.debug("UID request: url: {} post_body: {}",url,post_body.toString());
 
         String contents = Util.submitHttpRequest(url, headers, post_body.toString());
+        log.debug("url {} returned contents: {}",url,contents);
 
         JsonParser jparse = new JsonParser();
         JsonObject profile = jparse.parse(contents).getAsJsonObject();
