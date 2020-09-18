@@ -44,6 +44,43 @@
         [%X{size}]        - Size of the response
         %n                - newline
     -->
+    <!--
+        Log File Rollover Frequency Control
+
+        The logger infers the interval by which to "roll" the file from
+        the FileNamePattern.
+
+        There are several of these in this file:
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logfile.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <MaxHistory>30</MaxHistory>
+
+        From: http://logback.qos.ch/manual/appenders.html
+
+        The mandatory fileNamePattern property defines the name of the
+        rolled-over (archived) log files. Its value should consist of the
+        name of the file, plus a suitably placed %d conversion specifier.
+        The %d conversion specifier may contain a date-and-time pattern
+        as specified by the java.text.SimpleDateFormat class. If the
+        date-and-time pattern is omitted, then the default pattern
+        yyyy-MM-dd is assumed. The rollover period is inferred from the
+        value of fileNamePattern.
+
+        Use one of the following or make your own:
+
+        Daily:
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+
+        Weekly:
+            <fileNamePattern>logfile.%d{yyyy-ww}.log</fileNamePattern>
+
+        Monthly:
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM}.log</FileNamePattern>
+
+        Yearly:
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy}.log</FileNamePattern>
+    -->
 
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}] %-5p - %c - %m%n" />
 
@@ -80,7 +117,7 @@
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <fileNamePattern>logfile.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
