@@ -365,12 +365,19 @@ public class DispatchServlet extends HttpServlet {
      * @throws IOException
      */
     @Override
-    public void doHead(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doHead(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        String msg = "HEAD is not allowed in this area.";
-        response.setHeader("Disposition", msg);
-        response.setHeader("Allow","GET, POST");
-        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+
+        if(relativeUrl.equalsIgnoreCase("/")) {
+            super.doHead(request, response);
+        }
+        else {
+            String msg = "HEAD is not allowed in this area.";
+            response.setHeader("Disposition", msg);
+            response.setHeader("Allow", "GET, POST");
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
+        }
 
     }
 
