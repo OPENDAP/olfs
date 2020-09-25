@@ -349,6 +349,30 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
+    /**
+     * Temporary implementation HEAD denial response. Because in most cases
+     * the server has to do a lot of work to get a Content-Length value.
+     *
+     * The default implementation of doHead() appears to replace the
+     * ServletOutputStream in the response with a a stream that counts bytes
+     * but does not transmot them. Maybe this makes sense for an file service,
+     * but not here. We could refine this by adding DispatchHandler.doHead()
+     * and having each handler do something that makes sense.
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    public void doHead(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String msg = "HEAD is not allowed in this area.";
+        response.setHeader("Disposition", msg);
+        response.setHeader("Allow","GET, POST");
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
+
+    }
 
     /**
      * ***********************************************************************

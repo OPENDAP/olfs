@@ -55,18 +55,21 @@
             <role>.*</role>
             <resource>.*((\/)|(\.(css|png|jpg|ico|gif|xsl|jsp))|(\/contents\.html)|(\/catalog\.html)|(\/catalog\.xml)|(logout)|(login)|(\/version))$</resource>
             <queryString>.*$</queryString>
+            <allowedAction>HEAD</allowedAction>
             <allowedAction>GET</allowedAction>
         </Policy>
         <Policy class="opendap.auth.RegexPolicy">
             <role>guest</role>
             <resource>.*\.(dds|html|das|ddx)$</resource>
             <queryString>.*$</queryString>
+            <allowedAction>HEAD</allowedAction>
             <allowedAction>GET</allowedAction>
         </Policy>
         <Policy class="opendap.auth.RegexPolicy">≠
             <role>users</role>
             <resource>.*$</resource>
             <queryString>.*$</queryString>
+            <allowedAction>HEAD</allowedAction>
             <allowedAction>GET</allowedAction>
             <allowedAction>POST</allowedAction>
         </Policy>
