@@ -207,6 +207,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
     public static void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
         if (up != null) {
+            request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
