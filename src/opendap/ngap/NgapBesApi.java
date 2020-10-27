@@ -380,7 +380,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
                                        String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getDap4RequestDocument(user, DataDDX, dataSource, qp, xmlBase, null, null, XML_ERRORS);
+        Document reqDoc = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
         if(req==null)
