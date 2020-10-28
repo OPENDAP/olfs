@@ -96,9 +96,9 @@ public class Util {
             if( http_status != 200 )
             {
                 StringBuilder msg = new StringBuilder();
-                msg.append("HTTP request failed - status: ").append(http_status);
+                msg.append("HTTP request failed. status: ").append(http_status);
                 msg.append(" url: ").append(url);
-                msg.append(" Message: ").append(result);
+                msg.append(" message: ").append(result);
                 throw new IOException(msg.toString());
             }
 
