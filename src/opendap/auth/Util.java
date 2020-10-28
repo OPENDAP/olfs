@@ -56,9 +56,7 @@ public class Util {
 
         try
         {
-            /**
-             * Create a connection and build the request
-             */
+            // Create a connection and build the request
             connection = (HttpURLConnection) (new URL(url)).openConnection();
 
             connection.setUseCaches(false);
@@ -68,9 +66,7 @@ public class Util {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
 
-            /**
-             * If data is provided, then convert it to a POST request.
-             */
+            // If data is provided, then convert it to a POST request.
             if( data != null )
             {
                 connection.setRequestMethod("POST");
@@ -83,29 +79,31 @@ public class Util {
             }
 
 
-            int responseCode = connection.getResponseCode();
+            int http_status = connection.getResponseCode();
 
-            /**
-             * Check the response to the request. We consider anything other than
-             * 200 (OK) as an error, though it may be useful to be able to return
-             * this value to the caller and let the caller decide.
-             */
-            if( responseCode != 200 )
-            {
-
-                throw new IOException("URS failure - status " + responseCode);
-            }
-
-
-            /**
-             * Extract the body of the response so we can return it.
-             */
+            // Extract the body of the response so we can return it.
+            // We want this even if it's an error.
             BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(),HyraxStringEncoding.getCharset()));
+                    new InputStreamReader(connection.getInputStream(),HyraxStringEncoding.getCharset()));
 
             String line;
             while( (line = in.readLine()) != null ) result.append(line);
             in.close();
+
+            // Check the response to the request. We consider anything other than
+            // 200 (OK) as an error, though it may be useful to be able to return
+            // this value to the caller and let the caller decide.
+            if( http_status != 200 )
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("HTTP request failed - status: ").append(http_status);
+                msg.append(" url: ").append(url);
+                msg.append(" Message: ").append(result);
+                throw new IOException(msg.toString());
+            }
+
+
+
         }
         finally
         {
