@@ -213,7 +213,7 @@ public class IdFilter implements Filter {
                     } catch (IOException e) {
                         String msg = "Your Login Transaction FAILED!   " +
                                      "Authentication Context: '"+idProvider.getAuthContext()+
-                                     "'   Message: "+ e.getMessage();
+                                     "' Message: "+ e.getMessage();
                         log.error("doFilter() - {}", msg);
                         OPeNDAPException.setCachedErrorMessage(msg);
                         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
