@@ -27,10 +27,10 @@
 package opendap.auth;
 
 import opendap.io.HyraxStringEncoding;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -51,14 +51,13 @@ public class Util {
     public static String submitHttpRequest( String url, Map<String, String> headers, String data )
         throws IOException
     {
+        Logger log = LoggerFactory.getLogger("opendap.auth.Util");
         StringBuilder result = new StringBuilder();
         HttpURLConnection connection = null;
 
         try
         {
-            /**
-             * Create a connection and build the request
-             */
+            // Create a connection and build the request
             connection = (HttpURLConnection) (new URL(url)).openConnection();
 
             connection.setUseCaches(false);
@@ -68,9 +67,7 @@ public class Util {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
 
-            /**
-             * If data is provided, then convert it to a POST request.
-             */
+            // If data is provided, then convert it to a POST request.
             if( data != null )
             {
                 connection.setRequestMethod("POST");
@@ -82,30 +79,39 @@ public class Util {
                 out.close();
             }
 
+            int http_status = connection.getResponseCode();
 
-            int responseCode = connection.getResponseCode();
+            try {
+                // Here we try to get the response body even if it is an error
+                // because the server may ave sent back something useful in
+                // addition to the status.
+                InputStream is = connection.getInputStream();
+                // Extract the body of the response so we can return it.
+                // We always want this even if the http status is an error.
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(is,HyraxStringEncoding.getCharset()));
 
-            /**
-             * Check the response to the request. We consider anything other than
-             * 200 (OK) as an error, though it may be useful to be able to return
-             * this value to the caller and let the caller decide.
-             */
-            if( responseCode != 200 )
-            {
-
-                throw new IOException("URS failure - status " + responseCode);
+                String line;
+                while( (line = in.readLine()) != null ) result.append(line);
+                in.close();
+                is.close();
+            }
+            catch(IOException e){
+                log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
             }
 
+            // Check the response to the request. We consider anything other than
+            // 200 (OK) as an error, though it may be useful to be able to return
+            // this value to the caller and let the caller decide.
+            if( http_status != 200 )
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("HTTP request failed. status: ").append(http_status);
+                msg.append(" url: ").append(url);
+                msg.append(" message: ").append(result.toString());
+                throw new IOException(msg.toString());
+            }
 
-            /**
-             * Extract the body of the response so we can return it.
-             */
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(),HyraxStringEncoding.getCharset()));
-
-            String line;
-            while( (line = in.readLine()) != null ) result.append(line);
-            in.close();
         }
         finally
         {
