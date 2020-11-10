@@ -47,7 +47,6 @@ env:
 
 install:
   - npm install -g snyk
-  - snyk --help
 
 stages:
 - name: build
@@ -90,7 +89,7 @@ jobs:
       addons:
         snyk:
       script:
-        - snyk -q test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high
+        - snyk -q test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json
         - echo $?
         - export STAGE=scan
         - echo $STAGE
