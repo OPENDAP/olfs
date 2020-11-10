@@ -47,7 +47,7 @@ env:
 
 install:
   - npm install -g snyk
-  - snyk test
+  - snyk --help
 
 stages:
 - name: build
