@@ -47,6 +47,7 @@ env:
 
 install:
   - npm install -g snyk
+  - snyk auth
   - snyk test
 
 stages:
