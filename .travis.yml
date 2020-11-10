@@ -27,7 +27,6 @@ addons:
     packages:
       - awscli
       - sshpass
-      - snyk
 
 env:
   global:
@@ -43,6 +42,12 @@ env:
     - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
     # WOO_UID for travis
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
+    # SNYK TOKEN
+    - secure: "15dac100-df94-480b-8c15-a04f718dae31"
+
+install:
+  - //install process
+  - snyk test
 
 stages:
 - name: build
@@ -85,7 +90,8 @@ jobs:
       addons:
         snyk:
       script:
-        - snyk test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json | jq .ok
+        - snyk -q test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high
+        - echo $?
         - export STAGE=scan
         - echo $STAGE
 
@@ -160,7 +166,8 @@ after_deploy:
     - date | tee -a snapshot.time;
     - git commit -am "The OLFS has produced new snapshot files. Triggering Hyrax-Docker image builds for snapshots.";
     - git status;
-    - git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all 
+    - git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all
+    - snyk monitor
 
 
 

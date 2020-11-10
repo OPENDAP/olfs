@@ -17,6 +17,9 @@
                      
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
+### Snyk
+[![Known Vulnerabilities](https://snyk.io/test/npm/name/badge.svg)](https://app.snyk.io/org/opendap/project/432fade0-ba3f-43c8-a06f-645fe9c143c6/)
+
 ### First:
 
 Build and install the [`libdap4`](https://github.com/OPENDAP/libdap4) and 
