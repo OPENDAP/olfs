@@ -46,6 +46,7 @@ env:
     - secure: "15dac100-df94-480b-8c15-a04f718dae31"
 
 install:
+  - npm install -g snyk
   - snyk test
 
 stages:
