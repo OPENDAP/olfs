@@ -27,6 +27,7 @@ addons:
     packages:
       - awscli
       - sshpass
+      - snyk
 
 env:
   global:
