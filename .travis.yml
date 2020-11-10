@@ -15,13 +15,11 @@ services:
 # whitelist
 branches:
   only:
-    - master
-    - travis
+    - HYRAX-289
 
 notifications:
   email:
-    - ndp@opendap.org
-    - jgallagher@opendap.org
+    - slav.korolev@nasa.gov
 
 addons:
   # ssh_known_hosts: www.opendap.org
@@ -47,13 +45,13 @@ env:
 
 stages:
 - name: build
-  if:  branch = master
+  if:  branch = HYRAX-289
 - name: test
-  if:  branch = master
+  if:  branch = HYRAX-289
 - name: scan
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = HYRAX-289 AND NOT type = pull_request
 - name: snappah
-  if:  branch = master AND NOT type = pull_request
+  if:  branch = HYRAX-289 AND NOT type = pull_request
 
 jobs:
   include:
@@ -79,6 +77,14 @@ jobs:
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
         - ant sonar -Dsonar.login=$SONAR_LOGIN
+        - export STAGE=scan
+        - echo $STAGE
+
+    - stage: scan
+      addons:
+        snyk:
+      script:
+        - snyk test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json | jq .ok
         - export STAGE=scan
         - echo $STAGE
 
@@ -128,7 +134,7 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-      branch: master
+      branch: HYRAX-289
       condition: $STAGE =~ ^snappah$
 
 
