@@ -46,7 +46,6 @@ env:
     - secure: "15dac100-df94-480b-8c15-a04f718dae31"
 
 install:
-  - //install process
   - snyk test
 
 stages:
