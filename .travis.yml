@@ -46,8 +46,7 @@ env:
     - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
 
 install:
-  - npm install -g snyk
-  - npm i snyk-gradle-plugin
+  - npm install -g snyk-gradle-plugin
 
 stages:
 - name: build
