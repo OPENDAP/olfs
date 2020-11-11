@@ -47,7 +47,7 @@ env:
 
 install:
   - npm install -g snyk
-  - cnpm install snyk-gradle-plugin
+  - npm i snyk-gradle-plugin
 
 stages:
 - name: build
