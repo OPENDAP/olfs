@@ -69,7 +69,6 @@ jobs:
         snyk:
       script:
         - snyk test --severity-threshold=high
-        - echo $?
         - export STAGE=scan
         - echo $STAGE
 
