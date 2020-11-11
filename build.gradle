@@ -162,6 +162,6 @@ task getReports(dependsOn: ['htmlDependencyReport', 'propertyReport', 'taskRepor
     println("Reports:")
 }
 
-test {
-    useJUnitPlatform()
-}
+//test {
+//    useJUnitPlatform()
+//}
