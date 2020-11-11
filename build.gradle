@@ -47,7 +47,7 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '0.9.26'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
     implementation group: 'xerces', name: 'xercesImpl', version: '2.8.1'
