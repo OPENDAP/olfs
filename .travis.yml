@@ -89,7 +89,7 @@ jobs:
       addons:
         snyk:
       script:
-        - snyk test --severity-threshold=high --json | jq '.vulnerabilities[].from[1]'
+        - snyk test --severity-threshold=high --json | jq '.vulnerabilities[].from[]'
         - echo $?
         - export STAGE=scan
         - echo $STAGE
