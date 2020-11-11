@@ -89,8 +89,7 @@ jobs:
       addons:
         snyk:
       script:
-        - snyk test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json | jq .ok
-        - snyk test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json | jq .vulnerabilities[].isUpgradable
+        - snyk test --severity-threshold=high --json | jq '.vulnerabilities[].from[1]'
         - echo $?
         - export STAGE=scan
         - echo $STAGE
