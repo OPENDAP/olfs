@@ -82,7 +82,12 @@ jobs:
 
     - stage: scan
       addons:
-        snyk:
+        sonarcloud:
+      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+      jdk: openjdk8
+      script:
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant sonar -Dsonar.login=$SONAR_LOGIN
       script:
         - snyk test --project-name=/Users/vskorole/opendap/hyrax/olfs --severity-threshold=high --json | jq .ok
         - export STAGE=scan
