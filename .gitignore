@@ -53,3 +53,4 @@ foo.*
 
 # travis sec key (never gonna check it in)
 travis/woo_deploy_rsa
+/.gradle/

@@ -74,7 +74,6 @@ dependencies {
 //    implementation group: 'com.franz', name: 'openrdf-sesame-onejar', version: '2.6.2'
     implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
 
-
     providedCompile group: 'xalan', name: 'xalan', version: '2.5.1'
 }
 
@@ -174,7 +173,7 @@ war {
     destinationDirectory = file("$buildDir/dist")
 }
 
-task server(dependsOn: ['PreProcessSourceCode','war']) {
+task server(dependsOn: ['PreProcessSourceCode', 'build']){
     description = "Performs a clean build of the core software and assembles the WAR file."
 }
 
