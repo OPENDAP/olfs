@@ -16,10 +16,18 @@ repositories {
     maven {
         url "https://repo.enonic.com/public"
     }
-
 }
 
-apply plugin: 'maven'
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src_gradle/java']
+        }
+        resources {
+            srcDirs = ['src_gradle/resources']
+        }
+    }
+}
 
 ext {
     junitVersion = '5.6.2'
@@ -60,7 +68,14 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
     implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
     implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+
+    implementation group: 'org.apache.tomcat', name: 'catalina', version: '6.0.13'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+//    implementation group: 'com.franz', name: 'openrdf-sesame-onejar', version: '2.6.2'
+    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
+
+
+    providedCompile group: 'xalan', name: 'xalan', version: '2.5.1'
 }
 
 // see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
@@ -87,48 +102,23 @@ project.ext {
 }
 
 clean.doFirst {
-    delete "src/main/webapp"
+    delete "src_gradle"
 }
 
 task init_dir {
     description "Create required folders in the build directory."
     doLast {
         mkdir "${project.build_dir}"
-        mkdir "${project.'build_classes'}"
-        mkdir "${project.'build_docs'}"
-        mkdir "${project.'build_run'}"
+//        mkdir "${project.'build_classes'}"
+//        mkdir "${project.'build_docs'}"
+//        mkdir "${project.'build_run'}"
     }
 }
 
-task copyResources (type: Copy) {
-    description "Copy from original resources."
-    from("resources/hyrax") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    from("./doc") {
-        exclude "src.distribution.readme"
-        into("docs")
-    }
-    from("resources/WCS/2.0"){
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "WEB-INF/web.xml"
-        exclude "WEB-INF/urlrewrite.xml"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    into("src/main/webapp")
-}
-
-task copySources (type: Copy) {
+task copySources(type: Copy) {
     description "Copy original source code."
-    from("opendap_src"){
-        // include all the java files 
+    from("src") {
+        // include all the java files
         include "opendap/**"
         include "org/opendap/**"
         exclude "opendap/cmr/**"
@@ -145,7 +135,32 @@ task copySources (type: Copy) {
         // Exclude async test code
         exclude "opendap/async/**"
     }
-    into("src/main/java")
+    into("src_gradle/main/java")
+}
+
+task copyResources(type: Copy) {
+    description "Copy from original resources."
+    from("resources/hyrax") {
+        include "**"
+        include "xsl/**"
+        include "WEB-INF/**"
+        exclude "WEB-INF/logback.xml"
+        exclude "WEB-INF/logback-test.xml"
+    }
+    from("./doc") {
+        exclude "src.distribution.readme"
+        into("docs")
+    }
+    from("resources/WCS/2.0") {
+        include "**"
+        include "xsl/**"
+        include "WEB-INF/**"
+        exclude "WEB-INF/web.xml"
+        exclude "WEB-INF/urlrewrite.xml"
+        exclude "WEB-INF/logback.xml"
+        exclude "WEB-INF/logback-test.xml"
+    }
+    into("src_gradle/main/webapp")
 }
 
 task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyResources']) {
@@ -156,12 +171,14 @@ task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyR
 war {
     // Define war file name
     archiveName("${DEPLOYMENT_CONTEXT}.war")
+    destinationDirectory = file("$buildDir/dist")
 }
 
-task getReports(dependsOn: ['htmlDependencyReport', 'propertyReport', 'taskReport', 'projectReport']){
+task server(dependsOn: ['PreProcessSourceCode','war']) {
+    description = "Performs a clean build of the core software and assembles the WAR file."
+}
+
+task getReports(dependsOn: ['htmlDependencyReport', 'propertyReport', 'taskReport', 'projectReport']) {
     println("Reports:")
 }
 
-test {
-    useJUnitPlatform()
-}
