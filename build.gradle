@@ -4,7 +4,6 @@ plugins {
     id 'war'
     id 'idea'
     id 'project-report'
-    id 'org.sonarqube' version '2.7'
 }
 
 group 'org.opendap'
@@ -21,10 +20,7 @@ repositories {
 sourceSets {
     main {
         java {
-            srcDirs = ['src_gradle/java']
-        }
-        resources {
-            srcDirs = ['src_gradle/resources']
+            srcDirs = ['src_gradle']
         }
     }
 }
@@ -55,7 +51,8 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '0.9.26'
+//    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '0.9.26'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
     implementation group: 'xerces', name: 'xercesImpl', version: '2.8.1'
@@ -64,17 +61,22 @@ dependencies {
     implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
     implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
     implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '0.9.26'
+//    implementation group: 'ch.qos.logback', name: 'logback-core', version: '0.9.26'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
     implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
     implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
-
-    implementation group: 'org.apache.tomcat', name: 'catalina', version: '6.0.13'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-//    implementation group: 'com.franz', name: 'openrdf-sesame-onejar', version: '2.6.2'
-    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
+//    implementation group: 'xalan', name: 'xalan', version: '2.7.1'
+    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
 
-    providedCompile group: 'xalan', name: 'xalan', version: '2.5.1'
+//    implementation group: 'art.uniroma2.it.org.openrdf.sesame', name: 'sesame-onejar', version: '2.6.8'
+//    "owlim-lite-4.3.jar"
+
+//    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.14'
+    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 }
 
 // see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
@@ -108,10 +110,36 @@ task init_dir {
     description "Create required folders in the build directory."
     doLast {
         mkdir "${project.build_dir}"
-//        mkdir "${project.'build_classes'}"
+        mkdir "${project.build_classes}"
 //        mkdir "${project.'build_docs'}"
 //        mkdir "${project.'build_run'}"
     }
+}
+
+task copyResources(type: Copy) {
+    description "Copy from original resources."
+    from("resources/hyrax") {
+        include "**"
+        include "xsl/**"
+        include "WEB-INF/**"
+        exclude "WEB-INF/logback.xml"
+        exclude "WEB-INF/logback-test.xml"
+    }
+    from("./doc") {
+        exclude "src.distribution.readme"
+        into("docs")
+    }
+    from("resources/WCS/2.0") {
+        include "**"
+        include "xsl/**"
+        include "WEB-INF/**"
+        exclude "unused"
+        exclude "WEB-INF/web.xml"
+        exclude "WEB-INF/urlrewrite.xml"
+        exclude "WEB-INF/logback.xml"
+        exclude "WEB-INF/logback-test.xml"
+    }
+    into("src_gradle/main/webapp")
 }
 
 task copySources(type: Copy) {
@@ -137,31 +165,6 @@ task copySources(type: Copy) {
     into("src_gradle/main/java")
 }
 
-task copyResources(type: Copy) {
-    description "Copy from original resources."
-    from("resources/hyrax") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    from("./doc") {
-        exclude "src.distribution.readme"
-        into("docs")
-    }
-    from("resources/WCS/2.0") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "WEB-INF/web.xml"
-        exclude "WEB-INF/urlrewrite.xml"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    into("src_gradle/main/webapp")
-}
-
 task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyResources']) {
     description = "Moves selected source code from the development tree into the build/src directory. " +
             "The code text is filtered to update version numbers."
@@ -170,7 +173,9 @@ task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyR
 war {
     // Define war file name
     archiveName("${DEPLOYMENT_CONTEXT}.war")
+    webAppDirName = "src_gradle/main/webapp"
     destinationDirectory = file("$buildDir/dist")
+    //classpath = configurations.compileClasspath
 }
 
 task server(dependsOn: ['PreProcessSourceCode', 'build']){
