@@ -198,6 +198,8 @@ public class Dap2IFH extends Dap4Responder {
         String name  = dataset.getAttributeValue("name");
         sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
 
+        String description = "No description available.";
+        sb.append(indent).append("\"description\": \"").append(description).append("\",\n");
 
         Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
         String datasetUrl;
