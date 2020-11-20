@@ -199,7 +199,7 @@ public class Dap2IFH extends Dap4Responder {
         String name  = dataset.getAttributeValue("name");
         sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
 
-        String description = getBestDescription(dataset);
+        String description = getDatasetSearchDescription(dataset,attributeFilter);
         sb.append(indent).append("\"description\": \"").append(description).append("\",\n");
 
         Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
@@ -393,29 +393,9 @@ public class Dap2IFH extends Dap4Responder {
         return sb.toString();
     }
 
-    String getStringAttrValue(Element e, String target_name){
-        List<Element> dataset_attributes = e.getContent(attributeFilter);
-        for (Element attr: dataset_attributes) {
 
-            String type = e.getAttributeValue("type");
-            if (type == null) type = "";
-
-            String name = e.getAttributeValue("name");
-            if (name == null) name = "";
-
-            if(type.equalsIgnoreCase("string") && name.equalsIgnoreCase(target_name)){
-                Element valueElement = attr.getChild("Value",DAP.DAPv32_NS);
-                if(valueElement!=null){
-                    return valueElement.getTextTrim();
-                }
-            }
-        }
-        return null;
-    }
-
-
-    public String getBestDescription(Element dapObj) {
-        String bestDescription  = getDescription(dapObj);
+    public static String getDatasetSearchDescription(Element dapObj, Filter attrFilter) {
+        String bestDescription  = getDescription(dapObj, attrFilter);
         if(bestDescription==null){
             bestDescription = "The dataset contains no obvious metadata " +
                     "that might be used as a description.";
@@ -432,10 +412,10 @@ public class Dap2IFH extends Dap4Responder {
     }
 
 
-    private  String getDescription(Element dapObj){
+    private static String getDescription(Element dapObj, Filter attrFilter){
         String candidate = null;
 
-        List<Element> dataset_attributes = dapObj.getContent(attributeFilter);
+        List<Element> dataset_attributes = dapObj.getContent(attrFilter);
         Iterator<Element> itr = dataset_attributes.iterator();
         while (itr.hasNext() && candidate==null){
             Element attrElement = itr.next();
@@ -449,7 +429,7 @@ public class Dap2IFH extends Dap4Responder {
 
             if(type.equalsIgnoreCase("container")){
                 // Then we recurse....
-                candidate = getDescription(attrElement);
+                candidate = getDescription(attrElement, attrFilter);
             }
             else if(type.equalsIgnoreCase("string")){
                 // We only care about string valued attributes for a description...
