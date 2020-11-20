@@ -421,6 +421,10 @@ public class Dap2IFH extends Dap4Responder {
                     "that might be used as a description.";
         }
 
+
+        if(bestDescription.length()>500)
+            bestDescription = bestDescription.substring(0,498);
+
         while(bestDescription.length()<55)
             bestDescription += " ";
 
