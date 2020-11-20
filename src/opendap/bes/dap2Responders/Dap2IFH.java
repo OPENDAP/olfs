@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -198,7 +199,7 @@ public class Dap2IFH extends Dap4Responder {
         String name  = dataset.getAttributeValue("name");
         sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
 
-        String description = "No description available. No description available.";
+        String description = getBestDescription(dataset);
         sb.append(indent).append("\"description\": \"").append(description).append("\",\n");
 
         Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
@@ -392,32 +393,79 @@ public class Dap2IFH extends Dap4Responder {
         return sb.toString();
     }
 
+    String getStringAttrValue(Element e, String target_name){
+        List<Element> dataset_attributes = e.getContent(attributeFilter);
+        for (Element attr: dataset_attributes) {
 
-    /*
-    public String attributeToPropertyValue_OLD(Element attribute, String indent){
-        StringBuilder sb = new StringBuilder();
-        List<Element> values = attribute.getChildren("value",DAP.DAPv32_NS);
+            String type = e.getAttributeValue("type");
+            if (type == null) type = "";
 
-        if(!values.isEmpty()){
-            sb.append(indent).append("{\n");
-            sb.append(indent).append(indent_inc).append("\"@type\": \"PropertyValue\", \n");
-            sb.append(indent).append(indent_inc).append("\"name\": \"").append(attribute.getAttributeValue("name")).append("\", \n");
+            String name = e.getAttributeValue("name");
+            if (name == null) name = "";
 
-            boolean first = true;
-            for(Element value : values){
-                if(!first)
-                    sb.append(",\n");
-                sb.append(indent).append(indent_inc).append("\"value\": \"").append(value.getTextTrim()).append("\"");
-                first = false;
+            if(type.equalsIgnoreCase("string") && name.equalsIgnoreCase(target_name)){
+                Element valueElement = attr.getChild("Value",DAP.DAPv32_NS);
+                if(valueElement!=null){
+                    return valueElement.getTextTrim();
+                }
             }
-            sb.append("\n");
-            sb.append(indent).append("}");
         }
-        return sb.toString();
+        return null;
     }
 
-*/
 
+    public String getBestDescription(Element dapObj) {
+        String bestDescription  = getDescription(dapObj);
+        if(bestDescription==null){
+            bestDescription = "The dataset contains no obvious metadata " +
+                    "that might be used as a description.";
+        }
+
+        while(bestDescription.length()<55)
+            bestDescription += " ";
+
+        return bestDescription;
+    }
+
+
+    private  String getDescription(Element dapObj){
+        String candidate = null;
+
+        List<Element> dataset_attributes = dapObj.getContent(attributeFilter);
+        Iterator<Element> itr = dataset_attributes.iterator();
+        while (itr.hasNext() && candidate==null){
+            Element attrElement = itr.next();
+
+            String type = attrElement.getAttributeValue("type");
+            if(type==null) type="";
+
+            String name = attrElement.getAttributeValue("name");
+            if(name==null) name="";
+
+
+            if(type.equalsIgnoreCase("container")){
+                // Then we recurse....
+                candidate = getDescription(attrElement);
+            }
+            else if(type.equalsIgnoreCase("string")){
+                // We only care about string valued attributes for a description...
+
+                String value = null;
+                Element valueElement = attrElement.getChild("Value",DAP.DAPv32_NS);
+                if(valueElement!=null)
+                    value = valueElement.getTextTrim();
+
+                if(name.equalsIgnoreCase("description")){
+                    candidate = value;
+                }
+                else if(name.equalsIgnoreCase("title")){
+                    candidate = value;
+                }
+            }
+        }
+
+        return candidate;
+    }
 
 
 }
