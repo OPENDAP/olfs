@@ -451,7 +451,7 @@ public class Dap2IFH extends Dap4Responder {
                 // We only care about string valued attributes for a description...
 
                 String value = null;
-                Element valueElement = attrElement.getChild("Value",DAP.DAPv32_NS);
+                Element valueElement = attrElement.getChild("value",DAP.DAPv32_NS);
                 if(valueElement!=null)
                     value = valueElement.getTextTrim();
 
