@@ -7,6 +7,7 @@ isUpgradable=$(jq '.vulnerabilities[].isUpgradable | tostring | select(. == "tru
 if [[ $isUpgradable != '' ]]; then
     echo "To fix a problem you should change version of library in the build.gradle file
     and download library of new version into lib folder."
+    exit 1
 else
     exit 0
 fi
