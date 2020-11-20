@@ -10,8 +10,8 @@ sudo: false
 language: java
 
 services:
-    - docker
-    
+  - docker
+
 # whitelist
 branches:
   only:
@@ -44,16 +44,22 @@ env:
     - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
     # WOO_UID for travis
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
+    # SNYK_TOKEN
+    - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
+
+install:
+  - npm install -g snyk
+  - npm install -g snyk-gradle-plugin
 
 stages:
-- name: build
-  if:  branch = master
-- name: test
-  if:  branch = master
-- name: scan
-  if:  branch = master AND NOT type = pull_request
-- name: snappah
-  if:  branch = master AND NOT type = pull_request
+  - name: build
+    if:  branch = master
+  - name: test
+    if:  branch = master
+  - name: scan
+    if:  branch = master
+  - name: snappah
+    if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
@@ -70,15 +76,17 @@ jobs:
       script: ant check
     - jdk: openjdk8
       script: ant check
-    
+
     - stage: scan
-      addons: 
+      addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
       jdk: openjdk8
       script:
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build 
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
+      script:
+        - ./run-snyk.sh
         - export STAGE=scan
         - echo $STAGE
 
@@ -90,10 +98,10 @@ jobs:
         - export snap_tag="snapshot-"`date +%s`;
         - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;    
-        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"     
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-        
+
     - stage: snappah
       jdk: openjdk8
       script:
@@ -132,28 +140,28 @@ deploy:
       condition: $STAGE =~ ^snappah$
 
 
-  # Push snapshot files to w.o.o
-  # - provider: script
-  #  skip_cleanup: true
-  #  script:
-  #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
-  #  on:
-  #    branch: master
-  #    condition: $STAGE =~ ^snappah$
-       
-# The after_deploy section grabs the hyrax-docker project, sets the current 
-# snapshot time and pushes the result to GitHub. This push triggers TravisCI 
-# to build the Docker containers for all of the Hyrax snapshot products. 
+        # Push snapshot files to w.o.o
+        # - provider: script
+        #  skip_cleanup: true
+        #  script:
+        #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
+        #  on:
+        #    branch: master
+        #    condition: $STAGE =~ ^snappah$
+
+# The after_deploy section grabs the hyrax-docker project, sets the current
+# snapshot time and pushes the result to GitHub. This push triggers TravisCI
+# to build the Docker containers for all of the Hyrax snapshot products.
 after_deploy:
-    - ls -l ${TRAVIS_BUILD_DIR}/package/*
-    - git clone https://github.com/opendap/hyrax-docker;
-    - git config --global user.name "The-Robot-Travis"
-    - git config --global user.email "npotter@opendap.org"
-    - cd hyrax-docker/hyrax-snapshot;
-    - date | tee -a snapshot.time;
-    - git commit -am "The OLFS has produced new snapshot files. Triggering Hyrax-Docker image builds for snapshots.";
-    - git status;
-    - git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all 
+  - ls -l ${TRAVIS_BUILD_DIR}/package/*
+  - git clone https://github.com/opendap/hyrax-docker;
+  - git config --global user.name "The-Robot-Travis"
+  - git config --global user.email "npotter@opendap.org"
+  - cd hyrax-docker/hyrax-snapshot;
+  - date | tee -a snapshot.time;
+  - git commit -am "The OLFS has produced new snapshot files. Triggering Hyrax-Docker image builds for snapshots.";
+  - git status;
+  - git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all
 
 
 
