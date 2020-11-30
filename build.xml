@@ -212,11 +212,13 @@
 
 
     <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
-    <property name="logback-core.lib" value="logback-core-0.9.26.jar"/>
-    <property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/>
+    <!-- property name="logback-core.lib" value="logback-core-0.9.26.jar"/-->
+    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
+    <!-- property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/-->
+    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
 
-    <property name="owlim.lib" value="owlim-lite-4.3.jar"/>
-    <property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/>
+    <!-- property name="owlim.lib" value="owlim-lite-4.3.jar"/ -->
+    <!-- property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/-->
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -230,15 +232,18 @@
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-    <property name="xalan.lib" value="xalan.jar"/>
-    <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
+    <!-- property name="xalan.lib" value="xalan.jar"/-->
+    <property name="xalan.lib" value="xalan-2.7.2.jar"/>
+    <!-- property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/-->
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.0.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
     <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <!-- property name="catalina.lib" value="catalina-6.0.14.jar"/-->
+    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
     <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
     <property name="json.lib" value="json-simple-1.1.1.jar"/>
