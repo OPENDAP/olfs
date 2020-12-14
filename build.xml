@@ -228,7 +228,8 @@
     <property name="commons-io.lib" value="apache-commons-io-2.4.jar"/>
 
 
-    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <!-- property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/-->
+    <property name="http-components-httpclient.lib" value="httpclient-4.5.13.jar"/>
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
