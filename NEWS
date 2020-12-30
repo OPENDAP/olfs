@@ -1,4 +1,25 @@
 
+# OLFS Version 1.18.8 (30 December 2020)
+
+## NASA/NGAP Updates
+* Changes to our packaging of the ngap-snapshot docker images.
+* Added support for EDL token chaining (in concert with BES modifications)
+
+## Performance Improvements
+* Improved BES connection lifecycle reliability improvements.
+
+## Bug Fixes
+* Improved the servers response for HEAD requests, now the server correctly
+  returns 405 Method Not Allowed
+* Fixed bug in request routing for DAP4 requests.
+* Fixed the JSON-LD content in the Data Request Form so that the required 
+  description property is generated from the data set using a heuristic, or 
+  if that fails a generic string is used. The length of this mandatory 
+  property is now correctly limited to [50 < length < 5000]
+
+## Technical Debt
+* Started developing Gradle production rules.
+
 # OLFS Version 1.18.7 (27 April 2020)
 
 ## Features

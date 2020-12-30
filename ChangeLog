@@ -1,3 +1,294 @@
+2020-12-29  ndp-opendap  <ndp@opendap.org>
+	
+	Retired hyrax_tests as they have been migrated to the 
+	hyrax_regression_tests project.
+	
+2020-11-30  James Gallagher  <jgallagher@opendap.org>
+	
+	Merge pull request #103 from OPENDAP/HYRAX-292
+	HYRAX-292. Corrected build.gradle and updated build.xml
+	
+2020-11-25  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-292. Corrected build.gradle and updated build.xml
+	
+2020-11-20  James Gallagher  <jgallagher@opendap.org>
+	
+	Removed .gradle/
+	[skip ci]
+	
+2020-11-20  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	Merge pull request #101 from OPENDAP/HYRAX-314
+	Hyrax 314
+	
+	Merge branch 'master' into HYRAX-314
+	
+	HYRAX-314. Corrected run-snyk script.
+	
+2020-11-20  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #102 from OPENDAP/json_ld_patch
+	Json ld patch loooooooks gooooooood
+	
+2020-11-20  ndp-opendap  <ndp@opendap.org>
+	
+	Added dap4 to patch
+	
+	Added over length control to description
+	
+	Second pass at description heuristic
+	
+	Draft of a heuristic to grab a description string from top 
+	level metadata.
+	
+2020-11-20  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-314. Changed permission to execute run-snyk.sh script.
+	
+	HYRAX-314. Added run-snyk.sh script.
+	
+2020-11-19  ndp-opendap  <ndp@opendap.org>
+	
+	Test patch for missing description field.
+	
+	Test patch for missing description field.
+	
+2020-11-18  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-314. Corrected xerces version.
+	
+	HYRAX-314. Corrected .travis.yml.
+	
+2020-11-17  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-314. Fixed the versions for high vulnerability libraries 
+	proposed by Snyk.
+	
+2020-11-16  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-314. Added gradle files.
+	
+	HYRAX-314. Corrected build.gradle.
+	
+	HYRAX-314. Add Gradle.
+	
+	HYRAX-314. Added gradle server build.
+	
+	HYRAX-289. Test travis with gradle and snyk.
+	
+2020-11-10  Slav Korolev  <slav.korolev@nasa.gov>
+	
+	HYRAX-289. Test travis with gradle and snyk.
+	
+2020-10-31  ndp-opendap  <ndp@opendap.org>
+	
+	Correcting mistaken commit of web.xml
+	
+2020-10-30  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #99 from OPENDAP/edl_change_debug
+	Add info to error message from failed http GET/PUT requests
+	
+2020-10-30  ndp-opendap  <ndp@opendap.org>
+	
+	Refining http client use for the auth code.
+	
+2020-10-28  ndp-opendap  <ndp@opendap.org>
+	
+	Minor message content changes.
+	
+	Adding mor informationl error message to submitHttpRequest()
+	
+2020-10-27  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing Ngap and Gateway BESApi implementations so that they 
+	correctly request dap4 data when asked for it.
+	
+2020-10-21  ndp-opendap  <ndp@opendap.org>
+	
+	Adding uid to NGAP requests
+	
+2020-09-25  ndp-opendap  <ndp@opendap.org>
+	
+	Relaxing the no HEAD rule for testing. Need a more comlete 
+	implementation in th eDisoatchHandlers
+	
+	Added a default implmentation of doHead() to the 
+	DispatchServlet that returns an HTTP 405 Method Not Allowed status.
+	
+	-405
+	
+	405
+	
+2020-09-18  ndp-opendap  <ndp@opendap.org>
+	
+	Added some explanation and examples of how to configure the log 
+	file roll over interval to the logback.xml file
+	
+2020-09-17  ndp-opendap  <ndp@opendap.org>
+	
+	Problems with image - adding more debug.
+	
+2020-09-17  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #98 from OPENDAP/edl_token_to_uid
+	Convereted EDL token to uid conversion from
+	
+	Merge pull request #97 from OPENDAP/edl_token_to_uid
+	Edl token to uid
+	
+2020-09-17  ndp-opendap  <ndp@opendap.org>
+	
+	Convereted EDL token to uid conversion from passing EDL client 
+	app id to passing the base 64 encoded EDLClientAuth code.
+	
+	disabled atuh be defauklt.
+	
+	dded code to determine user id from the edl auth token.
+	
+2020-09-16  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #96 from OPENDAP/take_tokens
+	Take tokens
+	
+2020-09-16  ndp-opendap  <ndp@opendap.org>
+	
+	Typo fixing
+	
+	Change a var name for clarity. Clean up for merge.
+	
+2020-09-15  ndp-opendap  <ndp@opendap.org>
+	
+	Null pointer handling in UserProfile.
+	
+2020-09-14  ndp-opendap  <ndp@opendap.org>
+	
+	Null pointer handling in UserProfile. API changes for 
+	GuestProfile
+	
+	Seems to be working correctly after a basic mod to the access
+	
+	Merge branch 'HYRAX-222' into take_tokens
+	
+	Mergeed stash changes
+	
+	Docs...
+	
+2020-09-11  ndp-opendap  <ndp@opendap.org>
+	
+	First (kind of broken) effort for acccepting tokens.
+	
+2020-09-01  ndp-opendap  <ndp@opendap.org>
+	
+	Triggering TravisCI
+	
+	Adding comments to NgapBesApi
+	
+2020-08-31  ndp-opendap  <ndp@opendap.org>
+	
+	Sorting out EDL auth and Echo tokens for BES
+	
+2020-08-24  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing a string literal
+	
+2020-08-19  Samuel Lloyd  <slloyd@opendap.org>
+	
+	8/19/20 - HYRAX-222 - added 2nd edl header to NgapBesApi
+	
+2020-06-24  ndp-opendap  <ndp@opendap.org>
+	
+	Set the besTransaction retry limit to the number of connections 
+	plus 2
+	
+2020-06-16  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #95 from OPENDAP/try-it-again
+	Try it again
+	
+2020-06-16  ndp-opendap  <ndp@opendap.org>
+	
+	removing incorrect debug statement.
+	
+	Added some debug logging.
+	
+	olfs: Modified BES.besTRansaction() implementations to make a 
+	second attempt if the beslistener returns either a fatal error, 
+	atimeout error, or if the transaction encounters a PPTException..
+	
+2020-06-16  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #94 from OPENDAP/client-disconnect
+	Client disconnect
+	
+2020-06-11  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Fixing message construction and error handling issues in 
+	anyExceptionHandler() code.
+	
+2020-06-10  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Fixing message construction issue in 
+	anyExceptionHandler() code.
+	
+	olfs: Fixing message construction issue in 
+	anyExceptionHandler() code.
+	
+	Revert "Fixing message construction issue in 
+	anyExceptionHandler() code"
+	This reverts commit 2d6965dd5890f940151baf9b8b0720a151fc7258.
+	
+	Fixing message construction issue in anyExceptionHandler() code
+	
+2020-06-03  Nathan Potter  <ndp@opendap.org>
+	
+	Merge pull request #93 from OPENDAP/new-disconnect
+	New socket closure proceedings.
+	
+2020-06-01  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Small cleanups.
+	
+2020-05-30  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Added more fine grained application of try/catch blocks 
+	in the readChunkedMessage() code. This should provide somewhat better 
+	instrumentation and hopefully understanding of some of the socket and 
+	io stream issues we've been seeing.
+	
+2020-05-22  ndp-opendap  <ndp@opendap.org>
+	
+	New socket closure proceedings.
+	
+2020-05-07  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Repairs an annoying double "/" problem in the 
+	construction of URS redirect URLs
+	
+2020-05-06  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: HYRAX-137
+	
+	olfs: Session debugging instrumentation.
+	
+2020-05-05  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Session debugging instrumentation.
+	
+	olfs: Session debugging instrumentation.
+	
+2020-05-04  ndp-opendap  <ndp@opendap.org>
+	
+	olfs: Adding new logback config to ngap snapshot.
+	
+	olfs: Adding new logback config to ngap snapshot.
+	
+	More ngap configuration adjustments.
+	
+	olfs: Making the ngap version of logback.xml (formerly known as 
+	logback-ngap.xml) be deployed in the ngap bundle.
+ 
 2020-04-22  ndp-opendap  <ndp@opendap.org>
 	
 	olfs: Fixes a hard coded deployment context in FileAccess.java.

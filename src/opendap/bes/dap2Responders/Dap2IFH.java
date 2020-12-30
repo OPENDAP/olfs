@@ -394,6 +394,13 @@ public class Dap2IFH extends Dap4Responder {
     }
 
 
+    /**
+     * https://developers.google.com/search/docs/data-types/dataset said
+     *  "The summary must be between 50 and 5000 characters long."
+     * @param dapObj
+     * @param attrFilter
+     * @return The value of description for use in the Dataset property
+     */
     public static String getDatasetSearchDescription(Element dapObj, Filter attrFilter) {
         String bestDescription  = getDescription(dapObj, attrFilter);
         if(bestDescription==null){
@@ -402,9 +409,10 @@ public class Dap2IFH extends Dap4Responder {
         }
 
 
-        if(bestDescription.length()>500)
-            bestDescription = bestDescription.substring(0,498);
+        if(bestDescription.length()>5000)
+            bestDescription = bestDescription.substring(0,4998);
 
+        // We pad to 55 chars, just because.
         while(bestDescription.length()<55)
             bestDescription += " ";
 

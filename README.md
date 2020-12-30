@@ -2,18 +2,18 @@
   <img alt="TravisCI" src="https://travis-ci.org/OPENDAP/olfs.svg?branch=master"/>
 </a>
 
-# Hyrax/OLFS [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3762740.svg)](https://doi.org/10.5281/zenodo.3762740)
-             
+# Hyrax/OLFS 
+
+**_Hyrax Version 1.16.3  (30 December 2020)_**
+
+**_OLFS  Version 1.18.8  (30 December 2020)_** 
 
 
-**_Hyrax Version 1.16.2  (27 April 2020)_**
+### OLFS-1.18.8 requires
+* **bes-3.20.8** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4399984.svg)](https://doi.org/10.5281/zenodo.4399984)
+* **libdap4-3.20.7** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4399722.svg)](https://doi.org/10.5281/zenodo.4399722)
+                     
 
-**_OLFS  Version 1.18.7  (27 April 2020)_** 
-
-
-### OLFS-1.18.7 requires
-* **bes-3.20.7** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3762439.svg)](https://doi.org/10.5281/zenodo.3762439)
-* **libdap4-3.20.6** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3759849.svg)](https://doi.org/10.5281/zenodo.3759849)
                      
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
