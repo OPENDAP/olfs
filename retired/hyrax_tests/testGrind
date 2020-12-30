@@ -99,7 +99,7 @@ while [  $fail_count -lt $num_laps ]; do
     done
 
     echo "./hyraxTest --jobs=$PROCS $TESTS > mk-$fail_count.log 2>&1"
-    time ./hyraxTest --jobs=$PROCS $TESTS > mk-$fail_count.log 2>&1
+    time hyraxTest --jobs=$PROCS $TESTS > mk-$fail_count.log 2>&1
     status=$?
 
     echo "Test pass: $lap_count     status: $status"
