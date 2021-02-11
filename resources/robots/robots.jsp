@@ -57,5 +57,6 @@
         e.printStackTrace();
         return;
     }
+    response.setContentType("text/plain");
 %>
 <%=besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix)%>

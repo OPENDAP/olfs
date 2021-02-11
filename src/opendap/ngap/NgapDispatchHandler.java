@@ -203,8 +203,8 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         sos.println("      NGAP Service Endpoint<br/>");
         sos.println(". . . . . . . . . . . . . . . . .<br/>");
         sos.println("All Requests: " + reqCounter.get() + "<br/>");
-        sos.println("DAP Service: " + dapServiceCounter.get() + "<br/>");
-        sos.println("This page: " + ngapServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println(" DAP Service: " + dapServiceCounter.get() + "<br/>");
+        sos.println("   This page: " + ngapServiceEndpointCounter.incrementAndGet() + "<br/>");
         sos.println("-------------------------------------<br/>");
         sos.println("</p>");
         sos.println("</body>");
