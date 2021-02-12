@@ -35,6 +35,16 @@
     </rule>
 
     <rule>
+        <from>^/robots.txt$</from>
+        <to last="true">/siteMap/</to>
+    </rule>
+
+    <rule>
+        <from>^/(.*)help/?$</from>
+        <to last="true">/jsp/help.jsp</to>
+    </rule>
+
+    <rule>
         <from>^/(wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
@@ -43,11 +53,6 @@
         <condition type="attribute" name="doRedirect" operator="equal">1</condition>
         <from>^/(.*)$</from>
         <to last="true">/hyrax/$1</to>
-    </rule>
-
-    <rule>
-        <from>^/(.*)help/?$</from>
-        <to last="true">/jsp/help.jsp</to>
     </rule>
 
 
