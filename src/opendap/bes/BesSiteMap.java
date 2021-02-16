@@ -76,7 +76,7 @@ public class BesSiteMap {
         siteMap = new TreeSet<>();
         siteMapFileCount = 1;
         this.dapServicePrefix = dapServicePrefix;
-        siteMapCharCount = getSiteMapItemCount();
+        siteMapCharCount = getSiteMap();
         creation = new Date();
     }
 
@@ -211,14 +211,15 @@ public class BesSiteMap {
 
 
     /**
-     *
-     * @return The number of items in the site map.
+     * Loads the SiteMap. If the stiemap cache file is missing/empty/expired
+     * then it will be rebuilt.
+     * @return The number of bytes in the site map.
      * @throws BESError
      * @throws BadConfigurationException
      * @throws PPTException
      * @throws IOException
      */
-    private long getSiteMapItemCount() throws BESError, BadConfigurationException, PPTException, IOException {
+    private long getSiteMap() throws BESError, BadConfigurationException, PPTException, IOException {
 
         File smcFile = new File(SiteMapCacheFileName);
 
