@@ -1,0 +1,5 @@
+user-agent: *
+disallow: /login/
+disallow: /RemoteResources/
+disallow: /opendap/RemoteResources/
+disallow: /opendap/login/
