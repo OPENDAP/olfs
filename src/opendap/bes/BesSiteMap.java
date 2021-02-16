@@ -398,7 +398,7 @@ public class BesSiteMap {
         StringBuilder sb = new StringBuilder(RobotsBaseText);
         log.debug("Building siteMap files index response.");
         for(long i = 0; i < siteMapFileCount; i++){
-            sb.append("sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
+            sb.append("Sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
         }
         log.debug("siteMap files response content:\n{}",sb.toString());
         return sb.toString();

@@ -1,7 +1,7 @@
-user-agent: *
-disallow: /login/
-disallow: /opendap/login/
-disallow: /RemoteResources/
-disallow: /hyrax/RemoteResources/
-disallow: /opendap/RemoteResources/
-disallow: /opendap/hyrax/RemoteResources/
+User-agent: *
+Disallow: /login/
+Disallow: /opendap/login/
+Disallow: /RemoteResources/
+Disallow: /hyrax/RemoteResources/
+Disallow: /opendap/RemoteResources/
+Disallow: /opendap/hyrax/RemoteResources/
