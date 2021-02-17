@@ -161,8 +161,8 @@ public class BesSiteMap {
 
             // Load the robots.txt base file form the configuration, if possible.
             try {
-                byte[] daBytes = Files.readAllBytes(Paths.get(robotsBaseFilename));
-                RobotsBaseText = new String(daBytes, HyraxStringEncoding.getCharset());
+                byte[] allTheBytes = Files.readAllBytes(Paths.get(robotsBaseFilename));
+                RobotsBaseText = new String(allTheBytes, HyraxStringEncoding.getCharset());
             }
             catch (IOException e) {
                 LOG.error("Failed to read robots base file: {} , Message: {} SKIPPING.",robotsBaseFilename,e.getMessage());
