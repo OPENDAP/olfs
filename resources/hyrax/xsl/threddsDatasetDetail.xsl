@@ -42,6 +42,8 @@
     <xsl:param name="remoteCatalog" />
     <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteHost" />
+    <xsl:param name="remoteHostProtocol" />
+    <xsl:param name="remoteHostName" />
     <xsl:param name="typeMatch" />
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
@@ -213,6 +215,14 @@
                             </td>
                             <td class="dark" align="left">Hyrax - THREDDS Dataset Detail</td>
                         </tr>
+                        <!-- tr>
+                            <td width="30%" align="left"> </td>
+                            <td class="dark" align="left">
+                                remoteHost: <xsl:value-of select="$remoteHost" /><br/>
+                                remoteCatalog: <xsl:value-of select="$remoteCatalog" /><br/>
+                                remoteRelativeURL: <xsl:value-of select="$remoteRelativeURL" /><br/>
+                            </td>
+                        </tr -->
                     </table>
 
                     <xsl:if test="$debug">
@@ -1261,7 +1271,8 @@
                 <xsl:when test="$dap4">
                     <xsl:if test="$debug">DAP4:</xsl:if>
                     <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap4/@base"/><xsl:value-of select="$urlPath"/ -->
-                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap4/@base,$urlPath))"/>
+                    <!-- <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap4/@base,$urlPath))"/ -->
+                    <xsl:value-of select="$remoteHostProtocol[$remoteHostProtocol]" /><xsl:value-of select="hyrax:path_concat(($remoteHostName[$remoteHostName],$dap4/@base,$urlPath))" />
 
                 </xsl:when>
 
@@ -1270,14 +1281,17 @@
                 <xsl:when test="$httpServer and matches($urlPath,$typeMatch)">
                     <xsl:if test="$debug">MATCH:</xsl:if>
                     <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$httpServer/@base"/><xsl:value-of select="$urlPath"/ -->
-                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$httpServer/@base,$urlPath))"/>
+                    <!-- <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$httpServer/@base,$urlPath))"/ -->
+                    <xsl:value-of select="$remoteHostProtocol[$remoteHostProtocol]" /><xsl:value-of select="hyrax:path_concat(($remoteHostName[$remoteHostName],$httpServer/@base,$urlPath))"/>
+
                 </xsl:when>
 
                 <!-- Otherwise we'll use DAP2 if we can get it -->
                 <xsl:when test="$dap2">
                     <xsl:if test="$debug">DAP2:</xsl:if>
                     <!-- xsl:value-of select="$remoteHost[$remoteHost]"/><xsl:value-of select="$dap2/@base"/><xsl:value-of select="$urlPath"/ -->
-                    <xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap2/@base,$urlPath))"/>
+                    <!-- xsl:value-of select="hyrax:path_concat(($remoteHost[$remoteHost],$dap2/@base,$urlPath))"/ -->
+                    <xsl:value-of select="$remoteHostProtocol[$remoteHostProtocol]" /><xsl:value-of select="hyrax:path_concat(($remoteHostName[$remoteHostName],$dap2/@base,$urlPath))"/>
                 </xsl:when>
 
                 <!-- HTTP services only make sense if we know if the data type can be ingested. -->
