@@ -187,6 +187,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         // This could be made a real page (JSP?), but having something
         // simple in place should reduce problems caused by ELB health
         // check clients beating on the endpoint.
+        response.setContentType("text/html");
         ServletOutputStream sos = response.getOutputStream();
         sos.println("<html>");
         sos.println("<head>");
