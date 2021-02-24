@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,8 +25,10 @@ public class BesSiteMap {
     private static final Logger LOG = LoggerFactory.getLogger(BesSiteMap.class);
 
     public static final String SITE_MAP_CACHE_ELEMENT_NAME = "SiteMapCache";
+
     public static final String REFRESH_INTERVAL_ATTRIBUTE_NAME = "refreshInterval";
     public static final String CACHE_FILE_ATTRIBUTE_NAME = "cacheFile";
+    public static final String ROBOTS_BASE_ATTRIBUTE_NAME = "robotsBaseFile";
 
     private static final ReentrantReadWriteLock cacheLock = new ReentrantReadWriteLock();
     private static final AtomicBoolean ENABLED = new AtomicBoolean(false);
@@ -39,6 +43,10 @@ public class BesSiteMap {
 
     public static final String  DEFAULT_CACHE_FILE = "/etc/olfs/cache/SiteMap.cache"; // this is a punt
     private static String SiteMapCacheFileName = DEFAULT_CACHE_FILE;
+
+    public static final String  DEFAULT_ROBOTS_BASE_FILE = "/etc/olfs/robots.base"; // this is a punt
+    private static String RobotsBaseText = "";
+
 
     public static final long DEFAULT_CACHE_REFRESH_INTERVAL = 600; // Ten minutes worth of seconds.
     private static AtomicLong cacheRefreshInterval_ms = new AtomicLong(DEFAULT_CACHE_REFRESH_INTERVAL * 1000);
@@ -116,7 +124,13 @@ public class BesSiteMap {
             cacheFileName = cacheFileNameString;
         }
 
-        init(cacheFileName, refreshIntervalSeconds);
+        String rbFileName = DEFAULT_ROBOTS_BASE_FILE;
+        String robotsBaseAttrValue = config.getAttributeValue(ROBOTS_BASE_ATTRIBUTE_NAME);
+        if(robotsBaseAttrValue!=null){
+            rbFileName = robotsBaseAttrValue;
+        }
+
+        init(rbFileName, cacheFileName, refreshIntervalSeconds);
     }
 
 
@@ -127,7 +141,7 @@ public class BesSiteMap {
      * @param refreshIntervalSeconds The time that a site map is considered
      *                               valid, after which it must be refreshed.
      */
-    public static void init(String cacheFileName, long refreshIntervalSeconds)
+    public static void init(String robotsBaseFilename, String cacheFileName, long refreshIntervalSeconds)
             throws BadConfigurationException {
         cacheLock.writeLock().lock();
         try {
@@ -143,9 +157,17 @@ public class BesSiteMap {
             cacheRefreshInterval_ms.set(refreshIntervalSeconds * 1000);
 
             SiteMapCacheFileName = cacheFileName;
-
             checkSiteMapFileLocation();
 
+            // Load the robots.txt base file form the configuration, if possible.
+            try {
+                byte[] allTheBytes = Files.readAllBytes(Paths.get(robotsBaseFilename));
+                RobotsBaseText = new String(allTheBytes, HyraxStringEncoding.getCharset());
+            }
+            catch (IOException e) {
+                LOG.error("Failed to read robots base file: {} , Message: {} SKIPPING.",robotsBaseFilename,e.getMessage());
+            }
+            RobotsBaseText += "\n";
             ENABLED.set(true);
             LOG.debug("INITIALIZED  SiteMapCacheFile: {}  RefreshInterval: {} s",
                     SiteMapCacheFileName,
@@ -190,8 +212,9 @@ public class BesSiteMap {
 
 
     /**
-     *
-     * @return The number of items in the site map.
+     * Loads the SiteMap. If the stiemap cache file is missing/empty/expired
+     * then it will be rebuilt.
+     * @return The number of bytes in the site map.
      * @throws BESError
      * @throws BadConfigurationException
      * @throws PPTException
@@ -374,10 +397,10 @@ public class BesSiteMap {
      */
     public String getSiteMapEntryForRobotsDotText(String siteMapServicePrefix ) throws IOException {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(RobotsBaseText);
         log.debug("Building siteMap files index response.");
         for(long i = 0; i < siteMapFileCount; i++){
-            sb.append("sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
+            sb.append("Sitemap: ").append(siteMapServicePrefix).append("/").append(PseudoFileOpener).append(Long.toString(i)).append(PseudoFileCloser).append("\n");
         }
         log.debug("siteMap files response content:\n{}",sb.toString());
         return sb.toString();
