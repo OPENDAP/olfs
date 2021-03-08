@@ -952,6 +952,12 @@
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
             </zipfileset>
+
+            <!-- = = = = = = NGAP LANDING PAGE = = = = = = -->
+            <zipfileset dir="${ngapResources.dir}/landing" prefix="docs/ngap" />
+            <!-- = = = = = = = = = = = = = = = = = = = = = -->
+
+
         </war>
         <delete file="${build.dist}/index.html"/>
     </target>
