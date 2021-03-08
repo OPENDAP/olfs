@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="eui.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    <title>OPeNDAP Hyrax for NASA Earthdata</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-lg">
+            <a class="navbar-brand nasa" href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html">OPeNDAP Hyrax</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+              <a class="btn btn-outline-light" href="https://github.com/OPENDAP/hyrax" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                View on GitHub
+              </a>
+            </div>
+        </div>
+    </nav>
+    <div class="hero-callout" style="background-color: #2276ac;">
+        <div class="container-lg">
+            <div class="row pt-5">
+                <h1 class="text-center text-light display-4">Hyrax provides direct access to subsetting of NASA data using Python and analysis tools like Panolpy abd Matlab</h1>
+            </div>
+            <div class="row pt-4 justify-content-center cta">
+                <div class="col-md-6 text-center"><a class="btn btn-lg btn-success" href="https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html" role="button">Hyrax Installation and Configuration Guide</a></div>
+            </div>
+            <div class="row pt-3 pb-4 text-center">
+              <p><span class="badge bg-dark">Python</span> <span class="badge bg-dark">Java</span> <span class="badge bg-dark">C/C++</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="container-lg">
+        <div class="row pt-5 justify-content-center">
+            <h2 class="text-center display-4">Features</h2>
+        </div>
+        <div class="row pt-3 pb-3 justify-content-center">
+            <div class="col-md-5">
+              <h3>Multiple Data Formats</h3>
+              <p>Supports data retrieval in multiple return formats including DAP, DAP4, NetCDF-3, NetCDF-4, JSON, CSV, and ASCII. You can also add custom response types.</p>
+              <h3>RDF</h3>
+              <p>Hyrax provides RDF descriptions of it's data holdings enabling semantic web tools to operate upon the metadata content held in the server</p>
+              <h3>WebStart</h3>
+              <p>Extensible WebStart functionality for Java-based DAP clients</p>
+              <h3>JSON</h3>
+              <p>Both metadata and data are available in a JSON encoding</p>
+            </div>
+            <div class="col-md-5">
+              <h3>Server Side Functions</h3>
+              <p>Hyrax supports a number of Server side functions out of the box including (but not limited to):</p>
+                <ul>
+                  <li><code>geogrid</code>: Subset applicable DAP Grids using latitude and longitude values.</li>
+                  <li><code>grid</code>: Subset any DAP Grid object using the values of it’s map vectors.</li>
+                  <li><code>linear_scale</code>: Apply a linear equation to the data returned, including automatic use of CF attributes.</li>
+                  <li><code>version</code>: The version function provides a list of the server-side processing functions available.</li>
+                  <li>Easily add your own custom functions.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="hero-callout" style="background-color: #e3e3e3;">
+        <div class="container-lg">
+            <div class="row pt-5 pb-4 justify-content-center">
+              <div class="col-md-5">
+                <h3>Hyrax and Panoply Example</h3>
+                <p>Panoply plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets. With Panoply 4 (and later) you can Explore remote OpenDAP catalogs and open datasets served from them.</p>
+                <ol>
+                  <li>Launch Panoply and click <strong>File > Open > Open Remote Dataset</strong></li>
+                  <li>Type <code>http://test.opendap.org/opendap/hyrax/data/nc/coads_climatology.nc</code> into the remote URL dialog</li>
+                  <li>When the data loads, click <strong>SST</strong> to load the map visualization</li>
+                </ol>
+                <p>The Panoply application is a sophisticated GUI driven data client that is based around the CDM/NetCDF data model and utilizes that NetCDF-Java (and thus the Java DAP implementation) to access remote DAP datasets. Because it has a GUI it can retrieve (and cache for later) users credentials directly from the user.</p>
+              </div>
+              <div class="col-md-5">
+                <img class="img-fluid" alt="panoply-1" src="panoply-1.png" />
+                <img class="img-fluid" alt="panoply-2" src="panoply-2.png" />
+              </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container-lg">
+            <div class="row pt-3">
+                <div class="col-md-8">
+                    <ul class="list-inline">
+                        <li class="list-inline-item">NASA Official: XXX</li>
+                        <li class="list-inline-item">FOIA</li>
+                        <li class="list-inline-item">NASA Privacy Policy</li>
+                        <li class="list-inline-item">USA.gov</li>
+                        <li class="list-inline-item">Feedback</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-right"><span class="badge bg-dark">v 3.14159265359</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>  
+</body>
+</html>
