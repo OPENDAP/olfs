@@ -26,6 +26,7 @@
 
 package opendap.ngap;
 
+import opendap.PathBuilder;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
@@ -38,6 +39,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
@@ -72,6 +74,8 @@ public class NgapDispatchHandler extends BesDapDispatcher {
     private String _prefix = "ngap/";
     private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
+
+    private static final String d_landingPage="/docs/ngap/ngap.html";
 
     public NgapDispatchHandler() {
         super();
@@ -183,7 +187,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
     }
 
 
-    private void sendNgapLandingPage(HttpServletResponse response) throws IOException {
+    private void sendSimpleNgapLandingPage(HttpServletResponse response) throws IOException {
         // This could be made a real page (JSP?), but having something
         // simple in place should reduce problems caused by ELB health
         // check clients beating on the endpoint.
@@ -211,6 +215,20 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         sos.println("</body>");
         sos.println("</html>");
         sos.flush();
+
+    }
+
+    private void sendNgapLandingPage(HttpServletResponse response) throws IOException {
+
+        String target_file = PathBuilder.pathConcat(getSystemPath(),d_landingPage);
+
+        File f = new File(target_file);
+        if(f.exists() && !f.isDirectory()) {
+            response.sendRedirect(d_landingPage);
+        }
+        else {
+            sendSimpleNgapLandingPage(response);
+        }
 
     }
 
