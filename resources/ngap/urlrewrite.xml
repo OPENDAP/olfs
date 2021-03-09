@@ -35,6 +35,14 @@
     </rule>
 
     <rule>
+        <!-- This routes requests for "/" and "/index.html"
+             to the NGAP Landing Page -->
+        <from>^/(index\.html)?$</from>
+        <to last="true">/docs/ngap/ngap.html</to>
+    </rule>
+
+
+    <rule>
         <from>^/(wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
