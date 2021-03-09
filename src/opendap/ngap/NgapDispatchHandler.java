@@ -130,7 +130,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
                 reqCounter.incrementAndGet();
                 if(itsJustThePrefix){
-                    sendNgapLandingPage(response);
+                    sendSimpleNgapLandingPage(response);
                 }
                 else {
                     log.info("Sending NGAP Response");
@@ -215,20 +215,6 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         sos.println("</body>");
         sos.println("</html>");
         sos.flush();
-
-    }
-
-    private void sendNgapLandingPage(HttpServletResponse response) throws IOException {
-
-        String target_file = PathBuilder.pathConcat(getSystemPath(),d_landingPage);
-
-        File f = new File(target_file);
-        if(f.exists() && !f.isDirectory()) {
-            response.sendRedirect(d_landingPage);
-        }
-        else {
-            sendSimpleNgapLandingPage(response);
-        }
 
     }
 
