@@ -160,7 +160,7 @@ deploy:
 # The after_deploy section grabs the hyrax-docker project, sets the current
 # snapshot time and pushes the result to GitHub. This push triggers TravisCI
 # to build the Docker containers for all of the Hyrax snapshot products.
-after_deploy:
+after_success:
   - export snap_shot_count=$(( $snap_shot_count + 1 ));
   - echo "Finished pushing snapshot ${snap_shot_count} to S3"
   - if [ $snap_shot_count -eq 2 ]; then ./travis/trigger-hyrax-docker.sh; fi;
