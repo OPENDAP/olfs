@@ -46,6 +46,7 @@ env:
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
     # SNYK_TOKEN
     - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
+    - export snap_shot_count=0
 
 install:
   - npm install -g snyk
@@ -107,6 +108,7 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
+        - export snap_shot_count=$(( $snap_shot_count + 1 ));
 
     - stage: snappah
       name: "build olfs snapshot files for ngap"
@@ -120,6 +122,7 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
+        - export snap_shot_count=$(( $snap_shot_count + 1 ));
 
 
 # before_deploy:
@@ -160,7 +163,7 @@ deploy:
 # snapshot time and pushes the result to GitHub. This push triggers TravisCI
 # to build the Docker containers for all of the Hyrax snapshot products.
 after_deploy:
-  - ./travis/trigger-hyrax-docker.sh;
+  - if [ $snap_shot_count -eq 2 ]; then./travis/trigger-hyrax-docker.sh; fi;
 
 
 
