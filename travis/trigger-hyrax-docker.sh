@@ -29,7 +29,7 @@ echo "${OLFS_SNAPSHOT}" >> snapshot.time;
 
 cat snapshot.time;
 
-git commit -am "The OLFS has produced new snapshot files. Triggering Hyrax-Docker image builds for snapshots.";
+git commit -am "${OLFS_SNAPSHOT} Triggering Hyrax-Docker image builds for snapshots.";
 git status;
 git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all;
 
