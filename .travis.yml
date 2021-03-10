@@ -110,7 +110,6 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-        - echo "Travis Job ID - ${TRAVIS_JOB_ID}"
 
     - stage: ngap-snappah
       name: "build olfs snapshot files for ngap"
@@ -124,7 +123,6 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-        - echo "Travis Job ID - ${TRAVIS_JOB_ID}"
 
 
 
@@ -150,7 +148,7 @@ deploy:
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
       branch: master
-      condition: $STAGE =~ ^snappah$
+      condition: $STAGE =~ ^snappah|ngap-snappah$
 
 
         # Push snapshot files to w.o.o
@@ -166,7 +164,7 @@ deploy:
 # snapshot time and pushes the result to GitHub. This push triggers TravisCI
 # to build the Docker containers for all of the Hyrax snapshot products.
 after_deploy:
-  - if test x"$STAGE" = x"ngap-snappah"; then ./travis/trigger-hyrax-docker.sh; fi
+  - if test x"$STAGE" = x"ngap-snappah"; then ./travis/trigger-hyrax-docker.sh; else echo "Skipping hyrax-docker trigger"; fi
 
 
 
