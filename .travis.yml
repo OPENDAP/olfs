@@ -163,7 +163,7 @@ deploy:
 after_deploy:
   - export snap_shot_count=$(( $snap_shot_count + 1 ));
   - echo "Finished pushing snapshot ${snap_shot_count} to S3"
-  - if [ $snap_shot_count -eq 2 ]; then./travis/trigger-hyrax-docker.sh; fi;
+  - if [ $snap_shot_count -eq 2 ]; then ./travis/trigger-hyrax-docker.sh; fi;
 
 
 
