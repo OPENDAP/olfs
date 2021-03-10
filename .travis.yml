@@ -108,8 +108,6 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-        - export snap_shot_count=$(( $snap_shot_count + 1 ));
-        - echo "Finished snapshot ${snap_shot_count}"
 
     - stage: snappah
       name: "build olfs snapshot files for ngap"
@@ -123,8 +121,6 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
-        - export snap_shot_count=$(( $snap_shot_count + 1 ));
-        - echo "Finished snapshot ${snap_shot_count}"
 
 
 # before_deploy:
@@ -165,7 +161,8 @@ deploy:
 # snapshot time and pushes the result to GitHub. This push triggers TravisCI
 # to build the Docker containers for all of the Hyrax snapshot products.
 after_deploy:
-  - echo "So far ${snap_shot_count} snapshot war files have been created."
+  - export snap_shot_count=$(( $snap_shot_count + 1 ));
+  - echo "Finished pushing snapshot ${snap_shot_count} to S3"
   - if [ $snap_shot_count -eq 2 ]; then./travis/trigger-hyrax-docker.sh; fi;
 
 
