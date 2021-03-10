@@ -108,6 +108,7 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
+        - echo "Travis Job ID: ${TRAVIS_JOB_ID}"
 
     - stage: snappah
       name: "build olfs snapshot files for ngap"
@@ -121,6 +122,8 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
+        - echo "Travis Job ID: ${TRAVIS_JOB_ID}"
+
 
 
 # before_deploy:
@@ -163,6 +166,7 @@ deploy:
 after_success:
   - export snap_shot_count=$(( $snap_shot_count + 1 ));
   - echo "Finished pushing snapshot ${snap_shot_count} to S3"
+  - echo "Travis Job ID: ${TRAVIS_JOB_ID}"
   - if [ $snap_shot_count -eq 2 ]; then ./travis/trigger-hyrax-docker.sh; fi;
 
 
