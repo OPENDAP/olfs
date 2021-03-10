@@ -67,25 +67,25 @@ stages:
 jobs:
   include:
     - stage: build
-      name: "olfs web application, jdk7"
+      name: "jdk7"
       script: export STAGE=build
       jdk: openjdk7
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
     - jdk: openjdk8
-      name: "olfs web application, jdk8"
+      name: "jdk8"
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: test
-      name: "olfs unit tests, jdk7"
+      name: "jdk7"
       script: export STAGE=test
       jdk: openjdk7
       script: ant check
     - jdk: openjdk8
-      name: "olfs unit tests, jdk8"
+      name: "jdk8"
       script: ant check
 
     - stage: scan
-      name: "scan olfs (jdk8 + jdk7)"
+      name: "scan (jdk8)"
       addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
@@ -99,7 +99,7 @@ jobs:
         - echo $STAGE
 
     - stage: snappah
-      name: "build olfs snapshot files"
+      name: "olfs-snapshot"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -112,7 +112,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "build olfs snapshot files for ngap"
+      name: "ngap-snapshot"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -124,8 +124,13 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
+      # The hyrax-docker stage grabs the hyrax-docker project, sets the current
+      # snapshot time and pushes the result to GitHub. This push triggers TravisCI
+      # to build the Docker containers for all of the Hyrax snapshot products.
+      # I moved this into it's own stage instead of after_deploy so that it would
+      # reliably run once after everything else worked. -ndp 3/10/21
     - stage: hyrax-docker
-      name: "Triggering Hyrax Docker Build"
+      name: "Triggering hyrax-docker build"
       jdk: openjdk8
       script:
         - export STAGE=hyrax-docker
@@ -169,11 +174,6 @@ deploy:
         #    branch: master
         #    condition: $STAGE =~ ^snappah$
 
-# The after_deploy section grabs the hyrax-docker project, sets the current
-# snapshot time and pushes the result to GitHub. This push triggers TravisCI
-# to build the Docker containers for all of the Hyrax snapshot products.
-#after_deploy:
-#  - if test x"$STAGE" = x"ngap-snappah"; then ./travis/trigger-hyrax-docker.sh; else echo "Skipping hyrax-docker trigger"; fi
 
 
 
