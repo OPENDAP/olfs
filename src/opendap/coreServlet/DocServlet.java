@@ -36,10 +36,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -157,9 +154,9 @@ public class DocServlet extends HttpServlet {
                             if (mType != null)
                                 response.setContentType(mType);
 
-                            ServletOutputStream sos = response.getOutputStream();
 
                             if (mType != null && mType.startsWith("text/")) {
+                                PrintWriter sos = response.getWriter();
                                 String docString = readFileAsString(f);
                                 log.debug("Read file {} into a String.", f.getAbsolutePath());
                                 docString = docString.replace("<CONTEXT_PATH />", contextPath);
@@ -167,6 +164,7 @@ public class DocServlet extends HttpServlet {
                                 sos.println(docString);
                                 response_size = docString.length();
                             } else {
+                                ServletOutputStream sos = response.getOutputStream();
                                 DataOutputStream dos = new DataOutputStream(sos);
                                 try (FileInputStream fis = new FileInputStream(f)) {
                                     byte[] buff = new byte[8192];
