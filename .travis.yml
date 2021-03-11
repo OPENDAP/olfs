@@ -61,14 +61,16 @@ stages:
     if:  branch = master
   - name: snappah
     if:  branch = master AND NOT type = pull_request
-  - name: hyrax-docker
+  - name: hyrax-docker-trigger
     if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
     - stage: build
       name: "jdk7"
-      script: export STAGE=build
+      script:
+        - export STAGE=build
+        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
       jdk: openjdk7
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
     - jdk: openjdk8
@@ -103,7 +105,9 @@ jobs:
       jdk: openjdk8
       script:
         - export STAGE=snappah
-        - echo $STAGE
+        - echo "STAGE is ${STAGE}"
+        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
+        - echo "TRAVIS_BUILD_WEB_URL ${TRAVIS_BUILD_WEB_URL}"
         - export snap_tag="snapshot-"`date +%s`;
         - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
@@ -116,7 +120,9 @@ jobs:
       jdk: openjdk8
       script:
         - export STAGE=snappah
-        - echo $STAGE
+        - echo "STAGE is ${STAGE}"
+        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
+        - echo "TRAVIS_BUILD_WEB_URL ${TRAVIS_BUILD_WEB_URL}"
         - export snap_tag="snapshot-"`date +%s`;
         - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
@@ -124,19 +130,18 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-      # The hyrax-docker stage grabs the hyrax-docker project, sets the current
+      # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
       # snapshot time and pushes the result to GitHub. This push triggers TravisCI
       # to build the Docker containers for all of the Hyrax snapshot products.
       # I moved this into it's own stage instead of after_deploy so that it would
       # reliably run once after everything else worked. -ndp 3/10/21
-    - stage: hyrax-docker
-      name: "Triggering hyrax-docker build"
+    - stage: hyrax-docker-trigger
+      name: "Triggering hyrax-docker snapshot build"
       jdk: openjdk8
       script:
         - export STAGE=hyrax-docker
         - echo $STAGE
         - ./travis/trigger-hyrax-docker.sh
-
 
 
 
@@ -152,6 +157,8 @@ jobs:
 #        ssh-add /tmp/woo_deploy_rsa;
 #    fi
 
+
+
 # The deploy section copies the snapshot build product our S3 bucket
 deploy:
   - provider: s3
@@ -165,14 +172,14 @@ deploy:
       condition: $STAGE =~ ^snappah$
 
 
-        # Push snapshot files to w.o.o
-        # - provider: script
-        #  skip_cleanup: true
-        #  script:
-        #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
-        #  on:
-        #    branch: master
-        #    condition: $STAGE =~ ^snappah$
+  # Push snapshot files to w.o.o
+  # - provider: script
+  #  skip_cleanup: true
+  #  script:
+  #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
+  #  on:
+  #    branch: master
+  #    condition: $STAGE =~ ^snappah$
 
 
 
