@@ -293,8 +293,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         remoteHostName = remoteCatalog.substring(remoteHostProtocol.length(), remoteCatalog.indexOf('/', remoteHostProtocol.length()) + 1);
 
-
-
         log.debug("targetDataset: " + targetDataset);
         log.debug("remoteCatalog: " + remoteCatalog);
         log.debug("remoteHost: " + remoteHost);
