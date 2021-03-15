@@ -48,6 +48,7 @@ env:
     - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
     - export snap_shot_count=0
 
+
 install:
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
@@ -106,10 +107,13 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
+        - source VERSION
+        - export BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_BUILD_OFFSET)
         - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - echo "TRAVIS_BUILD_WEB_URL ${TRAVIS_BUILD_WEB_URL}"
+        - echo "OLFS_VERSION ${OLFS_VERSION}"
+        - echo "BUILD_NUMBER ${BUILD_NUMBER}"
         - export snap_tag="snapshot-"`date +%s`;
-        - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+        - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION="${OLFS_VERSION}-${BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
@@ -121,10 +125,13 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
+        - source VERSION
+        - export BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_BUILD_OFFSET)
         - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - echo "TRAVIS_BUILD_WEB_URL ${TRAVIS_BUILD_WEB_URL}"
+        - echo "OLFS_VERSION ${OLFS_VERSION}"
+        - echo "BUILD_NUMBER ${BUILD_NUMBER}"
         - export snap_tag="snapshot-"`date +%s`;
-        - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION=${snap_tag} -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
+        - ant -DHYRAX_VERSION=${snap_tag} -DOLFS_VERSION="${OLFS_VERSION}-${BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
