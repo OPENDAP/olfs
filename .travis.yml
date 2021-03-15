@@ -115,7 +115,6 @@ jobs:
         - export HYRAX_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_HYRAX_BUILD_OFFSET)
         - echo "HYRAX_VERSION ${HYRAX_VERSION}"
         - echo "HYRAX_BUILD_NUMBER ${HYRAX_BUILD_NUMBER}"
-        - export snap_tag="snapshot-"`date +%s`;
         - ant -DHYRAX_VERSION="${HYRAX_VERSION}-${HYRAX_BUILD_NUMBER}" -DOLFS_VERSION="${OLFS_VERSION}-${OLFS_BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
@@ -136,7 +135,6 @@ jobs:
         - export HYRAX_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_HYRAX_BUILD_OFFSET)
         - echo "HYRAX_VERSION ${HYRAX_VERSION}"
         - echo "HYRAX_BUILD_NUMBER ${HYRAX_BUILD_NUMBER}"
-        - export snap_tag="snapshot-"`date +%s`;
         - ant -DHYRAX_VERSION="${HYRAX_VERSION}-${HYRAX_BUILD_NUMBER}" -DOLFS_VERSION="${OLFS_VERSION}-${OLFS_BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
