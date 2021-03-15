@@ -456,7 +456,9 @@
         </copy>
 
         <copy todir="${build.ngap.resources}" filtering="true">
-            <fileset dir="${ngapResources.dir}"/>
+            <fileset dir="${ngapResources.dir}">
+                <exclude name="*.png" />
+            </fileset>
         </copy>
 
 
@@ -959,6 +961,9 @@
 
             <!-- = = = = = = NGAP LANDING PAGE = = = = = = -->
             <zipfileset dir="${build.ngap.resources}/landing" prefix="docs/ngap" />
+            <zipfileset dir="${ngapResources.dir}/landing" prefix="docs/ngap">
+                <include name="*.png" />
+            </zipfileset>
             <!-- = = = = = = = = = = = = = = = = = = = = = -->
 
         </war>
