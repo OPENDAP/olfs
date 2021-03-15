@@ -53,7 +53,7 @@
     <PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*</role>
-            <resource>.*((\/)|(\.(css|png|jpg|ico|gif|xsl|jsp))|(\/contents\.html)|(\/catalog\.html)|(\/catalog\.xml)|(logout)|(login)|(\/version))$</resource>
+            <resource>^.*((\/docs\/.*)|(\/)|(\.(css|png|jpg|ico|gif|xsl|jsp))|(\/contents\.html)|(\/catalog\.html)|(\/catalog\.xml)|(logout)|(login)|(\/version))$</resource>
             <queryString>.*$</queryString>
             <allowedAction>HEAD</allowedAction>
             <allowedAction>GET</allowedAction>
