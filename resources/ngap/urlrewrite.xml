@@ -37,8 +37,20 @@
     <rule>
         <!-- This routes requests for "/" and "/index.html"
              to the NGAP Landing Page -->
-        <from>^/(index\.html)?$</from>
+        <from>^\/(index\.html)?$</from>
         <to last="true">/docs/ngap/ngap.html</to>
+    </rule>
+    <rule>
+        <from>^\/?favicon\.ico$</from>
+        <to last="true">/docs/images/favicon.ico</to>
+    </rule>
+    <rule>
+        <from>^\/nasa-meatball-new\.svg$</from>
+        <to last="true">/docs/ngap/nasa-meatball-new.svg</to>
+    </rule>
+    <rule>
+        <from>^\/nasa-outline-new\.svg$</from>
+        <to last="true">/docs/ngap/nasa-outline-new.svg</to>
     </rule>
 
 
