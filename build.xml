@@ -194,8 +194,8 @@
     <property name="build.hyrax.resources" location="${build.dir}/resources"/>
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
 
-    <!-- property name="build.ngap.resources" location="${build.dir}/resources/ngap"/ -->
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
+    <property name="build.ngap.resources" location="${build.dir}/ngap"/>
 
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
@@ -453,6 +453,10 @@
 
         <copy todir="${build.robots.resources}" filtering="true">
             <fileset dir="${robotsResources.dir}"/>
+        </copy>
+
+        <copy todir="${build.ngap.resources}" filtering="true">
+            <fileset dir="${ngapResources.dir}"/>
         </copy>
 
 
@@ -925,7 +929,7 @@
            authentication and authorization filters enabled
         -->
         <war destfile="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"
-             webxml="${ngapResources.dir}/web.xml">
+             webxml="${build.ngap.resources}/web.xml">
 
             <lib  refid="hyrax-libs"/>
 
@@ -939,11 +943,11 @@
                 <exclude name="WEB-INF/urlrewrite.xml"/>
             </zipfileset>
 
-            <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF">
+            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
             </zipfileset>
 
-            <zipfileset dir="${ngapResources.dir}" prefix="WEB-INF/conf">
+            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF/conf">
                 <include name="logback.xml"/>
                 <include name="olfs.xml"/>
             </zipfileset>
@@ -954,9 +958,8 @@
             </zipfileset>
 
             <!-- = = = = = = NGAP LANDING PAGE = = = = = = -->
-            <zipfileset dir="${ngapResources.dir}/landing" prefix="docs/ngap" />
+            <zipfileset dir="${build.ngap.resources}/landing" prefix="docs/ngap" />
             <!-- = = = = = = = = = = = = = = = = = = = = = -->
-
 
         </war>
         <delete file="${build.dist}/index.html"/>
