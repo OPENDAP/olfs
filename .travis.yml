@@ -121,7 +121,7 @@ jobs:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
         - ./travis/compute_build_tags.sh
-        - ant-DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
