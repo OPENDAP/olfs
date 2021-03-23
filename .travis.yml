@@ -107,15 +107,8 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - source VERSION
-        - export OLFS_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_OLFS_BUILD_OFFSET)
-        - echo "OLFS_VERSION ${OLFS_VERSION}"
-        - echo "OLFS_BUILD_NUMBER ${OLFS_BUILD_NUMBER}"
-        - export HYRAX_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_HYRAX_BUILD_OFFSET)
-        - echo "HYRAX_VERSION ${HYRAX_VERSION}"
-        - echo "HYRAX_BUILD_NUMBER ${HYRAX_BUILD_NUMBER}"
-        - ant -DHYRAX_VERSION="${HYRAX_VERSION}-${HYRAX_BUILD_NUMBER}" -DOLFS_VERSION="${OLFS_VERSION}-${OLFS_BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+        - ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
@@ -127,15 +120,8 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - source VERSION
-        - export OLFS_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_OLFS_BUILD_OFFSET)
-        - echo "OLFS_VERSION ${OLFS_VERSION}"
-        - echo "OLFS_BUILD_NUMBER ${OLFS_BUILD_NUMBER}"
-        - export HYRAX_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_HYRAX_BUILD_OFFSET)
-        - echo "HYRAX_VERSION ${HYRAX_VERSION}"
-        - echo "HYRAX_BUILD_NUMBER ${HYRAX_BUILD_NUMBER}"
-        - ant -DHYRAX_VERSION="${HYRAX_VERSION}-${HYRAX_BUILD_NUMBER}" -DOLFS_VERSION="${OLFS_VERSION}-${OLFS_BUILD_NUMBER}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
+        - ./travis/compute_build_tags.sh
+        - ant-DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
@@ -152,6 +138,7 @@ jobs:
       script:
         - export STAGE=hyrax-docker
         - echo $STAGE
+        - ./travis/compute_build_tags.sh
         - ./travis/trigger-hyrax-docker.sh
 
 
