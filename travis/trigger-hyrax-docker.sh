@@ -22,12 +22,12 @@ git config --global user.email "npotter@opendap.org"
 cd hyrax-docker/hyrax-snapshot;
 git checkout master;
 
-OLFS_SNAPSHOT="${OLFS_BUILD_TAG} "`date "+%FT%T%z"`
-HYRAX_SNAPSHOT="${HYRAX_BUILD_TAG} "`date "+%FT%T%z"`
+OLFS_SNAPSHOT_TAG="${OLFS_BUILD_TAG} "`date "+%FT%T%z"`
+HYRAX_SNAPSHOT_TAG="${HYRAX_BUILD_TAG} "`date "+%FT%T%z"`
 
 echo "${BES_SNAPSHOT}" > snapshot.time;
-echo "${OLFS_SNAPSHOT}" >> snapshot.time;
-echo "${HYRAX_SNAPSHOT}" >> snapshot.time;
+echo "${OLFS_SNAPSHOT_TAG}" >> snapshot.time;
+echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time;
 
 cat snapshot.time;
 
