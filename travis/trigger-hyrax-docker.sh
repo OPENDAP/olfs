@@ -22,8 +22,8 @@ git config --global user.email "npotter@opendap.org"
 cd hyrax-docker/hyrax-snapshot;
 git checkout master;
 
-OLFS_SNAPSHOT_TAG="${OLFS_BUILD_TAG} "`date "+%FT%T%z"`
-HYRAX_SNAPSHOT_TAG="${HYRAX_BUILD_TAG} "`date "+%FT%T%z"`
+OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "`date "+%FT%T%z"`
+HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "`date "+%FT%T%z"`
 
 echo "${BES_SNAPSHOT}" > snapshot.time;
 echo "${OLFS_SNAPSHOT_TAG}" >> snapshot.time;
@@ -31,7 +31,7 @@ echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time;
 
 cat snapshot.time;
 
-git commit -am "${OLFS_SNAPSHOT} Triggering Hyrax-Docker image builds for snapshots.";
+git commit -am "${OLFS_SNAPSHOT_TAG} Triggering Hyrax-Docker image builds for snapshots.";
 git status;
 git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all;
 

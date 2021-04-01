@@ -106,9 +106,11 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE="olfs-${OLFS_BUILD_VERSION}" DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
@@ -119,9 +121,11 @@ jobs:
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_TAG}" -DOLFS_VERSION="${OLFS_BUILD_TAG}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot ngap-dist
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE="olfs-${OLFS_BUILD_VERSION}" DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
@@ -133,7 +137,6 @@ jobs:
       # reliably run once after everything else worked. -ndp 3/10/21
     - stage: hyrax-docker-trigger
       name: "Triggering hyrax-docker snapshot build"
-      jdk: openjdk8
       script:
         - export STAGE=hyrax-docker
         - echo $STAGE
