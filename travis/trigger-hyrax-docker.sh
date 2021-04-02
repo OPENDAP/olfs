@@ -9,6 +9,7 @@ set -e
 
 echo "-- -- -- -- -- -- -- -- -- after_deploy BEGIN -- -- -- -- -- -- -- -- --"
 
+# This will get both the BES and libdap version numbers
 BES_SNAPSHOT=`cat bes-snapshot`;
 
 echo "New OLFS Web Archive snapshot has been pushed. Triggering the Docker build"
@@ -17,19 +18,17 @@ git clone https://github.com/opendap/hyrax-docker
 git config --global user.name "The-Robot-Travis"
 git config --global user.email "npotter@opendap.org"
 
-
-
-cd hyrax-docker/hyrax-snapshot;
-git checkout master;
+cd hyrax-docker
+git checkout master
 
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "`date "+%FT%T%z"`
 HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "`date "+%FT%T%z"`
 
-echo "${BES_SNAPSHOT}" > snapshot.time;
-echo "${OLFS_SNAPSHOT_TAG}" >> snapshot.time;
-echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time;
+echo "${BES_SNAPSHOT}" > snapshot.time
+echo "${OLFS_SNAPSHOT_TAG}" >> snapshot.time
+echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time
 
-cat snapshot.time;
+cat snapshot.time
 
 git commit -am "${OLFS_SNAPSHOT_TAG} Triggering Hyrax-Docker image builds for snapshots.";
 git status;
