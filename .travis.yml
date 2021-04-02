@@ -16,7 +16,7 @@ services:
 branches:
   only:
     - master
-    - build-numbers
+    - travis
 
 notifications:
   email:
@@ -62,7 +62,7 @@ stages:
   - name: snappah
     if:  branch = master AND NOT type = pull_request
   - name: hyrax-docker-trigger
-    if:  branch = master OR branch = build-numbers AND NOT type = pull_request
+    if:  branch = master AND NOT type = pull_request
 
 jobs:
   include:
