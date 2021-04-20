@@ -769,8 +769,8 @@ public class BES {
 
     /**
      * Executes a command/response transaction with the BES and returns the
-     * BES response in a JDOM Document. Of course, if the response is NOT an
-     * parsale as an XML document then the bad things will happen.
+     * BES response in a JDOM Document. Of course, if the response is NOT
+     * parsable as an XML document then some bad things will happen.
      *
      *
      * @param request   The BES request document.
