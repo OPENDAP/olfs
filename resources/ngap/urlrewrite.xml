@@ -66,7 +66,7 @@
     -->
     <rule>
         <condition type="attribute" name="doRedirect" operator="equal">1</condition>
-        <from>^/(.*)$</from>
+        <from>^(\/ngap)?\/(.*)$</from>
         <to last="true">/hyrax/ngap/$1</to>
     </rule>
 
