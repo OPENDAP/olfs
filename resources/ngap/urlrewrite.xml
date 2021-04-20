@@ -55,7 +55,7 @@
 
 
     <rule>
-        <from>^/(wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
+        <from>^/(ngap|wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
