@@ -28,6 +28,7 @@ package opendap.auth;
 
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
@@ -161,8 +162,16 @@ public class IdFilter implements Filter {
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
 
-        String query = hsReq.getQueryString();
-        String requestUrl = hsReq.getRequestURL().toString() + ((query != null) ? ("?" + query) : "");
+        // FIXME The following needs to be replaced with a mechanism that does not require the query
+        //  to be added to the request URL in order for the redirect to produce the target request.
+        //  Why? Because the query may be too large for a URL on many servers.
+        //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
+        //  with the md5 hash of the query and then use that for a lookup down stream?
+        String requestUrl = hsReq.getRequestURL().toString();
+        String query = ReqInfo.getConstraintExpression(hsReq);
+        if(!query.isEmpty()) {
+            requestUrl += "?" + query;
+        }
 
         // Intercept login/logout requests
         if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
@@ -282,11 +291,11 @@ public class IdFilter implements Filter {
         if(log.isDebugEnabled()){
             String msg ="Caching request URL as session Attribute with key '"+RETURN_TO_URL+"' ";
             msg += "and value: " + requestUrl;
-            msg += "(session: "+session+")";
+            msg += "(session: "+session.getId()+")";
             log.debug(msg);
         }
         session.setAttribute(RETURN_TO_URL,requestUrl);
-        log.debug("Sanity check session.getAttribute(RETURN_TO_URL) returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session);
+        log.debug("Sanity check session.getAttribute("+RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session.getId());
     }
 
 

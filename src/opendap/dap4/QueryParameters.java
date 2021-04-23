@@ -43,10 +43,10 @@ import java.util.Vector;
  */
 public class QueryParameters {
 
-    public static final String STORE_RESULT = "dap4.store_result";
-    public static final String CONSTRAINT_EXPRESSION = "dap4.ce";
-    public static final String FUNC = "dap4.function";
-    public static final String ASYNC = "dap4.async";
+    public static final String DAP4_STORE_RESULT_KEY = "dap4.store_result";
+    public static final String DAP4_CONSTRAINT_EXPRESSION_KEY = "dap4.ce";
+    public static final String DAP4_FUNCTION_KEY = "dap4.function";
+    public static final String DAP4_ASYNC_KEY = "dap4.async";
     public static final String CLOUDY_DAP = "cloudydap";
 
 
@@ -151,16 +151,16 @@ public class QueryParameters {
             Vector<String> dropList = new Vector<String>();
             for(String key: params.keySet()){
 
-                if(key.equals(STORE_RESULT)){
+                if(key.equals(DAP4_STORE_RESULT_KEY)){
                     setIsStoreResultRequest(true);
                     setStoreResultRequestServiceUrl(new Request(null, req).getServiceUrl());
                     dropList.add(key);
                 }
-                if(key.equals(CONSTRAINT_EXPRESSION)){
+                if(key.equals(DAP4_CONSTRAINT_EXPRESSION_KEY)){
                     setCe(req.getParameter(key));
                     dropList.add(key);
                 }
-                if(key.equals(FUNC)){
+                if(key.equals(DAP4_FUNCTION_KEY)){
                     setFunc(req.getParameter(key));
                     dropList.add(key);
                 }
@@ -172,7 +172,7 @@ public class QueryParameters {
                 }
                 /** - - - - - - - - - - - - - - - - - - - - - - - */
 
-                if(key.equals(ASYNC)){
+                if(key.equals(DAP4_ASYNC_KEY)){
                     setAsync(req.getParameter(key));
                     dropList.add(key);
                 }
