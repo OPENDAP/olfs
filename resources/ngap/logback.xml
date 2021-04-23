@@ -96,7 +96,7 @@
     
 
     
-    <appender name="DebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="DebugLogDateRoller" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/debug.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${logdir}/debug.%d{yyyy-MM-dd}.log</FileNamePattern>
@@ -108,7 +108,7 @@
         </encoder>
     </appender>
 
-    <appender name="DebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="DebugLogSizeRoller" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/debug.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <FileNamePattern>${logdir}/debug.%i.log.zip</FileNamePattern>
@@ -134,7 +134,7 @@
 
 
     <logger name="opendap" level="error">
-        <appender-ref ref="DebugLog"/>
+        <appender-ref ref="DebugLogDateRoller"/>
     </logger>
 
     <!-- 

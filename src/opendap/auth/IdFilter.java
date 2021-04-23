@@ -28,6 +28,7 @@ package opendap.auth;
 
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
@@ -161,8 +162,11 @@ public class IdFilter implements Filter {
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
 
-        String query = hsReq.getQueryString();
-        String requestUrl = hsReq.getRequestURL().toString() + ((query != null) ? ("?" + query) : "");
+        String requestUrl = hsReq.getRequestURL().toString();
+        String query = ReqInfo.getConstraintExpression(hsReq);
+        if(!query.isEmpty()) {
+            requestUrl += "?" + query;
+        }
 
         // Intercept login/logout requests
         if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
@@ -282,11 +286,11 @@ public class IdFilter implements Filter {
         if(log.isDebugEnabled()){
             String msg ="Caching request URL as session Attribute with key '"+RETURN_TO_URL+"' ";
             msg += "and value: " + requestUrl;
-            msg += "(session: "+session+")";
+            msg += "(session: "+session.getId()+")";
             log.debug(msg);
         }
         session.setAttribute(RETURN_TO_URL,requestUrl);
-        log.debug("Sanity check session.getAttribute(RETURN_TO_URL) returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session);
+        log.debug("Sanity check session.getAttribute("+RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session.getId());
     }
 
 
