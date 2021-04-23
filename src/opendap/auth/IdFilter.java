@@ -162,6 +162,11 @@ public class IdFilter implements Filter {
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
 
+        // FIXME The following needs to be replaced with a mechanism that does not require the query
+        //  to be added to the request URL in order for the redirect to produce the target request.
+        //  Why? Because the query may be too large for a URL on many servers.
+        //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
+        //  with the md5 hash of the query and then use that for a lookup down stream?
         String requestUrl = hsReq.getRequestURL().toString();
         String query = ReqInfo.getConstraintExpression(hsReq);
         if(!query.isEmpty()) {
