@@ -156,7 +156,9 @@ public class IdFilter implements Filter {
         LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
         HttpSession session = hsReq.getSession(true);
-        log.debug("BEGIN (requestId: {} session: {})",requestId, session.getId());
+        log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
+
+        log.debug("Request Headers:\n{}", Util.requestHeadersToString(request));
 
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
@@ -194,7 +196,7 @@ public class IdFilter implements Filter {
                         // return to the root dir of the web application after
                         // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
-                        log.debug("Retrieved RETURN_TO_URL: {} from session: {}",returnToUrl,session.getId());
+                        log.debug("Retrieved RETURN_TO_URL: {} (session: {})",returnToUrl,session.getId());
                         if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
                             String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
                             msg += " (session: "+session.getId()+")";
@@ -255,6 +257,11 @@ public class IdFilter implements Filter {
         LogUtil.logServerAccessEnd(200,logName);
     }
 
+
+
+    /**
+     *
+     */
     public void destroy() {
         log = null;
     }
@@ -291,7 +298,7 @@ public class IdFilter implements Filter {
         if(log.isDebugEnabled()){
             String msg ="Caching request URL as session Attribute with key '"+RETURN_TO_URL+"' ";
             msg += "and value: " + requestUrl;
-            msg += "(session: "+session.getId()+")";
+            msg += " (session: "+session.getId()+")";
             log.debug(msg);
         }
         session.setAttribute(RETURN_TO_URL,requestUrl);

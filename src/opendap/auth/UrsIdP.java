@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -247,21 +246,7 @@ public class UrsIdP extends IdProvider{
         // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
-        Enumeration<String> h = request.getHeaderNames();
-
-        if(log.isDebugEnabled()){
-            StringBuilder sb = new StringBuilder();
-
-            while(h.hasMoreElements()){
-                String name = h.nextElement();
-                Enumeration<String> v = request.getHeaders(name);
-                while(v.hasMoreElements()){
-                    String value = v.nextElement();
-                    sb.append(name).append(": ").append(value).append("\n");
-                }
-            }
-            log.debug("Request Headers:\n{}",sb.toString());
-        }
+        log.debug("Request Headers:\n{}", Util.requestHeadersToString(request));
 
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authorization_header_value != null){

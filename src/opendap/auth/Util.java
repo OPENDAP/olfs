@@ -30,9 +30,11 @@ import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 
 /**
@@ -121,4 +123,25 @@ public class Util {
         return result.toString();
     }
 
+
+    /**
+     * Makes a json-like string of the request headers...
+     * @param request the request whose headers to stringify
+     * @return The string with the headers for your eyes.
+     */
+    static String requestHeadersToString(HttpServletRequest request){
+        StringBuilder sb = new StringBuilder();
+        Enumeration<String> h = request.getHeaderNames();
+
+        while(h.hasMoreElements()){
+            String name = h.nextElement();
+            Enumeration<String> v = request.getHeaders(name);
+            while(v.hasMoreElements()){
+                String value = v.nextElement();
+                sb.append(name).append(": ").append(value).append("\n");
+            }
+        }
+        //log.debug("Request Headers:\n{}",sb.toString());
+        return sb.toString();
+    }
 }
