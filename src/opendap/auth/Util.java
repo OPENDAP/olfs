@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.PathBuilder;
+import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,10 +132,13 @@ public class Util {
      * @param request the request whose headers to stringify
      * @return The string with the headers for your eyes.
      */
-    static void requestHeadersToDebugLog(HttpServletRequest request, Logger log){
+    static void debugHttpRequest(HttpServletRequest request, Logger log) throws IOException{
 
         if(log.isDebugEnabled()) {
-            log.debug("Request Headers:");
+            log.debug("HTTP Method: {}",request.getMethod());
+            log.debug("URL: {}",request.getRequestURL());
+            log.debug("URI: {}",request.getRequestURI());
+            log.debug("QueryString: {}",request.getQueryString());
             Enumeration<String> h = request.getHeaderNames();
             while (h.hasMoreElements()) {
                 String name = h.nextElement();
@@ -144,6 +148,8 @@ public class Util {
                     log.debug("{}: {}", name, value);
                 }
             }
+            log.debug("ReqInfo.getConstraintExpression(): {}",ReqInfo.getConstraintExpression(request));
+            log.debug("ReqInfo.getLocalUrl(): {}",ReqInfo.getLocalUrl(request));
         }
     }
 

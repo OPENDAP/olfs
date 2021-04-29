@@ -158,7 +158,7 @@ public class IdFilter implements Filter {
         HttpSession session = hsReq.getSession(true);
         log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
 
-        Util.requestHeadersToDebugLog(request,log);
+        Util.debugHttpRequest(request,log);
 
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
