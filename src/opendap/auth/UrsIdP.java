@@ -246,7 +246,7 @@ public class UrsIdP extends IdProvider{
         // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
 
-        log.debug("Request Headers:\n{}", Util.requestHeadersToString(request));
+        Util.requestHeadersToDebugLog(request,log);
 
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authorization_header_value != null){

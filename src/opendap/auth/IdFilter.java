@@ -158,7 +158,7 @@ public class IdFilter implements Filter {
         HttpSession session = hsReq.getSession(true);
         log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
 
-        log.debug("Request Headers:\n{}", Util.requestHeadersToString(request));
+        Util.requestHeadersToDebugLog(request,log);
 
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
@@ -250,7 +250,7 @@ public class IdFilter implements Filter {
         // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
         synchronized(session) {
-            cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+            Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
         }
         filterChain.doFilter(hsReq, hsRes);
         log.debug("END (session: {})",session.getId());
@@ -264,45 +264,6 @@ public class IdFilter implements Filter {
      */
     public void destroy() {
         log = null;
-    }
-
-
-    /**
-     * Here we make sure that request is really for something that the user would like to return to before we cache
-     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
-     * @param session
-     * @param requestUrl
-     * @param requestURI
-     * @param contextPath
-     */
-    private void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
-
-        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
-        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
-        String jsPath = PathBuilder.pathConcat(contextPath,"js");
-        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
-
-        log.debug("requestURI:  {}",requestURI);
-        log.debug("requestUrl:  {}",requestUrl);
-        log.debug("contextPath: {}",contextPath);
-
-        if(requestURI.startsWith(docsPath) ||
-                requestURI.startsWith(xslPath) ||
-                requestURI.startsWith(jsPath)  ||
-                requestURI.startsWith(webStartPath) ||
-                requestURI.equalsIgnoreCase("favicon.ico")
-                ){
-            log.debug("Not caching request url: {}",requestUrl);
-            return;
-        }
-        if(log.isDebugEnabled()){
-            String msg ="Caching request URL as session Attribute with key '"+RETURN_TO_URL+"' ";
-            msg += "and value: " + requestUrl;
-            msg += " (session: "+session.getId()+")";
-            log.debug(msg);
-        }
-        session.setAttribute(RETURN_TO_URL,requestUrl);
-        log.debug("Sanity check session.getAttribute("+RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(RETURN_TO_URL), session.getId());
     }
 
 

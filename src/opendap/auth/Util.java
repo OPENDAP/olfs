@@ -26,11 +26,13 @@
 
 package opendap.auth;
 
+import opendap.PathBuilder;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -129,19 +131,58 @@ public class Util {
      * @param request the request whose headers to stringify
      * @return The string with the headers for your eyes.
      */
-    static String requestHeadersToString(HttpServletRequest request){
-        StringBuilder sb = new StringBuilder();
-        Enumeration<String> h = request.getHeaderNames();
+    static void requestHeadersToDebugLog(HttpServletRequest request, Logger log){
 
-        while(h.hasMoreElements()){
-            String name = h.nextElement();
-            Enumeration<String> v = request.getHeaders(name);
-            while(v.hasMoreElements()){
-                String value = v.nextElement();
-                sb.append(name).append(": ").append(value).append("\n");
+        if(log.isDebugEnabled()) {
+            log.debug("Request Headers:");
+            Enumeration<String> h = request.getHeaderNames();
+            while (h.hasMoreElements()) {
+                String name = h.nextElement();
+                Enumeration<String> v = request.getHeaders(name);
+                while (v.hasMoreElements()) {
+                    String value = v.nextElement();
+                    log.debug("{}: {}", name, value);
+                }
             }
         }
-        //log.debug("Request Headers:\n{}",sb.toString());
-        return sb.toString();
+    }
+
+    /**
+     * Here we make sure that request is really for something that the user would like to return to before we cache
+     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
+     * @param session
+     * @param requestUrl
+     * @param requestURI
+     * @param contextPath
+     */
+    static void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
+        Logger log = LoggerFactory.getLogger("opendap.auth.Util");
+
+        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
+        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
+        String jsPath = PathBuilder.pathConcat(contextPath,"js");
+        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
+
+        log.debug("requestURI:  {}",requestURI);
+        log.debug("requestUrl:  {}",requestUrl);
+        log.debug("contextPath: {}",contextPath);
+
+        if(requestURI.startsWith(docsPath) ||
+                requestURI.startsWith(xslPath) ||
+                requestURI.startsWith(jsPath)  ||
+                requestURI.startsWith(webStartPath) ||
+                requestURI.equalsIgnoreCase("favicon.ico")
+                ){
+            log.debug("Not caching request url: {}",requestUrl);
+            return;
+        }
+        if(log.isDebugEnabled()){
+            String msg ="Caching request URL as session Attribute with key '"+ IdFilter.RETURN_TO_URL+"' ";
+            msg += "and value: " + requestUrl;
+            msg += " (session: "+session.getId()+")";
+            log.debug(msg);
+        }
+        session.setAttribute(IdFilter.RETURN_TO_URL,requestUrl);
+        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
     }
 }
