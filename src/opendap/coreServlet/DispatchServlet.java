@@ -168,12 +168,7 @@ public class DispatchServlet extends HttpServlet {
             initAuthenticationControls();
 
             try {
-                loadHyraxServiceHandlers(httpGetDispatchHandlers, config);
-                if (enablePost) {
-                    opendap.bes.BesDapDispatcher bdd = new opendap.bes.BesDapDispatcher();
-                    bdd.init(this, config);
-                    httpPostDispatchHandlers.add(bdd);
-                }
+                loadHyraxServiceHandlers(httpGetDispatchHandlers, httpPostDispatchHandlers, enablePost, config);
             } catch (Exception e) {
                 throw new ServletException(e);
             }
@@ -295,8 +290,17 @@ public class DispatchServlet extends HttpServlet {
      * <Handler className="opendap.bes.DirectoryDispatchHandler" />
      * <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
      * <Handler className="opendap.bes.FileDispatchHandler" />
+     *
+     * @param httpGetHandlers The list of GET handlers for the OLFS to use.
+     * @param httpPostHandlers The list of POST handlers for the OLFS to use.
+     * @param enablePost If the value is TRU then the POST handling will be enabled.
+     * @param config The configuration Element to use when configuring the service.
+     * @throws Exception
      */
-    private void loadHyraxServiceHandlers(List<DispatchHandler> handlers, Element config) throws Exception {
+    private void loadHyraxServiceHandlers(
+            List<DispatchHandler> httpGetHandlers,
+            List<DispatchHandler> httpPostHandlers,
+            boolean enablePost, Element config) throws Exception {
 
         if (config == null)
             throw new ServletException("Bad configuration! The configuration element was NULL");
@@ -304,14 +308,21 @@ public class DispatchServlet extends HttpServlet {
         Element botBlocker = config.getChild("BotBlocker");
         Element noDynamicNavigation = config.getChild("NoDynamicNavigation");
 
-        handlers.add(new opendap.bes.VersionDispatchHandler());
+        httpGetHandlers.add(new opendap.bes.VersionDispatchHandler());
         if (botBlocker != null)
-            handlers.add(new opendap.coreServlet.BotBlocker());
-        handlers.add(new opendap.ncml.NcmlDatasetDispatcher());
-        handlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
-        handlers.add(new opendap.gateway.DispatchHandler());
-        handlers.add(new opendap.ngap.NgapDispatchHandler());
-        handlers.add(new opendap.bes.BesDapDispatcher());
+            httpGetHandlers.add(new opendap.coreServlet.BotBlocker());
+        httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
+        httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
+        httpGetHandlers.add(new opendap.gateway.DispatchHandler());
+        httpGetHandlers.add(new opendap.ngap.NgapDispatchHandler());
+        httpGetHandlers.add(new opendap.bes.BesDapDispatcher());
+
+        if (enablePost) {
+            // The DAP dispatch handler does POST
+            httpPostHandlers.add( new opendap.bes.BesDapDispatcher());
+            // And the NGAP dispatch handler does POST
+            httpPostHandlers.add(new opendap.ngap.NgapDispatchHandler());
+        }
 
         if(noDynamicNavigation!=null) {
             log.info("Dynamic Site Navigation Has Been Disabled. " +
@@ -320,13 +331,16 @@ public class DispatchServlet extends HttpServlet {
         }
         else {
             // Load the dynamic catalog reponse handlers.
-            handlers.add(new opendap.bes.DirectoryDispatchHandler());
-            handlers.add(new opendap.bes.BESThreddsDispatchHandler());
+            httpGetHandlers.add(new opendap.bes.DirectoryDispatchHandler());
+            httpGetHandlers.add(new opendap.bes.BESThreddsDispatchHandler());
         }
 
-        handlers.add(new opendap.bes.FileDispatchHandler());
+        httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
 
-        for (DispatchHandler dh : handlers) {
+        for (DispatchHandler dh : httpGetHandlers) {
+            dh.init(this, config);
+        }
+        for (DispatchHandler dh : httpPostHandlers) {
             dh.init(this, config);
         }
     }
