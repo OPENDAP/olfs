@@ -36,12 +36,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
  * Created by ndp on 10/7/14.
  */
-public class ApacheIdP extends IdProvider implements Serializable {
+public class ApacheIdP extends IdProvider {
 
 
     public static final String DEFAULT_AUTHENTICATION_CONTEXT="apache";
@@ -56,9 +55,7 @@ public class ApacheIdP extends IdProvider implements Serializable {
      */
     public static final String DEFAULT_LOGIN_LOCATION = "/Login";
 
-    /* @serial */
     private String loginEndpoint;
-    /* @serial */
     private String logoutEndpoint;
 
 

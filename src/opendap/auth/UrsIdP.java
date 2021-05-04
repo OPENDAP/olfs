@@ -39,27 +39,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by ndp on 9/25/14.
  */
-public class UrsIdP extends IdProvider implements Serializable {
+public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
     public static final String AUTHORIZATION_HEADER_KEY="authorization";
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
-    /* @serial */
     private Logger log;
 
-    /* @serial */
     private String ursUrl;
-    /* @serial */
     private String clientAppId;
-    /* @serial */
     private String clientAppAuthCode;
 
     private static final String ERR_PRFX = "ERROR! msg: ";
@@ -75,10 +70,10 @@ public class UrsIdP extends IdProvider implements Serializable {
 
     @Override
     public void init(Element config, String serviceContext) throws ConfigurationException {
-        
         super.init(config, serviceContext);
 
         Element e;
+
         e = getConfigElement(config,"UrsUrl");
         ursUrl = e.getTextTrim();
 
@@ -87,6 +82,7 @@ public class UrsIdP extends IdProvider implements Serializable {
 
         e = getConfigElement(config,"UrsClientAuthCode");
         clientAppAuthCode = e.getTextTrim();
+
     }
 
 
