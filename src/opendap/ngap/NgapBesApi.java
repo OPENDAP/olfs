@@ -66,8 +66,8 @@ import java.util.regex.Pattern;
  */
 public class NgapBesApi extends BesApi implements Cloneable {
 
-    public static final String UID_CONTEXT  = "uid";
-    public static final String ACCESS_TOKEN_CONTEXT  = "edl_auth_token";
+    public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
+    public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -138,7 +138,6 @@ public class NgapBesApi extends BesApi implements Cloneable {
                 Thread.currentThread().getId()+":ngap_request]";
         request.setAttribute("reqID",reqID);
 
-
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
@@ -183,38 +182,60 @@ public class NgapBesApi extends BesApi implements Cloneable {
      * Adds the user id and/or the associated EDL auth token to the request
      * element. If either parameter is the empty string it is omitted.
      *
-     * Constructs the EDL/URS auth token for Hyrax to utilize when connecting to
-     * NGAP infrstructure (like cumulus and CMR) The token is made from the
+     * Constructs the EDL/URS Echo-Token and Authorization headers for use
+     * when connecting to NGAP infrstructure (like cumulus and CMR) The
+     * Echo-Token is made from the
      * EDL access_token returned for the user and the server's EDL Application
      * Client-Id.
      *
-     *    auth_token = access_token:Client-Id
+     *    Echo-Token: µedl_access_token:Client-Id
+     *
+     * The Authorization header is made of the sting:
+     *
+     *    Authorization: Bearer edl_access_token
+     *
+     * From a bes command:
+     *   <bes:setContext name="uid">ndp_opendap</bes:setContext>
+     *   <bes:setContext name="edl_echo_token">anecho:tokenvalue</bes:setContext>
+     *    <bes:setContext name="edl_auth_token">Bearer Abearertokenvalue</bes:setContext>
      *
      * @param request The BES request in which to set the UID_CONTEXT and
-     *                ACCESS_TOKEN_CONTEXT from the user object.
+     *                EDL_AUTH_TOKEN_CONTEXT from the user object.
      * @param user The instance of User from which to get the uid, the
      *             auth_token, and the EDL Application Client-Id..
      */
-    private void addEdlAuthToken(Element request, User user){
+    public static void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
-        if(up!=null){
-            String uid = up.getUID();
-            if(!uid.isEmpty())
-                request.addContent(setContextElement(UID_CONTEXT,uid));
-            EarthDataLoginAccessToken oat = up.getEDLAuthToken();
-            if(oat!=null){
-                String accessToken = oat.getAccessToken();
-                if(!accessToken.isEmpty()) {
-                    String echo_token = accessToken + ":" +up.getEDLClientAppId();
-                    request.addContent(setContextElement(ACCESS_TOKEN_CONTEXT, echo_token));
+        if (up != null) {
+            request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
-                }
+            EarthDataLoginAccessToken oat = up.getEDLAccessToken();
+            if (oat != null) {
+
+                // Make and add the @deprecated Echo-Token value
+                request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, oat.getEchoTokenValue()));
+
+                // Add the new service chaining Authorization header value
+                request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAuthorizationHeaderValue()));
             }
         }
 
     }
 
 
+    /**
+     *
+     * @param user
+     * @param type
+     * @param remoteDataSourceUrl
+     * @param qp
+     * @param xmlBase
+     * @param formURL
+     * @param returnAs
+     * @param errorContext
+     * @return
+     * @throws BadConfigurationException
+     */
     @Override
     public  Document getDap4RequestDocument(User user,
                                             String type,
@@ -359,7 +380,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
                                        String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getDap4RequestDocument(user, DataDDX, dataSource, qp, xmlBase, null, null, XML_ERRORS);
+        Document reqDoc = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
         if(req==null)

@@ -27,7 +27,6 @@
 package opendap.coreServlet;
 
 
-import opendap.PathBuilder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.http.mediaTypes.*;
 import opendap.io.HyraxStringEncoding;
@@ -42,6 +41,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -191,55 +191,6 @@ public class OPeNDAPException extends Exception {
     }
 
 
-    public static String getDap2Error(int code, String errorMessage) {
-
-        StringBuilder err = new StringBuilder("Error {\n");
-        err.append("     code = ").append(code).append(";\n");
-
-
-        // If the error message is wrapped in double quotes, print it, else,
-        // add wrapping double quotes.
-        if ((errorMessage != null) && (errorMessage.charAt(0) == '"'))
-            err.append("    message = ").append(errorMessage).append(";\n");
-        else
-            err.append("    message = \"").append(errorMessage).append("\";\n");
-
-
-        err.append("};\n");
-
-        return err.toString();
-
-    }
-
-    /**
-     * Print the DAP2 Error object on the given <code>PrintWriter</code>.
-     * This code can be used by servlets to throw an OPeNDAPException to a client.
-     *
-     * @param os the <code>PrintWriter</code> to use for output.
-     */
-    public void print(PrintStream os) {
-
-        os.println(getDap2Error(-1,_errorMessage));
-    }
-
-    /**
-     * Print the DAP2 Error object on the given <code>OutputStream</code>.
-     *
-     * @param os the <code>OutputStream</code> to use for output.
-     */
-    public final void print(OutputStream os) {
-        try {
-            PrintStream pw;
-            pw = new PrintStream(os, true,  HyraxStringEncoding.getCharset().name());
-            print(pw);
-            pw.flush();
-        } catch (UnsupportedEncodingException e) {
-            // Oh well...
-            _log.error("Unable to print error because the character set '{}' is an unsupported encoding. msg: {}",
-                    HyraxStringEncoding.getCharset().displayName(), e.getMessage());
-        }
-    }
-
 
     /**
      * ************************************************************************
@@ -288,24 +239,34 @@ public class OPeNDAPException extends Exception {
 
             }
 
-
             if(!response.isCommitted()){
 
                 response.reset();
 
                 oe.setSystemPath(ServletUtil.getSystemPath(servlet,""));
-
-                oe.sendHttpErrorResponse(response);
+                try {
+                    oe.sendHttpErrorResponse(response);
+                }
+                catch(IOException ioe){
+                    log.error("Failed to transmit http error response to " +
+                            "requesting client. Caught {} Message: {}", ioe.getClass().getName(),ioe.getMessage());
+                }
             }
             else {
-                oe.sendAsDap2Error(response);
+                try {
+                    oe.sendAsDap2Error(response);
+                }
+                catch(IOException ioe){
+                    log.error("Failed to transmit DAP2 error object to " +
+                            "requesting client. Caught {} Message: {}", ioe.getClass().getName(),ioe.getMessage());
+                }
             }
 
             return oe.getHttpStatusCode();
 
-        } catch (Throwable ioe) {
-            log.error("Bad things happened! Cannot process incoming " +
-                    "exception! New Exception thrown: " + ioe);
+        } catch (Throwable moreT) {
+            log.error("The Bad Things have happened! A new {} was thrown while " +
+                    "processing a prior exception. message: {}" , moreT.getClass().getName(), moreT.getMessage());
         }
 
         return -1;
@@ -366,50 +327,21 @@ public class OPeNDAPException extends Exception {
                 return;
             }
 
-
+            if (errorResponseMediaType.getSubType().equalsIgnoreCase(RDF.SUB_TYPE)) {
+                sendAsDap4Error(response);
+                return;
+            }
         }
         sendAsHtmlErrorPage(response);
-
-    }
-
-
-
-    /*
-    public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
-        String template = readFileAsString(htmlTemplateFile);
-        template = template.replaceAll("<CONTEXT />",context);
-        return template;
     }
 
 
 
 
-    public static String readFileAsString(String fileName) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
 
-        try {
-            while (scanner.hasNextLine()) {
-                stringBuilder.append(scanner.nextLine()).append("\n");
-            }
-        } finally {
-            scanner.close();
-        }
-        return stringBuilder.toString();
-    }
-      */
-
-
-
-
-
-
-    public int setHttpStatusCode(int code){
+    public void setHttpStatusCode(int code){
         //@TODO Make this thing look at the code and QC it's HTTP codyness.
-
         _httpStatusCode = code;
-        return getHttpStatusCode();
-
     }
 
 
@@ -470,7 +402,7 @@ public class OPeNDAPException extends Exception {
 
         opendap.dap4.Dap4Error d4e = new opendap.dap4.Dap4Error();
         d4e.setHttpStatusCode(getHttpStatusCode());
-        d4e.setMessage(getMessage());
+        d4e.setMessage(Encode.forXmlContent(getMessage()));
 
         response.setContentType(d4e.getMediaType().getMimeType());
         response.setHeader("Content-Description", "DAP4 Error Object");
@@ -535,7 +467,7 @@ public class OPeNDAPException extends Exception {
         sos.println("      \"type\":  =  \"String\",");
         sos.println("      \"attributes\":  =  \"[]\",");
         sos.print("      \"data\":  =  \"");
-        sos.print(getMessage());
+        sos.print(Encode.forJavaScriptBlock(getMessage()));
         sos.println("\"");
         sos.println("    },");
         sos.println("      \"name\":  =  \"HttpStatus\",");
@@ -574,19 +506,32 @@ public class OPeNDAPException extends Exception {
 
     /**
      *
-     * @return  The (any?) error message associated with the current thread.
+     * @return  The error message cached by the current thread. This message is
+     * not encoded for inclusion in a particular message type (such as HTML)
+     * encoding is left to the receiver.
      */
     public static String getAndClearCachedErrorMessage(){
-        String msg = _errorMessageCache.remove(Thread.currentThread());
-        return Encode.forHtml(msg);
+        return  _errorMessageCache.remove(Thread.currentThread());
     }
 
-    public static void setCachedErrorMessage(String s){
-        _errorMessageCache.put(Thread.currentThread(),s);
+    /**
+     * Adds the passed string to the error message cache for the current thread.
+     * @param errMsg The error message.
+     */
+    public static void setCachedErrorMessage(String errMsg){
+        _errorMessageCache.put(Thread.currentThread(),errMsg);
     }
 
 
-    public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail){
+    /**
+     * Builds the mailto link to be utilized in various form , error, and directory pages
+     * @param request
+     * @param http_status
+     * @param errorMessage
+     * @param adminEmail
+     * @return The support mailto link, encoded forHtmlAttribute
+     */
+    public static String getSupportMailtoLink(HttpServletRequest request, int http_status, String errorMessage, String adminEmail) throws UnsupportedEncodingException {
 
         StringBuilder sb = new StringBuilder();
         if(http_status!=200){
@@ -616,23 +561,41 @@ public class OPeNDAPException extends Exception {
             sb.append("# -- -- -- hyrax location info, please include -- -- --%0A");
         }
         sb.append("# %0A");
-        sb.append("# request_url: ").append(request.getRequestURL().toString()).append("%0A");
+        sb.append("# request_url: ");
+        sb.append(request.getRequestURL().toString()).append("%0A");
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");
         sb.append("# server: ").append(request.getServerName()).append("%0A");
         sb.append("# port: ").append(request.getServerPort()).append("%0A");
-        sb.append("# javax.servlet.forward.request_uri: ").append((String) request.getAttribute("javax.servlet.forward.request_uri")).append("%0A");
+
+        String cleanUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+        if(cleanUri!=null){
+            cleanUri = URLDecoder.decode(cleanUri, HyraxStringEncoding.getCharset().name());
+            cleanUri = Scrub.urlContent(cleanUri);
+        }
+        else {
+            cleanUri = "null";
+        }
+
+        sb.append("# javax.servlet.forward.request_uri: ");
+        sb.append(cleanUri);
+
+        sb.append("%0A");
 
         sb.append("# query_string: ");
         String queryString = request.getQueryString();
         if(queryString!=null && !queryString.isEmpty()){
-            sb.append(queryString).append("%0A");
+            sb.append(Scrub.simpleQueryString(queryString)).append("%0A");
         }
         else {
             sb.append("n/a%0A");
         }
         sb.append("# status: ").append(http_status).append("%0A");
         if(http_status !=200) {
-            sb.append("# message: ").append(errorMessage).append("%0A");
+            sb.append("# message: ");
+            if(errorMessage!=null)
+                sb.append(errorMessage).append("%0A");
+            else
+                sb.append("no_error_message_found").append("%0A");
         }
         sb.append("# %0A");
         sb.append("# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --%0A");

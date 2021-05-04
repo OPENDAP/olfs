@@ -50,7 +50,7 @@ public class BESSiteMapService extends HttpServlet {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException When the bad things happen.
      */
     @Override
     public void init() throws ServletException {
@@ -77,7 +77,10 @@ public class BESSiteMapService extends HttpServlet {
 
 
             if (!BESManager.isInitialized()) {
-                String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), "olfs.xml");
+                String configFilename = "olfs.xml";
+                PersistentConfigurationHandler.installDefaultConfiguration(this, configFilename);
+
+                String filename = PathBuilder.pathConcat(ServletUtil.getConfigPath(this), configFilename);
                 Element configElement;
                 try {
                     configElement = opendap.xml.Util.getDocumentRoot(filename);
@@ -191,10 +194,12 @@ public class BESSiteMapService extends HttpServlet {
 
                 if (relativeUrl.equals("/")) {
                     LOG.debug("Just the service endpoint. {}",request.getRequestURI());
+                    response.setContentType("text/plain");
                     sos.println(besSiteMap.getSiteMapEntryForRobotsDotText(siteMapServicePrefix));
                 }
                 else {
                     // If we are here then the request should be asking for a siteMap sub file.
+                    response.setContentType("text/plain");
                     besSiteMap.send_pseudoSiteMapFile(siteMapServicePrefix,sos,relativeUrl);
                 }
                 response_size = dos.size();

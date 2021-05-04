@@ -36,16 +36,17 @@ import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Request;
 import opendap.dap.User;
+import opendap.http.error.Forbidden;
+import opendap.http.error.NotFound;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
-// import org.apache.commons.httpclient.HttpStatus;
 import org.jdom.Element;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -117,34 +118,43 @@ public class FileAccess extends Dap4Responder {
 
                         }
                         else {
-                            log.warn("respondToHttpGetRequest() - Sending Access Denied for resource: " + Scrub.completeURL(resourceID));
+                            log.debug("Sending Access Denied for resource: " + Encode.forHtml(resourceID));
                             sendDirectAccessDenied(req,response);
                         }
                     }
                     else {
-                        String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(resourceID);
-                        log.info("respondToHttpGetRequest() - {}", errMsg);
-                        sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
+                        String errMsg = "Unable to locate BES resource: " + resourceID;
+                        log.debug(errMsg);
+                        throw new NotFound(errMsg);
+                        //String errMsg = "Unable to locate BES resource. Message:" + Encode.forHtml(resourceID);
+                        //sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
                     }
                 }
                 else {
-                    String errMsg = "BES data source {} is not accessible." + Scrub.completeURL(resourceID);
-                    log.info("respondToHttpGetRequest() - {}", errMsg);
-                    sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
+                    String errMsg = "Requested data source " + resourceID + " is not accessible.";
+
+                    log.debug(errMsg);
+                    throw new NotFound(errMsg);
+                    //String errMsg = "BES data source {} is not accessible. Message:" + Encode.forHtml(resourceID);
+                    //sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
                 }
 
             }
             else {
-                String errMsg = "You may not download nodes/directories, only files." + Scrub.completeURL(resourceID);
-                log.info("respondToHttpGetRequest() - {}", errMsg);
-                sendHttpErrorResponse(HttpServletResponse.SC_FORBIDDEN, errMsg, "docs", response);
+                String errMsg = "You may not download nodes/directories, only files. Requested resource: " + resourceID;
+                log.debug(errMsg);
+                throw new Forbidden(errMsg);
+                //String errMsg = "You may not download nodes/directories, only files. Message:" + Encode.forHtml(resourceID);
+                //sendHttpErrorResponse(HttpServletResponse.SC_FORBIDDEN, errMsg, "docs", response);
             }
 
         }
         else {
-            String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(resourceID);
-            log.info("matches() - {}", errMsg);
-            sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
+            String errMsg = "Unable to locate resource: " + resourceID;
+            log.debug("matches() - {}", errMsg);
+            throw new NotFound(errMsg);
+            //String errMsg = "Unable to locate BES resource: " + Encode.forHtml(resourceID);
+            //sendHttpErrorResponse(HttpServletResponse.SC_NOT_FOUND, errMsg, "docs", response);
         }
 
 
@@ -204,15 +214,16 @@ public class FileAccess extends Dap4Responder {
         String serviceUrl = new Request(null,request).getServiceUrl();
 
 
+        String context = request.getContextPath();
         pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");
         pw.println("<head>  ");
         pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />");
-        pw.println("    <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css' />");
+        pw.println("    <link rel='stylesheet' href='" + context + "/docs/css/contents.css' type='text/css' />");
         pw.println("<title>Hyrax:  Access Denied</title>");
         pw.println("</head>");
         pw.println("");
         pw.println("<body>");
-        pw.println("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>");
+        pw.println("<img alt=\"OPeNDAP Logo\" src=\"" + context + "/docs/images/logo.png\"/>");
 
         pw.println("<h1>Hyrax : Access Denied (403) </h1>");
         pw.println("<hr align=\"left\" size=\"1\" noshade=\"noshade\" />");

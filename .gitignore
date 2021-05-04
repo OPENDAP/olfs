@@ -10,6 +10,7 @@
 
 ## Build dir
 build
+release
 
 # Is there a file called ']' somewhere in this project? jhrg 3/11/15
 ]
@@ -53,3 +54,4 @@ foo.*
 
 # travis sec key (never gonna check it in)
 travis/woo_deploy_rsa
+/.gradle/

@@ -38,124 +38,152 @@ import java.util.*;
 public class UserProfile implements Serializable {
 
     /* @serial */
-    private Date objectCreationTime; // Serializable.
+    private Date objectCreationTime;
     /* @serial */
-    private String jsonStr; // Serializable.
+    private String d_jsonStr;
     /* @serial */
-    private JsonObject profile;   // NOT Serializable?
+    private HashSet<String> d_groups;
     /* @serial */
-    private HashSet<String> groups; // Serializable.
-    /* @serial */
-    private HashSet<String> roles;  // Serializable.
+    private HashSet<String> d_roles;
 
     /* @serial */
-    private IdProvider _idp; //Serializable
+    private String d_authContext;
+    /* @serial */
+    private EarthDataLoginAccessToken d_edlAccessToken;
 
     /* @serial */
-    private EarthDataLoginAccessToken _token; // Serializable
+    private String d_uid;
 
-    /* @serial */
-    private String edlClientAppId; // Serializable.
+    // TODO Annotate this so that it does not serialize.
+    private JsonObject d_profile;
+
+    // private String edlClientAppId;
 
 
     public UserProfile() {
         objectCreationTime = new Date();
-        profile = new JsonObject();
-        groups = new HashSet<>();
-        roles = new HashSet<>();
-        _idp  = null;
-        _token = null;
-        edlClientAppId ="";
+        d_groups = new HashSet<>();
+        d_roles = new HashSet<>();
+
+        d_profile = null;
+        d_authContext = null;
+        d_edlAccessToken = null;
+        // edlClientAppId ="";
+        d_uid = null;
     }
 
     /**
      *  Parse the json to extract the user id, first and last names,
      * and email address. We store these in the session. These four
      * parameters are mandatory, and will always exist in the user
-     * profile.
+     * d_profile.
      * @param jsonStr
      */
     public UserProfile(String jsonStr){
         this();
-        JsonParser jparse = new JsonParser();
-        profile = jparse.parse(jsonStr).getAsJsonObject();
-        this.jsonStr = jsonStr;
-
+        ingestJsonProfileString(jsonStr);
     }
 
-    public void setEDLAuthToken(EarthDataLoginAccessToken oat){
-        _token = new EarthDataLoginAccessToken(oat);
+    private JsonObject getProfile(){
+        if(d_profile ==null && d_jsonStr !=null){
+            JsonParser jparse = new JsonParser();
+            d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        }
+        return d_profile;
     }
 
-    public void setEDLClientAppId(String clientAppId){
-        edlClientAppId = clientAppId;
-    }
-    public String getEDLClientAppId(){
-        return edlClientAppId;
+    void ingestJsonProfileString(String jsonStr){
+        this.d_jsonStr = jsonStr;
+        d_uid = getProfile().get("d_uid").getAsString();
     }
 
-    public EarthDataLoginAccessToken getEDLAuthToken(){
-        return new EarthDataLoginAccessToken(_token);
+    public void setEDLAccessToken(EarthDataLoginAccessToken oat){
+        d_edlAccessToken = new EarthDataLoginAccessToken(oat);
+    }
+
+    // public void setEDLClientAppId(String clientAppId){ edlClientAppId = clientAppId; }
+
+    // public String getEDLClientAppId(){ return edlClientAppId; }
+
+    public EarthDataLoginAccessToken getEDLAccessToken(){
+        if(d_edlAccessToken ==null)
+            return null;
+
+        return new EarthDataLoginAccessToken(d_edlAccessToken);
     }
 
 
     public String getAttribute(String attrName){
-        JsonElement val =  profile.get(attrName);
-        if(val==null)
-            return null;
-        return val.toString();
+        JsonObject profile = getProfile();
+        if(profile !=null) {
+            JsonElement val = profile.get(attrName);
+            if (val == null)
+                return null;
+            return val.toString();
+        }
+        return null;
     }
 
     public void setAttribute(String attrName, String value){
-        profile.add(attrName, new JsonPrimitive(value));
+        JsonObject profile = getProfile();
+        if(profile !=null) {
+            profile.add(attrName, new JsonPrimitive(value));
+        }
     }
 
     public Vector<String> getAttributeNames(){
         Vector<String> keys = new Vector<>();
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()){
-            keys.add(e.getKey());
+        JsonObject profile = getProfile();
+        if(profile !=null) {
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                keys.add(e.getKey());
+            }
         }
         return keys;
     }
 
     public String getUID() {
-        return profile.get("uid").getAsString();
+        return d_uid;
+    }
+
+    public void setUID(String user_id) {
+        d_uid = user_id;
     }
 
     public IdProvider getIdP(){
-        return _idp;
+        return IdPManager.getProvider(d_authContext);
     }
-    public void setIdP(IdProvider idProvider){
-        _idp = idProvider;
+    public void setAuthContext(String context){
+        d_authContext = context;
     }
 
 
     public void addGroups(HashSet<String> groupMemberships){
-        groups.addAll(groupMemberships);
+        d_groups.addAll(groupMemberships);
 
     }
 
     public void addGroup(String group){
-        groups.add(group);
+        d_groups.add(group);
 
     }
 
     public void addRoles(HashSet<String> roles){
-        this.roles.addAll(roles);
+        this.d_roles.addAll(roles);
 
     }
     public void addRole(String role){
-        roles.add(role);
+        d_roles.add(role);
 
     }
 
 
     public HashSet<String> getGroups(){
-        return new HashSet<String>(groups);
+        return new HashSet<String>(d_groups);
     }
 
     public HashSet<String> getRoles(){
-        return new HashSet<String>(roles);
+        return new HashSet<String>(d_roles);
     }
 
 
@@ -186,7 +214,7 @@ public class UserProfile implements Serializable {
 
 
     public void setUID(String s) {
-        _profile.put("uid", s);
+        _profile.put("d_uid", s);
     }
 
     public String getUserType() {
@@ -235,15 +263,18 @@ public class UserProfile implements Serializable {
 
         sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
 
-        boolean comma = false;
-        for(Map.Entry<String,JsonElement> e: profile.entrySet()) {
-            sb.append(comma?",\n":"\n");
-            sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
-            comma =true;
+        JsonObject profile = getProfile();
+        if(profile != null) {
+            boolean comma = false;
+            for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
+                sb.append(comma ? ",\n" : "\n");
+                sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                comma = true;
+            }
+            sb.append(indent).append("\n");
         }
-        sb.append(indent).append("\n");
-        if(_token!=null){
-            sb.append(_token.toString(l1i,indent_inc));
+        if(d_edlAccessToken !=null){
+            sb.append(d_edlAccessToken.toString(l1i,indent_inc));
         }
         sb.append(indent).append("}\n");
         return sb.toString();
@@ -252,10 +283,10 @@ public class UserProfile implements Serializable {
 
 
     public static void main(String args[]){
-        String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+        String ursUserProfile = "{\"d_uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
 
         UserProfile up = new UserProfile(ursUserProfile);
-        up.setEDLAuthToken(new EarthDataLoginAccessToken());
+        up.setEDLAccessToken(new EarthDataLoginAccessToken());
         System.out.println(up.toString());
 
     }

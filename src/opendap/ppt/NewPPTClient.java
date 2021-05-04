@@ -153,11 +153,11 @@ public class NewPPTClient {
     }
 
     public boolean isClosed(){
-        return _mySock.isClosed();
+        return _mySock==null || _mySock.isClosed();
     }
 
     public boolean isConnected(){
-        return _mySock.isConnected();
+        return _mySock!=null && _mySock.isConnected();
     }
 
 
@@ -171,9 +171,11 @@ public class NewPPTClient {
 
     public void dieNow(){
         try{
-            _mySock.close();
+            if(_mySock!=null)
+                _mySock.close();
+            _mySock=null;
         }
-        catch(Throwable t){
+        catch(IOException t){
             log.error(t.getMessage());
         }
     }
@@ -285,7 +287,42 @@ public class NewPPTClient {
         else {
             msg.append(" _mySock is null");
         }
+        log.info(msg.toString());
 
+        if(_mySock!=null && !_mySock.isClosed()){
+
+            try {
+                _mySock.shutdownOutput();  // Sends 'FIN' to the other end of TCP connection
+                log.debug("Socket output shutdown accomplished.");
+            }
+            catch (IOException e) {
+                log.error("Unable to shutdown socket output. Base message: '" + e.getMessage()+"'");
+            }
+            finally {
+                _out = null;
+            }
+
+            try {
+                _mySock.shutdownInput();
+                log.debug("Socket input shutdown accomplished.");
+            }
+            catch (IOException e) {
+                log.error("Unable to shutdown socket input. Base message: '" + e.getMessage()+"'");
+            }
+            finally {
+                _in = null;
+            }
+
+            try {
+                _mySock.close();
+                log.debug("Socket closed.");
+            } catch (IOException e) {
+                log.error("Unable to close socket. Base message: '" + e.getMessage()+"'");
+            }
+            finally {
+                _mySock = null;
+            }
+        }
 
         /*
         try {
@@ -301,9 +338,8 @@ public class NewPPTClient {
             log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
         }
         */
+/*
 
-
-        log.info(msg.toString());
         try {
             if(informServer && _out != null) {
                 _out.close();
@@ -338,7 +374,7 @@ public class NewPPTClient {
                     log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
                 }
                 _mySock.shutdownOutput();           // Send 'FIN' to the other end of TCP connection
-                while(is!=null && is.read() >=0) ;  // Drain the pipe
+                //while(is!=null && is.read() >=0) ;  // Drain the pipe
                 _mySock.close();                    // Close the socket
             }
         }
@@ -348,6 +384,7 @@ public class NewPPTClient {
         finally {
             _mySock = null;
         }
+        */
     }
 
     public boolean sendRequest(String buffer) throws PPTException {

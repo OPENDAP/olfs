@@ -30,6 +30,7 @@ import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.dap2Responders.Dap2IFH;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
@@ -55,6 +56,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -190,6 +192,8 @@ public class HtmlDMR extends Dap4Responder {
         String name  = dataset.getAttributeValue("name");
         sb.append(indent).append("\"name\": \"").append(name).append("\",\n");
 
+        String description =Dap2IFH.getDatasetSearchDescription(dataset,dap4AttributeFilter);
+        sb.append(indent).append("\"description\": \"").append(description).append("\",\n");
 
         Attribute xmlBase  = dataset.getAttribute("base", Namespace.XML_NAMESPACE);
         String datasetUrl;
@@ -399,6 +403,7 @@ public class HtmlDMR extends Dap4Responder {
         }
         return sb.toString();
     }
+
 
 
 }

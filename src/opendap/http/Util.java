@@ -38,19 +38,13 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 public class Util {
 
@@ -188,7 +182,128 @@ public class Util {
         }
     }
 
+    /*
 
+
+    private static String uatURS = "https://uat.urs.earthdata.nasa.gov";
+
+
+    public static String getHttpResourceReturnAsString(String url, List<Header> headers,CredentialsProvider credsProvider) throws IOException {
+
+        _log.debug("URL: {}", url);
+
+        HttpHost targetHost = new HttpHost(uatURS, 443, "https");
+
+        // Create AuthCache instance
+        AuthCache authCache = new BasicAuthCache();
+
+        // Generate BASIC scheme object and add it to the local auth cache
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put(targetHost, basicAuth);
+
+        // Add AuthCache to the execution context
+        HttpClientContext context = HttpClientContext.create();
+        context.setCredentialsProvider(credsProvider);
+        context.setAuthCache(authCache);
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+
+
+        HttpGet httpGet = new HttpGet(url);
+
+        if(headers !=null) {
+            Header[] hdrs = new Header[headers.size()];
+            headers.toArray(hdrs);
+            httpGet.setHeaders(hdrs);
+        }
+
+        CloseableHttpResponse resp = null;
+        BufferedReader in = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            resp = httpclient.execute(httpGet);
+
+            sb.append("HTTP STATUS: ").append(resp.getStatusLine()).append("\n");
+            _log.debug("HTTP STATUS: {}", resp.getStatusLine());
+            HttpEntity entity1 = resp.getEntity();
+
+            for(Header header : resp.getAllHeaders()){
+                sb.append("  ").append(header.getName()).append(": ").append(header.getValue()).append("\n");
+            }
+
+
+            in = new BufferedReader(
+                    new InputStreamReader(entity1.getContent(),HyraxStringEncoding.getCharset()));
+            String line;
+            while( (line = in.readLine()) != null ) sb.append(line);
+
+            return sb.toString();
+
+        } finally {
+
+            if(in!=null)
+                in.close();
+
+            if(resp!=null)
+                resp.close();
+
+
+        }
+    }
+
+
+    public static String getHttpResourceReturnAsString(String url, List<Header> headers) throws IOException {
+        return getHttpResourceReturnAsString(url, headers, getNetRCCredentialsProvider());
+    }
+
+
+
+    private static String UAT_URS = "uat.urs.earthdata.nasa.gov";
+
+    public static void main(String[] args) throws Exception {
+        HttpHost target = new HttpHost(UAT_URS, 443, "https");
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(target.getHostName(), target.getPort()),
+                new UsernamePasswordCredentials("hyrax_sbx", "98764uygEWtqw"));
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider).build();
+        try {
+
+            // Create AuthCache instance
+            AuthCache authCache = new BasicAuthCache();
+            // Generate BASIC scheme object and add it to the local
+            // auth cache
+            BasicScheme basicAuth = new BasicScheme();
+            authCache.put(target, basicAuth);
+
+            // Add AuthCache to the execution context
+            HttpClientContext localContext = HttpClientContext.create();
+            localContext.setAuthCache(authCache);
+
+            AuthScheme as = authCache.get(target);
+
+            System.out.println("AuthRealm: " + as.getRealm() + "  AuthSchemeName " + as.getSchemeName());
+
+            HttpGet httpget = new HttpGet(uatURS);
+
+            System.out.println("Executing request " + httpget.getRequestLine() + " to target " + target);
+            for (int i = 0; i < 3; i++) {
+                CloseableHttpResponse response = httpclient.execute(target, httpget, localContext);
+                try {
+                    System.out.println("----------------------------------------");
+                    System.out.println(response.getStatusLine());
+                    System.out.println("Response body is " + EntityUtils.toString(response.getEntity()).length()+" chars");
+                } finally {
+                    response.close();
+                }
+            }
+        } finally {
+            httpclient.close();
+        }
+    }
+
+    */
 
 }
 

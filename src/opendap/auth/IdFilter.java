@@ -28,7 +28,9 @@ package opendap.auth;
 
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
+import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.owasp.encoder.Encode;
@@ -43,11 +45,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class IdFilter implements Filter {
 
     private Logger log;
+    private static final String logName = "AuthenticationLog";
+    private AtomicLong counter;
 
     public static final String RETURN_TO_URL      = "return_to_url";
     public static final String USER_PROFILE       = "user_profile";
@@ -69,7 +74,6 @@ public class IdFilter implements Filter {
 
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
-        log = LoggerFactory.getLogger(this.filterConfig.getFilterName());
         try {
             init();
         }
@@ -80,10 +84,14 @@ public class IdFilter implements Filter {
 
     }
 
-    public void init() throws IOException, JDOMException {
+    private void init() throws IOException, JDOMException {
 
         if(isInitialized)
             return;
+
+        counter = new AtomicLong(0);
+        LogUtil.initLogging(filterConfig.getServletContext());
+        log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing IdFilter...");
 
         String context = filterConfig.getServletContext().getContextPath();
@@ -127,7 +135,7 @@ public class IdFilter implements Filter {
     }
 
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         if (!isInitialized) {
             try {
@@ -140,18 +148,32 @@ public class IdFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
+        HttpServletRequest request = (HttpServletRequest) sreq;
+        HttpServletRequest hsReq = request;
 
-        HttpServletRequest hsReq = (HttpServletRequest) request;
+        // Get session, make new as needed.
+        String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
+        LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
+
+        HttpSession session = hsReq.getSession(true);
+        log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
+
+        Util.debugHttpRequest(request,log);
+
         HttpServletResponse hsRes = (HttpServletResponse) response;
         String requestURI = hsReq.getRequestURI();
         String contextPath = hsReq.getContextPath();
 
-        String query = hsReq.getQueryString();
-        String requestUrl = hsReq.getRequestURL().toString() + ((query != null) ? ("?" + query) : "");
-
-
-        // Get session, make new as needed.
-        HttpSession session = hsReq.getSession(true);
+        // FIXME The following needs to be replaced with a mechanism that does not require the query
+        //  to be added to the request URL in order for the redirect to produce the target request.
+        //  Why? Because the query may be too large for a URL on many servers.
+        //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
+        //  with the md5 hash of the query and then use that for a lookup down stream?
+        String requestUrl = hsReq.getRequestURL().toString();
+        String query = ReqInfo.getConstraintExpression(hsReq);
+        if(!query.isEmpty()) {
+            requestUrl += "?" + query;
+        }
 
         // Intercept login/logout requests
         if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
@@ -170,9 +192,17 @@ public class IdFilter implements Filter {
                 String loginEndpoint = idProvider.getLoginEndpoint();
                 if(requestURI.equals(loginEndpoint)) {
                     synchronized (session) {
+                        // Check the RETURN_TO_URL and if it's the login endpoint
+                        // return to the root dir of the web application after
+                        // authenticating.
                         String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
-                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint))
+                        log.debug("Retrieved RETURN_TO_URL: {} (session: {})",returnToUrl,session.getId());
+                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
+                            String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
+                            msg += " (session: "+session.getId()+")";
+                            log.debug(msg);
                             session.setAttribute(RETURN_TO_URL, contextPath);
+                        }
                     }
                     try {
                         //
@@ -188,15 +218,17 @@ public class IdFilter implements Filter {
                         // completed send a 302 redirect to the client. Thus we want the process to stop here until
                         // login is completed
                         //
+                        log.debug("END (session: {})",session.getId());
                         return;
 
                     } catch (IOException e) {
                         String msg = "Your Login Transaction FAILED!   " +
                                      "Authentication Context: '"+idProvider.getAuthContext()+
-                                     "'   Message: "+ e.getMessage();
+                                     "' Message: "+ e.getMessage();
                         log.error("doFilter() - {}", msg);
                         OPeNDAPException.setCachedErrorMessage(msg);
                         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                        log.debug("END (session: {})",session.getId());
                         return;
                     }
                 }
@@ -218,39 +250,20 @@ public class IdFilter implements Filter {
         // Cache the  request URL in the session. We do this here because we know by now that the request was
         // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
         synchronized(session) {
-            cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+            Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
         }
         filterChain.doFilter(hsReq, hsRes);
+        log.debug("END (session: {})",session.getId());
+        LogUtil.logServerAccessEnd(200,logName);
     }
 
-    public void destroy() {
-        log = null;
-    }
 
 
     /**
-     * Here we make sure that request is really for something that the user would like to return to before we cache
-     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
-     * @param session
-     * @param requestUrl
-     * @param requestURI
-     * @param contextPath
+     *
      */
-    private void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
-
-        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
-        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
-        String jsPath = PathBuilder.pathConcat(contextPath,"js");
-        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
-
-        if(requestURI.startsWith(docsPath) ||
-                requestURI.startsWith(xslPath) ||
-                requestURI.startsWith(jsPath)  ||
-                requestURI.startsWith(webStartPath)
-                ){
-            return;
-        }
-        session.setAttribute(RETURN_TO_URL,requestUrl);
+    public void destroy() {
+        log = null;
     }
 
 

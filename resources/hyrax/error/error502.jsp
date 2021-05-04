@@ -1,6 +1,8 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -29,11 +31,18 @@
 
 <%@page session="false" %>
 <%
+    int status = 502;
+    String title = "Hyrax - Bad Gateway ("+status+")";
+
     String contextPath = request.getContextPath();
     String localUrl = ReqInfo.getLocalUrl(request);
-
     BesApi besApi = new BesApi();
-    String supportEmail = besApi.getSupportEmail(localUrl);
+    String supportEmail;
+    try {
+        supportEmail = besApi.getSupportEmail(localUrl);
+    } catch (BadConfigurationException e) {
+        supportEmail=null;
+    }
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
     String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,502,message,supportEmail);
@@ -43,7 +52,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="<%= contextPath %>/docs/css/contents.css" type="text/css"/>
 
-    <title>Hyrax: ERROR</title>
+    <title><%=title%></title>
     <style type="text/css">
         <!--
         .style1 {
@@ -59,7 +68,7 @@
 <body>
 <p>&nbsp;</p>
 
-<h1 align="center">Hyrax Error - Bad Gateway (502)</h1>
+<h1 align="center"><%=title%></h1>
 <hr noshade="noshade" size="1"/>
 <table border="0" width="100%">
     <tbody>
@@ -71,24 +80,25 @@
                  title="Bad Gateway"
                     />
         </td>
-        <td><p class="style1" align="center">Oops!</p>
+        <td><p class="style1" align="left">Oops!</p>
 
             <p align="left">Drat! I was unable to act as a gateway to the requested remote resource..</p>
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
-            <blockquote><p><strong><%= message %>
-            </strong></p></blockquote>
+            <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
             <% } %>
 
-            <p align="left">If
-                you think that the server is broken (that the URL you submitted should
-                have worked), then please contact the OPeNDAP user support coordinator
-                at: <a href="<%= mailtoHrefAttributeValue %>"><%= supportEmail %>
-                </a></p></td>
+            <% if(supportEmail!=null){ %>
+            <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
+                then please contact the OPeNDAP user support coordinator at:
+                <a href="<%=mailtoHrefAttributeValue%>"><%= supportEmail %></a>
+            </p>
+            <% } %>
+        </td>
     </tr>
     </tbody>
 </table>
 <hr noshade="noshade" size="1"/>
-<h1 align="center">Hyrax Error - Bad Gateway (502)</h1>
+<h1 align="center"><%=title%></h1>
 </body>
 </html>

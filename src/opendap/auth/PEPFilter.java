@@ -28,6 +28,7 @@ package opendap.auth;
 
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
+import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -67,7 +68,6 @@ public class PEPFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
-        log = LoggerFactory.getLogger(this.filterConfig.getFilterName());
         try {
             init();
         }
@@ -78,10 +78,12 @@ public class PEPFilter implements Filter {
         }
 
     }
-    public void init() throws IOException, JDOMException, ConfigurationException {
+    private void init() throws IOException, JDOMException {
 
         if(isInitialized)
             return;
+        LogUtil.initLogging(filterConfig.getServletContext());
+        log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing PEPFilter...");
 
         String configFileName = filterConfig.getInitParameter(configParameterName);

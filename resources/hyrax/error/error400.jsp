@@ -1,6 +1,8 @@
 <%@ page import="opendap.bes.dap2Responders.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="opendap.bes.BadConfigurationException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -31,11 +33,18 @@
 
 <%@page session="false" %>
 <%
+    int status = 400;
+    String title = "Hyrax - Bad Request ("+status+")";
+
     String contextPath = request.getContextPath();
     String localUrl = ReqInfo.getLocalUrl(request);
-
     BesApi besApi = new BesApi();
-    String supportEmail = besApi.getSupportEmail(localUrl);
+    String supportEmail;
+    try {
+        supportEmail = besApi.getSupportEmail(localUrl);
+    } catch (BadConfigurationException e) {
+        supportEmail=null;
+    }
 
     String message = OPeNDAPException.getAndClearCachedErrorMessage();
     String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,400,message,supportEmail);
@@ -45,13 +54,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css' />
-<title>Hyrax:  Bad Request</title>
+<title><%=title%></title>
 </head>
 
 <body>
 <p align="left">&nbsp;</p>
 
-<h1 align="center">Hyrax - Bad Request (400) </h1>
+<h1 align="center"><%=title%></h1>
 <hr align="left" size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
@@ -61,7 +70,7 @@
             <p align="left">It appears that you have submitted a Bad Request. </p>
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong><%= message %> </strong></p> </blockquote>
+            <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
             <% } %>
 
             <p align="left">There may simply be problem with the syntax of your OPeNDAP URL. If you are using server
@@ -87,14 +96,16 @@
                 <span style="margin: 20px;"><strong>ddx</strong> - <em>The DAP3.2 dataset metadata response.</em></span><br/>
 
             </p>
+            <% if(supportEmail!=null){ %>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
                 then please contact the OPeNDAP user support coordinator at:
                 <a href="<%=mailtoHrefAttributeValue%>"><%= supportEmail %></a>
             </p>
+            <% } %>
         </td>
     </tr>
 </table>
 <hr align="left" size="1" noshade="noshade"/>
-<h1 align="center">Hyrax - Bad Request (400) </h1>
+<h1 align="center"><%=title%></h1>
 </body>
 </html>

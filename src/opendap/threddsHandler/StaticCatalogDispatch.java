@@ -274,11 +274,15 @@ public class StaticCatalogDispatch implements DispatchHandler {
         String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
         String remoteHost;
+        String remoteHostProtocol;
+        String remoteHostName;
 
         if (remoteCatalog.startsWith(https)) {
+            remoteHostProtocol = https;
             remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', https.length()) + 1);
         }
         else if(remoteCatalog.startsWith(http)){
+            remoteHostProtocol = http;
             remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
         }
         else {
@@ -287,9 +291,13 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throw new BadRequest(msg);
         }
 
+        remoteHostName = remoteCatalog.substring(remoteHostProtocol.length(), remoteCatalog.indexOf('/', remoteHostProtocol.length()) + 1);
+
         log.debug("targetDataset: " + targetDataset);
         log.debug("remoteCatalog: " + remoteCatalog);
         log.debug("remoteHost: " + remoteHost);
+        log.debug("remoteHostProtocol: " + remoteHostProtocol);
+        log.debug("remoteHostName: " + remoteHostName);
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -314,6 +322,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 _datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
                 _datasetToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
                 _datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
+                _datasetToHtmlTransform.setParameter("remoteHostProtocol", remoteHostProtocol);
+                _datasetToHtmlTransform.setParameter("remoteHostName", remoteHostName);
                 _datasetToHtmlTransform.setParameter("typeMatch", typeMatch);
 
 
@@ -395,7 +405,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besApi.writeFile(user, remoteCatalog,baos);
+        besApi.writeFile(user, remoteCatalog, baos);
         ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();

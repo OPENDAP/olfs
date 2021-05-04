@@ -49,7 +49,8 @@
      catalogs returned by the server.
      -->
 
-    <!-- WebServiceHandler className="opendap.viewers.NcWmsService" serviceId="ncWms" >
+    <!--
+    <WebServiceHandler className="opendap.viewers.NcWmsService" serviceId="ncWms" >
         <applicationName>Web Mapping Service</applicationName>
         <NcWmsService href="/ncWMS2/wms" base="/ncWMS2/wms" ncWmsDynamicServiceId="lds" />
     </WebServiceHandler>
@@ -58,7 +59,8 @@
         <applicationName>Godiva WMS GUI</applicationName>
         <NcWmsService href="http://localhost:8080/ncWMS2/wms" base="/ncWMS2/wms" ncWmsDynamicServiceId="lds"/>
         <Godiva href="/ncWMS2/Godiva3.html" base="/ncWMS2/Godiva3.html"/>
-    </WebServiceHandle  -->
+    </WebServiceHandle>
+    -->
 
     <!--
     <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-COADS" >

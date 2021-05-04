@@ -83,6 +83,9 @@ public class MimeTypes {
 
         typeMap.put("psd",   new String[] {"image", "psd"});
 
+        typeMap.put("svg",   new String[] {"image", "svg+xml"});
+        typeMap.put("svgz",  new String[] {"image", "svg+xml"});
+
 
         // Video
         typeMap.put("mov",   new String[] {"video", "quicktime"});

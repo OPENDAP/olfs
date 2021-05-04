@@ -26,6 +26,7 @@
 
 package opendap.ngap;
 
+import opendap.PathBuilder;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
@@ -34,9 +35,13 @@ import opendap.coreServlet.Util;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 /**
@@ -49,11 +54,28 @@ import java.util.regex.Pattern;
  */
 public class NgapDispatchHandler extends BesDapDispatcher {
 
+    private static final AtomicLong ngapServiceEndpointCounter;
+    static {
+        ngapServiceEndpointCounter = new AtomicLong(0);
+    }
+
+    private static final AtomicLong dapServiceCounter;
+    static {
+        dapServiceCounter = new AtomicLong(0);
+    }
+
+    private static final AtomicLong reqCounter;
+    static {
+        reqCounter = new AtomicLong(0);
+    }
+
     private Logger log;
     private boolean _initialized;
     private String _prefix = "ngap/";
     private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
+
+    private static final String d_landingPage="/docs/ngap/ngap.html";
 
     public NgapDispatchHandler() {
         super();
@@ -91,32 +113,40 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         String relativeURL = ReqInfo.getLocalUrl(request);
         log.debug("relativeURL:    "+relativeURL);
 
-        if(relativeURL.startsWith("/"))
+        while(relativeURL.startsWith("/") && relativeURL.length()>1)
             relativeURL = relativeURL.substring(1,relativeURL.length());
-
-        boolean isMyRequest = true;
-        //boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
-        //boolean itsJustThePrefix = _prefix.equals(relativeURL);
-        boolean startsWithPrefix = relativeURL.startsWith(_prefix);
-
-
-        isMyRequest = startsWithPrefix;
-        // || itsJustThePrefixWithoutTheSlash;
+        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
+        boolean itsJustThePrefix = _prefix.equals(relativeURL);
+        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || relativeURL.startsWith(_prefix);
 
         if(isMyRequest) {
             if (sendResponse) {
-                log.info("Sending NGAP Response");
-                if (!super.requestDispatch(request, response, true)) {
-                    if (!response.isCommitted()) {
-                        String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                        throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
-                                relativeURL.substring(s.length()) + "' is not recognized by this server.");
-                    } else {
-                        isMyRequest = false;
-                        log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                    }
+
+                if(itsJustThePrefixWithoutTheSlash ){
+                    response.sendRedirect(_prefix);
+                    log.debug("Sent redirect to service prefix: "+_prefix);
+                    return true;
                 }
-                log.info("Sent DAP NGAP Response.");
+
+                reqCounter.incrementAndGet();
+                if(itsJustThePrefix){
+                    sendSimpleNgapLandingPage(response);
+                }
+                else {
+                    log.info("Sending NGAP Response");
+                    if (!super.requestDispatch(request, response, true)) {
+                        if (!response.isCommitted()) {
+                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(NgapBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
+                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
+                                    relativeURL.substring(s.length()) + "' is not recognized by this server.");
+                        } else {
+                            isMyRequest = false;
+                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
+                        }
+                    }
+                    log.info("Sent DAP NGAP Response.");
+                    dapServiceCounter.incrementAndGet();
+                }
             }
 
         }
@@ -153,6 +183,38 @@ public class NgapDispatchHandler extends BesDapDispatcher {
             _prefix = _prefix.substring(1);
 
         log.info("Using prefix=" + _prefix);
+
+    }
+
+
+    private void sendSimpleNgapLandingPage(HttpServletResponse response) throws IOException {
+        // This could be made a real page (JSP?), but having something
+        // simple in place should reduce problems caused by ELB health
+        // check clients beating on the endpoint.
+        response.setContentType("text/html");
+        ServletOutputStream sos = response.getOutputStream();
+        sos.println("<html>");
+        sos.println("<head>");
+        sos.println("<meta http-equiv=\"refresh\" content=\"60\">");
+        sos.println("<title>OPeNDAP Hyrax: NGAP Service</title>");
+        sos.println("</head>");
+        sos.println("<body>");
+        sos.print("<p style='");
+        sos.print("font-family: Courier; ");
+        sos.print("text-align: center; ");
+        sos.print("transform: translate(0px, 100px); ");
+        sos.println("'>");
+        sos.println("-------------------------------------<br/>");
+        sos.println("      NGAP Service Endpoint<br/>");
+        sos.println(". . . . . . . . . . . . . . . . .<br/>");
+        sos.println("All Requests: " + reqCounter.get() + "<br/>");
+        sos.println(" DAP Service: " + dapServiceCounter.get() + "<br/>");
+        sos.println("   This page: " + ngapServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("-------------------------------------<br/>");
+        sos.println("</p>");
+        sos.println("</body>");
+        sos.println("</html>");
+        sos.flush();
 
     }
 

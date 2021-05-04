@@ -86,7 +86,7 @@ public class BES {
     private static final String BES_ADMIN_SET_CONFIG = "SetConfig";
     private static final String BES_ADMIN_TAIL_LOG = "TailLog";
 
-    
+
     public BES(BESConfig config) {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         this.config = config.copy();
@@ -106,6 +106,15 @@ public class BES {
 
         log.debug("BES built with configuration:\n{}", this.config);
 
+    }
+
+    /**
+     * Returns the number of times to retry a command transaction.
+     * Set dynamically to the number of client connections plus 2.
+     * @return
+     */
+    int getMaxCommandAttempts(){
+        return getBesClientCount() + 2;
     }
 
 
@@ -757,6 +766,163 @@ public class BES {
         reqElement.setAttribute(BesApi.REQUEST_ID,reqID);
     }
 
+
+    /**
+     * Executes a command/response transaction with the BES and returns the
+     * BES response in a JDOM Document. Of course, if the response is NOT
+     * parsable as an XML document then some bad things will happen.
+     *
+     *
+     * @param request   The BES request document.
+     * @param response  The document into which the BES response will be placed.
+     *                 If the passed Document object contains
+     * conent, then the content will be discarded.
+     * @throws IOException When bad things happen in the talking to the BES.
+     * @throws PPTException When bad things happen in the talking to the BES.
+     * @throws JDOMException When bad things happen trying to parse XML content
+     * received from the BES.
+     * @throws BESError When the BES itself returns a BESError document.
+     */
+    public void  besTransaction(Document request, Document response )
+            throws IOException, PPTException, JDOMException, BESError {
+
+
+        log.debug("BEGIN.");
+        SAXBuilder sb = new SAXBuilder();
+        Document doc;
+
+
+        try (ByteArrayOutputStream responseStream = new ByteArrayOutputStream()) {
+            besTransaction(request,responseStream);
+            log.debug("besTransaction() The BES returned this document:\n{}", responseStream);
+            if (responseStream.size() != 0) {
+
+                doc = sb.build(new ByteArrayInputStream(responseStream.toByteArray()));
+
+                // Get the root element.
+                Element root = doc.getRootElement();
+
+                // Detach it from the document
+                root.detach();
+
+                // Pitch the root element that came with the passed catalog.
+                // (There may not be one but whatever...)
+                response.detachRootElement();
+
+                // Set the root element to be the one sent from the BES.
+                response.setRootElement(root);
+            }
+        }
+        log.debug("END.");
+    }
+
+
+
+
+    /**
+     * Executes a command/response transaction with the BES
+     *
+     * @param request   The BES request document.
+     * @param os   The outputstream to write the BES response to.
+     * any error information will be written to the OutputStream err.
+     * @throws IOException When bad things happen in the talking to the BES.
+     * @throws PPTException When bad things happen in the talking to the BES.
+     * @throws BESError When the BES itself returns a BESError document.
+     */
+    public void besTransaction(Document request, OutputStream os)
+            throws IOException, PPTException, BESError {
+
+        log.debug("BEGIN");
+        int attempts = 0;
+        boolean besTrouble;
+        PPTException pptException;
+        BESError besFatalError;
+
+        do {
+            besTrouble = false;
+            pptException = null;
+            besFatalError = null;
+            attempts++;
+
+            log.debug("This is attempt: {}",attempts);
+
+            OPeNDAPClient oc = getClient();
+            if(oc==null){
+                String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
+                        "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
+                log.error(msg);
+                throw new IOException(msg);
+
+            }
+            tweakRequestId(request,oc);
+            if(log.isDebugEnabled()) {
+                log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
+            }
+            Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
+            if(besCommandLogger.isInfoEnabled()){
+                besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
+            }
+
+            Procedure timedProc = Timer.start();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+                boolean result = oc.sendRequest(request, os, baos);
+                log.debug("besTransaction() - Completed.");
+                if (!result) {
+
+                    log.debug("BESError: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
+                    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                    BESError besError = new BESError(bais);
+
+                    log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
+
+                    int besErrCode = besError.getBesErrorCode();
+                    // If the BES experienced a fatal error then we know we have
+                    // to dump the connection to the child besListener.
+                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                        besTrouble = true;
+                        besFatalError =  besError;
+                    }
+                    else {
+                        // If the error is not fatal then we just throw it and move on.
+                        throw besError;
+                    }
+                }
+            } catch (PPTException e) {
+                besTrouble = true;
+                log.debug("OLFS Encountered a PPT Problem! Transaction attempt: {}  Message: {}", attempts, e.getMessage());
+                String msg = "Problem encountered with BES connection. Message: '" + e.getMessage() + "' " +
+                        "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
+                log.error(msg);
+                e.setErrorMessage(msg);
+                pptException = e;
+            } finally {
+                returnClient(oc, besTrouble);
+                Timer.stop(timedProc);
+            }
+        }
+        while(besTrouble && attempts < getMaxCommandAttempts());
+
+        if(besTrouble){
+            if(besFatalError != null)
+                throw besFatalError;
+
+            if(pptException != null)
+                throw pptException;
+        }
+        log.debug("END");
+    }
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Executes a command/response transaction with the BES
      *
@@ -768,199 +934,130 @@ public class BES {
      * @throws PPTException
      * @throws JDOMException
      */
-    public void  besTransaction(Document request, Document response )
+    /*
+    public void  besTransaction_OLD(Document request, Document response )
             throws IOException, PPTException, JDOMException, BESError {
 
         log.debug("besTransaction() -  BEGIN.");
-
-
-        boolean trouble = false;
+        int attempts = 0;
+        boolean besTrouble;
+        PPTException pptException = null;
+        BESError besFatalError;
+        SAXBuilder sb = new SAXBuilder();
         Document doc;
 
-        SAXBuilder sb = new SAXBuilder();
+        do {
+            besTrouble = false;
+            pptException = null;
+            besFatalError = null;
+            attempts++;
 
-        OPeNDAPClient oc = getClient();
+            log.debug("This is attempt: {}",attempts);
 
-        if(oc==null){
-            String msg = "FAILED to retrieve valid OPeNDAPClient (connection to BES)!";
-            log.error("besTransaction() - {}", msg);
-            throw new IOException(msg);
-        }
-        tweakRequestId(request,oc);
-        if(log.isDebugEnabled()) {
-            log.debug("besTransaction() request document: \n{}-----------\n", showRequest(request));
-        }
-        Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
-        if(besCommandLogger.isInfoEnabled()){
-            besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
-        }
+            OPeNDAPClient oc = getClient();
 
-        Procedure timedProc = Timer.start();
+            if (oc == null) {
+                String msg = "FAILED to retrieve valid OPeNDAPClient (connection to BES)!";
+                log.error("besTransaction() - {}", msg);
+                throw new IOException(msg);
+            }
+            tweakRequestId(request, oc);
+            if (log.isDebugEnabled()) {
+                log.debug("besTransaction() request document: \n{}-----------\n", showRequest(request));
+            }
+            Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
+            if (besCommandLogger.isInfoEnabled()) {
+                besCommandLogger.info("BES COMMAND ({})\n{}\n", new Date(), showRequest(request));
+            }
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ByteArrayOutputStream erros = new ByteArrayOutputStream()) {
+            Procedure timedProc = Timer.start();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 ByteArrayOutputStream erros = new ByteArrayOutputStream()) {
 
+                if (oc.sendRequest(request, baos, erros)) {
+                    log.debug("besTransaction() The BES returned this document:\n{}", baos);
+                    if (baos.size() != 0) {
 
-            if (oc.sendRequest(request, baos, erros)) {
+                        doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
 
-                log.debug("besTransaction() The BES returned this document:\n{}", baos);
+                        // Get the root element.
+                        Element root = doc.getRootElement();
 
-                if (baos.size() != 0) {
+                        // Detach it from the document
+                        root.detach();
 
-                    doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+                        // Pitch the root element that came with the passed catalog.
+                        // (There may not be one but whatever...)
+                        response.detachRootElement();
 
-                    // Get the root element.
-                    Element root = doc.getRootElement();
-
-                    // Detach it from the document
-                    root.detach();
-
-                    // Pitch the root element that came with the passed catalog.
-                    // (There may not be one but whatever...)
-                    response.detachRootElement();
-
-                    // Set the root element to be the one sent from the BES.
-                    response.setRootElement(root);
-                }
-
-            } else {
-                log.debug("BES returned this ERROR document:\n-----------\n{}-----------", erros);
-
-                BESError besError;
-                if (erros.size() != 0) {
-
-                    ByteArrayInputStream bais = new ByteArrayInputStream(erros.toByteArray());
-                    besError = new BESError(bais);
-
-                    // This logging statement is turned down to debug because otherwise when the OLFS probes the
-                    // the BES in an effort to distinguish requests for files in the BES catalog from DAP and catalog
-                    // requests the log gets filled with spurious errors. When we eventually implement a showPathInfo()
-                    // method/model for that will allow the OLFS to do this in a more efficient and non error
-                    // producing manner we should also:
-                    // @TODO Promote this to log.error()
-                    log.debug("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
-
-                    int besErrCode = besError.getBesErrorCode();
-                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
-                        trouble = true;
+                        // Set the root element to be the one sent from the BES.
+                        response.setRootElement(root);
                     }
                 } else {
-                    String reqId = request.getRootElement().getAttributeValue(BesApi.REQUEST_ID);
-                    Document errDoc = getMissingBesResponseErrorDoc(reqId);
-                    besError = new BESError(errDoc);
+                    log.debug("BES returned this ERROR document:\n-----------\n{}-----------", erros);
+                    BESError besError;
+                    if (erros.size() != 0) {
 
+                        ByteArrayInputStream bais = new ByteArrayInputStream(erros.toByteArray());
+                        besError = new BESError(bais);
+
+                        // This logging statement is turned down to debug because otherwise when the OLFS probes the
+                        // the BES in an effort to distinguish requests for files in the BES catalog from DAP and catalog
+                        // requests the log gets filled with spurious errors. When we eventually implement a showPathInfo()
+                        // method/model for that will allow the OLFS to do this in a more efficient and non error
+                        // producing manner we should also:
+                        // @TODO Promote this to log.error()
+                        log.debug("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
+
+                        int besErrCode = besError.getBesErrorCode();
+                        if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                            besTrouble = true;
+                        }
+                    } else {
+                        String reqId = request.getRootElement().getAttributeValue(BesApi.REQUEST_ID);
+                        Document errDoc = getMissingBesResponseErrorDoc(reqId);
+                        besError = new BESError(errDoc);
+
+                    }
+
+                    int besErrCode = besError.getBesErrorCode();
+                    // If the BES experienced a fatal error then we know we have
+                    // to dump the connection to the child besListener.
+                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                        besTrouble = true;
+                        besFatalError =  besError;
+                    }
+                    else {
+                        // If the error is not fatal then we just throw it and move on.
+                        throw besError;
+                    }
                 }
+            } catch (PPTException e) {
+                besTrouble = true;
+                log.debug("OLFS Encountered a PPT Problem! Transaction attempt: {}  Message: {}", attempts, e.getMessage());
+                String msg = "Problem with OPeNDAPClient. OPeNDAPClient executed " + oc.getCommandCount() + " commands";
+                log.error(msg);
+                e.setErrorMessage(msg);
+                pptException = e;
 
-
-                int besErrCode = besError.getBesErrorCode();
-                if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
-                    trouble = true;
-                }
-
-                throw besError;
-
+            } finally {
+                returnClient(oc, besTrouble);
+                Timer.stop(timedProc);
             }
+        }
+        while(besTrouble && attempts < getMaxCommandAttempts());
 
-
-        } catch (PPTException e) {
-
-            trouble = true;
-
-            log.debug("OLFS Encountered a PPT Problem!", e);
-            String msg = "Problem with OPeNDAPClient. OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-
-            log.error(msg);
-
-            e.setErrorMessage(msg);
-            throw e;
-
-        } finally {
-            returnClient(oc, trouble);
-
-            Timer.stop(timedProc);
-            log.debug("besTransaction() -  END.");
+        if(besTrouble){
+            if(besFatalError != null)
+                throw besFatalError;
+            if(pptException != null)
+                throw pptException;
         }
 
+        log.debug("END");
 
     }
-
-
-    /**
-     * Executes a command/response transaction with the BES
-     *
-     * @param request   The BES request document.
-     * @param os   The outputstream to write the BES response to.
-     * any error information will be written to the OutputStream err.
-     * @throws BadConfigurationException
-     * @throws IOException
-     * @throws PPTException
-     */
-    public void besTransaction(Document request, OutputStream os)
-            throws IOException, PPTException, BESError {
-
-        log.debug("BEGIN");
-
-        boolean besTrouble = false;
-        OPeNDAPClient oc = getClient();
-        if(oc==null){
-            String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
-                    "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
-            log.error(msg);
-            throw new IOException(msg);
-
-        }
-        tweakRequestId(request,oc);
-        if(log.isDebugEnabled()) {
-            log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
-        }
-        Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
-        if(besCommandLogger.isInfoEnabled()){
-            besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
-        }
-
-
-
-
-        Procedure timedProc = Timer.start();
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            boolean result = oc.sendRequest(request, os, baos);
-            log.debug("besTransaction() - Completed.");
-            if (!result) {
-
-                log.debug("BESError: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
-                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                BESError besError = new BESError(bais);
-
-                log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
-
-                int besErrCode = besError.getBesErrorCode();
-                if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
-                    besTrouble = true;
-                }
-
-                throw besError;
-            }
-
-        } catch (PPTException e) {
-
-            besTrouble = true;
-            String msg = "Problem encountered with BES connection. Message: '" + e.getMessage() + "' " +
-                    "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
-
-            log.error(msg);
-            e.setErrorMessage(msg);
-            throw e;
-        } finally {
-            returnClient(oc, besTrouble);
-            Timer.stop(timedProc);
-            log.debug("END");
-
-        }
-
-    }
-
+*/
 
 
     String showRequest(Document request) throws IOException{

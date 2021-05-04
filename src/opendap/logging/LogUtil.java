@@ -30,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import opendap.PathBuilder;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class LogUtil {
     private static final String ID_KEY = "ID";
     private static final String SOURCE_KEY = "SOURCE";
     private static final String HOST_KEY = "host";
-    private static final String IDENT_KEY = "ident";
+    private static final String SESSION_ID_KEY = "ident";
     private static final String USER_ID_KEY = "userid";
     private static final String USER_AGENT_KEY = "UserAgent";
     private static final String START_TIME_KEY = "startTime";
@@ -120,7 +121,7 @@ public class LogUtil {
     /**
      * Initialize logging for the web application context in which the given
      * servlet is running. Two types of logging are supported:
-     * <p/>
+     * </p>
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
      * use the LogUtil.logServerStartup(String) method.
@@ -129,69 +130,12 @@ public class LogUtil {
      * directory. The configuration of logging is controlled by the log4j.xml
      * file.
      *
-     * @param servlet - the servlet.
+     * @param servlet - The servlet, used to determine the configuration
+     *                  location.
      */
     public static void initLogging(HttpServlet servlet) {
-
-        initLock.lock();
-        try {
-            // Initialize logging if not already done.
-            if (isLogInit.get())
-                return;
-
-            log.info("BEGIN servlet name: {}  class: {}", servlet.getServletName(), servlet.getClass().getCanonicalName());
-            ServletContext servletContext = servlet.getServletContext();
-
-            String configPath = ServletUtil.getConfigPath(servlet);
-
-            // set up the log path
-            String logPath = configPath + "logs";
-            File logPathFile = new File(logPath);
-            if (!logPathFile.exists() && !logPathFile.mkdirs()) {
-                throw new RuntimeException("Creation of logfile directory failed." + logPath);
-            }
-
-
-            // read in Logback config file
-            System.setProperty("logdir", logPath); // variable substitution
-
-            String logbackConfig = servletContext.getInitParameter("logbackConfig");
-            if (logbackConfig == null) {
-                logbackConfig = configPath + "logback-test.xml";
-                File f = new File(logbackConfig);
-                if (!f.exists()) {
-                    logbackConfig = configPath + "logback.xml";
-                    f = new File(logbackConfig);
-                    if (!f.exists()) {
-                        // Try to use the one that shipped with the webapp
-                        String defaultLogbackConfig = ServletUtil.getSystemPath(servlet, "WEB-INF/logback.xml");
-                        f = new File(defaultLogbackConfig);
-                        if (!f.exists())
-                            logbackConfig = null;
-                        else
-                            logbackConfig = defaultLogbackConfig;
-                    }
-
-                }
-            }
-
-            if (logbackConfig != null) {
-                log.info("Logback configuration using: {}", logbackConfig);
-                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-                attemptJoranConfiguration(logbackConfig, lc);
-                StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-            } else {
-                log.info("Logback configuration using logback's default configuration mechanism");
-            }
-
-            isLogInit.set(true);
-            log.info("END Logback is configured.");
-        }
-        finally {
-            initLock.unlock();
-        }
+        initLogging(servlet.getServletContext());
     }
-
 
     /**
      * Initialize logging for the web application context in which the given
@@ -200,89 +144,125 @@ public class LogUtil {
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
      * use the LogUtil.logServerStartup(String) method.
-     * <p/>
+     * </p>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
      * file.
      *
-     * @param path - the path to the log4j.xml file
+     * @param sc The servlet context used, to determine the configuration
+     *           location.
      */
-    public static void initLogging(String path) {
-
+    public static void initLogging(ServletContext sc) {
         initLock.lock();
         try {
-            // Initialize logging if not already done.
-            if (isLogInit.get())
+            if(isLogInit.get()) {
                 return;
-
-            log.info("BEGIN path='{}'", path);
-
-            // set up the log path
-            if (!path.endsWith("/"))
-                path += "/";
-            String logPath = path + "logs";
-            File logPathFile = new File(logPath);
-            if (!logPathFile.exists()) {
-                log.info("Creating log dir: {}", logPath);
-                if (!logPathFile.mkdirs()) {
-                    throw new RuntimeException("Creation of logfile directory failed." + logPath);
-                }
-            } else {
-                log.info("Found log dir: {} ", logPath);
-
             }
+            // The config path could resolve to one of several places
+            String configPath = ServletUtil.getConfigPath(sc);
 
-            log.info("Using log dir: {}", logPath);
+            // Make sure the logger has a place to write.
+            setupLoggingPath(configPath);
 
-            // read in Log4J config file
-            System.setProperty("logdir", logPath); // variable substitution
+            // The default configuration is always in the distribution:
+            // $CATALINA_HOME/webapps/$CONTEXT/WEB-INF/conf directory
+            String defaultConfigPath = ServletUtil.getDefaultConfigPath(sc);
 
-            String logbackConfig = path + "logback-test.xml";
-            File f = new File(logbackConfig);
-            if (!f.exists()) {
-                log.info("Unable to locate logback configuration: {}", logbackConfig);
-                logbackConfig = path + "logback.xml";
-                f = new File(logbackConfig);
-                if (!f.exists()) {
-                    log.info("Unable to locate logback configuration: {}", logbackConfig);
-                    logbackConfig = null;
-                }
-
+            // Find a logback(-test).xml config file in the config path.
+            String logbackFile = locateLogbackFile(configPath);
+            // Did ya find it?
+            if (logbackFile == null) {
+                // Nope. Better try the distribution files.
+                logbackFile = locateLogbackFile(defaultConfigPath);
             }
-
-            if (logbackConfig != null) {
-                log.info("Logback configuration using: {}", logbackConfig);
-                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-                attemptJoranConfiguration(logbackConfig, lc);
-                StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-
-            } else {
-                log.info("Logback configuration using logback default configuration mechanism");
-            }
+            // Ingest the possibly found file (null tolerant)
+            ingestLogbackFile(logbackFile);
 
             isLogInit.set(true);
-            log.info("END Logback is configured.");
         }
         finally {
             initLock.unlock();
         }
     }
 
-
+    /**
+     * Locates, if possible, the logback.xml or if that is missing the
+     * logback-test.xml in the targetDir. If neither are found, null is
+     * returned.
+     *
+     * @param targetDir The directory to search.
+     * @return The logback file path, or null if not located.
+     */
+    private static String locateLogbackFile(String targetDir){
+        String logbackTestConfig="logback-test.xml";
+        String logbackConfig="logback.xml";
+        String logbackFile = PathBuilder.pathConcat(targetDir,logbackConfig);
+        File f = new File(logbackFile);
+        if (!f.exists()) {
+            log.info("Did not locate logback configuration: {}", logbackFile);
+            logbackFile = PathBuilder.pathConcat(targetDir,logbackTestConfig);
+            f = new File(logbackFile);
+            if (!f.exists()) {
+                log.info("Unable to locate logback configuration: {}", logbackFile);
+                logbackFile = null;
+            }
+        }
+        return logbackFile;
+    }
 
     /**
+     * Make sure we have a valid and operational logging directory as a child
+     * directory of the current configuration path.
      *
-     * @param logbackConfig Path to logback configuration file.
+     * @param currentConfigPath The current configuration path.
+     */
+    private static void setupLoggingPath(String currentConfigPath){
+        // set up the log path
+        String logPath = PathBuilder.pathConcat(currentConfigPath ,"logs");
+        File logPathFile = new File(logPath);
+        if (!logPathFile.exists()) {
+            log.info("Creating log dir: {}", logPath);
+            if (!logPathFile.mkdirs()) {
+                String msg = "Creation of logfile directory failed." + logPath;
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
+        }
+        log.info("Using log dir: {}", logPath);
+        // read in by Log4J config file
+        System.setProperty("logdir", logPath); // variable substitution
+
+    }
+
+    /**
+     * Slurp up the logback file (if it's not null)
+     *
+     * @param logbackFile The name of the file to load.
+     */
+    private static void ingestLogbackFile(String logbackFile){
+        if (logbackFile != null) {
+            log.info("Logback configuration using: {}", logbackFile);
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            attemptJoranConfiguration(logbackFile, lc);
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+        } else {
+            log.error("Logback configuration using logback default configuration mechanism");
+        }
+    }
+
+    /**
+     * Tries to read and ingest the logback configuration file.
+     * @param logbackConfigFile Path to logback configuration file.
      * @param lc Logger context to condition.
      */
-    private static void attemptJoranConfiguration(String logbackConfig, LoggerContext lc){
+    private static void attemptJoranConfiguration(String logbackConfigFile, LoggerContext lc){
         try {
             JoranConfigurator configurator = new JoranConfigurator();
             configurator.setContext(lc);
             // the context was probably already configured by default configuration
             // rules
             lc.reset();
-            configurator.doConfigure(logbackConfig);
+            configurator.doConfigure(logbackConfigFile);
             log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {
             log.error("Caught {} Messge: ",je.getClass().getName(),je.getMessage());
@@ -387,7 +367,7 @@ public class LogUtil {
         MDC.put(ID_KEY, reqID);
         MDC.put(SOURCE_KEY, httpVerb);
         MDC.put(HOST_KEY, req.getRemoteHost());
-        MDC.put(IDENT_KEY, (session == null) ? "-" : session.getId());
+        MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
         MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
 
@@ -443,7 +423,7 @@ public class LogUtil {
 
             alb.append(MDC.get(HOST_KEY)).append(sep);
             alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
-            alb.append(MDC.get(IDENT_KEY)).append(sep);
+            alb.append(MDC.get(SESSION_ID_KEY)).append(sep);
             alb.append(MDC.get(USER_ID_KEY)).append(sep);
             alb.append(MDC.get(START_TIME_KEY)).append(sep);
             alb.append(MDC.get(ID_KEY)).append(sep);
@@ -534,7 +514,7 @@ public class LogUtil {
         MDC.remove(ID_KEY);
         MDC.remove(SOURCE_KEY);
         MDC.remove(HOST_KEY);
-        MDC.remove(IDENT_KEY);
+        MDC.remove(SESSION_ID_KEY);
         MDC.remove(USER_ID_KEY);
         MDC.remove(START_TIME_KEY);
 

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2019 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<configuration>
+    <!--
+        [%X{host}]        - Requesting client's host name or ip address 
+        [%X{UserAgent}]   - The value of the HTTP request header 'UserAgent' 
+        [%X{ident}]       - The session id if present. 
+        [%X{userid}]      - If the user is authenticated then their user id will appear here.
+        [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] - Date and time of request.
+        [%8X{duration}]   - time to service request.
+        [%X{http_status}] - http status returned to client. 
+        [%8X{ID}]         - Request ID. This is, in practice, a hit counter since the server was last started. 
+        [%X{SOURCE}]      - The Source HTTP verb for the request, GET, POST, etc. 
+        [%X{resourceID}]  - The local name/path/id of the requested object
+        [%X{query}]       - The query string submitted by the client.
+        [%X{size}]        - Size of the response 
+        %n                - newline 
+    -->
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M\\(\\) - %m%n"/>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+    <!--
+       This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+       and it must defined and added to the root logger in order to catch all the stuff,
+       and in order for the Java software to be able to locate it at run time.
+   -->
+    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
+        <MaxSize>512</MaxSize>
+    </appender>
+    
+    <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/HyraxErrors.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/HyraxErrors.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/HyraxAccess.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%X{host}] [%X{UserAgent}] [%X{ident}] [%X{userid}] [%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [%8X{duration}] [%X{http_status}] [%8X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}]%n</pattern>
+        </encoder>
+    </appender>
+        
+    <appender name="BESCommandLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/BESCommands.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logdir}/HyraxBESCommands.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] [request %X{ID}] [%X{resourceID}] [%X{query}] %m</pattern>
+        </encoder>
+    </appender>
+    
+
+    
+    <appender name="DebugLogDateRoller" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/debug.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logdir}/debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DebugLogSizeRoller" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/debug.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/debug.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="AuthenticationLog" level="info">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="opendap.dap.User" level="info"/>
+    <logger name="opendap.auth" level="all"/>
+    <logger name="opendap.auth.Util" level="all"/>
+    <logger name="opendap.ngap" level="info"/>
+
+
+    <logger name="opendap" level="error">
+        <appender-ref ref="DebugLogDateRoller"/>
+    </logger>
+
+    <!-- 
+    <logger name="opendap.coreServlet.DispatchServlet" level="error"/>
+    <logger name="opendap.bes.BESSiteMap" level="all"/>
+    <logger name="opendap.wcs" level="all"/>
+    <logger name="opendap.semantics" level="all"/>
+    <logger name="opendap.io" level="info" />
+    <logger name="opendap.bes.dap2Responders.Ascii"   level="info"/>
+
+    <logger name="opendap.logging.LogUtil" level="info" />
+
+    <logger name="org.jdom" level="all" />
+
+    <logger name="opendap.coreServlet" level="error" />
+
+    <logger name="opendap.hai" level="all" />
+
+    <logger name="opendap.aggregation" level="all" />
+
+    <logger name="opendap.dap.Request"         level="all"/>
+    
+    <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
+    <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
+    <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
+    <logger name="opendap.coreServlet.Scrub"              level="all"/>
+    <logger name="opendap.coreServlet.RequestCache"       level="all"/>
+    <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
+    <logger name="opendap.coreServlet.PersistentConfigurationHandler"  level="all"/>
+
+    <logger name="opendap.bes" level="error" />
+
+    <logger name="opendap.bes.BESManager"                  level="error" />
+    <logger name="opendap.bes.dap2Responders.BesApi"       level="error" />
+    <logger name="opendap.bes.BES"                         level="all"   />
+    <logger name="opendap.bes.BesDapDispatcher"            level="all"   />
+    <logger name="opendap.bes.DirectoryDispatchHandler"    level="all"   />
+    <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"   />
+
+    <logger name="opendap.bes.dap4Responders.FileAccess"   level="all"/>
+
+    <logger name="opendap.gateway" level="all" />
+    <logger name="opendap.webstart" level="all" />
+    <logger name="opendap.threddsHandler" level="all" />
+
+    <logger name="org.apache.jasper" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+
+
+    <logger name="JavaServerPages" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.auth" level="all" />
+    <logger name="PEP" level="all" >
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="IdP" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.aggregation" level="all" />
+
+    <logger name="opendap.w10n" level="all" />
+
+
+    <logger name="opendap.wcs.v2_0" level="all"/>
+
+-->
+    <!--
+    <logger name="opendap.ppt.NewPPTClient" level="all" />
+
+
+    <logger name="opendap.wcs.v2_0.http" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="opendap.WcsCatalog" level="all"/>
+
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
+    <logger name="opendap.WcsCatalog" level="all"/>
+
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
+
+    <logger name="opendap.semantics" level="debug">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="org.openrdf" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+
+
+    <logger name="opendap.semantics">
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.openrdf">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+    -->
+    <logger name="NodeCache" level="all">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    <logger name="HyraxAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="DocsAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="SiteMapAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="PDPServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="PDPServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxGatewayAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxGatewayLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxAdmindAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="HyraxAdminLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="S3ServiceAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="S3ServiceLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="WCSAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="WCSLastModifiedAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+    <logger name="BesCommandLog" level="info">
+        <appender-ref ref="BESCommandLogAppender"/>
+        <!-- appender-ref ref="stdout"/ -->
+    </logger>
+    
+    <root level="error">
+        <!--
+            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+            and it must appear here in the root level in order to catch all the stuff,
+            adn in order for the Java software to be able to locate it at run time.
+        -->
+        <appender-ref ref="HAI_DEBUG_LOGGER"/>
+    </root>
+</configuration>

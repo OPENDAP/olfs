@@ -519,12 +519,9 @@
                 <xsl:if test="ows:Constraint">
                     (<xsl:value-of select="ows:Constraint/ows:AllowedValues/ows:Value"/>)
                 </xsl:if>
-                <xsl:element name="a">
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="./@xlink:href"/>
-                    </xsl:attribute>
+                <span style="text-decoration: underline;">
                     <xsl:value-of select="./@xlink:href"/>
-                </xsl:element>
+                </span>
             </li>
         </xsl:for-each>
     </xsl:template>

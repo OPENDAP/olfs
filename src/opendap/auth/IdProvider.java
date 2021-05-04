@@ -102,7 +102,7 @@ public abstract class IdProvider implements Serializable {
      * @param request
      * @param response
      * @return True if login is complete and user profile has been added to session object. False otherwise.
-     * @throws Exception
+     * @throws IOException
      */
     public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException;
 

@@ -37,11 +37,12 @@ import java.util.Date;
  */
 public class EarthDataLoginAccessToken implements Serializable {
 
-    public static final String ACCESS_TOKEN  = "access_token";
-    public static final String ENDPOINT  = "endpoint";
-    public static final String EXPIRES_IN  = "expires_in";
-    public static final String TOKEN_TYPE  = "token_type";
-    public static final String REFRESH_TOKEN  = "refresh_token";
+    public static final String ACCESS_TOKEN_KEY = "access_token";
+    public static final String ENDPOINT_KEY = "endpoint";
+    public static final String EXPIRES_IN_KEY = "expires_in";
+    public static final String TOKEN_TYPE_KEY = "token_type";
+    public static final String REFRESH_TOKEN_KEY = "refresh_token";
+    public static final String BEARER_TOKEN_TYPE = "Bearer";
 
     /* @serial */
     private String accessToken;
@@ -55,27 +56,8 @@ public class EarthDataLoginAccessToken implements Serializable {
     private String refreshToken;
     /* @serial */
     private Date creationTime;
+    private String edlClientAppId;
 
-
-
-    public EarthDataLoginAccessToken(JsonObject json)  {
-        creationTime = new Date();
-        accessToken = json.get(ACCESS_TOKEN).getAsString();
-        endPoint = json.get(ENDPOINT).getAsString();
-        expiresIn = json.get(EXPIRES_IN).getAsLong();
-        tokenType = json.get(TOKEN_TYPE).getAsString();
-        refreshToken = json.get(REFRESH_TOKEN).getAsString();
-    }
-
-
-    public EarthDataLoginAccessToken(EarthDataLoginAccessToken oat)  {
-        creationTime = oat.creationTime;
-        accessToken = oat.accessToken;
-        endPoint = oat.endPoint;
-        expiresIn = oat.expiresIn;
-        tokenType = oat.tokenType;
-        refreshToken = oat.refreshToken;
-    }
     public EarthDataLoginAccessToken() {
         creationTime = new Date();
         accessToken = "ASPECIALURSACCESSTOKENSTRING";
@@ -83,9 +65,56 @@ public class EarthDataLoginAccessToken implements Serializable {
         expiresIn = 3600;
         tokenType = "token_type";
         refreshToken = "ASPECIALURSREFRESHTOKEN";
-
+        edlClientAppId="ThatSecretSauceFromEDL";
     }
 
+
+
+    public EarthDataLoginAccessToken(JsonObject json, String appID)  {
+        this();
+        creationTime = new Date();
+        edlClientAppId = appID;
+        accessToken = json.get(ACCESS_TOKEN_KEY).getAsString();
+        endPoint = json.get(ENDPOINT_KEY).getAsString();
+        expiresIn = json.get(EXPIRES_IN_KEY).getAsLong();
+        tokenType = json.get(TOKEN_TYPE_KEY).getAsString();
+        refreshToken = json.get(REFRESH_TOKEN_KEY).getAsString();
+    }
+
+
+    public EarthDataLoginAccessToken(String authorizationHeader, String appID)  {
+        this();
+        creationTime = new Date();
+        edlClientAppId = appID;
+        String[] tokens = authorizationHeader.split(" ");
+        if(tokens.length == 2){
+            accessToken = tokens[1];
+            tokenType = tokens[0];
+        }
+    }
+
+
+    public EarthDataLoginAccessToken(EarthDataLoginAccessToken oat)  {
+        this();
+        creationTime = oat.creationTime;
+        accessToken = oat.accessToken;
+        endPoint = oat.endPoint;
+        expiresIn = oat.expiresIn;
+        tokenType = oat.tokenType;
+        refreshToken = oat.refreshToken;
+        edlClientAppId = oat.getEdlClientAppId();
+    }
+
+    public static boolean checkAuthorizationHeader(String auth_header_value){
+        boolean retVal = false;
+        if(auth_header_value!=null) {
+            String[] tokens = auth_header_value.split(" ");
+            if(tokens.length == 2){
+                retVal = tokens[0].equalsIgnoreCase(BEARER_TOKEN_TYPE);
+            }
+        }
+        return retVal;
+    }
 
     public String getAccessToken(){
         return accessToken;
@@ -93,6 +122,14 @@ public class EarthDataLoginAccessToken implements Serializable {
 
     public void setAccessToken(String at){
         accessToken = at;
+    }
+
+    public String getEdlClientAppId(){
+        return edlClientAppId;
+    }
+
+    public void setEdlClientAppId(String at){
+        edlClientAppId = at;
     }
 
 
@@ -149,17 +186,24 @@ public class EarthDataLoginAccessToken implements Serializable {
         String l1i = indent +indent_inc;
         sb.append(indent).append("\"").append(this.getClass().getName()).append("\" : {\n");
         sb.append(l1i).append("\"creationTime\" : \"").append(creationTime).append("\",\n");
-        sb.append(l1i).append("\"").append(ACCESS_TOKEN).append("\" : \"").append(accessToken).append("\",\n");
-        sb.append(l1i).append("\"").append(ENDPOINT).append("\" : \"").append(endPoint).append("\",\n");
-        sb.append(l1i).append("\"").append(EXPIRES_IN).append("\" : \"").append(expiresIn).append("\",\n");
-        sb.append(l1i).append("\"").append(TOKEN_TYPE).append("\" : \"").append(tokenType).append("\",\n");
-        sb.append(l1i).append("\"").append(REFRESH_TOKEN).append("\" : \"").append(refreshToken).append("\"\n");
+        sb.append(l1i).append("\"").append(ACCESS_TOKEN_KEY).append("\" : \"").append(accessToken).append("\",\n");
+        sb.append(l1i).append("\"").append(ENDPOINT_KEY).append("\" : \"").append(endPoint).append("\",\n");
+        sb.append(l1i).append("\"").append(EXPIRES_IN_KEY).append("\" : \"").append(expiresIn).append("\",\n");
+        sb.append(l1i).append("\"").append(TOKEN_TYPE_KEY).append("\" : \"").append(tokenType).append("\",\n");
+        sb.append(l1i).append("\"").append(REFRESH_TOKEN_KEY).append("\" : \"").append(refreshToken).append("\"\n");
         sb.append(indent).append("}\n");
         return sb.toString();
     }
 
 
 
+    public String getEchoTokenValue(){
+        return  getAccessToken() + ":" + getEdlClientAppId();
+    }
+
+    public String getAuthorizationHeaderValue(){
+        return  getTokenType() + " " + getAccessToken();
+    }
 
 
 

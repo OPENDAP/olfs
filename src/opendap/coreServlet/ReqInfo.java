@@ -30,6 +30,7 @@ package opendap.coreServlet;
 
 import opendap.PathBuilder;
 import opendap.dap.Request;
+import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 
@@ -84,6 +85,7 @@ public class ReqInfo {
 
     public static final int DEFAULT_POST_BODY_MAX_LENGTH  =  2000000;
     public static final int ABSOLUTE_MAX_POST_BODY_LENGTH = 10000000;
+    public static final String  HTTP_POST = "POST";
 
     private static Logger log;
     static {
@@ -244,10 +246,11 @@ public class ReqInfo {
     }
 
 
+
     private static StringBuilder getPostBodyCE(HttpServletRequest req) throws IOException {
 
         StringBuilder bodyCE = new StringBuilder();
-        if(req.getMethod().equalsIgnoreCase("POST")){
+        if(req.getMethod().equalsIgnoreCase(HTTP_POST)){
             if(req.getContentLength()> getPostBodyMaxLength()) {
                 throw new IOException("POST body content length is longer than maximum allowed by service.");
             }
@@ -255,24 +258,33 @@ public class ReqInfo {
             if(contentType!=null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded")){
                 Map paramMap = req.getParameterMap();
                 if(paramMap!=null){
-                    String[] bodyCEValues = (String[]) paramMap.get("ce");
+
+                    // Check for DAP4 CE in the body.
+                    String[] bodyCEValues = (String[]) paramMap.get(QueryParameters.DAP4_CONSTRAINT_EXPRESSION_KEY);
                     if(bodyCEValues!=null){
                         for(String ceValue: bodyCEValues){
                             if(bodyCE.length()!=0){
-                                bodyCE.append(",");
+                                bodyCE.append(";");
+                            }
+                            else {
+                                bodyCE.append(QueryParameters.DAP4_CONSTRAINT_EXPRESSION_KEY + "=");
                             }
                             bodyCE.append(ceValue);
                         }
                     }
-                    bodyCEValues = (String[]) paramMap.get("dap4:ce");
-                    if(bodyCEValues!=null){
-                        for(String ceValue: bodyCEValues){
-                            if(bodyCE.length()!=0){
-                                bodyCE.append(",");
+                    else {
+                        // Check for DAP2 CE in the body.
+                        bodyCEValues = (String[]) paramMap.get("ce");
+                        if(bodyCEValues!=null){
+                            for(String ceValue: bodyCEValues){
+                                if(bodyCE.length()!=0){
+                                    bodyCE.append(",");
+                                }
+                                bodyCE.append(ceValue);
                             }
-                            bodyCE.append(ceValue);
                         }
                     }
+
                 }
             }
             else {

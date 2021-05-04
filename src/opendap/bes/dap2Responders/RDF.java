@@ -33,6 +33,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
+import opendap.http.error.InternalError;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
@@ -155,33 +156,19 @@ public class RDF extends Dap4Responder {
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
         } catch (Exception e) {
-            sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("I'm sorry. ");
+            errorMessage.append("You requested the RDF representation of the metadata for the dataset: ");
+            errorMessage.append(resourceID).append(" ");
+            errorMessage.append("The server attempted to transform the metadata in the dataset, ");
+            errorMessage.append("represented as a DAP-3.2 DDX document, into an RDF representation. ");
+            errorMessage.append( "The transform failed, and returned this error message: \"");
+            errorMessage.append(e.getMessage()).append("\"");
+            throw new InternalError(errorMessage.toString());
         }
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
-
-
-
-
-
-    public void sendRdfErrorResponse(Exception e, String dataSource, String docsService, HttpServletResponse response) throws Exception {
-
-        String errorMessage =
-                        "<p align=\"center\">I'm sorry.</p>\n" +
-                        "<p align=\"center\">You requested the RDF representation of the metadata for the dataset:</p>\n" +
-                        "<p align=\"center\" class=\"bold\">"+dataSource+" </p>\n" +
-                        "<p align=\"center\">The server attempted to transform the metadata in the dataset, " +
-                                "represented as a DDX document, into an RDF representation.</p>\n" +
-                        "<p align=\"center\">The transform failed, and returned this specific error message:</p>\n" +
-                        "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
-
-
-        sendHttpErrorResponse(500, errorMessage, docsService, response);
-
-    }
-
-
 
 }

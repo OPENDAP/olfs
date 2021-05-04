@@ -389,9 +389,14 @@ public class BesDapDispatcher implements DispatchHandler {
 
         for (HttpResponder r : _responders) {
             if (r.matches(relativeUrl)) {
-                _log.info("The relative URL: " + relativeUrl + " matches " +
-                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
-
+                if(_log.isInfoEnabled()) {
+                    String msg = "The relative URL: " + relativeUrl +
+                            " matches the pattern: \"" +
+                            r.getRequestMatchRegexString() +
+                            "\" (responder: " + r.getClass().getName() +
+                            ")";
+                    _log.info(msg);
+                }
                 try {
 
                     long lmt =  r.getLastModified(req);
