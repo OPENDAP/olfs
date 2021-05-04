@@ -56,6 +56,7 @@ public class EarthDataLoginAccessToken implements Serializable {
     private String refreshToken;
     /* @serial */
     private Date creationTime;
+    /* @serial */
     private String edlClientAppId;
 
     public EarthDataLoginAccessToken() {
