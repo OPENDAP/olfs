@@ -24,6 +24,10 @@ public class IdPManager {
 
     public static Collection<IdProvider> getProviders(){ return ipdInstances.values(); }
 
+    public static IdProvider getProvider(String auth_context){
+        return ipdInstances.get(auth_context);
+    }
+
 
 
     public static void addProvider(IdProvider ipd) throws ConfigurationException {

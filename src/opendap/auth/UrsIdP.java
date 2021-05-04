@@ -239,7 +239,7 @@ public class UrsIdP extends IdProvider{
         log.debug("BEGIN (session: {})",session.getId());
 
         UserProfile userProfile = new UserProfile();
-        userProfile.setIdP(this);
+        userProfile.setAuthContext(getAuthContext());
 
         // Add the this instance of UserProfile to the session for retrieval
         // down stream on this request.
