@@ -136,6 +136,6 @@ public class Netcdf4DR extends Dap4Responder{
         besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
-        log.debug("Sent {} size: {}",getServiceTitle(),os.size());
+        log.info("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }
