@@ -121,14 +121,24 @@ public class BESError extends OPeNDAPException {
     public static final int TIME_OUT              = 6;
 
 
-    Document besErrorDoc = null;
+    /**
+     *
+     */
+    private Document besErrorDoc = null;
 
 
+    /**
+     *
+     * @param error
+     */
     public BESError(Document error) {
         this(error,new TextHtml());
     }
 
 
+    /**
+     *
+     */
     private BESError() {
         _adminEmail = "support@opendap.org";
         _message = "Unknown Error";
@@ -138,7 +148,11 @@ public class BESError extends OPeNDAPException {
     }
 
 
-
+    /**
+     *
+     * @param error
+     * @param mt
+     */
     public BESError(Document error, MediaType mt) {
         this();
         setResponseMediaType(mt);
@@ -157,37 +171,48 @@ public class BESError extends OPeNDAPException {
 
     }
 
+    /**
+     *
+     * @param is
+     */
     public BESError( InputStream is) {
 
         this(is,new TextHtml());
 
-
     }
+
+    /**
+     *
+     * @param is
+     * @param mt
+     */
     public BESError( InputStream is, MediaType mt) {
         this();
 
-
         setResponseMediaType(mt);
-
         SAXBuilder sb = new SAXBuilder();
-
         try {
             Document error = sb.build(is);
-
             besErrorDoc = processError(error);
-
-            if(besErrorDoc ==null){
-                becomeInvalidError("Unable to locate <BESError> object in stream.");
+            if(besErrorDoc == null){
+                becomeInvalidError("ERROR - Failed to locate <BESError> object in XML document parsed from stream.");
             }
-
-        } catch (JDOMException | IOException e) {
-            becomeInvalidError("Unable to parse expected <BESError> object from passed stream.");
+        }
+        catch (JDOMException e) {
+            becomeInvalidError("ERROR - Unable to parse expected <BESError> object from stream! Message: "+e.getMessage());
+        }
+        catch (IOException e) {
+            becomeInvalidError("ERROR - Failed to read expected <BESError> object from stream. Message: "+e.getMessage());
         }
 
 
     }
 
 
+    /**
+     *
+     * @param message
+     */
     private void becomeInvalidError(String message){
 
         besErrorDoc = makeBesErrorDoc(INVALID_ERROR,message,null, null, -1);
@@ -195,10 +220,19 @@ public class BESError extends OPeNDAPException {
 
     }
 
+    /**
+     *
+     * @param error
+     */
     public BESError(String error) {
         this(error, new TextHtml());
     }
 
+    /**
+     *
+     * @param error
+     * @param mt
+     */
     public BESError(String error, MediaType mt) {
         this();
         setResponseMediaType(mt);
@@ -238,25 +272,43 @@ public class BESError extends OPeNDAPException {
     }
 
 
-
+    /**
+     *
+     * @return
+     */
     public boolean notFound(){
         return getBesErrorCode()==NOT_FOUND_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean forbidden(){
         return getBesErrorCode()==FORBIDDEN_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean syntax(){
         return getBesErrorCode()==USER_SYNTAX_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean internal(){
         return getBesErrorCode()==INTERNAL_FATAL_ERROR || getBesErrorCode()==INTERNAL_ERROR;
     }
 
 
-
+    /**
+     *
+     * @return
+     */
     public int convertBesErrorCodeToHttpStatusCode(){
         int httpStatus;
         switch(getBesErrorCode()){
@@ -290,15 +342,20 @@ public class BESError extends OPeNDAPException {
             default:
                 httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 break;
-
         }
-
         return httpStatus;
-
     }
 
 
-
+    /**
+     *
+     * @param besErrorCode
+     * @param message
+     * @param admin
+     * @param file
+     * @param line
+     * @return
+     */
     private Document makeBesErrorDoc(int besErrorCode, String message, String admin, String file, int line) {
 
 
@@ -332,20 +389,17 @@ public class BESError extends OPeNDAPException {
             besErrorElement.addContent(locationElement);
 
         }
-
         return new Document(besErrorElement);
-
-
     }
 
 
-
+    /**
+     *
+     * @param error
+     */
     private void processError(Element error){
         try {
-
             Element e;
-
-
             // <Type>
             e = error.getChild("Type",BES_NS);
             if(e!=null){
@@ -359,8 +413,6 @@ public class BESError extends OPeNDAPException {
                 _adminEmail = e.getTextTrim();
             }
 
-
-
             // <Message>
             e = error.getChild("Message",BES_NS);
             if(e!=null){
@@ -370,25 +422,17 @@ public class BESError extends OPeNDAPException {
             // <Location>
             Element location = error.getChild("Location",BES_NS);
             if(location!=null){
-
                 // <File>
                 e = error.getChild("File",BES_NS);
                 if(e!=null){
                     _file = e.getTextTrim();
                 }
-
                 // <Line>
                 e = error.getChild("Line",BES_NS);
                 if(e!=null){
                     _line = e.getTextTrim();
                 }
-
-
             }
-
-            // </Location>
-
-
         }
         catch(NumberFormatException nfe){
             setBesErrorCode(-1);
@@ -396,17 +440,17 @@ public class BESError extends OPeNDAPException {
 
         int httpStatus = convertBesErrorCodeToHttpStatusCode();
         setHttpStatusCode(httpStatus);
-
         // setErrorMessage(makeBesErrorMsg(error));
-
     }
 
 
-
+    /**
+     *
+     * @param error
+     * @return
+     */
     private Document processError(Document error){
-
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
-
         if(i.hasNext()){
             Element e = (Element)i.next();
             e.detach();
@@ -415,19 +459,11 @@ public class BESError extends OPeNDAPException {
             processError(e);
             return error;
         }
-        else
+        else {
             return null;
-
-
+        }
     }
 
-
-
-
-
-    public Document getErrorDoc(){
-        return (Document) besErrorDoc.clone();
-    }
-
+    
 
 }
