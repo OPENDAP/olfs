@@ -464,6 +464,6 @@ public class BESError extends OPeNDAPException {
         }
     }
 
-    
+
 
 }
