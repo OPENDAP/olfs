@@ -27,13 +27,15 @@
 package opendap.auth;
 
 import com.google.gson.*;
+
+import java.io.Serializable;
 import java.util.*;
 
 
 /**
  * Created by ndp on 9/25/14.
  */
-public class UserProfile {
+public class UserProfile implements Serializable {
 
     private Date objectCreationTime;
     private String d_jsonStr;

@@ -181,7 +181,7 @@ public class BESError extends OPeNDAPException {
             }
 
         } catch (JDOMException | IOException e) {
-            becomeInvalidError("Unable to process <BESError> object in stream.");
+            becomeInvalidError("Unable to parse expected <BESError> object from passed stream.");
         }
 
 
@@ -404,6 +404,7 @@ public class BESError extends OPeNDAPException {
 
 
     private Document processError(Document error){
+
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
 
         if(i.hasNext()){
