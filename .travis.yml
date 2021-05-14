@@ -33,13 +33,10 @@ addons:
       - awscli
       - sshpass
 
-script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - sonar-scanner
 env:
   global:
     # SONAR_LOGIN, made using "travis encrypt keythingy..."
-    - secure: "N6YIytQmB+pPQI4xAFRAZ9EmYeX9Sy5T50D+AY14Z+oTXeWaWAuMPrhJI9p9QPUgI4LzGQzr3aN7HmDOwDUHPrA1KQyBdzrntwNiG+EAw/UFYr1q2TFdubSTHeYJk2/gko/5cPqPyS2fGb6cKWtlFIQRp0EZJXvHBLDK4FXdvMQ="
+    # - secure: "N6YIytQmB+pPQI4xAFRAZ9EmYeX9Sy5T50D+AY14Z+oTXeWaWAuMPrhJI9p9QPUgI4LzGQzr3aN7HmDOwDUHPrA1KQyBdzrntwNiG+EAw/UFYr1q2TFdubSTHeYJk2/gko/5cPqPyS2fGb6cKWtlFIQRp0EZJXvHBLDK4FXdvMQ="
     # AWS_ACCESS_KEY_ID for the user 'travis-olfs'
     - secure: "N7FWlKcHNC4VRaNZFz/8WQlwJXjr7t4QLklJPiUY2xBw8n4lpYUuMjvDlwX7YupIKNGw8ama8GauNZhJ2h0qv08VeMF4VLOc5yUDt9BSEEnomiQZWa8N0paaSknlZP8Qq7YH2WVrlASIR+/Owdig1mqIv9GPW+ZkwdRTdRI9FZM="
     # AWS_SECRET_ACCESS_KEY
