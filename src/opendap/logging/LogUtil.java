@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,7 +378,7 @@ public class LogUtil {
         String resourceID =  req.getRequestURI();
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
-        String query = req.getQueryString();
+        String query = Scrub.simpleQueryString(req.getQueryString());
         query = (query == null) ? "" : query;
         MDC.put(QUERY_STRING_KEY, query);
 
@@ -393,6 +394,7 @@ public class LogUtil {
     }
 
     /**
+     *
      *  Bsed on the HyraxAccess.log pattern:
      *  <pattern>
      *  [%X{host}]

@@ -85,7 +85,7 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getProfile(){
-        if(d_profile ==null && d_jsonStr !=null){
+        if(d_profile==null && d_jsonStr !=null){
             JsonParser jparse = new JsonParser();
             d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
         }
@@ -94,7 +94,9 @@ public class UserProfile implements Serializable {
 
     void ingestJsonProfileString(String jsonStr){
         this.d_jsonStr = jsonStr;
-        d_uid = getProfile().get("d_uid").getAsString();
+        JsonObject profile = getProfile();
+        JsonElement uid=profile.get("uid");
+        d_uid = uid.getAsString();
     }
 
     public void setEDLAccessToken(EarthDataLoginAccessToken oat){

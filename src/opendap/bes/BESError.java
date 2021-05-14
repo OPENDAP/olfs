@@ -29,23 +29,17 @@ package opendap.bes;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.namespaces.*;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
-import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Iterator;
 
 
@@ -121,14 +115,24 @@ public class BESError extends OPeNDAPException {
     public static final int TIME_OUT              = 6;
 
 
-    Document besErrorDoc = null;
+    /**
+     *
+     */
+    private Document besErrorDoc = null;
 
 
+    /**
+     *
+     * @param error
+     */
     public BESError(Document error) {
         this(error,new TextHtml());
     }
 
 
+    /**
+     *
+     */
     private BESError() {
         _adminEmail = "support@opendap.org";
         _message = "Unknown Error";
@@ -138,7 +142,11 @@ public class BESError extends OPeNDAPException {
     }
 
 
-
+    /**
+     *
+     * @param error
+     * @param mt
+     */
     public BESError(Document error, MediaType mt) {
         this();
         setResponseMediaType(mt);
@@ -157,37 +165,97 @@ public class BESError extends OPeNDAPException {
 
     }
 
+    /**
+     *
+     * @param is
+     */
     public BESError( InputStream is) {
 
         this(is,new TextHtml());
 
-
     }
-    public BESError( InputStream is, MediaType mt) {
+
+    /**
+     * In an attempt to recover from a possibly corrupt stream, or
+     * FIXME - Covering for a bug in the way that PPT Client handles error chunks.
+     * This method  Drops bytes off the front of the stream is until the stream begins with
+     * the bytes "&lt;?xml "
+     * @param is The stream to cue.
+     * @return The cued up stream.
+     * @throws IOException
+     */
+    private InputStream cueErrorStreamToXmlStart(InputStream is) throws IOException {
+
+        byte xml_hdr[] ="<?xml ".getBytes(HyraxStringEncoding.getCharset());
+        PushbackInputStream pis = new PushbackInputStream(is,xml_hdr.length);
+
+        boolean found_xml_hdr = false;
+        while(!found_xml_hdr && pis.available()>=xml_hdr.length){
+            int retVal = pis.read();
+            while(retVal != '<' &&  retVal!=-1) {
+                retVal = pis.read();
+            }
+            if(retVal == '<'){
+                pis.unread(retVal);
+
+                byte look_ahead[] = new byte[xml_hdr.length];
+                int laRetVal = pis.read(look_ahead);
+                if(laRetVal == xml_hdr.length){
+                    found_xml_hdr = true;
+                    for(int i=0; i<xml_hdr.length; i++){
+                        found_xml_hdr = found_xml_hdr && (look_ahead[i] == xml_hdr[i]);
+                    }
+                }
+                pis.unread(look_ahead,0,laRetVal);
+            }
+        }
+        if(!found_xml_hdr){
+            String msg = "ERROR Failed to locate the BES Error XML header. ";
+            throw new IOException(msg);
+        }
+        return pis;
+    }
+
+    /**
+     * @param is
+     * @param mt
+     */
+    public BESError(InputStream is, MediaType mt) {
         this();
-
-
         setResponseMediaType(mt);
 
         SAXBuilder sb = new SAXBuilder();
 
         try {
+            is = cueErrorStreamToXmlStart(is);
             Document error = sb.build(is);
-
             besErrorDoc = processError(error);
 
-            if(besErrorDoc ==null){
-                becomeInvalidError("Unable to locate <BESError> object in stream.");
+            if (besErrorDoc == null) {
+                String msg = "ERROR - Failed to locate <BESError> object in XML document parsed from stream!";
+                becomeInvalidError(msg);
             }
 
-        } catch (JDOMException | IOException e) {
-            becomeInvalidError("Unable to process <BESError> object in stream.");
         }
-
+        catch (JDOMException e) {
+            String msg = "ERROR - Unable to parse expected <BESError> object from stream!";
+            msg += " Message: " + e.getMessage();
+            becomeInvalidError(msg);
+        }
+        catch (IOException e) {
+            StringBuilder msg = new StringBuilder();
+            msg.append("ERROR - Failed to locate expected <BESError> object from stream.");
+            msg.append(" Message: ").append(e.getMessage());
+            becomeInvalidError(msg.toString());
+        }
 
     }
 
 
+    /**
+     *
+     * @param message
+     */
     private void becomeInvalidError(String message){
 
         besErrorDoc = makeBesErrorDoc(INVALID_ERROR,message,null, null, -1);
@@ -195,10 +263,19 @@ public class BESError extends OPeNDAPException {
 
     }
 
+    /**
+     *
+     * @param error
+     */
     public BESError(String error) {
         this(error, new TextHtml());
     }
 
+    /**
+     *
+     * @param error
+     * @param mt
+     */
     public BESError(String error, MediaType mt) {
         this();
         setResponseMediaType(mt);
@@ -238,25 +315,43 @@ public class BESError extends OPeNDAPException {
     }
 
 
-
+    /**
+     *
+     * @return
+     */
     public boolean notFound(){
         return getBesErrorCode()==NOT_FOUND_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean forbidden(){
         return getBesErrorCode()==FORBIDDEN_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean syntax(){
         return getBesErrorCode()==USER_SYNTAX_ERROR;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean internal(){
         return getBesErrorCode()==INTERNAL_FATAL_ERROR || getBesErrorCode()==INTERNAL_ERROR;
     }
 
 
-
+    /**
+     *
+     * @return
+     */
     public int convertBesErrorCodeToHttpStatusCode(){
         int httpStatus;
         switch(getBesErrorCode()){
@@ -290,15 +385,20 @@ public class BESError extends OPeNDAPException {
             default:
                 httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 break;
-
         }
-
         return httpStatus;
-
     }
 
 
-
+    /**
+     *
+     * @param besErrorCode
+     * @param message
+     * @param admin
+     * @param file
+     * @param line
+     * @return
+     */
     private Document makeBesErrorDoc(int besErrorCode, String message, String admin, String file, int line) {
 
 
@@ -332,20 +432,17 @@ public class BESError extends OPeNDAPException {
             besErrorElement.addContent(locationElement);
 
         }
-
         return new Document(besErrorElement);
-
-
     }
 
 
-
+    /**
+     *
+     * @param error
+     */
     private void processError(Element error){
         try {
-
             Element e;
-
-
             // <Type>
             e = error.getChild("Type",BES_NS);
             if(e!=null){
@@ -359,8 +456,6 @@ public class BESError extends OPeNDAPException {
                 _adminEmail = e.getTextTrim();
             }
 
-
-
             // <Message>
             e = error.getChild("Message",BES_NS);
             if(e!=null){
@@ -370,25 +465,17 @@ public class BESError extends OPeNDAPException {
             // <Location>
             Element location = error.getChild("Location",BES_NS);
             if(location!=null){
-
                 // <File>
                 e = error.getChild("File",BES_NS);
                 if(e!=null){
                     _file = e.getTextTrim();
                 }
-
                 // <Line>
                 e = error.getChild("Line",BES_NS);
                 if(e!=null){
                     _line = e.getTextTrim();
                 }
-
-
             }
-
-            // </Location>
-
-
         }
         catch(NumberFormatException nfe){
             setBesErrorCode(-1);
@@ -396,16 +483,17 @@ public class BESError extends OPeNDAPException {
 
         int httpStatus = convertBesErrorCodeToHttpStatusCode();
         setHttpStatusCode(httpStatus);
-
         // setErrorMessage(makeBesErrorMsg(error));
-
     }
 
 
-
+    /**
+     *
+     * @param error
+     * @return
+     */
     private Document processError(Document error){
         Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
-
         if(i.hasNext()){
             Element e = (Element)i.next();
             e.detach();
@@ -414,19 +502,11 @@ public class BESError extends OPeNDAPException {
             processError(e);
             return error;
         }
-        else
+        else {
             return null;
-
-
+        }
     }
 
-
-
-
-
-    public Document getErrorDoc(){
-        return (Document) besErrorDoc.clone();
-    }
 
 
 }

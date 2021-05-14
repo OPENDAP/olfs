@@ -163,6 +163,8 @@ public class PDPService extends HttpServlet {
         String msg = "";
         int status = HttpServletResponse.SC_FORBIDDEN;
 
+        RequestCache.openThreadCache();
+
         LogUtil.logServerAccessStart(request, LogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
         try {
             if (!redirect(request, response)) {

@@ -137,6 +137,9 @@
         <appender-ref ref="DebugLogDateRoller"/>
     </logger>
 
+    <logger name="opendap.bes.dap2Responders.Netcdf4"   level="info" />
+    <logger name="opendap.bes.dap4Responders.Netcdf4DR" level="info" />
+
     <!-- 
     <logger name="opendap.coreServlet.DispatchServlet" level="error"/>
     <logger name="opendap.bes.BESSiteMap" level="all"/>

@@ -384,15 +384,24 @@ public class DispatchServlet extends HttpServlet {
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         if(relativeUrl.equalsIgnoreCase("/")) {
-            super.doHead(request, response);
+            try {
+                super.doHead(request, response);
+            }
+            catch(ServletException se){
+                log.error("ERROR - Failed to produce HEAD response for {}",relativeUrl);
+            }
         }
         else {
             String msg = "HEAD is not allowed in this area.";
             response.setHeader("Disposition", msg);
             response.setHeader("Allow", "GET, POST");
-            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
+            try {
+                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
+            }
+            catch(IOException ioe){
+                log.error("ERROR - To send METHOD NOT ALLOWED error to client for {}",relativeUrl);
+            }
         }
-
     }
 
     /**

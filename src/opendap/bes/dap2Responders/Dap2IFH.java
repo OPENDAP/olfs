@@ -1,11 +1,9 @@
-package opendap.bes.dap2Responders;
-
 /*
  * /////////////////////////////////////////////////////////////////////////////
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2018 OPeNDAP, Inc.
+ * // Copyright (c) 2021 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -26,6 +24,7 @@ package opendap.bes.dap2Responders;
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;

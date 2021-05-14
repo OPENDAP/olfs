@@ -118,6 +118,7 @@ public class AdminInfo {
      */
     public AdminInfo(AdminInfo adminInfo){
         this();
+        log           = adminInfo.log;
         _organization = adminInfo._organization;
         _country      = adminInfo._country;
         _city         = adminInfo._city;
