@@ -29,23 +29,17 @@ package opendap.bes;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.namespaces.*;
+import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
-import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Iterator;
 
 
@@ -182,29 +176,78 @@ public class BESError extends OPeNDAPException {
     }
 
     /**
-     *
+     * In an attempt to recover from a possibly corrupt stream, or
+     * FIXME - Covering for a bug in the way that PPT Client handles error chunks.
+     * This method  Drops bytes off the front of the stream is until the stream begins with
+     * the bytes "&lt;?xml "
+     * @param is The stream to cue.
+     * @return The cued up stream.
+     * @throws IOException
+     */
+    private InputStream cueErrorStreamToXmlStart(InputStream is) throws IOException {
+
+        byte xml_hdr[] ="<?xml ".getBytes(HyraxStringEncoding.getCharset());
+        PushbackInputStream pis = new PushbackInputStream(is,xml_hdr.length);
+
+        boolean found_xml_hdr = false;
+        while(!found_xml_hdr && pis.available()>=xml_hdr.length){
+            int retVal = pis.read();
+            while(retVal != '<' &&  retVal!=-1) {
+                retVal = pis.read();
+            }
+            if(retVal == '<'){
+                pis.unread(retVal);
+
+                byte look_ahead[] = new byte[xml_hdr.length];
+                int laRetVal = pis.read(look_ahead);
+                if(laRetVal == xml_hdr.length){
+                    found_xml_hdr = true;
+                    for(int i=0; i<xml_hdr.length; i++){
+                        found_xml_hdr = found_xml_hdr && (look_ahead[i] == xml_hdr[i]);
+                    }
+                }
+                pis.unread(look_ahead,0,laRetVal);
+            }
+        }
+        if(!found_xml_hdr){
+            String msg = "ERROR Failed to locate the BES Error XML header. ";
+            throw new IOException(msg);
+        }
+        return pis;
+    }
+
+    /**
      * @param is
      * @param mt
      */
-    public BESError( InputStream is, MediaType mt) {
+    public BESError(InputStream is, MediaType mt) {
         this();
-
         setResponseMediaType(mt);
+
         SAXBuilder sb = new SAXBuilder();
+
         try {
+            is = cueErrorStreamToXmlStart(is);
             Document error = sb.build(is);
             besErrorDoc = processError(error);
-            if(besErrorDoc == null){
-                becomeInvalidError("ERROR - Failed to locate <BESError> object in XML document parsed from stream.");
+
+            if (besErrorDoc == null) {
+                String msg = "ERROR - Failed to locate <BESError> object in XML document parsed from stream!";
+                becomeInvalidError(msg);
             }
+
         }
         catch (JDOMException e) {
-            becomeInvalidError("ERROR - Unable to parse expected <BESError> object from stream! Message: "+e.getMessage());
+            String msg = "ERROR - Unable to parse expected <BESError> object from stream!";
+            msg += " Message: " + e.getMessage();
+            becomeInvalidError(msg);
         }
         catch (IOException e) {
-            becomeInvalidError("ERROR - Failed to read expected <BESError> object from stream. Message: "+e.getMessage());
+            StringBuilder msg = new StringBuilder();
+            msg.append("ERROR - Failed to locate expected <BESError> object from stream.");
+            msg.append(" Message: ").append(e.getMessage());
+            becomeInvalidError(msg.toString());
         }
-
 
     }
 
