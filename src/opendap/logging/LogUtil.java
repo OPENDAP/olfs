@@ -394,6 +394,7 @@ public class LogUtil {
     }
 
     /**
+     *
      *  Bsed on the HyraxAccess.log pattern:
      *  <pattern>
      *  [%X{host}]
