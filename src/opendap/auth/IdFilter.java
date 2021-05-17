@@ -155,10 +155,10 @@ public class IdFilter implements Filter {
             HttpServletRequest request = (HttpServletRequest) sreq;
             HttpServletRequest hsReq = request;
 
-            // Get session, make new as needed.
             String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
             LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
+            // Get session, make new as needed.
             HttpSession session = hsReq.getSession(true);
             log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
 
