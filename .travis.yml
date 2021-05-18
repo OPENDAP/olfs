@@ -115,17 +115,17 @@ jobs:
 #        - ant check
 
     - stage: scan
-      name: "sonarscan (jdk11)"
+      name: "sonarscan (jdk8)"
       addons:
         sonarcloud:
       # jdk 7 and java 8 no longer work with sonar scan. jhrg 3/14/19
-      jdk: openjdk11
+      jdk: openjdk8
       script:
         - export STAGE=scan-sonar
         - echo $STAGE
-        #- ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         #- ant sonar -Dsonar.login=$SONAR_LOGIN
-        - sonar-scanner -X -Dproject.settings=sonar-olfs-framework.properties # -Dsonar.login=$SONAR_LOGIN
+        - sonar-scanner -X -Dproject.settings=sonar-olfs-framework.properties -Dsonar.login=$SONAR_LOGIN
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
