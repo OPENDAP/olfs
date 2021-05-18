@@ -85,13 +85,13 @@ jobs:
         - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
-    - stage: build
-      name: "jdk11"
-      jdk: openjdk11
-      script:
-        - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+#    - stage: build
+#      name: "jdk11"
+#      jdk: openjdk11
+#      script:
+#        - export STAGE=build
+#        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
+#        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: test
       name: "jdk7"
@@ -107,12 +107,12 @@ jobs:
         - export STAGE=test
         - ant check
 
-    - stage: test
-      name: "jdk11"
-      jdk: openjdk11
-      script:
-        - export STAGE=test
-        - ant check
+#    - stage: test
+#      name: "jdk11"
+#      jdk: openjdk11
+#      script:
+#        - export STAGE=test
+#        - ant check
 
     - stage: scan
       name: "sonarscan (jdk11)"
