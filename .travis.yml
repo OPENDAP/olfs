@@ -125,8 +125,9 @@ jobs:
         - echo $STAGE
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         #- ant sonar -Dsonar.login=$SONAR_LOGIN
-       jdk: openjdk11
-       - sonar-scanner -X -Dproject.settings=sonar-olfs-framework.properties -Dsonar.login=$SONAR_LOGIN
+      jdk: openjdk11
+      script:
+        - sonar-scanner -X -Dproject.settings=sonar-olfs-framework.properties -Dsonar.login=$SONAR_LOGIN
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
