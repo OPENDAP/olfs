@@ -364,7 +364,7 @@
                 <ul>
                     <xsl:choose>
                         <xsl:when test="true()">
-                            <xsl:apply-templates select="./*[not(self::dap:Attribute)]">
+                            <xsl:apply-templates select="./*[not(self::dap:Attribute) and not(self::dap:Dimension)]">
                                 <xsl:with-param name="parentContainer">
                                     <xsl:call-template name="computeVarName"/>
                                 </xsl:with-param>
