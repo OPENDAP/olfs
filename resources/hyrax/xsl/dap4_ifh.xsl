@@ -48,16 +48,16 @@
     </xsl:variable>
 
 
-    <!--###########################################################################
-        Variable: DimsMap
-        This variable serves a key value paired Map object in which the keys are
-        the fully qualified names (fqn) of each Dimension defined in the dataset.
-        The value of each entry is a copy of the Dimension which can be XPath
-        traversed.
+<!--###########################################################################
+    Variable: DimsMap
+    This variable serves a key value paired Map object in which the keys are
+    the fully qualified names (fqn) of each Dimension defined in the dataset.
+    The value of each entry is a copy of the Dimension which can be XPath
+    traversed.
 
-        This is used to resolve dimensions sizes in the UI
+    This is used to resolve dimensions sizes in the UI
 
-    -->
+-->
     <xsl:variable name="DimsMap">
         <xsl:apply-templates select="/dap:Dataset" mode="DimensionsMapper"/>
     </xsl:variable>
@@ -71,7 +71,7 @@
         <xsl:element name="entry"><xsl:attribute name="key" select="$fqn"/><xsl:copy-of select="."/></xsl:element>
     </xsl:template>
 
-    <!--###########################################################################-->
+<!--###########################################################################-->
 
     <xsl:function name="fn:DimSize">
         <xsl:param name="fqn"/>
