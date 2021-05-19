@@ -316,7 +316,9 @@
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
-        <xsl:call-template name="AttributesPresentation"/>
+        <xsl:call-template name="AttributesPresentation">
+            <xsl:with-param name="title">attributes</xsl:with-param>
+        </xsl:call-template>
     </xsl:template>
 
 
@@ -347,7 +349,9 @@
         <xsl:call-template name="VariableHeader">
             <xsl:with-param name="parentContainer" select="$parentContainer"/>
         </xsl:call-template>
-        <xsl:call-template name="AttributesPresentation"/>
+        <xsl:call-template name="AttributesPresentation">
+            <xsl:with-param name="title">attributes</xsl:with-param>
+        </xsl:call-template>
 
         <xsl:if test="dap:Dimension">
             <div>
@@ -666,13 +670,14 @@
     <!--            ATTRIBUTE TYPES               -->
 
     <xsl:template name="AttributesPresentation">
+        <xsl:param name="title" />
         <xsl:choose>
             <xsl:when test="dap:Attribute">
                 <div class="tightView">
 
                     <ul class="collapsibleList">
                         <li>
-                            <div class="small_bold" style="color:#527CC1;">attributes</div>
+                            <div class="small_bold" style="color:#527CC1;"><xsl:value-of select="$title"/></div>
                             <ul>
                                 <xsl:apply-templates select="dap:Attribute"/>
                             </ul>
@@ -793,8 +798,12 @@
                 </div>
             </td>
             <td width="100%">
-                <div style="width:100%;margin-left:10px;">
-                    <xsl:apply-templates select="dap:Attribute"/>
+                <div style="width:100%;margin-left:30px;">
+                    <xsl:call-template name="AttributesPresentation">
+                        <xsl:with-param name="title">View/Hide</xsl:with-param>
+                    </xsl:call-template>
+
+                    <!-- xsl:apply-templates select="dap:Attribute"/ -->
                 </div>
             </td>
         </tr>
