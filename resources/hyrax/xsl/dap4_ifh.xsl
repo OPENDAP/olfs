@@ -24,8 +24,11 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+<xsl:stylesheet version="2.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#"
+                xmlns:fn="http://xml.opendap.org/ns/xsl/functions/1.0#"
+>
     <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes"/>
 
     <xsl:param name="serviceContext"/>
@@ -44,8 +47,42 @@
         <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
-    
-    <xsl:key name="DimensionNames" match="dap:Dimension" use="@name"/>
+
+    <!--###########################################################################
+        Variable: DimsMap
+        This variable serves a key value paired Map object in which the keys are
+        the fully qualified names (fqn) of each Dimension defined in the dataset.
+        The value of each entry is a copy of the Dimension which can be XPath
+        traversed.
+
+        This is used to resolve dimensions sizes in the UI
+
+    -->
+    <xsl:variable name="DimsMap">
+        <xsl:apply-templates select="/dap:Dataset" mode="DimensionsMapper"/>
+    </xsl:variable>
+
+    <xsl:template match="*|@*|node()" mode="DimensionsMapper">
+        <xsl:apply-templates mode="DimensionsMapper"/>
+    </xsl:template>
+
+    <xsl:template match="dap:Dimension" mode="DimensionsMapper">
+        <xsl:variable name="fqn"><xsl:call-template name="computeFQN"/></xsl:variable>
+        <xsl:element name="entry"><xsl:attribute name="key" select="$fqn"/><xsl:copy-of select="."/></xsl:element>
+    </xsl:template>
+
+    <!--###########################################################################-->
+
+    <xsl:function name="fn:DimSize">
+        <xsl:param name="fqn"/>
+        <xsl:value-of select="$DimsMap/entry[@key=$fqn]/dap:Dimension/@size"/>
+    </xsl:function>
+
+    <xsl:function name="fn:GetDimension">
+        <xsl:param name="fqn"/>
+        <xsl:value-of select="$DimsMap/entry[@key=$fqn]/dap:Dimension"/>
+    </xsl:function>
+
 
     <xsl:template match="dap:Dataset">
         <xsl:call-template name="copyright"/>
@@ -357,9 +394,7 @@
 
 
         <xsl:variable name="myFQN">
-            <xsl:call-template name="computeFQN">
-                <xsl:with-param name="separator">.</xsl:with-param>
-            </xsl:call-template>
+            <xsl:call-template name="computeFQN" />
         </xsl:variable>
 
         <xsl:variable name="myJSVarName">
@@ -445,29 +480,18 @@
 
         <xsl:for-each select="dap:Dim">
 
-            <xsl:variable name="dimName">
-                <xsl:choose>
-                    <xsl:when test="starts-with(@name,'/')">
-                        <xsl:value-of select="substring-after(@name,'/')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="@name"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
+
             <span class="medium">[
                 <xsl:if test="@name">
                     <span class="small" style="vertical-align: 15%;">
-                        <xsl:value-of select="$dimName"/>=
+                        <xsl:value-of select="@name"/>=
                     </span>
                 </xsl:if>
-                0
-                <span class="medium" style="vertical-align: 10%;">..</span>
-                <xsl:value-of select="$dimSize - 1"/>]
+                0<span class="medium" style="vertical-align: 10%;">..</span>
+                <xsl:value-of select="format-number($dimSize - 1, '0')"/>]
             </span>
         </xsl:for-each>
     </xsl:template>
@@ -477,7 +501,7 @@
 
         <xsl:for-each select="dap:Dim">
             <xsl:variable name="dimSize">
-                <xsl:call-template name="DimSize"/>
+                <xsl:call-template name="DimSize" />
             </xsl:variable>
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
@@ -494,15 +518,8 @@
 
     <xsl:template name="DimSize">
         <xsl:choose>
-            <xsl:when test="@size">
-                <xsl:value-of select="@size"/>
-            </xsl:when>
-            <xsl:when test="starts-with(@name,'/')">
-                <xsl:value-of select="key('DimensionNames', substring-after(@name,'/'))/@size"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="key('DimensionNames', @name)/@size"/>
-            </xsl:otherwise>
+            <xsl:when test="./@name"><xsl:value-of select="fn:DimSize(./@name)"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -621,14 +638,10 @@
      -
     -->
     <xsl:template match="*" name="computeFQN" mode="computeFQN">
-        <xsl:param name="separator"/>
+        <xsl:variable name="separator">/</xsl:variable>
         <xsl:if test="generate-id(.)!=generate-id(/dap:Dataset)">
-            <xsl:apply-templates select=".." mode="computeFQN">
-                <xsl:with-param name="separator" select="$separator"/>
-            </xsl:apply-templates>
-            <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and not(parent::dap:Map)">
-                <xsl:value-of select="$separator"/>
-            </xsl:if>
+            <xsl:apply-templates select=".." mode="computeFQN"/>
+            <xsl:value-of select="$separator"/>
             <xsl:value-of select="translate(@name,' .','__')"/>
         </xsl:if>
     </xsl:template>
@@ -847,13 +860,15 @@
     <!-- ######################################## -->
     <!--            Dimensions Row                 -->
     <xsl:template match="dap:Dimension" name="Dimension">
+        <xsl:variable name="fqn"><xsl:call-template name="computeFQN" /></xsl:variable>
         <span class="large">[
             <xsl:if test="@name">
                 <span class="medium_italic" style="vertical-align: 10%;font-size: 12px;">
-                    <xsl:value-of select="@name"/> =
+                    <xsl:value-of select="$fqn"/> =
                 </span>
             </xsl:if>
-            <span class="medium_italic" style="vertical-align: 10%;">0..<xsl:value-of select="@size - 1"/>
+            <span class="medium_italic" style="vertical-align: 10%;">
+                0..<xsl:value-of select="format-number(@size - 1,'0')"/>
             </span>
             ]
         </span>
