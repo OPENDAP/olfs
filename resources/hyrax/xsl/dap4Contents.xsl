@@ -41,14 +41,7 @@
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
     <xsl:variable name="besPrefix">
-        <xsl:choose>
-            <xsl:when test="/bes:response/bes:showCatalog/bes:dataset/@prefix!='/'">
-                <xsl:value-of select="concat(/bes:response/bes:showCatalog/bes:dataset/@prefix,'/')"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="/bes:response/bes:showNode/@prefix" />
     </xsl:variable>
 
 
@@ -60,11 +53,20 @@
 
 
 
-    <xsl:template match="bes:showCatalog">
+    <xsl:template match="bes:showNode">
             <head>
                 <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
-                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
+                <title>OPeNDAP Hyrax: Contents of
+                    <xsl:choose>
+                        <xsl:when test="$besPrefix='/'">
+                            <xsl:value-of select="bes:node/@name"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@prefix"/><xsl:value-of select="bes:node/@name"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </title>
             </head>
             <body>
 
@@ -76,11 +78,11 @@
                 <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
                 <h1>Contents of
                     <xsl:choose>
-                        <xsl:when test="bes:dataset/@name='/'" >
-                            <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
+                        <xsl:when test="$besPrefix='/'" >
+                            <xsl:value-of select="bes:node/@name"/>
                         </xsl:when>
                         <xsl:otherwise >
-                            <xsl:value-of select="$besPrefix"/><xsl:value-of select="bes:dataset/@name"/>
+                            <xsl:value-of select="$besPrefix"/><xsl:value-of select="bes:node/@name"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </h1>
@@ -96,36 +98,37 @@
                             <th align="left">Name</th>
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
-                            <th align="center">DAP Response Links</th>
+                            <th align="center">DAP4 Links</th>
+                            <th align="center">DAP2 Links</th>
                             <th align="center">Webstart</th>
                         </tr>
                         <tr>
                             <td>
-                                <xsl:if test="bes:dataset/@name!='/'" >
+                                <xsl:if test="bes:node/@name!='/'" >
                                     <a href="..">Parent Directory/</a>
                                 </xsl:if>
                                 <xsl:if test="$besPrefix!='/'" >
-                                    <xsl:if test="bes:dataset/@name='/'" >
+                                    <xsl:if test="bes:node/@name='/'" >
                                         <a href="..">Parent Directory/</a>
                                     </xsl:if>
                                 </xsl:if>
                             </td>
                         </tr>
-                        <xsl:for-each select="bes:dataset/bes:dataset">
+                        <xsl:for-each select="bes:node/bes:item">
 
                             <!-- Process a collection. -->
-                            <xsl:if test="@node='true'">
+                            <xsl:if test="@type='node'">
                                 <tr>
                                     <xsl:call-template name="NodeLinks" />
                                 </tr>
                             </xsl:if>
 
                             <!-- Process a data set -->
-                            <xsl:if test="@node='false'">
+                            <xsl:if test="@type='leaf'">
                                 <tr>
                                 <xsl:choose>
-                                    <xsl:when test="bes:serviceRef">
-                                        <xsl:apply-templates />
+                                    <xsl:when test="@isData='true'">
+                                        <xsl:call-template name="DapServiceLinks" />
                                     </xsl:when>
 
                                     <xsl:otherwise>
@@ -169,7 +172,7 @@
                 <!--                                                        -->
                 <h3>OPeNDAP Hyrax (<a style="color: white;" href="{$dapService}/version"><xsl:value-of select="$HyraxVersion"/></a>)
 
-                    <xsl:if test="bes:dataset/@name='/'">
+                    <xsl:if test="bes:node/@name='/'">
                         <span class="uuid">
                             ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                         </span>
@@ -199,50 +202,42 @@
 
 
 
-
-    <xsl:template match="bes:serviceRef" >
-        <xsl:choose>
-            <xsl:when test=".='dap'">
-                <xsl:call-template name="DapServiceLinks" />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:call-template name="UnkownServiceLinks" />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
     <xsl:template name="DapServiceLinks" >
         <td align="left">
-            <b><a href="{../@name}.html">
-                <xsl:value-of select="../@name"/>
-            </a>
+            <b><a href="{@name}.dmr.html"><xsl:value-of select="@name"/></a>
             </b>
         </td>
 
         <td align="center" nowrap="nowrap">
-            <xsl:value-of select="../@lastModified" />
+            <xsl:value-of select="@lastModified" />
         </td>
 
         <td align="right">
-            <xsl:value-of select="../@size"/>
+            <xsl:value-of select="@size"/>
         </td>
 
 
         <td align="center">
             <table>
                 <tr>
-                    <td> <a href="{../@name}.xml">dsr</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dmr.xml">dmr</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dap">dap</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dmr.html">html</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dmr.rdf">rdf</a>&NBSP;</td>
+                    <!-- td> <a href="{@name}.xml">dsr</a>&NBSP;</td -->
+                    <td> <a href="{@name}.dmr.xml">dmr</a>&NBSP;</td>
+                    <td> <a href="{@name}.dap">dap</a>&NBSP;</td>
+                    <td> <a href="{@name}.dmr.html">html</a>&NBSP;</td>
+                    <td> <a href="{@name}.dmr.rdf">rdf</a>&NBSP;</td>
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
-                        <td> <a href="{../@name}.file">file</a>&NBSP;</td>
+                        <td> <a href="{@name}.file">file</a>&NBSP;</td>
                     </xsl:if>
-                    <td> <del><a href="{../@name}.ddx">ddx</a></del>&NBSP;</td>
-                    <td> <a href="{../@name}.dds">dds</a>&NBSP;</td>
-                    <td> <a href="{../@name}.das">das</a>&NBSP;</td>
-                    <td> <a href="{../@name}.info">info</a>&NBSP;</td>
+                </tr>
+            </table>
+        </td>
+        <td align="center">
+            <table>
+                <tr>
+                    <td> <del><a href="{@name}.ddx">ddx</a></del>&NBSP;</td>
+                    <td> <a href="{@name}.dds">dds</a>&NBSP;</td>
+                    <td> <a href="{@name}.das">das</a>&NBSP;</td>
+                    <td> <a href="{@name}.info">info</a>&NBSP;</td>
                 </tr>
             </table>
         </td>
@@ -303,7 +298,7 @@
 
 
 
-    <xsl:template name="UnkownServiceLinks" >
+    <xsl:template name="UnknownServiceLinks" >
         <td align="left">
             <a href="{../@name}">
                 <xsl:value-of select="../@name"/>
