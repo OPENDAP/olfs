@@ -55,7 +55,7 @@ public class UserProfile implements Serializable {
     private String d_uid;
 
     // TODO Annotate this so that it does not serialize.
-    private JsonObject d_profile;
+    private transient JsonObject d_profile;
 
     // private String edlClientAppId;
 
