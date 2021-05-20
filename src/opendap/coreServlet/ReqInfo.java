@@ -489,7 +489,7 @@ public class ReqInfo {
      *
      * @param req The client request.
      * @return The DataSourceName
-     * @deprecated 
+     * @deprecated
      */
     public static String getBesDataSourceID(HttpServletRequest req){
         String requestPath = getLocalUrl(req);
@@ -600,11 +600,11 @@ public class ReqInfo {
     }
 
 
-    
+
     // @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
     public static String toString(HttpServletRequest request){
         String s = "";
-        
+
         s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
         s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
         s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
@@ -622,7 +622,7 @@ public class ReqInfo {
         s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
 
         return s;
-        
+
     }
 
 
@@ -642,7 +642,7 @@ public class ReqInfo {
         return false;
     }
 
-    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
+    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd'T'HH:mm:ss.S'Z'";
 
     public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
         StringBuilder cf_history_entry = new StringBuilder();
@@ -659,8 +659,10 @@ public class ReqInfo {
 
         // Add the complete request URL
         cf_history_entry.append(getRequestUrlPath(request));
-        cf_history_entry.append("?");
-        cf_history_entry.append(ReqInfo.getConstraintExpression(request));
+        if(ReqInfo.getConstraintExpression(request).length() !=0) {
+            cf_history_entry.append("?");
+            cf_history_entry.append(ReqInfo.getConstraintExpression(request));
+        }
         cf_history_entry.append("\n");
 
         return cf_history_entry.toString();
@@ -694,6 +696,6 @@ public class ReqInfo {
     }
 
 
-}                                                          
+}
 
 
