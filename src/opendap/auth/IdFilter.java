@@ -247,9 +247,13 @@ public class IdFilter implements Filter {
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if (up != null) {
+                log.debug("Found UserProfile object in Session, this is an authenticated request for user: {}",up.getUID());
                 AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
                 authReq.setUid(up.getUID());
                 hsReq = authReq;
+            }
+            else {
+                log.debug("No UserProfile object found in Session. Request is not authenticated.");
             }
             // Cache the  request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
