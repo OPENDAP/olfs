@@ -642,7 +642,7 @@ public class ReqInfo {
         return false;
     }
 
-    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd'T'HH:mm:ss.S'Z'";
+    private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
 
     public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
         StringBuilder cf_history_entry = new StringBuilder();
@@ -654,7 +654,7 @@ public class ReqInfo {
         cf_history_entry.append(" ");
 
         // Add the Hyrax Version
-        cf_history_entry.append("Hyrax-").append(opendap.bes.Version.getHyraxVersionString());
+        cf_history_entry.append("hyrax-").append(opendap.bes.Version.getHyraxVersionString());
         cf_history_entry.append(" ");
 
         // Add the complete request URL
