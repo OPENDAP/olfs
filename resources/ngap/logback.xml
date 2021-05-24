@@ -159,7 +159,7 @@
     <logger name="opendap.bes.dap4Responders.Netcdf4DR" level="info" />
 
     <logger name="NodeCache" level="all">
-        <appender-ref ref="DebugLog"/>
+        <appender-ref ref="DebugLogDateRoller"/>
     </logger>
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
