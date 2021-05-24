@@ -42,18 +42,19 @@
     -->
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M\\(\\) - %m%n"/>
 
- <!--
+    <!--
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${FORMAT}</pattern>
         </encoder>
     </appender>
--->
-<!--
+    -->
+
+    <!--
     This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
     and it must defined and added to the root logger in order to catch all the stuff,
     and in order for the Java software to be able to locate it at run time.
--->
+    -->
     <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
         <MaxSize>512</MaxSize>
     </appender>
@@ -126,8 +127,22 @@
         </encoder>
     </appender>
 
+    <appender name="AuthLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/auth.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logdir}/debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+
     <logger name="AuthenticationLog" level="info">
-        <appender-ref ref="DebugLog"/>
+        <appender-ref ref="AuthLog"/>
+        <appender-ref ref="DebugLogDateRoller"/>
     </logger>
 
     <logger name="opendap.dap.User" level="info"/>
