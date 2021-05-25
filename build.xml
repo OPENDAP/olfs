@@ -52,9 +52,11 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
+    <property name="NGAP_VERSION" value="${OLFS_VERSION}"/>
     <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
+    <property name="NGAP_DIST_BASE" value="ngap-${OLFS_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
@@ -973,13 +975,12 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
-    <property name="NGAP_DIST" value="ngap-snapshot-webapp"/>
     <target name="ngap-dist"
         depends="ngap"
         description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
-        <tar destfile="${build.dist}/${NGAP_DIST}.tgz" compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="${NGAP_DIST}">
+        <tar destfile="${build.dist}/${NGAP_DIST_BASE}.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${NGAP_DIST_BASE}">
                 <include name="${NGAP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
         </tar>

@@ -123,7 +123,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE="olfs-${OLFS_BUILD_VERSION}" DISTRO
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Built Distribution Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -138,7 +138,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=ngap-snapshot ngap-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot ngap-dist
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -153,7 +153,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
