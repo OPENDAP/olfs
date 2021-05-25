@@ -979,7 +979,7 @@
         depends="ngap"
         description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
-        <tar destfile="${build.dist}/${NGAP_DIST_BASE}.tgz" compression="gzip">
+        <tar destfile="${build.dist}/${NGAP_DIST_BASE}-webapp.tgz" compression="gzip">
             <zipfileset dir="${build.dist}" prefix="${NGAP_DIST_BASE}">
                 <include name="${NGAP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
