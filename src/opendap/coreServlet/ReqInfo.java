@@ -659,7 +659,7 @@ public class ReqInfo {
 
         // Add the complete request URL
         cf_history_entry.append(getRequestUrlPath(request));
-        if(ReqInfo.getConstraintExpression(request).length() !=0) {
+        if(!ReqInfo.getConstraintExpression(request).isEmpty()) {
             cf_history_entry.append("?");
             cf_history_entry.append(ReqInfo.getConstraintExpression(request));
         }
