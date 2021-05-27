@@ -324,67 +324,6 @@ public class NewPPTClient {
             }
         }
 
-        /*
-        try {
-            if (!_mySock.isClosed()) {
-                InputStream is = _mySock.getInputStream();
-                _mySock.shutdownOutput();  // Send 'FIN' to the other end of TCP connection
-                while (is != null && is.read() >= 0) ;     // Drain the pipe
-                _mySock.close();           // Close the socket
-
-            }
-        }
-        catch (IOException se) {
-            log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
-        }
-        */
-/*
-
-        try {
-            if(informServer && _out != null) {
-                _out.close();
-            }
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to inform server that client is exiting, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _out = null;
-        }
-
-
-        try {
-            if (_in != null)
-                _in.close();
-            _in = null;
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to close input stream, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _in = null;
-        }
-
-        try {
-            if (_mySock != null) {
-                InputStream is = null;
-                try {
-                    is = _mySock.getInputStream();
-                } catch (SocketException se) {
-                    log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
-                }
-                _mySock.shutdownOutput();           // Send 'FIN' to the other end of TCP connection
-                //while(is!=null && is.read() >=0) ;  // Drain the pipe
-                _mySock.close();                    // Close the socket
-            }
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to close socket, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _mySock = null;
-        }
-        */
     }
 
     public boolean sendRequest(String buffer) throws PPTException {
