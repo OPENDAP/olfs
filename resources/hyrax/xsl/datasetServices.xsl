@@ -35,8 +35,11 @@
 
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
-    <xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable>
+    <xsl:param name="serviceContext"/>
+    <xsl:param name="docsService"/>
+    <xsl:param name="HyraxVersion"/>
+    <xsl:param name="supportLink"/>
+
 
     <xsl:template match="ds:DatasetServices">
         <html>
@@ -150,9 +153,12 @@
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
                 <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-
-                    <br/>
-                    <a href='{$docsService}/'>Documentation</a>
+                    <div>
+                        <a href="{$docsService}/">Documentation</a>
+                        <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
+                            <a href="{$supportLink}">Questions? Contact Support</a>
+                        </span>
+                    </div>
                 </h3>
 
             </body>
