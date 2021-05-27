@@ -145,15 +145,16 @@
         <appender-ref ref="DebugLogDateRoller"/>
     </logger>
 
+    <logger name="opendap" level="error">
+        <appender-ref ref="DebugLogDateRoller"/>
+    </logger>
+
     <logger name="opendap.dap.User" level="info"/>
     <logger name="opendap.auth" level="all"/>
     <logger name="opendap.auth.Util" level="all"/>
     <logger name="opendap.ngap" level="info"/>
 
-
-    <logger name="opendap" level="error">
-        <appender-ref ref="DebugLogDateRoller"/>
-    </logger>
+    <logger name="opendap.io.ChunkedInputStream" level="all"/>
 
     <logger name="opendap.bes.dap2Responders.Netcdf4"   level="info" />
     <logger name="opendap.bes.dap4Responders.Netcdf4DR" level="info" />
