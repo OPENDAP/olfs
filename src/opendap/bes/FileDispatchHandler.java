@@ -26,6 +26,8 @@
 
 package opendap.bes;
 
+import net.sf.saxon.style.XSLOutput;
+import opendap.bes.caching.BesNodeCache;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
@@ -33,14 +35,20 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.error.Forbidden;
 import opendap.io.HyraxStringEncoding;
+import opendap.namespaces.BES;
+import opendap.ppt.PPTException;
 import opendap.services.FileService;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -170,9 +178,11 @@ public class FileDispatchHandler implements DispatchHandler {
     }
 
 
+
+
     public void sendFile(HttpServletRequest req,
                          HttpServletResponse response)
-            throws Exception {
+            throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
 
 
         String name = ReqInfo.getLocalUrl(req);
@@ -184,6 +194,23 @@ public class FileDispatchHandler implements DispatchHandler {
         String downloadFileName = Scrub.fileName(name.substring(name.lastIndexOf("/")+1));
 
         log.debug("sendFile() downloadFileName: " + downloadFileName );
+
+
+        Document nodeDoc = new Document();
+        _besApi.getBesNode(name,nodeDoc);
+        XMLOutputter xmlo = new XMLOutputter();
+
+        log.debug(xmlo.outputString(nodeDoc));
+
+        Element root = nodeDoc.getRootElement();
+        Element showNode = root.getChild("showNode", BES.BES_NS);
+        Element item = showNode.getChild("item", BES.BES_NS);
+        String sizeStr = item.getAttributeValue("size");
+        String lastModified = item.getAttributeValue("lastModified");
+
+        long fileSize = Long.parseLong(sizeStr);
+        response.setHeader("Content-Length", Long.toString(fileSize));
+        response.setHeader("Last-Modified", lastModified);
 
         // I commented these two lines  out because it was incorrectly causing browsers to downloadJobOutput
         // (as opposed to display) EVERY file retrieved.
