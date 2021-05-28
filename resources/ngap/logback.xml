@@ -157,7 +157,7 @@
     <logger name="opendap.io.ChunkedInputStream" level="all"/>
 
     <logger name="opendap.bes.dap2Responders.Netcdf4"   level="info" />
-    <logger name="opendap.bes.dap4Responders.Netcdf4DR" level="info" />
+    <logger name="opendap.bes.dap4Responders.DataResponse.Netcdf4DR" level="info" />
 
 
     <logger name="NodeCache" level="all">
