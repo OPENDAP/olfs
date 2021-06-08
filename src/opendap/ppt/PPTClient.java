@@ -122,7 +122,7 @@ class PPTClient {
 
     public boolean initConnection() throws PPTException {
         try {
-            this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);
+            this.writeBuffer(PPTSessionProtocol.PPT_CLIENT_TESTING_CONNECTION);
         }
         catch (PPTException e) {
             String msg = "Failed to initialize connection to server. ";
@@ -138,7 +138,7 @@ class PPTClient {
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 throw new PPTException("Could not connect to server, server may be down or busy");
             }
-            if (status.compareTo(PPTSessionProtocol.PPTSERVER_CONNECTION_OK) != 0) {
+            if (status.compareTo(PPTSessionProtocol.PPT_SERVER_CONNECTION_OK) != 0) {
                 throw new PPTException("Server reported an invalid connection, \"" + status + "\"");
             }
         }
@@ -201,7 +201,7 @@ class PPTClient {
 
     public boolean sendRequest(String buffer) throws PPTException {
         this.writeBuffer(buffer);
-        this.writeBuffer(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION);
+        this.writeBuffer(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMISSION);
 
         return true;
     }
@@ -238,8 +238,8 @@ class PPTClient {
 
             int bytesRead, markBufBytes, i;
 
-            MarkFinder mfinder = new MarkFinder(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.getBytes(HyraxStringEncoding.getCharset()));
-            byte[] markBuffer = new byte[PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length()];
+            MarkFinder mfinder = new MarkFinder(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMISSION.getBytes(HyraxStringEncoding.getCharset()));
+            byte[] markBuffer = new byte[PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMISSION.length()];
             markBufBytes = 0; // zero byte count in the mark buffer
 
             BufferedOutputStream bstrm = new BufferedOutputStream(strm);

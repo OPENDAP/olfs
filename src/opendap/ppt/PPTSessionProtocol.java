@@ -31,11 +31,11 @@ public class PPTSessionProtocol implements ChunkProtocol {
     // Message when the mapper fails to find the proper protocol string
     public static final String PPT_PROTOCOL_UNDEFINED = "PPT_PROTOCOL_UNDEFINED";
 
-    public static final String PPTCLIENT_TESTING_CONNECTION = "PPTCLIENT_TESTING_CONNECTION";
+    public static final String PPT_CLIENT_TESTING_CONNECTION = "PPTCLIENT_TESTING_CONNECTION";
 
-    public static final String PPTSERVER_CONNECTION_OK = "PPTSERVER_CONNECTION_OK";
+    public static final String PPT_SERVER_CONNECTION_OK = "PPTSERVER_CONNECTION_OK";
 
-    public static final String PPT_COMPLETE_DATA_TRANSMITION = "PPT_COMPLETE_DATA_TRANSMITION";
+    public static final String PPT_COMPLETE_DATA_TRANSMISSION = "PPT_COMPLETE_DATA_TRANSMITION";
 
     public static final String PPT_EXIT_NOW = "PPT_EXIT_NOW";
 
@@ -48,15 +48,15 @@ public class PPTSessionProtocol implements ChunkProtocol {
         return PPT_PROTOCOL_UNDEFINED;
     }
     public String clientTestingConnection(){
-        return PPTCLIENT_TESTING_CONNECTION;
+        return PPT_CLIENT_TESTING_CONNECTION;
 
     }
     public String serverConnectionOk(){
-        return PPTSERVER_CONNECTION_OK;
+        return PPT_SERVER_CONNECTION_OK;
 
     }
     public String clientCompleteDataTransmission(){
-        return PPT_COMPLETE_DATA_TRANSMITION;
+        return PPT_COMPLETE_DATA_TRANSMISSION;
 
     }
     public String clientExitingNow(){
