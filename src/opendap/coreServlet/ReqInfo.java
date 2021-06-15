@@ -643,6 +643,7 @@ public class ReqInfo {
     }
 
     private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
+    private static final String History_Json_Entry_Date_Format = "yyyy-MM-ddTHH:mm:ssZ";
 
     public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
         StringBuilder cf_history_entry = new StringBuilder();
@@ -668,7 +669,13 @@ public class ReqInfo {
         return cf_history_entry.toString();
     }
 
-
+    public  static String getHistoryJsonEntry(HttpServletRequest request) throws IOException {
+        String res = "{\"$schema\":\"https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-0.1.0.json\", " +
+                "\"date_time\":\"2021-05-20T20:37:25Z\",\"program\":\"hyrax\",\"version\":'1.16.3\", " +
+                "\"parameters\":[\"request_url=	" +
+                "http://opendap.uat.earthdata.nasa.gov/collections/C1234714698-EEDTEST/granules/EEDTEST-ATL08-003-ATL08_20200711T232648.nc\"]}";
+        return res;
+    }
 
 
     public static String getRequestUrlPath(HttpServletRequest req) {

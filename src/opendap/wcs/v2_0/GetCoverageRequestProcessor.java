@@ -502,7 +502,8 @@ public class GetCoverageRequestProcessor {
                                     user,
                                     besDatatsetId,
                                     dap2ce,
-                                    req.getCfHistoryAttribute());
+                                    req.getCfHistoryAttribute(),
+                                    req.getHistoryJsonAttribute());
                     break;
 
                 case geotiff:

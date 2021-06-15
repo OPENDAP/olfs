@@ -55,6 +55,7 @@ public class GetCoverageRequest {
     private TemporalDimensionSubset _temporalSubset;
     private RangeSubset _rangeSubset;
     private String _cfHistoryAttribute;
+    private String _historyJsonAttribute;
 
     private String _requestUrl;
 
@@ -441,6 +442,14 @@ public class GetCoverageRequest {
 
     public String getCfHistoryAttribute(){
         return _cfHistoryAttribute;
+    }
+
+    public void setHistoryJsonAttribute(String s){
+        _historyJsonAttribute = s;
+    }
+
+    public String getHistoryJsonAttribute(){
+        return _historyJsonAttribute;
     }
 
 }
