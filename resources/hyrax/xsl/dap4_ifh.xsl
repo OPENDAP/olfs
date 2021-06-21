@@ -112,7 +112,7 @@
                     enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
-                <title>DAP4 Data Request Form (beta)<xsl:value-of select="@name"/></title>
+                <title>DAP4 Data Request Form<xsl:value-of select="@name"/></title>
             </head>
             <body>
                 <!-- ****************************************************** -->
@@ -157,7 +157,7 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="large">OPeNDAP Data Access Form</div>
+                            <div class="large">OPeNDAP DAP4 Data Request Form</div>
                         </td>
                     </tr>
                 </table>

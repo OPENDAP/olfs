@@ -93,31 +93,26 @@ public class ChunkedInputStream  {
 
         //log.info(NewPPTClient.showConnectionProperties(_mySock));
 
-        // Read the header
+        // Read the header, returns chunk size.
         currentChunkDataSize = Chunk.readChunkHeader(is,currentChunkHeader,0);
 
         if(currentChunkDataSize==-1)
             return currentChunkDataSize;
 
-        // Cache the chunk size the header
-        //currentChunkDataSize = Chunk.getDataSize(currentChunkHeader);
 
         // Cache the Chunk Type.
         currentChunkType = Chunk.getType(currentChunkHeader);
 
+        log.debug("currentChunkDataSize: {}  currentChunkType: {}", currentChunkDataSize, (char)currentChunkType);
 
-        log.debug("Chunk Data Size: " + currentChunkDataSize +
-                           "    Chunk Type: "+ (char)currentChunkType);
+        // Reset the read position for this new chunk.
+        chunkReadPosition = 0;
 
-         chunkReadPosition = 0;
-
-        if(largestChunkDataSize< currentChunkDataSize)
+        // Update the high water mark for the chunk size
+        if(largestChunkDataSize < currentChunkDataSize)
             largestChunkDataSize = currentChunkDataSize;
 
-
         return currentChunkDataSize;
-
-
     }
 
 
@@ -251,13 +246,14 @@ public class ChunkedInputStream  {
                     throw new IOException(msg,e);
                 }
 
-                log.debug("CurrentChunksize: "+ currentChunkDataSize+ " bytesReceived: "+ bytesReceived);
+                log.debug("CurrentChunksize: {} bytesReceived: {}",currentChunkDataSize, bytesReceived);
                 
                 // update the read pointer.
                 chunkReadPosition += bytesReceived;
 
                 // And keep the books...
                 totalBytesReadInMessage += bytesReceived;
+                log.debug("bytesReceived: {} totalBytesReadInMessage: {}",bytesReceived,totalBytesReadInMessage);
 
                 switch (getCurrentChunkType()){
 
@@ -298,7 +294,7 @@ public class ChunkedInputStream  {
 
         }
 
-        log.info("END: Message contained {} bytes. (status:{})",totalBytesReadInMessage,isError?"ERROR":"SUCCESS");
+        log.debug("END: Message contained {} bytes. (status:{})",totalBytesReadInMessage,isError?"ERROR":"SUCCESS");
         return !isError;
     }
 

@@ -27,6 +27,7 @@
 package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.PathBuilder;
+import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -34,6 +35,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
+import opendap.dap.Request;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.LogUtil;
 import opendap.xml.Transformer;
@@ -101,10 +103,16 @@ public class HtmlDSR extends Dap4Responder {
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String context = request.getContextPath()+"/";
-        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
 
-        String baseUrl = Util.dropSuffixFrom(relativeUrl, normDSR.getRequestSuffixMatchPattern());
+        String baseUrl = Util.dropSuffixFrom(requestedResourceId, normDSR.getRequestSuffixMatchPattern());
         baseUrl = PathBuilder.pathConcat(context,baseUrl);
+
+        Request oreq = new Request(null,request);
+
+        BesApi besApi = getBesApi();
+        String supportEmail = besApi.getSupportEmail(requestedResourceId);
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
         Document responseDoc = new Document();
         HashMap<String,String> piMap = new HashMap<>( 2 );
@@ -130,6 +138,11 @@ public class HtmlDSR extends Dap4Responder {
         try {
             String xsltDocName = "datasetServices.xsl";
             Transformer transformer = new Transformer(xsltDocName);
+            transformer.setParameter("serviceContext", request.getContextPath()); // This is ServletAPI-2.5 (Tomcat 6 stopped here)
+            transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
+            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+            // transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
+            transformer.setParameter("supportLink", mailtoHrefAttributeValue);
 
             MediaType responseMediaType = getNormativeMediaType();
             // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.

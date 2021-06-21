@@ -189,7 +189,7 @@ public class NewPPTClient {
         log.debug("initConnection() -  START");
 
         try {
-            _rawOut.write(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION.getBytes(HyraxStringEncoding.getCharset()));
+            _rawOut.write(PPTSessionProtocol.PPT_CLIENT_TESTING_CONNECTION.getBytes(HyraxStringEncoding.getCharset()));
             _rawOut.flush();
         }
         catch (IOException e) {
@@ -199,7 +199,7 @@ public class NewPPTClient {
             throw new PPTException(msg, e);
         }
 
-        log.debug("initConnection() -  Sent '"+PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION+"' to server.");
+        log.debug("initConnection() -  Sent '"+PPTSessionProtocol.PPT_CLIENT_TESTING_CONNECTION +"' to server.");
 
         byte[] inBuff = new byte[4096];
         int bytesRead;
@@ -243,11 +243,11 @@ public class NewPPTClient {
                 log.error("initConnection() -  Received '"+PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED+"' from server. That's a bad thing!");
                 throw new PPTException("Could not connect to server, server may be down or busy");
             }
-            if (status.compareTo(PPTSessionProtocol.PPTSERVER_CONNECTION_OK) != 0) {
+            if (status.compareTo(PPTSessionProtocol.PPT_SERVER_CONNECTION_OK) != 0) {
                 log.error("initConnection() -  Received unrecognized status '"+status+"' from server. That's a bummer man...");
                 throw new PPTException("Server reported an invalid connection status , \"" + status + "\"");
             }
-            log.debug("initConnection() -  Received '"+PPTSessionProtocol.PPTSERVER_CONNECTION_OK+"' from server.");
+            log.debug("initConnection() -  Received '"+PPTSessionProtocol.PPT_SERVER_CONNECTION_OK +"' from server.");
 
             if(_rawIn.available()>0){
                 long skipped = _rawIn.skip(_rawIn.available());
@@ -324,67 +324,6 @@ public class NewPPTClient {
             }
         }
 
-        /*
-        try {
-            if (!_mySock.isClosed()) {
-                InputStream is = _mySock.getInputStream();
-                _mySock.shutdownOutput();  // Send 'FIN' to the other end of TCP connection
-                while (is != null && is.read() >= 0) ;     // Drain the pipe
-                _mySock.close();           // Close the socket
-
-            }
-        }
-        catch (IOException se) {
-            log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
-        }
-        */
-/*
-
-        try {
-            if(informServer && _out != null) {
-                _out.close();
-            }
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to inform server that client is exiting, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _out = null;
-        }
-
-
-        try {
-            if (_in != null)
-                _in.close();
-            _in = null;
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to close input stream, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _in = null;
-        }
-
-        try {
-            if (_mySock != null) {
-                InputStream is = null;
-                try {
-                    is = _mySock.getInputStream();
-                } catch (SocketException se) {
-                    log.warn("closeConnection(): Unable to acquire socket InputStream. Base message: '" + se.getMessage()+"'");
-                }
-                _mySock.shutdownOutput();           // Send 'FIN' to the other end of TCP connection
-                //while(is!=null && is.read() >=0) ;  // Drain the pipe
-                _mySock.close();                    // Close the socket
-            }
-        }
-        catch (IOException e) {
-            log.error("closeConnection(): Unable to close socket, continuing. Base message: '" + e.getMessage()+"'");
-        }
-        finally {
-            _mySock = null;
-        }
-        */
     }
 
     public boolean sendRequest(String buffer) throws PPTException {
