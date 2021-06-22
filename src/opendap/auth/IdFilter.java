@@ -29,6 +29,7 @@ package opendap.auth;
 import opendap.PathBuilder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
@@ -148,113 +149,125 @@ public class IdFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
-        HttpServletRequest request = (HttpServletRequest) sreq;
-        HttpServletRequest hsReq = request;
+        try {
+            RequestCache.openThreadCache();
 
-        // Get session, make new as needed.
-        String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
-        LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
+            HttpServletRequest request = (HttpServletRequest) sreq;
+            HttpServletRequest hsReq = request;
 
-        HttpSession session = hsReq.getSession(true);
-        log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
+            String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
+            LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
-        Util.debugHttpRequest(request,log);
+            // Get session, make new as needed.
+            HttpSession session = hsReq.getSession(true);
+            log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
 
-        HttpServletResponse hsRes = (HttpServletResponse) response;
-        String requestURI = hsReq.getRequestURI();
-        String contextPath = hsReq.getContextPath();
+            Util.debugHttpRequest(request,log);
 
-        // FIXME The following needs to be replaced with a mechanism that does not require the query
-        //  to be added to the request URL in order for the redirect to produce the target request.
-        //  Why? Because the query may be too large for a URL on many servers.
-        //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
-        //  with the md5 hash of the query and then use that for a lookup down stream?
-        String requestUrl = hsReq.getRequestURL().toString();
-        String query = ReqInfo.getConstraintExpression(hsReq);
-        if(!query.isEmpty()) {
-            requestUrl += "?" + query;
-        }
+            HttpServletResponse hsRes = (HttpServletResponse) response;
+            String requestURI = hsReq.getRequestURI();
+            String contextPath = hsReq.getContextPath();
 
-        // Intercept login/logout requests
-        if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
-            doLogout(hsReq, hsRes);
-            return;
-        } else if (AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
-            doLandingPage(hsReq, hsRes);
-            return;
-        } else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
-            doGuestLogin(hsReq, hsRes);
-            return;
-        } else {
-            // Check IdProviders to see if this request is a valid login context.
-            for (IdProvider idProvider : IdPManager.getProviders()) {
+            // FIXME The following needs to be replaced with a mechanism that does not require the query
+            //  to be added to the request URL in order for the redirect to produce the target request.
+            //  Why? Because the query may be too large for a URL on many servers.
+            //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
+            //  with the md5 hash of the query and then use that for a lookup down stream?
+            String requestUrl = hsReq.getRequestURL().toString();
+            String query = ReqInfo.getConstraintExpression(hsReq);
+            if(!query.isEmpty()) {
+                requestUrl += "?" + query;
+            }
 
-                String loginEndpoint = idProvider.getLoginEndpoint();
-                if(requestURI.equals(loginEndpoint)) {
-                    synchronized (session) {
-                        // Check the RETURN_TO_URL and if it's the login endpoint
-                        // return to the root dir of the web application after
-                        // authenticating.
-                        String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
-                        log.debug("Retrieved RETURN_TO_URL: {} (session: {})",returnToUrl,session.getId());
-                        if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
-                            String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
-                            msg += " (session: "+session.getId()+")";
-                            log.debug(msg);
-                            session.setAttribute(RETURN_TO_URL, contextPath);
+            // Intercept login/logout requests
+            if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
+                doLogout(hsReq, hsRes);
+                return;
+            } else if (AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
+                doLandingPage(hsReq, hsRes);
+                return;
+            } else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
+                doGuestLogin(hsReq, hsRes);
+                return;
+            } else {
+                // Check IdProviders to see if this request is a valid login context.
+                for (IdProvider idProvider : IdPManager.getProviders()) {
+
+                    String loginEndpoint = idProvider.getLoginEndpoint();
+                    if(requestURI.equals(loginEndpoint)) {
+                        synchronized (session) {
+                            // Check the RETURN_TO_URL and if it's the login endpoint
+                            // return to the root dir of the web application after
+                            // authenticating.
+                            String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
+                            log.debug("Retrieved RETURN_TO_URL: {} (session: {})",returnToUrl,session.getId());
+                            if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
+                                String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
+                                msg += " (session: "+session.getId()+")";
+                                log.debug(msg);
+                                session.setAttribute(RETURN_TO_URL, contextPath);
+                            }
                         }
-                    }
-                    try {
-                        //
-                        // Run the login gizwhat. This may involve simply collecting credentials from the user and
-                        // forwarding them on to the IdP, or it may involve a complex dance of redirection in which
-                        // the user drives their browser through an elaborate auth like OAuth2 so they can come back
-                        // to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
-                        // complete.
-                        //
-                        idProvider.doLogin(hsReq, hsRes);
-                        //
-                        // We return here and don't do the filter chain because the "doLogin" method will, when
-                        // completed send a 302 redirect to the client. Thus we want the process to stop here until
-                        // login is completed
-                        //
-                        log.debug("END (session: {})",session.getId());
-                        return;
+                        try {
+                            //
+                            // Run the login gizwhat. This may involve simply collecting credentials from the user and
+                            // forwarding them on to the IdP, or it may involve a complex dance of redirection in which
+                            // the user drives their browser through an elaborate auth like OAuth2 so they can come back
+                            // to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
+                            // complete.
+                            //
+                            idProvider.doLogin(hsReq, hsRes);
+                            //
+                            // We return here and don't do the filter chain because the "doLogin" method will, when
+                            // completed send a 302 redirect to the client. Thus we want the process to stop here until
+                            // login is completed
+                            //
+                            log.debug("END (session: {})",session.getId());
+                            return;
 
-                    } catch (IOException e) {
-                        String msg = "Your Login Transaction FAILED!   " +
-                                     "Authentication Context: '"+idProvider.getAuthContext()+
-                                     "' Message: "+ e.getMessage();
-                        log.error("doFilter() - {}", msg);
-                        OPeNDAPException.setCachedErrorMessage(msg);
-                        ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
-                        log.debug("END (session: {})",session.getId());
-                        return;
+                        } catch (IOException e) {
+                            String msg = "Your Login Transaction FAILED!   " +
+                                    "Authentication Context: '"+idProvider.getAuthContext()+
+                                    "' Message: "+ e.getMessage();
+                            log.error("doFilter() - {}", msg);
+                            OPeNDAPException.setCachedErrorMessage(msg);
+                            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                            log.debug("END (session: {})",session.getId());
+                            return;
+                        }
                     }
                 }
             }
-        }
 
-        //
-        // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
-        // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
-        // the presence of the USER_PROFILE attribute in the session) we need to spoof the API to show our
-        // authenticated user.
-        //
-        UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
-        if (up != null) {
-            AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
-            authReq.setUid(up.getUID());
-            hsReq = authReq;
+            //
+            // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
+            // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
+            // the presence of the USER_PROFILE attribute in the session) we need to spoof the API to show our
+            // authenticated user.
+            //
+            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            if (up != null) {
+                log.debug("Found UserProfile object in Session, this is an authenticated request for user: {}",up.getUID());
+                AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
+                authReq.setUid(up.getUID());
+                hsReq = authReq;
+            }
+            else {
+                log.debug("No UserProfile object found in Session. Request is not authenticated.");
+            }
+            // Cache the  request URL in the session. We do this here because we know by now that the request was
+            // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
+            synchronized(session) {
+                Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+            }
+            filterChain.doFilter(hsReq, hsRes);
+            log.debug("END (session: {})",session.getId());
+            LogUtil.logServerAccessEnd(200,logName);
+
         }
-        // Cache the  request URL in the session. We do this here because we know by now that the request was
-        // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
-        synchronized(session) {
-            Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+        finally {
+            RequestCache.closeThreadCache();
         }
-        filterChain.doFilter(hsReq, hsRes);
-        log.debug("END (session: {})",session.getId());
-        LogUtil.logServerAccessEnd(200,logName);
     }
 
 

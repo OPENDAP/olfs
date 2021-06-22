@@ -44,12 +44,19 @@ public class EarthDataLoginAccessToken implements Serializable {
     public static final String REFRESH_TOKEN_KEY = "refresh_token";
     public static final String BEARER_TOKEN_TYPE = "Bearer";
 
+    /* @serial */
     private String accessToken;
+    /* @serial */
     private String endPoint;
+    /* @serial */
     private long expiresIn;
+    /* @serial */
     private String tokenType;
+    /* @serial */
     private String refreshToken;
+    /* @serial */
     private Date creationTime;
+    /* @serial */
     private String edlClientAppId;
 
     public EarthDataLoginAccessToken() {

@@ -27,10 +27,12 @@
 package opendap.auth;
 
 
+import java.io.Serializable;
+
 /**
  * Created by ndp on 9/24/14.
  */
-public class GuestProfile extends UserProfile {
+public class GuestProfile extends UserProfile implements Serializable {
 
 
     public GuestProfile(){
