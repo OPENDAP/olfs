@@ -164,16 +164,22 @@ public class BES {
         Document response = new Document();
         try {
             besTransaction(showBesKeyCmd,response);
-            Element showBesKey = response.getRootElement().getChild("showBesKey",BES_NS);
-            if(showBesKey!=null){
-                if(log.isDebugEnabled()) {
-                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                    log.debug("BES Support Email Key for \"{}\"\n{}",getPrefix(), xmlo.outputString(showBesKey));
+            Element rootE = response.getRootElement();
+            if(rootE!=null) {
+                Element showBesKey = rootE.getChild("showBesKey", BES_NS);
+                if (showBesKey != null) {
+                    if (log.isDebugEnabled()) {
+                        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                        log.debug("BES Support Email Key for \"{}\"\n{}", getPrefix(), xmlo.outputString(showBesKey));
+                    }
+                    Element value = showBesKey.getChild(BesApi.VALUE, opendap.namespaces.BES.BES_NS);
+                    if (value != null) {
+                        emailAddress = value.getTextTrim();
+                    }
                 }
-                Element value =  showBesKey.getChild(BesApi.VALUE,opendap.namespaces.BES.BES_NS);
-                if(value!=null){
-                    emailAddress = value.getTextTrim();
-                }
+            }
+            else {
+                log.error("Bes response document did not contain a root element.");
             }
         }
         catch (PPTException | IOException | JDOMException | BESError e) {
