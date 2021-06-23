@@ -671,6 +671,9 @@ public class ReqInfo {
         return cf_history_entry.toString();
     }
 
+    /**
+       Creates JSON array for history_json
+    */
     public  static String getHistoryJsonEntry(HttpServletRequest request) throws IOException {
 
         // Add the date
