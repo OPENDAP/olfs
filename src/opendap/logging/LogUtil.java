@@ -243,9 +243,12 @@ public class LogUtil {
     private static void ingestLogbackFile(String logbackFile){
         if (logbackFile != null) {
             log.info("Logback configuration using: {}", logbackFile);
-            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-            attemptJoranConfiguration(logbackFile, lc);
-            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            attemptJoranConfiguration(logbackFile, loggerContext);
+            if(log.isInfoEnabled()){
+                log.info("LoggerContext Follows: {}", logbackFile);
+                StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
+            }
         } else {
             log.error("Logback configuration using logback default configuration mechanism");
         }
@@ -254,15 +257,15 @@ public class LogUtil {
     /**
      * Tries to read and ingest the logback configuration file.
      * @param logbackConfigFile Path to logback configuration file.
-     * @param lc Logger context to condition.
+     * @param loggerContext Logger context to condition.
      */
-    private static void attemptJoranConfiguration(String logbackConfigFile, LoggerContext lc){
+    private static void attemptJoranConfiguration(String logbackConfigFile, LoggerContext loggerContext){
         try {
             JoranConfigurator configurator = new JoranConfigurator();
-            configurator.setContext(lc);
+            configurator.setContext(loggerContext);
             // the context was probably already configured by default configuration
             // rules
-            lc.reset();
+            loggerContext.reset();
             configurator.doConfigure(logbackConfigFile);
             log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {

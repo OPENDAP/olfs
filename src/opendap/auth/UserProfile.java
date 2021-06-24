@@ -37,18 +37,24 @@ import java.util.*;
  */
 public class UserProfile implements Serializable {
 
+    /* @serial */
     private Date objectCreationTime;
+    /* @serial */
     private String d_jsonStr;
+    /* @serial */
     private HashSet<String> d_groups;
+    /* @serial */
     private HashSet<String> d_roles;
 
+    /* @serial */
     private String d_authContext;
+    /* @serial */
     private EarthDataLoginAccessToken d_edlAccessToken;
 
+    /* @serial */
     private String d_uid;
 
-    // TODO Annotate this so that it does not serialize.
-    private JsonObject d_profile;
+    private transient JsonObject d_profile;
 
     // private String edlClientAppId;
 
