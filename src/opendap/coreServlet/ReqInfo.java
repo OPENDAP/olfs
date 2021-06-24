@@ -699,12 +699,7 @@ public class ReqInfo {
         history_json_obj.put("version", version);
         history_json_obj.put("parameters", parameters);
 
-        //JSONArray history_json_arr = new JSONArray();
-        //history_json_arr.add(history_json_obj);
-
-
         StringWriter out = new StringWriter();
-        //history_json_arr.writeJSONString(out);
         history_json_obj.writeJSONString(out);
 
         log.debug("history_json entry: {}", out.toString());
