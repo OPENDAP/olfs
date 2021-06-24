@@ -1774,13 +1774,12 @@ public class BesApi implements Cloneable {
 
         Document besRequest = getDap2RequestDocument(user, DAP2_DATA, dataSource, ce, null, null, NETCDF_4, XML_ERRORS);
 
+        Element root = besRequest.getRootElement();
         if(cf_history_entry!=null) {
-            Element root = besRequest.getRootElement();
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
         }
 
         if(history_json_entry!=null) {
-            Element root = besRequest.getRootElement();
             root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
         }
 
@@ -1792,10 +1791,13 @@ public class BesApi implements Cloneable {
             throws BadConfigurationException {
 
         Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, NETCDF_4, XML_ERRORS);
+        Element root = besRequest.getRootElement();
 
         if(cf_history_entry!=null) {
-            Element root = besRequest.getRootElement();
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
+        }
+
+        if(history_json_entry!=null) {
             root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
         }
 

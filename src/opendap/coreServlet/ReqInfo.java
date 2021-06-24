@@ -706,6 +706,7 @@ public class ReqInfo {
         StringWriter out = new StringWriter();
         history_json_arr.writeJSONString(out);
 
+        log.debug("history_json entry: {}", out.toString());
         return out.toString();
     }
 
