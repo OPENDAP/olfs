@@ -755,6 +755,7 @@ public class W10nResponder {
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
+                null,
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());
@@ -810,6 +811,7 @@ public class W10nResponder {
                 w10nRequest.getValidResourcePath(),
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
+                null,
                 os);
         os.flush();
         LogUtil.setResponseSize(os.size());

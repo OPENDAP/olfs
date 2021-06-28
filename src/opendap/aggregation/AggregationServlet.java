@@ -393,17 +393,18 @@ public class AggregationServlet extends HttpServlet {
 
 
         String cfHistoryEntry = granule + "?" + ce;
+        String historyJsonEntry = "{'test' : 'history'}";
 
         switch (format) {
             case NETCDF_3:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
-                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, os);
+                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, historyJsonEntry, os);
                 break;
             case NETCDF_4:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
-                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, os);
+                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, historyJsonEntry, os);
                 break;
             case ASCII:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.

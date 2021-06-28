@@ -111,6 +111,7 @@ public class Netcdf3DR extends Dap4Responder{
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        String history_json_entry = ReqInfo.getHistoryJsonEntry(request);
         User user = new User(request);
 
         BesApi besApi = getBesApi();
@@ -140,7 +141,7 @@ public class Netcdf3DR extends Dap4Responder{
         response.setHeader("Content-Disposition", contentDisposition);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsNetcdf3(user, resourceID, qp, cf_history_entry, os);
+        besApi.writeDap4DataAsNetcdf3(user, resourceID, qp, cf_history_entry, history_json_entry, os);
         os.flush();
         LogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());

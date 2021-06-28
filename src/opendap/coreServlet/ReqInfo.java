@@ -27,15 +27,17 @@
 
 package opendap.coreServlet;
 
-
 import opendap.PathBuilder;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -643,6 +645,7 @@ public class ReqInfo {
     }
 
     private static final String CF_History_Entry_Date_Format = "yyyy-MM-dd HH:mm:ss z";
+    private static final String History_Json_Entry_Date_Format = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     public  static String getCFHistoryEntry(HttpServletRequest request) throws IOException {
         StringBuilder cf_history_entry = new StringBuilder();
@@ -668,7 +671,40 @@ public class ReqInfo {
         return cf_history_entry.toString();
     }
 
+    /**
+       Creates JSON array for history_json
+    */
+    public  static String getHistoryJsonEntry(HttpServletRequest request) throws IOException {
 
+        // Add the date
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(History_Json_Entry_Date_Format);
+        sdf.setTimeZone(new SimpleTimeZone(0,"GMT"));
+        String timestamp = sdf.format(now);
+        String schema = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-0.1.0.json";
+        String program = "hyrax";
+        String version = opendap.bes.Version.getHyraxVersionString();
+        String request_url = getRequestUrlPath(request);
+
+        JSONObject param = new JSONObject();
+        param.put("request_url",request_url);
+        JSONArray parameters = new JSONArray();
+        parameters.add(param);
+
+        JSONObject history_json_obj = new JSONObject();
+
+        history_json_obj.put("$schema", schema);
+        history_json_obj.put("date_time", timestamp);
+        history_json_obj.put("program", program);
+        history_json_obj.put("version", version);
+        history_json_obj.put("parameters", parameters);
+
+        StringWriter out = new StringWriter();
+        history_json_obj.writeJSONString(out);
+
+        log.debug("history_json entry: {}", out.toString());
+        return out.toString();
+    }
 
 
     public static String getRequestUrlPath(HttpServletRequest req) {
