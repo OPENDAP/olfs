@@ -973,11 +973,11 @@
         <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
         <copy todir="${build.ngap.resources}/lib" filtering="false">
             <fileset refid="hyrax-libs"/>
-            <!-- fileset dir="${ngapResources.dir}/lib">
+            <fileset dir="${ngapResources.dir}/lib">
                 <exclude name="AmazonElastiCacheClusterClient-no-version.jar"/>
                 <exclude name="memcached-session-manager-2.3.3-SNAPSHOT.jar"/>
                 <exclude name="memcached-session-manager-tc7-2.3.3-SNAPSHOT.jar"/>
-            </fileset -->
+            </fileset>
         </copy>
 
 
