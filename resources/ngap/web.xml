@@ -35,7 +35,7 @@
 
     <display-name>Hyrax</display-name>
     <description>OPeNDAP Hyrax Server</description>
-
+    <distributable />
 
   <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
   <!-- used by Tomcat to support JSP pages.  Traditionally, this servlet    -->
