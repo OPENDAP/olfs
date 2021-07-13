@@ -45,7 +45,7 @@ env:
     # WOO_UID for travis
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
     # SNYK_TOKEN
-    - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
+    - secure: "LjpHivwAX9/UjXWpCEDaofdm4FWBWpdvC5eKicZ7VS7EKK1s9bLxNerVsf/N72c4cx6WF5xyyfYMLBUFD7GviAx7dMBLuDpKiRkZqjccmerX3DkXhQWUQ1lIIcE/o5mUnGhblouz7N/oLe8NWzhImfJ/eMy+o16zO/TKJ8bdBBU="
 
 
 install:
