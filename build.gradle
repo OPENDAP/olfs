@@ -98,6 +98,7 @@ dependencies {
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
     //redisson-all-3.5.5.jar
     implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
+    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 
 }
 
