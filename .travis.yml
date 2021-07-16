@@ -83,17 +83,21 @@ jobs:
       jdk: openjdk7
       script: ant check
     - jdk: openjdk8
+
       name: "jdk8"
       script: ant check
 
     - stage: scan
-      name: "scan (jdk8)"
+      name: "scan (jdk11)"
       addons:
         sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
-      jdk: openjdk8
+      # jdk 7 does not work with sonar scan. jhrg 3/14/19 and 8 sk 7/15/21
+      jdk:
+        - openjdk8
+        - openjdk11
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - jdk_switcher use openjdk11
         - ant sonar -Dsonar.login=$SONAR_LOGIN
       script:
         - ./run-snyk.sh
