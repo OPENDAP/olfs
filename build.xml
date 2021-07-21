@@ -974,9 +974,9 @@
         <copy todir="${build.ngap.resources}/lib" filtering="false">
             <fileset refid="hyrax-libs"/>
             <fileset dir="${ngapResources.dir}/lib">
-                <exclude name="AmazonElastiCacheClusterClient-no-version.jar"/>
-                <exclude name="memcached-session-manager-2.3.3-SNAPSHOT.jar"/>
-                <exclude name="memcached-session-manager-tc7-2.3.3-SNAPSHOT.jar"/>
+                <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
+                <exclude name="memcached-session-manager-2.3.2.jar"/>
+                <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
             </fileset>
         </copy>
 
