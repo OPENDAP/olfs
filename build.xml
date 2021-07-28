@@ -935,7 +935,7 @@
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
-                
+
             </fileset>
 
         </copy>
