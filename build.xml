@@ -935,28 +935,7 @@
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
-
-                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-                <!-- I think AmazonElastiCacheClusterClient-no-version.jar has
-                been replaced by elasticache-java-cluster-client-1.1.2.jar and
-                should be removed -->
-                <exclude name="AmazonElastiCacheClusterClient-no-version.jar"/>
-                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                - Including the following libraries cause the server to FAIL
-                - on startup.
-                -->
-                <exclude name="redisson-all-3.11.6.jar"/>
-
-                <!--
-                - These XML libs already in the olfs/lib so the conflict can be
-                - avoided be removing them from resources/ngap/lib
-                -->
-                <exclude name="xalan-2.7.2.jar"/>
-                <exclude name="xercesImpl-2.12.1.jar"/>
-                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
+                
             </fileset>
 
         </copy>
