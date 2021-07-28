@@ -52,7 +52,7 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
-    <property name="NGAP_VERSION" value="${OLFS_VERSION}"/>
+    <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
     <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
@@ -131,17 +131,18 @@
 
     <target name="show" description="Show build settings.">
 
-        <echo level="info" message="Project Name:          ${ant.project.name}"/>
-        <echo level="info" message="Project File:          ${ant.file}"/>
-        <echo level="info" message="Hyrax Version:         ${HYRAX_VERSION}"/>
-        <echo level="info" message="Olfs Version:          ${OLFS_VERSION}"/>
-        <echo level="info" message="Deployment Context:    ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="           Project Name: ${ant.project.name}"/>
+        <echo level="info" message="           Project File: ${ant.file}"/>
+        <echo level="info" message="          Hyrax Version: ${HYRAX_VERSION}"/>
+        <echo level="info" message="           OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="     Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:           ${src.dir}"/>
-        <echo level="info" message="    doc.dir:           ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:           ${lib.dir}"/>
-        <echo level="info" message="    resources.dir:     ${resources.dir}"/>
+        <echo level="info" message="                src.dir: ${src.dir}"/>
+        <echo level="info" message="                doc.dir: ${doc.dir}"/>
+        <echo level="info" message="                lib.dir: ${lib.dir}"/>
+        <echo level="info" message="          resources.dir: ${resources.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
         <echo level="info" message="    build.dir:         ${build.dir}"/>
@@ -236,8 +237,7 @@
 
     <!-- property name="xalan.lib" value="xalan.jar"/-->
     <property name="xalan.lib" value="xalan-2.7.2.jar"/>
-    <!-- property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/-->
-    <property name="xercesImpl.lib" value="xercesImpl-2.12.0.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
     <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
@@ -268,50 +268,6 @@
 
 
     <fileset id="hyrax-libs" dir="${lib.dir}">
-        <include name="${owasp-encoder}"/>
-        <include name="${owasp-encoder-jsp}"/>
-
-        <include name="${json.lib}"/>
-        <include name="${sjson.lib}"/>
-        <include name="${jdom.lib}"/>
-        <include name="${junit.lib}"/>
-
-        <include name="${commons-lang.lib}"/>
-        <include name="${commons-cli.lib}"/>
-        <include name="${commons-httpclient.lib}"/>
-        <include name="${commons-logging.lib}"/>
-        <include name="${commons-codec.lib}"/>
-
-        <include name="${http-components-httpclient.lib}"/>
-        <include name="${http-components-httpcore.lib}"/>
-
-        <include name="${commons-io.lib}"/>
-
-        <!-- include name="${xercesImpl.lib}"/>
-        <include name="${xercesXmlApis.lib}"/-->
-        <include name="${saxon-jdom.lib}"/>
-        <include name="${saxon-s9api.lib}"/>
-        <include name="${saxon.lib}"/>
-
-        <include name="${slf4j.lib}"/>
-        <include name="${logback-core.lib}"/>
-        <include name="${logback-classic.lib}"/>
-
-        <include name="${urlRewrite.lib}"/>
-
-        <!--    WCS-2.0 Libs   -->
-        <include name="${ogc-wcs.lib}"/>
-        <include name="${ogc-gml.lib}"/>
-        <include name="${ogc-swe.lib}"/>
-        <include name="${ogc-gmlcov.lib}"/>
-        <include name="${ogc-ows.lib}"/>
-        <include name="${ogc-jaxb.lib}"/>
-        <include name="${jaxb-core.lib}"/>
-        <include name="${jaxb-impl.lib}"/>
-        <include name="${xlink.lib}"/>
-    </fileset>
-
-    <fileset id="ngap-libs" dir="${lib.dir}">
         <include name="${owasp-encoder}"/>
         <include name="${owasp-encoder-jsp}"/>
 
@@ -439,16 +395,15 @@
             depends="clean,init"
             description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
-
-        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=" Moving and filtering Source code."/>
+        <echo level="info" message="                AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message="          HYRAX_VERSION: ${HYRAX_VERSION}"/>
+        <echo level="info" message="           NGAP_VERSION: ${NGAP_VERSION}"/>
+        <echo level="info" message="           OLFS_VERSION: ${OLFS_VERSION}"/>
+        <echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/>
+        <echo level="info" message="     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="NGAP_DEPLOYMENT_CONTEXT: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
-        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
-        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
-        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
-        <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
-
-        <echo level="info" message=""/>
-
 
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
@@ -973,11 +928,37 @@
         <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
         <copy todir="${build.ngap.resources}/lib" filtering="false">
             <fileset refid="hyrax-libs"/>
-            <!-- fileset dir="${ngapResources.dir}/lib">
+            <fileset dir="${ngapResources.dir}/lib">
+
+                <!-- We exclude these because they get placed into
+                $CATALINA_HOM/lib when the Docker containers are built.-->
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
-            </fileset -->
+
+                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+                <!-- I think AmazonElastiCacheClusterClient-no-version.jar has
+                been replaced by elasticache-java-cluster-client-1.1.2.jar and
+                should be removed -->
+                <exclude name="AmazonElastiCacheClusterClient-no-version.jar"/>
+                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                - Including the following libraries cause the server to FAIL
+                - on startup.
+                -->
+                <exclude name="redisson-all-3.11.6.jar"/>
+
+                <!--
+                - These XML libs already in the olfs/lib so the conflict can be
+                - avoided be removing them from resources/ngap/lib
+                -->
+                <exclude name="xalan-2.7.2.jar"/>
+                <exclude name="xercesImpl-2.12.1.jar"/>
+                <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+            </fileset>
+
         </copy>
 
 
