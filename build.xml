@@ -287,8 +287,52 @@
 
         <include name="${commons-io.lib}"/>
 
-        <include name="${xercesImpl.lib}"/>
-        <include name="${xercesXmlApis.lib}"/>
+        <!-- include name="${xercesImpl.lib}"/>
+        <include name="${xercesXmlApis.lib}"/-->
+        <include name="${saxon-jdom.lib}"/>
+        <include name="${saxon-s9api.lib}"/>
+        <include name="${saxon.lib}"/>
+
+        <include name="${slf4j.lib}"/>
+        <include name="${logback-core.lib}"/>
+        <include name="${logback-classic.lib}"/>
+
+        <include name="${urlRewrite.lib}"/>
+
+        <!--    WCS-2.0 Libs   -->
+        <include name="${ogc-wcs.lib}"/>
+        <include name="${ogc-gml.lib}"/>
+        <include name="${ogc-swe.lib}"/>
+        <include name="${ogc-gmlcov.lib}"/>
+        <include name="${ogc-ows.lib}"/>
+        <include name="${ogc-jaxb.lib}"/>
+        <include name="${jaxb-core.lib}"/>
+        <include name="${jaxb-impl.lib}"/>
+        <include name="${xlink.lib}"/>
+    </fileset>
+
+    <fileset id="ngap-libs" dir="${lib.dir}">
+        <include name="${owasp-encoder}"/>
+        <include name="${owasp-encoder-jsp}"/>
+
+        <include name="${json.lib}"/>
+        <include name="${sjson.lib}"/>
+        <include name="${jdom.lib}"/>
+        <include name="${junit.lib}"/>
+
+        <include name="${commons-lang.lib}"/>
+        <include name="${commons-cli.lib}"/>
+        <include name="${commons-httpclient.lib}"/>
+        <include name="${commons-logging.lib}"/>
+        <include name="${commons-codec.lib}"/>
+
+        <include name="${http-components-httpclient.lib}"/>
+        <include name="${http-components-httpcore.lib}"/>
+
+        <include name="${commons-io.lib}"/>
+
+        <!-- include name="${xercesImpl.lib}"/>
+        <include name="${xercesXmlApis.lib}"/-->
         <include name="${saxon-jdom.lib}"/>
         <include name="${saxon-s9api.lib}"/>
         <include name="${saxon.lib}"/>
