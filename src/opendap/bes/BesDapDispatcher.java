@@ -226,7 +226,7 @@ public class BesDapDispatcher implements DispatchHandler {
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             _responders.add(dfa);
 
-            _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
+            // _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
         }
 
 
