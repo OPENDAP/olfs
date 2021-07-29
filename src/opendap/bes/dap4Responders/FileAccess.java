@@ -104,6 +104,9 @@ public class FileAccess extends Dap4Responder {
 
         String resourceID = getResourceId(requestedResourceId, false);
 
+        if(resourceID.endsWith(requestSuffix))
+            resourceID = resourceID.substring(0,resourceID.length()-requestSuffix.length());
+
         User user = new User(req);
 
         BesApi besApi = getBesApi();
@@ -163,6 +166,12 @@ public class FileAccess extends Dap4Responder {
 
 
     }
+
+    @Override
+    public String getRequestSuffix(){
+        return "";
+    }
+
 
     private void sendDatasetFile(User user, String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
         log.debug("sendDatasetFile() - Sending dataset file \"" + dataSourceId + "\"");
@@ -292,6 +301,9 @@ public class FileAccess extends Dap4Responder {
     public boolean matches(String relativeUrl){
 
         log.debug("matches() -    BEGIN");
+
+        if(relativeUrl.endsWith(requestSuffix))
+            relativeUrl = relativeUrl.substring(0,relativeUrl.length()-requestSuffix.length());
 
         return super.matches(relativeUrl);
 
