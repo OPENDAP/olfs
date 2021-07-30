@@ -109,7 +109,7 @@
         See Dap4 specification for more:
         https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
     -->
-    <!-- UseDAP2ResourceUrlResponse / -->
+    <UseDAP2ResourceUrlResponse />
 
 
     <!--
