@@ -277,15 +277,33 @@ public class DispatchServlet extends HttpServlet {
      * - underlying NetCDF files located on the server without using the OPeNDAP
      * - request interface.
      * -->
-     * <!-- AllowDirectDataSourceAccess / -->
      * <!--
-     * By default, the server will provide a DAP2-style response
-     * to requests for a dataset resource URL. Commenting out the
-     * "UseDAP2ResourceUrlResponse" element will cause the server
-     * to return the DAP4 DSR response when a dataset resource URL
-     * is requested.
+     *     UseDAP2ResourceUrlResponse
+     *     When enabled, the server will provide a DAP2-style response
+     *     to requests for a dataset resource URL, meaning that the response
+     *     will be either source data file or an HTTP 403 Forbidden error, as
+     *     defined by the state of the AllowDirectDataSourceAccess feature.
+     *
+     *     If UseDAP2ResourceUrlResponse is not enabled (not present in the
+     *     configuration, or commented out) the server will default to returning
+     *     the DAP4 Dataset Services Response (DSR) when a dataset resource URL
+     *     is requested.
+     *
+     *     See Dap4 specification for more:
+     *     https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
      * -->
      * <UseDAP2ResourceUrlResponse />
+     *
+     * <!--
+     *     DataRequestForm
+     *
+     *     Defines the DAP data model version for the DAta Request Form linked to
+     *     from the "blue-bar" catalog.html pages generated from  either the
+     *     DDX (for DAP2) or the DMR (for DAP4).
+     * -->
+     * <DataRequestForm type="dap4" />
+     *
+     *
      * </Handler>
      * <Handler className="opendap.bes.DirectoryDispatchHandler" />
      * <Handler className="opendap.bes.BESThreddsDispatchHandler"/>

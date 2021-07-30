@@ -239,7 +239,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-        if(BesDapDispatcher.useDAP2ResourceUrlResponse())
+        if(BesDapDispatcher.dataRequestFormType() == BesDapDispatcher.DataRequestFormType.DAP2)
             xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);

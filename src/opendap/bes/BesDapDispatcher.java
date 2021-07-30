@@ -34,7 +34,6 @@ import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dap4Responders.Iso19115.IsoDMR;
 import opendap.bes.dap4Responders.Iso19115.IsoRubricDMR;
-//import opendap.bes.dap4Responders.DataResponse.JsonDR;
 import opendap.bes.dap4Responders.Version;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.HttpResponder;
@@ -42,7 +41,6 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.dap.Dap2Service;
 import opendap.dap4.Dap4Service;
-import opendap.services.FileService;
 import opendap.services.ServicesRegistry;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -75,14 +73,21 @@ public class BesDapDispatcher implements DispatchHandler {
     private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
     private static boolean _enforceRequiredUserSelection = false;
 
+    public enum DataRequestFormType {
+        DAP2, DAP4
+    }
+    private static DataRequestFormType d_dataRequestFormType;
+
 
     private BesApi _besApi;
 
+    public Enum moo;
 
 
     public BesDapDispatcher() {
         _log = LoggerFactory.getLogger(getClass());
         _responders = new Vector<>();
+        d_dataRequestFormType = DataRequestFormType.DAP4;
 
     }
 
@@ -98,6 +103,9 @@ public class BesDapDispatcher implements DispatchHandler {
 
     public static boolean useDAP2ResourceUrlResponse() {
         return _useDAP2ResourceUrlResponse;
+    }
+    public static DataRequestFormType dataRequestFormType() {
+        return d_dataRequestFormType;
     }
 
 
@@ -146,6 +154,13 @@ public class BesDapDispatcher implements DispatchHandler {
                 _useDAP2ResourceUrlResponse = true;
             }
             _log.info("ingestConfig() - UseDAP2ResourceUrlResponse: {}",_useDAP2ResourceUrlResponse);
+
+            d_dataRequestFormType = DataRequestFormType.DAP4;
+            dv = _config.getChild("DataRequestForm");
+            if (dv != null) {
+                d_dataRequestFormType = DataRequestFormType.DAP2;
+            }
+            _log.info("ingestConfig() - DataRequestForm: {}",d_dataRequestFormType.toString());
 
             _addFileoutTypeSuffixToDownloadFilename = false;
             dv = _config.getChild("AddFileoutTypeSuffixToDownloadFilename");
@@ -290,7 +305,6 @@ public class BesDapDispatcher implements DispatchHandler {
         }
         else {
 
-
             // If we are running a dap4 centric server then we need to install the
             // FileAccess handler so the service responds to <dataset_url>.file to
             // retrieve the source data file.
@@ -298,8 +312,9 @@ public class BesDapDispatcher implements DispatchHandler {
             d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             _responders.add(d4fa);
 
-
             // This call maps the DSR response to the <dataset_url> ala DAP4
+            // And also causes the URL <dataset_url>.html to be a specific
+            // client request for the HTML encoded DSR.
             _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
 
         }
