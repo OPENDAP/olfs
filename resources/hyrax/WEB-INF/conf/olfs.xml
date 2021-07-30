@@ -108,6 +108,11 @@
 
         See Dap4 specification for more:
         https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
+
+        Note: Disabling UseDAP2ResourceUrlResponse will have the effect that
+        requests for the DAP2 Data Request Form at <dataset_url>.html will
+        will return the HTML encoded DSR.
+
     -->
     <UseDAP2ResourceUrlResponse />
 

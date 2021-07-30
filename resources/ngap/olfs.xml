@@ -96,9 +96,10 @@
 
     <!--
         UseDAP2ResourceUrlResponse
+
         When enabled, the server will provide a DAP2-style response
         to requests for a dataset resource URL, meaning that the response
-        will be either source data file or an HTTP 403 Forbidden error, as
+        will be either the source data file or an HTTP 403 Forbidden error, as
         defined by the state of the AllowDirectDataSourceAccess feature.
 
         If UseDAP2ResourceUrlResponse is not enabled (not present in the
@@ -108,6 +109,11 @@
 
         See Dap4 specification for more:
         https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
+
+        Note: Disabling UseDAP2ResourceUrlResponse will have the effect that
+        requests for the DAP2 Data Request Form at <dataset_url>.html will
+        return the HTML encoded DSR.
+
     -->
     <UseDAP2ResourceUrlResponse />
 
