@@ -158,7 +158,10 @@ public class BesDapDispatcher implements DispatchHandler {
             d_dataRequestFormType = DataRequestFormType.DAP4;
             dv = _config.getChild("DataRequestForm");
             if (dv != null) {
-                d_dataRequestFormType = DataRequestFormType.DAP2;
+                String drfTypeStr = dv.getAttributeValue("type");
+                if(drfTypeStr.equalsIgnoreCase("dap2")) {
+                    d_dataRequestFormType = DataRequestFormType.DAP2;
+                }
             }
             _log.info("ingestConfig() - DataRequestForm: {}",d_dataRequestFormType.toString());
 
