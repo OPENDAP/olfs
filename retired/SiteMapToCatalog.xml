@@ -30,7 +30,11 @@
 
 <project
         name="SiteMapToCatalog - Converts 3 column site map to thredds catalog a replicate null data tree."
-        default="all" basedir=".">
+        default="all" basedir="..">
+    <description>
+
+    </description>
+
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -152,18 +156,18 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
+    <property name="WebInfResources.dir" location="/WEB-INF"/>
     <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
 
-    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+    <property name="hyraxResources.dir" location="/"/>
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.docs" location="${build.dir}/docs"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -174,7 +178,7 @@
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
 
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
+    <property name="wcs.resources.dir" location="/resources/WCS/2.0"/>
     <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
     <!-- Libraries -->
@@ -236,7 +240,7 @@
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
             <include name="${owasp-encoder}"/>
             <include name="${owasp-encoder-jsp}"/>
@@ -311,7 +315,7 @@
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
                 <!-- include all the java files -->
                 <include name="opendap/threddsHandler/SiteMapToCatalog.java"/>
                 <include name="opendap/namespaces/THREDDS.java"/>
@@ -325,9 +329,9 @@
         </copy>
         <copy todir="${build.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
-            <fileset dir="${hyraxResources.dir}"/>
+            <fileset dir="/"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
-            <fileset dir="${wcs.resources.dir}">
+            <fileset dir="/resources/WCS/2.0">
                 <include name="xsl/**"/>
                 <include name="WEB-INF/**"/>
                 <exclude name="WEB-INF/web.xml"/>
@@ -377,7 +381,7 @@
 
         <mkdir dir="${build.dist}/${appName}"/>
 
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${appName}/${commons-cli.lib}"/>
+        <copy file="/lib/apache-commons-cli-1.2.jar" tofile="${build.dist}/${appName}/${commons-cli.lib}"/>
 
         <jar destfile="${build.dist}/${appName}/${appName}.jar"
              manifest="resources/${appName}/${appName}.MANIFEST.MF">

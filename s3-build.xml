@@ -31,6 +31,11 @@
 <project
         name="S3_DAP_Service"
         default="all" basedir=".">
+    <description>
+        Builds the NOAA S3 service. This is no longer in use.
+        Of note is the taget 's3up' which will rip a directory tree into NOAAs magic //index.xml
+        files ad load them, along with the source data, into an S3 bucket.
+    </description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 

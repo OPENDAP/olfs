@@ -31,6 +31,9 @@
 <project
         name="Web Coverage Service"
         default="all" basedir=".">
+    <description>
+        Builds the WCS-1.1.2 service as a "standalone" war file that can be run without the OLFS.
+    </description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
