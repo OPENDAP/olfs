@@ -30,10 +30,10 @@
 
 <project
         name="S3_DAP_Service"
-        default="all" basedir=".">
+        default="all" basedir="..">
     <description>
         Builds the NOAA S3 service. This is no longer in use.
-        Of note is the taget 's3up' which will rip a directory tree into NOAAs magic //index.xml
+        Of note is the target 's3up' which will rip a directory tree into NOAAs magic //index.xml
         files ad load them, along with the source data, into an S3 bucket.
     </description>
 
@@ -135,19 +135,19 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="aws.resources"     location="resources/experiments/AWS" />
-    <property name="glacier.resources" location="${aws.resources}/Glacier"/>
-    <property name="s3.resources"      location="${aws.resources}/s3"/>
-    <property name="aws.lib.dir"       location="${aws.resources}/lib"/>
-    <property name="hyrax.resources"   location="resources/hyrax"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="aws.resources"     location="../resources/experiments/AWS" />
+    <property name="glacier.resources" location="/resources/experiments/AWS/Glacier"/>
+    <property name="s3.resources"      location="/resources/experiments/AWS/s3"/>
+    <property name="aws.lib.dir"       location="/resources/experiments/AWS/lib"/>
+    <property name="hyrax.resources"   location="../resources/hyrax"/>
 
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.doc" location="${build.dir}/doc"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -211,7 +211,7 @@
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
             <include name="${catalina.lib}"/>
 
@@ -247,7 +247,7 @@
 
         </fileset>
 
-        <fileset dir="${aws.lib.dir}">
+        <fileset dir="/resources/experiments/AWS/lib">
             <include name="**"/>
         </fileset>
 
@@ -345,7 +345,7 @@ the build/src directory. The code text is filtered to update version numbers.">
 
 
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
                 <!-- include all the java files -->
                 <include  name="opendap/**/*.java"/>
                 <exclude  name="opendap/experiments/**"/>
@@ -366,7 +366,7 @@ the build/src directory. The code text is filtered to update version numbers.">
         </copy>
 
         <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${s3.resources}">
+            <fileset dir="/resources/experiments/AWS/s3">
                 <!-- include all the files -->
                 <include name="**"/>
                 <exclude name="lib/**"/>
@@ -375,7 +375,7 @@ the build/src directory. The code text is filtered to update version numbers.">
 
 
         <copy todir="${build.resources}/xsl" filtering="true">
-            <fileset dir="${hyrax.resources}/xsl">
+            <fileset dir="/xsl">
                 <include name="datasetServices.xsl"/>
                 <include name="dap4_ifh.xsl"/>
                 <include name="version.xsl"/>
@@ -383,14 +383,14 @@ the build/src directory. The code text is filtered to update version numbers.">
         </copy>
 
         <copy todir="${build.resources}/nciso" filtering="true">
-            <fileset dir="${hyrax.resources}/nciso">
+            <fileset dir="/nciso">
                 <include name="**"/>
             </fileset>
         </copy>
 
 
         <copy todir="${build.resources}/js" filtering="true">
-            <fileset dir="${hyrax.resources}/js">
+            <fileset dir="/js">
                 <include name="**"/>
             </fileset>
         </copy>
@@ -445,7 +445,7 @@ the build/src directory. The code text is filtered to update version numbers.">
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="s3dap-${S3_DAP_SERVICE_SOFTWARE_VERSION}-src">
+            <zipfileset dir=".." prefix="s3dap-${S3_DAP_SERVICE_SOFTWARE_VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <exclude name="doc/admin/**"/>
@@ -495,7 +495,7 @@ the build/src directory. The code text is filtered to update version numbers.">
     >
 
         <copy todir="${build.lib}" filtering="false">
-            <fileset dir="${lib.dir}">
+            <fileset dir="/lib">
                 
                 <!-- OWASP Encoding -->
                 <include name="${owasp-encoder}"/>
@@ -534,7 +534,7 @@ the build/src directory. The code text is filtered to update version numbers.">
                 <include name="${aws.sdk.tools}"/>
             </fileset>
 
-            <fileset dir="${aws.lib.dir}">
+            <fileset dir="/resources/experiments/AWS/lib">
                 <include name="**"/>
             </fileset>
 
@@ -557,7 +557,7 @@ the build/src directory. The code text is filtered to update version numbers.">
 
 
         <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${s3.resources}/WEB-INF/web.xml"
+             webxml="/resources/experiments/AWS/s3/WEB-INF/web.xml"
                 >
 
 
@@ -569,7 +569,7 @@ the build/src directory. The code text is filtered to update version numbers.">
 
             <classes dir="${build.classes}"/>
 
-            <zipfileset dir="${doc.dir}" prefix="docs" >
+            <zipfileset dir="/../../doc" prefix="docs" >
                 <exclude name="src.distribution.readme"/>
                 <exclude name="admin/**"/>
                 <exclude name="_notes"/>

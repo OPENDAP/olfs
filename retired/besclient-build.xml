@@ -29,14 +29,14 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="Simple Policy Decision Point"
-        default="all" basedir=".">
-
-    <description>Builds the Simple Policy Decision Point web service WAR file.</description>
+        name="BES Client Application"
+        default="all" basedir="..">
+    <description>
+        Builds and runs opendap.ppt.OPeNDAPClient using passed commandline
+        parameters (-DNAME=VALUE). See target "besclient"
+    </description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
-
-    <property name="DEPLOYMENT_CONTEXT" value="pdp"/>
 
 
     <!-- ********************************************* -->
@@ -51,11 +51,6 @@
          line by the distribution build script using
          tag information from CVS.
     -->
-    <property name="PDP_SERVICE_VERSION" value="Not.A.Release"/>
-    <property name="WEBAPP_DIST"   value="pdpService-${PDP_SERVICE_VERSION}-webapp"/>
-    <property name="SRC_DIST"      value="pdpService-${PDP_SERVICE_VERSION}-src"/>
-    <property name="DOC_DIST"      value="pdpService-${PDP_SERVICE_VERSION}-doc"/>
-    <property name="OLFS_LIB"      value="pdpService-${PDP_SERVICE_VERSION}"/>
 
 
     <!-- Compiler Settings -->
@@ -123,22 +118,18 @@
 
     <target name="show" description="Show build settings.">
 
-        <echo level="info" message="Project Name:          ${ant.project.name}"/>
-        <echo level="info" message="Project File:          ${ant.file}"/>
-        <echo level="info" message="PdP Service Version:   ${PDP_SERVICE_VERSION}"/>
-        <echo level="info" message="Deployment Context:    ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="Project Name:         ${ant.project.name}"/>
+        <echo level="info" message="Project File:         ${ant.file}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:           ${src.dir}"/>
-        <echo level="info" message="    doc.dir:           ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:           ${lib.dir}"/>
-        <echo level="info" message="    resources.dir:     ${resources.dir}"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:         ${build.dir}"/>
-        <echo level="info" message="    build.classes:     ${build.classes}"/>
-        <echo level="info" message="    build.doc:         ${build.docs}"/>
-        <echo level="info" message="    build.resources:   ${build.resources}"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="    ant.file:          ${ant.file}"/>
@@ -151,12 +142,6 @@
         <echo level="info" message="    user.home:         ${user.home}"/>
         <echo level="info" message="    java.home:         ${java.home}"/>
         <echo level="info" message=""/>
-        <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="    WEBAPP_DIST:       ${WEBAPP_DIST}"/>
-        <echo level="info" message="    SRC_DIST:          ${SRC_DIST}"/>
-        <echo level="info" message="    DOC_DIST:          ${DOC_DIST}"/>
-        <echo level="info" message="    OLFS_LIB:          ${OLFS_LIB}"/>
-        <echo level="info" message=""/>
 
     </target>
 
@@ -168,108 +153,100 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources/pdpService"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
-
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
 
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
-    <property name="build.docs" location="${build.dir}/docs"/>
+    <property name="build.doc" location="${build.dir}/doc"/>
     <property name="build.dist" location="${build.dir}/dist"/>
     <property name="build.lib" location="${build.dir}/lib"/>
-    <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.run" location=".."/>
     <property name="build.src" location="${build.dir}/src"/>
     <property name="build.resources" location="${build.dir}/resources"/>
-    <property name="build.webapp" location="${build.dir}/webapp"/>
-
 
 
     <!-- Libraries -->
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib"  value="urlrewrite-3.2.0.jar"/>
+    <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
 
 
     <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
     <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
     <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
 
-    <property name="owlim.lib"            value="owlim-lite-4.3.jar"/>
-    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
 
     <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
-
-    <property name="http-components-httpclient.lib"       value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpclient-cache.lib" value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="apache-http-components-httpcore-4.3.jar"/>
-
-
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
 
     <property name="xalan.lib"         value="xalan.jar"/>
     <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
 
     <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
     <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
-
-    <property name="json.lib"      value="json-simple-1.1.1.jar"/>
+    <property name="servlet-api.lib"      value="servlet-api-3.0.jar"/>
 
 
-    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
-               property="fortify.present"/>
-
-    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
-    <property name="rules.dir" value="fortify"/>
 
 
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
-            <include name="${json.lib}"/>
+            <include name="${catalina.lib}"/>
+
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
+            <include name="${urlRewrite.lib}"/>
+
+            <!-- Apache Commons tools -->
             <include name="${commons-cli.lib}"/>
-            <include name="${http-components-httpclient.lib}"/>
-            <include name="${http-components-httpclient-cache.lib}"/>
-            <include name="${http-components-httpcore.lib}"/>
-            <include name="${commons-logging.lib}"/>
+            <include name="${commons-httpclient.lib}"/>
             <include name="${commons-lang.lib}"/>
+            <include name="${commons-logging.lib}"/>
+            <include name="${commons-codec.lib}"/>
+            <include name="${commons-io.lib}"/>
+
+            <!-- XML tools -->
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
+            <include name="${xalan.lib}"/>
+            <include name="${xercesImpl.lib}"/>
+            <include name="${xercesXmlApis.lib}"/>
 
-            <include name="${catalina.lib}"/>
-
+            <!-- Logging Framework -->
             <include name="${slf4j.lib}"/>
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
 
 
         </fileset>
+
     </path>
 
 
 
-    <target name="all" depends="clean,server"
+
+
+
+    <target name="all" depends="clean,besclient"
             description="Builds lots of stuff."/>
-
-
 
 
     <target name="clean" description="Clean up ALL build products.">
@@ -280,18 +257,17 @@
     <target name="init" description="Prepare all build directories.">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${build.classes}"/>
-        <mkdir dir="${build.docs}"/>
+        <mkdir dir="${build.doc}"/>
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
-        <mkdir dir="${build.run}"/>
+        <mkdir dir="/"/>
         <mkdir dir="${build.src}"/>
-
-        <filter token="PdpServiceVersion" value="${PDP_SERVICE_VERSION}"/>
-        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <mkdir dir="${build.resources}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
     </target>
+
 
 
 
@@ -306,86 +282,31 @@
 
 
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
                 <!-- include all the java files -->
-                <include name="opendap/**"/>
-                <include name="org/opendap/**"/>
-                <include name="opendap/xml/Util.java"/>
-                <include name="opendap/coreServlet/RequestCache.java"/>
-                <include name="opendap/coreServlet/ServletUtil.java"/>
-
-
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
-
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/semantics/**"/>
-
-                <!-- Exclude prototype Amazon Web Services code from production -->
-                <exclude name="opendap/aws/**"/>
-                <exclude name="opendap/noaa_s3/**"/>
-
+                <include  name="opendap/**/*.java"/>
+                <exclude  name="opendap/experiments/**"/>
+                <exclude  name="opendap/semantics/**"/>
+                <exclude  name="opendap/metacat/**"/>
+                <exclude  name="opendap/wcs/**"/>
+                <exclude  name="opendap/aws/**"/>
+                <exclude  name="opendap/noaa_s3/**"/>
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
 
-
-                <!-- Exclude Hyrax (for the most part)   -->
-                <exclude name="opendap/hai/**"/>
-                <exclude name="opendap/bes/**"/>
-                <exclude name="opendap/coreServlet/**"/>
-                <exclude name="opendap/dap/**"/>
-                <exclude name="opendap/dap4/**"/>
-                <exclude name="opendap/gateway/**"/>
-                <exclude name="opendap/io/**"/>
-                <exclude name="opendap/namespaces/**"/>
-                <exclude name="opendap/nciso/**"/>
-                <exclude name="opendap/ncml/**"/>
-                <exclude name="opendap/ppt/**"/>
-                <exclude name="opendap/semantics/**"/>
-                <exclude name="opendap/services/**"/>
-                <exclude name="opendap/threddsHandler/**"/>
-                <exclude name="opendap/viewers/**"/>
-                <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/webstart/**"/>
-                <exclude name="opendap/xml/**"/>
-
-
-
-            </fileset>
-            <fileset dir="${src.dir}">
-                <include name="opendap/xml/Util.java"/>
-                <include name="opendap/coreServlet/RequestCache.java"/>
-                <include name="opendap/coreServlet/ServletUtil.java"/>
-                <include name="opendap/coreServlet/Scrub.java"/>
-                <include name="opendap/coreServlet/ReqInfo.java"/>
-                <include name="opendap/coreServlet/Util.java"/>
-
             </fileset>
 
-
         </copy>
-
-
-        <!-- Copy and filter all of the web application resources -->
-        <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${resources.dir}"/>
-        </copy>
-
 
 
     </target>
 
-
     <target
             name="compile"
             depends="PreProcessSourceCode"
-            description="Compiles the OLFS."
+            description="Compiles the BES Client software."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling BES Client"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -407,66 +328,70 @@
 
 
 
-    <target
-            name="server"
-            depends="clean,compile"
-            description="Performs a clean build of the PdP Service software and assembles the WAR file."
-            >
 
 
+    <!-- *******************************************************
 
-        <echo level="info" message="Building PdpService war file."/>
-        <echo level="info" message="build.resources: ${build.resources}"/>
-        <echo level="info" message="build.dist:      ${build.dist}"/>
+            BES Client
+
+            Send commands to the BES
+    -->
+
+    <property name="host"     value="localhost"/>
+    <property name="port"     value="10022"/>
+
+    <property name="reps"     value="1"/>
+    <property name="maxCmds"  value="1"/>
+
+    <property name="outFile"  value="bes.out" />
+    <property name="errFile"  value="bes.err" />
+
+    <property name="besCmd"   value="bes.cmd" />
 
 
+    <target  name="besclient" depends="compile">
 
-        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
-             webxml="${build.resources}/WEB-INF/web.xml"
+        <java classname="opendap.ppt.OPeNDAPClient"
+              fork="true"
+              maxmemory="1024m"
+              dir="/"
                 >
+            <classpath refid="compile.classpath"/>
 
-            <lib dir="${lib.dir}">
-                <include name="${jdom.lib}"/>
-                <include name="${junit.lib}"/>
-                <include name="${urlRewrite.lib}"/>
-                <include name="${json.lib}"/>
+            <arg line="--host=${host}" />
+            <arg line="--port=${port}" />
 
-                <include name="${commons-lang.lib}"/>
-                <include name="${commons-cli.lib}"/>
-                <include name="${http-components-httpclient.lib}"/>
-                <include name="${http-components-httpclient-cache.lib}"/>
-                <include name="${http-components-httpcore.lib}"/>
-                <include name="${commons-logging.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-                <include name="${saxon-jdom.lib}"/>
-                <include name="${saxon-s9api.lib}"/>
-                <include name="${saxon.lib}"/>
+            <arg line="--reps=${reps}" />
+            <arg line="--maxCmds=${maxCmds}" />
 
-                <include name="${slf4j.lib}"/>
-                <include name="${logback-core.lib}"/>
-                <include name="${logback-classic.lib}"/>
+            <arg line="--outFile=${outFile}" />
 
-            </lib>
-            <classes dir="${build.classes}"/>
+            <arg line="--errFile=${errFile}" />
+            <arg line="--besCmd=${besCmd}" />
+        </java>
 
+    </target>
 
-            <zipfileset dir="${build.resources}" prefix="">
-                <include name="**/*"/>
-                <exclude name="WEB-INF/web.xml"/>
-            </zipfileset>
+    <target  name="run_besclient">
 
+        <java classname="opendap.ppt.OPeNDAPClient"
+              fork="true"
+              maxmemory="1024m"
+              dir="/"
+                >
+            <classpath refid="compile.classpath"/>
 
+            <arg line="--host=${host}" />
+            <arg line="--port=${port}" />
 
-            <webinf dir="${build.resources}/WEB-INF">
-                <include name="logback-test.xml"/>
-                <include name="logback.xml"/>
-            </webinf>
+            <arg line="--reps=${reps}" />
+            <arg line="--maxCmds=${maxCmds}" />
 
+            <arg line="--outFile=${outFile}" />
 
-        </war>
-
-        <delete file="${build.dist}/index.html"/>
+            <arg line="--errFile=${errFile}" />
+            <arg line="--besCmd=${besCmd}" />
+        </java>
 
     </target>
 

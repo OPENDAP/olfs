@@ -215,13 +215,8 @@
 
 
     <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
-    <!-- property name="logback-core.lib" value="logback-core-0.9.26.jar"/-->
     <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
-    <!-- property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/-->
     <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
-
-    <!-- property name="owlim.lib" value="owlim-lite-4.3.jar"/ -->
-    <!-- property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/-->
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -235,7 +230,6 @@
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-    <!-- property name="xalan.lib" value="xalan.jar"/-->
     <property name="xalan.lib" value="xalan-2.7.2.jar"/>
     <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
@@ -244,11 +238,13 @@
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <!-- property name="catalina.lib" value="catalina-6.0.14.jar"/-->
     <property name="catalina.lib" value="catalina-6.0.53.jar"/>
     <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
     <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
+
+    <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
+    <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
 
     <!-- WCS Libs -->
@@ -262,14 +258,12 @@
     <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="owasp-encoder" value="encoder-1.2.2.jar"/>
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar"/>
 
 
 
     <fileset id="hyrax-libs" dir="${lib.dir}">
-        <include name="${owasp-encoder}"/>
-        <include name="${owasp-encoder-jsp}"/>
+        <include name="${owasp-encoder.lib}"/>
+        <include name="${owasp-encoder-jsp.lib}"/>
 
         <include name="${json.lib}"/>
         <include name="${sjson.lib}"/>
@@ -281,14 +275,12 @@
         <include name="${commons-httpclient.lib}"/>
         <include name="${commons-logging.lib}"/>
         <include name="${commons-codec.lib}"/>
+        <include name="${commons-io.lib}"/>
 
         <include name="${http-components-httpclient.lib}"/>
         <include name="${http-components-httpcore.lib}"/>
 
-        <include name="${commons-io.lib}"/>
 
-        <!-- include name="${xercesImpl.lib}"/>
-        <include name="${xercesXmlApis.lib}"/-->
         <include name="${saxon-jdom.lib}"/>
         <include name="${saxon-s9api.lib}"/>
         <include name="${saxon.lib}"/>

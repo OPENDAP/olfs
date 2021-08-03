@@ -32,6 +32,8 @@
         name="Hyrax robots.txt service"
         default="all" basedir=".">
 
+    <description>Builds Hyrax robots.txt service WAR file.</description>
+
     <!-- Global Properties for Java-OPeNDAP software development -->
 
     <property name="DEPLOYMENT_CONTEXT" value="ROOT"/>

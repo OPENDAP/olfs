@@ -29,10 +29,10 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="Web Coverage Service 2.0"
-        default="all" basedir=".">
+        name="Web Coverage Service"
+        default="all" basedir="..">
     <description>
-        Builds the WCS-2.0 service as a "standalone" war file that can be run without the OLFS.
+        Builds the WCS-1.1.2 service as a "standalone" war file that can be run without the OLFS.
     </description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
@@ -156,18 +156,19 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources"/>
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
-    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
-    <property name="distributionResources.dir"  location="${wcs.resources.dir}/distribution"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
+    <property name="WCS.dir" location="/resources/WCS"/>
+    <property name="initialContent.dir" location="/1.1.2/initialContent"/>
+    <property name="WebInfResources.dir" location="/1.1.2/WEB-INF"/>
+    <property name="distributionResources.dir"  location="/1.1.2/distribution"/>
 
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.doc" location="${build.dir}/doc"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -192,39 +193,21 @@
     <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
 
     <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
-
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
-    <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
 
-    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
-
-
-    <property name="xalan.lib"         value="xalan.jar"/>
-    <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
-    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+    <property name="serializer.lib"    value="xalan-2.7.1-serializer.jar"/>
+    <property name="xalan.lib"         value="xalan-2.7.1-xalan.jar"/>
+    <property name="xercesImpl.lib"    value="xalan-2.7.1-xercesImpl.jar"/>
+    <property name="xercesXmlApis.lib" value="xalan-2.7.1-xml-apis.jar"/>
+    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
 
     <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
     <property name="catalina.lib"       value="catalina-6.0.14.jar"/>
-
-    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
-    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
-    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
-    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
-    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
-    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
-    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
-
-    <property name="owasp-encoder"     value="encoder-1.2.2.jar" />
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar" />
 
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
@@ -237,24 +220,14 @@
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
-
-            <include name="${owasp-encoder}"/>
-            <include name="${owasp-encoder-jsp}"/>
-
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
             <include name="${commons-cli.lib}"/>
             <include name="${commons-httpclient.lib}"/>
             <include name="${commons-logging.lib}"/>
             <include name="${commons-codec.lib}"/>
-            <include name="${commons-lang.lib}"/>
-
-
-            <include name="${http-components-httpclient.lib}"/>
-            <include name="${http-components-httpcore.lib}"/>
-
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
@@ -266,18 +239,7 @@
 
 	        <include name="${owlim.lib}"/>
             <include name="${openrdf-sesame.lib}"/>
-        </fileset>
 
-        <fileset dir="${wcs.lib.dir}">
-            <include name="${ogc-wcs.lib}" />
-            <include name="${ogc-gml.lib}" />
-            <include name="${ogc-swe.lib}" />
-            <include name="${ogc-gmlcov.lib}" />
-            <include name="${ogc-ows.lib}" />
-            <include name="${ogc-jaxb.lib}" />
-        	<include name="${jaxb-core.lib}" />
-        	<include name="${jaxb-impl.lib}" />
-        	<include name="${xlink.lib}" />
         </fileset>
     </path>
 
@@ -325,49 +287,10 @@
 
 
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
-                <!-- include all the WCS 2.0 java files -->
-                <include name="opendap/wcs/v2_0/**/*.java"/>
-                <include name="opendap/wcs/srs/**/*.java"/>
-
-                <!-- include name="opendap/semantics/**/*.java"/ -->
-                
-                <include name="opendap/bes/BESManager.java"/>
-                <include name="opendap/bes/BesGroup.java"/>
-                <include name="opendap/bes/CyclicGroup.java"/>
-                <include name="opendap/bes/BES.java"/>
-                <include name="opendap/bes/BESConfig.java"/>
-                <include name="opendap/bes/BesConfigurationModule.java"/>
-                <include name="opendap/bes/BesAdminFail.java"/>
-                <include name="opendap/bes/BESError.java"/>
-                <include name="opendap/bes/BadConfigurationException.java"/>
-                <include name="opendap/bes/BESChunkedInputStream.java"/>
-                <include name="opendap/bes/BESChunkedOutputStream.java"/>
-                <include name="opendap/bes/dap4Responders/MediaType.java"/>
-                <include name="opendap/bes/Version.java"/>
-                <include name="opendap/bes/BESResource.java"/>
-
-                <include name="opendap/bes/caching/BesCatalogCache.java"/>
-                <include name="opendap/bes/caching/CatalogCacheUpdater.java"/>
-
-
-                <include name="opendap/bes/dap2Responders/BesApi.java"/>
-                
-                <include name="opendap/io/ChunkProtocol.java"/>
-                <include name="opendap/io/ChunkedInputStream.java"/>
-                <include name="opendap/io/ChunkedOutputStream.java"/>
-                <include name="opendap/io/Chunk.java"/>
-                
-
-                <include name="opendap/ppt/PPTException.java"/>
-                <include name="opendap/ppt/OPeNDAPClient.java"/>
-                <include name="opendap/ppt/NewPPTClient.java"/>
-                <include name="opendap/ppt/PPTSessionProtocol.java"/>
-                <include name="opendap/ppt/PPTEndOfStreamException.java"/>
-
-                <!-- include DAP4 stuff -->
-                <exclude name="opendap/dap4/Dap4Service.java"/>
-                <include name="opendap/dap4/**/*.java" />
+            <fileset dir="/">
+                <!-- include all the java files -->
+                <include name="opendap/wcs/v1_1_2/**/*.java"/>
+                <include name="opendap/semantics/**/*.java"/>
 
                 <include name="opendap/coreServlet/DocServlet.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
@@ -378,37 +301,25 @@
                 <include name="opendap/coreServlet/OPeNDAPException.java"/>
                 <include name="opendap/coreServlet/OpendapHttpDispatchHandler.java"/>
                 <include name="opendap/coreServlet/DataSourceInfo.java"/>
-                <include name="opendap/coreServlet/PersistentConfigurationHandler.java"/>
+                <include name="opendap/coreServlet/PersistentContentHandler.java"/>
                 <include name="opendap/coreServlet/Debug.java"/>
                 <include name="opendap/coreServlet/RequestCache.java"/>
                 <include name="opendap/coreServlet/Util.java"/>
                 <include name="opendap/coreServlet/MimeTypes.java"/>
-                <include name="opendap/coreServlet/NoPostHandler.java"/>
-                <include name="opendap/coreServlet/LicenseManager.java"/>
-                <include name="opendap/coreServlet/ResourceInfo.java"/>
 
                 <include name="opendap/dap/Request.java"/>
 
                 <include name="opendap/namespaces/**/*.java"/>
                 <include name="opendap/logging/**/*.java"/>
                 <include name="opendap/xml/**/*.java"/>
-                <include name="opendap/http/**/*.java"/>
-                
                 <include name="opendap/threddsHandler/ThreddsCatalogUtil.java"/>
-
-
-                <include name="opendap/io/HyraxStringEncoding.java"/>
-                <include name="opendap/PathBuilder.java"/>
-
-
-
 
             </fileset>
 
         </copy>
 
         <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${wcs.resources.dir}">
+            <fileset dir="/resources/WCS">
                 <!-- include all the java files -->
                 <include name="**"/>
 
@@ -422,9 +333,9 @@
     <target
             name="compile"
             depends="PreProcessSourceCode"
-            description="Compiles the Web Coverage Service 2.0 software."
+            description="Compiles the OLFS."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling WCS-2.0"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -438,6 +349,34 @@
             <classpath refid="compile.classpath"/>
 
             <src path="${build.src}"/>
+
+        </javac>
+
+    </target>
+
+
+    <target
+            name="compile_old"
+            depends="init"
+            description="Compiles the Web Coverage Service."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <compilerarg value="-Xlint:unchecked"/>
+            <classpath refid="compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/wcs/v1_1_2/**/*.java"/>
+            <include name="opendap/semantics/**/*.java"/>
+            <include name="opendap/coreServlet/DocServlet.java"/>
 
         </javac>
 
@@ -458,7 +397,7 @@
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="wcs-${WCS_SOFTWARE_VERSION}-src">
+            <zipfileset dir=".." prefix="wcs-${WCS_SOFTWARE_VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <exclude name="doc/admin/**"/>
@@ -501,38 +440,38 @@
     <target
             name="DISTRO"
             depends="clean,src-dist,server-dist"
-            description="Builds complete WCS-2.0 distribution"
+            description="Builds complete distribution"
             >
+
     </target>
+
+
+
+
 
     <target
             name="server"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
+
+
         <echo level="info" message="Building WCS server war file."/>
-        <echo level="info" message="WCS-Resources.dir: ${wcs.resources.dir}"/>
+        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
 
-        <war destfile="${build.dist}/WCS-2.0.war"
-             webxml="${wcs.resources.dir}/WEB-INF/web.xml"
+
+        <war destfile="${build.dist}/WCS.war"
+             webxml="/1.1.2/WEB-INF/web.xml"
                 >
 
-            <lib dir="${lib.dir}">
-
-                <include name="${owasp-encoder}"/>
-                <include name="${owasp-encoder-jsp}"/>
-
+            <lib dir="/lib">
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
                 <include name="${commons-cli.lib}"/>
                 <include name="${commons-httpclient.lib}"/>
                 <include name="${commons-logging.lib}"/>
                 <include name="${commons-codec.lib}"/>
-
-                <include name="${http-components-httpclient.lib}"/>
-                <include name="${http-components-httpcore.lib}"/>
-
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
                 <include name="${saxon-jdom.lib}"/>
@@ -545,23 +484,11 @@
 
 	            <include name="${owlim.lib}"/>
                 <include name="${openrdf-sesame.lib}"/>
-            </lib>
 
-            <lib dir="${wcs.lib.dir}">
-                <include name="${ogc-wcs.lib}"/>
-                <include name="${ogc-gml.lib}"/>
-                <include name="${ogc-swe.lib}"/>
-                <include name="${ogc-gmlcov.lib}"/>
-                <include name="${ogc-ows.lib}"/>
-                <include name="${ogc-jaxb.lib}"/>
-                <include name="${jaxb-core.lib}"/>
-                <include name="${jaxb-impl.lib}"/>
-                <include name="${xlink.lib}"/>
             </lib>
-            
             <classes dir="${build.classes}"/>
 
-            <zipfileset dir="${doc.dir}" prefix="docs" >
+            <zipfileset dir="/../../doc" prefix="docs" >
                 <exclude name="src.distribution.readme"/>
                 <exclude name="admin/**"/>
                 <exclude name="_notes"/>
@@ -611,122 +538,82 @@
 
 
 
-    <target  name="WcsMarshaller" depends="compile">
+    <!-- *******************************************************
 
-        <java classname="opendap.wcs.v2_0.WcsMarshaller"
+            Semantic Web targets
+
+    -->
+
+    <target  name="test" depends="compile">
+
+        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
+        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
+        <copy file="${build.resources}/WEB-INF/logback-test.xml"  tofile="${build.run}/logback-test.xml"/>
+
+        <java classname="opendap.semantics.wcs.StaticRdfCatalog"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
-        >
-            <classpath refid="compile.classpath" />
+                >
+            <classpath refid="compile.classpath"/>
+            <arg value="${CONFIG_FILE}"/>
         </java>
 
     </target>
-
-
-    <target  name="DynamicCoverageDescription" depends="compile">
-
-        <java classname="opendap.wcs.v2_0.DynamicCoverageDescription"
-              fork="true"
-              maxmemory="1024m"
-              dir="${build.run}"
-        >
-            <classpath refid="compile.classpath" />
-        </java>
-
-    </target>
-
-
-    <target name="merra2wcs" depends="clean,init">
-    	
-    	<!-- 
-    	      templates.dir is the where we keep the complete WCS coverage description 
-    	      for MERRA2 with replacment tokens for where file specific information 
-    	      (such as filename) should be
-    	      
-    	      IMPORTANT: The File 00 and LFC.xml should be in this directory BEFORE 
-    	      running this target
-
-    	 -->
-        <property name="templates.dir"       value="resources/WCS/2.0/templates"/>
-        
- 
-    	<!-- 
-    	     lfc.build.dir is directory WITHIN olfs.dir for the Local File Catalog (LFC) to 
-    	     which we will copying the 00 file seven times and also the LFC.xml 
-    	-->
-    	
-        <property name="lfc.build.dir" value="${build.dir}/wcs"/>
-    	
-    	<!-- filenames (TOKEN replacement values in the 00 file) -->
-    	<property name="collection.name" value="MERRA2_400.tavgM_2d_int_Nx" />
-    	<property name="file.00.name"   value="${collection.name}.201600.nc4"/><!-- This is the file 00 with tokens -->
-        <property name="file.01.name"   value="${collection.name}.201601.nc4"/>
-        <property name="file.02.name"   value="${collection.name}.201602.nc4"/>
-        <property name="file.03.name"   value="${collection.name}.201603.nc4"/>
-        <property name="file.04.name"   value="${collection.name}.201604.nc4"/>
-        <property name="file.05.name"   value="${collection.name}.201605.nc4"/>
-        <property name="file.06.name"   value="${collection.name}.201606.nc4"/>
-        <property name="file.07.name"   value="${collection.name}.201607.nc4"/>
-        
-    
-	    <!-- first delete, then create the destination LFC folder -->	
-	    <delete dir="${lfc.build.dir}"/>
-    	<mkdir  dir="${lfc.build.dir}"/>
-    	
-    	<copy file="${templates.dir}/LFC.xml" todir="${lfc.build.dir}" />
-	    
-	    <!-- copy file 00 from src into the respective seven files in the actual LFC -->
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.01.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.02.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.03.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.04.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.05.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.06.name}.xml" />
-	    <copy file="${templates.dir}/${collection.name}.xml" tofile="${lfc.build.dir}/${file.07.name}.xml" />
-	    
-	    <!-- now replace tokens -->
-	    <replace file="${lfc.build.dir}/${file.01.name}.xml" token="@MERRA2DATASET@" value="${file.01.name}" />
-	    <replace file="${lfc.build.dir}/${file.02.name}.xml" token="@MERRA2DATASET@" value="${file.02.name}" />
-	    <replace file="${lfc.build.dir}/${file.03.name}.xml" token="@MERRA2DATASET@" value="${file.03.name}" />
-	    <replace file="${lfc.build.dir}/${file.04.name}.xml" token="@MERRA2DATASET@" value="${file.04.name}" />
-	    <replace file="${lfc.build.dir}/${file.05.name}.xml" token="@MERRA2DATASET@" value="${file.05.name}" />
-	    <replace file="${lfc.build.dir}/${file.06.name}.xml" token="@MERRA2DATASET@" value="${file.06.name}" />
-	    <replace file="${lfc.build.dir}/${file.07.name}.xml" token="@MERRA2DATASET@" value="${file.07.name}" />
-    	
-    </target>
-
-
-
-
-
-
 
     <!-- *******************************************************  -->
 
 
+    <target name="fortify" if="fortify.present">
+        <typedef name="sourceanalyzer"
+                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
 
-    <!--
-    <target name="check"
-            description="Run Unit Tests"
-            depends="compile"
-    >
 
-        <junit
-                showoutput="yes"
-                haltonfailure="yes"
-                printsummary="yes">
-            
-            <formatter type="plain" usefile="false"/>
-            <classpath refid="compile.classpath"/>
+        <!-- call clean to ensure that all source files are recompiled -->
+        <antcall target="clean"/>
 
-            <test name="opendap.dap4.DatasetTest" />
-            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
 
-        </junit>
+
+        <!-- call the compile target using the SCA Compiler Adapter to -->
+        <!-- translate all source files -->
+        <antcall target="compile">
+            <param name="build.compiler"
+                   value="com.fortify.dev.ant.SCACompiler"/>
+        </antcall>
+
+
+        <!-- capture all configuration files in the WEB-INF directory -->
+        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                       >
+            <fileset dir="${WebInfResources.dir}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </sourceanalyzer>
+
+
+
+        <!-- run analysis -->
+        <echo>sourceanalyzer scan</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                        scan="true"
+                        resultsfile="${build.dir}/issues.fpr"
+                        rules="${rules.dir}/OlfsRulePack.xml"
+                >
+        </sourceanalyzer>
     </target>
 
-    -->
+
+
+
+
+
+
+
+
+
+
 
 
 </project>

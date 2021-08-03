@@ -28,7 +28,9 @@
 
 <!-- Build file for the REAP THREDDS/DDX/EML Crawler and related software -->
 
-<project name="REAP Crawlers" default="all" basedir=".">
+<project name="REAP Crawlers" default="all" basedir="..">
+
+	<description>Runs the various REAP crawlers.</description>
 
 	<!-- Compiler Settings -->
 
@@ -120,11 +122,11 @@
 	<!-- ................................................................. -->
 
 	<!-- Project directories -->
-	<property name="src.dir" location="src" />
-	<property name="doc.dir" location="doc" />
-	<property name="lib.dir" location="lib" />
+	<property name="src.dir" location="../src" />
+	<property name="doc.dir" location="../doc" />
+	<property name="lib.dir" location="../lib" />
 
-	<property name="resources.dir" location="resources" />
+	<property name="resources.dir" location="../resources" />
 	<property name="initialContent.dir" location="/initialContent" />
 	<property name="WebInfResources.dir" location="/resources/hyrax/WEB-INF" />
 	<property name="distributionResources.dir" location="${resources.dir}/distribution" />
@@ -132,7 +134,7 @@
 	<property name="THREDDSResources.dir" location="${resources.dir}/THREDDS" />
 
 	<!-- Build Directories -->
-	<property name="build.dir" location="build" />
+	<property name="build.dir" location="../build" />
 	<property name="build.classes" location="${build.dir}/classes" />
 	<property name="build.doc" location="${build.dir}/doc" />
 	<property name="build.dist" location="${build.dir}/dist" />
@@ -179,7 +181,7 @@
 
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
-		<fileset dir="${lib.dir}">
+		<fileset dir="/lib">
 			<include name="${slf4j.lib}" />
 			<include name="${logback-core.lib}" />
 			<include name="${logback-classic.lib}" />
@@ -215,7 +217,7 @@
 		</mapper>
 		<path>
 			<!-- lib.home contains all jar files -->
-			<fileset dir="${lib.dir}">
+			<fileset dir="/lib">
 				<include name="${slf4j.lib}" />
 				<include name="${logback-core.lib}" />
 				<include name="${logback-classic.lib}" />
@@ -244,7 +246,7 @@
 		</mapper>
 		<path>
 			<!-- lib.home contains all jar files -->
-			<fileset dir="${lib.dir}">
+			<fileset dir="/lib">
                 <include name="${slf4j.lib}" />
                 <include name="${logback-core.lib}" />
                 <include name="${logback-classic.lib}" />
@@ -281,7 +283,7 @@
 		</mapper>
 		<path>
 			<!-- lib.home contains all jar files -->
-			<fileset dir="${lib.dir}">
+			<fileset dir="/lib">
 				<include name="${slf4j.lib}" />
 				<include name="${logback-core.lib}" />
 				<include name="${logback-classic.lib}" />
@@ -349,15 +351,15 @@
 		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
 		<copy file="${resources.dir}/metacat/ddx_crawler.sh" todir="${build.run}/" />
 
-		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+		<copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+		<copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+		<copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5.jar" todir="${build.lib}/" />
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
@@ -399,15 +401,15 @@
 		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
 		<copy file="${resources.dir}/metacat/print_cached_urls.sh" todir="${build.run}/" />
 
-		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+		<copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+		<copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+		<copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5.jar" todir="${build.lib}/" />
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
@@ -431,15 +433,15 @@
 		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
 		<copy file="${resources.dir}/metacat/ddx_retriever.sh" todir="${build.run}/" />
 
-		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+		<copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+		<copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
 		<copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+		<copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/" />
+		<copy file="/lib/saxon-9.1.0.5.jar" todir="${build.lib}/" />
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
@@ -465,12 +467,12 @@
         <copy file="${resources.dir}/metacat/logback.xml" todir="${build.libexec}/" />
         <copy file="${resources.dir}/metacat/url_classifier.sh" todir="${build.run}/" />
 
-        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+        <copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
 
         <copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
@@ -498,21 +500,21 @@
     	<copy file="${resources.dir}/metacat/ddx2eml-3.2.xsl" todir="${build.run}/" />
         <copy file="${resources.dir}/metacat/many_ddx2eml-1.0.xsl" todir="${build.run}/" />
     	
-        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+        <copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
 
-        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5.jar" todir="${build.lib}/" />
 
     	<copy file="${lib.dir}/${metacat-client.lib}" todir="${build.lib}/" />
     	<copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/" />
     	<copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/" />
-    	<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/" />
+    	<copy file="/lib/servlet-api-3.0.jar" todir="${build.lib}/" />
     	<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/" />
     	<copy file="${lib.dir}/${xalan.lib}" todir="${build.lib}/" />
 
@@ -541,16 +543,16 @@
         <copy file="${resources.dir}/metacat/ncml_writer.sh" todir="${build.run}/" />
         <copy file="${resources.dir}/metacat/many_ddx2ncml-1.0.xsl" todir="${build.run}/" />
         
-        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="/lib/jdom-1.1.1.jar" todir="${build.lib}/" />
         <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+        <copy file="/lib/apache-commons-httpclient-3.1.jar" todir="${build.lib}/" />
 
-        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/" />
+        <copy file="/lib/saxon-9.1.0.5.jar" todir="${build.lib}/" />
 
         <copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
