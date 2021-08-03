@@ -205,7 +205,9 @@
 
     <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
 
-    <!-- Libraries -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      Libraries
+    -->
     <property name="json.lib" value="gson-2.3.1.jar"/>
 
 
@@ -403,17 +405,7 @@
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
-
                 <exclude name="opendap/cmr/**"/>
-
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the auth code  -->
-                <!-- exclude name="opendap/auth/**"/ -->
-
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
 
                 <!-- Exclude WCS 1.1.2 and semantics code  -->
                 <exclude name="opendap/wcs/v1_1_2/**"/>
@@ -421,7 +413,6 @@
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
                 <exclude name="opendap/aws/**"/>
-                <exclude name="opendap/noaa_s3/**"/>
 
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
