@@ -32,6 +32,13 @@
         name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
         default="all" basedir="."
         xmlns:sonar="antlib:org.sonar.ant" >
+    <description>
+        Builds the OLFS service as a WAR file which can be deployed (in
+        Tomcat) alongside a BES deployment.
+        Builds the NGAP service as a WAR file which can be deployed (in
+        Tomcat) alongside a BES deployment.
+    </description>
+
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -263,6 +270,9 @@
 
 
 
+    <!--
+        These are the library jars used by Hyrax.
+    -->
     <fileset id="hyrax-libs" dir="${lib.dir}">
         <include name="${owasp-encoder.lib}"/>
         <include name="${owasp-encoder-jsp.lib}"/>
@@ -306,7 +316,7 @@
     </fileset>
 
 
-    <!-- Library (class)paths -->
+    <!-- Library compile (class)paths -->
     <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}"/>
         <!--
@@ -322,13 +332,8 @@
     </path>
 
 
-    <target name="all" depends="clean,clients,check,server"
+    <target name="all" depends="clean,check,server"
             description="Builds lots of stuff."/>
-
-
-    <target name="clients" depends="BESclient"
-            description="Compiles the clients."/>
-
 
     <target name="clean" description="Clean up ALL build products.">
         <delete dir="${build.dir}"/>
@@ -480,41 +485,6 @@
     </target>
 
 
-    <target
-            name="olfs-experiments"
-            depends="init"
-            description="Compiles the experimental code."
-    >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-
-
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <classpath refid="olfs.compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/**/*.java"/>
-            <include name="hao/**/*.java"/>
-
-        </javac>
-
-    </target>
-
-
-    <target name="olfs-lib" depends="clean,compile">
-
-        <jar destfile="${build.lib}/${OLFS_LIB}.jar">
-            <fileset dir="${build.classes}"/>
-        </jar>
-
-    </target>
 
 
 
@@ -600,32 +570,13 @@
 
     </target>
 
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="BESclient"
-            depends="olfs-lib"
-            description="Build and package the back end client."
-    >
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
-
-        <jar destfile="${build.dist}/beclient.jar"
-             manifest="resources/META-INF/BESclient.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ppt/**/*.class"/>
-            </fileset>
-        </jar>
-
-
-    </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="hexEncoderApp"
             depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
+            description="Builds executable jar file of the hex encoder application">
 
 
         <mkdir dir="${build.dist}/hexEncoder"/>
@@ -650,47 +601,13 @@
 
     </target>
 
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="NcmlDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the NcML Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ncml/DispatchHandler.class"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="GatewayDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the Gateway Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
-            <fileset dir=".">
-                <include name="resources/gateway/**"/>
-            </fileset>
-            <fileset dir="${build.classes}">
-                <include name="opendap/gateway/**"/>
-            </fileset>
-        </jar>
-
-    </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="validatorApp"
             depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
+            description="Builds executable jar file for the simple XML Validator">
 
         <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
         <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>

@@ -30,7 +30,7 @@
 
 <project
         name="Hyrax robots.txt service"
-        default="all" basedir=".">
+        default="all" basedir="..">
 
     <description>Builds Hyrax robots.txt service WAR file.</description>
 
@@ -172,15 +172,15 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources"/>
-    <property name="robots_service.dir" location="${resources.dir}/robots"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
+    <property name="robots_service.dir" location="/resources/robots"/>
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.docs" location="${build.dir}/docs"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -253,7 +253,7 @@
     <!-- Library (class)paths -->
     <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
             <include name="${owasp-encoder}"/>
             <include name="${owasp-encoder-jsp}"/>
@@ -359,7 +359,7 @@
 
 
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
                 <!-- include all the java files -->
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
@@ -381,7 +381,7 @@
 
         <copy todir="${build.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
-            <fileset dir="${robots_service.dir}"/>
+            <fileset dir="/resources/robots"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
 
         </copy>
@@ -426,7 +426,7 @@
     >
         <uptodate property="JavaDocIsUpToDate"
                   targetfile="${build.docs}/opendap/index.html">
-            <srcfiles dir="${src.dir}">
+            <srcfiles dir="/">
                 <include name="opendap/**/*.java"/>
                 <include name="org/opendap/**/*.java"/>
             </srcfiles>
@@ -450,7 +450,7 @@
              webxml="${build.resources}/WEB-INF/web.xml"
         >
 
-            <lib dir="${lib.dir}">
+            <lib dir="/lib">
                 <include name="${owasp-encoder}"/>
                 <include name="${owasp-encoder-jsp}"/>
 
@@ -491,7 +491,7 @@
             </zipfileset>
 
 
-            <zipfileset dir="${doc.dir}" prefix="docs">
+            <zipfileset dir="/../../doc" prefix="docs">
                 <exclude name="src.distribution.readme"/>
             </zipfileset>
 
