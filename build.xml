@@ -33,10 +33,14 @@
         default="all" basedir="."
         xmlns:sonar="antlib:org.sonar.ant" >
     <description>
-        Builds the OLFS service as a WAR file which can be deployed (in
-        Tomcat) alongside a BES deployment.
-        Builds the NGAP service as a WAR file which can be deployed (in
-        Tomcat) alongside a BES deployment.
+        Builds:
+        - The OLFS/Hyrax service
+        - THe NGAP/Hyrax service
+        - The robots.txt service
+        as a WAR files.
+        Also builds:
+        - The hex Encoder/Decoder application as an executable jar file.
+        - The XML Validator application as an executable  jar file.
     </description>
 
 
