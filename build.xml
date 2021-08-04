@@ -25,22 +25,20 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-
-<!-- Build file for OPeNDAP core software -->
-
 <project
         name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
         default="all" basedir="."
         xmlns:sonar="antlib:org.sonar.ant" >
     <description>
-        Builds:
-        - The OLFS/Hyrax service
-        - THe NGAP/Hyrax service
-        - The robots.txt service
-        as a WAR files.
+        Compiles the OLFS project software and, depending on the chosen target,
+        can produce a Web Application aRchive (WAR) file for each of:
+        - The OLFS/Hyrax service build targets(s): server
+        - The NGAP/Hyrax service, build targets(s): ngap
+        - The robots.txt service, build targets(s): robots, hyrax-robots
+
         Also builds:
         - The hex Encoder/Decoder application as an executable jar file.
-        - The XML Validator application as an executable  jar file.
+        - The XML Validator application as an executable jar file.
     </description>
 
 
@@ -56,24 +54,22 @@
     <!-- ".."                                          -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Version Tag: Used for doing distribution builds.
-         This property should be set from the command
-         line by the distribution build script using
-         tag information from CVS.
+    <!-- Version Tags: Used for doing distribution builds.
+         These properties should be set from the command
+         line when running the DISTRO build target.
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
     <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
+    <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${OLFS_VERSION}"/>
+    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
     <property name="OLFS_LIB" value="${OLFS_DIST_BASE}"/>
-
 
     <!-- Compiler Settings -->
 
@@ -142,10 +138,15 @@
 
     <target name="show" description="Show build settings.">
 
+        <echo level="info" message="##########################################################"/>
+        <echo level="info" message="# Build Settings"/>
+        <echo level="info" message="#"/>
         <echo level="info" message="           Project Name: ${ant.project.name}"/>
         <echo level="info" message="           Project File: ${ant.file}"/>
         <echo level="info" message="          Hyrax Version: ${HYRAX_VERSION}"/>
         <echo level="info" message="           OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="           NGAP Version: ${NGAP_VERSION}"/>
+        <echo level="info" message="            WCS Version: ${WCS_VERSION}"/>
         <echo level="info" message="     Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
@@ -156,27 +157,27 @@
         <echo level="info" message="          resources.dir: ${resources.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:         ${build.dir}"/>
-        <echo level="info" message="    build.classes:     ${build.classes}"/>
-        <echo level="info" message="    build.doc:         ${build.docs}"/>
-        <echo level="info" message="    build.resources:   ${build.hyrax.resources}"/>
+        <echo level="info" message="              build.dir: ${build.dir}"/>
+        <echo level="info" message="          build.classes: ${build.classes}"/>
+        <echo level="info" message="              build.doc: ${build.docs}"/>
+        <echo level="info" message="        build.resources: ${build.hyrax.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="    ant.file:          ${ant.file}"/>
-        <echo level="info" message="    ant.home:          ${ant.home}"/>
-        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
-        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
-        <echo level="info" message="    ant.version:       ${ant.version}"/>
-        <echo level="info" message="    basedir:           ${basedir}"/>
-        <echo level="info" message="    user.name:         ${user.name}"/>
-        <echo level="info" message="    user.home:         ${user.home}"/>
-        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message="               ant.file: ${ant.file}"/>
+        <echo level="info" message="               ant.home: ${ant.home}"/>
+        <echo level="info" message="       ant.java.version: ${ant.java.version}"/>
+        <echo level="info" message="       ant.project.name: ${ant.project.name}"/>
+        <echo level="info" message="            ant.version: ${ant.version}"/>
+        <echo level="info" message="                basedir: ${basedir}"/>
+        <echo level="info" message="              user.name: ${user.name}"/>
+        <echo level="info" message="              user.home: ${user.home}"/>
+        <echo level="info" message="              java.home: ${java.home}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="    WEBAPP_DIST:       ${WEBAPP_DIST}"/>
-        <echo level="info" message="    SRC_DIST:          ${SRC_DIST}"/>
-        <echo level="info" message="    DOC_DIST:          ${DOC_DIST}"/>
-        <echo level="info" message="    OLFS_LIB:          ${OLFS_LIB}"/>
+        <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
+        <echo level="info" message="               SRC_DIST: ${SRC_DIST}"/>
+        <echo level="info" message="               DOC_DIST: ${DOC_DIST}"/>
+        <echo level="info" message="               OLFS_LIB: ${OLFS_LIB}"/>
         <echo level="info" message=""/>
 
     </target>
