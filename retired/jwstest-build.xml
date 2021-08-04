@@ -30,7 +30,13 @@
 
 <project
         name="Java WebStart Test"
-        default="all" basedir=".">
+        default="all" basedir="..">
+
+    <description>Runs opendap.experiments.JwsTest</description>
+
+
+
+
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -113,17 +119,17 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
     <property name="initialContent.dir" location="/initialContent"/>
     <property name="WebInfResources.dir" location="/resources/hyrax/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.doc" location="${build.dir}/doc"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -150,7 +156,7 @@
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
 
             <include name="${slf4j.lib}"/>
             <include name="${logback-core.lib}"/>
@@ -231,7 +237,7 @@
     <target name="dist" depends="compile">
 
         <jar destfile="${build.dist}/resources.jar">
-            <fileset dir="${doc.dir}">
+            <fileset dir="/../../doc">
                 <include name="images/logo.gif"/>
             </fileset>
         </jar>
@@ -243,7 +249,7 @@
         </jar>
 
 
-        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.dist}" />
+        <copy file="/lib/slf4j-api-1.6.1.jar" todir="${build.dist}" />
         <copy file="${lib.dir}/${logback-core.lib}" todir="${build.dist}" />
         <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.dist}" />
 
@@ -273,7 +279,7 @@
 
 
 
-        <copy file="${resources.dir}/experiments/jwstest.jnlp" toDir="${build.webstart}" overwrite="true"/>
+        <copy file="/resources/experiments/jwstest.jnlp" toDir="${build.webstart}" overwrite="true"/>
 
         <signjar alias="jwstest" jar="${build.dist}/jwstest.jar" keystore="${keystore}"
             signedjar="${build.webstart}/jwstest.jar" storepass="${keystore.password}"/>
@@ -281,8 +287,8 @@
         <signjar alias="jwstest" jar="${build.dist}/resources.jar" keystore="${keystore}"
             signedjar="${build.webstart}/resources.jar" storepass="${keystore.password}"/>
 
-        <signjar alias="jwstest" jar="${lib.dir}/${slf4j.lib}" keystore="${keystore}"
-            signedjar="${build.webstart}/slf4j.jar" storepass="${keystore.password}"/>
+        <signjar alias="jwstest" jar="/lib/slf4j-api-1.6.1.jar" keystore="${keystore}"
+                 signedjar="${build.webstart}/slf4j.jar" storepass="${keystore.password}"/>
         <signjar alias="jwstest" jar="${lib.dir}/${logback-core.lib}" keystore="${keystore}"
             signedjar="${build.webstart}/logback-core.jar" storepass="${keystore.password}"/>
         <signjar alias="jwstest" jar="${lib.dir}/${logback-classic.lib}" keystore="${keystore}"

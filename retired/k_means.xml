@@ -28,8 +28,9 @@
 
 <!-- Build file for the REAP THREDDS/DDX/EML Crawler and related software -->
 
-<project name="Cluster Example" default="all" basedir=".">
+<project name="KMeans" default="all" basedir="..">
 
+	<description>Metacat KMeans Builder</description>
 	<!-- Compiler Settings -->
 
 	<property name="compile.debug" value="on"/>
@@ -120,14 +121,14 @@
 	<!-- ................................................................. -->
 
 	<!-- Project directories -->
-	<property name="src.dir" location="src"/>
-	<property name="doc.dir" location="doc"/>
-	<property name="lib.dir" location="lib"/>
+	<property name="src.dir" location="../src"/>
+	<property name="doc.dir" location="../doc"/>
+	<property name="lib.dir" location="../lib"/>
 
-	<property name="resources.dir" location="resources"/>
+	<property name="resources.dir" location="../resources"/>
 
 	<!-- Build Directories -->
-	<property name="build.dir" location="build"/>
+	<property name="build.dir" location="../build"/>
 	<property name="build.classes" location="${build.dir}/classes"/>
 	<property name="build.doc" location="${build.dir}/doc"/>
 	<property name="build.dist" location="${build.dir}/dist"/>
@@ -136,12 +137,102 @@
 	<property name="build.libexec" location="${build.dir}/libexec"/>
 
 	<!-- Libraries -->
+    <property name="junit.lib"   value="junit-4.4.jar"/>
+    <property name="jdom.lib"    value="jdom-1.1.1.jar"/>
+    <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
+    <property name="echo.lib"    value="echosoap.jar"/>
+
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+
+    <property name="owlim.lib"            value="owlim-3.0.beta9.jar"/>
+    <property name="trree.lib"            value="trree-3.0.beta9.jar"/>
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.0-onejar.jar" />
+
+    <property name="commons-cli.lib"        value="commons-cli-1.2.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+
+    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
+    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+
+    <property name="catalina.lib"    value="catalina-6.0.14.jar"/>
+
+    <!-- Used for metacat -->
+    <property name="metacat.lib" value="metacat-client.jar"/>
+    <property name="nceas-utilities.lib" value="nceas-utilities.jar"/>
+    <property name="httpclient.lib" value="httpclient.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
+    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <property name="xalan.lib" value="xalan.jar"/>
+
+    <property name="postgres-jdbc.lib" value="postgresql-8.4-701.jdbc4.jar"/>
 
 	<!-- ******************************************** -->
 
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
+        <fileset dir="/lib">
+            <include name="${slf4j.lib}" />
+            <include name="${logback-core.lib}" />
+            <include name="${logback-classic.lib}" />
+            <include name="${jdom.lib}" />
+            <include name="${commons-cli.lib}" />
+            <include name="${commons-httpclient.lib}" />
+            <include name="${saxon-jdom.lib}" />
+            <include name="${saxon-s9api.lib}" />
+            <include name="${saxon.lib}" />
+
+            <!-- Used for metacat -->
+            <include name="${metacat.lib}" />
+            <include name="${nceas-utilities.lib}"/>
+            <include name="${httpclient.lib}" />
+            <include name="${servlet-api.lib}"/>
+            <include name="${catalina.lib}"/>
+            <include name="${xalan.lib}"/>
+
+            <include name="${postgres-jdbc.lib}"/>
+        </fileset>
 	</path>
+
+    <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+    <pathconvert property="crawlers_libs.jar" pathsep=" ">
+        <mapper>
+            <chainedmapper>
+                <!-- remove absolute path -->
+                <flattenmapper />
+                <!-- add lib/ prefix -->
+                <globmapper from="*" to="../lib/*" />
+            </chainedmapper>
+        </mapper>
+        <path>
+            <!-- lib.home contains all jar files -->
+            <fileset dir="/lib">
+                <include name="${slf4j.lib}" />
+                <include name="${logback-core.lib}" />
+                <include name="${logback-classic.lib}" />
+                <include name="${jdom.lib}" />
+                <include name="${commons-cli.lib}" />
+                <include name="${commons-httpclient.lib}" />
+                <include name="${saxon-jdom.lib}" />
+                <include name="${saxon-s9api.lib}" />
+                <include name="${saxon.lib}" />
+
+                <!-- Used for metacat -->
+                <include name="${metacat.lib}" />
+                <include name="${nceas-utilities.lib}" />
+                <include name="${httpclient.lib}" />
+                <include name="${servlet-api.lib}" />
+                <include name="${catalina.lib}" />
+                <include name="${xalan.lib}" />
+
+                <include name="${postgres-jdbc.lib}" />
+            </fileset>
+        </path>
+    </pathconvert>
 
 	<target name="all" depends="clean,compile" description="Builds lots of stuff." />
 
@@ -182,7 +273,7 @@
 			<classpath refid="classpath"/>
 
 			<src path="${src.dir}"/>
-			<include name="opendap/metacat/cluster_example/*.java"/>
+			<include name="opendap/metacat/k_means/*.java"/>
 		</javac>
 	</target>
 
@@ -199,7 +290,7 @@
 		<jar destfile="${build.libexec}/Cluster.jar">
 
 			<fileset dir="${build.classes}">
-				<include name="opendap/metacat/cluster_example/*.class" />
+				<include name="opendap/metacat/k_means/*.class" />
 			</fileset>
 			<!-- This adds the file to the jar at the top level. Using fileset
                  dir="..." and an <include .../> element adds the directory
@@ -209,7 +300,7 @@
 			<!-- define MANIFEST.MF -->
 			<manifest>
 				<attribute name="Built-By" value="ant" />
-				<attribute name="Main-Class" value="opendap.metacat.cluster_example.PrgMain" />
+				<attribute name="Main-Class" value="opendap.metacat.k_means.PrgMain" />
 				<!-- finally, use the magically generated libs path -->
 				<attribute name="Class-Path" value="" />
 			</manifest>
@@ -219,9 +310,10 @@
 
 	<!-- ******************************************************* -->
 
-	<target name="TestJCA" depends="compile">
+	<target name="TestKMeans" depends="compile">
 
-		<java classname="opendap.metacat.cluster_example.PrgMain" fork="true" dir="${build.run}">
+		<java classname="opendap.metacat.k_means.KMeans" fork="true" dir="${build.run}">
+			<arg line="test.opendap.org"/>
 			<classpath refid="classpath" />
 		</java>
 

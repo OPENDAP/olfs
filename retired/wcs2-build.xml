@@ -29,8 +29,11 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="Glacier Access Service"
-        default="all" basedir=".">
+        name="Web Coverage Service 2.0"
+        default="all" basedir="..">
+    <description>
+        Builds the WCS-2.0 service as a "standalone" war file that can be run without the OLFS.
+    </description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -47,11 +50,8 @@
          line by the distribution build script using
          tag information from CVS.
     -->
-    <property name="GLACIER_SERVICE_SOFTWARE_VERSION" value="Not.A.Release"/>
-    <property name="HYRAX_VERSION" value="Not.A.Release"/>
-    <!-- property name="CONFIG_FILE" value="ConfigFileNotSpecified"/ -->
-
-    <property name="DEPLOYMENT_CONTEXT" value="glacier"/>
+    <property name="WCS_SOFTWARE_VERSION" value="Not.A.Release"/>
+    <property name="CONFIG_FILE" value="ConfigFileNotSpecified"/>
 
 
     <!-- Compiler Settings -->
@@ -121,14 +121,13 @@
 
         <echo level="info" message="Project Name:         ${ant.project.name}"/>
         <echo level="info" message="Project File:         ${ant.file}"/>
-        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
+        <echo level="info" message="WCS_SOFTWARE_VERSION: ${WCS_SOFTWARE_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:       ${src.dir}"/>
         <echo level="info" message="    doc.dir:       ${doc.dir}"/>
         <echo level="info" message="    lib.dir:       ${lib.dir}"/>
-        <echo level="info" message="    resources.dir: ${glacier.resources}"/>
+        <echo level="info" message="    resources.dir: ${resources.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
         <echo level="info" message="    build.dir:      ${build.dir}"/>
@@ -157,17 +156,18 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="aws.resources" location="resources/experiments/AWS"/>
-    <property name="glacier.resources" location="${aws.resources}/Glacier"/>
-    <property name="hyrax.resources"   location="resources/hyrax"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
+    <property name="wcs.resources.dir" location="/resources/WCS/2.0"/>
+    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
+    <property name="distributionResources.dir"  location="/resources/WCS/2.0/distribution"/>
 
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.doc" location="${build.dir}/doc"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -180,7 +180,8 @@
     <!-- Libraries -->
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
+    <property name="echo.lib"        value="echosoap.jar"/>
 
 
     <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
@@ -191,23 +192,39 @@
     <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
 
     <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
     <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
     <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
+
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
     <property name="commons-io.lib"         value="apache-commons-io-2.4.jar"/>
+
+    <property name="http-components-httpclient.lib"       value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib"         value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
+
 
     <property name="xalan.lib"         value="xalan.jar"/>
     <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
-    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
 
     <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-3.0.jar"/>
+    <property name="catalina.lib"       value="catalina-6.0.14.jar"/>
+
+    <property name="ogc-wcs.lib"      value="wcs-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gml.lib"      value="gml-v_3_2_1-2.6.1.jar"/>
+    <property name="ogc-swe.lib"      value="sweCommon-v_2_0-2.6.1.jar"/>
+    <property name="ogc-gmlcov.lib"   value="gmlcov-v_1_0-2.6.1.jar"/>
+    <property name="ogc-ows.lib"      value="ows-v_2_0-2.6.1.jar"/>
+    <property name="ogc-jaxb.lib"     value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-core.lib"    value="jaxb-core-2.3.0-b170127.1453.jar"/>
+    <property name="jaxb-impl.lib"    value="jaxb-impl-2.3.0-b170127.1453.jar"/>
+    <property name="xlink.lib"        value="xlink-v_1_0-1.4.0.jar"/>
+
+    <property name="owasp-encoder"     value="encoder-1.2.2.jar" />
+    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar" />
 
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
@@ -220,41 +237,48 @@
     <!-- Library (class)paths -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
-            <include name="${catalina.lib}"/>
+
+            <include name="${owasp-encoder}"/>
+            <include name="${owasp-encoder-jsp}"/>
 
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
-            <include name="${urlRewrite.lib}"/>
-
-            <!-- Apache Commons tools -->
             <include name="${commons-cli.lib}"/>
             <include name="${commons-httpclient.lib}"/>
-            <include name="${commons-lang.lib}"/>
             <include name="${commons-logging.lib}"/>
             <include name="${commons-codec.lib}"/>
-            <include name="${commons-io.lib}"/>
+            <include name="${commons-lang.lib}"/>
 
-            <!-- XML tools -->
+
+            <include name="${http-components-httpclient.lib}"/>
+            <include name="${http-components-httpcore.lib}"/>
+
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
-            <include name="${xalan.lib}"/>
-            <include name="${xercesImpl.lib}"/>
-            <include name="${xercesXmlApis.lib}"/>
+            <include name="${catalina.lib}"/>
 
-            <!-- Logging Framework -->
             <include name="${slf4j.lib}"/>
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
 
-
-        </fileset>
-        <fileset dir="${aws.resources}/lib">
-            <include name="**"/>
+	        <include name="${owlim.lib}"/>
+            <include name="${openrdf-sesame.lib}"/>
         </fileset>
 
+        <fileset dir="${wcs.lib.dir}">
+            <include name="${ogc-wcs.lib}" />
+            <include name="${ogc-gml.lib}" />
+            <include name="${ogc-swe.lib}" />
+            <include name="${ogc-gmlcov.lib}" />
+            <include name="${ogc-ows.lib}" />
+            <include name="${ogc-jaxb.lib}" />
+        	<include name="${jaxb-core.lib}" />
+        	<include name="${jaxb-impl.lib}" />
+        	<include name="${xlink.lib}" />
+        </fileset>
     </path>
 
 
@@ -281,9 +305,7 @@
         <mkdir dir="${build.src}"/>
         <mkdir dir="${build.resources}"/>
 
-        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
-        <filter token="GLACIER_SERVICE_SOFTWARE_VERSION" value="${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
-        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WcsSoftwareVersion" value="${WCS_SOFTWARE_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -294,7 +316,7 @@
 
 
     <target  name="PreProcessSourceCode"
-             depends="clean,init"
+             depends="init"
              description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
 
@@ -303,40 +325,96 @@
 
 
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
+                <!-- include all the WCS 2.0 java files -->
+                <include name="opendap/wcs/v2_0/**/*.java"/>
+                <include name="opendap/wcs/srs/**/*.java"/>
+
+                <!-- include name="opendap/semantics/**/*.java"/ -->
+                
+                <include name="opendap/bes/BESManager.java"/>
+                <include name="opendap/bes/BesGroup.java"/>
+                <include name="opendap/bes/CyclicGroup.java"/>
+                <include name="opendap/bes/BES.java"/>
+                <include name="opendap/bes/BESConfig.java"/>
+                <include name="opendap/bes/BesConfigurationModule.java"/>
+                <include name="opendap/bes/BesAdminFail.java"/>
+                <include name="opendap/bes/BESError.java"/>
+                <include name="opendap/bes/BadConfigurationException.java"/>
+                <include name="opendap/bes/BESChunkedInputStream.java"/>
+                <include name="opendap/bes/BESChunkedOutputStream.java"/>
+                <include name="opendap/bes/dap4Responders/MediaType.java"/>
+                <include name="opendap/bes/Version.java"/>
+                <include name="opendap/bes/BESResource.java"/>
+
+                <include name="opendap/bes/caching/BesCatalogCache.java"/>
+                <include name="opendap/bes/caching/CatalogCacheUpdater.java"/>
+
+
+                <include name="opendap/bes/dap2Responders/BesApi.java"/>
+                
+                <include name="opendap/io/ChunkProtocol.java"/>
+                <include name="opendap/io/ChunkedInputStream.java"/>
+                <include name="opendap/io/ChunkedOutputStream.java"/>
+                <include name="opendap/io/Chunk.java"/>
+                
+
+                <include name="opendap/ppt/PPTException.java"/>
+                <include name="opendap/ppt/OPeNDAPClient.java"/>
+                <include name="opendap/ppt/NewPPTClient.java"/>
+                <include name="opendap/ppt/PPTSessionProtocol.java"/>
+                <include name="opendap/ppt/PPTEndOfStreamException.java"/>
+
+                <!-- include DAP4 stuff -->
+                <exclude name="opendap/dap4/Dap4Service.java"/>
+                <include name="opendap/dap4/**/*.java" />
+
+                <include name="opendap/coreServlet/DocServlet.java"/>
+                <include name="opendap/coreServlet/ServletUtil.java"/>
+                <include name="opendap/coreServlet/Scrub.java"/>
+                <include name="opendap/coreServlet/ReqInfo.java"/>
+                <include name="opendap/coreServlet/DispatchHandler.java"/>
+                <include name="opendap/coreServlet/DispatchServlet.java"/>
+                <include name="opendap/coreServlet/OPeNDAPException.java"/>
+                <include name="opendap/coreServlet/OpendapHttpDispatchHandler.java"/>
+                <include name="opendap/coreServlet/DataSourceInfo.java"/>
+                <include name="opendap/coreServlet/PersistentConfigurationHandler.java"/>
+                <include name="opendap/coreServlet/Debug.java"/>
+                <include name="opendap/coreServlet/RequestCache.java"/>
+                <include name="opendap/coreServlet/Util.java"/>
+                <include name="opendap/coreServlet/MimeTypes.java"/>
+                <include name="opendap/coreServlet/NoPostHandler.java"/>
+                <include name="opendap/coreServlet/LicenseManager.java"/>
+                <include name="opendap/coreServlet/ResourceInfo.java"/>
+
+                <include name="opendap/dap/Request.java"/>
+
+                <include name="opendap/namespaces/**/*.java"/>
+                <include name="opendap/logging/**/*.java"/>
+                <include name="opendap/xml/**/*.java"/>
+                <include name="opendap/http/**/*.java"/>
+                
+                <include name="opendap/threddsHandler/ThreddsCatalogUtil.java"/>
+
+
+                <include name="opendap/io/HyraxStringEncoding.java"/>
+                <include name="opendap/PathBuilder.java"/>
+
+
+
+
+            </fileset>
+
+        </copy>
+
+        <copy todir="${build.resources}" filtering="true">
+            <fileset dir="/resources/WCS/2.0">
                 <!-- include all the java files -->
-                <include  name="opendap/**/*.java"/>
-                <exclude  name="opendap/experiments/**"/>
-                <exclude  name="opendap/metacat/**"/>
-                <exclude  name="opendap/wcs/**"/>
-                <exclude  name="opendap/hai/**"/>
-            </fileset>
-
-        </copy>
-
-        <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${glacier.resources}">
-                <!-- include all the files -->
                 <include name="**"/>
-                <exclude name="lib/**"/>
+
             </fileset>
+
         </copy>
-
-
-        <copy todir="${build.resources}" filtering="true">
-            <fileset dir="${hyrax.resources}">
-                <include name="xsl/asyncResponse.xsl"/>
-                <include name="xsl/datasetServices.xsl"/>
-                <include name="xsl/addRdfId2Dap3.2.xsl"/>
-                <include name="xsl/anyXml2Rdf.xsl"/>
-                <include name="xsl/xml2rdf.xsl"/>
-                <include name="xsl/version.xsl"/>
-                <include name="jsp/help.jsp"/>
-                <include name="js/CollapsibleLists.js"/>
-                <include name="nciso"/>
-            </fileset>
-        </copy>
-
 
 
     </target>
@@ -344,9 +422,9 @@
     <target
             name="compile"
             depends="PreProcessSourceCode"
-            description="Compiles the Glacier Service software."
+            description="Compiles the Web Coverage Service 2.0 software."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Glacier Service"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling WCS-2.0"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -370,19 +448,17 @@
 
 
 
-
-
     <target
             name="src-dist"
             depends="clean,init"
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/glacier-${GLACIER_SERVICE_SOFTWARE_VERSION}-src.tgz"
+        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-src.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="glacier-${GLACIER_SERVICE_SOFTWARE_VERSION}-src">
+            <zipfileset dir=".." prefix="wcs-${WCS_SOFTWARE_VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <exclude name="doc/admin/**"/>
@@ -403,18 +479,21 @@
             depends="server"
             description="Packages the war file into tar file with a release related name.">
 
-        <tar destfile="${build.dist}/glacier-${GLACIER_SERVICE_SOFTWARE_VERSION}-webapp.tgz"
+        <copy file="/resources/WCS/2.0/distribution/README"
+              tofile="${build.dist}/README"/>
+
+        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-webapp.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.dist}" prefix="glacier-${GLACIER_SERVICE_SOFTWARE_VERSION}-webapp">
-                <include name="glacier.war"/>
+            <zipfileset dir="${build.dist}" prefix="wcs-${WCS_SOFTWARE_VERSION}-webapp">
+                <include name="WCS.war"/>
                 <include name="README"/>
             </zipfileset>
 
         </tar>
 
         <delete file="${build.dist}/README"/>
-        <delete file="${build.dist}/glacier.war"/>
+        <delete file="${build.dist}/WCS.war"/>
 
     </target>
 
@@ -422,85 +501,82 @@
     <target
             name="DISTRO"
             depends="clean,src-dist,server-dist"
-            description="Builds complete distribution"
+            description="Builds complete WCS-2.0 distribution"
             >
-
     </target>
-
-
-
-
 
     <target
             name="server"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
-
-
-        <echo level="info" message="Building glacier service war file."/>
+        <echo level="info" message="Building WCS server war file."/>
+        <echo level="info" message="WCS-Resources.dir: ${wcs.resources.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
 
-
-        <war destfile="${build.dist}/glacier.war"
-             webxml="${glacier.resources}/WEB-INF/web.xml"
+        <war destfile="${build.dist}/WCS-2.0.war"
+             webxml="/resources/WCS/2.0/WEB-INF/web.xml"
                 >
 
+            <lib dir="/lib">
 
-
-            <lib dir="${lib.dir}">
+                <include name="${owasp-encoder}"/>
+                <include name="${owasp-encoder-jsp}"/>
 
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
-                <include name="${urlRewrite.lib}"/>
-
-                <!-- Apache Commons tools -->
                 <include name="${commons-cli.lib}"/>
                 <include name="${commons-httpclient.lib}"/>
-                <include name="${commons-lang.lib}"/>
                 <include name="${commons-logging.lib}"/>
                 <include name="${commons-codec.lib}"/>
-                <include name="${commons-io.lib}"/>
 
-                <!-- XML tools -->
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
                 <include name="${saxon-jdom.lib}"/>
                 <include name="${saxon-s9api.lib}"/>
                 <include name="${saxon.lib}"/>
-                <include name="${xalan.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
 
-                <!-- Logging Framework -->
                 <include name="${slf4j.lib}"/>
                 <include name="${logback-core.lib}"/>
                 <include name="${logback-classic.lib}"/>
 
-
-            </lib>
-            <lib dir="/resources/experiments/AWS/lib">
-                <include name="jackson-all-1.9.11.jar"/>
-                <include name="**"/>
-                <include name="**"/>
-                <include name="**"/>
+	            <include name="${owlim.lib}"/>
+                <include name="${openrdf-sesame.lib}"/>
             </lib>
 
-
+            <lib dir="${wcs.lib.dir}">
+                <include name="${ogc-wcs.lib}"/>
+                <include name="${ogc-gml.lib}"/>
+                <include name="${ogc-swe.lib}"/>
+                <include name="${ogc-gmlcov.lib}"/>
+                <include name="${ogc-ows.lib}"/>
+                <include name="${ogc-jaxb.lib}"/>
+                <include name="${jaxb-core.lib}"/>
+                <include name="${jaxb-impl.lib}"/>
+                <include name="${xlink.lib}"/>
+            </lib>
+            
             <classes dir="${build.classes}"/>
 
-            <zipfileset dir="${doc.dir}" prefix="docs" >
+            <zipfileset dir="/../../doc" prefix="docs" >
                 <exclude name="src.distribution.readme"/>
                 <exclude name="admin/**"/>
                 <exclude name="_notes"/>
             </zipfileset>
-
+            
             <zipfileset dir="${build.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
 
 
-
-
+            <webinf dir="${build.resources}/WEB-INF">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+            </webinf>
 
 
         </war>
@@ -510,14 +586,10 @@
     </target>
 
 
-
-
-
-
     <target
             name="doc"
             depends="clean,PreProcessSourceCode"
-            description="Builds JavaDoc for the Glacier Service software packages, if missing or out of date."
+            description="Builds JavaDoc for the WCS Service software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
             >
 
@@ -539,126 +611,122 @@
 
 
 
-    <!-- *******************************************************
+    <target  name="WcsMarshaller" depends="compile">
 
-            NOAA S3 Resource Ingester -
-
-            Given an S3 Bucket that contains an index/catalog as defined by Relph and Ogata along with the associated
-            data files the application will retrieve the S3 contents, create a local catalog, upload all of the data into a
-            glacier vault (with the same smae as the s3 bucket) and inter the dataset metadata locally in the process.
-
-    -->
-
-    <property name="S3_ROOT"              value="/Users/ndp/scratch/s3Test"/>
-    <property name="S3_BUCKET"            value="foo-s3cmd.nodc.noaa.gov"/>
-
-    <property name="GLACIER_ARCHIVE_ROOT" value="/Users/ndp/scratch/glacier"/>
-    <property name="GLACIER_ENDPOINT_URL" value="https://glacier.us-east-1.amazonaws.com"/>
-
-    <property name="AWS_KEY_ID"           value="anonymous" />
-    <property name="AWS_SECRET_KEY"       value="YouShouldKnowBetterThanThat" />
-
-    <property name="BES_PREFIX"           value="/Users/ndp/hyrax/trunk" />
-
-    <property name="VAULT_CMD"            value="isInventoryReady" />
-
-    <property name="VAULT_NAME"           value="foo-s3cmd.nodc.noaa.gov" />
-    <property name="WORKING_DIR"          value="${GLACIER_ARCHIVE_ROOT}/cache" />
-
-
-    <target  name="IngestS3Bucket" depends="compile">
-
-        <java classname="opendap.aws.glacier.NoaaResourceIngester"
+        <java classname="opendap.wcs.v2_0.WcsMarshaller"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
-                >
-            <classpath refid="compile.classpath"/>
-
-            <arg line="--s3-root=${S3_ROOT}" />
-            <arg line="--s3-bucket-name=${S3_BUCKET}" />
-
-            <arg line="--glacier-archive-root=${GLACIER_ARCHIVE_ROOT}" />
-            <arg line="--glacier-endpoint-url=${GLACIER_ENDPOINT_URL}" />
-
-            <arg line="--bes-install-prefix=${BES_PREFIX}" />
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
+        >
+            <classpath refid="compile.classpath" />
         </java>
 
     </target>
 
 
-    <target  name="VaultOperation" depends="compile">
+    <target  name="DynamicCoverageDescription" depends="compile">
 
-        <java classname="opendap.aws.glacier.Vault"
+        <java classname="opendap.wcs.v2_0.DynamicCoverageDescription"
               fork="true"
               maxmemory="1024m"
               dir="${build.run}"
-                >
-            <classpath refid="compile.classpath"/>
-
-            <arg line="--vault-name=${GLACIER_ARCHIVE_ROOT}" />
-            <arg line="--endpoint-url=${GLACIER_ENDPOINT_URL}" />
-
-            <arg line="--awsId=${AWS_KEY_ID}" />
-            <arg line="--awsKey=${AWS_SECRET_KEY}" />
-
-            <arg line="--vault-name=${VAULT_NAME}" />
-            <arg line="--working-directory=${WORKING_DIR}" />
-
-            <arg line="${VAULT_CMD}" />
-
-
+        >
+            <classpath refid="compile.classpath" />
         </java>
 
     </target>
+
+
+    <target name="merra2wcs" depends="clean,init">
+    	
+    	<!-- 
+    	      templates.dir is the where we keep the complete WCS coverage description 
+    	      for MERRA2 with replacment tokens for where file specific information 
+    	      (such as filename) should be
+    	      
+    	      IMPORTANT: The File 00 and LFC.xml should be in this directory BEFORE 
+    	      running this target
+
+    	 -->
+        <property name="templates.dir"       value="../resources/WCS/2.0/templates"/>
+        
+ 
+    	<!-- 
+    	     lfc.build.dir is directory WITHIN olfs.dir for the Local File Catalog (LFC) to 
+    	     which we will copying the 00 file seven times and also the LFC.xml 
+    	-->
+    	
+        <property name="lfc.build.dir" value="${build.dir}/wcs"/>
+    	
+    	<!-- filenames (TOKEN replacement values in the 00 file) -->
+    	<property name="collection.name" value="MERRA2_400.tavgM_2d_int_Nx" />
+    	<property name="file.00.name"   value="${collection.name}.201600.nc4"/><!-- This is the file 00 with tokens -->
+        <property name="file.01.name"   value="${collection.name}.201601.nc4"/>
+        <property name="file.02.name"   value="${collection.name}.201602.nc4"/>
+        <property name="file.03.name"   value="${collection.name}.201603.nc4"/>
+        <property name="file.04.name"   value="${collection.name}.201604.nc4"/>
+        <property name="file.05.name"   value="${collection.name}.201605.nc4"/>
+        <property name="file.06.name"   value="${collection.name}.201606.nc4"/>
+        <property name="file.07.name"   value="${collection.name}.201607.nc4"/>
+        
+    
+	    <!-- first delete, then create the destination LFC folder -->	
+	    <delete dir="${lfc.build.dir}"/>
+    	<mkdir  dir="${lfc.build.dir}"/>
+    	
+    	<copy file="../resources/WCS/2.0/templates/LFC.xml" todir="${lfc.build.dir}" />
+	    
+	    <!-- copy file 00 from src into the respective seven files in the actual LFC -->
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.01.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.02.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.03.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.04.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.05.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.06.name}.xml" />
+	    <copy file="../resources/WCS/2.0/templates/MERRA2_400.tavgM_2d_int_Nx.xml" tofile="${lfc.build.dir}/${file.07.name}.xml" />
+	    
+	    <!-- now replace tokens -->
+	    <replace file="${lfc.build.dir}/${file.01.name}.xml" token="@MERRA2DATASET@" value="${file.01.name}" />
+	    <replace file="${lfc.build.dir}/${file.02.name}.xml" token="@MERRA2DATASET@" value="${file.02.name}" />
+	    <replace file="${lfc.build.dir}/${file.03.name}.xml" token="@MERRA2DATASET@" value="${file.03.name}" />
+	    <replace file="${lfc.build.dir}/${file.04.name}.xml" token="@MERRA2DATASET@" value="${file.04.name}" />
+	    <replace file="${lfc.build.dir}/${file.05.name}.xml" token="@MERRA2DATASET@" value="${file.05.name}" />
+	    <replace file="${lfc.build.dir}/${file.06.name}.xml" token="@MERRA2DATASET@" value="${file.06.name}" />
+	    <replace file="${lfc.build.dir}/${file.07.name}.xml" token="@MERRA2DATASET@" value="${file.07.name}" />
+    	
+    </target>
+
+
+
+
+
 
 
     <!-- *******************************************************  -->
 
 
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
 
+    <!--
+    <target name="check"
+            description="Run Unit Tests"
+            depends="compile"
+    >
 
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
+        <junit
+                showoutput="yes"
+                haltonfailure="yes"
+                printsummary="yes">
+            
+            <formatter type="plain" usefile="false"/>
+            <classpath refid="compile.classpath"/>
 
+            <test name="opendap.dap4.DatasetTest" />
+            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
 
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >
-        </sourceanalyzer>
+        </junit>
     </target>
 
+    -->
 
 
 </project>

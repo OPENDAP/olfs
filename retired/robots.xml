@@ -29,10 +29,15 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="SiteMapToCatalog - Converts 3 column site map to thredds catalog a replicate null data tree."
-        default="all" basedir=".">
+        name="Hyrax robots.txt service"
+        default="all" basedir="..">
+
+    <description>Builds Hyrax robots.txt service WAR file.</description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
+
+    <property name="DEPLOYMENT_CONTEXT" value="ROOT"/>
+
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
@@ -46,6 +51,14 @@
          line by the distribution build script using
          tag information from CVS.
     -->
+    <property name="HYRAX_VERSION" value="Not.A.Release"/>
+    <property name="OLFS_VERSION" value="Not.A.Release"/>
+    <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
+    <property name="WEBAPP_DIST" value="olfs-${OLFS_VERSION}-webapp"/>
+    <property name="SRC_DIST" value="olfs-${OLFS_VERSION}-src"/>
+    <property name="DOC_DIST" value="olfs-${OLFS_VERSION}-doc"/>
+    <property name="OLFS_LIB" value="olfs-${OLFS_VERSION}"/>
+
 
     <!-- Compiler Settings -->
 
@@ -116,6 +129,9 @@
 
         <echo level="info" message="Project Name:          ${ant.project.name}"/>
         <echo level="info" message="Project File:          ${ant.file}"/>
+        <echo level="info" message="Hyrax Version:         ${HYRAX_VERSION}"/>
+        <echo level="info" message="Olfs Version:          ${OLFS_VERSION}"/>
+        <echo level="info" message="Deployment Context:    ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:           ${src.dir}"/>
@@ -141,6 +157,10 @@
         <echo level="info" message="    java.home:         ${java.home}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Distribution Targets: "/>
+        <echo level="info" message="    WEBAPP_DIST:       ${WEBAPP_DIST}"/>
+        <echo level="info" message="    SRC_DIST:          ${SRC_DIST}"/>
+        <echo level="info" message="    DOC_DIST:          ${DOC_DIST}"/>
+        <echo level="info" message="    OLFS_LIB:          ${OLFS_LIB}"/>
         <echo level="info" message=""/>
 
     </target>
@@ -152,18 +172,15 @@
 
 
     <!-- Project directories -->
-    <property name="src.dir" location="src"/>
-    <property name="doc.dir" location="doc"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="resources.dir" location="resources"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
-    <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
-
-    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+    <property name="src.dir" location="../src"/>
+    <property name="doc.dir" location="../doc"/>
+    <property name="lib.dir" location="../lib"/>
+    <property name="resources.dir" location="../resources"/>
+    <property name="robots_service.dir" location="/resources/robots"/>
 
 
     <!-- Build Directories -->
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="../build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
     <property name="build.docs" location="${build.dir}/docs"/>
     <property name="build.dist" location="${build.dir}/dist"/>
@@ -174,10 +191,10 @@
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
 
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
-    <property name="wcs.lib.dir" location="${wcs.resources.dir}/lib"/>
 
-    <!-- Libraries -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      Libraries
+    -->
     <property name="json.lib" value="gson-2.3.1.jar"/>
 
 
@@ -187,11 +204,8 @@
 
 
     <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
-    <property name="logback-core.lib" value="logback-core-0.9.26.jar"/>
-    <property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/>
-
-    <property name="owlim.lib" value="owlim-lite-4.3.jar"/>
-    <property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -205,18 +219,21 @@
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-    <property name="xalan.lib" value="xalan.jar"/>
-    <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
+    <property name="xalan.lib" value="xalan-2.7.2.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
     <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
     <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
-    <property name="json.lib" value="json-simple-1.1.1.jar"/>
+    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
+
+    <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
+    <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
 
     <!-- WCS Libs -->
@@ -234,13 +251,14 @@
     <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar"/>
 
     <!-- Library (class)paths -->
-    <path id="compile.classpath">
+    <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
+        <fileset dir="/lib">
             <include name="${servlet-api.lib}"/>
             <include name="${owasp-encoder}"/>
             <include name="${owasp-encoder-jsp}"/>
             <include name="${json.lib}"/>
+            <include name="${sjson.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
             <include name="${commons-cli.lib}"/>
@@ -264,22 +282,11 @@
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
         </fileset>
-        <fileset dir="${wcs.lib.dir}">
-            <include name="${ogc-wcs.lib}"/>
-            <include name="${ogc-gml.lib}"/>
-            <include name="${ogc-swe.lib}"/>
-            <include name="${ogc-gmlcov.lib}"/>
-            <include name="${ogc-ows.lib}"/>
-            <include name="${ogc-jaxb.lib}"/>
-            <include name="${jaxb-core.lib}"/>
-            <include name="${jaxb-impl.lib}"/>
-            <include name="${xlink.lib}"/>
-        </fileset>
 
     </path>
 
 
-    <target name="all" depends="clean,compile,smtc"
+    <target name="all" depends="clean,check,robots"
             description="Builds lots of stuff."/>
 
 
@@ -297,10 +304,43 @@
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.run}"/>
         <mkdir dir="${build.src}"/>
+
+        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
+        <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
+        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WcsSoftwareVersion" value="${WCS_VERSION}"/>
+
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
     </target>
 
+
+    <!-- It would be better if this target only copied the files that have changed.
+         jhrg 5/26/16 -->
+    <target name="check"
+            description="Run Unit Tests"
+            depends="compile"
+    >
+
+        <junit showoutput="yes"
+               haltonfailure="yes"
+               printsummary="yes"
+        >
+
+            <formatter type="plain" usefile="false"/>
+            <classpath refid="olfs.compile.classpath"/>
+
+            <test name="opendap.coreServlet.Scrub"/>
+            <test name="opendap.aggregation.AggregationParamsTest"/>
+            <test name="opendap.bes.dap4Responders.Dap4ResponderTest"/>
+
+            <!--
+            <test name="opendap.dap4.DatasetTest" />
+            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
+            -->
+
+        </junit>
+    </target>
 
 
     <target name="PreProcessSourceCode"
@@ -310,30 +350,39 @@
 
         <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
+        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
+        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
+        <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
+
+        <echo level="info" message=""/>
+
+
         <copy todir="${build.src}" filtering="true">
-            <fileset dir="${src.dir}">
+            <fileset dir="/">
                 <!-- include all the java files -->
-                <include name="opendap/threddsHandler/SiteMapToCatalog.java"/>
-                <include name="opendap/namespaces/THREDDS.java"/>
-                <include name="opendap/namespaces/XLINK.java"/>
-                <include name="opendap/PathBuilder.java"/>
-                <include name="opendap/gateway/Encoder.java"/>
-                <include name="opendap/gateway/HexAsciiEncoder.java"/>
-                <include name="opendap/io/HyraxStringEncoding.java"/>
+                <include name="opendap/**"/>
+                <include name="org/opendap/**"/>
+
+
+                <exclude name="opendap/cmr/**"/>
+                <exclude name="opendap/experiments/**"/>
+                <exclude name="opendap/metacat/**"/>
+                <exclude name="opendap/aws/**"/>
+                <exclude name="opendap/noaa_s3/**"/>
+                <exclude name="opendap/async/**"/>
+                <exclude name="opendap/semantics/**"/>
+                <exclude name="opendap/wcs/**"/>
+
             </fileset>
 
         </copy>
+
+
         <copy todir="${build.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
-            <fileset dir="${hyraxResources.dir}"/>
+            <fileset dir="/resources/robots"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
-            <fileset dir="${wcs.resources.dir}">
-                <include name="xsl/**"/>
-                <include name="WEB-INF/**"/>
-                <exclude name="WEB-INF/web.xml"/>
-                <exclude name="WEB-INF/urlrewrite.xml"/>
-                <exclude name="WEB-INF/logback.xml"/>
-            </fileset>
 
         </copy>
     </target>
@@ -360,7 +409,7 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}">
 
-            <classpath refid="compile.classpath"/>
+            <classpath refid="olfs.compile.classpath"/>
 
             <src path="${build.src}"/>
 
@@ -369,48 +418,94 @@
     </target>
 
 
-    <property name="appName" value="smtc"/>
 
-    <target name="smtcApp"
-            depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
 
-        <mkdir dir="${build.dist}/${appName}"/>
 
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${appName}/${commons-cli.lib}"/>
-
-        <jar destfile="${build.dist}/${appName}/${appName}.jar"
-             manifest="resources/${appName}/${appName}.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/threddsHandler/SimpleSiteMapCatalogFactory"/>
-            </fileset>
-        </jar>
-
-        <tar destfile="${build.dist}/${appName}.tgz" compression="gzip">
-            <zipfileset dir="${build.dist}/${appName}"/>
-        </tar>
+    <target name="IsJavaDocUpToDate"
+            description="Checks to see if the JavaDoc is out of date."
+    >
+        <uptodate property="JavaDocIsUpToDate"
+                  targetfile="${build.docs}/opendap/index.html">
+            <srcfiles dir="/">
+                <include name="opendap/**/*.java"/>
+                <include name="org/opendap/**/*.java"/>
+            </srcfiles>
+        </uptodate>
 
     </target>
 
 
-    <property name="siteMapFileName"   value="/tmp/siteMap.txt"/>
-    <property name="outputDirName"     value="/tmp/hic_ingest"/>
-    <property name="hyraxServiceBase"  value="/opendap/hyrax/"/>
 
-    <target  name="smtc" depends="compile">
 
-        <java classname="opendap.threddsHandler.SiteMapToCatalog"
-              fork="true"
-              maxmemory="1024m"
-              dir="${build.run}"
+    <target
+            name="robots"
+            depends="clean,compile"
+            description="Performs a clean build of the robots/sitemap service and assembles the WAR file."
+    >
+        <echo level="info" message="Building Hyrax server war file."/>
+        <echo level="info" message="build.resources: ${build.resources}"/>
+        <echo level="info" message="build.dist:      ${build.dist}"/>
+
+        <war destfile="${build.dist}/${DEPLOYMENT_CONTEXT}.war"
+             webxml="${build.resources}/WEB-INF/web.xml"
         >
-            <classpath refid="compile.classpath" />
 
-            <arg line="--verbose" />
-            <arg line="--siteMapFileName=${siteMapFileName}" />
-            <arg line="--outputDirName=${outputDirName}" />
-            <arg line="--hyraxServiceBase=${hyraxServiceBase}" />
-        </java>
+            <lib dir="/lib">
+                <include name="${owasp-encoder}"/>
+                <include name="${owasp-encoder-jsp}"/>
+
+                <include name="${json.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${urlRewrite.lib}"/>
+
+                <include name="${commons-lang.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+
+                <include name="${http-components-httpclient.lib}"/>
+                <include name="${http-components-httpcore.lib}"/>
+
+                <include name="${commons-io.lib}"/>
+
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+            </lib>
+
+            <classes dir="${build.classes}"/>
+
+
+            <zipfileset dir="${build.resources}" prefix="">
+                <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </zipfileset>
+
+
+            <zipfileset dir="/../../doc" prefix="docs">
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+
+
+            <webinf dir="${build.resources}/WEB-INF">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+                <include name="urlrewrite.xml"/>
+            </webinf>
+
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
 
     </target>
 
