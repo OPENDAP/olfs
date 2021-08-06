@@ -522,7 +522,10 @@
 
     <xsl:template name="DimSize">
         <xsl:choose>
-            <xsl:when test="./@name"><xsl:value-of select="fn:DimSize(./@name)"/></xsl:when>
+            <xsl:when test="./@name">
+                <xsl:variable name="fqn"> <xsl:value-of select="translate(./@name,' .','__')"/></xsl:variable>
+                <xsl:value-of select="fn:DimSize($fqn)"/>
+            </xsl:when>
             <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
