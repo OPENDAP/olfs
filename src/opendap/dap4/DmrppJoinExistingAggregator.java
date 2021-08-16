@@ -61,6 +61,8 @@ public class DmrppJoinExistingAggregator {
     private Element newAggDimensionElement;
     private String aggVarsFileName;
     private Set<String> aggVarNames;
+    private String aggDataFileName;
+    private Set<String> aggFileNames;
 
     /**
      *
@@ -77,6 +79,7 @@ public class DmrppJoinExistingAggregator {
         aggDatasetTemplate = null;
         aggVarsFileName = aggVariablesFileName;
         aggVarNames = new HashSet<>();
+        aggFileNames = new LinkedHashSet<>();
 
         if(dimName==null) {
             dimName="myNewDim";
@@ -99,6 +102,18 @@ public class DmrppJoinExistingAggregator {
      */
     public void loadAggVarsList() throws IOException {
         loadListFile(aggVarsFileName,aggVarNames);
+    }
+
+    /**
+     *
+     * @throws IOException
+     */
+    public void loadAggFilesList(String args) throws IOException {
+        loadListFile(args,aggFileNames);
+    }
+
+    public String[] getAggFileNames(){
+        return aggFileNames.toArray(new String[aggFileNames.size()]);
     }
 
     /**
@@ -315,7 +330,7 @@ public class DmrppJoinExistingAggregator {
 
                 String aggVarName = getFQN(kid);
 
-                if(!coordinateVars.containsKey(aggVarName)) {
+                if(aggVarName.equals("/time") || !coordinateVars.containsKey(aggVarName)) {
 
                     Element templateVar = aggVarTemplates.get(aggVarName);
 
@@ -377,7 +392,12 @@ public class DmrppJoinExistingAggregator {
 
                             for (Element vChunkElement : vChunkElements) {
                                 String chunkPositionInArray = vChunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
-                                chunkPositionInArray = chunkPositionInArray.replaceFirst("\\[", "[" + chunkIndex + ",");
+                                if (!aggVarName.equals("/time")) {
+                                    chunkPositionInArray = chunkPositionInArray.replaceFirst("\\[0,", "[" + chunkIndex + ",");
+                                }
+                                else {
+                                    chunkPositionInArray = chunkPositionInArray.replaceFirst("\\[0", "[" + chunkIndex);
+                                }
                                 Element chunk = (Element) vChunkElement.clone();
                                 chunk.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY,chunkPositionInArray);
 
@@ -510,7 +530,7 @@ public class DmrppJoinExistingAggregator {
 
             Element matchVar = aggVarTemplates.get(dimName);
 
-            if(matchVar!=null) {
+            if(matchVar!=null && !dimName.equals("/time")) {
                 // So it's a coordinate variable, we add it to the
                 // coordinate variable list.
                 coordinateVars.put(dimName,matchVar);
@@ -581,12 +601,16 @@ public class DmrppJoinExistingAggregator {
                                     DMRPP.CHUNK_DIMENSION_SIZES + " element!");
                         }
 
+                        // this works to change
+                        // if (varFQN.equals("/time"))
+                        //    chunksElement.getChild(DMRPP.CHUNK_DIMENSION_SIZES, DMRPP.NS).setText("2");
+
                         // And add the new dimension to the CHUNK_POSITION_IN_ARRAY attribute in each chunk.
                         @SuppressWarnings("unchecked")
                         List<Element> chunkElements = chunksElement.getChildren(DMRPP.CHUNK, DMRPP.NS);
                         for (Element chunkElement : chunkElements) {
                             String chunkPositionInArray = chunkElement.getAttributeValue(DMRPP.CHUNK_POSITION_IN_ARRAY);
-                            chunkElement.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY, chunkPositionInArray.replaceFirst("\\[", "[0,"));
+                            chunkElement.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY, chunkPositionInArray.replaceFirst("\\[0,", "[0,"));
 
                             String href = chunkElement.getAttributeValue(DMRPP.HREF);
                             if (href == null)
@@ -699,7 +723,8 @@ public class DmrppJoinExistingAggregator {
 
             DmrppJoinExistingAggregator dAgg = new DmrppJoinExistingAggregator(joinNewDimName, aggVarsFile);
             dAgg.log.setLevel(debugLevel);
-            dAgg.loadDmrppList(args);
+            dAgg.loadAggFilesList(args[0]);
+            dAgg.loadDmrppList(dAgg.getAggFileNames());
             dAgg.loadAggVarsList();
 
             Document aggDatasetDoc = dAgg.aggregate();
