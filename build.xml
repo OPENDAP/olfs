@@ -669,6 +669,7 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
+    <target name="opendap" depends="server" />
     <target
             name="server"
             depends="clean,compile"
