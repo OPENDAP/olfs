@@ -65,7 +65,7 @@ public class DmrppJoinExistingAggregator {
     private Map<String, Element> dimensions;
 
     // The coordinate vars in the template dataset
-    private Map<String,Element> coordinateVars;
+    private Map<String,Element> domainCoordinateVars;
 
     // The template aggregation variables from inside the aggDatasetTemplate document.
     private Map<String,Element> templateVars;
@@ -99,7 +99,7 @@ public class DmrppJoinExistingAggregator {
 
         aggFileList = new ArrayList<>();
         dimensions = new TreeMap<>();
-        coordinateVars = new TreeMap<>();
+        domainCoordinateVars = new TreeMap<>();
         templateVars = new TreeMap<>();
         aggDatasetTemplate = null;
         aggVarsFileName = aggVariablesFileName;
@@ -281,6 +281,7 @@ public class DmrppJoinExistingAggregator {
         Document aggDataset = Util.getDocument(templateDmrppUrl);
         ingestTemplateDataset(aggDataset);
 
+        aggVarDimensionElement.getAttributeValue(DAP4.SIZE);
         int chunkIndex = 1;
         for(URL url:aggFileList){
             log.info("Aggregating dmr++ document: {}",url);
@@ -373,7 +374,7 @@ public class DmrppJoinExistingAggregator {
                     dapObject.getName().equals(DAP4.OPAQUE)
                     ){
 
-                if(aggVarName.equals(aggDimensionName) || !coordinateVars.containsKey(aggVarName)) {
+                if(aggVarName.equals(aggDimensionName) || !domainCoordinateVars.containsKey(aggVarName)) {
 
                     Element templateVar = templateVars.get(aggVarName);
 
@@ -405,9 +406,7 @@ public class DmrppJoinExistingAggregator {
                                 throw new DmrppAggException("The template variable '" + aggVarName + "' has no chunks!");
                             }
                             Element tChunkDimSizesElement = tChunksElement.getChild(DMRPP.CHUNK_DIMENSION_SIZES, DMRPP.NS);
-                            // if (tChunkDimSizesElement == null) {
-                            //    tChunkDimSizesElement = hack_simple_var_chunks(aggVarName,tChunksElement);
-                            // }
+
                             List<Integer> tChunkDimSizes = parseChunkDimensionSizes(tChunkDimSizesElement);
 
                             String msg = "The template variable chunk dimension sizes (" +
@@ -443,6 +442,9 @@ public class DmrppJoinExistingAggregator {
                                 String href = chunk.getAttributeValue(DMRPP.HREF);
                                 if(href==null)
                                     chunk.setAttribute(DMRPP.HREF,dataURL.toString());
+
+                                if(trustDatasetUrls())
+                                    chunk.setAttribute(DMRPP.TRUST,Boolean.toString(trustDatasetUrls()),DMRPP.NS);
 
                                 tChunksElement.addContent(chunk);
                             }
@@ -513,7 +515,7 @@ public class DmrppJoinExistingAggregator {
             }
             matchingVars.add(outerDimName);
 
-            if(!aggVarNames.contains(varFQN) && !coordinateVars.containsKey(varFQN)){
+            if(!aggVarNames.contains(varFQN) && !domainCoordinateVars.containsKey(varFQN)){
                 dropList.put(varFQN,varElement);
             }
         }
@@ -554,9 +556,10 @@ public class DmrppJoinExistingAggregator {
         // it's not null then grab the dataURL.
         if(s!=null){
             dataURL = new URL(s);
-            // Mark the Dataset to trust the URL.
-            if(trustDatasetUrls){
-                dataset.setAttribute(DMRPP.TRUST,"true",DMRPP.NS);
+            
+            if(trustDatasetUrls()) {
+                // Mark the Dataset to trust the URL.
+                dataset.setAttribute(DMRPP.TRUST, Boolean.toString(trustDatasetUrls()), DMRPP.NS);
             }
         }
 
@@ -564,7 +567,7 @@ public class DmrppJoinExistingAggregator {
         // we can just throw it into the recursive ingestContainerTemplate()
         ingestContainerTemplate(dataset, dataURL);
 
-        locateCoordinates();
+        ingestDomainCoordinateVars();
 
         pruneAggTree();
 
@@ -603,46 +606,65 @@ public class DmrppJoinExistingAggregator {
 
 
         if(log.isDebugEnabled()) {
+            log.debug("Ingested Template Dataset Summary:");
             for (Map.Entry<String, Element> entry : dimensions.entrySet()) {
-                log.debug("    Dimension: {}", entry.getKey(), entry.getValue().getName());
+                log.debug("    Dimension: '{}'", entry.getKey());
             }
-            for (Map.Entry<String, Element> entry : coordinateVars.entrySet()) {
-                log.debug("coordinateVar: {}", entry.getKey());
+            for (Map.Entry<String, Element> entry : domainCoordinateVars.entrySet()) {
+                log.debug("    coordinateVar: '{}'", entry.getKey());
             }
             for (Map.Entry<String, Element> entry : templateVars.entrySet()) {
-                log.debug("aggVarTemplates: name({}) type:({})", entry.getKey(), entry.getValue().getName());
+                log.debug("    aggVarTemplates: name: '{}' type: '{}'", entry.getKey(), entry.getValue().getName());
             }
         }
 
     }
 
     /**
+     * This method locates every domain coordinate variable,  which for now are those whose name exactly
+     * matches an associated variable. In the process it locates the aggregation variable element.
+     * The domain coordinate variables are removed from the list of aggregatable template variables
+     * and keeps them in a separate list since, except for the aggregation variable (which must be a
+     * domain coordinate variable), we will not be aggregating the domain coordinate variables.
      *
      */
-    public void locateCoordinates(){
+    public void ingestDomainCoordinateVars(){
         for(Map.Entry<String,Element> entry : dimensions.entrySet()){
             String dimName = getFQN(entry.getValue());
+            log.info("Locating domain coordinate for dimension: {} to coordinateVars",dimName);
 
-            Element matchVar = templateVars.get(dimName);
+            Element matchingVarible = templateVars.get(dimName);
 
-            if(matchVar!=null) {
+            if(matchingVarible!=null) {
                 if(!dimName.equals(aggVarName)){
-                    // So it's a coordinate variable, we add it to the
-                    // coordinate variable list.
-                    coordinateVars.put(dimName,matchVar);
+                    // This domain coordinate variable is not the aggregation variable,
+                    // we don't want to aggregate it.
+                    log.info("Adding domain coordinate variable: {} to domainCoordinateVars",aggVarName);
+                    // Add the matchingVarible the domain coordinate variable list.
+                    domainCoordinateVars.put(dimName,matchingVarible);
 
-                    // And we drop it from the aggregation variable list because
-                    // we are not going to aggregate coordinates variables.
+                    // And we drop it from the template variable list because
+                    // we are not going to aggregate domain coordinate variables other than the aggregation variable.
+                    log.info("Removing domain coordinate variable: {} from templateVars",aggVarName);
                     templateVars.remove(dimName);
                 }
                 else {
                     // If the dimension name matches the aggVarName then it's the AggVar!
-                    aggVarElement = matchVar;
+                    log.info("Found aggregation variable element: {}",aggVarElement);
+                    aggVarElement = matchingVarible;
                 }
             }
+
         }
     }
 
+    /**
+     *
+     * @param varFQN
+     * @param chunksElement
+     * @return
+     * @throws DmrppAggException
+     */
     private Element hack_simple_var_chunks(String varFQN, Element chunksElement) throws DmrppAggException
     {
         // A missing chunkDimensionSizes element is bad, but may be recoverable is it's a variable
@@ -787,8 +809,7 @@ public class DmrppJoinExistingAggregator {
 
 
 
-    /**
-     *
+    /** Computes a DAP4 FQN for the passed Element.
      * @param var
      * @return
      */
@@ -836,6 +857,7 @@ public class DmrppJoinExistingAggregator {
         String loggerName = introSpec.getName();
         String aggVarsFile = null;
         String aggFilesListFileName = null;
+        boolean trustUrls = false;
 
         Logger log = (Logger) LoggerFactory.getLogger(introSpec);
         log.setLevel(Level.DEBUG);
@@ -894,11 +916,17 @@ public class DmrppJoinExistingAggregator {
                 aggVarsFile = cmd.getOptionValue("v");
             }
 
+            //---------------------------
+            // Mark the URLs as trusted.
+            if (cmd.hasOption("t")) {
+                trustUrls = true;
+            }
+
             //----------------------------------------------------------------------
             //----------------------------------------------------------------------
 
             DmrppJoinExistingAggregator dAgg = new DmrppJoinExistingAggregator(joinNewDimName, aggVarsFile);
-            dAgg.trustDatasetUrls(true);
+            dAgg.trustDatasetUrls(trustUrls);
             dAgg.loadAggFilesList(aggFilesListFileName);
             dAgg.ingestDmrppList(dAgg.getAggFileNames());
             dAgg.loadAggVarsList();
@@ -936,6 +964,8 @@ public class DmrppJoinExistingAggregator {
                 "files to aggregate.");
         options.addOption("n", "dimName", true, "joinNew dimension name");
         options.addOption("v", "variablesFile", true, "A file containing a list of " +
+                "the names of the variables to be aggregated.");
+        options.addOption("t", "trust", false, "A file containing a list of " +
                 "the names of the variables to be aggregated.");
         return options;
     }
