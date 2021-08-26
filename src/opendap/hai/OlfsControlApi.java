@@ -38,6 +38,7 @@ import ch.qos.logback.core.read.CyclicBufferAppender;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
+import opendap.logging.LogUtil;
 import opendap.logging.ServletLogUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
@@ -270,7 +271,7 @@ public class OlfsControlApi extends HttpResponder {
                     loggerName = getValidLoggerName(kvp.get(olfsCmds.logger.toString()));
 
                     if(loggerName!=null  && logLevel!=null){
-                        sb.append(ServletLogUtil.setLogLevel(loggerName, logLevel));
+                        sb.append(LogUtil.setLogLevel(loggerName, logLevel));
                     }
                     else {
                         sb.append("Unable to set log level. ");

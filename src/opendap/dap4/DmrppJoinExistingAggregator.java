@@ -28,7 +28,7 @@ package opendap.dap4;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
-import opendap.logging.ServletLogUtil;
+import opendap.logging.LogUtil;
 import opendap.namespaces.DAP4;
 import opendap.namespaces.DMRPP;
 import opendap.xml.Util;
@@ -867,7 +867,7 @@ public class DmrppJoinExistingAggregator {
             // Debug control
             if (cmd.hasOption("d")) {
                 debugLevel = cmd.getOptionValue("d");
-                ServletLogUtil.setLogLevel(loggerName,debugLevel);
+                LogUtil.setLogLevel(loggerName,debugLevel);
             }
 
             //---------------------------
