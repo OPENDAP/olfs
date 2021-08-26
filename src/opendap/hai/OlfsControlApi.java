@@ -39,7 +39,6 @@ import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
-import opendap.logging.ServletLogUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 

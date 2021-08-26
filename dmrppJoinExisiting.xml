@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -26,26 +25,17 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
-        default="all" basedir="."
-        xmlns:sonar="antlib:org.sonar.ant" >
+        name="dmrppJoinExisting"
+        default="all" basedir="." >
     <description>
-        Compiles the OLFS project software and, depending on the chosen target,
-        can produce a Web Application aRchive (WAR) file for each of:
-        - The OLFS/Hyrax service build targets(s): server
-        - The NGAP/Hyrax service, build targets(s): ngap
-        - The robots.txt service, build targets(s): robots, hyrax-robots
-
-        Also builds:
-        - The hex Encoder/Decoder application as an executable jar file.
-        - The XML Validator application as an executable jar file.
+This ANT file has two primary targets.
+- dmrppJoinExisiting - Build and run the DmrppJoinExisitingAggregator application
+- dmrppJoinExisitingApp - Build the
     </description>
 
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
-    <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
-    <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
@@ -58,18 +48,6 @@
          These properties should be set from the command
          line when running the DISTRO build target.
     -->
-    <property name="HYRAX_VERSION" value="Not.A.Release"/>
-    <property name="OLFS_VERSION" value="Not.A.Release"/>
-    <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
-
-    <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
-    <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
-
-    <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
-    <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
-    <property name="OLFS_LIB" value="${OLFS_DIST_BASE}"/>
 
     <!-- Compiler Settings -->
 
@@ -143,12 +121,6 @@
         <echo level="info" message="#"/>
         <echo level="info" message="           Project Name: ${ant.project.name}"/>
         <echo level="info" message="           Project File: ${ant.file}"/>
-        <echo level="info" message="          Hyrax Version: ${HYRAX_VERSION}"/>
-        <echo level="info" message="           OLFS Version: ${OLFS_VERSION}"/>
-        <echo level="info" message="           NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="            WCS Version: ${WCS_VERSION}"/>
-        <echo level="info" message="     Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="                src.dir: ${src.dir}"/>
@@ -160,7 +132,6 @@
         <echo level="info" message="              build.dir: ${build.dir}"/>
         <echo level="info" message="          build.classes: ${build.classes}"/>
         <echo level="info" message="              build.doc: ${build.docs}"/>
-        <echo level="info" message="        build.resources: ${build.hyrax.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="               ant.file: ${ant.file}"/>
@@ -173,11 +144,6 @@
         <echo level="info" message="              user.home: ${user.home}"/>
         <echo level="info" message="              java.home: ${java.home}"/>
         <echo level="info" message=""/>
-        <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
-        <echo level="info" message="               SRC_DIST: ${SRC_DIST}"/>
-        <echo level="info" message="               DOC_DIST: ${DOC_DIST}"/>
-        <echo level="info" message="               OLFS_LIB: ${OLFS_LIB}"/>
         <echo level="info" message=""/>
 
     </target>
@@ -206,123 +172,34 @@
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
 
-    <property name="build.hyrax.resources" location="${build.dir}/resources"/>
-    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
-
-    <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
-    <property name="build.ngap.resources" location="${build.dir}/ngap"/>
-
-    <property name="robotsResources.dir" location="${resources.dir}/robots"/>
-    <property name="build.robots.resources" location="${build.dir}/robots"/>
-
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      Libraries
-    -->
-    <property name="json.lib" value="gson-2.3.1.jar"/>
-
-
-    <property name="junit.lib" value="junit-4.4.jar"/>
     <property name="jdom.lib" value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
-
-
+    <property name="junit.lib" value="junit-4.4.jar"/>
+    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
+    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
     <property name="slf4j.lib" value="slf4j-api-1.7.16.jar"/>
     <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
     <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
 
-    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
-    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-lang.lib" value="apache-commons-lang-2.5.jar"/>
-    <property name="commons-logging.lib" value="apache-commons-logging-1.1.3.jar"/>
-    <property name="commons-io.lib" value="apache-commons-io-2.4.jar"/>
-
-
-    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
-    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
-
-
-    <property name="xalan.lib" value="xalan-2.7.2.jar"/>
-    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
-    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
-
-    <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
-    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
-    <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
-
-    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
-    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
-
-    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
-
-    <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
-    <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
-
-
-    <!-- WCS Libs -->
-    <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
-    <property name="ogc-swe.lib" value="sweCommon-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
-    <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
-    <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
-    <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
-    <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
-    <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
-
-
-
-
     <!--
         These are the library jars used by Hyrax.
     -->
-    <fileset id="hyrax-libs" dir="${lib.dir}">
-        <include name="${owasp-encoder.lib}"/>
-        <include name="${owasp-encoder-jsp.lib}"/>
-
-        <include name="${json.lib}"/>
-        <include name="${sjson.lib}"/>
+    <fileset id="dependencies" dir="${lib.dir}">
         <include name="${jdom.lib}"/>
         <include name="${junit.lib}"/>
-
-        <include name="${commons-lang.lib}"/>
         <include name="${commons-cli.lib}"/>
-        <include name="${commons-httpclient.lib}"/>
-        <include name="${commons-logging.lib}"/>
-        <include name="${commons-codec.lib}"/>
-        <include name="${commons-io.lib}"/>
-
         <include name="${http-components-httpclient.lib}"/>
         <include name="${http-components-httpcore.lib}"/>
-
-
-        <include name="${saxon-jdom.lib}"/>
-        <include name="${saxon-s9api.lib}"/>
-        <include name="${saxon.lib}"/>
-
         <include name="${slf4j.lib}"/>
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
-
-
     </fileset>
 
 
-    <!-- Library compile (class)paths -->
+    <!-- Compile & run classpath -->
     <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
-        <!--
-            We have to have the catalina and servlet api's on the classpath at
-            compile time, but their not needed at deployment because they come
-            bundled with Tomcat
-        -->
-        <fileset dir="${lib.dir}">
-            <include name="${catalina.lib}"/>
-            <include name="${servlet-api.lib}"/>
-        </fileset>
-        <fileset refid="hyrax-libs" />
+        <fileset refid="dependencies" />
     </path>
 
 
@@ -343,11 +220,10 @@
         <mkdir dir="${build.run}"/>
         <mkdir dir="${build.src}"/>
 
-        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
-        <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
-        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
-
+        <!-- This is where one sets up filters for PreProcessSourceCode -->
+        <!--
+        <filter token="Version" value="${VERSION}"/>
+        -->
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
         <echo message="hyrax-libs: ${toString:hyrax-libs}"/>
@@ -358,14 +234,8 @@
             depends="clean,init"
             description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
-        <echo level="info" message=" Moving and filtering Source code."/>
-        <echo level="info" message="                AntFile: ${ant.file} Moving and filtering Source code."/>
-        <echo level="info" message="          HYRAX_VERSION: ${HYRAX_VERSION}"/>
-        <echo level="info" message="           NGAP_VERSION: ${NGAP_VERSION}"/>
-        <echo level="info" message="           OLFS_VERSION: ${OLFS_VERSION}"/>
-        <echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/>
-        <echo level="info" message="     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="NGAP_DEPLOYMENT_CONTEXT: ${NGAP_DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="Moving and filtering Source code."/>
+        <echo level="info" message="  AntFile: ${ant.file} Moving and filtering Source code."/>
         <echo level="info" message=""/>
 
         <copy todir="${build.src}" filtering="true">
@@ -380,11 +250,6 @@
                 <include name="opendap/logging/Timer.java"/>
                 <include name="opendap/coreServlet/Scrub.java"/>
                 <include name="opendap/logging/LogUtil.java"/>
-                <!--
-                <include name="opendap/coreServlet/ServletUtil.java"/>
-                <include name="opendap/coreServlet/ReqInfo.java"/>
-                <include name="opendap/PathBuilder.java"/>
-                -->
             </fileset>
 
         </copy>
@@ -427,59 +292,33 @@
 
 
     <property name="ARGS"     value="-h"/>
-    <target  name="dmrppJoinExisiting"
-             description="This performs a Join Existing aggregation of the dmr++ files
+    <target  name="dmrppJoinExisting"
+             description="This target performs a Join Existing aggregation of the dmr++ files
 located identified in the arguments. Run this target with no arguments to see the argument list.
 Use -DARGS=&quot;...&quot; to specify command line options."
              depends="compile ">
+
         <java classname="opendap.dap4.DmrppJoinExistingAggregator"
               fork="true"
               maxmemory="4096m"
-              dir="${build.run}"
-        >
+              dir="${build.run}" >
             <classpath refid="compile.classpath" />
             <arg line="${ARGS}" />
         </java>
     </target>
 
 
-    <target name="dmrppJoinExisitingApp"
+    <target name="dmrppJoinExistingApp"
             depends="clean,compile"
             description="Builds executable jar file for the DmrppJoinExistingAggregator">
-
-        <!--
-        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
-        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.lib}/${commons-httpclient.lib}"/>
-        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.lib}/${commons-codec.lib}"/>
-
-        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
-        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
-        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
-        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
-        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
-        -->
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.lib}/${commons-cli.lib}"/>
-        <copy file="${lib.dir}/${http-components-httpclient.lib}" tofile="${build.lib}/${http-components-httpclient.lib}"/>
-        <copy file="${lib.dir}/${http-components-httpcore.lib}" tofile="${build.lib}/${http-components-httpcore.lib}"/>
-
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.lib}/${commons-cli.lib}"/>
-        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.lib}/${jdom.lib}"/>
-
-        <copy file="${lib.dir}/${slf4j.lib}" tofile="${build.lib}/${slf4j.lib}"/>
-        <copy file="${lib.dir}/${logback-core.lib}" tofile="${build.lib}/${logback-core.lib}"/>
-        <copy file="${lib.dir}/${logback-classic.lib}" tofile="${build.lib}/${logback-classic.lib}"/>
-
 
         <jar destfile="${build.dist}/joinExisting.jar"
              manifest="resources/META-INF/joinExisting.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="**"/>
             </fileset>
-            <zipgroupfileset dir="${build.lib}" includes="**/*.jar" />
+            <zipgroupfileset refid="dependencies"  />
         </jar>
-
     </target>
-
 
 </project>
