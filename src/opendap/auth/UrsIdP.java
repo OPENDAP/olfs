@@ -29,7 +29,7 @@ package opendap.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import opendap.PathBuilder;
-import opendap.logging.ServletLogUtil;
+import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -273,14 +273,14 @@ public class UrsIdP extends IdProvider{
                 url += "&";
                 url += "response_type=code&redirect_uri=" + request.getRequestURL();
 
-                log.info("Redirecting client to URS SSO. URS Code Request URL: {}", ServletLogUtil.scrubEntry(url));
+                log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);
 
                 log.debug("END (session: {})", session.getId());
                 return false;
             }
 
-            log.info("URS Code: {}", ServletLogUtil.scrubEntry(code));
+            log.info("URS Code: {}", LogUtil.scrubEntry(code));
 
             // If we get here, the the user was redirected by URS back to our application,
             // and we have a code. We now exchange the code for a token, which is
@@ -296,7 +296,7 @@ public class UrsIdP extends IdProvider{
             headers.put("Authorization", authHeader);
 
             log.info("URS Token Request URL: {}", url);
-            log.info("URS Token Request POST data: {}", ServletLogUtil.scrubEntry(postData));
+            log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
             log.info("URS Token Request Authorization Header: {}", authHeader);
 
             String contents = Util.submitHttpRequest(url, headers, postData);

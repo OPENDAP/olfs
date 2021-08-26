@@ -26,7 +26,6 @@
 
 package opendap.logging;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -390,7 +389,7 @@ public class ServletLogUtil {
         if(log.isInfoEnabled()) {
             StringBuilder startMsg = new StringBuilder();
             startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(ServletLogUtil.scrubEntry(req.getRemoteHost())).append("' ");
+            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
             startMsg.append("RequestedResource: '").append(resourceID).append("' ");
             startMsg.append("QueryString: '").append(query).append("' ");
             startMsg.append("AccessLog: ").append(logName);
@@ -539,21 +538,6 @@ public class ServletLogUtil {
         MDC.remove(HTTP_STATUS_KEY);
 
     }
-
-    /**
-     * https://affinity-it-security.com/how-to-prevent-log-injection/
-     * @param s String to prep for log.
-     * @return String ready for log.
-     */
-    public static String scrubEntry(String s){
-        char[] disallowedChars = {'\r','\n', 0x08, '<', '>', '&', '\"', '\''} ;
-        // Grind out a char by char replacement.
-        for(char badChar: disallowedChars){
-            s = s.replace(badChar,'_');
-        }
-        return s;
-    }
-
 
 
     public static void useCombinedLog(boolean value) {

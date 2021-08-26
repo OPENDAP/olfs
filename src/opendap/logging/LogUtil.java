@@ -1,10 +1,46 @@
 package opendap.logging;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import opendap.coreServlet.Scrub;
 import org.slf4j.LoggerFactory;
 
 public class LogUtil {
+
+    /**
+     * https://affinity-it-security.com/how-to-prevent-log-injection/
+     * @param s String to prep for log.
+     * @return String ready for log.
+     */
+    public static String scrubEntry(String s){
+        char[] disallowedChars = {'\r','\n', 0x08, '<', '>', '&', '\"', '\''} ;
+        // Grind out a char by char replacement.
+        for(char badChar: disallowedChars){
+            s = s.replace(badChar,'_');
+        }
+        return s;
+    }
+
+    public static String getLogLevel(String loggerName){
+
+        StringBuilder sb = new StringBuilder();
+
+
+        if(loggerName != null){
+            Logger namedLog = (Logger) LoggerFactory.getLogger(loggerName);
+
+            Level level = namedLog.getLevel();
+
+            String levelStr = "off";
+            if(level!=null)
+                levelStr = level.toString().toLowerCase();
+
+            sb.append(levelStr);
+        }
+
+        return sb.toString();
+
+    }
 
     public enum logLevels {all, error, warn, info, debug, off}
 

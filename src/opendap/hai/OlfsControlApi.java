@@ -26,8 +26,6 @@
 package opendap.hai;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
@@ -200,30 +198,6 @@ public class OlfsControlApi extends HttpResponder {
     }
 
 
-    public String getLogLevel(String loggerName){
-
-        StringBuilder sb = new StringBuilder();
-
-
-        if(loggerName != null){
-            Logger namedLog = (Logger) LoggerFactory.getLogger(loggerName);
-
-            Level level = namedLog.getLevel();
-
-            String levelStr = "off";
-            if(level!=null)
-                levelStr = level.toString().toLowerCase();
-
-            sb.append(levelStr);
-        }
-
-        return sb.toString();
-
-    }
-
-
-
-
     private enum olfsCmds {
         cmd, getLog, lines, getLogLevel, setLogLevel, logger, level
     }
@@ -261,7 +235,7 @@ public class OlfsControlApi extends HttpResponder {
                 case getLogLevel:
                     loggerName = getValidLoggerName(kvp.get(olfsCmds.logger.toString()));
 
-                    sb.append(getLogLevel(loggerName));
+                    sb.append(LogUtil.getLogLevel(loggerName));
                     break;
 
 
