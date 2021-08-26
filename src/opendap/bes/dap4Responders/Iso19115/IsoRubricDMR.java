@@ -38,7 +38,7 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -166,7 +166,7 @@ public class IsoRubricDMR extends Dap4Responder {
             transformer.transform(new JDOMSource(dmr), os);
 
             os.flush();
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {

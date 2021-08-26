@@ -35,7 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -148,7 +148,7 @@ public class Iso19115 extends Dap4Responder {
 
 
             os.flush();
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {

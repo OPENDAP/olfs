@@ -26,6 +26,7 @@
 
 package opendap.logging;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -53,7 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Date: Feb 6, 2007
  * Time: 3:34:35 PM
  */
-public class LogUtil {
+public class ServletLogUtil {
 
     public static final String HYRAX_ACCESS_LOG_ID = "HyraxAccess";
     public static final String HYRAX_LAST_MODIFIED_ACCESS_LOG_ID = "HyraxLastModifiedAccess";
@@ -99,12 +100,14 @@ public class LogUtil {
 
     private static AtomicBoolean useCombinedLog = new AtomicBoolean(false);
 
+    public enum logLevels {all, error, warn, info, debug, off}
+
     private static Logger log;
     static{
         System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
 
         try {
-            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
+            log = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.class);
             log.info("Logger instantiated. class: {}",log.getClass().getCanonicalName());
         }
         catch(NoClassDefFoundError e) {
@@ -117,7 +120,7 @@ public class LogUtil {
      * Private constructor prevents inadvertent instantiation of this class which is really a collection
      * of functions (static methods).
      */
-    private LogUtil(){}
+    private ServletLogUtil(){}
 
     /**
      * Initialize logging for the web application context in which the given
@@ -296,7 +299,7 @@ public class LogUtil {
      */
     public static void logServerStartup(String source) {
         // Setup context.
-        synchronized (LogUtil.class) {
+        synchronized (ServletLogUtil.class) {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
@@ -324,7 +327,7 @@ public class LogUtil {
      */
     public static void logServerShutdown(String source) {
         // Setup context.
-        synchronized (LogUtil.class) {
+        synchronized (ServletLogUtil.class) {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
@@ -388,7 +391,7 @@ public class LogUtil {
         if(log.isInfoEnabled()) {
             StringBuilder startMsg = new StringBuilder();
             startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
+            startMsg.append("RemoteHost: '").append(ServletLogUtil.scrubEntry(req.getRemoteHost())).append("' ");
             startMsg.append("RequestedResource: '").append(resourceID).append("' ");
             startMsg.append("QueryString: '").append(query).append("' ");
             startMsg.append("AccessLog: ").append(logName);
@@ -557,4 +560,58 @@ public class LogUtil {
     public static void useCombinedLog(boolean value) {
         useCombinedLog.set(value);
     }
+
+    public static String setLogLevel(String loggerName, String level){
+
+        StringBuilder sb = new StringBuilder();
+
+        if(loggerName != null){
+            ch.qos.logback.classic.Logger namedLog = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName);
+
+            switch(logLevels.valueOf(level)){
+
+                case all:
+                    namedLog.setLevel(Level.ALL);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.all.toString());
+                    break;
+
+                case error:
+                    namedLog.setLevel(Level.ERROR);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.error.toString());
+                    break;
+
+                case warn:
+                    namedLog.setLevel(Level.WARN);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.warn.toString());
+                    break;
+
+                case info:
+                    namedLog.setLevel(Level.INFO);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.info.toString());
+                    break;
+
+                case debug:
+                    namedLog.setLevel(Level.DEBUG);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.debug.toString());
+                    break;
+
+                case off:
+                    namedLog.setLevel(Level.OFF);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.off.toString());
+                    break;
+
+                default:
+                    sb.append(loggerName).append(" ERROR! The logging level ")
+                            .append(Scrub.simpleString(level))
+                            .append(" is unrecognized. Nothing has been done.");
+                    break;
+
+
+            }
+        }
+
+        return sb.toString();
+
+    }
+
 }

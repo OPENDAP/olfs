@@ -36,7 +36,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Json;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -120,7 +120,7 @@ public class JsonDR extends Dap4Responder {
                 qp,
                 os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

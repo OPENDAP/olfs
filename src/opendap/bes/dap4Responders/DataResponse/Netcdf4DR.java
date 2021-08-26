@@ -36,9 +36,8 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf4;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
-import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -136,7 +135,7 @@ public class Netcdf4DR extends Dap4Responder{
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, history_json_entry, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

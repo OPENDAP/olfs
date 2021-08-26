@@ -11,6 +11,7 @@ public class DMRPP {
     public static final String    NAMESPACE_STRING = "http://xml.opendap.org/dap/dmrpp/1.0.0#";
     public static final Namespace NS = Namespace.getNamespace("dmrpp",NAMESPACE_STRING);
 
+    public static final String TRUST = "trust";
     public static final String CHUNKS = "chunks";
     public static final String CHUNK = "chunk";
     public static final String HREF = "href";

@@ -33,7 +33,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -115,7 +115,7 @@ public class Ijson extends Dap4Responder {
                 os);
 
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 
