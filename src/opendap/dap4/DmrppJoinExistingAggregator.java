@@ -857,7 +857,9 @@ public class DmrppJoinExistingAggregator {
         String aggFilesListFileName = null;
         boolean trustUrls = false;
 
-        Logger log = (Logger) LoggerFactory.getLogger(introSpec);
+        Logger log = (Logger) LoggerFactory.getLogger(DmrppJoinExistingAggregator.class);
+        log.setLevel(Level.ERROR);
+        log = (Logger) LoggerFactory.getLogger(opendap.xml.Util.class);
         log.setLevel(Level.ERROR);
         /*
         Iterator<Appender<ILoggingEvent>> it = log.iteratorForAppenders();
