@@ -51,8 +51,6 @@ public class DmrppJoinExistingAggregator {
     public static final String HTTP_PROTOCOL  = "http://";
     public static final String HTTPS_PROTOCOL = "https://";
 
-    java.net.URL url;
-
     // The list of dmr++ files that will be used to form the aggregation.
     private ArrayList<String> aggFileList;
 
