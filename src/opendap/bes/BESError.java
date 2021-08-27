@@ -38,10 +38,11 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 
@@ -59,6 +60,7 @@ public class BESError extends OPeNDAPException {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
+    private Logger d_log;
 
     private String _adminEmail;
     private String _message;
@@ -136,6 +138,7 @@ public class BESError extends OPeNDAPException {
      *
      */
     private BESError() {
+        d_log = LoggerFactory.getLogger(this.getClass());
         _adminEmail = "support@opendap.org";
         _message = "Unknown Error";
         _file = "Unknown File";
@@ -240,7 +243,8 @@ public class BESError extends OPeNDAPException {
             if (besErrorDoc == null) {
                 StringBuilder msg = new StringBuilder();
                 msg.append("ERROR - Failed to locate <BESError> object in XML document parsed from stream! ");
-                msg.append(" RawInput: ").append(rawBesError);
+                if(d_log.isDebugEnabled())
+                    msg.append(" RawInput: ").append(rawBesError);
                 becomeInvalidError(msg.toString());
             }
 
@@ -249,14 +253,16 @@ public class BESError extends OPeNDAPException {
             StringBuilder msg = new StringBuilder();
             msg.append("ERROR - Unable to parse expected <BESError> object from stream!");
             msg.append(" Message: ").append(e.getMessage());
-            msg.append(" RawInput: ").append(rawBesError);
+            if(d_log.isDebugEnabled())
+                msg.append(" RawInput: ").append(rawBesError);
             becomeInvalidError(msg.toString());
         }
         catch (IOException e) {
             StringBuilder msg = new StringBuilder();
             msg.append("ERROR - Failed to locate expected <BESError> object from stream.");
             msg.append(" Message: ").append(e.getMessage());
-            msg.append(" RawInput: ").append(rawBesError);
+            if(d_log.isDebugEnabled())
+                msg.append(" RawInput: ").append(rawBesError);
             becomeInvalidError(msg.toString());
         }
 
