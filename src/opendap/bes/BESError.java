@@ -231,7 +231,7 @@ public class BESError extends OPeNDAPException {
 
         try {
             is = cueErrorStreamToXmlStart(is);
-            
+
             rawBesError = IOUtils.toString(is, HyraxStringEncoding.getCharset());
             is = new ByteArrayInputStream(rawBesError.getBytes(HyraxStringEncoding.getCharset()));
 
