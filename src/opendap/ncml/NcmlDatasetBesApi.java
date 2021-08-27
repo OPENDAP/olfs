@@ -30,17 +30,12 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.BES;
-import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Date;
 
 
 /**
@@ -106,7 +101,7 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 

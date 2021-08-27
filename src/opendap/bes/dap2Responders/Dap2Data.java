@@ -35,7 +35,7 @@ import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -140,7 +140,7 @@ public class Dap2Data extends Dap4Responder {
             handleStoreResultResponse(srr, response);
         }
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 

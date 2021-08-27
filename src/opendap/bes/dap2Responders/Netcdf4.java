@@ -32,7 +32,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,7 +129,7 @@ public class Netcdf4 extends Dap4Responder {
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf4(user, resourceID, constraintExpression, cf_history_entry, history_json_entry, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 }

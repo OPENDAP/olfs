@@ -33,7 +33,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextPlain;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -115,7 +115,7 @@ public class DDS extends Dap4Responder {
         User user = new User(request);
         besApi.writeDDS(user, resourceID, constraintExpression, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 

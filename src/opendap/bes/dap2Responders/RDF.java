@@ -36,7 +36,7 @@ import opendap.dap.User;
 import opendap.http.error.InternalError;
 import opendap.http.mediaTypes.TextXml;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -167,7 +167,7 @@ public class RDF extends Dap4Responder {
             errorMessage.append(e.getMessage()).append("\"");
             throw new InternalError(errorMessage.toString());
         }
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 

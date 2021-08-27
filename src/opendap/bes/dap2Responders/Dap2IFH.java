@@ -37,7 +37,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
@@ -173,7 +173,7 @@ public class Dap2IFH extends Dap4Responder {
             DataOutputStream os = new DataOutputStream(response.getOutputStream());
             transformer.transform(new JDOMSource(ddx), os);
             os.flush();
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             _log.info("Sent {} size: {}", getServiceTitle(),os.size());
         }
         finally {

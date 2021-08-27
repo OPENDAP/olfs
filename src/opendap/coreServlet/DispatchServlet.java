@@ -30,7 +30,7 @@ package opendap.coreServlet;
 import opendap.auth.AuthenticationControls;
 import opendap.bes.BESManager;
 import opendap.http.error.NotFound;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Document;
@@ -113,7 +113,7 @@ public class DispatchServlet extends HttpServlet {
 
             super.init();
             initDebug();
-            LogUtil.initLogging(this);
+            ServletLogUtil.initLogging(this);
 
             // Timer.enable()
 
@@ -121,7 +121,7 @@ public class DispatchServlet extends HttpServlet {
 
             log.debug("BEGIN");
 
-            LogUtil.logServerStartup("init()");
+            ServletLogUtil.logServerStartup("init()");
             log.info("init() start.");
 
             String configFile = getInitParameter("ConfigFileName");
@@ -140,7 +140,7 @@ public class DispatchServlet extends HttpServlet {
 
             Element enableCombinedLog = config.getChild("EnableCombinedLog");
             if(enableCombinedLog!=null){
-                LogUtil.useCombinedLog(true);
+                ServletLogUtil.useCombinedLog(true);
             }
 
             boolean enablePost = false;
@@ -472,7 +472,7 @@ public class DispatchServlet extends HttpServlet {
                 }
 
                 int reqno = reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
                 if (redirectForServiceOnlyRequest(request, response))
                     return;
@@ -517,7 +517,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             log.info("Response completed.\n");
         }
@@ -563,7 +563,7 @@ public class DispatchServlet extends HttpServlet {
 
                 int reqno = reqNumber.incrementAndGet();
 
-                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
 
                 if (log.isDebugEnabled()) {
                     log.debug(ServletUtil.showRequest(request, reqno));
@@ -600,7 +600,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
         } finally {
-            LogUtil.logServerAccessEnd(httpStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(httpStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -642,7 +642,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
 
         long lmt = new Date().getTime();
 
@@ -663,7 +663,7 @@ public class DispatchServlet extends HttpServlet {
             log.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
         }
         return lmt;
@@ -673,7 +673,7 @@ public class DispatchServlet extends HttpServlet {
     @Override
     public void destroy() {
 
-        LogUtil.logServerShutdown("destroy()");
+        ServletLogUtil.logServerShutdown("destroy()");
 
         for (DispatchHandler dh : httpGetDispatchHandlers) {
             log.debug("Shutting down handler: {}", dh.getClass().getName());

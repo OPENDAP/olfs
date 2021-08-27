@@ -33,7 +33,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -104,7 +104,7 @@ public class CovJson extends Dap4Responder {
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsCovJson(user, resourceID, constraintExpression, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 }

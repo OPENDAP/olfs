@@ -1,0 +1,324 @@
+<?xml version="1.0"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2019 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<project
+        name="dmrppJoinExisting"
+        default="all" basedir="." >
+    <description>
+This ANT file has two primary targets.
+- dmrppJoinExisiting - Build and run the DmrppJoinExisitingAggregator application
+- dmrppJoinExisitingApp - Build the
+    </description>
+
+
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tags: Used for doing distribution builds.
+         These properties should be set from the command
+         line when running the DISTRO build target.
+    -->
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="compile.TARGET" value="1.7"/>
+    <property name="compile.SOURCE" value="1.7"/>
+
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+    <!-- ********************************************* -->
+
+    <!-- Target to create the build directories -->
+    <!-- prior to a compile target. We also mark -->
+    <!-- the start time of the build for the log. -->
+
+    <target name="noop" description="Do Nothing Target">
+        <echo level="info" message="no-op target in ${ant.file}"/>
+    </target>
+
+
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="##########################################################"/>
+        <echo level="info" message="# Build Settings"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="           Project Name: ${ant.project.name}"/>
+        <echo level="info" message="           Project File: ${ant.file}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="                src.dir: ${src.dir}"/>
+        <echo level="info" message="                doc.dir: ${doc.dir}"/>
+        <echo level="info" message="                lib.dir: ${lib.dir}"/>
+        <echo level="info" message="          resources.dir: ${resources.dir}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="              build.dir: ${build.dir}"/>
+        <echo level="info" message="          build.classes: ${build.classes}"/>
+        <echo level="info" message="              build.doc: ${build.docs}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="               ant.file: ${ant.file}"/>
+        <echo level="info" message="               ant.home: ${ant.home}"/>
+        <echo level="info" message="       ant.java.version: ${ant.java.version}"/>
+        <echo level="info" message="       ant.project.name: ${ant.project.name}"/>
+        <echo level="info" message="            ant.version: ${ant.version}"/>
+        <echo level="info" message="                basedir: ${basedir}"/>
+        <echo level="info" message="              user.name: ${user.name}"/>
+        <echo level="info" message="              user.home: ${user.home}"/>
+        <echo level="info" message="              java.home: ${java.home}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message=""/>
+
+    </target>
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+
+
+    <!-- Project directories -->
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
+    <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
+
+
+    <!-- Build Directories -->
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.docs" location="${build.dir}/docs"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
+    <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
+
+    <property name="jdom.lib" value="jdom-1.1.1.jar"/>
+    <property name="junit.lib" value="junit-4.4.jar"/>
+    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
+    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
+    <property name="slf4j.lib" value="slf4j-api-1.7.16.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
+
+    <!--
+        These are the library jars used by Hyrax.
+    -->
+    <fileset id="dependencies" dir="${lib.dir}">
+        <include name="${jdom.lib}"/>
+        <include name="${junit.lib}"/>
+        <include name="${commons-cli.lib}"/>
+        <include name="${http-components-httpclient.lib}"/>
+        <include name="${http-components-httpcore.lib}"/>
+        <include name="${slf4j.lib}"/>
+        <include name="${logback-core.lib}"/>
+        <include name="${logback-classic.lib}"/>
+    </fileset>
+
+
+    <!-- Compile & run classpath -->
+    <path id="compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset refid="dependencies" />
+    </path>
+
+
+    <target name="all" depends="clean,compile"
+            description="Builds lots of stuff."/>
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.docs}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
+
+        <!-- This is where one sets up filters for PreProcessSourceCode -->
+        <!--
+        <filter token="Version" value="${VERSION}"/>
+        -->
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+        <echo message="hyrax-libs: ${toString:hyrax-libs}"/>
+    </target>
+
+
+    <target name="PreProcessSourceCode"
+            depends="clean,init"
+            description="Moves selected source code from the development tree into
+             the build/src directory. The code text is filtered to update version numbers.">
+        <echo level="info" message="Moving and filtering Source code."/>
+        <echo level="info" message="  AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=""/>
+
+        <copy todir="${build.src}" filtering="true">
+            <fileset dir="${src.dir}">
+                <!-- include all the java files -->
+                <include name="opendap/dap4/DmrppJoinExistingAggregator.java"/>
+                <include name="opendap/dap4/DmrppAggException.java"/>
+                <include name="opendap/namespaces/DAP4.java"/>
+                <include name="opendap/namespaces/DMRPP.java"/>
+                <include name="opendap/xml/Util.java"/>
+                <include name="opendap/logging/Procedure.java"/>
+                <include name="opendap/logging/Timer.java"/>
+                <include name="opendap/coreServlet/Scrub.java"/>
+                <include name="opendap/logging/LogUtil.java"/>
+            </fileset>
+
+        </copy>
+    </target>
+
+
+    <target
+            name="compile"
+            depends="PreProcessSourceCode"
+            description="Compiles the OLFS."
+    >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info" message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message="java.home (ant):       ${java.home}"/>
+        <echo level="info" message="Target JVM Version:    ${compile.TARGET}"/>
+        <echo level="info" message="Source Syntax Version: ${compile.SOURCE}"/>
+        <echo level="info" message=""/>
+
+        <javac compiler="${build.compiler}"
+               target="${compile.TARGET}"
+               source="${compile.SOURCE}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="compile.classpath"/>
+
+            <src path="${build.src}"/>
+
+        </javac>
+
+    </target>
+
+
+
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+
+    <property name="ARGS"     value="-h"/>
+    <target  name="dmrppJoinExisting"
+             description="This target performs a Join Existing aggregation of the dmr++ files
+located identified in the arguments. Run this target with no arguments to see the argument list.
+Use -DARGS=&quot;...&quot; to specify command line options."
+             depends="compile ">
+
+        <java classname="opendap.dap4.DmrppJoinExistingAggregator"
+              fork="true"
+              maxmemory="4096m"
+              dir="${build.run}" >
+            <classpath refid="compile.classpath" />
+            <arg line="${ARGS}" />
+        </java>
+    </target>
+
+
+    <target name="dmrppJoinExistingApp"
+            depends="clean,compile"
+            description="Builds executable jar file for the DmrppJoinExistingAggregator">
+
+        <jar destfile="${build.dist}/joinExisting.jar"
+             manifest="resources/META-INF/joinExisting.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="**"/>
+            </fileset>
+            <zipgroupfileset refid="dependencies"  />
+        </jar>
+    </target>
+
+</project>

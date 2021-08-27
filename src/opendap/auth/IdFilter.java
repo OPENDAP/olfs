@@ -31,7 +31,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.owasp.encoder.Encode;
@@ -91,7 +91,7 @@ public class IdFilter implements Filter {
             return;
 
         counter = new AtomicLong(0);
-        LogUtil.initLogging(filterConfig.getServletContext());
+        ServletLogUtil.initLogging(filterConfig.getServletContext());
         log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing IdFilter...");
 
@@ -156,7 +156,7 @@ public class IdFilter implements Filter {
             HttpServletRequest hsReq = request;
 
             String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
-            LogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
+            ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
             // Get session, make new as needed.
             HttpSession session = hsReq.getSession(true);
@@ -262,7 +262,7 @@ public class IdFilter implements Filter {
             }
             filterChain.doFilter(hsReq, hsRes);
             log.debug("END (session: {})",session.getId());
-            LogUtil.logServerAccessEnd(200,logName);
+            ServletLogUtil.logServerAccessEnd(200,logName);
 
         }
         finally {
