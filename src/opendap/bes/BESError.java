@@ -31,6 +31,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
+import org.apache.commons.io.IOUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -40,6 +41,7 @@ import org.jdom.input.SAXBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 
@@ -225,27 +227,36 @@ public class BESError extends OPeNDAPException {
         setResponseMediaType(mt);
 
         SAXBuilder sb = new SAXBuilder();
+        String rawBesError = null;
 
         try {
             is = cueErrorStreamToXmlStart(is);
+            
+            rawBesError = IOUtils.toString(is, HyraxStringEncoding.getCharset());
+            is = new ByteArrayInputStream(rawBesError.getBytes(HyraxStringEncoding.getCharset()));
+
             Document error = sb.build(is);
             besErrorDoc = processError(error);
-
             if (besErrorDoc == null) {
-                String msg = "ERROR - Failed to locate <BESError> object in XML document parsed from stream!";
-                becomeInvalidError(msg);
+                StringBuilder msg = new StringBuilder();
+                msg.append("ERROR - Failed to locate <BESError> object in XML document parsed from stream! ");
+                msg.append(" RawInput: ").append(rawBesError);
+                becomeInvalidError(msg.toString());
             }
 
         }
         catch (JDOMException e) {
-            String msg = "ERROR - Unable to parse expected <BESError> object from stream!";
-            msg += " Message: " + e.getMessage();
-            becomeInvalidError(msg);
+            StringBuilder msg = new StringBuilder();
+            msg.append("ERROR - Unable to parse expected <BESError> object from stream!");
+            msg.append(" Message: ").append(e.getMessage());
+            msg.append(" RawInput: ").append(rawBesError);
+            becomeInvalidError(msg.toString());
         }
         catch (IOException e) {
             StringBuilder msg = new StringBuilder();
             msg.append("ERROR - Failed to locate expected <BESError> object from stream.");
             msg.append(" Message: ").append(e.getMessage());
+            msg.append(" RawInput: ").append(rawBesError);
             becomeInvalidError(msg.toString());
         }
 
