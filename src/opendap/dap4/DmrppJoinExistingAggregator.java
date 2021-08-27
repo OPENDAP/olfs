@@ -26,8 +26,6 @@
 package opendap.dap4;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
 import opendap.logging.LogUtil;
 import opendap.namespaces.DAP4;
 import opendap.namespaces.DMRPP;
@@ -42,21 +40,21 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 public class DmrppJoinExistingAggregator {
 
     private Logger log;
 
-
     public static final String S3_PROTOCOL    = "s3://";
     public static final String FILE_PROTOCOL  = "file://";
     public static final String HTTP_PROTOCOL  = "http://";
     public static final String HTTPS_PROTOCOL = "https://";
 
+    java.net.URL url;
+
     // The list of dmr++ files that will be used to form the aggregation.
-    private ArrayList<URL> aggFileList;
+    private ArrayList<String> aggFileList;
 
     // The list of dmr++ access URLs loaded from
     private ArrayList<String> aggFileNames;
@@ -186,12 +184,12 @@ public class DmrppJoinExistingAggregator {
     public void ingestDmrppList(ArrayList<String> dmrpp_urls) throws IOException, DmrppAggException {
 
         for(String dmrppUrl: dmrpp_urls){
-            URL targetUrl;
+            String targetUrl;
             if (dmrppUrl.startsWith(HTTP_PROTOCOL) ||
                     dmrppUrl.startsWith(HTTPS_PROTOCOL) ||
                     dmrppUrl.startsWith(S3_PROTOCOL)) {
                 // It's http or s3 protocol, we use it as is.
-                targetUrl = new URL(dmrppUrl);
+                targetUrl = dmrppUrl;
             }
             else {
                 if (dmrppUrl.contains(".."))
@@ -211,7 +209,7 @@ public class DmrppJoinExistingAggregator {
                         dmrppUrl = FILE_PROTOCOL + cwd + dmrppUrl;
                     }
                 }
-                targetUrl = new URL(dmrppUrl);
+                targetUrl = dmrppUrl;
             }
             aggFileList.add(targetUrl);
         }
@@ -277,18 +275,19 @@ public class DmrppJoinExistingAggregator {
 
 
         // Use the first file on the list as the template dataset
-        URL templateDmrppUrl = aggFileList.remove(0);
+        String templateDmrppUrl = aggFileList.remove(0);
         Document aggDataset = Util.getDocument(templateDmrppUrl);
         ingestTemplateDataset(aggDataset);
 
         aggVarDimensionElement.getAttributeValue(DAP4.SIZE);
         int chunkIndex = 1;
-        for(URL url:aggFileList){
-            log.info("Aggregating dmr++ document: {}",url);
+        for(String url:aggFileList){
+            log.info("Processing dmr++ dataset document: {}",url);
             aggDataset = Util.getDocument(url);
-            ingestAggDataset(aggDataset,chunkIndex);
+            ingestAggDataset(aggDataset, chunkIndex);
             chunkIndex++;
             aggVarDimensionElement.setAttribute(DAP4.SIZE, chunkIndex+"");
+            log.info("Processing completed for: {}",url);
         }
 
         if(log.isDebugEnabled()) {
@@ -311,12 +310,11 @@ public class DmrppJoinExistingAggregator {
 
         Element datasetElement = datasetDoc.getRootElement();
         String s = datasetElement.getAttributeValue(DMRPP.HREF,DMRPP.NS);
-        URL dataURL = null;
+        String dataAccessURL = null;
         if(s!=null)
-            dataURL = new URL(s);
+            dataAccessURL = s;
 
-        aggContainer(datasetElement, dataURL, chunkIndex);
-        log.info("Dataset has been ingested.");
+        aggContainer(datasetElement, dataAccessURL, chunkIndex);
     }
 
 
@@ -326,13 +324,13 @@ public class DmrppJoinExistingAggregator {
      * @param chunkIndex
      * @throws DmrppAggException
      */
-    private void aggContainer(Element container,  URL dataURL , int chunkIndex ) throws DmrppAggException {
+    private void aggContainer(Element container,  String dataURL , int chunkIndex ) throws DmrppAggException {
 
         @SuppressWarnings("unchecked")
         List<Element> dapObjects = container.getChildren();
         for(Element dapObject:dapObjects){
             String aggVarName = getFQN(dapObject);
-            log.info("Begin processing {}",aggVarName);
+            log.debug("Begin processing {}",aggVarName);
             if (dapObject.getName().equals(DAP4.GROUP)){
                 aggContainer(dapObject, dataURL, chunkIndex);
             }
@@ -342,14 +340,6 @@ public class DmrppJoinExistingAggregator {
                 if(templateDimension==null){
                     throw new DmrppAggException("OUCH! Encountered non templated Dimension declaration for '"+dimName+"'");
                 }
-                /*
-                String dSize = dapObject.getAttributeValue(DAP4.SIZE);
-                String tSize = templateDimension.getAttributeValue(DAP4.SIZE);
-                if(!dSize.equals(tSize)){
-                    throw new DmrppAggException("OUCH! Agg dimension ("+dimName+") size ("+dSize+")" +
-                            " does not match template dimension size ("+tSize+")");
-                }
-                */
             }
             else if (dapObject.getName().equals(DAP4.STRUCTURE)){
                 aggContainer(dapObject, dataURL, chunkIndex);
@@ -379,7 +369,7 @@ public class DmrppJoinExistingAggregator {
                     Element templateVar = templateVars.get(aggVarName);
 
                     if (templateVar == null) {
-                        log.warn("Unable to locate aggVarTemplate '{}' SKIPPING.", aggVarName);
+                        log.info("Skipping variable '{}', no matching aggVarTemplate.", aggVarName);
                     } else {
                         @SuppressWarnings("unchecked")
                         List<Element> vDims = dapObject.getChildren(DAP4.DIM, DAP4.NS);
@@ -439,9 +429,11 @@ public class DmrppJoinExistingAggregator {
                                 Element chunk = (Element) vChunkElement.clone();
                                 chunk.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY,chunkPositionInArray);
 
-                                String href = chunk.getAttributeValue(DMRPP.HREF);
-                                if(href==null)
-                                    chunk.setAttribute(DMRPP.HREF,dataURL.toString());
+                                String href = chunk.getAttributeValue(DMRPP.HREF,DMRPP.NS);
+                                if(href==null) {
+                                    chunk.setAttribute(DMRPP.HREF, dataURL,DMRPP.NS);
+                                }
+                                log.info("./Chunk@dmrpp:href is set to current chunk to: {}",chunk.getAttributeValue(DMRPP.HREF,DMRPP.NS));
 
                                 if(trustDatasetUrls())
                                     chunk.setAttribute(DMRPP.TRUST,Boolean.toString(trustDatasetUrls()),DMRPP.NS);
@@ -454,12 +446,12 @@ public class DmrppJoinExistingAggregator {
                 }
             }
             else if (dapObject.getName().equals(DAP4.ENUMERATION)){
-                log.warn("Skipping {} name: {}",DAP4.ENUMERATION,dapObject.getAttributeValue(DAP4.NAME));
+                log.info("Skipping {} name: {}",DAP4.ENUMERATION,dapObject.getAttributeValue(DAP4.NAME));
             }
             else if (dapObject.getName().equals(DAP4.ENUM)){
-                log.warn("Skipping {} name: {}",DAP4.ENUM,dapObject.getAttributeValue(DAP4.NAME));
+                log.info("Skipping {} name: {}",DAP4.ENUM,dapObject.getAttributeValue(DAP4.NAME));
             }
-            log.info("Finished processing {}",aggVarName);
+            log.debug("Finished processing {}",aggVarName);
         }
     }
 
@@ -502,6 +494,7 @@ public class DmrppJoinExistingAggregator {
             String varFQN = entry.getKey();
             Element varElement = entry.getValue();
 
+            // The outer most Dim is the first Dim in the document order.
             Element outerDim = varElement.getChild(DAP4.DIM,DAP4.NS);
             if(outerDim==null)
                 throw new DmrppAggException("OUCH! The aggVarTemplate variable "+varFQN+" has no "+DAP4.DIM+" elements.");
@@ -516,13 +509,16 @@ public class DmrppJoinExistingAggregator {
             matchingVars.add(outerDimName);
 
             if(!aggVarNames.contains(varFQN) && !domainCoordinateVars.containsKey(varFQN)){
+                log.debug("Adding variable {} to drop list",varFQN);
                 dropList.put(varFQN,varElement);
             }
         }
         for(Map.Entry<String,Element> entry: dropList.entrySet()) {
-            String name = entry.getKey();
+            String varFQN = entry.getKey();
             Element varElement = entry.getValue();
-            templateVars.remove(name);
+            log.debug("Removing variable {} from templateVars",varFQN);
+            templateVars.remove(varFQN);
+            log.debug("Detaching variable element {} from parent document.",varFQN);
             varElement.detach();
         }
 
@@ -550,13 +546,13 @@ public class DmrppJoinExistingAggregator {
         }
         // Check the top-level URL for the dataset.
         // This implementation only support top level dmrpp:href URLs and not individual chunk URLs
-        URL dataURL = null;
+        String dataURL = null;
         String s = dataset.getAttributeValue(DMRPP.HREF,DMRPP.NS);
         // There might not be a Dataset level URL if all the Chunks already have them, so null is OK, but if
         // it's not null then grab the dataURL.
         if(s!=null){
-            dataURL = new URL(s);
-            
+            dataURL =s;
+
             if(trustDatasetUrls()) {
                 // Mark the Dataset to trust the URL.
                 dataset.setAttribute(DMRPP.TRUST, Boolean.toString(trustDatasetUrls()), DMRPP.NS);
@@ -631,7 +627,7 @@ public class DmrppJoinExistingAggregator {
     public void ingestDomainCoordinateVars(){
         for(Map.Entry<String,Element> entry : dimensions.entrySet()){
             String dimName = getFQN(entry.getValue());
-            log.info("Locating domain coordinate for dimension: {} to coordinateVars",dimName);
+            log.info("Locating domain coordinate for dimension: {}",dimName);
 
             Element matchingVarible = templateVars.get(dimName);
 
@@ -639,19 +635,23 @@ public class DmrppJoinExistingAggregator {
                 if(!dimName.equals(aggVarName)){
                     // This domain coordinate variable is not the aggregation variable,
                     // we don't want to aggregate it.
-                    log.info("Adding domain coordinate variable: {} to domainCoordinateVars",aggVarName);
+                    log.info("Adding domain coordinate variable: {} to domainCoordinateVars",dimName);
                     // Add the matchingVarible the domain coordinate variable list.
                     domainCoordinateVars.put(dimName,matchingVarible);
 
                     // And we drop it from the template variable list because
                     // we are not going to aggregate domain coordinate variables other than the aggregation variable.
-                    log.info("Removing domain coordinate variable: {} from templateVars",aggVarName);
+                    log.info("Removing domain coordinate variable: {} from templateVars",dimName);
                     templateVars.remove(dimName);
                 }
                 else {
                     // If the dimension name matches the aggVarName then it's the AggVar!
-                    log.info("Found aggregation variable element: {}",aggVarElement);
                     aggVarElement = matchingVarible;
+                    log.info("Found aggregation variable element: {}",aggVarName);
+                    if(log.isDebugEnabled()){
+                        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                        log.debug("Aggregation Variable Element:\n{}",xmlo.outputString(aggVarElement));
+                    }
                 }
             }
 
@@ -688,11 +688,11 @@ public class DmrppJoinExistingAggregator {
         Element theChunk = chunkElements.get(0);
         theChunk.setAttribute(DMRPP.CHUNK_POSITION_IN_ARRAY, "[0]");
 
-        if (log.isWarnEnabled()) {
+        if (log.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("Added ").append(DMRPP.CHUNK_DIMENSION_SIZES).append(" element to the ");
-            sb.append(DMRPP.CHUNKS).append(" element of the variable ").append(varFQN);
-            log.warn(sb.toString());
+            sb.append("Added ").append(DMRPP.CHUNK_DIMENSION_SIZES).append(" to the ");
+            sb.append(DMRPP.CHUNKS).append(" the variable ").append(varFQN);
+            log.info(sb.toString());
         }
         return chunkDimSizesElement;
     }
@@ -702,7 +702,7 @@ public class DmrppJoinExistingAggregator {
      * @param container
      * @throws DmrppAggException
      */
-    private void ingestContainerTemplate(Element container, URL dataURL ) throws DmrppAggException {
+    private void ingestContainerTemplate(Element container, String dataURL ) throws DmrppAggException {
 
         @SuppressWarnings("unchecked")
         List<Element> childElements = container.getChildren();
@@ -860,16 +860,15 @@ public class DmrppJoinExistingAggregator {
         boolean trustUrls = false;
 
         Logger log = (Logger) LoggerFactory.getLogger(introSpec);
-        log.setLevel(Level.DEBUG);
-        log.debug("Log Test.");
-        log.setLevel(Level.OFF);
-        log.debug("Log Test.");
-
+        log.setLevel(Level.ERROR);
+        /*
         Iterator<Appender<ILoggingEvent>> it = log.iteratorForAppenders();
         while (it.hasNext()) {
             Appender<ILoggingEvent> app = it.next();
             System.out.println( app.getName() );
         }
+        */
+
 
         try {
             //----------------------------------------------------------------------
@@ -965,8 +964,8 @@ public class DmrppJoinExistingAggregator {
         options.addOption("n", "dimName", true, "joinNew dimension name");
         options.addOption("v", "variablesFile", true, "A file containing a list of " +
                 "the names of the variables to be aggregated.");
-        options.addOption("t", "trust", false, "A file containing a list of " +
-                "the names of the variables to be aggregated.");
+        options.addOption("t", "trust", false, "If used will tag as trusted all the " +
+                "URLs processed from the dmr++ file.");
         return options;
     }
 
