@@ -116,7 +116,7 @@ public class DmrppJoinExistingAggregator {
 
     }
     void trustDatasetUrls(boolean v){ trustDatasetUrls = v; }
-    boolean trustDatasetUrls(){return trustDatasetUrls; }
+    boolean trustDatasetUrls(){ return trustDatasetUrls; }
 
     /**
      *
