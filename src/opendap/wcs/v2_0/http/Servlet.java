@@ -31,7 +31,7 @@ import opendap.bes.BESManager;
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.wcs.v2_0.WcsServiceManager;
 import opendap.wcs.v2_0.WcsException;
 import opendap.xml.Util;
@@ -89,7 +89,7 @@ public class Servlet extends HttpServlet {
 
             super.init();
 
-            LogUtil.initLogging(this);
+            ServletLogUtil.initLogging(this);
 
             String contextPath = ServletUtil.getContextPath(this);
             log.info("contextPath: {}", contextPath);
@@ -203,7 +203,7 @@ public class Servlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, LogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -257,7 +257,7 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.WCS_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
@@ -269,7 +269,7 @@ public class Servlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(req, LogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -305,7 +305,7 @@ public class Servlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.WCS_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.WCS_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
 
         }
@@ -317,11 +317,11 @@ public class Servlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             return new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID);
         }
 
 
@@ -330,7 +330,7 @@ public class Servlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        LogUtil.logServerShutdown("destroy()");
+        ServletLogUtil.logServerShutdown("destroy()");
 
         httpGetService.destroy();
         formService.destroy();

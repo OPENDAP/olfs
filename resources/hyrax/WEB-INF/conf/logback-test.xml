@@ -130,7 +130,7 @@
     <logger name="opendap.io" level="info" />
     <logger name="opendap.bes.dap2Responders.Ascii"   level="info"/>
 
-    <logger name="opendap.logging.LogUtil" level="info" />
+    <logger name="opendap.logging.ServletLogUtil" level="info" />
 
     <logger name="org.jdom" level="all" />
 

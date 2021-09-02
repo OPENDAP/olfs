@@ -40,7 +40,7 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.error.*;
 import opendap.http.mediaTypes.*;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.xml.Transformer;
@@ -58,7 +58,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 import org.owasp.encoder.Encode;
@@ -758,7 +757,7 @@ public class W10nResponder {
                 null,
                 os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent NetCDF-3 for {} size: {}",
                 w10nRequest.getValidResourcePath(),
                 os.size());
@@ -814,7 +813,7 @@ public class W10nResponder {
                 null,
                 os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("sendNetCdf4() - Sent NetCDF-4 for dataset: {} size: {}",
                 w10nRequest.getValidResourcePath(),os.size());
     }

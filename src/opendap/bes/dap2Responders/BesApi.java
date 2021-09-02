@@ -34,7 +34,7 @@ import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import opendap.ppt.PPTException;
@@ -2277,7 +2277,7 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
@@ -2373,7 +2373,7 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 

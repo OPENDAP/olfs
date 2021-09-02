@@ -35,7 +35,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.http.mediaTypes.TextXml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
@@ -130,7 +130,7 @@ public class XmlDSR extends Dap4Responder {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         xmlo.output(serviceDescription, os);
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
 
     }

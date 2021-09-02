@@ -37,7 +37,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.Header;
@@ -142,7 +142,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
@@ -262,7 +262,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 

@@ -29,7 +29,7 @@ package opendap.coreServlet;
 
 import opendap.http.error.NotFound;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -118,7 +118,7 @@ public class DocServlet extends HttpServlet {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
 
-            LogUtil.logServerAccessStart(request, LogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -213,7 +213,7 @@ public class DocServlet extends HttpServlet {
                 }
             }
         } finally {
-            LogUtil.logServerAccessEnd(status, response_size, LogUtil.DOCS_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(status, response_size, ServletLogUtil.DOCS_ACCESS_LOG_ID);
         }
     }
 

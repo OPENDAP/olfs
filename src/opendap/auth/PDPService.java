@@ -30,7 +30,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,7 @@ public class PDPService extends HttpServlet {
                 return;
             }
             super.init();
-            LogUtil.initLogging(this);
+            ServletLogUtil.initLogging(this);
 
             String systemPath = ServletUtil.getSystemPath(this, "");
             String configFile = getInitParameter("config");
@@ -121,11 +121,11 @@ public class PDPService extends HttpServlet {
         try {
             RequestCache.openThreadCache();
             long reqno = REQ_NUMBER.incrementAndGet();
-            LogUtil.logServerAccessStart(req, LogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
             return new Date().getTime();
 
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -165,7 +165,7 @@ public class PDPService extends HttpServlet {
 
         RequestCache.openThreadCache();
 
-        LogUtil.logServerAccessStart(request, LogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
+        ServletLogUtil.logServerAccessStart(request, ServletLogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
         try {
             if (!redirect(request, response)) {
 
@@ -226,7 +226,7 @@ public class PDPService extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(status, LogUtil.PDP_SERVICE_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(status, ServletLogUtil.PDP_SERVICE_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }

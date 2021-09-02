@@ -27,7 +27,7 @@ package opendap.gateway;
 
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -69,7 +69,7 @@ public class DispatchServlet extends HttpServlet {
         if (isInitialized.get())
             return;
 
-        LogUtil.logServerStartup("init()");
+        ServletLogUtil.logServerStartup("init()");
 
         gatewayDispatchHandler = new DispatchHandler();
 
@@ -153,7 +153,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             if (ReqInfo.isServiceOnlyRequest(req))
                 return new Date().getTime();
@@ -161,7 +161,7 @@ public class DispatchServlet extends HttpServlet {
             return gatewayDispatchHandler.getLastModified(req);
         }
         finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -188,7 +188,7 @@ public class DispatchServlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            LogUtil.logServerAccessStart(request, LogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             if (!redirect(request, response)) {
 
                 if(!gatewayDispatchHandler.requestDispatch(request,response,true)){
@@ -206,7 +206,7 @@ public class DispatchServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.GATEWAY_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.GATEWAY_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -214,7 +214,7 @@ public class DispatchServlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        LogUtil.logServerShutdown("destroy()");
+        ServletLogUtil.logServerShutdown("destroy()");
         gatewayDispatchHandler.destroy();
         super.destroy();
         log.info("Gateway service shutdown complete.");
