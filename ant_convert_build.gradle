@@ -121,7 +121,7 @@ project.ext {
     hyrax_resources_dir = "${project.resources_dir}/hyrax"
     ngap_resources_dir = "${project.resources_dir}/ngap"
     robots_resources_dir = "${project.resources_dir}/robots"
-    build_robots_resources = "${buildBir}/robots"
+    build_robots_resources = "${buildDir}/robots"
     wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
