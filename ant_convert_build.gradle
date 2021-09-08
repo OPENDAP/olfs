@@ -116,17 +116,17 @@ project.ext {
     // Build Directories
     //build_dir = "${buildDir}"
     build_classes = "${buildDir}/classes"
-    build_docs = "${project.build_dir}/docs"
-    build_dist = "${project.build_dir}/dist"
-    build_lib = "${project.build_dir}/lib"
-    build_run = "${project.build_dir}/run"
-    build_src = "${project.build_dir}/src"
-    build_resources = "${project.build_dir}/resources"
+    build_docs = "${buildDir}/docs"
+    build_dist = "${buildDir}/dist"
+    build_lib = "${buildDir}/lib"
+    build_run = "${buildDir}/run"
+    build_src = "${buildDir}/src"
+    build_resources = "${buildDir}/resources"
 
     hyrax_resources_dir = "${project.resources_dir}/hyrax"
     ngap_resources_dir = "${project.resources_dir}/ngap"
     robots_resources_dir = "${project.resources_dir}/robots"
-    build_robots_resources = "${project.build_dir}/robots"
+    build_robots_resources = "${buildDir}/robots"
     wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
@@ -138,12 +138,15 @@ clean.doFirst {
 task init_dir {
     description "Create required folders in the build directory."
     doLast {
-        mkdir "${project.build_dir}"
+        mkdir "${buildDir}"
         mkdir "${project.build_classes}"
 //        mkdir "${project.'build_docs'}"
 //        mkdir "${project.'build_run'}"
     }
+
 }
+
+
 
 task copyResources(type: Copy) {
     description "Copy from original resources."
@@ -171,7 +174,7 @@ task copyResources(type: Copy) {
     into("src_gradle/main/webapp")
 }
 
-task copySources(type: Copy) {
+task copySources(type: Copy){
     description "Copy original source code."
     from("src") {
         // include all the java files
@@ -193,6 +196,20 @@ task copySources(type: Copy) {
     }
     into("src_gradle/main/java")
 }
+
+/*
+task copyFilter(type: Copy){
+    from "bean.xml"
+    into ("$buildDir/beans")
+    def myProps = new Properties()
+    file("my.properties").withInputStream{
+        myProps.load(it);
+    }
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: myProps)
+}
+
+copyFilter.shouldRunAfter copySources
+*/
 
 task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyResources']) {
     description = "Moves selected source code from the development tree into the build/src directory. " +
