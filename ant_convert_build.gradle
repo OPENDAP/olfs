@@ -9,6 +9,7 @@ plugins {
 group 'org.opendap'
 version '1.0-SNAPSHOT'
 
+
 repositories {
     mavenCentral()
     jcenter()
@@ -16,6 +17,7 @@ repositories {
         url "https://repo.enonic.com/public"
     }
 }
+
 
 sourceSets {
     main {
@@ -26,7 +28,7 @@ sourceSets {
 }
 
 ext {
-    junitVersion = '5.6.2'
+    junitversion = '5.6.2'
 }
 
 tasks.register('hello') {
@@ -121,6 +123,7 @@ project.ext {
     build_lib = "${buildDir}/lib"
     build_run = "${buildDir}/run"
     build_src = "${buildDir}/src"
+
     build_resources = "${buildDir}/resources"
 
     hyrax_resources_dir = "${project.resources_dir}/hyrax"
@@ -132,23 +135,23 @@ project.ext {
 
 // FIXME remove this and store the sources in build_src once this is closer to working. jhrg
 clean.doFirst {
-    delete "${projectDir}/src_gradle"
+    delete "${buildDir}"
 }
 
-task init_dir {
-    description "Create required folders in the build directory."
+tasks.register('init_dir') {
+    description "Prepare all build directories. (WIP)"
     doLast {
         mkdir "${buildDir}"
         mkdir "${project.build_classes}"
-//        mkdir "${project.'build_docs'}"
-//        mkdir "${project.'build_run'}"
+        mkdir "${project.build_docs}"
+        mkdir "${project.build_dist}"
+        mkdir "${project.build_lib}"
+        mkdir "${project.build_run}"
+        mkdir "${project.build_src}"
     }
-
 }
 
-
-
-task copyResources(type: Copy) {
+tasks.register('copyResources', Copy) {
     description "Copy from original resources."
     from("resources/hyrax") {
         include "**"
@@ -174,27 +177,27 @@ task copyResources(type: Copy) {
     into("src_gradle/main/webapp")
 }
 
-task copySources(type: Copy){
+tasks.register ('copySources', Copy) {
     description "Copy original source code."
-    from("src") {
+    from "src" {
         // include all the java files
-        include "opendap/**"
-        include "org/opendap/**"
-        exclude "opendap/cmr/**"
+        include "**"
+
+        //exclude "opendap/cmr/**"
         // Exclude the experimental code
-        exclude "opendap/experiments/**"
+        //exclude "opendap/experiments/**"
         // Exclude the Metacat code
-        exclude "opendap/metacat/**"
+        //exclude "opendap/metacat/**"
         // Exclude WCS 1.1.2 and semantics code
-        exclude "opendap/wcs/v1_1_2/**"
-        exclude "opendap/semantics/**"
+        //exclude "opendap/wcs/v1_1_2/**"
+        //exclude "opendap/semantics/**"
         // Exclude prototype Amazon Web Services code from production
-        exclude "opendap/aws/**"
-        exclude "opendap/noaa_s3/**"
+        //exclude "opendap/aws/**"
+        //exclude "opendap/noaa_s3/**"
         // Exclude async test code
-        exclude "opendap/async/**"
+        //exclude "opendap/async/**"
     }
-    into("src_gradle/main/java")
+    into "${project.build_src}"
 }
 
 /*
