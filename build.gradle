@@ -62,17 +62,32 @@ ext {
 sourceSets {
     main {
         java {
-            srcDirs 'src'
+            srcDir 'src'
             // exclude 'some/unwanted/package/**'
         }
+
+        resources {
+            srcDirs 'resources/hyrax', 'resources/WCS/2.0/xsl', 'resources/WCS/2.0/WEB-INF'
+
+            exclude 'resources/WCS/WEB-INF/web.xml'
+            exclude 'resources/WCS/WEB-INF/urlrewrite.xml'
+            exclude 'resources/WCS/WEB-INF/logback.xml'
+            exclude 'resources/WCS/WEB-INF/logback-test.xml'
+        }
     }
+
+    // , 'resources/robots' //, 'resources/ngap'
+    // exclude 'resources/ngap/lib/**'
+    // exclude 'resources/ngap/landing/*.png'
 }
 
 dependencies {
     // The biggest difference I see between the gradle file written by Slav for the Snyk
     // integration and my olf 'Feedback' project is the use of 'compile' versus
     // 'implementation' in the dependencies. I'll leave some of the old lines in here as
-    // comments. jhrg 9/8/21
+    // comments.
+    // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
+    // jhrg 9/8/21
     //
     //    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     //    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -152,20 +167,6 @@ configurations {
     }
 }
 */
-
-// When using the plugin org.springframework.boot, the jar and war tasks are
-// disabled by default in favor of the bootJar/bootWar tasks. This section enables
-// them and adds '-boot' to the name of the bootable jar/war files, so that
-// the jar and bootJar don't over write each other (same for war/bootWar). jhrg 11/5/18
-//
-// I don't think we need the plain jar file... jhrg 11/8/18
-//jar {
-//	enabled = true
-//}
-//
-//bootJar {
-//	classifier = 'boot'
-//}
 
 war {
     enabled = true
