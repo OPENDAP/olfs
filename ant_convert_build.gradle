@@ -29,6 +29,12 @@ ext {
     junitVersion = '5.6.2'
 }
 
+tasks.register('hello') {
+    doLast {
+        println 'Hello world!'
+    }
+}
+
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -89,7 +95,7 @@ dependencies {
     //memcached-session-manager-2.3.3-SNAPSHOT.jar
     implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
     //memcached-session-manager-tc7-2.3.3-SNAPSHOT.jar
-    compile group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
+    // jhrg FIXME compile group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
     //minlog-1.3.0.jar
     implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
     //msm-kryo-serializer-2.3.3-SNAPSHOT.jar
@@ -99,7 +105,6 @@ dependencies {
     //redisson-all-3.5.5.jar
     implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
-
 }
 
 // see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
@@ -109,8 +114,8 @@ project.ext {
     // distribution_resources_dir = "${project.resources_dir}/distribution"
 
     // Build Directories
-    build_dir = "${buildDir}"
-    build_classes = "${project.build_dir}/classes"
+    //build_dir = "${buildDir}"
+    build_classes = "${buildDir}/classes"
     build_docs = "${project.build_dir}/docs"
     build_dist = "${project.build_dir}/dist"
     build_lib = "${project.build_dir}/lib"
@@ -125,8 +130,9 @@ project.ext {
     wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
+// FIXME remove this and store the sources in build_src once this is closer to working. jhrg
 clean.doFirst {
-    delete "src_gradle"
+    delete "${projectDir}/src_gradle"
 }
 
 task init_dir {
@@ -193,6 +199,7 @@ task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyR
             "The code text is filtered to update version numbers."
 }
 
+/*
 war {
     // Define war file name
     archiveName("${DEPLOYMENT_CONTEXT}.war")
@@ -200,6 +207,7 @@ war {
     destinationDirectory = file("$buildDir/dist")
     //classpath = configurations.compileClasspath
 }
+*/
 
 task server(dependsOn: ['PreProcessSourceCode', 'build']){
     description = "Performs a clean build of the core software and assembles the WAR file."
