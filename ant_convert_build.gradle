@@ -121,7 +121,7 @@ project.ext {
     hyrax_resources_dir = "${project.resources_dir}/hyrax"
     ngap_resources_dir = "${project.resources_dir}/ngap"
     robots_resources_dir = "${project.resources_dir}/robots"
-    build_robots_resources = "${project.build_dir}/robots"
+    build_robots_resources = "${buildBir}/robots"
     wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
@@ -132,7 +132,7 @@ clean.doFirst {
 task init_dir {
     description "Create required folders in the build directory."
     doLast {
-        mkdir "${project.build_dir}"
+        mkdir "${buildDir}"
         mkdir "${project.build_classes}"
 //        mkdir "${project.'build_docs'}"
 //        mkdir "${project.'build_run'}"
