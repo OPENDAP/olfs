@@ -168,13 +168,22 @@ configurations {
 }
 */
 
+// See: https://docs.gradle.org/current/userguide/war_plugin.html
+// We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
+// given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
     enabled = true
+    //    webAppDirectory = file('src/main/webapp')
+    //    from 'src/rootContent' // adds a file-set to the root of the archive
+    //    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
+    //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
+    //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
+    //    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
 }
 
 tasks.register('hello') {
-    description 'Goofy hello task'
+    description = "Goofy hello task"
     doLast {
-        println 'Hello world!'
+        println('Hello world!')
     }
 }
