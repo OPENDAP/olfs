@@ -39,7 +39,7 @@ repositories {
     // For just about everything except...
     mavenCentral()
     // For: org.clojars.pjt and org.jdom
-    // jcenter()
+    // jcenter(); removed jhrg 9/8/21
     // For: net.sf.saxon
     maven {
         url 'https://repo.enonic.com/public'
