@@ -39,7 +39,7 @@ repositories {
     // For just about everything except...
     mavenCentral()
     // For: org.clojars.pjt and org.jdom
-    jcenter()
+    // jcenter()
     // For: net.sf.saxon
     maven {
         url 'https://repo.enonic.com/public'
@@ -47,7 +47,7 @@ repositories {
     // I cannot get the above 'enonic' repo to work and cannot find saxon 9.1.0.8
     // anywhere. But we have 9.1.0.5 locally. jhrg 9/8/21
     flatDir {
-        dirs 'gralde_local_repo'
+        dirs 'lib' // 'gralde_local_repo'
     }
 }
 
@@ -121,17 +121,17 @@ dependencies {
     implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
     implementation group: 'commons-io', name: 'commons-io', version: '1.2'
     implementation group: 'org.jdom', name: 'jdom', version: '1.1.1'
-    implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
 
     // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
     // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
     // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
+    // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
     implementation files('gradle_local_repo/saxon-9.1.0.5.jar')
     implementation files('gradle_local_repo/saxon-9.1.0.5-jdom.jar')
+    implementation files('gradle_local_repo/saxon-9.1.0.5-s9api.jar')
     // I don't know if we can use the 9.1.0.8 version pulled from a maven repo (above)
     // or if we need the 9.1.0.5 version below to match the saxon jars used from a local
     // repo. jhrg 9/8/21
-    // implementation files('gradle_local_repo/saxon-9.1.0.5-s9api.jar')
 
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
