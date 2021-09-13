@@ -63,8 +63,8 @@ public class IdPManager {
         }
         try {
             log.debug("idpFactory(): Building Identity Provider: " + idpClassName);
-            Class classDefinition = Class.forName(idpClassName);
-            IdProvider idp = (IdProvider) classDefinition.newInstance();
+            Class<?> classDefinition = Class.forName(idpClassName);
+            IdProvider idp = (IdProvider) classDefinition.getDeclaredConstructor().newInstance();
             idp.init(config, serviceContext);
             addProvider(idp);
         } catch (Exception e) {

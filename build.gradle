@@ -32,8 +32,8 @@ version = '0.1.0-SNAPSHOT'
 
 description = """The OLFS"""
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     // For just about everything except...
@@ -139,10 +139,9 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
 
-
-    //annottaonProcessor 'org.tuckey:urlrewritefilter:3.2.0'
+    annotationProcessor 'org.tuckey:urlrewritefilter:3.2.0'
     //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
-    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
+    //implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
 
     implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
@@ -190,6 +189,11 @@ war {
     //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
     //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
     //    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+    options.deprecation = true
 }
 
 tasks.register('hello') {
