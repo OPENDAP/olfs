@@ -39,7 +39,7 @@ repositories {
     // For just about everything except...
     mavenCentral()
     // For: org.clojars.pjt and org.jdom
-    // jcenter()
+    // jcenter(); removed jhrg 9/8/21
     // For: net.sf.saxon
     maven {
         url 'https://repo.enonic.com/public'
@@ -48,7 +48,7 @@ repositories {
     // I cannot get the above 'enonic' repo to work and cannot find saxon 9.1.0.8
     // anywhere. But we have 9.1.0.5 locally. jhrg 9/8/21
     flatDir {
-        dirs 'gralde_local_repo'
+        dirs 'lib' // 'gralde_local_repo'
     }
 
 }
@@ -123,13 +123,14 @@ dependencies {
     implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
     implementation group: 'commons-io', name: 'commons-io', version: '1.2'
     implementation group: 'org.jdom', name: 'jdom', version: '1.1.1'
-    implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
 
     // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
     // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
     // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
+    // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
     implementation files('gradle_local_repo/saxon-9.1.0.5.jar')
     implementation files('gradle_local_repo/saxon-9.1.0.5-jdom.jar')
+    implementation files('gradle_local_repo/saxon-9.1.0.5-s9api.jar')
     // I don't know if we can use the 9.1.0.8 version pulled from a maven repo (above)
     // or if we need the 9.1.0.5 version below to match the saxon jars used from a local
     // repo. jhrg 9/8/21
@@ -171,13 +172,22 @@ configurations {
 }
 */
 
+// See: https://docs.gradle.org/current/userguide/war_plugin.html
+// We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
+// given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
     enabled = true
+    //    webAppDirectory = file('src/main/webapp')
+    //    from 'src/rootContent' // adds a file-set to the root of the archive
+    //    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
+    //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
+    //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
+    //    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
 }
 
 tasks.register('hello') {
-    description 'Goofy hello task'
+    description = "Goofy hello task"
     doLast {
-        println 'Hello world!'
+        println('Hello world!')
     }
 }
