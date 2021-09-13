@@ -64,23 +64,29 @@ ext {
 sourceSets {
     main {
         java {
-            srcDir 'src'
+            srcDirs = ['src']
             // exclude 'some/unwanted/package/**'
+            // TODO Exclude the *Test.java files but put them in a 'test' source set. jhrg 9/13/21
+            // See also: https://docs.gradle.org/current/userguide/java_testing.html#java_testing
+            // and https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
         }
 
         resources {
-            srcDirs 'resources/hyrax', 'resources/WCS/2.0/xsl', 'resources/WCS/2.0/WEB-INF'
+            // Using the following results in a copy of the 'resources//hyrax/WEB-INF'
+            // dir's contents in the 'classes' dir. Probably not what we want. jhrg 9/13/21
+            //
+            // See the war { } task at the end of this file for the low down on how we
+            // get the resources copied into the war file. jhrg 9/13/21
 
-            exclude 'resources/WCS/WEB-INF/web.xml'
-            exclude 'resources/WCS/WEB-INF/urlrewrite.xml'
-            exclude 'resources/WCS/WEB-INF/logback.xml'
-            exclude 'resources/WCS/WEB-INF/logback-test.xml'
+            // srcDirs = ['resources/hyrax']
+            // , 'resources/WCS/2.0/xsl', 'resources/WCS/2.0/WEB-INF'
+
+            //exclude 'resources/WCS/WEB-INF/web.xml'
+            //exclude 'resources/WCS/WEB-INF/urlrewrite.xml'
+            //exclude 'resources/WCS/WEB-INF/logback.xml'
+            //exclude 'resources/WCS/WEB-INF/logback-test.xml'
         }
     }
-
-    // , 'resources/robots' //, 'resources/ngap'
-    // exclude 'resources/ngap/lib/**'
-    // exclude 'resources/ngap/landing/*.png'
 }
 
 dependencies {
@@ -128,9 +134,9 @@ dependencies {
     // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
     // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
     // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
-    implementation files('gradle_local_repo/saxon-9.1.0.5.jar')
-    implementation files('gradle_local_repo/saxon-9.1.0.5-jdom.jar')
-    implementation files('gradle_local_repo/saxon-9.1.0.5-s9api.jar')
+    implementation files('lib/saxon-9.1.0.5.jar')
+    implementation files('lib/saxon-9.1.0.5-jdom.jar')
+    implementation files('lib/saxon-9.1.0.5-s9api.jar')
     // I don't know if we can use the 9.1.0.8 version pulled from a maven repo (above)
     // or if we need the 9.1.0.5 version below to match the saxon jars used from a local
     // repo. jhrg 9/8/21
@@ -151,8 +157,6 @@ dependencies {
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    compile group: 'org.daisy.libs', name: 'saxon-he', version: '9.5.1.5-1'
-
 
     // ---- NGAP libraries -----
     implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
@@ -178,13 +182,19 @@ configurations {
 }
 */
 
+// TODO Copy and filter the resources, then install the copied resources to the
+// war file by changing the 'resources/hyrax' in the 'from' line below to the
+// location of the copied/filtered resource files. jhrg 9/13/21
+
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    enabled = true
+    // Not needed. Use this with a Spring project. jhrg 9/13/21 enabled = true
     //    webAppDirectory = file('src/main/webapp')
     //    from 'src/rootContent' // adds a file-set to the root of the archive
+    from 'resources/hyrax'
+    //from 'doc' to 'docs'
     //    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
     //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
     //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
