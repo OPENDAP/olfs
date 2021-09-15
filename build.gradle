@@ -17,6 +17,7 @@ buildscript {
     dependencies {
         // Required dependency for spring-boot plugin
         // jhrg classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE'
+        classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
     }
 }
 
@@ -38,19 +39,22 @@ targetCompatibility = 1.7
 repositories {
     // For just about everything except...
     mavenCentral()
+
     // For: org.clojars.pjt and org.jdom
     // jcenter(); removed jhrg 9/8/21
     // For: net.sf.saxon
     maven {
         url 'https://repo.enonic.com/public'
-        }
-    maven { url 'https://clojars.org/repo/' }
+    }
+    maven {
+        url 'https://clojars.org/repo/'
+
+    }
     // I cannot get the above 'enonic' repo to work and cannot find saxon 9.1.0.8
     // anywhere. But we have 9.1.0.5 locally. jhrg 9/8/21
     flatDir {
-        dirs 'lib' // 'gralde_local_repo'
+        dirs 'lib'
     }
-
 }
 
 ext {
@@ -87,7 +91,8 @@ sourceSets {
             //exclude 'resources/WCS/WEB-INF/logback-test.xml'
         }
     }
-    testMain{
+
+    testMain {
         java {
             include 'src/**/*Test.java'
         }
@@ -150,9 +155,9 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
 
-    annotationProcessor 'org.tuckey:urlrewritefilter:3.2.0'
+    //annotationProcessor 'org.tuckey:urlrewritefilter:3.2.0'
     //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
-    //implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
+    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
 
     implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
@@ -190,6 +195,7 @@ configurations {
 // TODO Copy and filter the resources, then install the copied resources to the
 //  war file by changing the 'resources/hyrax' in the 'from' line below to the
 //  location of the copied/filtered resource files. jhrg 9/13/21
+/*
 import org.apache.tools.ant.filters.ReplaceTokens
 
 tasks.register('FilterResources', Copy){
@@ -197,25 +203,20 @@ tasks.register('FilterResources', Copy){
     to $buildDir/resourcesTemp
     filter(ReplaceToken, tokens: [placeholderToken: 'replacementValue'])
 }
+*/
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    println 'entered war build'
-    // Not needed. Use this with a Spring project. jhrg 9/13/21 enabled = true
-    //    webAppDirectory = file('src/main/webapp')
-    //    from 'src/rootContent' // adds a file-set to the root of the archive
-    from 'resources/hyrax'
-    into 'docs', {
-        from 'doc'
-    }
-    //    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
-    //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
-    //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
-    //    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+    println 'Entered war build...'
+
+    dependsOn 'copyOLFSResources'
+
+    from layout.buildDirectory.dir("resources")
+
     doLast {
-        println 'war build done'
+        println 'war build done.'
     }
 }
 
@@ -225,9 +226,32 @@ tasks.withType(JavaCompile) {
     options.deprecation = true
 }
 
-tasks.register('hello') {
-    description = "Goofy hello task"
-    doLast {
-        println('Hello world!')
-    }
+// Copy and filter the resource files. These tasks are run by the 'war' task.
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+tasks.register('copyHyraxResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in resources/hyrax/.'
+
+    from layout.projectDirectory.dir("resources/hyrax")
+    into layout.buildDirectory.dir("resources")
+    filter(ReplaceTokens, tokens: [placeholderToken: 'replacementValue'])
+}
+
+tasks.register('copyDocResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in doc/.'
+
+    from layout.projectDirectory.dir("doc")
+    into layout.buildDirectory.dir("resources/docs")
+    filter(ReplaceTokens, tokens: [placeholderToken: 'replacementValue'])
+}
+
+tasks.register('copyOLFSResources') {
+    group = 'Filtering'
+    description = 'Copy and filter the resources for the war file.'
+
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
 }
