@@ -1,0 +1,7 @@
+The service context is /@SERVICE_CONTEXT@.
+
+VERSION
+
+@VERSION@
+
+Done.
