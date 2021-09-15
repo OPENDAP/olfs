@@ -29,10 +29,9 @@ plugins {
 }
 
 group = 'org.opendap'
+description = 'The OLFs build'
+
 version = '0.1.0-SNAPSHOT'
-
-description = """The OLFS"""
-
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
@@ -58,6 +57,20 @@ repositories {
 }
 
 ext {
+    DEPLOYMENT_CONTEXT = 'opendap'
+    NGAP_DEPLOYMENT_CONTEXT = 'ngap'
+
+    HYRAX_VERSION = 'Not.A.Release'
+    OLFS_VERSION = 'Not.A.Release'
+    WCS_VERSION = '${OLFS_VERSION}'
+
+    OLFS_DIST_BASE = 'olfs-${OLFS_VERSION}'
+    WEBAPP_DIST = '${OLFS_DIST_BASE}-webapp'
+
+    SRC_DIST = '${OLFS_DIST_BASE}-src'
+    DOC_DIST = '${OLFS_DIST_BASE}-doc'
+    OLFS_LIB = '${OLFS_DIST_BASE}'
+
     junitVersion = '5.6.2'
 }
 
@@ -210,6 +223,7 @@ tasks.register('FilterResources', Copy){
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
     println 'Entered war build...'
+    println "Deployment context: ${DEPLOYMENT_CONTEXT}"
 
     dependsOn 'copyOLFSResources'
 
@@ -230,13 +244,22 @@ tasks.withType(JavaCompile) {
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
+/*
+    From the ant build.xml
+
+        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
+        <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
+        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
+        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
+ */
+
 tasks.register('copyHyraxResources', Copy) {
     group = 'Filtering'
     description = 'Copy and filter the resources in resources/hyrax/.'
 
     from layout.projectDirectory.dir("resources/hyrax")
     into layout.buildDirectory.dir("resources")
-    filter(ReplaceTokens, tokens: [placeholderToken: 'replacementValue'])
+    //filter(ReplaceTokens, tokens: [SERVICE_CONTEXT: "${DEPLOYMENT_CONTEXT}"])
 }
 
 tasks.register('copyDocResources', Copy) {
