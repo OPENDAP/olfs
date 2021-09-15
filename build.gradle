@@ -65,7 +65,7 @@ sourceSets {
     main {
         java {
             srcDirs = ['src']
-            // exclude 'some/unwanted/package/**'
+            exclude '**/*Test.java'
             // TODO Exclude the *Test.java files but put them in a 'test' source set. jhrg 9/13/21
             // See also: https://docs.gradle.org/current/userguide/java_testing.html#java_testing
             // and https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
@@ -78,13 +78,18 @@ sourceSets {
             // See the war { } task at the end of this file for the low down on how we
             // get the resources copied into the war file. jhrg 9/13/21
 
-            // srcDirs = ['resources/hyrax']
+            //srcDirs = ['resources/hyrax']
             // , 'resources/WCS/2.0/xsl', 'resources/WCS/2.0/WEB-INF'
 
             //exclude 'resources/WCS/WEB-INF/web.xml'
             //exclude 'resources/WCS/WEB-INF/urlrewrite.xml'
             //exclude 'resources/WCS/WEB-INF/logback.xml'
             //exclude 'resources/WCS/WEB-INF/logback-test.xml'
+        }
+    }
+    testMain{
+        java {
+            include 'src/**/*Test.java'
         }
     }
 }
@@ -183,13 +188,14 @@ configurations {
 */
 
 // TODO Copy and filter the resources, then install the copied resources to the
-// war file by changing the 'resources/hyrax' in the 'from' line below to the
-// location of the copied/filtered resource files. jhrg 9/13/21
+//  war file by changing the 'resources/hyrax' in the 'from' line below to the
+//  location of the copied/filtered resource files. jhrg 9/13/21
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
+    println 'entered war build'
     // Not needed. Use this with a Spring project. jhrg 9/13/21 enabled = true
     //    webAppDirectory = file('src/main/webapp')
     //    from 'src/rootContent' // adds a file-set to the root of the archive
@@ -199,10 +205,14 @@ war {
     //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
     //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
     //    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+    doLast {
+        println 'war build done'
+    }
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:unchecked'
+    //options.compilerArgs << '-Xlint:unchecked'
+    //options.compilerArgs << '-Xlint:unchecked' << '-Werror' //enable to mark deprecated warnings as errors
     options.deprecation = true
 }
 
