@@ -190,6 +190,13 @@ configurations {
 // TODO Copy and filter the resources, then install the copied resources to the
 //  war file by changing the 'resources/hyrax' in the 'from' line below to the
 //  location of the copied/filtered resource files. jhrg 9/13/21
+import org.apache.tools.ant.filters.ReplaceTokens
+
+tasks.register('FilterResources', Copy){
+    from resources/hyrax
+    to $buildDir/resourcesTemp
+    filter(ReplaceToken, tokens: [placeholderToken: 'replacementValue'])
+}
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
@@ -200,7 +207,9 @@ war {
     //    webAppDirectory = file('src/main/webapp')
     //    from 'src/rootContent' // adds a file-set to the root of the archive
     from 'resources/hyrax'
-    //from 'doc' to 'docs'
+    into 'docs', {
+        from 'doc'
+    }
     //    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
     //    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
     //    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
