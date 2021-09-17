@@ -119,18 +119,14 @@ dependencies {
     // comments.
     // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
     // jhrg 9/8/21
-    //
-    //    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    //    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    //    providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.22' // '1.6.1'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2' // '1.1.11'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
+    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+    providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
 
     implementation group: 'junit', name: 'junit', version: '4.13.1'
     implementation group: 'org.jdom', name: 'jdom', version: '1.1.1'
@@ -138,116 +134,86 @@ dependencies {
     //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
     implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
 
-    // Include or not, this makes no difference. We still get the 'severe' error
-    // regarding a cast: "org.slf4j.impl.SimpleLoggerFactory cannot be cast to
-    // ch.qos.logback.classic.LoggerContext"
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.22' // '1.6.1'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2' // '1.1.11'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
 
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
     implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    // Duplicate? jhrg 9/15/21 implementation group: 'commons-io', name: 'commons-io', version: '1.2'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.5'
     implementation group: 'commons-logging', name: 'commons-logging', version: '1.1.3'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
 
-    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1' // Used for XSLTransformer, validatorApp targets
     implementation group: 'xalan', name: 'xalan', version: '2.7.2' // not used?
+    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1' // Used for XSLTransformer, validatorApp targets
 
     // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
     // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
     // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
     // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
-    implementation files('lib/saxon-9.1.0.5.jar')
     implementation files('lib/saxon-9.1.0.5-jdom.jar')
     implementation files('lib/saxon-9.1.0.5-s9api.jar')
+    implementation files('lib/saxon-9.1.0.5.jar')
 
     implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2.2'
     implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    //implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
-    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
-    // Duplicate? jhrg 9/16/21 providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-    providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-
-    ///
     /// WCS libs
-    ///
-    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
-    implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
-    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
     implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
 
+    implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
 
-    ///
-    /// NGAP libraries
-    ///
-//    implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
-//    implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
-//    implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
-//    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
-//    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
-//
-//    implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
-//    implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
-//    implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
-//    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
+    /// NGAP libraries - look in resources/ngap/lib - some libs are missing below
+    /// Build a separate war file for NGAP. jhrg 9/17/21
+    //    implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
+    //    implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
+    //    implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
+    //    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
+    //    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
+    //
+    //    implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
+    //    implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
+    //      DO NOT use reddisson-all, that will include all of the reddisson's deps and that
+    //      will break our code. Use the lib with a version number.
+    //    implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
+    //    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 }
 
+// Substitute the version information before compilation
 compileJava {
-    doFirst {
-        println 'Entered compileJava...'
-    }
-
     dependsOn 'substituteVersionInfo'
-
-    doLast {
-        println 'compileJava done.'
-    }
 }
 
 // war depends on 'processResources'
 processResources {
-    doFirst {
-        println 'Entered processResources...'
-    }
-
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
     dependsOn 'copyWCSResources'
-
-    doLast {
-        println 'processResources done.'
-    }
 }
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    doFirst {
-        println 'Entered war build...'
-    }
-
     archiveName = 'opendap.war'
 
     // Use the file in build/resources to populate the war file's resources
     from layout.buildDirectory.dir("resources")
-
-    doLast {
-        println 'war build done.'
-    }
 }
 
 clean {
@@ -289,8 +255,9 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
               HyraxVersion: project.HYRAX_VERSION,
-              OlfsVersion: project.OLFS_VERSION,
-              WCS_SOFTWARE_VERSION: project.WCS_VERSION]
+              OlfsVersion: project.OLFS_VERSION]
+
+// Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
 
 // This task copys resources from 'resources/hyrax' to $buildDir/resources
 // and, along the way, substitutes various tokes in the files.
@@ -310,12 +277,15 @@ tasks.register('copyDocResources', Copy) {
 
     from layout.projectDirectory.dir("doc")
     into layout.buildDirectory.dir("resources/docs")
+
+    exclude 'src.distribution.readme'
+
     shouldRunAfter 'copyHyraxResources'
 }
 
 tasks.register('copyWCSResources', Copy) {
     group = 'Filtering'
-    description = 'Copy and filter the resources in doc/.'
+    description = 'Copy and filter the resources in resources/WCS/2.0.'
 
     from layout.projectDirectory.dir("resources/WCS/2.0")
     into layout.buildDirectory.dir("resources/")
@@ -330,15 +300,6 @@ tasks.register('copyWCSResources', Copy) {
 
     shouldRunAfter 'copyHyraxResources'
 }
-
-/*
-               <include name="xsl/**"/>
-                <include name="WEB-INF/**"/>
-                <exclude name="WEB-INF/web.xml"/>
-                <exclude name="WEB-INF/urlrewrite.xml"/>
-                <exclude name="WEB-INF/logback.xml"/>
-                <exclude name="WEB-INF/logback-test.xml"/>
-*/
 
 // This task looks for anything in 'src/' that ends in .java.in, substitutes the
 // tokens in it and places the result into a file with the same basename ending in
@@ -357,5 +318,4 @@ tasks.register('substituteVersionInfo', Copy) {
     include '**/*.java.in'
     filter(ReplaceTokens, tokens: tokens)
     rename '(.+)\\.in', '$1'
-
 }
