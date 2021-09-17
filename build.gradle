@@ -225,6 +225,7 @@ processResources {
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
+    dependsOn 'copyWCSResources'
 
     doLast {
         println 'processResources done.'
@@ -311,6 +312,33 @@ tasks.register('copyDocResources', Copy) {
     into layout.buildDirectory.dir("resources/docs")
     shouldRunAfter 'copyHyraxResources'
 }
+
+tasks.register('copyWCSResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in doc/.'
+
+    from layout.projectDirectory.dir("resources/WCS/2.0")
+    into layout.buildDirectory.dir("resources/")
+
+    include 'xsl/**'
+    include 'WEB-INF/**'
+
+    exclude 'WEB-INF/web.xml'
+    exclude 'WEB-INF/urlrewrite.xml'
+    exclude 'WEB-INF/logback.xml'
+    exclude 'WEB-INF/logback-test.xml'
+
+    shouldRunAfter 'copyHyraxResources'
+}
+
+/*
+               <include name="xsl/**"/>
+                <include name="WEB-INF/**"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+                <exclude name="WEB-INF/logback.xml"/>
+                <exclude name="WEB-INF/logback-test.xml"/>
+*/
 
 // This task looks for anything in 'src/' that ends in .java.in, substitutes the
 // tokens in it and places the result into a file with the same basename ending in
