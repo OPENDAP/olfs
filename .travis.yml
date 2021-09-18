@@ -78,7 +78,10 @@ jobs:
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
     - jdk: openjdk7
       name: "gradle jdk7"
-      script: gradle war 
+      script:
+      - gradle --version
+      - gradle tasks
+      - gradle war 
 
     - stage: test
       name: "jdk7"
