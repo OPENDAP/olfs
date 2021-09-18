@@ -86,12 +86,6 @@ jobs:
     - jdk: openjdk8
       name: "jdk8"
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - jdk: openjdk7
-      name: "gradle jdk7"
-      script:
-      - ./gradlew --version
-      - ./gradlew tasks
-      - ./gradlew war 
     - jdk: openjdk8
       name: "gradle jdk8"
       script:
