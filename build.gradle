@@ -51,17 +51,37 @@ ext {
     DEPLOYMENT_CONTEXT = 'opendap'
     NGAP_DEPLOYMENT_CONTEXT = 'ngap'
 
-    HYRAX_VERSION = 'Not.A.Release'
-    OLFS_VERSION = 'Not.A.Release'
+    // Use gradle showInfo -P OLFS_VERSION=x.y.z to override the default. jhrg 9/20/21
+    HYRAX_VERSION = project.hasProperty('HYRAX_VERSION') ? project.property('HYRAX_VERSION') : 'Not.A.Release'
+    OLFS_VERSION = project.hasProperty('OLFS_VERSION') ? project.property('OLFS_VERSION') : 'Not.A.Release'
+
     WCS_VERSION = project.OLFS_VERSION
 
     // TODO Fix these strings. Maybe add a task to print them all. jhrg 9/17/21
-    OLFS_DIST_BASE = 'olfs-${OLFS_VERSION}'
-    WEBAPP_DIST = '${OLFS_DIST_BASE}-webapp'
+    OLFS_DIST_BASE = 'olfs-' + project.OLFS_VERSION // olfs-${OLFS_VERSION}'
+    WEBAPP_DIST = project.OLFS_DIST_BASE + '-webapp' //'${OLFS_DIST_BASE}-webapp'
 
-    SRC_DIST = '${OLFS_DIST_BASE}-src'
-    DOC_DIST = '${OLFS_DIST_BASE}-doc'
-    OLFS_LIB = '${OLFS_DIST_BASE}'
+    SRC_DIST = project.OLFS_DIST_BASE + '-src' // '${OLFS_DIST_BASE}-src'
+    DOC_DIST = project.OLFS_DIST_BASE + '-doc' //${OLFS_DIST_BASE}-doc'
+    OLFS_LIB = project.OLFS_DIST_BASE // ${OLFS_DIST_BASE}'
+}
+
+tasks.register('showInfo') {
+    group = 'info'
+    description = 'Dsiplay additional project properties - used to control version numbers'
+
+    println 'DEPLOYMENT_CONTEXT: ' + project.DEPLOYMENT_CONTEXT
+    println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
+    println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+    println 'OLFS_VERSION: ' + project.OLFS_VERSION
+    println 'WCS_VERSION: ' + project.OLFS_VERSION
+
+    println 'OLFS_DIST_BASE: ' + project.OLFS_DIST_BASE
+    println 'WEBAPP_DIST: ' + project.WEBAPP_DIST
+
+    println 'SRC_DIST: ' + project.SRC_DIST
+    println 'DOC_DIST: ' + project.DOC_DIST
+    println 'OLFS_LIB: ' + project.OLFS_LIB
 }
 
 // See https://docs.gradle.org/current/userguide/building_java_projects.html#sec:java_source_sets
@@ -87,12 +107,50 @@ sourceSets {
             include 'src/**/*Test.java'
         }
     }
+
+    ngap {
+        java {
+            srcDirs = ['src']
+        }
+
+        resources {
+
+        }
+
+        dependencies {
+            implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
+            implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
+            implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
+            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
+            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
+
+            implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
+            implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
+            // DO NOT use reddisson-all, that will include all of the reddisson's deps and that
+            // will break our code. Use the lib with a version number.
+            implementation group: 'org.redisson', name: 'redisson', version: '3.11.6'
+            implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
+        }
+
+        war {
+            baseName = 'ngap'
+
+            // Copy/filter the various resource files
+            dependsOn 'copyHyraxResources'
+            dependsOn 'copyDocResources'
+            dependsOn 'copyWCSResources'
+
+            // Use the file in build/resources to populate the war file's resources
+            from layout.buildDirectory.dir("resources")
+        }
+
+    }
 }
 
 dependencies {
     // The biggest difference I see between the gradle file written by Slav for the Snyk
     // integration and my olf 'Feedback' project is the use of 'compile' versus
-    // 'implementation' in the dependencies. I'll leave some of the old lines in here as
+    // 'implemetation' in the dependencies. I'll leave some of the old lines in here as
     // comments.
     // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
     // jhrg 9/8/21
@@ -153,21 +211,6 @@ dependencies {
     // implementation group: 'xalan', name: 'xalan', version: '2.7' // not used?
     // Used for XSLTransformer, validatorApp targets
     // implementation group: 'xerces', name: 'xercesImpl', version: '2.12'
-
-    /// NGAP libraries - look in resources/ngap/lib - some libs are missing below
-    /// Build a separate war file for NGAP. jhrg 9/17/21
-    //    implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
-    //    implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
-    //    implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
-    //    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
-    //    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
-    //
-    //    implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
-    //    implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
-    //      DO NOT use reddisson-all, that will include all of the reddisson's deps and that
-    //      will break our code. Use the lib with a version number.
-    //    implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
-    //    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 }
 
 // Substitute the version information before compilation
@@ -179,7 +222,7 @@ compileJava {
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    archiveName = 'opendap.war'
+    baseName = 'opendap'
 
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
