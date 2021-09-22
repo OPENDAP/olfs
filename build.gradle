@@ -108,6 +108,9 @@ sourceSets {
         }
     }
 
+    /*
+     * Block comment this out. Look at multi-project gradle.build files.
+     * jhrg 9/22/21
     ngap {
         java {
             srcDirs = ['src']
@@ -143,8 +146,8 @@ sourceSets {
             // Use the file in build/resources to populate the war file's resources
             from layout.buildDirectory.dir("resources")
         }
-
     }
+    */
 }
 
 dependencies {
