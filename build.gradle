@@ -218,6 +218,10 @@ dependencies {
 
 // Substitute the version information before compilation
 compileJava {
+    doFirst {
+    	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+    }
+    
     dependsOn 'substituteVersionInfo'
 }
 
