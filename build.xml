@@ -517,11 +517,11 @@
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/gateway/**"/>
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/nciso/**"/>
 
-            <zipfileset dir="." prefix="${SRC_DIST}" file="build.xml"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="README"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="NEWS"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="ChangeLog"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="COPYRIGHT"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="build.xml"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="README"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="NEWS"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="ChangeLog"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="COPYRIGHT"/>
 
         </tar>
 
