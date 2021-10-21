@@ -52,6 +52,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Vector;
 
+import static opendap.bes.DatasetUrlResponseAction.*;
+import static opendap.bes.DataRequestFormType.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
@@ -73,41 +76,30 @@ public class BesDapDispatcher implements DispatchHandler {
     private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
     private static boolean _enforceRequiredUserSelection = false;
 
-    public enum DataRequestFormType {
-        DAP2, DAP4
-    }
-    private static DataRequestFormType d_dataRequestFormType;
-
+    private static DataRequestFormType d_dataRequestFormType = dap4;
+    private static DatasetUrlResponseAction d_datasetUrlResponse = requestForm;
 
     private BesApi _besApi;
-
-    public Enum moo;
-
 
     public BesDapDispatcher() {
         _log = LoggerFactory.getLogger(getClass());
         _responders = new Vector<>();
-        d_dataRequestFormType = DataRequestFormType.DAP4;
-
+        d_dataRequestFormType = dap4;
+        d_datasetUrlResponse = requestForm;
     }
 
 
-    public String getSystemPath(){
-        return _systemPath;
-
-    }
+    public String getSystemPath(){ return _systemPath; }
 
     public static boolean allowDirectDataSourceAccess() {
         return _allowDirectDataSourceAccess;
     }
+    public static boolean useDAP2ResourceUrlResponse() { return _useDAP2ResourceUrlResponse; }
 
-    public static boolean useDAP2ResourceUrlResponse() {
-        return _useDAP2ResourceUrlResponse;
-    }
-    public static DataRequestFormType dataRequestFormType() {
-        return d_dataRequestFormType;
-    }
+    public static DataRequestFormType dataRequestFormType() { return d_dataRequestFormType; }
 
+    public static DatasetUrlResponseAction datasetUrlResponseAction() { return d_datasetUrlResponse; }
+    public static String datasetUrlResponseActionStr() { return d_datasetUrlResponse.toString(); }
 
     protected Vector<Dap4Responder> getResponders() {
         return _responders;
@@ -127,7 +119,7 @@ public class BesDapDispatcher implements DispatchHandler {
     }
 
 
-    private void ingestConfig(Element config) throws Exception {
+    private void ingestConfig(Element config) {
 
         if(config!=null){
             _config = config;
@@ -155,15 +147,31 @@ public class BesDapDispatcher implements DispatchHandler {
             }
             _log.info("ingestConfig() - UseDAP2ResourceUrlResponse: {}",_useDAP2ResourceUrlResponse);
 
-            d_dataRequestFormType = DataRequestFormType.DAP4;
+            d_dataRequestFormType = dap4;
             dv = _config.getChild("DataRequestForm");
             if (dv != null) {
                 String drfTypeStr = dv.getAttributeValue("type");
-                if(drfTypeStr.equalsIgnoreCase("dap2")) {
-                    d_dataRequestFormType = DataRequestFormType.DAP2;
+                if(drfTypeStr!=null && drfTypeStr.equalsIgnoreCase("dap2")) {
+                    d_dataRequestFormType = dap2;
                 }
             }
             _log.info("ingestConfig() - DataRequestForm: {}",d_dataRequestFormType.toString());
+
+            d_datasetUrlResponse = requestForm;
+            dv = _config.getChild("DatasetUrlResponse");
+            if (dv != null) {
+                String drfTypeStr = dv.getAttributeValue("type");
+                if(drfTypeStr!=null) {
+                    if (drfTypeStr.equalsIgnoreCase("dsr")) {
+                        d_datasetUrlResponse = DatasetUrlResponseAction.dsr;
+                    } else if (drfTypeStr.equalsIgnoreCase("download")) {
+                        d_datasetUrlResponse = download;
+                    } else if (drfTypeStr.equalsIgnoreCase("requestForm")) {
+                        d_datasetUrlResponse = requestForm;
+                    }
+                }
+            }
+            _log.info("ingestConfig() - DatasetUrlResponse: {}",d_datasetUrlResponse.toString());
 
             _addFileoutTypeSuffixToDownloadFilename = false;
             dv = _config.getChild("AddFileoutTypeSuffixToDownloadFilename");
@@ -284,45 +292,159 @@ public class BesDapDispatcher implements DispatchHandler {
         rubric.setCombinedRequestSuffixRegex(rubric.buildRequestMatchingRegex());
         _responders.add(rubric);
 
+/*
+    if (_useDAP2ResourceUrlResponse) {
 
-        if (_useDAP2ResourceUrlResponse) {
 
-            // Add the HTML form conditionally because the ".html" suffix is used
-            // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
-            // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder ifh = new Dap2IFH(_systemPath, besApi,_enforceRequiredUserSelection);
-            _responders.add(ifh);
+        // Add the HTML form conditionally because the ".html" suffix is used
+        // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
+        // We should make sure that the old HTML ".html" response is available.
+        Dap4Responder ifh = new Dap2IFH(_systemPath, besApi, _enforceRequiredUserSelection);
+        _responders.add(ifh);
 
-            // Add the "old" Data Request Form - the one that is generated by the BES.
-            Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
-            _responders.add(htmlForm);
+        // Add the "old" Data Request Form - the one that is generated by the BES.
+        Dap4Responder htmlForm = new DatasetHtmlForm(_systemPath, besApi);
+        _responders.add(htmlForm);
 
-            // If we are running a dap2 centric server then we need to install the
-            // FileAccess so it responds to <dataset_url> alone.
-            FileAccess d2fa = new FileAccess(_systemPath, null, "", besApi);
-            d2fa.clearAltResponders();
-            d2fa.setCombinedRequestSuffixRegex(d2fa.buildRequestMatchingRegex());
-            d2fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            _responders.add(d2fa);
-        }
-        else {
+        // If we are running a dap2 centric server then we need to install the
+        // FileAccess so it responds to <dataset_url> alone.
+        FileAccess d2fa = new FileAccess(_systemPath, null, "", besApi);
+        d2fa.clearAltResponders();
+        d2fa.setCombinedRequestSuffixRegex(d2fa.buildRequestMatchingRegex());
+        d2fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
+        _responders.add(d2fa);
+    } else {
 
-            // If we are running a dap4 centric server then we need to install the
-            // FileAccess handler so the service responds to <dataset_url>.file to
-            // retrieve the source data file.
+        // If we are running a dap4 centric server then we need to install the
+        // FileAccess handler so the service responds to <dataset_url>.file to
+        // retrieve the source data file.
+        FileAccess d4fa = new FileAccess(_systemPath, besApi);
+        d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
+
+        _responders.add(d4fa);
+
+        // This call maps the DSR response to the <dataset_url> ala DAP4
+        // And also causes the URL <dataset_url>.html to be a specific
+        // client request for the HTML encoded DSR.
+        _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
+
+    }
+*/
+
+
+         if(d_datasetUrlResponse == download || d_datasetUrlResponse == requestForm){
+             // Either the download or the requestForm option imply that there
+             // can be no DSR response associated with the dataset URL
+             // with these options we need a DAP2 Data Request Form response
+             // (DSR response space collides with the DAP2 Data Request Form URL)
+             Dap2IFH d2ifh = new Dap2IFH(_systemPath, besApi, _enforceRequiredUserSelection);
+             _responders.add(d2ifh);
+         }
+         // We install the FileAccess handler so the service
+         // responds to <dataset_url>.file to retrieve the source data file.
+         // This is the default behavior of FileAccess(String, BesApi)
+         FileAccess d4fa = new FileAccess(_systemPath, besApi);
+         d4fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+         d4fa.setDatasetRequestFormType(d_dataRequestFormType);
+         _responders.add(d4fa);
+
+         if(d_datasetUrlResponse == download) {
+             // We install and configure the FileAccess handler so that the FileAccess
+             // service will respond to the unmodified <dataset_url> to retrieve the
+             // source data file.
+             FileAccess d2fa = new FileAccess(_systemPath, null, "", besApi);
+             d2fa.clearAltResponders();
+             d2fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+             d2fa.setDatasetRequestFormType(d_dataRequestFormType);
+             d2fa.setCombinedRequestSuffixRegex(d2fa.buildRequestMatchingRegex());
+             _responders.add(d2fa);
+         }
+         if(d_datasetUrlResponse == dsr){
+             // This call maps the DSR response to the <dataset_url> ala DAP4
+             // And also causes the URL <dataset_url>.html to be a specific
+             // client request for the HTML encoded DSR.
+             _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
+         }
+
+
+         /*
+
+         switch (d_datasetUrlResponse) {
+        case dsr: {
+            // We don't install a DAP2 Data Request Form response
+            // because the DSR URL space collides with the DAP2 Data
+            // Request Form URL.
+
+            // We install the FileAccess handler so the service
+            // responds to <dataset_url>.file to retrieve the source data file.
+            // This is the default behavior of FileAccess(String, BesApi)
             FileAccess d4fa = new FileAccess(_systemPath, besApi);
-            d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
+            d4fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+            d4fa.setDatasetRequestFormType(d_dataRequestFormType);
             _responders.add(d4fa);
 
             // This call maps the DSR response to the <dataset_url> ala DAP4
             // And also causes the URL <dataset_url>.html to be a specific
             // client request for the HTML encoded DSR.
             _responders.add(new NormativeDSR(_systemPath, besApi, _responders));
-
+            break;
         }
 
-        _log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") + "  " +
-                "Resource URL returns: " + (_useDAP2ResourceUrlResponse ? "DAP2 File Response" : "DAP4 Service Description"));
+        case download:
+        {
+            // Because there is no DSR response with this option we need a DAP2 Data
+            // Request Form response (DSR response space collides with the DAP2 Data
+            // Request Form URL)
+            Dap2IFH d2ifh = new Dap2IFH(_systemPath, besApi, _enforceRequiredUserSelection);
+            _responders.add(d2ifh);
+
+            // We install the FileAccess handler so the service
+            // responds to <dataset_url>.file to retrieve the source data file.
+            // This is the default behavior of FileAccess(String, BesApi)
+            FileAccess d4fa = new FileAccess(_systemPath, besApi);
+            d4fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+            d4fa.setDatasetRequestFormType(d_dataRequestFormType);
+            _responders.add(d4fa);
+
+            // We install and configure the FileAccess handler so that the FileAccess
+            // service will respond to the unmodified <dataset_url> to retrieve the
+            // source data file.
+            FileAccess d2fa = new FileAccess(_systemPath, null, "", besApi);
+            d2fa.clearAltResponders();
+            d2fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+            d2fa.setDatasetRequestFormType(d_dataRequestFormType);
+            d2fa.setCombinedRequestSuffixRegex(d2fa.buildRequestMatchingRegex());
+            _responders.add(d2fa);
+
+            break;
+        }
+        case requestForm:
+        default: {
+            // Because there is no DSR response with this option we need a DAP2 Data
+            // Request Form response (DSR response space collides with the DAP2 Data
+            // Request Form URL)
+            Dap2IFH d2ifh = new Dap2IFH(_systemPath, besApi, _enforceRequiredUserSelection);
+            _responders.add(d2ifh);
+
+
+            // We install the FileAccess handler so the service
+            // responds to <dataset_url>.file to retrieve the source data file.
+            // This is the default behavior of FileAccess(String, BesApi)
+            FileAccess d4fa = new FileAccess(_systemPath, besApi);
+            d4fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
+            d4fa.setDatasetRequestFormType(d_dataRequestFormType);
+            _responders.add(d4fa);
+            break;
+        }
+    }
+*/
+
+
+        _log.info("Initialized. " +
+                "Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") +
+                " d_datasetUrlResponse: " + (d_datasetUrlResponse.toString()) +
+                " d_dataRequestFormType: " + (d_dataRequestFormType.toString())
+        );
 
 
         Dap2Service dap2Service = new Dap2Service();
