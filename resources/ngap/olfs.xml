@@ -96,7 +96,9 @@
 
 
     <!--
-    The <DatasetUrlResponse type="..." /> element is used to configure the type of response
+    <DatasetUrlResponse type="..." />
+    Supported type values are: dsr, download, and requestForm
+    The DatasetUrlResponse element is used to configure the type of response
     that the server will generate when a client attempts to access the Dataset URL.
     The type of response is controlled by the value of the type attribute.
     The supported values are: dsr, download, and requestForm.
@@ -121,7 +123,7 @@
 
     <!--
         <DataRequestForm type="..." />
-
+        Supported type values are: dap2 and dap4
         The DataRequestForm element defines the target DAP data model for the dataset links
         in the "blue-bar" catalog.html pages. These links point to the DAP Data Request Form for each dataset.
         This element also determines the type  of Data request form page  returned when the
