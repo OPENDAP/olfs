@@ -113,7 +113,7 @@
         The dap4 DSR response will be returned for the dataset URL.
 
     download:
-        If the configuration parameter AllowDirectDataSourceAccess is present then
+        If the configuration parameter AllowDirectDataSourceAccess is set (present) then
         the source data file will be returned for the dataset URL. If the configuration
         parameter AllowDirectDataSourceAccess is not present then a 403 forbidden will
         be returned for the dataset URL. (This is basically a file retrieval service,
@@ -141,7 +141,7 @@
         Hyrax as a file server and download the underlying data files/granules/objects
         directly, without utilizing the DAP APIs.
     -->
-    <AllowDirectDataSourceAccess />
+    <!-- AllowDirectDataSourceAccess /-->
 
     <!--
         HttpPost Support
