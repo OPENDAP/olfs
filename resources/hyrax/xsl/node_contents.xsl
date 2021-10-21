@@ -39,7 +39,10 @@
     <xsl:param name="collectionURL" />
     <xsl:param name="catalogPublisherJsonLD" />
     <xsl:param name="supportLink"/>
+
     <xsl:param name="allowDirectDataSourceAccess" />
+    <xsl:param name="datasetUrlResponseType"/>
+
     <xsl:param name="userId" />
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
@@ -334,11 +337,28 @@
                         <meta itemprop="name" content="{@name}.covjson" />
                         <meta itemprop="encodingFormat" content="application/covjson" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.covjson">covjson</a>&NBSP;</td>
+                    <!--
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
                         <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
                             <meta itemprop="name" content="{@name}" />
                             <meta itemprop="contentSize" content="{@size}" />
                             <a itemprop="contentUrl" href="{encode-for-uri(@name)}">file</a>&NBSP;</td>
+                    </xsl:if>
+                    -->
+
+                    <xsl:if test="$allowDirectDataSourceAccess='true'">
+                        <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                            <meta itemprop="name" content="{@name}" />
+                            <meta itemprop="contentSize" content="{@size}" />
+                            <!-- a itemprop="contentUrl" href="{encode-for-uri(@name)}">file</a-->
+                            <xsl:element name="a">
+                                <xsl:attribute name="itemprop">contentUrl</xsl:attribute>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="encode-for-uri(@name)" />
+                                    <xsl:if test="$datasetUrlResponseType!='download'">.file</xsl:if>
+                                </xsl:attribute>
+                                <xsl:text>file</xsl:text>
+                            </xsl:element>&NBSP;</td>
                     </xsl:if>
                 </tr>
             </table>

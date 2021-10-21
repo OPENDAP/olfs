@@ -1,3 +1,4 @@
+var enforce_selection;
 function make_a_selection(){
     alert("Please select one or more variables before attempting to download/access data.");
 }

@@ -239,7 +239,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-        if(BesDapDispatcher.dataRequestFormType() == BesDapDispatcher.DataRequestFormType.DAP2)
+        if(BesDapDispatcher.dataRequestFormType() == DataRequestFormType.dap2)
             xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
@@ -253,8 +253,11 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.setParameter("collectionURL",collectionURL);
         transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
         transformer.setParameter("supportLink", mailtoHrefAttributeValue);
+
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             transformer.setParameter("allowDirectDataSourceAccess","true");
+
+        transformer.setParameter("datasetUrlResponseType",BesDapDispatcher.datasetUrlResponseActionStr());
 
         AuthenticationControls.setLoginParameters(transformer,request);
 

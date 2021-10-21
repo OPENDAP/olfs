@@ -1,8 +1,8 @@
 var enforce_selection;
-
 function make_a_selection(){
     alert("Please select one or more variables before attempting to download/access data.");
 }
+
 function getAs_button_action(type_name, suffix) {
     var url = new String(document.forms[0].url.value);
 

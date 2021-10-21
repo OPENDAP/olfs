@@ -112,7 +112,7 @@
                     enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
-                <title>DAP4 Data Request Form<xsl:value-of select="@name"/></title>
+                <title>DAP4 Data Request Form <xsl:value-of select="@name"/></title>
             </head>
             <body>
                 <!-- ****************************************************** -->

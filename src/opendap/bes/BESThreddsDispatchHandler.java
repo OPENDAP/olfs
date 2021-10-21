@@ -224,8 +224,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if(BesDapDispatcher.allowDirectDataSourceAccess())
             showNodeToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
-        if(BesDapDispatcher.useDAP2ResourceUrlResponse())
-            showNodeToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
+        showNodeToThreddsCatalog.setParameter("datasetUrlResponseType",BesDapDispatcher.datasetUrlResponseActionStr());
 
         JDOMSource besCatalog = new JDOMSource(showNodeDoc);
 

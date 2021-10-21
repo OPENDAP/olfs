@@ -32,6 +32,7 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
+import opendap.bes.DatasetUrlResponseAction;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
@@ -426,13 +427,13 @@ public class BesCatalog implements Catalog {
 
                     if (wsh.getServiceId().equalsIgnoreCase(FileService.ID)) {
                         if (BesDapDispatcher.allowDirectDataSourceAccess()) {
+                            if(BesDapDispatcher.datasetUrlResponseAction() != DatasetUrlResponseAction.download)
+                            access.setAttribute("urlPath", wsh.getThreddsUrlPath(datasetID)+".file");
                             e.addContent(access);
                         }
-
                     } else {
                         e.addContent(access);
                     }
-
                 }
             } else {
                 WebServiceHandler wsh = ServicesRegistry.getWebServiceById(FileService.ID);
