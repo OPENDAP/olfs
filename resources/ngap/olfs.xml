@@ -94,38 +94,46 @@
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
 
+
     <!--
-        UseDAP2ResourceUrlResponse
+    The <DatasetUrl type="..." /> element is used to configure the type of response
+    that the server will generate when a client attempts to access the Dataset URL.
+    The type of response is controlled by the value of the type attribute.
+    The supported values are: dsr, download, and requestForm.
 
-        When enabled, the server will provide a DAP2-style response
-        to requests for a dataset resource URL, meaning that the response
-        will be either the source data file or an HTTP 403 Forbidden error, as
-        defined by the state of the AllowDirectDataSourceAccess feature.
+    Allowed Values
+    dsr:
+        The dap4 DSR response will be returned for the dataset URL.
 
-        If UseDAP2ResourceUrlResponse is not enabled (not present in the
-        configuration, or commented out) the server will default to returning
-        the DAP4 Dataset Services Response (DSR) when a dataset resource URL
-        is requested.
+    download:
+        If the configuration parameter AllowDirectDataSourceAccess is present then
+        the source data file will be returned for the dataset URL. If the configuration
+        parameter AllowDirectDataSourceAccess is not present then a 403 forbidden will
+        be returned for the dataset URL. (This is basically a file retrieval service,
+        any constraint expression submitted with the dataset URL will be ignored.)
 
-        See Dap4 specification for more:
-        https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
-
-        Note: Disabling UseDAP2ResourceUrlResponse will have the effect that
-        requests for the DAP2 Data Request Form at <dataset_url>.html will
-        return the HTML encoded DSR.
+    requestForm:
+        The Hyrax Data Request Form Page will be returned for the
+        dataset URL.
 
     -->
-    <UseDAP2ResourceUrlResponse />
-
+    <DatasetUrlResponse type="requestForm"/>
 
     <!--
         DataRequestForm
 
-        Defines the DAP data model version for the DAta Request Form linked to
-        from the "blue-bar" catalog.html pages generated from  either the
-        DDX (for DAP2) or the DMR (for DAP4).
+        Defines the DAP data model version for the Data Request Form links which
+        are used in the "blue-bar" catalog.html pages. This also determines the type
+        of Data request form page when the DatasetUrlResponse type="requestForm".
     -->
     <DataRequestForm type="dap4" />
+
+    <!--
+        'AllowDirectDataSourceAccess' - When enabled users will be able to use
+        Hyrax as a file server and download the underlying data files/granules/objects
+        directly, without utilizing the DAP APIs.
+    -->
+    <!-- AllowDirectDataSourceAccess / -->
 
     <!--
         HttpPost Support

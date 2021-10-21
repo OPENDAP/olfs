@@ -101,10 +101,10 @@
 
 
     <!--
-    The <DatasetUrl responseType="..." /> element is used to configure the type of response
-    that the server will generate when a client attempts to access the base Dataset URL.
-    The type of response is controlled by the value of the responseType attribute.
-    The supported values are: dap4:dsr, download, and formPage.
+    The <DatasetUrl type="..." /> element is used to configure the type of response
+    that the server will generate when a client attempts to access the Dataset URL.
+    The type of response is controlled by the value of the type attribute.
+    The supported values are: dsr, download, and requestForm.
 
     Allowed Values
     dsr:
