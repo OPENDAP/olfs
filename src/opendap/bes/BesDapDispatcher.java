@@ -79,6 +79,8 @@ public class BesDapDispatcher implements DispatchHandler {
     private static DataRequestFormType d_dataRequestFormType = dap4;
     private static DatasetUrlResponseAction d_datasetUrlResponse = requestForm;
 
+    private static boolean d_forceDataRequestFormLinkToHttps = false;
+
     private BesApi _besApi;
 
     public BesDapDispatcher() {
@@ -100,6 +102,8 @@ public class BesDapDispatcher implements DispatchHandler {
 
     public static DatasetUrlResponseAction datasetUrlResponseAction() { return d_datasetUrlResponse; }
     public static String datasetUrlResponseActionStr() { return d_datasetUrlResponse.toString(); }
+
+    public static boolean forceDataRequestFormLinkToHttps() { return d_forceDataRequestFormLinkToHttps; }
 
     protected Vector<Dap4Responder> getResponders() {
         return _responders;
@@ -156,6 +160,11 @@ public class BesDapDispatcher implements DispatchHandler {
                 }
             }
             _log.info("ingestConfig() - DataRequestForm: {}",d_dataRequestFormType.toString());
+
+            d_forceDataRequestFormLinkToHttps = false;
+            dv = _config.getChild("ForceDataRequestFormLinkToHttps");
+            d_forceDataRequestFormLinkToHttps = dv != null;
+            _log.info("ingestConfig() - ForceDataRequestFormLinkToHttps: {}",(d_forceDataRequestFormLinkToHttps?"true":"false"));
 
             d_datasetUrlResponse = requestForm;
             dv = _config.getChild("DatasetUrlResponse");

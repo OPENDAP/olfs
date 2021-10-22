@@ -28,6 +28,7 @@ package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.BesDapDispatcher;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap2Responders.Dap2IFH;
@@ -158,6 +159,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
+            transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceDataRequestFormLinkToHttps()?"true":"false"));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
