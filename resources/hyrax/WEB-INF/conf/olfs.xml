@@ -145,19 +145,19 @@
 
 
     <!--
-    'ForceDataRequestFormLinkToHttps' - When this will cause the Data Request Form interfaces
-    to "force" the dataset URL to HTTPS. This is useful for situations where the sever is
-    sitting behind a connection management tool (like CLoudFront) whose outward facing connections
-    are HTTPS but Hyrax is not using HTTPS. Thus the internal URLs beig received by Hyrax are
-    on HTTP. When these URLs are exposed via the Data Request Forms they can cause some clients \
+    'ForceDataRequestFormLinkToHttps' - The presence of this element will cause the Data Request
+    Form interfaces to "force" the dataset URL to HTTPS. This is useful for situations where the sever is
+    sitting behind a connection management tool (like CloudFront) whose outward facing connections
+    are HTTPS but Hyrax is not using HTTPS. Thus the internal URLs being received by Hyrax are
+    on HTTP. When these URLs are exposed via the Data Request Forms they can cause some clients
     issues with session dropping because the protocols are not consistent.
     -->
-    <ForceDataRequestFormLinkToHttps />
+    <!-- ForceDataRequestFormLinkToHttps / -->
 
 
-<!--
-    HttpPost Support
--->
+    <!--
+        HttpPost Support
+    -->
     <HttpPost enabled="true" max="2000000"/>
 
 
