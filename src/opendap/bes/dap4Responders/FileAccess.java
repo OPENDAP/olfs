@@ -158,7 +158,7 @@ public class FileAccess extends Dap4Responder {
 
                                 case dsr:
                                 {
-                                    String redirectUrl =  resourceID + ".dsr";
+                                    String redirectUrl =  ReqInfo.getRequestUrlPath(req) + ".dsr";
                                     log.debug("Redirecting request for dataset URL to DSR: {}",redirectUrl);
                                     response.sendRedirect(redirectUrl);
                                     break;
@@ -167,7 +167,7 @@ public class FileAccess extends Dap4Responder {
                                 case requestForm:
                                 default:
                                 {
-                                    String redirectUrl =  resourceID;
+                                    String redirectUrl =  ReqInfo.getRequestUrlPath(req);
                                     switch(BesDapDispatcher.dataRequestFormType()){
                                         case dap2:
                                             redirectUrl += ".html";
