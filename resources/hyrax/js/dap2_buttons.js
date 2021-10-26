@@ -4,20 +4,22 @@ function make_a_selection(){
 }
 
 function getAs_button_action(type_name, suffix) {
-    var url = new String(document.forms[0].url.value);
-
-    var url_parts = url.split("?");
+    let currentUrl = new URL(window.location.href);
+    let downloadUrl = new URL(document.forms[0].url.value);
+ 
     /* handle case where constraint is null. */
-    if (url_parts[1] != null && url_parts[1].length>0) {
-        var get_as_url = url_parts[0] + suffix + "?" + url_parts[1];
-    } else if(enforce_selection) {
+    if (downloadUrl.search.length === 0 && enforce_selection) {
         make_a_selection();
         return;
     }
-    else {
-        var get_as_url = url_parts[0] +  suffix + "?";
-    }
-    window.open(encodeURI(get_as_url),type_name);
+    
+    // force the current protocol on the download url
+    downloadUrl.protocol = currentUrl.protocol;
+
+    // append suffix
+    downloadUrl.pathname += suffix;  
+       
+    window.open(downloadUrl.toString(), type_name);
 }
 
 var help = 0;
