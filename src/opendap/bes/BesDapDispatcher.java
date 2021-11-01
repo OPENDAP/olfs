@@ -71,11 +71,10 @@ public class BesDapDispatcher implements DispatchHandler {
     private String _systemPath;
     private Element _config;
     private Vector<Dap4Responder> _responders;
-    private static boolean _allowDirectDataSourceAccess = false;
-    private static boolean _useDAP2ResourceUrlResponse = false;
     private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
     private static boolean _enforceRequiredUserSelection = false;
 
+    private static boolean d_allowDirectDataSourceAccess = false;
     private static DataRequestFormType d_dataRequestFormType = dap4;
     private static DatasetUrlResponseAction d_datasetUrlResponse = requestForm;
 
@@ -94,9 +93,8 @@ public class BesDapDispatcher implements DispatchHandler {
     public String getSystemPath(){ return _systemPath; }
 
     public static boolean allowDirectDataSourceAccess() {
-        return _allowDirectDataSourceAccess;
+        return d_allowDirectDataSourceAccess;
     }
-    public static boolean useDAP2ResourceUrlResponse() { return _useDAP2ResourceUrlResponse; }
 
     public static DataRequestFormType dataRequestFormType() { return d_dataRequestFormType; }
 
@@ -128,28 +126,21 @@ public class BesDapDispatcher implements DispatchHandler {
         if(config!=null){
             _config = config;
 
-            _log.info("ingestConfig() - Using BES API implementation: "+getBesApi().getClass().getName());
+            _log.info("Using BES API implementation: "+getBesApi().getClass().getName());
 
-            _allowDirectDataSourceAccess = false;
+            d_allowDirectDataSourceAccess = false;
             Element dv = _config.getChild("AllowDirectDataSourceAccess");
             if (dv != null) {
-                _allowDirectDataSourceAccess = true;
+                d_allowDirectDataSourceAccess = true;
             }
-            _log.info("ingestConfig() - AllowDirectDataSourceAccess: {}",_allowDirectDataSourceAccess);
+            _log.info("AllowDirectDataSourceAccess: {}", d_allowDirectDataSourceAccess);
 
             _enforceRequiredUserSelection = false;
             dv = _config.getChild("RequireUserSelection");
             if (dv != null) {
                 _enforceRequiredUserSelection = true;
             }
-            _log.info("ingestConfig() - RequireUserSelection: {}",_enforceRequiredUserSelection);
-
-            _useDAP2ResourceUrlResponse = false;
-            dv = _config.getChild("UseDAP2ResourceUrlResponse");
-            if (dv != null) {
-                _useDAP2ResourceUrlResponse = true;
-            }
-            _log.info("ingestConfig() - UseDAP2ResourceUrlResponse: {}",_useDAP2ResourceUrlResponse);
+            _log.info("RequireUserSelection: {}",_enforceRequiredUserSelection);
 
             d_dataRequestFormType = dap4;
             dv = _config.getChild("DataRequestForm");
@@ -159,12 +150,12 @@ public class BesDapDispatcher implements DispatchHandler {
                     d_dataRequestFormType = dap2;
                 }
             }
-            _log.info("ingestConfig() - DataRequestForm: {}",d_dataRequestFormType.toString());
+            _log.info("DataRequestForm: {}",d_dataRequestFormType.toString());
 
             d_forceDataRequestFormLinkToHttps = false;
             dv = _config.getChild("ForceDataRequestFormLinkToHttps");
             d_forceDataRequestFormLinkToHttps = dv != null;
-            _log.info("ingestConfig() - ForceDataRequestFormLinkToHttps: {}",(d_forceDataRequestFormLinkToHttps?"true":"false"));
+            _log.info("ForceDataRequestFormLinkToHttps: {}",(d_forceDataRequestFormLinkToHttps?"true":"false"));
 
             d_datasetUrlResponse = requestForm;
             dv = _config.getChild("DatasetUrlResponse");
@@ -180,14 +171,14 @@ public class BesDapDispatcher implements DispatchHandler {
                     }
                 }
             }
-            _log.info("ingestConfig() - DatasetUrlResponse: {}",d_datasetUrlResponse.toString());
+            _log.info("DatasetUrlResponse: {}",d_datasetUrlResponse.toString());
 
             _addFileoutTypeSuffixToDownloadFilename = false;
             dv = _config.getChild("AddFileoutTypeSuffixToDownloadFilename");
             if (dv != null) {
                 _addFileoutTypeSuffixToDownloadFilename = true;
             }
-            _log.info("ingestConfig() - AddFileoutTypeSuffixToDownloadFilename: {}",_addFileoutTypeSuffixToDownloadFilename);
+            _log.info("AddFileoutTypeSuffixToDownloadFilename: {}",_addFileoutTypeSuffixToDownloadFilename);
 
             dv = _config.getChild("HttpPost");
             if (dv != null) {
@@ -203,7 +194,7 @@ public class BesDapDispatcher implements DispatchHandler {
                     }
                 }
             }
-            _log.info("ingestConfig() - HTTP POST max body length is set to: {}", ReqInfo.getPostBodyMaxLength());
+            _log.info("HTTP POST max body length is set to: {}", ReqInfo.getPostBodyMaxLength());
         }
     }
 
@@ -355,6 +346,7 @@ public class BesDapDispatcher implements DispatchHandler {
          FileAccess d4fa = new FileAccess(_systemPath, besApi);
          d4fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
          d4fa.setDatasetRequestFormType(d_dataRequestFormType);
+         d4fa.setAllowDirectDataSourceAccess(d_allowDirectDataSourceAccess);
          _responders.add(d4fa);
 
          if(d_datasetUrlResponse == download) {
@@ -365,6 +357,7 @@ public class BesDapDispatcher implements DispatchHandler {
              d2fa.clearAltResponders();
              d2fa.setDatasetUrlResponseAction(d_datasetUrlResponse);
              d2fa.setDatasetRequestFormType(d_dataRequestFormType);
+             d2fa.setAllowDirectDataSourceAccess(d_allowDirectDataSourceAccess);
              d2fa.setCombinedRequestSuffixRegex(d2fa.buildRequestMatchingRegex());
              _responders.add(d2fa);
          }
@@ -450,7 +443,7 @@ public class BesDapDispatcher implements DispatchHandler {
 
 
         _log.info("Initialized. " +
-                "Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") +
+                "Direct Data Source Access: " + (d_allowDirectDataSourceAccess ? "Enabled" : "Disabled") +
                 " d_datasetUrlResponse: " + (d_datasetUrlResponse.toString()) +
                 " d_dataRequestFormType: " + (d_dataRequestFormType.toString())
         );

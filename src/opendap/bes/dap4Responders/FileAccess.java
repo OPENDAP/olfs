@@ -102,12 +102,14 @@ public class FileAccess extends Dap4Responder {
     public DataRequestFormType datasetRequestFormType(){ return d_dataRequestFormType;}
 
 
-    private boolean allowDirectDataSourceAccess = false;
+    private boolean d_allowDirectDataSourceAccess = false;
+
+
     public void setAllowDirectDataSourceAccess(boolean allowed){
-        allowDirectDataSourceAccess = allowed;
+        d_allowDirectDataSourceAccess = allowed;
     }
     public boolean allowDirectDataSourceAccess() {
-        return allowDirectDataSourceAccess;
+        return d_allowDirectDataSourceAccess;
     }
 
 
@@ -132,7 +134,7 @@ public class FileAccess extends Dap4Responder {
                 if (dsi.sourceIsAccesible()) {
                     if (dsi.isDataset()) {
                         if(isFileServiceUrl){
-                            if(BesDapDispatcher.allowDirectDataSourceAccess()) {
+                            if(d_allowDirectDataSourceAccess) {
                                 log.debug("Sending source dataset file: " + Encode.forHtml(resourceID));
                                 sendDatasetFile(user, resourceID, response);
                             }
@@ -142,10 +144,10 @@ public class FileAccess extends Dap4Responder {
                             }
                         }
                         else {
-                            switch(BesDapDispatcher.datasetUrlResponseAction()){
+                            switch(d_datasetUrlResponseAction){
                                 case download:
                                 {
-                                    if(BesDapDispatcher.allowDirectDataSourceAccess()) {
+                                    if(d_allowDirectDataSourceAccess) {
                                         log.debug("Sending source dataset file: " + Encode.forHtml(resourceID));
                                         sendDatasetFile(user, resourceID, response);
                                     }
