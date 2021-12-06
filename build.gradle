@@ -47,6 +47,12 @@ repositories {
     }
 }
 
+configurations {
+    opendapDep
+    ngapDep
+    robotDep
+}
+
 ext {
     DEPLOYMENT_CONTEXT = 'opendap'
     NGAP_DEPLOYMENT_CONTEXT = 'ngap'
@@ -121,7 +127,7 @@ sourceSets {
         }
 
         dependencies {
-            implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
+             implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
             implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
             implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
             implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
@@ -172,7 +178,7 @@ dependencies {
     //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
     implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
 
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.22' // '1.7.22', '1.6.1'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28' // '1.7.22', '1.6.1'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2' // '1.1.11'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
 
@@ -211,6 +217,20 @@ dependencies {
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
 
+    //ngapDep providedCompile group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version:'1.1.2'
+    ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")
+
+    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager:2.3.2")
+    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager-tc7:2.3.2")
+    ngapDep implementation("de.javakaffee:kryo-serializers:0.45")
+    ngapDep implementation("de.javakaffee.msm:msm-kryo-serializer:2.3.2")
+
+    ngapDep implementation("com.esotericsoftware:kryo:4.0.2")
+    ngapDep implementation("com.esotericsoftware:minlog:1.3.0")
+    ngapDep implementation("com.esotericsoftware:reflectasm:1.11.9")
+
+    ngapDep implementation("org.redisson:redisson:3.11.6")
+
     // implementation group: 'xalan', name: 'xalan', version: '2.7' // not used?
     // Used for XSLTransformer, validatorApp targets
     // implementation group: 'xerces', name: 'xercesImpl', version: '2.12'
@@ -236,8 +256,54 @@ war {
     dependsOn 'copyDocResources'
     dependsOn 'copyWCSResources'
 
+    // Use the files in build/resources to populate the war file's resources
+    from layout.buildDirectory.dir("resources")
+}
+
+task createOpendapWar(type: War, dependsOn: classes){
+    baseName = 'opendap_server'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Server war'
+
+    // Copy/filter the various resource files
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
+    dependsOn 'copyWCSResources'
+
     // Use the file in build/resources to populate the war file's resources
     from layout.buildDirectory.dir("resources")
+}
+
+task createNgapWar(type: War, dependsOn: classes){
+    dependsOn configurations.ngapDep
+    baseName = 'opendap_ngap'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Ngap war.'
+
+    // Copy/filter the various resource files
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
+    dependsOn 'copyWCSResources'
+
+    // Use the file in build/resources to populate the war file's resources
+    from layout.buildDirectory.dir("resources")
+}
+
+task createRobotsWar(type: War, dependsOn: classes){
+    baseName = 'opendap_robots'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Robots war.'
+}
+
+task createDists(dependsOn: [createOpendapWar, createNgapWar]){ //hold for later ", createRobotsWar"
+    group = 'warBuilds'
+    description = 'Build the Opendap, Ngap, and Robots war.'
 }
 
 clean {
@@ -288,7 +354,7 @@ def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
 
 // Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
 
-// This task copiess resources from 'resources/hyrax' to $buildDir/resources
+// This task copies resources from 'resources/hyrax' to $buildDir/resources
 // and, along the way, substitutes various tokes in the files.
 tasks.register('copyHyraxResources', Copy) {
     group = 'Filtering'
