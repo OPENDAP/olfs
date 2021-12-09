@@ -1,3 +1,26 @@
+# OLFS Version 1.18.9 (15 September 2021)
+
+## NASA/NGAP Updates
+* Fixed gradle dependancies according snyk scan.
+* Session serialization 
+* Added session manager jars to ngap resources.
+* Updated production rules to include session manager code in the ngap application build.
+* Made history_json output as JSONArray.
+* New landing page for NGAP service.
+* Added UNIX time to OLFS logs in NGAP.
+
+## Bug Fixes
+* Fixed bug in computation of dimension sizes in the dap4 ifh xsl.
+* Dropped DSR response for just the dataset_url.
+* Fixed broken json error output.
+* Changed the broken naming pattern for the PPT strings.
+* Enabled ChunkedInputStream debugging and cleaned up the messages in support of stream pollution problem.
+* Fixed broken css and deployment context links construction in DSR HTML page.
+
+## Performance Improvements
+* Added file size and last modified headers to flat file transfer.
+* Added auth.log independant of debug log.
+* First pass at patching POST request handling.
 
 # OLFS Version 1.18.8 (30 December 2020)
 

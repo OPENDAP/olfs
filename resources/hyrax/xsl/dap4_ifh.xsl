@@ -40,11 +40,18 @@
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
     <xsl:param name="enforceSelection" />
+    <xsl:param name="forceDataRequestFormLinkToHttps" />
+
 
     <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="datasetUrl">
-        <xsl:value-of select="/dap:Dataset/@xml:base"/>
+        <xsl:choose>
+            <xsl:when test="$forceDataRequestFormLinkToHttps='true'">
+                <xsl:value-of select='replace(/dap:Dataset/@xml:base,"^http:","https:")'/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:otherwise>
+        </xsl:choose>
     </xsl:variable>
 
 
@@ -112,7 +119,7 @@
                     enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
-                <title>DAP4 Data Request Form<xsl:value-of select="@name"/></title>
+                <title>DAP4 Data Request Form <xsl:value-of select="@name"/></title>
             </head>
             <body>
                 <!-- ****************************************************** -->

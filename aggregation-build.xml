@@ -145,7 +145,7 @@
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
     <!-- Libraries -->
-    <property name="json.lib" value="gson-2.3.1.jar"/>
+    <property name="json.lib" value="gson-2.8.9.jar"/>
 
 
     <property name="junit.lib" value="junit-4.4.jar"/>

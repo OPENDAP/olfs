@@ -1152,9 +1152,16 @@ public class BES {
     }
 
 
+    /**
+     * Removes the prefix associated with this BES instance from the
+     * dataset name and returns the result. For a prefix of "/" this
+     * method will return the unchanged dataset name.
+     * @param dataset The dataset name from which to remove the prefix
+     * @return The dataset nae with the prefix removed.
+     */
     public String trimPrefix(String dataset) {
         String trim;
-        if (getPrefix().equals("/")) {
+        if (getPrefix().equals("/") || !dataset.startsWith(getPrefix())) {
             trim = dataset;
         }
         else {

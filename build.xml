@@ -220,7 +220,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       Libraries
     -->
-    <property name="json.lib" value="gson-2.3.1.jar"/>
+    <property name="json.lib" value="gson-2.8.9.jar"/>
 
 
     <property name="junit.lib" value="junit-4.4.jar"/>
@@ -516,11 +516,11 @@
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/gateway/**"/>
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/nciso/**"/>
 
-            <zipfileset dir="." prefix="${SRC_DIST}" file="build.xml"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="README"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="NEWS"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="ChangeLog"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="COPYRIGHT"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="build.xml"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="README"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="NEWS"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="ChangeLog"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="COPYRIGHT"/>
 
         </tar>
 

@@ -26,9 +26,7 @@
 
 package opendap.bes.dap4Responders;
 
-import opendap.bes.BESError;
-import opendap.bes.BESResource;
-import opendap.bes.BadConfigurationException;
+import opendap.bes.*;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
@@ -62,21 +60,20 @@ public class FileAccess extends Dap4Responder {
 
     private Logger log;
     private static String defaultRequestSuffix = ".file";
-    private boolean allowDirectDataSourceAccess = false;
 
-
+    private DatasetUrlResponseAction d_datasetUrlResponseAction;
+    private DataRequestFormType d_dataRequestFormType;
 
     public FileAccess(String sysPath, BesApi besApi) {
         this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public FileAccess(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
-    }
-
     public FileAccess(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        d_datasetUrlResponseAction = DatasetUrlResponseAction.requestForm;
+        d_dataRequestFormType = DataRequestFormType.dap4;
 
         setServiceRoleId("http://services.opendap.org/dap4/file-access");
         setServiceTitle("Data File Access");
@@ -93,19 +90,39 @@ public class FileAccess extends Dap4Responder {
     }
 
 
+
     public boolean isDataResponder(){ return true; }
     public boolean isMetadataResponder(){ return false; }
+
+
+    public void setDatasetUrlResponseAction(DatasetUrlResponseAction action){ d_datasetUrlResponseAction = action;}
+    public DatasetUrlResponseAction datasetUrlResponseAction(){ return d_datasetUrlResponseAction;}
+
+    public void setDatasetRequestFormType(DataRequestFormType type){ d_dataRequestFormType = type;}
+    public DataRequestFormType datasetRequestFormType(){ return d_dataRequestFormType;}
+
+
+    private boolean d_allowDirectDataSourceAccess = false;
+
+
+    public void setAllowDirectDataSourceAccess(boolean allowed){
+        d_allowDirectDataSourceAccess = allowed;
+    }
+    public boolean allowDirectDataSourceAccess() {
+        return d_allowDirectDataSourceAccess;
+    }
 
 
 
     public void sendNormativeRepresentation(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         String requestedResourceId = ReqInfo.getLocalUrl(req);
-
         String resourceID = getResourceId(requestedResourceId, false);
-
-        if(resourceID.endsWith(requestSuffix))
-            resourceID = resourceID.substring(0,resourceID.length()-requestSuffix.length());
+        boolean isFileServiceUrl = false;
+        if(resourceID.endsWith(requestSuffix)) {
+            resourceID = resourceID.substring(0, resourceID.length() - requestSuffix.length());
+            isFileServiceUrl = true;
+        }
 
         User user = new User(req);
 
@@ -116,13 +133,57 @@ public class FileAccess extends Dap4Responder {
             if (!dsi.isNode()) {
                 if (dsi.sourceIsAccesible()) {
                     if (dsi.isDataset()) {
-                        if (allowDirectDataSourceAccess()) {
-                            sendDatasetFile(user, resourceID, response);
-
+                        if(isFileServiceUrl){
+                            if(d_allowDirectDataSourceAccess) {
+                                log.debug("Sending source dataset file: " + Encode.forHtml(resourceID));
+                                sendDatasetFile(user, resourceID, response);
+                            }
+                            else {
+                                log.debug("Sending Access Denied for resource: " + Encode.forHtml(resourceID));
+                                sendDirectAccessDenied(req, response);
+                            }
                         }
                         else {
-                            log.debug("Sending Access Denied for resource: " + Encode.forHtml(resourceID));
-                            sendDirectAccessDenied(req,response);
+                            switch(d_datasetUrlResponseAction){
+                                case download:
+                                {
+                                    if(d_allowDirectDataSourceAccess) {
+                                        log.debug("Sending source dataset file: " + Encode.forHtml(resourceID));
+                                        sendDatasetFile(user, resourceID, response);
+                                    }
+                                    else {
+                                        log.debug("Sending Access Denied for resource: " + Encode.forHtml(resourceID));
+                                        sendDirectAccessDenied(req, response);
+                                    }
+                                    break;
+                                }
+
+                                case dsr:
+                                {
+                                    String redirectUrl =  ReqInfo.getRequestUrlPath(req) + ".dsr";
+                                    log.debug("Redirecting request for dataset URL to DSR: {}",redirectUrl);
+                                    response.sendRedirect(redirectUrl);
+                                    break;
+                                }
+
+                                case requestForm:
+                                default:
+                                {
+                                    String redirectUrl =  ReqInfo.getRequestUrlPath(req);
+                                    switch(BesDapDispatcher.dataRequestFormType()){
+                                        case dap2:
+                                            redirectUrl += ".html";
+                                            break;
+                                        case dap4:
+                                        default:
+                                            redirectUrl += ".dmr.html";
+                                            break;
+                                    }
+                                    log.debug("Redirecting request for dataset URL to Data Request Form: {}",redirectUrl);
+                                    response.sendRedirect(redirectUrl);
+                                    break;
+                                }
+                            }
                         }
                     }
                     else {
@@ -173,7 +234,8 @@ public class FileAccess extends Dap4Responder {
     }
 
 
-    private void sendDatasetFile(User user, String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
+    private void sendDatasetFile(User user, String dataSourceId, HttpServletResponse response)
+            throws IOException, BESError, BadConfigurationException, PPTException {
         log.debug("sendDatasetFile() - Sending dataset file \"" + dataSourceId + "\"");
 
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(dataSourceId)+"\"");
@@ -200,14 +262,6 @@ public class FileAccess extends Dap4Responder {
         log.debug("sendDatasetFile() - Sent {}",getServiceTitle());
 
 
-    }
-
-    public void setAllowDirectDataSourceAccess(boolean allowed){
-        allowDirectDataSourceAccess = allowed;
-    }
-
-    public boolean allowDirectDataSourceAccess(){
-        return allowDirectDataSourceAccess;
     }
 
 

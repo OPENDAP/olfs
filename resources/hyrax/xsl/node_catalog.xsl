@@ -36,7 +36,7 @@
         >
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
-    <xsl:param name="useDAP2ResourceUrlResponse"/>
+    <xsl:param name="datasetUrlResponseType"/>
     <xsl:param name="ncWmsServiceBase"/>
     <xsl:param name="ncWmsDynamicServiceId"/>
     <xsl:param name="WcsServices"/>
@@ -312,10 +312,14 @@
 
         <xsl:choose>
             <xsl:when test="@isData='true'">
+                <!-- DAP2/4 access -->
                 <thredds:access>
                     <xsl:attribute name="serviceName">dap</xsl:attribute>
                     <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
                 </thredds:access>
+
+                <!-- Download granule file access -->
+                <!--
                 <xsl:if test="$allowDirectDataSourceAccess='true'">
                     <thredds:access>
                         <xsl:attribute name="serviceName">file</xsl:attribute>
@@ -325,6 +329,22 @@
                         </xsl:attribute>
                     </thredds:access>
                 </xsl:if>
+
+-->
+                <xsl:if test="$allowDirectDataSourceAccess='true'">
+                    <thredds:access>
+                        <xsl:attribute name="serviceName">file</xsl:attribute>
+                        <xsl:attribute name="urlPath">
+                            <xsl:value-of select="$urlPath" />
+                            <!-- If the dataset URL is in use for something other than downloads,
+                            use the dap4 file service link -->
+                            <xsl:if test='$datasetUrlResponseType != "download"'>.file</xsl:if>
+                        </xsl:attribute>
+                    </thredds:access>
+                </xsl:if>
+
+
+
                 <xsl:if test="$ncWmsServiceBase">
                     <thredds:access>
                         <xsl:attribute name="serviceName">wms</xsl:attribute>
