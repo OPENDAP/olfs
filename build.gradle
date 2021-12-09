@@ -289,6 +289,7 @@ task createNgapWar(type: War, dependsOn: classes){
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
+    dependsOn 'copyNgapResources'
     dependsOn 'copyWCSResources'
 
     // Use the file in build/resources to populate the war file's resources
@@ -378,6 +379,17 @@ tasks.register('copyDocResources', Copy) {
     exclude 'src.distribution.readme'
 
     shouldRunAfter 'copyHyraxResources'
+}
+
+// Copy the files in 'resources/ngap/landing' to /$buildDir/resources/docs'. Note the plural ending.
+tasks.register('copyNgapResources', Copy) {
+    group = 'ngap'
+    description = 'Copy the ngap resources in resources/ngap/landing.'
+
+    from layout.projectDirectory.dir("resources/ngap/landing")
+    into layout.buildDirectory.dir("resources/docs/ngap")
+
+    shouldRunAfter 'copyDocResources'
 }
 
 // Copy the resources for the WCS code
