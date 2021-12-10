@@ -172,7 +172,7 @@ dependencies {
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
 
-    implementation group: 'org.jdom', name: 'jdom', version: '1.1'
+    implementation group: 'org.jdom', name: 'jdom', version: '1.1.3'
     //annotationProcessor 'org.tuckey:urlrewritefilter:3.2.0'
     //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
     implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
@@ -262,7 +262,7 @@ war {
     from layout.buildDirectory.dir("resources")
 }
 
-task createOpendapWar(type: War, dependsOn: classes){
+task buildOpendapWar(type: War, dependsOn: classes){
     baseName = 'opendap_server'
     destinationDir = file("$buildDir/dist")
 
@@ -278,7 +278,7 @@ task createOpendapWar(type: War, dependsOn: classes){
     from layout.buildDirectory.dir("resources")
 }
 
-task createNgapWar(type: War, dependsOn: classes){
+task buildNgapWar(type: War, dependsOn: classes){
     dependsOn configurations.ngapDep
     baseName = 'opendap_ngap'
     destinationDir = file("$buildDir/dist")
@@ -296,7 +296,7 @@ task createNgapWar(type: War, dependsOn: classes){
     from layout.buildDirectory.dir("resources")
 }
 
-task createRobotsWar(type: War, dependsOn: classes){
+task buildRobotsWar(type: War, dependsOn: classes){
     baseName = 'opendap_robots'
     destinationDir = file("$buildDir/dist")
 
@@ -304,7 +304,7 @@ task createRobotsWar(type: War, dependsOn: classes){
     description = 'Build the Opendap Robots war.'
 }
 
-task createDists(dependsOn: [createOpendapWar, createNgapWar]){ //hold for later ", createRobotsWar"
+task buildDists(dependsOn: [createOpendapWar, createNgapWar]){ //hold for later ", createRobotsWar"
     group = 'warBuilds'
     description = 'Build the Opendap, Ngap, and Robots war.'
 }
