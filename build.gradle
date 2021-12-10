@@ -304,7 +304,7 @@ task buildRobotsWar(type: War, dependsOn: classes){
     description = 'Build the Opendap Robots war.'
 }
 
-task buildDists(dependsOn: [createOpendapWar, createNgapWar]){ //hold for later ", createRobotsWar"
+task buildDists(dependsOn: [buildOpendapWar, buildNgapWar]){ //hold for later ", buildRobotsWar"
     group = 'warBuilds'
     description = 'Build the Opendap, Ngap, and Robots war.'
 }
