@@ -220,6 +220,7 @@ dependencies {
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
+    implementation group: 'io.netty', name: 'netty-codec', version: '4.1.68.Final'
 
     //ngapDep providedCompile group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version:'1.1.2'
     ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")
