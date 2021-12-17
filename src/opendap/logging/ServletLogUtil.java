@@ -377,7 +377,7 @@ public class ServletLogUtil {
         MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
 
         String userAgent = req.getHeader("User-Agent");
-        MDC.put(USER_AGENT_KEY,  userAgent==null?"-":userAgent);
+        MDC.put(USER_AGENT_KEY,  userAgent==null?"-":Scrub.simpleString(userAgent));
 
         String resourceID =  req.getRequestURI();
         MDC.put(RESOURCE_ID_KEY,resourceID);
