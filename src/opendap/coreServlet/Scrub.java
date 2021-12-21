@@ -66,8 +66,9 @@ public class Scrub {
 
     // Added the colon (:) to the list of allowed characters, based on 
     // a bug report from NASA/Raytheon. jhrg 5/7/15
-    private static final String URL_CONTENT_INCLUSION_REGEX = "[-a-zA-Z0-9/.%_ :]*";
-    private static final String URL_CONTENT_EXCLUSION_REGEX = "[^-a-zA-Z0-9/.%_ :]";
+    //  [-+a-zA-Z0-9_/%.\\][-+a-zA-Z0-9_/%.\\#]*
+    private static final String URL_CONTENT_INCLUSION_REGEX =  "[-+a-zA-Z0-9/.%_ :\\#]*";
+    private static final String URL_CONTENT_EXCLUSION_REGEX = "[^-+a-zA-Z0-9/.%_ :]";
     private static final Pattern URL_CONTENT_INCLUSION_PATTERN = Pattern.compile(URL_CONTENT_INCLUSION_REGEX);
 
     public static String urlContent(String urlContent){
@@ -138,8 +139,8 @@ public class Scrub {
         }
     }
 
-    private static final String SIMPLE_QUERY_STRING_INCLUSION_REGEX = "[a-zA-Z0-9_ =\\.]*";
-    private static final String SIMPLE_QUERY_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ =\\.]";
+    private static final String SIMPLE_QUERY_STRING_INCLUSION_REGEX =  "[a-zA-Z0-9_ =\\[\\:\\]\\.]*";
+    private static final String SIMPLE_QUERY_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ =\\[\\:\\]\\.]";
     private static final Pattern SIMPLE_QUERY_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleQueryString(String s){
