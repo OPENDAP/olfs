@@ -376,10 +376,10 @@ public class ServletLogUtil {
         MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
 
-        String userAgent = req.getHeader("User-Agent");
-        MDC.put(USER_AGENT_KEY,  userAgent==null?"-":Scrub.simpleString(userAgent));
+        String userAgent = Scrub.simpleString(req.getHeader("User-Agent"));
+        MDC.put(USER_AGENT_KEY,  userAgent==null?"-":userAgent);
 
-        String resourceID =  req.getRequestURI();
+        String resourceID =  Scrub.urlContent(req.getRequestURI());
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
         String query = Scrub.simpleQueryString(req.getQueryString());
