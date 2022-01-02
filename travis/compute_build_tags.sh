@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "TRAVIS_BUILD_NUMBER: ${TRAVIS_BUILD_NUMBER}"
-source ./VERSION
+source ./travis/versions_and_build_offsets.sh
 
 export OLFS_BUILD_NUMBER=$(expr $TRAVIS_BUILD_NUMBER - $TRAVIS_OLFS_BUILD_OFFSET)
 export OLFS_BUILD_VERSION="${OLFS_VERSION}-${OLFS_BUILD_NUMBER}"
