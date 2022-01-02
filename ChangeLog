@@ -1,3 +1,289 @@
+2021-12-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-0 2021-12-30T20:42:12+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-125 2021-12-30T16:58:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-124 2021-12-30T13:22:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-29  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Dropped link to the (no longer supported) old data request form
+	
+2021-12-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-113 2021-12-27T19:51:47+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-108 2021-12-21T21:59:20+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-21  ndp-opendap  <ndp@opendap.org>
+	
+	Updated gradle.build for new SLF4J and Logback
+	
+2021-12-21  Nathan Potter  <ndp@opendap.org>
+	
+	Updating slf4j and logback libs (#135)
+	* Updating slf4j and logback libs
+	* Updating SLF4J and Logback loib refs in alternate build files
+	* Updated scrubbydubby
+	* Code Formatting
+	* Code formatting
+	* Dropping older Logback and SLF4J libs
+	
+2021-12-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-106 2021-12-21T03:01:16+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-105 2021-12-18T00:07:36+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-17  Nathan Potter  <ndp@opendap.org>
+	
+	Cleaning urlrewrite config and logging comments to reflect 
+	current implementaion (#134)
+	
+	Scrub client User-Agent string
+	Added Scrub step to client submitted User-Agent string prior to 
+	logging
+	
+2021-12-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-103 2021-12-10T05:55:34+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-99 2021-12-10T01:49:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-98 2021-12-09T02:54:47+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-91 2021-12-02T02:46:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-90 2021-11-30T18:11:10+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-89 2021-11-24T07:49:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-87 2021-11-24T05:59:42+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-86 2021-11-24T00:45:45+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-76 2021-11-18T01:49:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-74 2021-11-16T20:45:19+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-73 2021-11-15T23:37:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-68 2021-11-10T19:21:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-66 2021-11-10T07:15:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-61 2021-11-09T03:43:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-59 2021-11-09T00:20:04+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-58 2021-11-05T00:26:51+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-56 2021-11-04T22:00:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-55 2021-11-04T16:51:23+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-53 2021-11-03T23:09:23+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-03  ndp-opendap  <ndp@opendap.org>
+	
+	Oops. Adding new gson-2.8.9.jar file now
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Upgraded gson-2.3.1 to gson-2.8.9
+	
+2021-11-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-52 2021-11-03T19:44:54+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-02  Nathan Potter  <ndp@opendap.org>
+	
+	Patch for bug in BES.trimPrefix() where the passed string was 
+	not (#133)
+	checked to see if it actually began with the prefix
+	
+2021-11-02  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+2021-11-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-45 2021-11-02T00:47:26+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-01  ndp-opendap  <ndp@opendap.org>
+	
+	Cleaning up code and normalizing (some) member variable names.
+	
+2021-10-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-40 2021-10-29T22:16:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-38 2021-10-29T21:06:50+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-36 2021-10-29T17:11:02+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-32 2021-10-28T23:18:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-29 2021-10-28T19:24:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-28 2021-10-28T01:03:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-27 2021-10-27T20:42:17+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-22  Nathan Potter  <ndp@opendap.org>
+	
+	HTTPS always for the data request form URL (#130)
+	* First draft of forcing the datarequest fomr URL to https
+	* Updated default olfs.xml and ngap/olfs.xml with 
+	ForceDataRequestFormLinkToHttps elements
+	
+2021-10-22  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Fixed incorrect redirect URL construction in FileAccess
+	
+2021-10-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-20 2021-10-22T01:30:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-21  Nathan Potter  <ndp@opendap.org>
+	
+	First pass at dataset_url management via redirects. (#129)
+	* First pass at dataset_url management via redirects.
+	* Updated olfs.xml cpmments and the ngap version of same
+	* More documentation work.
+	* More documentation work.
+	* More documentation work.
+	
+2021-10-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-15 2021-10-19T00:07:15+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-11 2021-10-16T00:46:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-8 2021-10-14T16:58:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-6 2021-09-23T19:51:52+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-23  dh-opendap  <dholloway@opendap.org>
+	
+	Updated to Version 1.18.9
+	
+2021-09-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-5 2021-09-21T17:07:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-4 2021-09-21T15:50:41+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-3 2021-09-20T19:38:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-2 2021-09-17T21:22:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.8-304 2021-09-16T21:14:51+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.8-303 2021-09-16T00:05:19+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-15  dh-opendap  <dholloway@opendap.org>
+	
+	Updated on 2021-09-15
 2021-09-02  The-Robot-Travis  <npotter@opendap.org>
 
 	bes-3.20.8-301 2021-09-02T22:39:38+0000 - Triggering OLFS build for snapshots.
