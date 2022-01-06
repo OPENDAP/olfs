@@ -11,7 +11,9 @@ Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/aggregation-build.xml
 
 Main targets:
 
- PreProcessSourceCode  Moves selected source code from the development tree into              the build/src directory. The code text is filtered to update version numbers.
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update
+                       version numbers.
  all                   Builds lots of stuff.
  check                 Run Unit Tests
  clean                 Clean up ALL build products.
@@ -41,7 +43,9 @@ Main targets:
  GatewayDispatchHandler  Builds jar file for the Gateway Dispatch Handler
  IsJavaDocUpToDate       Checks to see if the JavaDoc is out of date.
  NcmlDispatchHandler     Builds jar file for the NcML Dispatch Handler
- PreProcessSourceCode    Moves selected source code from the development tree into              the build/src directory. The code text is filtered to update version numbers.
+ PreProcessSourceCode    Moves selected source code from the development tree into
+                         the build/src directory. The code text is filtered to update
+                         version numbers.
  XSLTransformer          Builds executable jar file of a simple XSL Transformer application
  all                     Builds lots of stuff.
  check                   Run Unit Tests
@@ -50,11 +54,13 @@ Main targets:
  compile                 Compiles the OLFS.
  hexEncoderApp           Builds executable jar file of the hex encoder
  hyrax-robots            Builds the war files for the robots/sitemap and Hyrax's OLFS.
- hyrax-robots-dist       Packages the war files for the robots/sitemap and Hyrax's OLFS into a tar file with a release related name.
+ hyrax-robots-dist       Packages the war files for the robots/sitemap and Hyrax's OLFS into
+                         a tar file with a release related name.
  init                    Prepare all build directories.
 
  ngap                    Performs a clean build of the core software and assembles the WAR file.
- ngap-dist               Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.
+ ngap-dist               Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a
+                         gzipped tar file with a release related name.
 
  noop                    Do Nothing Target
  olfs-experiments        Compiles the experimental code.
@@ -79,7 +85,9 @@ Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/pdpservice-build.xml
 
 Main targets:
 
- PreProcessSourceCode  Moves selected source code from the development tree into              the build/src directory. The code text is filtered to update version numbers.
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update
+                       version numbers.
  all                   Builds lots of stuff.
  clean                 Clean up ALL build products.
  compile               Compiles the OLFS.
@@ -106,7 +114,8 @@ Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/robots.xml
 Main targets:
 
  IsJavaDocUpToDate     Checks to see if the JavaDoc is out of date.
- PreProcessSourceCode  Moves selected source code from the development tree into              the build/src directory. The code text is filtered to update version numbers.
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update version numbers.
  all                   Builds lots of stuff.
  check                 Run Unit Tests
  clean                 Clean up ALL build products.
