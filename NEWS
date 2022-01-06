@@ -48,7 +48,7 @@ the underlying data files/granules/objects directly, without utilizing the DAP A
 Default: disabled.
 <!--AllowDirectDataSourceAccess / -->
 
-### <ForceDataRequestFormLinkToHttp />
+### <ForceDataRequestFormLinkToHttps />
 The presence of this element will cause the Data Request Form interfaces to
 "force" the dataset URL to HTTPS. This is useful for situations where the sever
 is sitting behind a connection management tool (like AWS CloudFront) whose outward
