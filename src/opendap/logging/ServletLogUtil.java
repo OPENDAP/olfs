@@ -129,7 +129,7 @@ public class ServletLogUtil {
      * use the LogUtil.logServerStartup(String) method.
      * <p/>
      * The log directory is determined by the servlet containers content
-     * directory. The configuration of logging is controlled by the log4j.xml
+     * directory. The configuration of logging is controlled by the logback.xml
      * file.
      *
      * @param servlet - The servlet, used to determine the configuration
@@ -148,7 +148,7 @@ public class ServletLogUtil {
      * use the LogUtil.logServerStartup(String) method.
      * </p>
      * The log directory is determined by the servlet containers content
-     * directory. The configuration of logging is controlled by the log4j.xml
+     * directory. The configuration of logging is controlled by the logback.xml
      * file.
      *
      * @param sc The servlet context used, to determine the configuration
@@ -290,7 +290,7 @@ public class ServletLogUtil {
      * 2) "startTime" - the system time in millis when this method is called.
      * <p/>
      * The appearance of the regular log messages are controlled in the
-     * log4j.xml configuration file.
+     * logback.xml configuration file.
      * @param source The source id of who started the logging. Typically an init()
      * method.
      *
@@ -318,7 +318,7 @@ public class ServletLogUtil {
      * 2) "startTime" - the system time in millis when this method is called.
      * <p/>
      * The appearance of the regular log messages are controlled in the
-     * log4j.xml configuration file.
+     * logback.xml configuration file.
      * @param source The source id of who started the logging. Typically an init()
      * method.
      *
@@ -352,9 +352,9 @@ public class ServletLogUtil {
      * 5) "request" - The HTTP request, e.g., "GET /index.html HTTP/1.1".
      * <p/>
      * The appearance of the regular log messages and the THREDDS access log
-     * messages are controlled in the log4j.xml configuration file. For the log
+     * messages are controlled in the logback.xml configuration file. For the log
      * messages to look like an Apache server "common" log message, use the
-     * following log4j pattern:
+     * following pattern:
      * <p/>
      * "%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] %X{request} %m%n"
      *
@@ -376,10 +376,10 @@ public class ServletLogUtil {
         MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
         MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
 
-        String userAgent = req.getHeader("User-Agent");
+        String userAgent = Scrub.simpleString(req.getHeader("User-Agent"));
         MDC.put(USER_AGENT_KEY,  userAgent==null?"-":userAgent);
 
-        String resourceID =  req.getRequestURI();
+        String resourceID =  Scrub.urlContent(req.getRequestURI());
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
         String query = Scrub.simpleQueryString(req.getQueryString());

@@ -227,9 +227,10 @@
     <property name="jdom.lib" value="jdom-1.1.1.jar"/>
     <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
 
-    <property name="slf4j.lib" value="slf4j-api-1.7.16.jar"/>
-    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
-    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
+
+    <property name="slf4j.lib" value="slf4j-api-1.7.32.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.2.9.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.9.jar"/>
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -669,8 +670,6 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="opendap" depends="server" />
-
-
     <target
             name="server"
             depends="clean,compile"

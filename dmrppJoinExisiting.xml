@@ -177,9 +177,9 @@ This ANT file has two primary targets.
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
-    <property name="slf4j.lib" value="slf4j-api-1.7.16.jar"/>
-    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
-    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
+    <property name="slf4j.lib" value="slf4j-api-1.7.32.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.2.9.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.9.jar"/>
 
     <!--
         These are the library jars used by Hyrax.

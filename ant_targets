@@ -1,0 +1,128 @@
+
+###############################################################
+# aggregation-build.xml
+#
+# status: ACTIVE
+#
+# Builds the aggregation service as a WAR file which can be deployed (in
+# Tomcat) alongside a BES deployment.
+
+Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/aggregation-build.xml
+
+Main targets:
+
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update
+                       version numbers.
+ all                   Builds lots of stuff.
+ check                 Run Unit Tests
+ clean                 Clean up ALL build products.
+ compile               Compiles the OLFS.
+ init                  Prepare all build directories.
+ noop                  Do Nothing Target
+ server                Performs a clean build of the core software and assembles the WAR file.
+ server-fast           Performs a build (but no clean) of the core software and assembles the WAR file.
+Default target: all
+
+
+###############################################################
+# build.xml
+#
+# status: ACTIVE
+# The build.xml files contains the primary production rules for building
+# - The OLFS/Hyrax service as a WAR file
+# - The NGAP/Hyrax service as a WAR file
+#
+
+Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/build.xml
+
+Main targets:
+
+ BESclient               Build and package the back end client.
+ DISTRO                  Builds complete distribution
+ GatewayDispatchHandler  Builds jar file for the Gateway Dispatch Handler
+ IsJavaDocUpToDate       Checks to see if the JavaDoc is out of date.
+ NcmlDispatchHandler     Builds jar file for the NcML Dispatch Handler
+ PreProcessSourceCode    Moves selected source code from the development tree into
+                         the build/src directory. The code text is filtered to update
+                         version numbers.
+ XSLTransformer          Builds executable jar file of a simple XSL Transformer application
+ all                     Builds lots of stuff.
+ check                   Run Unit Tests
+ clean                   Clean up ALL build products.
+ clients                 Compiles the clients.
+ compile                 Compiles the OLFS.
+ hexEncoderApp           Builds executable jar file of the hex encoder
+ hyrax-robots            Builds the war files for the robots/sitemap and Hyrax's OLFS.
+ hyrax-robots-dist       Packages the war files for the robots/sitemap and Hyrax's OLFS into
+                         a tar file with a release related name.
+ init                    Prepare all build directories.
+
+ ngap                    Performs a clean build of the core software and assembles the WAR file.
+ ngap-dist               Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a
+                         gzipped tar file with a release related name.
+
+ noop                    Do Nothing Target
+ olfs-experiments        Compiles the experimental code.
+ robots                  Performs a clean build of the robots/sitemap service and assembles the WAR file.
+ server                  Performs a clean build of the core software and assembles the WAR file.
+ server-dist             Packages the war file into tar file with a release related name.
+ show                    Show build settings.
+ src-dist                Builds source distribution
+ validatorApp            Builds executable jar file of the hex encoder
+Default target: all
+
+
+###############################################################
+# pdpservice-build.xml
+#
+# status: ACTIVE
+#
+# This build file assembles a WAR file for the PDP (Policy Decision Point)
+# Service.
+#
+Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/pdpservice-build.xml
+
+Main targets:
+
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update
+                       version numbers.
+ all                   Builds lots of stuff.
+ clean                 Clean up ALL build products.
+ compile               Compiles the OLFS.
+ init                  Prepare all build directories.
+ noop                  Do Nothing Target
+ osx-package           Builds OSX package installer for the OLFS
+ server                Performs a clean build of the PdP Service software and assembles the WAR file.
+ show                  Show build settings.
+Default target: all
+
+
+###############################################################
+# robots.xml
+#
+# status: ACTIVE
+#
+# Builds the special robots.txt service as WAR file so that it may be
+# deployed in the "ROOT" context of a Tomcat instance. This service
+# make the http://server:port/robots.xml file a dynamic service that reports
+# the site map file(s) for the associated BES.
+#
+Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/robots.xml
+
+Main targets:
+
+ IsJavaDocUpToDate     Checks to see if the JavaDoc is out of date.
+ PreProcessSourceCode  Moves selected source code from the development tree into
+                       the build/src directory. The code text is filtered to update version numbers.
+ all                   Builds lots of stuff.
+ check                 Run Unit Tests
+ clean                 Clean up ALL build products.
+ compile               Compiles the OLFS.
+ init                  Prepare all build directories.
+ noop                  Do Nothing Target
+ robots                Performs a clean build of the robots/sitemap service and assembles the WAR file.
+ show                  Show build settings.
+Default target: all
+

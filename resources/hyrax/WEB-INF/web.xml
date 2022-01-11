@@ -277,7 +277,7 @@
         </init-param>
         <init-param>
             <param-name>RewriteLog</param-name>
-            <param-value>log4j</param-value>
+            <param-value>slf4j</param-value>
         </init-param>
     </filter>
 
