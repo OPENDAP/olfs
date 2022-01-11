@@ -1,4 +1,3 @@
-
 /// This build.gradle file was adapted from the Feedback project. That project
 /// built a war file using Java files that relied on teh Spring framework. In this
 /// build file I have removed or commented the parts that have to do with Spring.
@@ -127,7 +126,7 @@ sourceSets {
         }
 
         dependencies {
-             implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
+            implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
             implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
             implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
             implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
@@ -169,16 +168,15 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6'
 
     providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
 
     implementation group: 'org.jdom', name: 'jdom', version: '1.1.3'
-    //annotationProcessor 'org.tuckey:urlrewritefilter:3.2.0'
-    //hold the line above to replace the line below for upgrade to gradle 4.6, SBL 9.13.21
-    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
 
-    //implementation group: 'junit', name: 'junit', version: '4.4'
+    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
     implementation group: 'junit', name: 'junit', version: '4.13.1'
+
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32' // '1.7.22', '1.6.1'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.9' // '1.1.11'
@@ -187,12 +185,13 @@ dependencies {
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
     implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.5'
     implementation group: 'commons-logging', name: 'commons-logging', version: '1.1.3'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
 
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
-    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
 
     // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
     // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
@@ -203,10 +202,10 @@ dependencies {
     implementation files('lib/saxon-9.1.0.5.jar')
 
     implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2'
-    implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2'
+    implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
     /// WCS libs
     implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
@@ -222,7 +221,10 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
     implementation group: 'io.netty', name: 'netty-codec', version: '4.1.68.Final'
 
-    //ngapDep providedCompile group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version:'1.1.2'
+    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
+    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
+
+    // ---- NGAP libraries -----
     ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")
 
     ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager:2.3.2")
@@ -236,15 +238,61 @@ dependencies {
 
     ngapDep implementation("org.redisson:redisson:3.11.6")
 
-    // implementation group: 'xalan', name: 'xalan', version: '2.7' // not used?
-    // Used for XSLTransformer, validatorApp targets
-    // implementation group: 'xerces', name: 'xercesImpl', version: '2.12'
+    ngapDep testImplementation("org.objenesis:objenesis:3.2")
+
 }
 
 // Substitute the version information before compilation
 compileJava {
     doFirst {
     	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+    }
+
+    dependsOn 'substituteVersionInfo'
+}
+
+// see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
+project.ext {
+    resources_dir = "${projectDir}/resources"
+    // WebInf_resources_dir = "${project.resources_dir}/hyrax/WEB-INF"
+    // distribution_resources_dir = "${project.resources_dir}/distribution"
+
+    // Build Directories
+    build_dir = "${buildDir}"
+    build_classes = "${project.build_dir}/classes"
+    build_docs = "${project.build_dir}/docs"
+    build_dist = "${project.build_dir}/dist"
+    build_lib = "${project.build_dir}/lib"
+    build_run = "${project.build_dir}/run"
+    build_src = "${project.build_dir}/src"
+    build_resources = "${project.build_dir}/resources"
+
+    hyrax_resources_dir = "${project.resources_dir}/hyrax"
+    ngap_resources_dir = "${project.resources_dir}/ngap"
+    robots_resources_dir = "${project.resources_dir}/robots"
+    build_robots_resources = "${project.build_dir}/robots"
+    wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
+}
+
+clean.doFirst {
+    delete "src_gradle"
+}
+
+task init_dir {
+    description "Create required folders in the build directory."
+    doLast {
+        mkdir "${project.build_dir}"
+        mkdir "${project.build_classes}"
+//        mkdir "${project.'build_docs'}"
+//        mkdir "${project.'build_run'}"
+    }
+
+}
+
+// Substitute the version information before compilation
+compileJava {
+    doFirst {
+        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
     }
 
     dependsOn 'substituteVersionInfo'
