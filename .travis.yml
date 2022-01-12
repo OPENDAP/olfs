@@ -63,6 +63,8 @@ stages:
     if:  branch = master AND NOT type = pull_request
   - name: hyrax-docker-trigger
     if:  branch = master AND NOT type = pull_request
+  - name: gradle
+    if:  branch = master
 
 # caching for gradle
 before_cache:
@@ -91,7 +93,12 @@ jobs:
       script:
       - ./gradlew --version
       - ./gradlew tasks
-      - ./gradlew war 
+      - ./gradlew war
+
+    - stage: gradle
+      name: "gradle scan"
+      jdk: openjdk8
+      script: ./gradlew buildDists --scan -s
 
     - stage: test
       name: "jdk7"
