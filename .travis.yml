@@ -98,7 +98,7 @@ jobs:
     - stage: gradle
       name: "gradle scan"
       jdk: openjdk8
-      script: ./gradlew buildDists --scan -s
+      script: ./gradlew buildDists #--scan -s
 
     - stage: test
       name: "jdk7"
