@@ -20,6 +20,13 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+    id 'war'
+    id 'eclipse'
+    id 'idea'
+}
+
 // used to auto publish scan results in travis or travis hangs. SBL 1.12.22
 if (hasProperty('buildScan')) {
     buildScan {
@@ -27,13 +34,6 @@ if (hasProperty('buildScan')) {
         //change to 'no' if we don't want to publish scan results. SBL 1.12.22
         termsOfServiceAgree = 'yes'
     }
-}
-
-plugins {
-    id 'java'
-    id 'war'
-    id 'eclipse'
-    id 'idea'
 }
 
 group = 'org.opendap'
