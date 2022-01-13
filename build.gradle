@@ -179,7 +179,7 @@ dependencies {
     // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
     // jhrg 9/8/21
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6'
 
