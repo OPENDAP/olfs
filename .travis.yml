@@ -112,7 +112,7 @@ jobs:
 
 
     - stage: gradle
-      name: "gradle scan"
+      name: "gradle build"
       jdk: openjdk8
       script: ./gradlew buildDists #--scan -s
 
@@ -127,7 +127,7 @@ jobs:
       script: ant check
 
     - stage: scan
-      name: "sonar"
+      name: "sonar (ant)"
       addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
@@ -135,7 +135,19 @@ jobs:
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
-        - export STAGE=sonar
+        - export STAGE=sonar_ant
+        - echo $STAGE
+
+    - stage: scan
+      name: "sonar (gradle)"
+      addons:
+        sonarcloud:
+      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+      jdk: openjdk8
+      script:
+        - ./gradlew war #buildDists #will only scan opendap war file, change if we want to scan all war files
+        - ./gradlew sonarqube -Dsonar.login=$SONAR_LOGIN
+        - export STAGE=sonar_gradle
         - echo $STAGE
 
     - stage: scan

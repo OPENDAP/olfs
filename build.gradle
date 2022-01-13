@@ -25,6 +25,13 @@ plugins {
     id 'war'
     id 'eclipse'
     id 'idea'
+    id "org.sonarqube" version "3.3"
+}
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+    }
 }
 
 // used to auto publish scan results in travis or travis hangs. SBL 1.12.22
