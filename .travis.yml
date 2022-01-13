@@ -95,20 +95,21 @@ jobs:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
-      jdk: openjdk11
-      name: "jdk11"
-      script:
-        - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-
-    - stage: build
       jdk: openjdk8
       name: "gradle jdk8"
       script:
-      - ./gradlew --version
-      - ./gradlew tasks
-      - ./gradlew war
+        - ./gradlew --version
+        - ./gradlew tasks
+        - ./gradlew war
+
+    - stage: build
+      jdk: openjdk11
+      name: "gradle jdk11"
+      script:
+        - ./gradlew --version
+        - ./gradlew tasks
+        - ./gradlew war
+
 
     - stage: gradle
       name: "gradle scan"
@@ -130,7 +131,7 @@ jobs:
       addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
-      jdk: openjdk11
+      jdk: openjdk8
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
