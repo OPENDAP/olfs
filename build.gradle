@@ -47,8 +47,8 @@ group = 'org.opendap'
 description = 'The OLFs build'
 
 // version = '0.1.0-SNAPSHOT'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     // For just about everything except...
