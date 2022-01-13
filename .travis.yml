@@ -67,15 +67,28 @@ stages:
 jobs:
   include:
     - stage: build
+      jdk: openjdk7
       name: "jdk7"
       script:
         - export STAGE=build
         - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-      jdk: openjdk7
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - jdk: openjdk8
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      jdk: openjdk8
       name: "jdk8"
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+      script:
+        - export STAGE=build
+        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      jdk: openjdk11
+      name: "jdk11"
+      script:
+        - export STAGE=build
+        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: test
       name: "jdk7"
