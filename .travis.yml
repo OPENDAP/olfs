@@ -116,10 +116,11 @@ jobs:
       script: ./gradlew buildDists #--scan -s
 
     - stage: test
-      name: "jdk7"
-      script: export STAGE=test
       jdk: openjdk7
-      script: ant check
+      name: "jdk7"
+      script:
+      - export STAGE=test
+      - ant check
     - jdk: openjdk8
       name: "jdk8"
       script: ant check
@@ -133,7 +134,6 @@ jobs:
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
-      script:
         - ./run-snyk.sh
         - export STAGE=scan
         - echo $STAGE
