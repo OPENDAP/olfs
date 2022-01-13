@@ -128,11 +128,11 @@ jobs:
       script: ant check
 
     - stage: scan
-      name: "scan (jdk8)"
+      name: "scan (jdk11)"
       addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
-      jdk: openjdk8
+      jdk: openjdk11
       script:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
