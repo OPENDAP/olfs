@@ -1,101 +1,263 @@
+/// This build.gradle file was adapted from the Feedback project. That project
+/// built a war file using Java files that relied on teh Spring framework. In this
+/// build file I have removed or commented the parts that have to do with Spring.
+///
+/// The build will try to use the existing organization of the Java sources in the
+/// ant-based OLFS project.
+///
+/// jhrg 9/8/21
+
+// The 'buildscript' block holds what gradle needs to run the build script
+buildscript {
+    repositories {
+        //Required repos
+        mavenCentral()
+    }
+    dependencies {
+        // Required dependency for spring-boot plugin
+        // jhrg classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE'
+        classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
+    }
+}
 
 plugins {
     id 'java'
     id 'war'
+    id 'eclipse'
     id 'idea'
-    id 'project-report'
 }
 
-group 'org.opendap'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven {
-        url "https://repo.enonic.com/public"
+// used to auto publish scan results in travis or travis hangs. SBL 1.12.22
+if (hasProperty('buildScan')) {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        //change to 'no' if we don't want to publish scan results. SBL 1.12.22
+        termsOfServiceAgree = 'yes'
     }
 }
+
+group = 'org.opendap'
+description = 'The OLFs build'
+
+// version = '0.1.0-SNAPSHOT'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    // For just about everything except...
+    mavenCentral()
+
+    // I cannot get the 'enonic' repo to work and cannot find saxon 9.1.0.8
+    // anywhere. But we have 9.1.0.5 locally. The URL to the enomic repo was:
+    // 'https://repo.enonic.com/public' jhrg 9/8/21
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+configurations {
+    opendapDep
+    ngapDep
+    robotDep
+}
+
+ext {
+    DEPLOYMENT_CONTEXT = 'opendap'
+    NGAP_DEPLOYMENT_CONTEXT = 'ngap'
+
+    // Use gradle showInfo -P OLFS_VERSION=x.y.z to override the default. jhrg 9/20/21
+    HYRAX_VERSION = project.hasProperty('HYRAX_VERSION') ? project.property('HYRAX_VERSION') : 'Not.A.Release'
+    OLFS_VERSION = project.hasProperty('OLFS_VERSION') ? project.property('OLFS_VERSION') : 'Not.A.Release'
+
+    WCS_VERSION = project.OLFS_VERSION
+
+    // TODO Fix these strings. Maybe add a task to print them all. jhrg 9/17/21
+    OLFS_DIST_BASE = 'olfs-' + project.OLFS_VERSION // olfs-${OLFS_VERSION}'
+    WEBAPP_DIST = project.OLFS_DIST_BASE + '-webapp' //'${OLFS_DIST_BASE}-webapp'
+
+    SRC_DIST = project.OLFS_DIST_BASE + '-src' // '${OLFS_DIST_BASE}-src'
+    DOC_DIST = project.OLFS_DIST_BASE + '-doc' //${OLFS_DIST_BASE}-doc'
+    OLFS_LIB = project.OLFS_DIST_BASE // ${OLFS_DIST_BASE}'
+}
+
+tasks.register('showInfo') {
+    group = 'info'
+    description = 'Dsiplay additional project properties - used to control version numbers'
+
+    println 'DEPLOYMENT_CONTEXT: ' + project.DEPLOYMENT_CONTEXT
+    println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
+    println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+    println 'OLFS_VERSION: ' + project.OLFS_VERSION
+    println 'WCS_VERSION: ' + project.OLFS_VERSION
+
+    println 'OLFS_DIST_BASE: ' + project.OLFS_DIST_BASE
+    println 'WEBAPP_DIST: ' + project.WEBAPP_DIST
+
+    println 'SRC_DIST: ' + project.SRC_DIST
+    println 'DOC_DIST: ' + project.DOC_DIST
+    println 'OLFS_LIB: ' + project.OLFS_LIB
+}
+
+// See https://docs.gradle.org/current/userguide/building_java_projects.html#sec:java_source_sets
+// and https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceSet.html
+// jhrg 9/8/21
 
 sourceSets {
     main {
         java {
-            srcDirs = ['src_gradle']
+            srcDirs = ['src']
+            exclude '**/*Test.java'
+            // See also: https://docs.gradle.org/current/userguide/java_testing.html#java_testing
+            // and https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
+        }
+
+        resources {
         }
     }
-}
 
-ext {
-    junitVersion = '5.6.2'
+    test {
+        java {
+            srcDirs = ['src']
+            include 'src/**/*Test.java'
+        }
+    }
+
+    /*
+     * Block comment this out. Look at multi-project gradle.build files.
+     * jhrg 9/22/21
+    ngap {
+        java {
+            srcDirs = ['src']
+        }
+
+        resources {
+
+        }
+
+        dependencies {
+            implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
+            implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
+            implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
+            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
+            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
+
+            implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
+            implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
+            // DO NOT use reddisson-all, that will include all of the reddisson's deps and that
+            // will break our code. Use the lib with a version number.
+            implementation group: 'org.redisson', name: 'redisson', version: '3.11.6'
+            implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
+        }
+
+        war {
+            baseName = 'ngap'
+
+            // Copy/filter the various resource files
+            dependsOn 'copyHyraxResources'
+            dependsOn 'copyDocResources'
+            dependsOn 'copyWCSResources'
+
+            // Use the file in build/resources to populate the war file's resources
+            from layout.buildDirectory.dir("resources")
+        }
+    }
+    */
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    // The biggest difference I see between the gradle file written by Slav for the Snyk
+    // integration and my olf 'Feedback' project is the use of 'compile' versus
+    // 'implemetation' in the dependencies. I'll leave some of the old lines in here as
+    // comments.
+    // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
+    // jhrg 9/8/21
 
-    //implementation group: 'junit', name: 'junit', version: '4.4'
-    implementation group: 'junit', name: 'junit', version: '4.13.1'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
-    implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
-    implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation group: 'commons-lang', name: 'commons-lang', version: '2.5'
-    implementation group: 'commons-logging', name: 'commons-logging', version: '1.1.3'
-    implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2.2'
-    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
-    implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
-    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.9'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.9'
-//    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
-    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
-//    implementation group: 'xerces', name: 'xercesImpl', version: '2.8.1'
-//    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.0'
-    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
-    implementation group: 'commons-io', name: 'commons-io', version: '1.2'
-    implementation group: 'org.jdom', name: 'jdom', version: '1.1.1'
-    implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
-    implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
-    implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
-    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
-    implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-//    implementation group: 'xalan', name: 'xalan', version: '2.7.1'
-    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
-//    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.14'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6'
+    testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6'
+
     providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-    // ---- NGAP libraries -----
-    //AmazonElastiCacheClusterClient-no-version.jar
-    implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
-    //kryo-4.0.2.jar
-    implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
-    //kryo-serializers-0.46-SNAPSHOT.jar
-    implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
-    //memcached-session-manager-2.3.3-SNAPSHOT.jar
-    implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
-    //memcached-session-manager-tc7-2.3.3-SNAPSHOT.jar
-    compile group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
-    //minlog-1.3.0.jar
-    implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
-    //msm-kryo-serializer-2.3.3-SNAPSHOT.jar
-    implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
-    //objenesis-3.2.jar
-    testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
-    //redisson-all-3.5.5.jar
-    implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
-    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
+    providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
 
+    implementation group: 'org.jdom', name: 'jdom', version: '1.1.3'
+
+    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
+    implementation group: 'junit', name: 'junit', version: '4.13.1'
+
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32' // '1.7.22', '1.6.1'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.9' // '1.1.11'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.9'
+
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
+    implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.5'
+    implementation group: 'commons-logging', name: 'commons-logging', version: '1.1.3'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
+
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
+
+    // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
+    // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
+    // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
+    // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
+    implementation files('lib/saxon-9.1.0.5-jdom.jar')
+    implementation files('lib/saxon-9.1.0.5-s9api.jar')
+    implementation files('lib/saxon-9.1.0.5.jar')
+
+    implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2'
+    implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
+
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.3'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+
+    /// WCS libs
+    implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
+    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
+
+    implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
+    implementation group: 'io.netty', name: 'netty-codec', version: '4.1.68.Final'
+
+    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
+    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
+
+    // ---- NGAP libraries -----
+    ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")
+
+    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager:2.3.2")
+    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager-tc7:2.3.2")
+    ngapDep implementation("de.javakaffee:kryo-serializers:0.45")
+    ngapDep implementation("de.javakaffee.msm:msm-kryo-serializer:2.3.2")
+
+    ngapDep implementation("com.esotericsoftware:kryo:4.0.2")
+    ngapDep implementation("com.esotericsoftware:minlog:1.3.0")
+    ngapDep implementation("com.esotericsoftware:reflectasm:1.11.9")
+
+    ngapDep implementation("org.redisson:redisson:3.11.6")
+
+    ngapDep testImplementation("org.objenesis:objenesis:3.2")
+
+}
+
+// Substitute the version information before compilation
+compileJava {
+    doFirst {
+    	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+    }
+
+    dependsOn 'substituteVersionInfo'
 }
 
 // see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
@@ -133,75 +295,198 @@ task init_dir {
 //        mkdir "${project.'build_docs'}"
 //        mkdir "${project.'build_run'}"
     }
+
 }
 
-task copyResources(type: Copy) {
-    description "Copy from original resources."
-    from("resources/hyrax") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
+// Substitute the version information before compilation
+compileJava {
+    doFirst {
+        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
     }
-    from("./doc") {
-        exclude "src.distribution.readme"
-        into("docs")
-    }
-    from("resources/WCS/2.0") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "unused"
-        exclude "WEB-INF/web.xml"
-        exclude "WEB-INF/urlrewrite.xml"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    into("src_gradle/main/webapp")
+
+    dependsOn 'substituteVersionInfo'
 }
 
-task copySources(type: Copy) {
-    description "Copy original source code."
-    from("src") {
-        // include all the java files
-        include "opendap/**"
-        include "org/opendap/**"
-        exclude "opendap/cmr/**"
-        // Exclude the experimental code
-        exclude "opendap/experiments/**"
-        // Exclude the Metacat code
-        exclude "opendap/metacat/**"
-        // Exclude WCS 1.1.2 and semantics code
-        exclude "opendap/wcs/v1_1_2/**"
-        exclude "opendap/semantics/**"
-        // Exclude prototype Amazon Web Services code from production
-        exclude "opendap/aws/**"
-        exclude "opendap/noaa_s3/**"
-        // Exclude async test code
-        exclude "opendap/async/**"
-    }
-    into("src_gradle/main/java")
-}
-
-task PreProcessSourceCode(dependsOn: ['clean', 'init_dir', 'copySources', 'copyResources']) {
-    description = "Moves selected source code from the development tree into the build/src directory. " +
-            "The code text is filtered to update version numbers."
-}
-
+// See: https://docs.gradle.org/current/userguide/war_plugin.html
+// We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
+// given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    // Define war file name
-    archiveName("${DEPLOYMENT_CONTEXT}.war")
-    webAppDirName = "src_gradle/main/webapp"
-    destinationDirectory = file("$buildDir/dist")
-    //classpath = configurations.compileClasspath
+    baseName = 'opendap'
+
+    // Copy/filter the various resource files
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
+    dependsOn 'copyWCSResources'
+
+    // Use the files in build/resources to populate the war file's resources
+    from layout.buildDirectory.dir("resources")
 }
 
-task server(dependsOn: ['PreProcessSourceCode', 'build']){
-    description = "Performs a clean build of the core software and assembles the WAR file."
+task buildOpendapWar(type: War, dependsOn: classes){
+    baseName = 'opendap_server'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Server war'
+
+    // Copy/filter the various resource files
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
+    dependsOn 'copyWCSResources'
+
+    // Use the file in build/resources to populate the war file's resources
+    from layout.buildDirectory.dir("resources")
 }
 
-task getReports(dependsOn: ['htmlDependencyReport', 'propertyReport', 'taskReport', 'projectReport']) {
-    println("Reports:")
+task buildNgapWar(type: War, dependsOn: classes){
+    dependsOn configurations.ngapDep
+    baseName = 'opendap_ngap'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Ngap war.'
+
+    // Copy/filter the various resource files
+    dependsOn 'copyHyraxResources'
+    dependsOn 'copyDocResources'
+    dependsOn 'copyNgapResources'
+    dependsOn 'copyWCSResources'
+
+    // Use the file in build/resources to populate the war file's resources
+    from layout.buildDirectory.dir("resources")
 }
 
+task buildRobotsWar(type: War, dependsOn: classes){
+    baseName = 'opendap_robots'
+    destinationDir = file("$buildDir/dist")
+
+    group = 'warBuilds'
+    description = 'Build the Opendap Robots war.'
+}
+
+task buildDists(dependsOn: [buildOpendapWar, buildNgapWar]){ //hold for later ", buildRobotsWar"
+    group = 'warBuilds'
+    description = 'Build the Opendap, Ngap, and Robots war.'
+}
+
+clean {
+    // FIXME: Awful. instead, look for all (.+)\\.java.in files and delete $1.java jhrg 9/16/21
+    delete 'src/opendap/bes/Version.java'
+}
+
+tasks.withType(JavaCompile) {
+    //options.compilerArgs << '-Xlint:unchecked'
+    //options.compilerArgs << '-Xlint:unchecked' << '-Werror' //enable to mark deprecated warnings as errors
+    options.deprecation = true
+}
+
+// Copy and filter the resource files. These tasks are run by the 'war' task.
+// Looking for the substitutions in the src/ and resource/ dirs shows these
+// files need to be processed.
+//
+// SERVICE_CONTEXT:
+// ./resources/hyrax/test_filtering.txt
+// ./resources/hyrax/xsl/serviceDescription.xsl
+// ./resources/hyrax/xsl/asyncResponse.xsl
+//
+// HyraxVersion:
+// ./src/opendap/bes/Version.java
+// ./resources/osx/Info.plist
+// ./resources/hyrax/xsl/version.xsl
+// ./resources/hyrax/gateway/gateway_form.html
+// ./resources/ngap/landing/ngap.html
+//
+// OlfsVersion:
+// ./src/opendap/bes/Version.java
+// ./resources/osx/Info.plist
+//
+// WCS_SOFTWARE_VERSION:
+// Does not appear in any source file.
+//
+// WcsSoftwareVersion
+// capabilities.xsl
+// coverageDescription.xsl
+// jhrg 9/15/21
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
+              HyraxVersion: project.HYRAX_VERSION,
+              OlfsVersion: project.OLFS_VERSION,
+              WcsSoftwareVersion: project.WCS_VERSION]
+
+// Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
+
+// This task copies resources from 'resources/hyrax' to $buildDir/resources
+// and, along the way, substitutes various tokes in the files.
+tasks.register('copyHyraxResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in resources/hyrax/.'
+
+    from layout.projectDirectory.dir("resources/hyrax")
+    into layout.buildDirectory.dir("resources")
+    filter(ReplaceTokens, tokens: tokens)
+}
+
+// Copy the files in 'doc/' to /$buildDir/resources/docs'. Note the plural ending.
+tasks.register('copyDocResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in doc/.'
+
+    from layout.projectDirectory.dir("doc")
+    into layout.buildDirectory.dir("resources/docs")
+
+    exclude 'src.distribution.readme'
+
+    shouldRunAfter 'copyHyraxResources'
+}
+
+// Copy the files in 'resources/ngap/landing' to /$buildDir/resources/docs'. Note the plural ending.
+tasks.register('copyNgapResources', Copy) {
+    group = 'ngap'
+    description = 'Copy the ngap resources in resources/ngap/landing.'
+
+    from layout.projectDirectory.dir("resources/ngap/landing")
+    into layout.buildDirectory.dir("resources/docs/ngap")
+
+    shouldRunAfter 'copyDocResources'
+}
+
+// Copy the resources for the WCS code
+tasks.register('copyWCSResources', Copy) {
+    group = 'Filtering'
+    description = 'Copy and filter the resources in resources/WCS/2.0.'
+
+    from layout.projectDirectory.dir("resources/WCS/2.0")
+    into layout.buildDirectory.dir("resources/")
+
+    include 'xsl/**'
+    include 'WEB-INF/**'
+
+    exclude 'WEB-INF/web.xml'
+    exclude 'WEB-INF/urlrewrite.xml'
+    exclude 'WEB-INF/logback.xml'
+    exclude 'WEB-INF/logback-test.xml'
+
+    filter(ReplaceTokens, tokens: tokens)
+    shouldRunAfter 'copyHyraxResources'
+}
+
+// This task looks for anything in 'src/' that ends in .java.in, substitutes the
+// tokens in it and places the result into a file with the same basename ending in
+// '.java'.
+//
+// I made this to see if I could and because I wanted to make the files that get
+// tokens substituted explict in the sources. There might be better ways to do this.
+// And handling the substitution this way makes the clean target more complex.
+// jhrg 9/16 21
+tasks.register('substituteVersionInfo', Copy) {
+    group = 'Filtering'
+    description = 'Copy and substitute version numbers in java source templates.'
+
+    from 'src'
+    into 'src'
+    include '**/*.java.in'
+    filter(ReplaceTokens, tokens: tokens)
+    rename '(.+)\\.in', '$1'
+}

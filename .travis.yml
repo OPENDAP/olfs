@@ -63,6 +63,18 @@ stages:
     if:  branch = master AND NOT type = pull_request
   - name: hyrax-docker-trigger
     if:  branch = master AND NOT type = pull_request
+  - name: gradle
+    if:  branch = master
+
+# caching for gradle
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 jobs:
   include:
@@ -76,6 +88,17 @@ jobs:
     - jdk: openjdk8
       name: "jdk8"
       script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    - jdk: openjdk8
+      name: "gradle jdk8"
+      script:
+      - ./gradlew --version
+      - ./gradlew tasks
+      - ./gradlew war
+
+    - stage: gradle
+      name: "gradle scan"
+      jdk: openjdk8
+      script: ./gradlew buildDists #--scan -s
 
     - stage: test
       name: "jdk7"

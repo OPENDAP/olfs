@@ -306,7 +306,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
                     }
                 }
-                Collection<Element> servicesToAdd = inheritedServicesElement.getChildren("service",THREDDS.NS);
+                @SuppressWarnings("unchecked") //suppressed the 'unchecked' warning being thrown here, SBL 9.13.21
+                Collection<Element> servicesToAdd = (Collection<Element>) inheritedServicesElement.getChildren("service",THREDDS.NS);
                 Vector<Element> services = new Vector<Element>();
                 for(Element e : servicesToAdd){
                     services.add(e);
