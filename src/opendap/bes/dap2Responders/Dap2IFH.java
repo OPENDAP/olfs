@@ -167,7 +167,7 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("JsonLD", jsonLD);
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
-            transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceDataRequestFormLinkToHttps()?"true":"false"));
+            transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceLinksToHttps()?"true":"false"));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 

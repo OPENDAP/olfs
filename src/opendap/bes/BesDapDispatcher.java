@@ -101,7 +101,7 @@ public class BesDapDispatcher implements DispatchHandler {
     public static DatasetUrlResponseAction datasetUrlResponseAction() { return d_datasetUrlResponse; }
     public static String datasetUrlResponseActionStr() { return d_datasetUrlResponse.toString(); }
 
-    public static boolean forceDataRequestFormLinkToHttps() { return d_forceDataRequestFormLinkToHttps; }
+    public static boolean forceLinksToHttps() { return d_forceDataRequestFormLinkToHttps; }
 
     protected Vector<Dap4Responder> getResponders() {
         return _responders;
