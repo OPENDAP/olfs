@@ -151,7 +151,7 @@ jobs:
 
 
     - stage: scan
-      name: "gradle scan jdk8"
+      name: "gradle scan (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=build
