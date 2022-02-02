@@ -26,13 +26,10 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.ppt.PPTException;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,9 +40,8 @@ import java.util.TreeSet;
  * Contains the Version and UUID information for Hyrax Server.
  */
 public class Version  {
-    private static final String olfsVersion  = "Not.A.Release";
-    private static final String hyraxVersion = "Not.A.Release";
-
+    private static final String olfsVersion  = "@OlfsVersion@";
+    private static final String hyraxVersion = "@HyraxVersion@";
 
     /**
      * Returns a String containing the OLFS version.
@@ -58,7 +54,8 @@ public class Version  {
     /**
      * Returns a String containing the Hyrax version.
      * @return The version of Hyrax.
-     */    public static String getHyraxVersionString() {
+     */
+    public static String getHyraxVersionString() {
         return (hyraxVersion);
     }
 
