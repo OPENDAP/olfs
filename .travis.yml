@@ -53,6 +53,8 @@ install:
   - npm install -g snyk-gradle-plugin
 
 stages:
+  - name: jdk11
+    if:  branch = master
   - name: scan
     if:  branch = master
   - name: build
@@ -89,6 +91,13 @@ jobs:
     - stage: build
       name: "jdk8"
       jdk: openjdk8
+      script:
+        - export STAGE=build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: jdk11
+      name: "jdk11"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
