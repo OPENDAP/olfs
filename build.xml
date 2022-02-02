@@ -268,6 +268,7 @@
     <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
     <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
     <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-api.lib" value="jaxb-api-2.3.1.jar"/>
     <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
     <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
@@ -315,6 +316,7 @@
         <include name="${ogc-gmlcov.lib}"/>
         <include name="${ogc-ows.lib}"/>
         <include name="${ogc-jaxb.lib}"/>
+        <include name="${jaxb-api.lib}"/>
         <include name="${jaxb-core.lib}"/>
         <include name="${jaxb-impl.lib}"/>
         <include name="${xlink.lib}"/>

@@ -58,13 +58,13 @@ stages:
   - name: test
     if:  branch = master
   - name: scan
+    if: branch = master
+  - name: gradle
     if:  branch = master
   - name: snappah
     if:  branch = master AND NOT type = pull_request
   - name: hyrax-docker-trigger
     if:  branch = master AND NOT type = pull_request
-  - name: gradle
-    if:  branch = master
 
 # caching for gradle
 before_cache:
@@ -80,48 +80,83 @@ jobs:
   include:
     - stage: build
       name: "jdk7"
+      jdk: openjdk7
       script:
         - export STAGE=build
         - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-      jdk: openjdk7
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - jdk: openjdk8
-      name: "jdk8"
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - jdk: openjdk8
-      name: "gradle jdk8"
-      script:
-      - ./gradlew --version
-      - ./gradlew tasks
-      - ./gradlew war
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
-    - stage: gradle
-      name: "gradle scan"
+    - stage: build
+      name: "jdk8"
       jdk: openjdk8
-      script: ./gradlew buildDists #--scan -s
+      script:
+        - export STAGE=build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      name: "jdk11"
+      jdk: openjdk11
+      script:
+        - export STAGE=build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      name: "gradle jdk8"
+      jdk: openjdk8
+      script:
+        - export STAGE=build
+        - ./gradlew --version
+        - ./gradlew tasks
+        - ./gradlew war
 
     - stage: test
       name: "jdk7"
-      script: export STAGE=test
       jdk: openjdk7
-      script: ant check
-    - jdk: openjdk8
-      name: "jdk8"
-      script: ant check
+      script:
+        - export STAGE=test
+        - ant check
 
-    - stage: scan
-      name: "scan (jdk8)"
-      addons:
-        sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+    - stage: test
+      name: "jdk8"
       jdk: openjdk8
       script:
+        - export STAGE=test
+        - ant check
+
+    - stage: test
+      name: "jdk11"
+      jdk: openjdk11
+      script:
+        - export STAGE=test
+        - ant check
+
+    - stage: scan
+      name: "sonarscan (jdk11)"
+      jdk: openjdk11
+      addons: sonarcloud
+      script:
+        - export STAGE=scan
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+
+    - stage: scan
+      name: "synk (jdk8)"
+      jdk: openjdk8
       script:
+        - export STAGE=scan
         - ./run-snyk.sh
         - export STAGE=scan
         - echo $STAGE
+
+
+    - stage: scan
+      name: "gradle scan (jdk8)"
+      jdk: openjdk8
+      script:
+        - export STAGE=build
+        - ./gradlew buildDists #--scan -s
+
 
     - stage: snappah
       name: "olfs-snapshot"

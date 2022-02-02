@@ -108,7 +108,7 @@ public class W10nResponder {
 
         log = LoggerFactory.getLogger(this.getClass());
 
-        this.systemPath = systemPath;
+        this.systemPath = null;
 
         besApi = new BesApi();
 
