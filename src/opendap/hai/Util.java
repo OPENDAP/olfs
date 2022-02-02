@@ -59,7 +59,7 @@ public class Util {
                     log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", Scrub.urlContent(name));
                 }
                 for(String value: values){
-                    sb.append("'").append(value).append("' ");
+                    sb.append("'").append(Scrub.simpleQueryString(value)).append("' ");
                     kvp.put(name,value);
                 }
                 sb.append("\n");
