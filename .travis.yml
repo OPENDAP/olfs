@@ -146,7 +146,7 @@ jobs:
         - export STAGE=scan
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
         - ant sonar -Dsonar.login=$SONAR_LOGIN
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=OPENDAP-libdap4 | grep "QUALITY GATE PASS"
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=OPENDAP-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
       name: "synk (jdk8)"
