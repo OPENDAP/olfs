@@ -53,8 +53,6 @@ install:
   - npm install -g snyk-gradle-plugin
 
 stages:
-  - name: jdk11
-    if:  branch = master
   - name: scan
     if:  branch = master
   - name: build
@@ -95,12 +93,12 @@ jobs:
         - export STAGE=build
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
-    - stage: jdk11
+    - stage: build
       name: "jdk11"
       jdk: openjdk11
       script:
         - export STAGE=build
-        - ant -v server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
       name: "gradle jdk8"
@@ -132,8 +130,15 @@ jobs:
         - export STAGE=test
         - ant check
 
+    - stage: test
+      name: "jdk11"
+      jdk: openjdk11
+      script:
+        - export STAGE=test
+        - ant check
+
     - stage: scan
-      name: "sonarscan (jdk8)"
+      name: "sonarscan (jdk11)"
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
       jdk: openjdk11
       addons: sonarcloud

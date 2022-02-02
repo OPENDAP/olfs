@@ -530,7 +530,7 @@ public class AggregationServlet extends HttpServlet {
 
             RequestCache.openThreadCache();
 
-            String requestKind = request.getParameter("operation");
+            String requestKind = Scrub.simpleString(request.getParameter("operation"));
             if (requestKind == null)
                 requestKind = "nothing - the operation parameter was not supplied.";
 
