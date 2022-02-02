@@ -54,12 +54,12 @@ public class Util {
 
             for(Map.Entry<String,String[]> e: params.entrySet()){
                 String name = e.getKey();
-                String values[] = e.getValue();
+                String[] values = e.getValue();
                 if(values.length>1){
                     log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", Scrub.urlContent(name));
                 }
                 for(String value: values){
-                    sb.append("'").append(value).append("' ");
+                    sb.append("'").append(Scrub.simpleQueryString(value)).append("' ");
                     kvp.put(name,value);
                 }
                 sb.append("\n");

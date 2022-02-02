@@ -169,19 +169,19 @@ public class PDPService extends HttpServlet {
         try {
             if (!redirect(request, response)) {
 
-                String uid         = request.getParameter("uid");
+                String uid         = Scrub.simpleString(request.getParameter("uid"));
                 if(uid == null) uid = "";
 
-                String authContext  = request.getParameter("authContext");
+                String authContext  = Scrub.simpleString(request.getParameter("authContext"));
                 if(authContext == null) authContext = "";
 
-                String resourceId  = request.getParameter("resourceId");
+                String resourceId  = Scrub.urlContent(request.getParameter("resourceId"));
                 if(resourceId == null) resourceId = "";
 
-                String query       = request.getParameter("query");
+                String query       = Scrub.simpleQueryString(request.getParameter("query"));
                 if(query == null) query = "";
 
-                String action      = request.getParameter("action");
+                String action      = Scrub.simpleString(request.getParameter("action"));
                 if(action == null) action = "GET";
 
 
