@@ -274,9 +274,11 @@ public class UrsIdP extends IdProvider{
                 String returnToUrl = request.getRequestURL().toString();
                 String clientProto = request.getHeader("CloudFront-Forwarded-Proto");
                 log.debug("CloudFront-Forwarded-Proto: {}",(clientProto==null?"MISSING":clientProto));
-                /*
+
                 if(BesDapDispatcher.forceLinksToHttps() &&
-                        returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL)){
+                        returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL) &&
+                        !returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL+"localhost")
+                ){
 
                     returnToUrl = opendap.http.Util.HTTPS_PROTOCOL +
                             returnToUrl.substring(opendap.http.Util.HTTP_PROTOCOL.length());
