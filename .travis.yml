@@ -108,6 +108,15 @@ jobs:
         - ./gradlew tasks
         - ./gradlew war
 
+    - stage: build
+      name: "gradle jdk11"
+      jdk: openjdk11
+      script:
+        - export STAGE=build
+        - ./gradlew --version
+        - ./gradlew tasks
+        - ./gradlew war
+
     - stage: test
       name: "jdk7"
       jdk: openjdk7
