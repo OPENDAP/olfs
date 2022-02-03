@@ -31,6 +31,19 @@ plugins {
 sonarqube {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.projectKey", "opendap-olfs"
+        property "sonar.projectName", "olfs"
+        property "sonar.projectVersion", "${OLFS_VERSION}"
+        property "sonar.organization", "opendap"
+        property "sonar.inclusions", "src"
+        property "sonar.exclusions", "src/opendap/Coverity_Model.java," +
+                                    "src/opendap/experiments/**/*.java," +
+                                    "src/opendap/metacat/**/*.java," +
+                                    "src/opendap/aws/**/*.java," +
+                                    "src/opendap/noaa_s3/**/*.java," +
+                                    "src/opendap/**/*Test.java"
+        property "sonar.java.binaries", "build"
+        property "sonar.java.libraries", "lib/*.jar"
     }
 }
 
@@ -39,7 +52,7 @@ if (hasProperty('buildScan')) {
     buildScan {
         termsOfServiceUrl = 'https://gradle.com/terms-of-service'
         //change to 'no' if we don't want to publish scan results. SBL 1.12.22
-        termsOfServiceAgree = 'yes'
+        termsOfServiceAgree = 'no'
     }
 }
 
@@ -47,8 +60,8 @@ group = 'org.opendap'
 description = 'The OLFs build'
 
 // version = '0.1.0-SNAPSHOT'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     // For just about everything except...

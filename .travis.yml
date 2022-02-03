@@ -143,7 +143,7 @@ jobs:
       addons:
         sonarcloud:
       # jdk 7 does not work with sonar scan. jhrg 3/14/19
-      jdk: openjdk8
+      jdk: openjdk11
       script:
         - ./gradlew war #buildDists #will only scan opendap war file, change if we want to scan all war files
         - ./gradlew sonarqube -Dsonar.login=$SONAR_LOGIN
