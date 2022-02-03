@@ -148,7 +148,7 @@ jobs:
         - ./gradlew buildDists #--scan -s
 
     - stage: snappah
-      name: "olfs-snapshot"
+      name: "olfs-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -163,7 +163,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "olfs-build-number"
+      name: "olfs-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -178,7 +178,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-snapshot"
+      name: "ngap-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -193,7 +193,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-build-number"
+      name: "ngap-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
