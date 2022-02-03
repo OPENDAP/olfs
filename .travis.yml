@@ -77,13 +77,6 @@ cache:
 
 jobs:
   include:
-    - stage: build
-      name: "jdk7"
-      jdk: openjdk7
-      script:
-        - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
       name: "jdk8"
@@ -100,8 +93,8 @@ jobs:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
-      name: "gradle jdk8"
-      jdk: openjdk8
+      name: "gradle (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ./gradlew --version
@@ -140,17 +133,16 @@ jobs:
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
-      name: "synk (jdk8)"
-      jdk: openjdk8
+      name: "synk (jdk1)"
+      jdk: openjdk11
       script:
         - export STAGE=scan
-        - ./run-snyk.sh
-        - export STAGE=scan
         - echo $STAGE
+        - ./run-snyk.sh
 
     - stage: scan
-      name: "gradle scan (jdk8)"
-      jdk: openjdk8
+      name: "gradle scan (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ./gradlew buildDists #--scan -s
