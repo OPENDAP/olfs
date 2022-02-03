@@ -133,7 +133,7 @@ jobs:
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
-      name: "synk (jdk1)"
+      name: "synk (jdk11)"
       jdk: openjdk11
       script:
         - export STAGE=scan
