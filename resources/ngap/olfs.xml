@@ -147,7 +147,7 @@
     on HTTP. When these URLs are exposed via the Data Request Forms they can cause some clients
     issues with session dropping because the protocols are not consistent.
     -->
-    <ForceDataRequestFormLinkToHttps />
+    <!-- ForceDataRequestFormLinkToHttps / -->
 
 
 
