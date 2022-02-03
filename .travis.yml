@@ -77,13 +77,6 @@ cache:
 
 jobs:
   include:
-    - stage: build
-      name: "jdk7"
-      jdk: openjdk7
-      script:
-        - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
       name: "jdk8"
@@ -100,16 +93,7 @@ jobs:
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
-      name: "gradle jdk8"
-      jdk: openjdk8
-      script:
-        - export STAGE=build
-        - ./gradlew --version
-        - ./gradlew tasks
-        - ./gradlew war
-
-    - stage: build
-      name: "gradle jdk11"
+      name: "gradle (jdk11)"
       jdk: openjdk11
       script:
         - export STAGE=build
@@ -158,8 +142,8 @@ jobs:
         - echo $STAGE
 
     - stage: scan
-      name: "gradle scan (jdk8)"
-      jdk: openjdk8
+      name: "gradle scan (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ./gradlew buildDists #--scan -s
