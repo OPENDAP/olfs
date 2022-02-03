@@ -283,7 +283,7 @@ public class UrsIdP extends IdProvider{
                     returnToUrl = opendap.http.Util.HTTPS_PROTOCOL +
                             returnToUrl.substring(opendap.http.Util.HTTP_PROTOCOL.length());
                 }
-                 */
+                
                 url += "response_type=code&redirect_uri=" + returnToUrl;
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
