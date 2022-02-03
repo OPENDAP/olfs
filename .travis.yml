@@ -28,7 +28,6 @@ addons:
   apt:
     packages:
       - awscli
-      - sshpass
 
 env:
   global:
@@ -53,18 +52,18 @@ install:
   - npm install -g snyk-gradle-plugin
 
 stages:
+  - name: gradle
+    if:  branch = master
   - name: build
     if:  branch = master
   - name: test
     if:  branch = master
   - name: scan
-    if:  branch = master
+    if: branch = master
   - name: snappah
     if:  branch = master AND NOT type = pull_request
   - name: hyrax-docker-trigger
     if:  branch = master AND NOT type = pull_request
-  - name: gradle
-    if:  branch = master
 
 # caching for gradle
 before_cache:
@@ -78,89 +77,78 @@ cache:
 
 jobs:
   include:
-    - stage: build
-      jdk: openjdk7
-      name: "jdk7"
-      script:
-        - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
-      jdk: openjdk8
       name: "jdk8"
+      jdk: openjdk8
       script:
         - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
-      jdk: openjdk8
-      name: "gradle jdk8"
+      name: "jdk11"
+      jdk: openjdk11
       script:
-        - ./gradlew --version
-        - ./gradlew tasks
-        - ./gradlew war
+        - export STAGE=build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
 
     - stage: build
+      name: "gradle (jdk11)"
       jdk: openjdk11
-      name: "gradle jdk11"
       script:
+        - export STAGE=build
         - ./gradlew --version
         - ./gradlew tasks
         - ./gradlew war
-
-
-    - stage: gradle
-      name: "gradle build"
-      jdk: openjdk8
-      script: ./gradlew buildDists #--scan -s
 
     - stage: test
-      jdk: openjdk7
       name: "jdk7"
+      jdk: openjdk7
       script:
-      - export STAGE=test
-      - ant check
-    - jdk: openjdk8
-      name: "jdk8"
-      script: ant check
+        - export STAGE=test
+        - ant check
 
-    - stage: scan
-      name: "sonar (ant)"
-      addons:
-        sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+    - stage: test
+      name: "jdk8"
       jdk: openjdk8
       script:
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-        - ant sonar -Dsonar.login=$SONAR_LOGIN
-        - export STAGE=sonar_ant
-        - echo $STAGE
+        - export STAGE=test
+        - ant check
 
-    - stage: scan
-      name: "sonar (gradle)"
-      addons:
-        sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+    - stage: test
+      name: "jdk11"
       jdk: openjdk11
       script:
-        - ./gradlew war #buildDists #will only scan opendap war file, change if we want to scan all war files
-        - ./gradlew sonarqube -Dsonar.login=$SONAR_LOGIN
-        - export STAGE=sonar_gradle
-        - echo $STAGE
+        - export STAGE=test
+        - ant check
 
     - stage: scan
-      name: "snyk"
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
-      jdk: openjdk8
+      name: "sonarscan (jdk11)"
+      jdk: openjdk11
+      addons: sonarcloud
       script:
-        - ./run-snyk.sh
-        - export STAGE=snyk
+        - export STAGE=scan
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant sonar -Dsonar.login=$SONAR_LOGIN
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+
+    - stage: scan
+      name: "synk (jdk1)"
+      jdk: openjdk11
+      script:
+        - export STAGE=scan
         - echo $STAGE
+        - ./run-snyk.sh
+
+    - stage: scan
+      name: "gradle scan (jdk11)"
+      jdk: openjdk11
+      script:
+        - export STAGE=build
+        - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN
 
     - stage: snappah
-      name: "olfs-snapshot"
+      name: "olfs-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -175,7 +163,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "olfs-build-number"
+      name: "olfs-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -190,7 +178,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-snapshot"
+      name: "ngap-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -205,7 +193,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-build-number"
+      name: "ngap-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -269,6 +257,7 @@ deploy:
   #  on:
   #    branch: master
   #    condition: $STAGE =~ ^snappah$
+
 
 
 

@@ -29,6 +29,7 @@ package opendap.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import opendap.PathBuilder;
+import opendap.bes.BesDapDispatcher;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -250,9 +251,7 @@ public class UrsIdP extends IdProvider{
 
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authorization_header_value != null){
-
             if(EarthDataLoginAccessToken.checkAuthorizationHeader(authorization_header_value)){
-
                 EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
                 userProfile.setEDLAccessToken(edlat);
                 String uid = getEdlUserId(edlat.getAccessToken());
@@ -271,7 +270,21 @@ public class UrsIdP extends IdProvider{
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
                 url += "&";
-                url += "response_type=code&redirect_uri=" + request.getRequestURL();
+
+                String returnToUrl = request.getRequestURL().toString();
+                String clientProto = request.getHeader("CloudFront-Forwarded-Proto");
+                log.debug("CloudFront-Forwarded-Proto: {}",(clientProto==null?"MISSING":clientProto));
+
+                if(BesDapDispatcher.forceLinksToHttps() &&
+                        returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL) &&
+                        !returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL+"localhost")
+                ){
+
+                    returnToUrl = opendap.http.Util.HTTPS_PROTOCOL +
+                            returnToUrl.substring(opendap.http.Util.HTTP_PROTOCOL.length());
+                }
+                
+                url += "response_type=code&redirect_uri=" + returnToUrl;
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);

@@ -405,7 +405,7 @@ public class DispatchServlet extends HttpServlet {
             try {
                 super.doHead(request, response);
             }
-            catch(ServletException se){
+            catch(IOException | ServletException se){
                 log.error("ERROR - Failed to produce HEAD response for {}",relativeUrl);
             }
         }

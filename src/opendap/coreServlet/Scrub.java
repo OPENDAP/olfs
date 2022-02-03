@@ -105,8 +105,8 @@ public class Scrub {
         }
     }
 
-    private static final String SIMPLE_STRING_INCLUSION_REGEX =  "[a-zA-Z0-9_ ]*";
-    private static final String SIMPLE_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ ]";
+    private static final String SIMPLE_STRING_INCLUSION_REGEX =  "[a-zA-Z0-9_\\- ]*";
+    private static final String SIMPLE_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_\\- ]";
     private static final Pattern SIMPLE_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleString(String s){
