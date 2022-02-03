@@ -52,6 +52,7 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
     implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
     implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
 //    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '0.9.26'

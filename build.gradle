@@ -224,6 +224,7 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
 
     implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
 
