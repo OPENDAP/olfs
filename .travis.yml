@@ -122,15 +122,16 @@ jobs:
         - export STAGE=test
         - ant check
 
-    - stage: scan
-      name: "sonarscan (jdk11)"
-      jdk: openjdk11
-      addons: sonarcloud
-      script:
-        - export STAGE=scan
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-        - ant sonar -Dsonar.login=$SONAR_LOGIN
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+    # this needs to be added back before merging to master
+    #- stage: scan
+    #  name: "sonarscan (jdk11)"
+    #  jdk: openjdk11
+    #  addons: sonarcloud
+    #  script:
+    #    - export STAGE=scan
+    #    - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+    #    - ant sonar -Dsonar.login=$SONAR_LOGIN
+    #    - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
       name: "synk (jdk11)"
@@ -141,10 +142,10 @@ jobs:
         - ./run-snyk.sh
 
     - stage: scan
-      name: "gradle scan (jdk11)"
+      name: "gradle sonarscan (jdk11)"
       jdk: openjdk11
       script:
-        - export STAGE=build
+        - export STAGE=scan
         - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
