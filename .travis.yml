@@ -146,6 +146,7 @@ jobs:
       script:
         - export STAGE=build
         - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
       name: "olfs-snapshot (jdk8)"
