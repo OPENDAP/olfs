@@ -169,8 +169,7 @@ public class PDPService extends HttpServlet {
         try {
             if (!redirect(request, response)) {
 
-                //String uid         = Scrub.simpleString(request.getParameter("uid"));
-                String uid         = request.getParameter("uid");
+                String uid         = Scrub.simpleString(request.getParameter("uid"));
                 if(uid == null) uid = "";
 
                 String authContext  = Scrub.simpleString(request.getParameter("authContext"));

@@ -454,9 +454,6 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
-        String uid = request.getHeader("uid");
-        log.debug("uid: {}",(uid!=null?uid:"NOTSET"));
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         int request_status = HttpServletResponse.SC_OK;
