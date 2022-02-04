@@ -122,7 +122,8 @@ jobs:
         - export STAGE=test
         - ant check
 
-    - stage: scan
+    # change me before master merge
+    - stage: gradle
       name: "sonarscan (jdk11)"
       jdk: openjdk11
       addons: sonarcloud
