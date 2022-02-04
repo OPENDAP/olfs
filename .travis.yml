@@ -51,14 +51,13 @@ install:
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
 
-# remove hacking before master merge
 stages:
   - name: gradle
-    if:  branch = master AND NOT type = pull_request
+    if:  branch = master
   - name: build
-    if:  branch = master AND NOT type = pull_request
+    if:  branch = master
   - name: test
-    if:  branch = master AND NOT type = pull_request
+    if:  branch = master
   - name: scan
     if: branch = master
   - name: snappah
