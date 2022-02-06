@@ -563,6 +563,8 @@ public class OPeNDAPException extends Exception {
             sb.append("# -- -- -- hyrax location info, please include -- -- --%0A");
         }
         sb.append("# %0A");
+        sb.append("# ReqInfo.getRequestUrl(): ");
+        sb.append(ReqInfo.getRequestUrlPath(request)).append("%0A");
         sb.append("# request_url: ");
         sb.append(request.getRequestURL().toString()).append("%0A");
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");

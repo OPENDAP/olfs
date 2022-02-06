@@ -29,7 +29,7 @@ package opendap.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import opendap.PathBuilder;
-import opendap.bes.BesDapDispatcher;
+import opendap.coreServlet.ReqInfo;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -265,25 +265,15 @@ public class UrsIdP extends IdProvider{
             if (code == null) {
                 //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 //   "&response_type=code&redirect_uri=" + request.getRequestURL();
+                request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
 
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
                 url += "&";
 
-                String returnToUrl = request.getRequestURL().toString();
-                String clientProto = request.getHeader("CloudFront-Forwarded-Proto");
-                log.debug("CloudFront-Forwarded-Proto: {}",(clientProto==null?"MISSING":clientProto));
+                String returnToUrl = ReqInfo.getRequestUrlPath(request);
 
-                if(BesDapDispatcher.forceLinksToHttps() &&
-                        returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL) &&
-                        !returnToUrl.startsWith(opendap.http.Util.HTTP_PROTOCOL+"localhost")
-                ){
-
-                    returnToUrl = opendap.http.Util.HTTPS_PROTOCOL +
-                            returnToUrl.substring(opendap.http.Util.HTTP_PROTOCOL.length());
-                }
-                
                 url += "response_type=code&redirect_uri=" + returnToUrl;
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
@@ -301,7 +291,7 @@ public class UrsIdP extends IdProvider{
             String url = getUrsUrl() + "/oauth/token";
 
             String postData = "grant_type=authorization_code&code=" + code +
-                    "&redirect_uri=" + request.getRequestURL();
+                    "&redirect_uri=" + ReqInfo.getRequestUrlPath(request);
 
             Map<String, String> headers = new HashMap<>();
 

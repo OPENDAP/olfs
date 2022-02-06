@@ -173,7 +173,7 @@ public class IdFilter implements Filter {
             //  Why? Because the query may be too large for a URL on many servers.
             //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
             //  with the md5 hash of the query and then use that for a lookup down stream?
-            String requestUrl = hsReq.getRequestURL().toString();
+            String requestUrl = ReqInfo.getRequestUrlPath(hsReq);
             String query = ReqInfo.getConstraintExpression(hsReq);
             if(!query.isEmpty()) {
                 requestUrl += "?" + query;

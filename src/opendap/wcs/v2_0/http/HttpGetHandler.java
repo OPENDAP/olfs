@@ -431,7 +431,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String docsService = oreq.getDocsServiceLocalID();
 
 
-        String url = Scrub.completeURL(request.getRequestURL().toString());
+        String url = Scrub.completeURL( ReqInfo.getRequestUrlPath(request));
         String query = Scrub.completeURL(request.getQueryString());
         String requestUrl = getRequestUrlWithQuery(request);
         response.setContentType("text/html");

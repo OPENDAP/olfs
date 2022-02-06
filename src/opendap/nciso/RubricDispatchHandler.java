@@ -203,7 +203,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = ReqInfo.getRequestUrlPath(request);
         int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
         xmlBase = xmlBase.substring(0, suffix_start);
 

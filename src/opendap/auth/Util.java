@@ -129,16 +129,18 @@ public class Util {
 
     /**
      * Makes a json-like string of the request headers...
-     * @param request the request whose headers to stringify
-     * @return The string with the headers for your eyes.
+     * @param request the HttpServletRequest to explore and to stringify
+     * @param log The log object to which to log the HttpServletRequest info
      */
     static void debugHttpRequest(HttpServletRequest request, Logger log) throws IOException{
 
         if(log.isDebugEnabled()) {
-            log.debug("HTTP Method: {}",request.getMethod());
-            log.debug("URL: {}",request.getRequestURL());
-            log.debug("URI: {}",request.getRequestURI());
-            log.debug("QueryString: {}",request.getQueryString());
+            log.debug("HttpServletRequest.getMethod(): {}",request.getMethod());
+            log.debug("HttpServletRequest.getRequestURL(): {}",request.getRequestURL());
+            log.debug("HttpServletRequest.getRequestURI(): {}",request.getRequestURI());
+            log.debug("HttpServletRequest.getServerName(): {}",request.getServerName());
+            log.debug("HttpServletRequest.getServerPort(): {}",request.getServerPort());
+            log.debug("HttpServletRequest.getQueryString(): {}",request.getQueryString());
             Enumeration<String> h = request.getHeaderNames();
             while (h.hasMoreElements()) {
                 String name = h.nextElement();

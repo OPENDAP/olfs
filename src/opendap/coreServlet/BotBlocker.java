@@ -171,7 +171,7 @@ public class BotBlocker implements DispatchHandler {
 
     public boolean isResponseBlocked(HttpServletRequest request) {
 
-        String requestUrl = request.getRequestURL().toString();
+        String requestUrl = ReqInfo.getRequestUrlPath(request);
 
         boolean isBlocked;
 

@@ -188,7 +188,7 @@ public class DocServlet extends HttpServlet {
                         } else if (f.isDirectory()) {
                             log.debug("   Requested directory exists.");
                             try {
-                                response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString()) + "/");
+                                response.sendRedirect(Scrub.completeURL(ReqInfo.getRequestUrlPath(request)) + "/");
                             } catch (IOException e) {
                                 status = OPeNDAPException.anyExceptionHandler(e, this, response);
                             }
