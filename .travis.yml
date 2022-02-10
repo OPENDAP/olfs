@@ -129,7 +129,7 @@ jobs:
       script:
         - export STAGE=scan
         - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-        - ant sonar -Dsonar.login=$SONAR_LOGIN
+        - ant sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
@@ -145,7 +145,7 @@ jobs:
       jdk: openjdk11
       script:
         - export STAGE=scan
-        - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN
+        - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
