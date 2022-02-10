@@ -454,7 +454,6 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         int request_status = HttpServletResponse.SC_OK;
