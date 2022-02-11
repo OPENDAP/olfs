@@ -12,7 +12,7 @@ language: java
 services:
   - docker
 
-# whitelist
+# safelist
 branches:
   only:
     - master
@@ -242,8 +242,8 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-    all_branches: true
-    condition: $STAGE =~ ^snappah$
+      all_branches: true
+      condition: $STAGE =~ ^snappah$
 
 
   # Push snapshot files to w.o.o
