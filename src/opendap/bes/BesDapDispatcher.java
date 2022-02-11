@@ -3,7 +3,7 @@
  * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
  * //
  * //
- * // Copyright (c) $year OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -156,7 +156,7 @@ public class BesDapDispatcher implements DispatchHandler {
             d_forceLinksToHttps = false;
             dv = _config.getChild(d_forceLinksToHttpsKey);
             d_forceLinksToHttps = dv != null;
-            _log.info("{}}: {}",d_forceLinksToHttpsKey,(d_forceLinksToHttps ?"true":"false"));
+            _log.info("{}: {}",d_forceLinksToHttpsKey,(d_forceLinksToHttps ?"true":"false"));
 
             d_datasetUrlResponse = requestForm;
             dv = _config.getChild("DatasetUrlResponse");

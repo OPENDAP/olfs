@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2018 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -265,7 +265,7 @@ public class UrsIdP extends IdProvider{
             if (code == null) {
                 //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 //   "&response_type=code&redirect_uri=" + request.getRequestURL();
-                request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
+                // request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
 
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
