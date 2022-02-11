@@ -61,9 +61,9 @@ stages:
   - name: gradle
     if: branch = master
   - name: snappah
-    if:  branch = master #AND NOT type = pull_request # =~ /^(master|.*-test-deploy)$/
+    if:  (branch = master AND NOT type = pull_request) OR branch =~ ^(detect.*Change|.*-test-deploy)$
   - name: hyrax-docker-trigger
-    if:  branch = master #AND NOT type = pull_request # =~ /^(master|.*-test-deploy)$/
+    if:  (branch = master AND NOT type = pull_request) OR branch =~ ^(detect.*Change|.*-test-deploy)$
 
 # caching for gradle
 before_cache:
@@ -246,8 +246,8 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-      branch: /^(master|detect.*Change|.*-test-deploy)$/
-      condition: $STAGE =~ ^snappah$
+    all_branches: true
+    condition: $STAGE =~ ^snappah$
 
 
   # Push snapshot files to w.o.o
