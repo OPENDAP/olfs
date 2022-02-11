@@ -16,8 +16,7 @@ services:
 branches:
   only:
     - master
-    - detectClientProtcolChange
-    - /^(detectClientProtcolChange|.*-test-deploy)$/
+    - /^(.*-test-deploy)$/
 
 notifications:
   email:
@@ -58,9 +57,9 @@ stages:
   - name: scan
   - name: gradle
   - name: snappah
-    if: type != pull_request OR branch =~ ^(detectClientProtcolChange|.*-test-deploy)$
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
-    if:  type != pull_request OR branch =~ ^(detectClientProtcolChange|.*-test-deploy)$
+    if:  type != pull_request OR branch =~ ^(.*-test-deploy)$
 
 # caching for gradle
 before_cache:
