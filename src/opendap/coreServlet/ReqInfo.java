@@ -868,8 +868,10 @@ public class ReqInfo {
             serverRequestPort = xfp_client_port;
         }
 
-        // Now we have a peek to see if the request was an internal forward from some
-        // our servlet
+        // Now we have a peek to see if the request was an internal forward from
+        // one of our servlets
+        // See: https://stackoverflow.com/questions/1256562/java-httpservletrequest-get-url-in-browsers-url-bar
+        //
         log.debug("show_javax_servlet_forward():\n {}", show_javax_servlet_forward(req));
         String forwardRequestUri = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_REQUEST_URI);
         log.debug("{}: {}",JAVAX_SERVLET_FORWARD_REQUEST_URI, forwardRequestUri!=null?forwardRequestUri:MISSING);
@@ -884,7 +886,7 @@ public class ReqInfo {
             }
         }
         else {
-            // Read the javadoc entry for HttpServletRequest.getREquestUrl() in the header
+            // Read the javadoc entry for HttpServletRequest.getRequestUrl() in the header
             // comment for this method.
             //
             // Because javax.servlet.forward.request_uri does not contain the request
