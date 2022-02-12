@@ -59,7 +59,7 @@ stages:
   - name: snappah
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
-    if:  type != pull_request OR branch =~ ^(.*-test-deploy)$
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
 
 # caching for gradle
 before_cache:
