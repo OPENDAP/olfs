@@ -804,6 +804,10 @@ public class ReqInfo {
      * I think that since the rewrite case of http ->https is rare and potentially useless,
      * I will implement this so that it slavishly utilizes the value of the CLOUD_FRONT_FORWARDED_PROTOCOL
      * or X_FORWARDED_PROTOCOL request headers to determine the protocol for the returned URL.
+     *
+     * Client      ReWritten -> RESULT
+     * Protocol    Protocol
+     * - - - - - - - -- - - -- - - -- -
      * Client   to ReWrite  -> RESULT
      * http://  to http://  -> http://
      * http://  to https:// -> http://
