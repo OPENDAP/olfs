@@ -743,8 +743,7 @@ public class ReqInfo {
 
     /**
      * -----------------------------------------------------------------------------------
-     *
-     * - BEGIN: From javaee6 javadoc ---------------------
+     * BEGIN: From javaee6 javadoc ---------------------
      *
      * Interface HttpServletRequest
      *
@@ -768,26 +767,24 @@ public class ReqInfo {
      * Returns:
      * a StringBuffer object containing the reconstructed URL
      *
-     * - END: From javaee6 javadoc ---------------------
-     *
+     * END: From javaee6 javadoc --------------------
      * -----------------------------------------------------------------------------------
      * 
      * public static String getRequestUrlPath(HttpServletRequest req);
      * 
-     * 
      * This method returns the client issued request URL. This can be a bit difficult to
-     * determined because of CDN, Firewall, or server internal server redirect URL rewriting.
+     * determined because of CDN, Firewall, or internal server redirect URL rewriting.
      *
      * The method checks for the presence of the request headers: CLOUD_FRONT_FORWARDED_PROTOCOL
      * and X_FORWARDED_PROTOCOL to determine f the protocol of the request was rewritten by
-     * some forwardning agent (such as the AWS CloudFront Content Delivery Network).
+     * some forwarding agent (such as the AWS CloudFront Content Delivery Network).
      *
      * It can often be the case that the forwarding entity is supporting TLS on an outward facing
      * endpoint but the OLFS/Tomcat instance is not. The forwarding entity may then rewrite the
      * URL by replacing the https:// protocol with the http:// protocol, and if the forwarding
      * entity is well behaved the original request protocol will be noted in an injected
-     * X_FORWARDED_PROTOCOL request header in an injected  CLOUD_FRONT_FORWARDED_PROTOCOL if
-     * the forwarding entity is an instance of AWS CloudFront.
+     * X_FORWARDED_PROTOCOL, or CLOUD_FRONT_FORWARDED_PROTOCOL request header (if
+     * the forwarding entity is an instance of AWS CloudFront.)
      *
      * If we allow the value of CLOUD_FRONT_FORWARDED_PROTOCOL or X_FORWARDED_PROTOCOL to simply
      * dictate the protocol of the returned URL then the case in which the protocol is rewritten
@@ -796,7 +793,9 @@ public class ReqInfo {
      *
      * If instead we implement this so that https:// is favored then we might say that:
      *
-     * Client   to ReWrite  -> RESULT
+     * Client      ReWritten -> RESULT
+     * Protocol    Protocol
+     * - - - - - - - -- - - -- - - -- -
      * http://  to http://  -> http://
      * http://  to https:// -> https://
      * https:// to http://  -> https://
@@ -811,7 +810,7 @@ public class ReqInfo {
      * https:// to http://  -> https://
      * https:// to https:// -> https://
      *
-     * Additonallu, if the OLFS configuration parameter <ForceServiceLinksToHttps /> is
+     * Additonallu, if the OLFS configuration parameter <ForceLinksToHttps /> is
      * present this will override all of the above and force the protocol for the
      * returned URL to https://
      * 
@@ -896,7 +895,7 @@ public class ReqInfo {
             int serverPort = Integer.parseInt(serverRequestPort);
             requestUrlStr = client_request_protcol + serverName;
 
-            // If the port used is "unusual" then we make sure to include it in the URL.
+            // If the port used is "unusual" for HTTP or HTTPS then we make sure to include it in the URL.
             if( client_request_protcol.equalsIgnoreCase(opendap.http.Util.HTTP_PROTOCOL) && serverPort != 80) {
                 requestUrlStr += ":";
                 requestUrlStr += serverPort;
