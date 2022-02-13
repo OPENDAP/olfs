@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2017 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -431,7 +431,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String docsService = oreq.getDocsServiceLocalID();
 
 
-        String url = Scrub.completeURL(request.getRequestURL().toString());
+        String url = Scrub.completeURL( ReqInfo.getRequestUrlPath(request));
         String query = Scrub.completeURL(request.getQueryString());
         String requestUrl = getRequestUrlWithQuery(request);
         response.setContentType("text/html");

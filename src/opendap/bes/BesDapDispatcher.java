@@ -3,7 +3,7 @@
  * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
  * //
  * //
- * // Copyright (c) $year OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -78,7 +78,8 @@ public class BesDapDispatcher implements DispatchHandler {
     private static DataRequestFormType d_dataRequestFormType = dap4;
     private static DatasetUrlResponseAction d_datasetUrlResponse = requestForm;
 
-    private static boolean d_forceDataRequestFormLinkToHttps = false;
+    private static boolean d_forceLinksToHttps = false;
+    private static final String d_forceLinksToHttpsKey = "ForceLinksToHttps";
 
     private BesApi _besApi;
 
@@ -101,7 +102,7 @@ public class BesDapDispatcher implements DispatchHandler {
     public static DatasetUrlResponseAction datasetUrlResponseAction() { return d_datasetUrlResponse; }
     public static String datasetUrlResponseActionStr() { return d_datasetUrlResponse.toString(); }
 
-    public static boolean forceLinksToHttps() { return d_forceDataRequestFormLinkToHttps; }
+    public static boolean forceLinksToHttps() { return d_forceLinksToHttps; }
 
     protected Vector<Dap4Responder> getResponders() {
         return _responders;
@@ -152,10 +153,10 @@ public class BesDapDispatcher implements DispatchHandler {
             }
             _log.info("DataRequestForm: {}",d_dataRequestFormType.toString());
 
-            d_forceDataRequestFormLinkToHttps = false;
-            dv = _config.getChild("ForceDataRequestFormLinkToHttps");
-            d_forceDataRequestFormLinkToHttps = dv != null;
-            _log.info("ForceDataRequestFormLinkToHttps: {}",(d_forceDataRequestFormLinkToHttps?"true":"false"));
+            d_forceLinksToHttps = false;
+            dv = _config.getChild(d_forceLinksToHttpsKey);
+            d_forceLinksToHttps = dv != null;
+            _log.info("{}: {}",d_forceLinksToHttpsKey,(d_forceLinksToHttps ?"true":"false"));
 
             d_datasetUrlResponse = requestForm;
             dv = _config.getChild("DatasetUrlResponse");

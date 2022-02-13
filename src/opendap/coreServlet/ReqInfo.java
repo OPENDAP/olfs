@@ -1,26 +1,26 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "Hyrax Data Server" project.
- * //
- * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
- * // Author: Nathan David Potter  <ndp@opendap.org>
- * //
- * // This library is free software; you can redistribute it and/or
- * // modify it under the terms of the GNU Lesser General Public
- * // License as published by the Free Software Foundation; either
- * // version 2.1 of the License, or (at your option) any later version.
- * //
- * // This library is distributed in the hope that it will be useful,
- * // but WITHOUT ANY WARRANTY; without even the implied warranty of
- * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * // Lesser General Public License for more details.
- * //
- * // You should have received a copy of the GNU Lesser General Public
- * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * //
- * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * This file is part of the "Hyrax Data Server" project.
+ *
+ *
+ * Copyright (c) 2022 OPeNDAP, Inc.
+ * Author: Nathan David Potter  <ndp@opendap.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ *
+ * You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
 
@@ -28,6 +28,7 @@
 package opendap.coreServlet;
 
 import opendap.PathBuilder;
+import opendap.bes.BesDapDispatcher;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
@@ -48,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static opendap.http.Util.PROTOCOL_TERMINATON;
 
 
 /**
@@ -89,10 +92,41 @@ public class ReqInfo {
     public static final int ABSOLUTE_MAX_POST_BODY_LENGTH = 10000000;
     public static final String  HTTP_POST = "POST";
 
+    private static final String CLOUD_FRONT_FORWARDED_PROTOCOL = "CloudFront-Forwarded-Proto";
+    private static final String X_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
+    private static final String X_FORWARDED_PORT = "X-Forwarded-Port";
+
+    private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "javax.servlet.forward.request_uri";
+    private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
+    private static final String JAVAX_SERVLET_FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";
+    private static final String JAVAX_SERVLET_FORWARD_PATH_INFO    = "javax.servlet.forward.path_info";
+    private static final String JAVAX_SERVLET_FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
+    private static final String MISSING = "MISSING";
+
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
 
+    }
+
+    private static String show_javax_servlet_forward(HttpServletRequest req){
+        String forwardRequestUri = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_REQUEST_URI);
+        String context_path = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_CONTEXT_PATH);
+        String servlet_path = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_SERVLET_PATH);
+        String path_info = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_PATH_INFO);
+        String query_string  = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_QUERY_STRING);
+
+        String sb = JAVAX_SERVLET_FORWARD_REQUEST_URI + ": " +
+                (forwardRequestUri != null ? forwardRequestUri : MISSING) + '\n' +
+                JAVAX_SERVLET_FORWARD_CONTEXT_PATH + ": " +
+                (context_path != null ? context_path : MISSING) + '\n' +
+                JAVAX_SERVLET_FORWARD_SERVLET_PATH + ": " +
+                (servlet_path != null ? servlet_path : MISSING) + '\n' +
+                JAVAX_SERVLET_FORWARD_PATH_INFO + ": " +
+                (path_info != null ? path_info : MISSING) + '\n' +
+                JAVAX_SERVLET_FORWARD_QUERY_STRING + ": " +
+                (query_string != null ? query_string : MISSING) + '\n';
+        return sb;
     }
 
     private static AtomicInteger maxPostBodyLength;
@@ -707,28 +741,177 @@ public class ReqInfo {
     }
 
 
+    /**
+     * -----------------------------------------------------------------------------------
+     * BEGIN: From javaee6 javadoc ---------------------
+     *
+     * Interface HttpServletRequest
+     *
+     * getRequestURL()
+     *
+     * java.lang.StringBuffer getRequestURL()
+     * Reconstructs the URL the client used to make the request. The returned
+     * URL contains a protocol, server name, port number, and server path,
+     * but it does not include query string parameters.
+     *
+     * If this request has been forwarded using:
+     *    RequestDispatcher.forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
+     * the server path in the reconstructed URL must reflect the path used to
+     * obtain the RequestDispatcher, and not the server path specified by the client.
+     *
+     * Because this method returns a StringBuffer, not a string, you can modify the URL
+     * easily, for example, to append query parameters.
+     *
+     * This method is useful for creating redirect messages and for reporting errors.
+     *
+     * Returns:
+     * a StringBuffer object containing the reconstructed URL
+     *
+     * END: From javaee6 javadoc --------------------
+     * -----------------------------------------------------------------------------------
+     * 
+     * public static String getRequestUrlPath(HttpServletRequest req);
+     * 
+     * This method returns the client issued request URL. This can be a bit difficult to
+     * determined because of CDN, Firewall, or internal server redirect URL rewriting.
+     *
+     * The method checks for the presence of the request headers: CLOUD_FRONT_FORWARDED_PROTOCOL
+     * and X_FORWARDED_PROTOCOL to determine f the protocol of the request was rewritten by
+     * some forwarding agent (such as the AWS CloudFront Content Delivery Network).
+     *
+     * It can often be the case that the forwarding entity is supporting TLS on an outward facing
+     * endpoint but the OLFS/Tomcat instance is not. The forwarding entity may then rewrite the
+     * URL by replacing the https:// protocol with the http:// protocol, and if the forwarding
+     * entity is well behaved the original request protocol will be noted in an injected
+     * X_FORWARDED_PROTOCOL, or CLOUD_FRONT_FORWARDED_PROTOCOL request header (if
+     * the forwarding entity is an instance of AWS CloudFront.)
+     *
+     * If we allow the value of CLOUD_FRONT_FORWARDED_PROTOCOL or X_FORWARDED_PROTOCOL to simply
+     * dictate the protocol of the returned URL then the case in which the protocol is rewritten
+     * from http:// to https:// may be encountered. The use-case for this scenario escapes me,
+     * and I think that while possible it does not regularly happen.
+     *
+     * If instead we implement this so that https:// is favored then we might say that:
+     *
+     * Client      ReWritten -> RESULT
+     * Protocol    Protocol
+     * - - - - - - - -- - - -- - - -- -
+     * http://  to http://  -> http://
+     * http://  to https:// -> https://
+     * https:// to http://  -> https://
+     * https:// to https:// -> https://
+     *
+     * I think that since the rewrite case of http ->https is rare and potentially useless,
+     * I will implement this so that it slavishly utilizes the value of the CLOUD_FRONT_FORWARDED_PROTOCOL
+     * or X_FORWARDED_PROTOCOL request headers to determine the protocol for the returned URL.
+     *
+     * Client      ReWritten -> RESULT
+     * Protocol    Protocol
+     * - - - - - - - -- - - -- - - -- -
+     * Client   to ReWrite  -> RESULT
+     * http://  to http://  -> http://
+     * http://  to https:// -> http://
+     * https:// to http://  -> https://
+     * https:// to https:// -> https://
+     *
+     * Additonallu, if the OLFS configuration parameter <ForceLinksToHttps /> is
+     * present this will override all of the above and force the protocol for the
+     * returned URL to https://
+     * 
+     * @param req The request to assess.
+     * @return The client issued URL
+     */
     public static String getRequestUrlPath(HttpServletRequest req) {
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        StringBuilder requestUrl = new StringBuilder();
 
-        if(forwardRequestUri == null) {
-            requestUrl.append(req.getRequestURL().toString());
+        // We assume the scheme in the request is correct as a starting place.
+        String client_request_protcol = req.getScheme();
+
+        // Are we forcing to HTTPS?
+        if(BesDapDispatcher.forceLinksToHttps()) {
+            // Yes, then do so...
+            client_request_protcol = opendap.http.Util.HTTPS_PROTOCOL;
         }
         else {
-            String serverName = req.getServerName();
-            int serverPort = req.getServerPort();
-            String transport = req.getScheme();
-            requestUrl.append(transport).append("://").append(serverName);
-            if( transport.equalsIgnoreCase("http") && serverPort != 80) {
-                requestUrl.append(":").append(serverPort);
+            // We are not forcing so we, navigate the protocol determination
+            // See if this was a forward from AWS CloudFront
+            String cf_client_proto = req.getHeader(CLOUD_FRONT_FORWARDED_PROTOCOL);
+            log.debug("{}: {}",CLOUD_FRONT_FORWARDED_PROTOCOL,(cf_client_proto!=null?cf_client_proto:MISSING));
+
+            // See if this was a forward from someplace willing to admit it.
+            String xfp_client_proto = req.getHeader(X_FORWARDED_PROTOCOL);
+            log.debug("{}: {}",X_FORWARDED_PROTOCOL,(xfp_client_proto!=null?xfp_client_proto:MISSING));
+
+            if(cf_client_proto != null){
+                // It's a CloudFront redirect, use the indicated protocol
+                client_request_protcol = cf_client_proto;
             }
-            else if( transport.equalsIgnoreCase("https") && (serverPort != 443 && serverPort != 80) ) {
-                requestUrl.append(":").append(serverPort);
+            else if(xfp_client_proto!=null){
+                // It's a from something, use the indicated protocol
+                client_request_protcol = xfp_client_proto;
             }
-            requestUrl.append(forwardRequestUri);
+        }
+        // We know that the values of the request headers CLOUD_FRONT_FORWARDED_PROTOCOL
+        // and X_FORWARDED_PROTOCOL don't end with the PROTOCOL_TERMINATON (aka "://")
+        // zso we check for the abscence of a trailing PROTOCOL_TERMINATON and add it
+        // as needed.
+        if(!client_request_protcol.endsWith(PROTOCOL_TERMINATON)){
+            client_request_protcol += PROTOCOL_TERMINATON;
         }
 
-        return requestUrl.toString();
+        // Determine which server port the client was accessing.
+        // Start with request's ServerPort.
+        String serverRequestPort = Integer.toString(req.getServerPort());
+
+        // Check for a forwarded port header and use it if present. It
+        // looks like AWS supports this as well.
+        // See: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/x-forwarded-headers.html
+        String xfp_client_port = req.getHeader(X_FORWARDED_PORT);
+        log.debug("{}: {}",X_FORWARDED_PORT, xfp_client_port!=null?xfp_client_port:MISSING);
+        if(xfp_client_port!=null){
+            serverRequestPort = xfp_client_port;
+        }
+
+        // Now we have a peek to see if the request was an internal forward from
+        // one of our servlets
+        // See: https://stackoverflow.com/questions/1256562/java-httpservletrequest-get-url-in-browsers-url-bar
+        //
+        log.debug("show_javax_servlet_forward():\n {}", show_javax_servlet_forward(req));
+        String forwardRequestUri = (String)req.getAttribute(JAVAX_SERVLET_FORWARD_REQUEST_URI);
+        log.debug("{}: {}",JAVAX_SERVLET_FORWARD_REQUEST_URI, forwardRequestUri!=null?forwardRequestUri:MISSING);
+
+        String requestUrlStr;
+        if(forwardRequestUri == null) {
+            requestUrlStr = req.getRequestURL().toString();
+            if(!requestUrlStr.startsWith(client_request_protcol)){
+                // If protocols do not match then update the requestUrlStr to match client_request_protcol
+                int index = requestUrlStr.indexOf(PROTOCOL_TERMINATON) + PROTOCOL_TERMINATON.length();
+                requestUrlStr = client_request_protcol + requestUrlStr.substring(index);
+            }
+        }
+        else {
+            // Read the javadoc entry for HttpServletRequest.getRequestUrl() in the header
+            // comment for this method.
+            //
+            // Because javax.servlet.forward.request_uri does not contain the request
+            // protocol or the port number of the service we have to determine this
+            // by examining the HttpServletRequest objects state.
+            String serverName = req.getServerName();
+            int serverPort = Integer.parseInt(serverRequestPort);
+            requestUrlStr = client_request_protcol + serverName;
+
+            // If the port used is "unusual" for HTTP or HTTPS then we make sure to include it in the URL.
+            if( client_request_protcol.equalsIgnoreCase(opendap.http.Util.HTTP_PROTOCOL) && serverPort != 80) {
+                requestUrlStr += ":";
+                requestUrlStr += serverPort;
+            }
+            else if( client_request_protcol.equalsIgnoreCase(opendap.http.Util.HTTPS_PROTOCOL) && (serverPort != 443 && serverPort != 80) ) {
+                requestUrlStr += ":";
+                requestUrlStr += serverPort;
+            }
+            requestUrlStr += forwardRequestUri;
+        }
+
+        return requestUrlStr;
     }
 
 

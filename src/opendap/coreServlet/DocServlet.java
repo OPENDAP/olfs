@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -188,7 +188,7 @@ public class DocServlet extends HttpServlet {
                         } else if (f.isDirectory()) {
                             log.debug("   Requested directory exists.");
                             try {
-                                response.sendRedirect(Scrub.completeURL(request.getRequestURL().toString()) + "/");
+                                response.sendRedirect(Scrub.completeURL(ReqInfo.getRequestUrlPath(request)) + "/");
                             } catch (IOException e) {
                                 status = OPeNDAPException.anyExceptionHandler(e, this, response);
                             }

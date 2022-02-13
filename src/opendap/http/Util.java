@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2017 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -48,9 +48,11 @@ import java.io.OutputStream;
 
 public class Util {
 
+    public static final String PROTOCOL_TERMINATON = "://";
     public static final String HTTP_PROTOCOL = "http://";
     public static final String HTTPS_PROTOCOL = "https://";
     public static final String BES_PROTOCOL = "bes://";
+    public static final String S3_PROTOCOL = "s3://";
 
     static private Logger _log;
     static {
