@@ -249,14 +249,17 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
+        boolean foundEDLAuthToken = false;
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(AuthorizationHeader.isBearer(authorization_header_value)){
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
             String uid = getEdlUserId(edlat.getAccessToken());
             userProfile.setUID(uid);
+            foundEDLAuthToken = uid!=null;
         }
-        else {
+
+        if(!foundEDLAuthToken) {
             if(authorization_header_value!=null)
                 log.info("Received unexpected Authorization header! Value: {}",authorization_header_value);
 
