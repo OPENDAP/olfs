@@ -258,7 +258,7 @@ public class UrsIdP extends IdProvider{
         }
         else {
             if(authorization_header_value!=null)
-                log.info("Received unexpected Authroization header! Value: {}",authorization_header_value);
+                log.info("Received unexpected Authorization header! Value: {}",authorization_header_value);
 
             // Check to see if we have a code returned from URS. If not, we must
             // redirect the user to URS to start the authentication process.
