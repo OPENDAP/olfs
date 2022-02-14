@@ -250,15 +250,16 @@ public class UrsIdP extends IdProvider{
         Util.debugHttpRequest(request,log);
 
         String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
-        if(authorization_header_value != null){
-            if(EarthDataLoginAccessToken.checkAuthorizationHeader(authorization_header_value)){
-                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
-                userProfile.setEDLAccessToken(edlat);
-                String uid = getEdlUserId(edlat.getAccessToken());
-                userProfile.setUID(uid);
-            }
+        if(AuthorizationHeader.isBearer(authorization_header_value)){
+            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
+            userProfile.setEDLAccessToken(edlat);
+            String uid = getEdlUserId(edlat.getAccessToken());
+            userProfile.setUID(uid);
         }
         else {
+            if(authorization_header_value!=null)
+                log.info("Received unexpected Authroization header! Value: {}",authorization_header_value);
+
             // Check to see if we have a code returned from URS. If not, we must
             // redirect the user to URS to start the authentication process.
             String code = request.getParameter("code");
@@ -318,7 +319,7 @@ public class UrsIdP extends IdProvider{
             log.info("URS UID: {}", userProfile.getUID());
         }
 
-        // Finally, redirect the user back to the their original requested resource.
+        // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
 
