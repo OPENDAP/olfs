@@ -46,6 +46,7 @@
         <UrsClientId>EDL_CLIENT_ID</UrsClientId>
         <UrsClientAuthCode>EDL_CLIENT_AUTH_CODE</UrsClientAuthCode>
         <UrsUrl>EDL_SSO_ENDPOINT_URL</UrsUrl>
+        <!-- RejectUnexpectedAuth / -->
     </IdProvider>
 
 

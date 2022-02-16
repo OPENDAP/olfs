@@ -52,13 +52,20 @@ public class UrsIdP extends IdProvider{
     public static final String AUTHORIZATION_HEADER_KEY="authorization";
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
+    public static final String URS_URL_KEY = "UrsUrl";
+    public static final String URS_CLIENT_ID_KEY = "UrsUrl";
+    public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsUrl";
+
+    public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnexpectedAuthzSchemes";
+
     private Logger log;
 
     private String ursUrl;
     private String clientAppId;
     private String clientAppAuthCode;
+    private boolean rejectUnsupportedAuthzSchemes;
 
-    private static final String ERR_PRFX = "ERROR! msg: ";
+    private static final String ERR_PREFIX = "ERROR! msg: ";
 
 
     public UrsIdP(){
@@ -66,6 +73,7 @@ public class UrsIdP extends IdProvider{
         log = LoggerFactory.getLogger(this.getClass());
         setAuthContext(DEFAULT_AUTH_CONTEXT);
         setDescription("The NASA Earthdata Login (formerly known as URS)");
+        rejectUnsupportedAuthzSchemes =  false;
     }
 
 
@@ -75,14 +83,18 @@ public class UrsIdP extends IdProvider{
 
         Element e;
 
-        e = getConfigElement(config,"UrsUrl");
+        e = getConfigElement(config,URS_URL_KEY);
         ursUrl = e.getTextTrim();
 
-        e = getConfigElement(config,"UrsClientId");
+        e = getConfigElement(config,URS_CLIENT_ID_KEY);
         clientAppId = e.getTextTrim();
 
-        e = getConfigElement(config,"UrsClientAuthCode");
+        e = getConfigElement(config,URS_CLIENT_AUTH_CODE_KEY);
         clientAppAuthCode = e.getTextTrim();
+
+        e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
+        if(e != null)
+            rejectUnsupportedAuthzSchemes = true;
 
     }
 
@@ -113,7 +125,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsUrl(String ursUrl) throws ServletException{
         if(ursUrl == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a URS Service URL. (urs_url)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
 
@@ -131,7 +143,7 @@ public class UrsIdP extends IdProvider{
 
         if(ursClientApplicationId == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Application ID. (client_id)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
         clientAppId = ursClientApplicationId;
@@ -146,7 +158,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsClientAppAuthCode(String ursClientAppAuthCode) throws ServletException {
         if(ursClientAppAuthCode == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Authorization Code. (client_auth_code)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
 
@@ -250,9 +262,9 @@ public class UrsIdP extends IdProvider{
         Util.debugHttpRequest(request,log);
 
         boolean foundEDLAuthToken = false;
-        String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
-        if(AuthorizationHeader.isBearer(authorization_header_value)){
-            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
+        String authz_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
+        if(AuthorizationHeader.isBearer(authz_header_value)){
+            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_header_value,getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
             String uid = getEdlUserId(edlat.getAccessToken());
             userProfile.setUID(uid);
@@ -260,8 +272,17 @@ public class UrsIdP extends IdProvider{
         }
 
         if(!foundEDLAuthToken) {
-            if(authorization_header_value!=null)
-                log.info("Received unexpected Authorization header, IGNORED! Value: {}",authorization_header_value);
+            if(authz_header_value!=null){
+                if(rejectUnsupportedAuthzSchemes){
+                    String msg = ERR_PREFIX + "Received unsolicited/unsupported/unanticipated/unappreciated " +
+                            "Authorization header: \n";
+                    msg += authz_header_value + "\n";
+                    msg += "I'm sorry, but I cannot do that.";
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN,msg);
+                    return false;
+                }
+                log.warn("WARNING - Received unexpected Authorization header, IGNORED! Value: {}",authz_header_value);
+            }
 
             // Check to see if we have a code returned from URS. If not, we must
             // redirect the user to URS to start the authentication process.
@@ -318,7 +339,7 @@ public class UrsIdP extends IdProvider{
 
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
-            getEDLUserProfile(userProfile,edlat.getEndPoint(),edlat.getTokenType(),edlat.getAccessToken());
+            getEDLUserProfile(userProfile,edlat.getEndPoint(),edlat.getAuthzScheme(),edlat.getAccessToken());
             log.info("URS UID: {}", userProfile.getUID());
         }
 
