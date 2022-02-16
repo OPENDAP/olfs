@@ -30,6 +30,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
+import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -246,7 +247,8 @@ public class UrsIdP extends IdProvider{
      * @return True if login is complete and user profile has been added to session object. False otherwise.
      * @throws IOException
      */
-	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+	public boolean doLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, Forbidden
     {
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
@@ -274,12 +276,18 @@ public class UrsIdP extends IdProvider{
         if(!foundEDLAuthToken) {
             if(authz_header_value!=null){
                 if(rejectUnsupportedAuthzSchemes){
-                    String msg = ERR_PREFIX + "Received unsolicited/unsupported/unanticipated/unappreciated " +
-                            "Authorization header: \n";
+                    String msg = ERR_PREFIX;
+                    msg += "Received unsolicited/unsupported/unanticipated/unappreciated ";
+                    msg += "Authorization header: \n";
                     msg += authz_header_value + "\n";
+                    if(AuthorizationHeader.isBasic(authz_header_value)){
+                        msg += "Your request included unencrypted credentials that this ";
+                        msg += "service is not prepared to receive. Please check the version ";
+                        msg += "and configuration of your client software as this is a security ";
+                        msg += "concern and needs to be corrected.\n";
+                    }
                     msg += "I'm sorry, but I cannot do that.";
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN,msg);
-                    return false;
+                    throw new Forbidden(msg);
                 }
                 log.warn("WARNING - Received unexpected Authorization header, IGNORED! Value: {}",authz_header_value);
             }
