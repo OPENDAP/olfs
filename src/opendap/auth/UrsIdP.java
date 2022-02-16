@@ -53,8 +53,8 @@ public class UrsIdP extends IdProvider{
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
     public static final String URS_URL_KEY = "UrsUrl";
-    public static final String URS_CLIENT_ID_KEY = "UrsUrl";
-    public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsUrl";
+    public static final String URS_CLIENT_ID_KEY = "UrsClientId";
+    public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsClientAuthCode";
 
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
