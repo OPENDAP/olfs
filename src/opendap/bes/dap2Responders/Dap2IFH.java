@@ -416,6 +416,7 @@ public class Dap2IFH extends Dap4Responder {
         // We pad to 55 chars, just because.
         while(bestDescription.length()<55)
             bestDescription += " ";
+        bestDescription += ".";
 
         return bestDescription;
     }
