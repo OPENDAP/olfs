@@ -155,8 +155,9 @@
     of the links returned by the server to be expressed with the HTTPS protocol.
 
     When the 'ForceLinksToHttps' element is absent from the config (commented out) then
-    the forcing to https is feature is disabled. The server will continue to return https
-    urls when:
+    the forcing to https is feature is disabled.
+
+    The server will continue to return https urls when:
         - The incoming request URL uses https.
         - The server detects the presence of the CloudFront-Forwarded-Proto or X-Forwarded-Proto
         request headers with a values of https. These are typically set by some redirecting
@@ -165,7 +166,7 @@
 
     'ForceLinksToHttps' is a heavy handed way of accomplishing this in the absence of *-Forwarded-Proto
     headers. It is heavy handed because it will break thinks like accesses http://localhost that retrun
-    redirects ot content with URLs that reference the server (ex: the xml:base attribute in the DMR)
+    redirects to content with URLs that reference the server (ex: the xml:base attribute in the DMR)
     -->
     <!-- ForceLinksToHttps /  -->
 

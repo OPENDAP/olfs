@@ -31,6 +31,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
+import opendap.http.error.Forbidden;
 import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -225,7 +226,7 @@ public class IdFilter implements Filter {
                             log.debug("END (session: {})",session.getId());
                             return;
 
-                        } catch (IOException e) {
+                        } catch (IOException | Forbidden e) {
                             String msg = "Your Login Transaction FAILED!   " +
                                     "Authentication Context: '"+idProvider.getAuthContext()+
                                     "' Message: "+ e.getMessage();
