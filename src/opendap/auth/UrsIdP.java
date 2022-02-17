@@ -276,17 +276,15 @@ public class UrsIdP extends IdProvider{
         if(!foundEDLAuthToken) {
             if(authz_header_value!=null){
                 if(rejectUnsupportedAuthzSchemes){
-                    String msg = ERR_PREFIX;
-                    msg += "Received unsolicited/unsupported/unanticipated/unappreciated ";
-                    msg += "Authorization header: \n";
-                    msg += authz_header_value + "\n";
+                    String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
+                    msg += "header. 'Authorization: " + authz_header_value + "' ";
                     if(AuthorizationHeader.isBasic(authz_header_value)){
                         msg += "Your request included unencrypted credentials that this ";
                         msg += "service is not prepared to receive. Please check the version ";
                         msg += "and configuration of your client software as this is a security ";
-                        msg += "concern and needs to be corrected.\n";
+                        msg += "concern and needs to be corrected. ";
                     }
-                    msg += "I'm sorry, but I cannot do that.";
+                    msg += "I am sorry, but I cannot allow this.";
                     throw new Forbidden(msg);
                 }
                 log.warn("WARNING - Received unexpected Authorization header, IGNORED! Value: {}",authz_header_value);
