@@ -43,8 +43,8 @@ import java.util.TreeSet;
  * Contains the Version and UUID information for Hyrax Server.
  */
 public class Version  {
-    private static final String olfsVersion  = "Not.A.Release";
-    private static final String hyraxVersion = "Not.A.Release";
+    private static final String olfsVersion  = "@OlfsVersion@";
+    private static final String hyraxVersion = "@HyraxVersion@";
 
 
     /**
