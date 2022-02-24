@@ -768,7 +768,7 @@
                     <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
                     <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
-                    <input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/>
+                    <!-- input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/ -->
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>
