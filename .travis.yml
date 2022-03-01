@@ -189,7 +189,6 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-
     - stage: snappah
       name: "ngap-build-number (jdk8)"
       jdk: openjdk8
