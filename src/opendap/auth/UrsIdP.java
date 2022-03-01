@@ -277,7 +277,8 @@ public class UrsIdP extends IdProvider{
             if(authz_header_value!=null){
                 if(rejectUnsupportedAuthzSchemes){
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
-                    msg += "header. 'Authorization: " + authz_header_value + "' ";
+                    msg += "header. 'Authorization Scheme: ";
+                    msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
                     if(AuthorizationHeader.isBasic(authz_header_value)){
                         msg += "Your request included unencrypted credentials that this ";
                         msg += "service is not prepared to receive. Please check the version ";
@@ -287,7 +288,8 @@ public class UrsIdP extends IdProvider{
                     msg += "I am sorry, but I cannot allow this.";
                     throw new Forbidden(msg);
                 }
-                log.warn("WARNING - Received unexpected Authorization header, IGNORED! Value: {}",authz_header_value);
+                log.warn("WARNING - Received unexpected Authorization header, IGNORED! Authz Scheme: {}",
+                        AuthorizationHeader.getScheme(authz_header_value));
             }
 
             // Check to see if we have a code returned from URS. If not, we must
