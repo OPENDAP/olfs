@@ -288,8 +288,9 @@ public class UrsIdP extends IdProvider{
                     msg += "I am sorry, but I cannot allow this.";
                     throw new Forbidden(msg);
                 }
-                log.warn("WARNING - Received unexpected Authorization header, IGNORED! Authz Scheme: {}",
-                        AuthorizationHeader.getScheme(authz_header_value));
+                String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
+                msg += "Authorization Scheme: {}";
+                log.warn(msg, AuthorizationHeader.getScheme(authz_header_value));
             }
 
             // Check to see if we have a code returned from URS. If not, we must
