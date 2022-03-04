@@ -136,7 +136,7 @@ jobs:
         - echo $STAGE
         - ./run-snyk.sh
 
-    - stage: gradle
+    - stage: scan
       name: "gradle sonarscan (jdk11)"
       jdk: openjdk11
       script:
