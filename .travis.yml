@@ -51,11 +51,13 @@ install:
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
 
+# We need the gradlescan target because we can't run simultaneous
+# sonarscans without encountering a race condition at sonarcloud.io
 stages:
   - name: build
   - name: test
   - name: scan
-  - name: gradle
+  - name: gradlescan
   - name: snappah
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
@@ -136,7 +138,7 @@ jobs:
         - echo $STAGE
         - ./run-snyk.sh
 
-    - stage: scan
+    - stage: gradlescan
       name: "gradle sonarscan (jdk11)"
       jdk: openjdk11
       script:
