@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URLDecoder;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -724,6 +725,7 @@ public class ReqInfo {
         String request_url = getRequestUrlPath(request);
         String ce = getConstraintExpression(request);
         if(!ce.isEmpty()){
+            ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
             request_url += "?" + ce;
         }
         JSONObject param = new JSONObject();
