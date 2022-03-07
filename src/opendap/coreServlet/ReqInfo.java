@@ -725,7 +725,7 @@ public class ReqInfo {
         String request_url = getRequestUrlPath(request);
         String ce = getConstraintExpression(request);
         if(!ce.isEmpty()){
-            ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
+            // ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
             request_url += "?" + ce;
         }
         JSONObject param = new JSONObject();
