@@ -47,10 +47,13 @@ env:
     - secure: "A+Ll8E9FlU0B4qAYb9GTmuCFgY0RstSXiJqTuXcEmej/ppalCvCXN4t+Ss3fyy4zF3NbNh54kVhnZOL3/bDe8VihvL48MbftCfdq4kmE3UdYqdTjs6vqGl0g1UkMqdGq/uvxPhBM0ggMM1EO9aN03OtCnEehcnKtwqKVdOGzQg4="
 
 before_install:
+  - echo "#######################################################"
+  - echo "Install JDK-11"
   - curl -s "https://get.sdkman.io" | bash
   - source "$HOME/.sdkman/bin/sdkman-init.sh"
   - sdk install java 11.0.12-open
   - java -version
+  - echo "#######################################################"
 
 install:
   - nvm install 12.13.0
