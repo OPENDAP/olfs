@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -148,7 +148,7 @@ public class BotBlocker implements DispatchHandler {
 
         if(ipAddresses.contains(remoteAddr)){
             log.info("The ip address: {} is " +
-                    "on the list of blocked addresses",LogUtil.scrubEntry(remoteAddr));
+                    "on the list of blocked addresses", LogUtil.scrubEntry(remoteAddr));
 
             if(responseFiltering)
                 return isResponseBlocked(request);
@@ -156,7 +156,7 @@ public class BotBlocker implements DispatchHandler {
 
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
-                log.info("The ip address: {} matches the pattern: \"{}\"",LogUtil.scrubEntry(remoteAddr),p.pattern());
+                log.info("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
 
                 if(responseFiltering)
                     return isResponseBlocked(request);
@@ -171,7 +171,7 @@ public class BotBlocker implements DispatchHandler {
 
     public boolean isResponseBlocked(HttpServletRequest request) {
 
-        String requestUrl = request.getRequestURL().toString();
+        String requestUrl = ReqInfo.getRequestUrlPath(request);
 
         boolean isBlocked;
 
@@ -230,7 +230,7 @@ public class BotBlocker implements DispatchHandler {
         String msg = "Denied access to "+request.getRemoteAddr()+" because it is " +
                 "either on the list, or matches a blocking pattern.";
 
-        log.info("handleRequest() - {}",LogUtil.scrubEntry(msg));
+        log.info("handleRequest() - {}", LogUtil.scrubEntry(msg));
 
 
         throw new Forbidden(msg);

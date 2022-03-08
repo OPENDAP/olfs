@@ -27,8 +27,9 @@
 package opendap.auth;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class PEPFilter implements Filter {
 
         if(isInitialized)
             return;
-        LogUtil.initLogging(filterConfig.getServletContext());
+        ServletLogUtil.initLogging(filterConfig.getServletContext());
         log = LoggerFactory.getLogger(this.getClass());
         log.info("init() - Initializing PEPFilter...");
 
@@ -133,38 +134,40 @@ public class PEPFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
-
-
-        HttpServletRequest  hsReq = (HttpServletRequest)  request;
-        HttpServletResponse hsRes = (HttpServletResponse) response;
-
-        // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
-        String userId = null;
-        String authContext = null;
-        HttpSession session = hsReq.getSession(false);
-        if(session!=null){
-            UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
-            if(userProfile!=null){
-                userId = userProfile.getUID();
-                IdProvider ipd = userProfile.getIdP();
-                authContext = ipd.getAuthContext();
-            }
-        }
-
-        if(userId==null) {
-            String remoteUser = hsReq.getRemoteUser();
-            if (remoteUser == null) {
-                Principal userPrinciple = hsReq.getUserPrincipal();
-                if (userPrinciple != null) {
-                    userId = userPrinciple.getName();
-                }
-            } else {
-                userId = remoteUser;
-            }
-            // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
-        }
-
         try {
+
+            RequestCache.openThreadCache();
+
+
+            HttpServletRequest  hsReq = (HttpServletRequest)  request;
+            HttpServletResponse hsRes = (HttpServletResponse) response;
+
+            // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
+            String userId = null;
+            String authContext = null;
+            HttpSession session = hsReq.getSession(false);
+            if(session!=null){
+                UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+                if(userProfile!=null){
+                    userId = userProfile.getUID();
+                    IdProvider ipd = userProfile.getIdP();
+                    authContext = ipd.getAuthContext();
+                }
+            }
+
+            if(userId==null) {
+                String remoteUser = hsReq.getRemoteUser();
+                if (remoteUser == null) {
+                    Principal userPrinciple = hsReq.getUserPrincipal();
+                    if (userPrinciple != null) {
+                        userId = userPrinciple.getName();
+                    }
+                } else {
+                    userId = remoteUser;
+                }
+                // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
+            }
+
             // So - Do they have to be authenticated?
             if (userId == null && everyOneMustHaveUid) {
                 if (IdPManager.hasDefaultProvider()) {
@@ -200,6 +203,11 @@ public class PEPFilter implements Filter {
             OPeNDAPException.setCachedErrorMessage(e.getMessage());
             throw new ServletException(e.getMessage(),e);
         }
+        finally{
+            RequestCache.closeThreadCache();
+
+        }
+
     }
 
     @Override

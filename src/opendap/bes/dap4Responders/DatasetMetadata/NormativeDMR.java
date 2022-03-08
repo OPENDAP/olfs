@@ -36,7 +36,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.DMR;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +113,7 @@ public class NormativeDMR extends Dap4Responder {
         User user = new User(request);
         besApi.writeDMR(user, resourceID, qp, xmlBase, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
 }

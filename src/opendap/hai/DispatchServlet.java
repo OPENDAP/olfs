@@ -27,7 +27,7 @@ package opendap.hai;
 
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -172,12 +172,12 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     protected long getLastModified(HttpServletRequest req) {
         RequestCache.openThreadCache();
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             return new Date().getTime();
         }
         finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -205,7 +205,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, LogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -245,7 +245,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.ADMIN_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.ADMIN_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -257,7 +257,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, LogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -293,7 +293,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.ADMIN_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.ADMIN_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }

@@ -35,7 +35,7 @@
 
     <display-name>Hyrax</display-name>
     <description>OPeNDAP Hyrax Server</description>
-
+    <distributable />
 
   <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
   <!-- used by Tomcat to support JSP pages.  Traditionally, this servlet    -->
@@ -276,7 +276,7 @@
         </init-param>
         <init-param>
             <param-name>RewriteLog</param-name>
-            <param-value>log4j</param-value>
+            <param-value>slf4j</param-value>
         </init-param>
     </filter>
 

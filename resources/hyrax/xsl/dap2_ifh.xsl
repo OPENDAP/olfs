@@ -37,11 +37,17 @@
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
     <xsl:param name="enforceSelection" />
+    <xsl:param name="forceDataRequestFormLinkToHttps" />
 
     <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="datasetUrl">
-        <xsl:value-of select="/dap:Dataset/@xml:base"/>
+        <xsl:choose>
+            <xsl:when test="$forceDataRequestFormLinkToHttps='true'">
+                <xsl:value-of select='replace(/dap:Dataset/@xml:base,"^http:","https:")'/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:otherwise>
+        </xsl:choose>
     </xsl:variable>
 
     <xsl:template match="dap:Dataset">
@@ -121,11 +127,8 @@
                             <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
                         </td>
                         <td>
-                            <div class="small_italic" style="padding-bottom: 5px;">Welcome to the new</div>
-                            <div class="large" style="padding-bottom: 5px;">OPeNDAP Data Access Form</div>
-                            <div class="small_italic" style="padding-bottom: 5px;">
-                                <a href="{$datasetUrl}.html_old">The old form can be found here...</a>
-                            </div>
+                            <div class="small_italic" style="padding-bottom: 5px;">Welcome to the</div>
+                            <div class="large" style="padding-bottom: 5px;">OPeNDAP DAP2 Data Access Form</div>
                         </td>
                     </tr>
                 </table>

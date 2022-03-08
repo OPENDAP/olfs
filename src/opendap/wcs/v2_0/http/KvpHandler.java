@@ -198,6 +198,7 @@ public class KvpHandler {
         String requestUrl = HttpGetHandler.getRequestUrlWithQuery(request);
         GetCoverageRequest coverageRequest = new GetCoverageRequest(user,requestUrl, keyValuePairs);
         coverageRequest.setCfHistoryAttribute(ReqInfo.getCFHistoryEntry(request));
+        coverageRequest.setHistoryJsonAttribute(ReqInfo.getHistoryJsonEntry(request));
         GetCoverageRequestProcessor.sendCoverageResponse(user, coverageRequest, response, false );
 
     }

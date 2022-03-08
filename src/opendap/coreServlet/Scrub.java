@@ -45,7 +45,7 @@ public class Scrub {
 
     // The C++ coe uses this regex: Regex name("[-0-9A-z_./]+");
 
-    private static final String FILE_NAME_INCLUSION_REGEX = "[-a-zA-Z0-9/.%_ :]*";
+    private static final String FILE_NAME_INCLUSION_REGEX =  "[-a-zA-Z0-9/.%_ :]*";
     private static final String FILE_NAME_EXCLUSION_REGEX = "[^-a-zA-Z0-9/.%_ :]";
     private static final Pattern FILE_NAME_INCLUSION_PATTERN = Pattern.compile(FILE_NAME_INCLUSION_REGEX);
 
@@ -66,8 +66,9 @@ public class Scrub {
 
     // Added the colon (:) to the list of allowed characters, based on 
     // a bug report from NASA/Raytheon. jhrg 5/7/15
-    private static final String URL_CONTENT_INCLUSION_REGEX = "[-a-zA-Z0-9/.%_ :]*";
-    private static final String URL_CONTENT_EXCLUSION_REGEX = "[^-a-zA-Z0-9/.%_ :]";
+    //  [-+a-zA-Z0-9_/%.\\][-+a-zA-Z0-9_/%.\\#]*
+    private static final String URL_CONTENT_INCLUSION_REGEX =  "[-+a-zA-Z0-9/.%_ :#]*";
+    private static final String URL_CONTENT_EXCLUSION_REGEX = "[^-+a-zA-Z0-9/.%_ :]";
     private static final Pattern URL_CONTENT_INCLUSION_PATTERN = Pattern.compile(URL_CONTENT_INCLUSION_REGEX);
 
     public static String urlContent(String urlContent){
@@ -104,8 +105,8 @@ public class Scrub {
         }
     }
 
-    private static final String SIMPLE_STRING_INCLUSION_REGEX = "[a-zA-Z0-9_ ]*";
-    private static final String SIMPLE_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ ]";
+    private static final String SIMPLE_STRING_INCLUSION_REGEX =  "[a-zA-Z0-9_\\- ]*";
+    private static final String SIMPLE_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_\\- ]";
     private static final Pattern SIMPLE_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleString(String s){
@@ -121,7 +122,7 @@ public class Scrub {
         }
     }
 
-    private static final String INTEGER_STRING_INCLUSION_REGEX = "[0-9]*";
+    private static final String INTEGER_STRING_INCLUSION_REGEX =  "[0-9]*";
     private static final String INTEGER_STRING_EXCLUSION_REGEX = "[^0-9]";
     private static final Pattern INTEGER_STRING_INCLUSION_PATTERN = Pattern.compile(INTEGER_STRING_INCLUSION_REGEX);
 
@@ -138,8 +139,8 @@ public class Scrub {
         }
     }
 
-    private static final String SIMPLE_QUERY_STRING_INCLUSION_REGEX = "[a-zA-Z0-9_ =\\.]*";
-    private static final String SIMPLE_QUERY_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ =\\.]";
+    private static final String SIMPLE_QUERY_STRING_INCLUSION_REGEX =  "[a-zA-Z0-9_ =\\[\\:\\]\\.]*";
+    private static final String SIMPLE_QUERY_STRING_EXCLUSION_REGEX = "[^a-zA-Z0-9_ =\\[\\:\\]\\.]";
     private static final Pattern SIMPLE_QUERY_STRING_INCLUSION_PATTERN = Pattern.compile(SIMPLE_STRING_INCLUSION_REGEX);
 
     public static String simpleQueryString(String s){

@@ -32,7 +32,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,10 +81,10 @@ public class Netcdf3 extends Dap4Responder {
 
 
     /**
-     * For netCDF3, examine the name and prefix it with 'nc_' if the 
-     * name would otherwise not be an acceptable filename (in 
+     * For netCDF3, examine the name and prefix it with 'nc_' if the
+     * name would otherwise not be an acceptable filename (in
      * practice this means 'if the name starts with a number').
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -108,6 +108,7 @@ public class Netcdf3 extends Dap4Responder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        String history_json_entry = ReqInfo.getHistoryJsonEntry(request);
         User user = new User(request);
 
         log.debug("sendNormativeRepresentation(): cf_history_entry: '{}'",cf_history_entry);
@@ -128,9 +129,9 @@ public class Netcdf3 extends Dap4Responder {
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsNetcdf3(user, resourceID, constraintExpression, cf_history_entry, os);
+        besApi.writeDap2DataAsNetcdf3(user, resourceID, constraintExpression, cf_history_entry, history_json_entry, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());
     }
 }

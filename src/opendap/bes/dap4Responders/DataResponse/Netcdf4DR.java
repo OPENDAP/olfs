@@ -36,9 +36,8 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf4;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
-import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,7 +99,7 @@ public class Netcdf4DR extends Dap4Responder{
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
         */
-        
+
         return downloadFileName;
     }
 
@@ -112,6 +111,7 @@ public class Netcdf4DR extends Dap4Responder{
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        String history_json_entry = ReqInfo.getHistoryJsonEntry(request);
         User user = new User(request);
 
         BesApi besApi = getBesApi();
@@ -133,9 +133,9 @@ public class Netcdf4DR extends Dap4Responder{
         response.setHeader("Content-Disposition", contentDisposition);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, os);
+        besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, history_json_entry, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

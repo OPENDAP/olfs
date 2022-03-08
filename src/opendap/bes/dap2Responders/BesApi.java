@@ -34,7 +34,7 @@ import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import opendap.ppt.PPTException;
@@ -133,6 +133,7 @@ public class BesApi implements Cloneable {
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
+    public static final String HISTORY_JSON_ENTRY_CONTEXT = "history_json_entry";
 
     // public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
 
@@ -519,12 +520,13 @@ public class BesApi implements Cloneable {
                                        String dataSource,
                                        String constraintExpression,
                                        String cf_history_entry,
-                                          OutputStream os)
+                                       String history_json_entry,
+                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf3Request(user, dataSource, constraintExpression, cf_history_entry),
+                getDap2DataAsNetcdf3Request(user, dataSource, constraintExpression, cf_history_entry, history_json_entry),
                 os);
     }
 
@@ -545,14 +547,15 @@ public class BesApi implements Cloneable {
      */
     public void writeDap4DataAsNetcdf3(User user,
                                        String dataSource,
-                                          QueryParameters qp,
-                                           String cf_history_entry,
-                                          OutputStream os)
+                                       QueryParameters qp,
+                                       String cf_history_entry,
+                                       String history_json_entry,
+                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap4DataAsNetcdf3Request(user, dataSource, qp, cf_history_entry),
+                getDap4DataAsNetcdf3Request(user, dataSource, qp, cf_history_entry, history_json_entry),
                 os);
     }
 
@@ -574,14 +577,15 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2DataAsNetcdf4(User user,
                                        String dataSource,
-                                          String constraintExpression,
-                                          String cf_history_entry,
-                                          OutputStream os)
+                                       String constraintExpression,
+                                       String cf_history_entry,
+                                       String history_json_entry,
+                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap2DataAsNetcdf4Request(user, dataSource, constraintExpression, cf_history_entry),
+                getDap2DataAsNetcdf4Request(user, dataSource, constraintExpression, cf_history_entry, history_json_entry),
                 os);
     }
 
@@ -601,14 +605,15 @@ public class BesApi implements Cloneable {
      */
     public void writeDap4DataAsNetcdf4(User user,
                                        String dataSource,
-                                          QueryParameters qp,
-                                          String cf_history_entry,
-                                          OutputStream os)
+                                       QueryParameters qp,
+                                       String cf_history_entry,
+                                       String history_json_entry,
+                                       OutputStream os)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
-                getDap4DataAsNetcdf4Request(user, dataSource, qp, cf_history_entry),
+                getDap4DataAsNetcdf4Request(user, dataSource, qp, cf_history_entry, history_json_entry),
                 os);
     }
 
@@ -1722,9 +1727,8 @@ public class BesApi implements Cloneable {
 
     }
 
-    public Document getDap2DataAsNetcdf3Request(User user, String dataSource, String ce, String cf_history_entry)
+    public Document getDap2DataAsNetcdf3Request(User user, String dataSource, String ce, String cf_history_entry, String history_json_entry)
             throws BadConfigurationException {
-
 
         Document besRequest = getDap2RequestDocument(user,DAP2_DATA, dataSource, ce, null, null, NETCDF_3, XML_ERRORS);
 
@@ -1733,12 +1737,17 @@ public class BesApi implements Cloneable {
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
         }
 
+        if(history_json_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
+        }
+
         return besRequest;
 
     }
 
 
-    public Document getDap4DataAsNetcdf3Request(User user, String dataSource, QueryParameters qp, String cf_history_entry)
+    public Document getDap4DataAsNetcdf3Request(User user, String dataSource, QueryParameters qp, String cf_history_entry, String history_json_entry)
             throws BadConfigurationException {
 
         Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, NETCDF_3, XML_ERRORS);
@@ -1748,6 +1757,11 @@ public class BesApi implements Cloneable {
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
         }
 
+        if(history_json_entry!=null) {
+            Element root = besRequest.getRootElement();
+            root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
+        }
+
         return besRequest;
 
 
@@ -1755,35 +1769,39 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Document getDap2DataAsNetcdf4Request(User user, String dataSource, String ce, String cf_history_entry)
+    public Document getDap2DataAsNetcdf4Request(User user, String dataSource, String ce, String cf_history_entry, String history_json_entry)
             throws BadConfigurationException {
 
         Document besRequest = getDap2RequestDocument(user, DAP2_DATA, dataSource, ce, null, null, NETCDF_4, XML_ERRORS);
 
+        Element root = besRequest.getRootElement();
         if(cf_history_entry!=null) {
-            Element root = besRequest.getRootElement();
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
         }
 
+        if(history_json_entry!=null) {
+            root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
+        }
+
         return besRequest;
-
-
-
 
     }
-    public Document getDap4DataAsNetcdf4Request(User user, String dataSource, QueryParameters qp, String cf_history_entry)
+
+    public Document getDap4DataAsNetcdf4Request(User user, String dataSource, QueryParameters qp, String cf_history_entry, String history_json_entry)
             throws BadConfigurationException {
 
-
         Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, NETCDF_4, XML_ERRORS);
+        Element root = besRequest.getRootElement();
 
         if(cf_history_entry!=null) {
-            Element root = besRequest.getRootElement();
             root.addContent(0, setContextElement(CF_HISTORY_ENTRY_CONTEXT, cf_history_entry));
         }
 
-        return besRequest;
+        if(history_json_entry!=null) {
+            root.addContent(0, setContextElement(HISTORY_JSON_ENTRY_CONTEXT, history_json_entry));
+        }
 
+        return besRequest;
 
     }
 
@@ -2259,7 +2277,7 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
@@ -2355,7 +2373,7 @@ public class BesApi implements Cloneable {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        String logEntryForBes = LogUtil.getLogEntryForBesLog();
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 

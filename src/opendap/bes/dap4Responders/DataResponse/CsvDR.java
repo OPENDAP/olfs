@@ -36,7 +36,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextCsv;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -112,7 +112,7 @@ public class CsvDR extends Dap4Responder {
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap4DataAsCsv(user, resourceID, qp,os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {}  size: {}",getServiceTitle(),os.size());
     }
 

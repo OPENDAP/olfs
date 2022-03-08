@@ -393,17 +393,18 @@ public class AggregationServlet extends HttpServlet {
 
 
         String cfHistoryEntry = granule + "?" + ce;
+        String historyJsonEntry = "{'test' : 'history'}";
 
         switch (format) {
             case NETCDF_3:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
-                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, os);
+                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, historyJsonEntry, os);
                 break;
             case NETCDF_4:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
-                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, os);
+                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, historyJsonEntry, os);
                 break;
             case ASCII:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
@@ -529,7 +530,7 @@ public class AggregationServlet extends HttpServlet {
 
             RequestCache.openThreadCache();
 
-            String requestKind = request.getParameter("operation");
+            String requestKind = Scrub.simpleString(request.getParameter("operation"));
             if (requestKind == null)
                 requestKind = "nothing - the operation parameter was not supplied.";
 
@@ -601,7 +602,7 @@ public class AggregationServlet extends HttpServlet {
             RequestCache.openThreadCache();
             ServletOutputStream out = response.getOutputStream();
 
-            String requestKind = request.getParameter("operation");
+            String requestKind = Scrub.simpleString(request.getParameter("operation"));
             log.debug("Aggregation: The requested operation is: {}", requestKind);
             if (requestKind == null)
                 requestKind = "nothing - the operation parameter was not supplied.";

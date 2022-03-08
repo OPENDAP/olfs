@@ -37,7 +37,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.dap.Request;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -153,7 +153,7 @@ public class HtmlDSR extends Dap4Responder {
             DataOutputStream os = new DataOutputStream(response.getOutputStream());
             // Transform the DSR into an HTML page.
             transformer.transform(new JDOMSource(responseDoc), os);
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {

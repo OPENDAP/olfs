@@ -33,7 +33,7 @@ import opendap.coreServlet.Util;
 import opendap.coreServlet.Debug;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.Scrub;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
 import opendap.services.ServicesRegistry;
@@ -90,7 +90,7 @@ public class W10nServlet extends HttpServlet   {
     protected long getLastModified(HttpServletRequest req) {
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         long lmt = new Date().getTime();
         Procedure timedProcedure = Timer.start();
         try {
@@ -101,7 +101,7 @@ public class W10nServlet extends HttpServlet   {
         } catch (Exception e) {
             LOG.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
         }
         return lmt;
@@ -122,7 +122,7 @@ public class W10nServlet extends HttpServlet   {
                 RequestCache.openThreadCache();
 
                 int reqno = _reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
                 LOG.debug(Util.getMemoryReport());
                 LOG.debug(ServletUtil.showRequest(request, reqno));
                 //log.debug(AwsUtil.probeRequest(this, request));
@@ -159,7 +159,7 @@ public class W10nServlet extends HttpServlet   {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
 

@@ -28,6 +28,7 @@ package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.BesDapDispatcher;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -37,7 +38,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
@@ -166,6 +167,7 @@ public class Dap2IFH extends Dap4Responder {
             transformer.setParameter("JsonLD", jsonLD);
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
+            transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceLinksToHttps()?"true":"false"));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
@@ -173,7 +175,7 @@ public class Dap2IFH extends Dap4Responder {
             DataOutputStream os = new DataOutputStream(response.getOutputStream());
             transformer.transform(new JDOMSource(ddx), os);
             os.flush();
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             _log.info("Sent {} size: {}", getServiceTitle(),os.size());
         }
         finally {
@@ -414,6 +416,7 @@ public class Dap2IFH extends Dap4Responder {
         // We pad to 55 chars, just because.
         while(bestDescription.length()<55)
             bestDescription += " ";
+        bestDescription += ".";
 
         return bestDescription;
     }

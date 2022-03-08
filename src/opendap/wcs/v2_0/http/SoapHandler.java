@@ -81,7 +81,8 @@ public class SoapHandler extends XmlRequestHandler {
                 throw new WcsException("SOAP Envelope is missing SOAP Body element.",
                         WcsException.INVALID_PARAMETER_VALUE);
 
-            List<Element> soapContents = soapBody.getChildren();
+            @SuppressWarnings("unchecked") //supressing warning 'unchecked' thrown here, SBL 9.13.21
+            List<Element> soapContents = (List<Element>) soapBody.getChildren();
             log.debug("Got " + soapContents.size() + " child elements of SOAP body.");
 
             if(soapContents.size()!=1){

@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -458,25 +458,27 @@ public class OPeNDAPException extends Exception {
         ServletOutputStream sos  = response.getOutputStream();
 
         sos.println("{");
-        sos.println("  \"name\":  =  \"ERROR\",");
-        sos.println("  \"type\":  =  \"node\",");
-        sos.println("  \"attributes\":  =  \"[]\",");
-        sos.println("  \"leaves\":  =  [\"");
+        sos.println("  \"name\":  \"ERROR\",");
+        sos.println("  \"type\":  \"node\",");
+        sos.println("  \"attributes\": \"[]\",");
+        sos.println("  \"leaves\":  [");
         sos.println("    {");
-        sos.println("      \"name\":  =  \"Message\",");
-        sos.println("      \"type\":  =  \"String\",");
-        sos.println("      \"attributes\":  =  \"[]\",");
-        sos.print("      \"data\":  =  \"");
+        sos.println("      \"name\": \"Message\",");
+        sos.println("      \"type\": \"String\",");
+        sos.println("      \"attributes\": \"[]\",");
+        sos.print("      \"data\": \"");
         sos.print(Encode.forJavaScriptBlock(getMessage()));
         sos.println("\"");
         sos.println("    },");
-        sos.println("      \"name\":  =  \"HttpStatus\",");
-        sos.println("      \"type\":  =  \"Int32\",");
-        sos.println("      \"attributes\":  =  \"[]\",");
-        sos.print("      \"data\":  =  ");
+        sos.println("    {");
+        sos.println("      \"name\": \"HttpStatus\",");
+        sos.println("      \"type\": \"Int32\",");
+        sos.println("      \"attributes\": \"[]\",");
+        sos.print("      \"data\": ");
         sos.print(getHttpStatusCode());
         sos.println("");
         sos.println("    }");
+        sos.println("  ]");
         sos.println("}");
         sos.flush();
     }
@@ -561,6 +563,8 @@ public class OPeNDAPException extends Exception {
             sb.append("# -- -- -- hyrax location info, please include -- -- --%0A");
         }
         sb.append("# %0A");
+        sb.append("# ReqInfo.getRequestUrl(): ");
+        sb.append(ReqInfo.getRequestUrlPath(request)).append("%0A");
         sb.append("# request_url: ");
         sb.append(request.getRequestURL().toString()).append("%0A");
         sb.append("# protocol: ").append(request.getProtocol()).append("%0A");

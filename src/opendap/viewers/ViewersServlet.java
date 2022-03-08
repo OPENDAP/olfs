@@ -37,7 +37,7 @@ import opendap.http.error.BadRequest;
 import opendap.http.error.NotFound;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.io.HyraxStringEncoding;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.ppt.PPTException;
 import opendap.services.ServicesRegistry;
 import opendap.services.WebServiceHandler;
@@ -59,7 +59,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -386,7 +385,7 @@ public class ViewersServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         RequestCache.openThreadCache();
-        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
         LOG.debug(ServletUtil.showRequest(req, REQ_NUMBER.get()));
 
         Request dapRequest = new Request(this,req);
@@ -438,7 +437,7 @@ public class ViewersServlet extends HttpServlet {
                 resp.setContentType("text/html");
                 sendDatasetPage(getServiceId(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, dos);
 
-                LogUtil.setResponseSize(dos.size());
+                ServletLogUtil.setResponseSize(dos.size());
             }
             else {
                 String dataAccessURL = serverURL+dapService+besDatasetId;
@@ -461,7 +460,7 @@ public class ViewersServlet extends HttpServlet {
 
                     // Send the jnlp to the client.
                     ps.print(jnlpContent);
-                    LogUtil.setResponseSize(dos.size());
+                    ServletLogUtil.setResponseSize(dos.size());
 
                 }
                 else {
@@ -490,7 +489,7 @@ public class ViewersServlet extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(requestStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(requestStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             // this.destroy(); // I commented this out because: WTF? Why? - ndp 03/05/2019
         }

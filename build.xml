@@ -25,13 +25,22 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-
-<!-- Build file for OPeNDAP core software -->
-
 <project
         name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
         default="all" basedir="."
         xmlns:sonar="antlib:org.sonar.ant" >
+    <description>
+        Compiles the OLFS project software and, depending on the chosen target,
+        can produce a Web Application aRchive (WAR) file for each of:
+        - The OLFS/Hyrax service build targets(s): server
+        - The NGAP/Hyrax service, build targets(s): ngap
+        - The robots.txt service, build targets(s): robots, hyrax-robots
+
+        Also builds:
+        - The hex Encoder/Decoder application as an executable jar file.
+        - The XML Validator application as an executable jar file.
+    </description>
+
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
@@ -45,24 +54,22 @@
     <!-- ".."                                          -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Version Tag: Used for doing distribution builds.
-         This property should be set from the command
-         line by the distribution build script using
-         tag information from CVS.
+    <!-- Version Tags: Used for doing distribution builds.
+         These properties should be set from the command
+         line when running the DISTRO build target.
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
-    <property name="NGAP_VERSION" value="${OLFS_VERSION}"/>
-    <property name="WCS_VERSION" value="${OLFS_VERSION}"/>
+    <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
+    <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${OLFS_VERSION}"/>
+    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
     <property name="OLFS_LIB" value="${OLFS_DIST_BASE}"/>
-
 
     <!-- Compiler Settings -->
 
@@ -131,40 +138,46 @@
 
     <target name="show" description="Show build settings.">
 
-        <echo level="info" message="Project Name:          ${ant.project.name}"/>
-        <echo level="info" message="Project File:          ${ant.file}"/>
-        <echo level="info" message="Hyrax Version:         ${HYRAX_VERSION}"/>
-        <echo level="info" message="Olfs Version:          ${OLFS_VERSION}"/>
-        <echo level="info" message="Deployment Context:    ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="##########################################################"/>
+        <echo level="info" message="# Build Settings"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="           Project Name: ${ant.project.name}"/>
+        <echo level="info" message="           Project File: ${ant.file}"/>
+        <echo level="info" message="          Hyrax Version: ${HYRAX_VERSION}"/>
+        <echo level="info" message="           OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="           NGAP Version: ${NGAP_VERSION}"/>
+        <echo level="info" message="            WCS Version: ${WCS_VERSION}"/>
+        <echo level="info" message="     Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:           ${src.dir}"/>
-        <echo level="info" message="    doc.dir:           ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:           ${lib.dir}"/>
-        <echo level="info" message="    resources.dir:     ${resources.dir}"/>
+        <echo level="info" message="                src.dir: ${src.dir}"/>
+        <echo level="info" message="                doc.dir: ${doc.dir}"/>
+        <echo level="info" message="                lib.dir: ${lib.dir}"/>
+        <echo level="info" message="          resources.dir: ${resources.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:         ${build.dir}"/>
-        <echo level="info" message="    build.classes:     ${build.classes}"/>
-        <echo level="info" message="    build.doc:         ${build.docs}"/>
-        <echo level="info" message="    build.resources:   ${build.hyrax.resources}"/>
+        <echo level="info" message="              build.dir: ${build.dir}"/>
+        <echo level="info" message="          build.classes: ${build.classes}"/>
+        <echo level="info" message="              build.doc: ${build.docs}"/>
+        <echo level="info" message="        build.resources: ${build.hyrax.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="    ant.file:          ${ant.file}"/>
-        <echo level="info" message="    ant.home:          ${ant.home}"/>
-        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
-        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
-        <echo level="info" message="    ant.version:       ${ant.version}"/>
-        <echo level="info" message="    basedir:           ${basedir}"/>
-        <echo level="info" message="    user.name:         ${user.name}"/>
-        <echo level="info" message="    user.home:         ${user.home}"/>
-        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message="               ant.file: ${ant.file}"/>
+        <echo level="info" message="               ant.home: ${ant.home}"/>
+        <echo level="info" message="       ant.java.version: ${ant.java.version}"/>
+        <echo level="info" message="       ant.project.name: ${ant.project.name}"/>
+        <echo level="info" message="            ant.version: ${ant.version}"/>
+        <echo level="info" message="                basedir: ${basedir}"/>
+        <echo level="info" message="              user.name: ${user.name}"/>
+        <echo level="info" message="              user.home: ${user.home}"/>
+        <echo level="info" message="              java.home: ${java.home}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="    WEBAPP_DIST:       ${WEBAPP_DIST}"/>
-        <echo level="info" message="    SRC_DIST:          ${SRC_DIST}"/>
-        <echo level="info" message="    DOC_DIST:          ${DOC_DIST}"/>
-        <echo level="info" message="    OLFS_LIB:          ${OLFS_LIB}"/>
+        <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
+        <echo level="info" message="               SRC_DIST: ${SRC_DIST}"/>
+        <echo level="info" message="               DOC_DIST: ${DOC_DIST}"/>
+        <echo level="info" message="               OLFS_LIB: ${OLFS_LIB}"/>
         <echo level="info" message=""/>
 
     </target>
@@ -204,8 +217,10 @@
 
     <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
 
-    <!-- Libraries -->
-    <property name="json.lib" value="gson-2.3.1.jar"/>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      Libraries
+    -->
+    <property name="json.lib" value="gson-2.8.9.jar"/>
 
 
     <property name="junit.lib" value="junit-4.4.jar"/>
@@ -213,14 +228,9 @@
     <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
 
 
-    <property name="slf4j.lib" value="slf4j-api-1.6.1.jar"/>
-    <!-- property name="logback-core.lib" value="logback-core-0.9.26.jar"/-->
-    <property name="logback-core.lib" value="logback-core-1.1.11.jar"/>
-    <!-- property name="logback-classic.lib" value="logback-classic-0.9.26.jar"/-->
-    <property name="logback-classic.lib" value="logback-classic-1.2.0.jar"/>
-
-    <!-- property name="owlim.lib" value="owlim-lite-4.3.jar"/ -->
-    <!-- property name="openrdf-sesame.lib" value="openrdf-sesame-2.6.2-onejar.jar"/-->
+    <property name="slf4j.lib" value="slf4j-api-1.7.32.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.2.9.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.9.jar"/>
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -234,21 +244,21 @@
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-    <!-- property name="xalan.lib" value="xalan.jar"/-->
     <property name="xalan.lib" value="xalan-2.7.2.jar"/>
-    <!-- property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/-->
-    <property name="xercesImpl.lib" value="xercesImpl-2.12.0.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
     <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <!-- property name="catalina.lib" value="catalina-6.0.14.jar"/-->
     <property name="catalina.lib" value="catalina-6.0.53.jar"/>
     <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
-    <property name="json.lib" value="json-simple-1.1.1.jar"/>
+    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
+
+    <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
+    <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
 
     <!-- WCS Libs -->
@@ -258,20 +268,23 @@
     <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
     <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
     <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
+    <property name="jaxb-api.lib" value="jaxb-api-2.3.1.jar"/>
     <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
     <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
-    <property name="owasp-encoder" value="encoder-1.2.2.jar"/>
-    <property name="owasp-encoder-jsp" value="encoder-jsp-1.2.2.jar"/>
 
 
 
+    <!--
+        These are the library jars used by Hyrax.
+    -->
     <fileset id="hyrax-libs" dir="${lib.dir}">
-        <include name="${owasp-encoder}"/>
-        <include name="${owasp-encoder-jsp}"/>
+        <include name="${owasp-encoder.lib}"/>
+        <include name="${owasp-encoder-jsp.lib}"/>
 
         <include name="${json.lib}"/>
+        <include name="${sjson.lib}"/>
         <include name="${jdom.lib}"/>
         <include name="${junit.lib}"/>
 
@@ -280,14 +293,12 @@
         <include name="${commons-httpclient.lib}"/>
         <include name="${commons-logging.lib}"/>
         <include name="${commons-codec.lib}"/>
+        <include name="${commons-io.lib}"/>
 
         <include name="${http-components-httpclient.lib}"/>
         <include name="${http-components-httpcore.lib}"/>
 
-        <include name="${commons-io.lib}"/>
 
-        <!-- include name="${xercesImpl.lib}"/>
-        <include name="${xercesXmlApis.lib}"/-->
         <include name="${saxon-jdom.lib}"/>
         <include name="${saxon-s9api.lib}"/>
         <include name="${saxon.lib}"/>
@@ -305,13 +316,14 @@
         <include name="${ogc-gmlcov.lib}"/>
         <include name="${ogc-ows.lib}"/>
         <include name="${ogc-jaxb.lib}"/>
+        <include name="${jaxb-api.lib}"/>
         <include name="${jaxb-core.lib}"/>
         <include name="${jaxb-impl.lib}"/>
         <include name="${xlink.lib}"/>
     </fileset>
 
 
-    <!-- Library (class)paths -->
+    <!-- Library compile (class)paths -->
     <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}"/>
         <!--
@@ -327,13 +339,8 @@
     </path>
 
 
-    <target name="all" depends="clean,clients,check,server"
+    <target name="all" depends="clean,check,server"
             description="Builds lots of stuff."/>
-
-
-    <target name="clients" depends="BESclient"
-            description="Compiles the clients."/>
-
 
     <target name="clean" description="Clean up ALL build products.">
         <delete dir="${build.dir}"/>
@@ -394,16 +401,15 @@
             depends="clean,init"
             description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
-
-        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=" Moving and filtering Source code."/>
+        <echo level="info" message="                AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message="          HYRAX_VERSION: ${HYRAX_VERSION}"/>
+        <echo level="info" message="           NGAP_VERSION: ${NGAP_VERSION}"/>
+        <echo level="info" message="           OLFS_VERSION: ${OLFS_VERSION}"/>
+        <echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/>
+        <echo level="info" message="     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="NGAP_DEPLOYMENT_CONTEXT: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
-        <echo level="info" message="HYRAX_VERSION:      ${HYRAX_VERSION}"/>
-        <echo level="info" message="OLFS_VERSION:       ${OLFS_VERSION}"/>
-        <echo level="info" message="WCS_VERSION:        ${WCS_VERSION}"/>
-        <echo level="info" message="DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
-
-        <echo level="info" message=""/>
-
 
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
@@ -411,17 +417,7 @@
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
-
                 <exclude name="opendap/cmr/**"/>
-
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the auth code  -->
-                <!-- exclude name="opendap/auth/**"/ -->
-
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
 
                 <!-- Exclude WCS 1.1.2 and semantics code  -->
                 <exclude name="opendap/wcs/v1_1_2/**"/>
@@ -429,7 +425,6 @@
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
                 <exclude name="opendap/aws/**"/>
-                <exclude name="opendap/noaa_s3/**"/>
 
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
@@ -460,6 +455,7 @@
         <copy todir="${build.ngap.resources}" filtering="true">
             <fileset dir="${ngapResources.dir}">
                 <exclude name="*.png" />
+                <exclude name="lib/**" />
             </fileset>
         </copy>
 
@@ -496,41 +492,6 @@
     </target>
 
 
-    <target
-            name="olfs-experiments"
-            depends="init"
-            description="Compiles the experimental code."
-    >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-
-
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <classpath refid="olfs.compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/**/*.java"/>
-            <include name="hao/**/*.java"/>
-
-        </javac>
-
-    </target>
-
-
-    <target name="olfs-lib" depends="clean,compile">
-
-        <jar destfile="${build.lib}/${OLFS_LIB}.jar">
-            <fileset dir="${build.classes}"/>
-        </jar>
-
-    </target>
 
 
 
@@ -558,11 +519,11 @@
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/gateway/**"/>
             <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/nciso/**"/>
 
-            <zipfileset dir="." prefix="${SRC_DIST}" file="build.xml"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="README"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="NEWS"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="ChangeLog"/>
-            <zipfileset dir="." prefix="${SRC_DIST}" file="COPYRIGHT"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="build.xml"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="README"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="NEWS"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="ChangeLog"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="COPYRIGHT"/>
 
         </tar>
 
@@ -616,32 +577,13 @@
 
     </target>
 
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="BESclient"
-            depends="olfs-lib"
-            description="Build and package the back end client."
-    >
-
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
-
-        <jar destfile="${build.dist}/beclient.jar"
-             manifest="resources/META-INF/BESclient.MANIFEST.MF">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ppt/**/*.class"/>
-            </fileset>
-        </jar>
-
-
-    </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="hexEncoderApp"
             depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
+            description="Builds executable jar file of the hex encoder application">
 
 
         <mkdir dir="${build.dist}/hexEncoder"/>
@@ -666,47 +608,13 @@
 
     </target>
 
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="NcmlDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the NcML Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
-            <fileset dir="${build.classes}">
-                <include name="opendap/ncml/DispatchHandler.class"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
-
-    <target name="GatewayDispatchHandler"
-            depends="clean,compile"
-            description="Builds jar file for the Gateway Dispatch Handler">
-
-
-        <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
-            <fileset dir=".">
-                <include name="resources/gateway/**"/>
-            </fileset>
-            <fileset dir="${build.classes}">
-                <include name="opendap/gateway/**"/>
-            </fileset>
-        </jar>
-
-    </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="validatorApp"
             depends="clean,compile"
-            description="Builds executable jar file of the hex encoder">
+            description="Builds executable jar file for the simple XML Validator">
 
         <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
         <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
@@ -763,6 +671,7 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
+    <target name="opendap" depends="server" />
     <target
             name="server"
             depends="clean,compile"
@@ -907,10 +816,9 @@
         <sonar:sonar />
     </target>
 
-
-
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
     <target
         name="ngap"
         depends="clean,compile"
@@ -925,6 +833,22 @@
              delete it from the dist dir -->
         <!-- copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/ -->
 
+        <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
+        <copy todir="${build.ngap.resources}/lib" filtering="false">
+            <fileset refid="hyrax-libs"/>
+            <fileset dir="${ngapResources.dir}/lib">
+
+                <!-- We exclude these because they get placed into
+                $CATALINA_HOM/lib when the Docker containers are built.-->
+                <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
+                <exclude name="memcached-session-manager-2.3.2.jar"/>
+                <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
+
+            </fileset>
+
+        </copy>
+
+
         <!--
         Here we:
          - Set the WAR file name to ${NGAP_DEPLOYMENT_CONTEXT}.war (A value of
@@ -935,7 +859,7 @@
         <war destfile="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"
              webxml="${build.ngap.resources}/web.xml">
 
-            <lib  refid="hyrax-libs"/>
+            <lib dir="${build.ngap.resources}/lib"/>
 
             <classes dir="${build.classes}"/>
 
@@ -955,7 +879,6 @@
                 <include name="logback.xml"/>
                 <include name="olfs.xml"/>
             </zipfileset>
-
 
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>

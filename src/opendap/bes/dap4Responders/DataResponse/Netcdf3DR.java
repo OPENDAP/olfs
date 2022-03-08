@@ -36,7 +36,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf3;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -111,6 +111,7 @@ public class Netcdf3DR extends Dap4Responder{
         QueryParameters qp = new QueryParameters(request);
         String resourceID = getResourceId(requestedResourceId, false);
         String cf_history_entry = ReqInfo.getCFHistoryEntry(request);
+        String history_json_entry = ReqInfo.getHistoryJsonEntry(request);
         User user = new User(request);
 
         BesApi besApi = getBesApi();
@@ -140,9 +141,9 @@ public class Netcdf3DR extends Dap4Responder{
         response.setHeader("Content-Disposition", contentDisposition);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsNetcdf3(user, resourceID, qp, cf_history_entry, os);
+        besApi.writeDap4DataAsNetcdf3(user, resourceID, qp, cf_history_entry, history_json_entry, os);
         os.flush();
-        LogUtil.setResponseSize(os.size());
+        ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size: {}",getServiceTitle(),os.size());
     }
 }

@@ -4,7 +4,7 @@ package opendap.bes;
 import opendap.PathBuilder;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Element;
@@ -62,7 +62,7 @@ public class BESSiteMapService extends HttpServlet {
 
             super.init();
 
-            LogUtil.initLogging(this);
+            ServletLogUtil.initLogging(this);
             LOG.debug("init() start");
             // Timer.enable();
             RequestCache.openThreadCache();
@@ -167,7 +167,7 @@ public class BESSiteMapService extends HttpServlet {
             try {
 
                 int reqno = REQ_NUMBER.incrementAndGet();
-                LogUtil.logServerAccessStart(request, LogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
                 LOG.debug(Util.getMemoryReport());
                 LOG.debug(ServletUtil.showRequest(request, reqno));
@@ -226,7 +226,7 @@ public class BESSiteMapService extends HttpServlet {
             }
         }
         finally {
-            LogUtil.logServerAccessEnd(request_status, response_size, LogUtil.SITEMAP_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, response_size, ServletLogUtil.SITEMAP_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             LOG.info("Response completed.\n");
         }

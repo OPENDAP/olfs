@@ -3,7 +3,7 @@
  * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2018 OPeNDAP, Inc.
+ * // Copyright (c) 2022 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -29,6 +29,8 @@ package opendap.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import opendap.PathBuilder;
+import opendap.coreServlet.ReqInfo;
+import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -51,13 +53,20 @@ public class UrsIdP extends IdProvider{
     public static final String AUTHORIZATION_HEADER_KEY="authorization";
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
+    public static final String URS_URL_KEY = "UrsUrl";
+    public static final String URS_CLIENT_ID_KEY = "UrsClientId";
+    public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsClientAuthCode";
+
+    public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
+
     private Logger log;
 
     private String ursUrl;
     private String clientAppId;
     private String clientAppAuthCode;
+    private boolean rejectUnsupportedAuthzSchemes;
 
-    private static final String ERR_PRFX = "ERROR! msg: ";
+    private static final String ERR_PREFIX = "ERROR! msg: ";
 
 
     public UrsIdP(){
@@ -65,6 +74,7 @@ public class UrsIdP extends IdProvider{
         log = LoggerFactory.getLogger(this.getClass());
         setAuthContext(DEFAULT_AUTH_CONTEXT);
         setDescription("The NASA Earthdata Login (formerly known as URS)");
+        rejectUnsupportedAuthzSchemes =  false;
     }
 
 
@@ -74,14 +84,18 @@ public class UrsIdP extends IdProvider{
 
         Element e;
 
-        e = getConfigElement(config,"UrsUrl");
+        e = getConfigElement(config,URS_URL_KEY);
         ursUrl = e.getTextTrim();
 
-        e = getConfigElement(config,"UrsClientId");
+        e = getConfigElement(config,URS_CLIENT_ID_KEY);
         clientAppId = e.getTextTrim();
 
-        e = getConfigElement(config,"UrsClientAuthCode");
+        e = getConfigElement(config,URS_CLIENT_AUTH_CODE_KEY);
         clientAppAuthCode = e.getTextTrim();
+
+        e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
+        if(e != null)
+            rejectUnsupportedAuthzSchemes = true;
 
     }
 
@@ -112,7 +126,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsUrl(String ursUrl) throws ServletException{
         if(ursUrl == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a URS Service URL. (urs_url)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
 
@@ -130,7 +144,7 @@ public class UrsIdP extends IdProvider{
 
         if(ursClientApplicationId == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Application ID. (client_id)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
         clientAppId = ursClientApplicationId;
@@ -145,7 +159,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsClientAppAuthCode(String ursClientAppAuthCode) throws ServletException {
         if(ursClientAppAuthCode == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Authorization Code. (client_auth_code)";
-            log.error("{}{}", ERR_PRFX,msg);
+            log.error("{}{}", ERR_PREFIX,msg);
             throw new ServletException(msg);
         }
 
@@ -233,7 +247,8 @@ public class UrsIdP extends IdProvider{
      * @return True if login is complete and user profile has been added to session object. False otherwise.
      * @throws IOException
      */
-	public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+	public boolean doLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, Forbidden
     {
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
@@ -248,30 +263,52 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
-        String authorization_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
-        if(authorization_header_value != null){
-
-            if(EarthDataLoginAccessToken.checkAuthorizationHeader(authorization_header_value)){
-
-                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authorization_header_value,getUrsClientAppId());
-                userProfile.setEDLAccessToken(edlat);
-                String uid = getEdlUserId(edlat.getAccessToken());
-                userProfile.setUID(uid);
-            }
+        boolean foundEDLAuthToken = false;
+        String authz_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
+        if(AuthorizationHeader.isBearer(authz_header_value)){
+            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_header_value,getUrsClientAppId());
+            userProfile.setEDLAccessToken(edlat);
+            String uid = getEdlUserId(edlat.getAccessToken());
+            userProfile.setUID(uid);
+            foundEDLAuthToken = uid!=null;
         }
-        else {
+
+        if(!foundEDLAuthToken) {
+            if(authz_header_value!=null){
+                if(rejectUnsupportedAuthzSchemes){
+                    String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
+                    msg += "header. 'Authorization Scheme: ";
+                    msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
+                    if(AuthorizationHeader.isBasic(authz_header_value)){
+                        msg += "Your request included unencrypted credentials that this ";
+                        msg += "service is not prepared to receive. Please check the version ";
+                        msg += "and configuration of your client software as this is a security ";
+                        msg += "concern and needs to be corrected. ";
+                    }
+                    msg += "I am sorry, but I cannot allow this.";
+                    throw new Forbidden(msg);
+                }
+                String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
+                msg += "Authorization Scheme: {}";
+                log.warn(msg, AuthorizationHeader.getScheme(authz_header_value));
+            }
+
             // Check to see if we have a code returned from URS. If not, we must
             // redirect the user to URS to start the authentication process.
             String code = request.getParameter("code");
             if (code == null) {
                 //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
                 //   "&response_type=code&redirect_uri=" + request.getRequestURL();
+                // request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
 
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
                 url += "&";
-                url += "response_type=code&redirect_uri=" + request.getRequestURL();
+
+                String returnToUrl = ReqInfo.getRequestUrlPath(request);
+
+                url += "response_type=code&redirect_uri=" + returnToUrl;
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);
@@ -288,7 +325,7 @@ public class UrsIdP extends IdProvider{
             String url = getUrsUrl() + "/oauth/token";
 
             String postData = "grant_type=authorization_code&code=" + code +
-                    "&redirect_uri=" + request.getRequestURL();
+                    "&redirect_uri=" + ReqInfo.getRequestUrlPath(request);
 
             Map<String, String> headers = new HashMap<>();
 
@@ -315,7 +352,7 @@ public class UrsIdP extends IdProvider{
             log.info("URS UID: {}", userProfile.getUID());
         }
 
-        // Finally, redirect the user back to the their original requested resource.
+        // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
 

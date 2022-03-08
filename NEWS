@@ -1,3 +1,102 @@
+# OLFS Version 1.18.10 (04 January 2022)
+
+## Configuration and behavior updates.
+In order to make the server's behavior more understandable to users, and its configuration
+more understandable to admins we have changed the way that the server responds to client
+requests for the unadorned Dataset URL and the way that the server generates Data Request
+Form links in its catalog pages. There are new configuration parameters to control these
+behaviors.
+
+### <UseDAP2ResourceUrlResponse />
+This configuration parameter has been DEPRECATED - Use the <DatasetUrlResponse /> and
+<DataRequestForm /> elements to configure this behavior (see below).
+
+### <DatasetUrlResponse type="..." />
+The DatasetUrlResponse element is used to configure the type of response
+that the server will generate when a client attempts to access the Dataset URL.
+The type of response is controlled by the value of the type attribute.
+
+Allowed Values:
+* dsr - The dap4 DSR response will be returned for the dataset URL. Note: This
+setting is not compatible with DataRequestForm type of "dap2" as the DSR response
+URL collides with the DAP2 Data Request Form URL.
+* download - If the configuration parameter AllowDirectDataSourceAccess is set
+(present) thenthe source data file will be returned for the dataset URL. If the
+configuration parameter AllowDirectDataSourceAccess is not present then a 403
+forbidden will be returned for the dataset URL. (This is basically a file retrieval
+service, any constraint expression submitted with the unadorned dataset URL will be
+ignored.)
+* requestForm - The Hyrax Data Request Form Page will be returned for the dataset URL.
+
+Default: download
+<DatasetUrlResponse type="download"/>
+
+### <DataRequestForm type="..." />
+The DataRequestForm element defines the target DAP data model for the dataset links
+in the "blue-bar" catalog.html pages. These links point to the DAP Data Request Form
+for each dataset. This element also determines the type  of Data request form page
+returned when the DatasetUrlResponse type="requestForm" and the request is for the
+Dataset URL. Allowed type values are: dap2 and dap4.
+
+Default: dap4
+<DataRequestForm type="dap4" />
+
+### <AllowDirectDataSourceAccess />
+When enabled users will be able to use Hyrax as a file server and download
+the underlying data files/granules/objects directly, without utilizing the DAP APIs.
+
+Default: disabled.
+<!--AllowDirectDataSourceAccess / -->
+
+### <ForceDataRequestFormLinkToHttps />
+The presence of this element will cause the Data Request Form interfaces to
+"force" the dataset URL to HTTPS. This is useful for situations where the sever
+is sitting behind a connection management tool (like AWS CloudFront) whose outward
+facing connections are HTTPS but Hyrax is not using HTTPS. Thus the internal URLs
+being received by Hyrax are on HTTP. When these URLs are exposed via the Data
+Request Forms they can cause some client's to have issues with session dropping
+because the protocols are not consistent.
+
+Default: disabled
+<!-- ForceDataRequestFormLinkToHttps / -->
+
+## Dependency Library Updates
+* Updated the dependency libraries as follows:
+  - Upgraded gson-2.3.1 to gson-2.8.9
+  - Upgraded slf4j-1.7.16 to slf4j-1.7.32
+  - Upgraded logback-core-1.1.11 to logback-core-1.2.9
+  - Upgraded logback-classic-1.2.0 to logback-classic-1.2.9
+
+## Log Sanitization
+* Log entries for User-Agent, URL path, and query string are now scrubbed.
+
+## DAP2 Data Request Form
+* Dropped link to in DAP2 Data Request Form to the no longer supported BES
+generated request form.
+
+# OLFS Version 1.18.9 (15 September 2021)
+
+## NASA/NGAP Updates
+* Fixed gradle dependancies according snyk scan.
+* Session serialization 
+* Added session manager jars to ngap resources.
+* Updated production rules to include session manager code in the ngap application build.
+* Made history_json output as JSONArray.
+* New landing page for NGAP service.
+* Added UNIX time to OLFS logs in NGAP.
+
+## Bug Fixes
+* Fixed bug in computation of dimension sizes in the dap4 ifh xsl.
+* Dropped DSR response for just the dataset_url.
+* Fixed broken json error output.
+* Changed the broken naming pattern for the PPT strings.
+* Enabled ChunkedInputStream debugging and cleaned up the messages in support of stream pollution problem.
+* Fixed broken css and deployment context links construction in DSR HTML page.
+
+## Performance Improvements
+* Added file size and last modified headers to flat file transfer.
+* Added auth.log independant of debug log.
+* First pass at patching POST request handling.
 
 # OLFS Version 1.18.8 (30 December 2020)
 

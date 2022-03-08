@@ -12,11 +12,11 @@ language: java
 services:
   - docker
 
-# whitelist
+# safelist
 branches:
   only:
     - master
-    - travis
+    - /^(.*-test-deploy)$/
 
 notifications:
   email:
@@ -28,7 +28,6 @@ addons:
   apt:
     packages:
       - awscli
-      - sshpass
 
 env:
   global:
@@ -41,67 +40,114 @@ env:
     # GIT_UID for travis-ci-opendap
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
     # GIT_PSWD for travis-ci-opendap
-    - secure: "KDP1zPlruadQIbkvXHWHx6rLcTJ3P7AK2Io7IBnAiW3QETDxVksThXKY2Hey25fXw8+UV0nXuQ4v4gMNmghjvCU1k3N/vkIk9AUDC19z1IM282GumvJjZ+6WdHGvMn1sRPi3Jt3ymHoLAHiUnMbJcdc6xtAUlDCq7x2fb99sUFc="
+    - secure: "i9V81CV2PlYy4NsTSvx8XydBlBkemXIFWkWBXupViKHqOAGVfyBArm2lj/uKz6TnUcvCngDQIjeDqTOOOArxNpoHLO07PqF4be4K+i4+fctDM6lP2Rd/+p2Jc9W3mV1KSrZF/QteyUahUFCaqSTxOe3h7mI178CaGoNJdTV4k/w="
     # WOO_UID for travis
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
     # SNYK_TOKEN
-    - secure: "PmWGs/4SJH3bbB66E7eHLrrjKZ7mDnobAhQriRjpVjzGfKIpYqpiYGDF4rKVyYS9nkDgnZQaUErHFmmCcuZ603Rd4RikB/EKHPUtaWBT0IOGbrF0DqL27t/xOhkJVq9OUczLt2HVYoK1qFZXs/Q3bz5FvnNIrr4lp+oUE+gvSaY="
-
+    - secure: "A+Ll8E9FlU0B4qAYb9GTmuCFgY0RstSXiJqTuXcEmej/ppalCvCXN4t+Ss3fyy4zF3NbNh54kVhnZOL3/bDe8VihvL48MbftCfdq4kmE3UdYqdTjs6vqGl0g1UkMqdGq/uvxPhBM0ggMM1EO9aN03OtCnEehcnKtwqKVdOGzQg4="
 
 install:
+  - nvm install 12.13.0
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
 
+# We need the gradlescan target because we can't run simultaneous
+# sonarscans without encountering a race condition at sonarcloud.io
 stages:
   - name: build
-    if:  branch = master
   - name: test
-    if:  branch = master
   - name: scan
-    if:  branch = master
+  - name: gradlescan
   - name: snappah
-    if:  branch = master AND NOT type = pull_request
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
-    if:  branch = master AND NOT type = pull_request
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+
+# caching for gradle
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 jobs:
   include:
+
     - stage: build
-      name: "jdk7"
+      name: "jdk8"
+      jdk: openjdk8
       script:
         - export STAGE=build
-        - echo "TRAVIS_BUILD_NUMBER ${TRAVIS_BUILD_NUMBER}"
-      jdk: openjdk7
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-    - jdk: openjdk8
-      name: "jdk8"
-      script: ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      name: "jdk11"
+      jdk: openjdk11
+      script:
+        - export STAGE=build
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+
+    - stage: build
+      name: "gradle (jdk11)"
+      jdk: openjdk11
+      script:
+        - export STAGE=build
+        - ./gradlew --version
+        - ./gradlew tasks
+        - ./gradlew war
 
     - stage: test
       name: "jdk7"
-      script: export STAGE=test
       jdk: openjdk7
-      script: ant check
-    - jdk: openjdk8
-      name: "jdk8"
-      script: ant check
+      script:
+        - export STAGE=test
+        - ant check
 
-    - stage: scan
-      name: "scan (jdk8)"
-      addons:
-        sonarcloud:
-      # jdk 7 does not work with sonar scan. jhrg 3/14/19
+    - stage: test
+      name: "jdk8"
       jdk: openjdk8
       script:
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-        - ant sonar -Dsonar.login=$SONAR_LOGIN
+        - export STAGE=test
+        - ant check
+
+    - stage: test
+      name: "jdk11"
+      jdk: openjdk11
       script:
-        - ./run-snyk.sh
+        - export STAGE=test
+        - ant check
+
+    - stage: scan
+      name: "sonarscan (jdk11)"
+      jdk: openjdk11
+      addons: sonarcloud
+      script:
+        - export STAGE=scan
+        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
+        - ant sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+
+    - stage: scan
+      name: "synk (jdk11)"
+      jdk: openjdk11
+      script:
         - export STAGE=scan
         - echo $STAGE
+        - ./run-snyk.sh
+
+    - stage: gradlescan
+      name: "gradle sonarscan (jdk11)"
+      jdk: openjdk11
+      script:
+        - export STAGE=scan
+        - ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
-      name: "olfs-snapshot"
+      name: "olfs-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -116,7 +162,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "olfs-build-number"
+      name: "olfs-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -131,7 +177,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-snapshot"
+      name: "ngap-snapshot (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -146,7 +192,7 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-build-number"
+      name: "ngap-build-number (jdk8)"
       jdk: openjdk8
       script:
         - export STAGE=snappah
@@ -198,7 +244,7 @@ deploy:
     skip_cleanup: true
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
-      branch: master
+      all_branches: true
       condition: $STAGE =~ ^snappah$
 
 
@@ -210,6 +256,7 @@ deploy:
   #  on:
   #    branch: master
   #    condition: $STAGE =~ ^snappah$
+
 
 
 

@@ -4,17 +4,19 @@
 
 # Hyrax/OLFS 
 
-**_Hyrax Version 1.16.3  (30 December 2020)_**
+**_Hyrax Version 1.16.5 (04 January 2022)_**
 
-**_OLFS  Version 1.18.8  (30 December 2020)_** 
+**_OLFS  Version 1.18.10  (04 January 2022 2021)_** 
 
 
-### OLFS-1.18.8 requires
-* **bes-3.20.8** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4399984.svg)](https://doi.org/10.5281/zenodo.4399984)
-* **libdap4-3.20.7** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4399722.svg)](https://doi.org/10.5281/zenodo.4399722)
-                     
+### OLFS-1.18.10 requires
+* **bes-3.20.10** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5810850.svg)](https://doi.org/10.5281/zenodo.5810850)
+* **libdap4-3.20.9** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5807905.svg)](https://doi.org/10.5281/zenodo.5807905)
 
-                     
+
+
+
+
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
 ### First:
@@ -88,3 +90,5 @@ instructions and NEWS.
 In src/opendap/aggregation we have a servlet that performs aggregation for use,
 initially, with NASA's EDSC (Earth Data Search Client). In that directory you
 will find a README along with some help in testing the servlet using curl.
+
+

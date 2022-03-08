@@ -93,8 +93,90 @@
 
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
+
+    <!-- <UseDAP2ResourceUrlResponse />
+    @DEPRECATED - Use the <DatasetUrlResponse /> and <DataRequestForm /> elements to
+    configure this behavior
     <UseDAP2ResourceUrlResponse />
+    -->
+
+
+    <!--
+    <DatasetUrlResponse type="..." />
+    Supported type values are: dsr, download, and requestForm
+    The DatasetUrlResponse element is used to configure the type of response
+    that the server will generate when a client attempts to access the Dataset URL.
+    The type of response is controlled by the value of the type attribute.
+    The supported values are: dsr, download, and requestForm.
+
+    Allowed Values
+    dsr:
+        The dap4 DSR response will be returned for the dataset URL. Note: This
+        setting is not compatible with DataRequestForm type of "dap2" as the
+        DSR response URL collides with the DAP2 Data Request Form URL.
+
+    download:
+        If the configuration parameter AllowDirectDataSourceAccess is set (present) then
+        the source data file will be returned for the dataset URL. If the configuration
+        parameter AllowDirectDataSourceAccess is not present then a 403 forbidden will
+        be returned for the dataset URL. (This is basically a file retrieval service,
+        any constraint expression submitted with the dataset URL will be ignored.)
+
+    requestForm:
+        The Hyrax Data Request Form Page will be returned for the
+        dataset URL.
+
+    -->
+    <DatasetUrlResponse type="download"/>
+
+    <!--
+        <DataRequestForm type="..." />
+        Supported type values are: dap2 and dap4
+        The DataRequestForm element defines the target DAP data model for the dataset links
+        in the "blue-bar" catalog.html pages. These links point to the DAP Data Request Form for each dataset.
+        This element also determines the type  of Data request form page  returned when the
+        DatasetUrlResponse type="requestForm" and the request is for the Dataset URL.
+    -->
+    <DataRequestForm type="dap4" />
+
+    <!--
+        'AllowDirectDataSourceAccess' - When enabled users will be able to use
+        Hyrax as a file server and download the underlying data files/granules/objects
+        directly, without utilizing the DAP APIs.
+    -->
+    <!-- AllowDirectDataSourceAccess /-->
+
+
+    <!-- @DEPRECATED - ForceDataRequestFormLinkToHttps - IGNORED -  @DEPRECATED -->
+
+
+    <!--
+    'ForceLinksToHttps' - The presence of this element will cause the server to "force" all
+    of the links returned by the server to be expressed with the HTTPS protocol.
+
+    When the 'ForceLinksToHttps' element is absent from the config (commented out) then
+    the forcing to https is feature is disabled.
+
+    The server will continue to return https urls when:
+        - The incoming request URL uses https.
+        - The server detects the presence of the CloudFront-Forwarded-Proto or X-Forwarded-Proto
+        request headers with a values of https. These are typically set by some redirecting
+        entity (like Cloudfront) that is in the business of rewriting the request URLs to remove
+        the HTTPS protocol for internal request servicing.
+
+    'ForceLinksToHttps' is a heavy handed way of accomplishing this in the absence of *-Forwarded-Proto
+    headers. It is heavy handed because it will break thinks like accesses http://localhost that retrun
+    redirects to content with URLs that reference the server (ex: the xml:base attribute in the DMR)
+    -->
+    <!-- ForceLinksToHttps /  -->
+
+
+    <!--
+        HttpPost Support
+    -->
     <HttpPost enabled="true" max="2000000"/>
+
+
 
     <!--
         'RequireUserSelection' - When enabled this will cause both the DAP2
@@ -108,13 +190,7 @@
     <!-- RequireUserSelection /-->
 
 
-    <!--
-        'AllowDirectDataSourceAccess' - When enabled users will be able to use
-        Hyrax as a file server and download the underlying data files/granules/objects
-        directly, without utilizing the DAP APIs.
-    -->
-    <!-- AllowDirectDataSourceAccess / -->
-    
+
     <!-- 
         'AddFileoutTypeSuffixToDownloadFilename' - When enabled the server will add 
         the file type suffix of the requested data format to the download file name.

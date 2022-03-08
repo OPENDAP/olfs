@@ -28,6 +28,7 @@ package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.BesDapDispatcher;
 import opendap.bes.Version;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap2Responders.Dap2IFH;
@@ -40,7 +41,7 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.namespaces.DAP;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
@@ -56,7 +57,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -159,6 +159,7 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
+            transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceLinksToHttps()?"true":"false"));
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
@@ -167,7 +168,7 @@ public class HtmlDMR extends Dap4Responder {
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(dmr), os);
             os.flush();
-            LogUtil.setResponseSize(os.size());
+            ServletLogUtil.setResponseSize(os.size());
             log.debug("Sent {} size:{}",getServiceTitle(),os.size());
         }
         finally {

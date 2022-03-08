@@ -30,7 +30,7 @@ package opendap.coreServlet;
 import opendap.auth.AuthenticationControls;
 import opendap.bes.BESManager;
 import opendap.http.error.NotFound;
-import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Document;
@@ -113,7 +113,7 @@ public class DispatchServlet extends HttpServlet {
 
             super.init();
             initDebug();
-            LogUtil.initLogging(this);
+            ServletLogUtil.initLogging(this);
 
             // Timer.enable()
 
@@ -121,7 +121,7 @@ public class DispatchServlet extends HttpServlet {
 
             log.debug("BEGIN");
 
-            LogUtil.logServerStartup("init()");
+            ServletLogUtil.logServerStartup("init()");
             log.info("init() start.");
 
             String configFile = getInitParameter("ConfigFileName");
@@ -140,7 +140,7 @@ public class DispatchServlet extends HttpServlet {
 
             Element enableCombinedLog = config.getChild("EnableCombinedLog");
             if(enableCombinedLog!=null){
-                LogUtil.useCombinedLog(true);
+                ServletLogUtil.useCombinedLog(true);
             }
 
             boolean enablePost = false;
@@ -277,15 +277,33 @@ public class DispatchServlet extends HttpServlet {
      * - underlying NetCDF files located on the server without using the OPeNDAP
      * - request interface.
      * -->
-     * <!-- AllowDirectDataSourceAccess / -->
      * <!--
-     * By default, the server will provide a DAP2-style response
-     * to requests for a dataset resource URL. Commenting out the
-     * "UseDAP2ResourceUrlResponse" element will cause the server
-     * to return the DAP4 DSR response when a dataset resource URL
-     * is requested.
+     *     UseDAP2ResourceUrlResponse
+     *     When enabled, the server will provide a DAP2-style response
+     *     to requests for a dataset resource URL, meaning that the response
+     *     will be either source data file or an HTTP 403 Forbidden error, as
+     *     defined by the state of the AllowDirectDataSourceAccess feature.
+     *
+     *     If UseDAP2ResourceUrlResponse is not enabled (not present in the
+     *     configuration, or commented out) the server will default to returning
+     *     the DAP4 Dataset Services Response (DSR) when a dataset resource URL
+     *     is requested.
+     *
+     *     See Dap4 specification for more:
+     *     https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
      * -->
      * <UseDAP2ResourceUrlResponse />
+     *
+     * <!--
+     *     DataRequestForm
+     *
+     *     Defines the DAP data model version for the DAta Request Form linked to
+     *     from the "blue-bar" catalog.html pages generated from  either the
+     *     DDX (for DAP2) or the DMR (for DAP4).
+     * -->
+     * <DataRequestForm type="dap4" />
+     *
+     *
      * </Handler>
      * <Handler className="opendap.bes.DirectoryDispatchHandler" />
      * <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
@@ -335,7 +353,7 @@ public class DispatchServlet extends HttpServlet {
             httpGetHandlers.add(new opendap.bes.BESThreddsDispatchHandler());
         }
 
-        httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
+        // httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
 
         for (DispatchHandler dh : httpGetHandlers) {
             dh.init(this, config);
@@ -387,7 +405,7 @@ public class DispatchServlet extends HttpServlet {
             try {
                 super.doHead(request, response);
             }
-            catch(ServletException se){
+            catch(IOException | ServletException se){
                 log.error("ERROR - Failed to produce HEAD response for {}",relativeUrl);
             }
         }
@@ -436,7 +454,6 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
-
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         int request_status = HttpServletResponse.SC_OK;
@@ -454,7 +471,7 @@ public class DispatchServlet extends HttpServlet {
                 }
 
                 int reqno = reqNumber.incrementAndGet();
-                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
 
                 if (redirectForServiceOnlyRequest(request, response))
                     return;
@@ -499,7 +516,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
         } finally {
-            LogUtil.logServerAccessEnd(request_status, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
             log.info("Response completed.\n");
         }
@@ -545,7 +562,7 @@ public class DispatchServlet extends HttpServlet {
 
                 int reqno = reqNumber.incrementAndGet();
 
-                LogUtil.logServerAccessStart(request, LogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
 
                 if (log.isDebugEnabled()) {
                     log.debug(ServletUtil.showRequest(request, reqno));
@@ -582,7 +599,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
         } finally {
-            LogUtil.logServerAccessEnd(httpStatus, LogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(httpStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
         }
     }
@@ -624,7 +641,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
 
         long lmt = new Date().getTime();
 
@@ -645,7 +662,7 @@ public class DispatchServlet extends HttpServlet {
             log.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, LogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
         }
         return lmt;
@@ -655,7 +672,7 @@ public class DispatchServlet extends HttpServlet {
     @Override
     public void destroy() {
 
-        LogUtil.logServerShutdown("destroy()");
+        ServletLogUtil.logServerShutdown("destroy()");
 
         for (DispatchHandler dh : httpGetDispatchHandlers) {
             log.debug("Shutting down handler: {}", dh.getClass().getName());

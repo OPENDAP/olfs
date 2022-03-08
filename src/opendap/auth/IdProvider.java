@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import opendap.http.error.Forbidden;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,7 +100,7 @@ public abstract class IdProvider {
      * @return True if login is complete and user profile has been added to session object. False otherwise.
      * @throws IOException
      */
-    public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException, Forbidden;
 
 
     /**

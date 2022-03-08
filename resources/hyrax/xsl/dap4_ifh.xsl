@@ -40,11 +40,18 @@
     <xsl:param name="loginLink" />
     <xsl:param name="logoutLink" />
     <xsl:param name="enforceSelection" />
+    <xsl:param name="forceDataRequestFormLinkToHttps" />
+
 
     <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="datasetUrl">
-        <xsl:value-of select="/dap:Dataset/@xml:base"/>
+        <xsl:choose>
+            <xsl:when test="$forceDataRequestFormLinkToHttps='true'">
+                <xsl:value-of select='replace(/dap:Dataset/@xml:base,"^http:","https:")'/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:otherwise>
+        </xsl:choose>
     </xsl:variable>
 
 
@@ -112,7 +119,7 @@
                     enforce_selection = es.localeCompare("true")==0;
                 </xsl:element>
 
-                <title>DAP4 Data Request Form<xsl:value-of select="@name"/></title>
+                <title>DAP4 Data Request Form <xsl:value-of select="@name"/></title>
             </head>
             <body>
                 <!-- ****************************************************** -->
@@ -522,7 +529,10 @@
 
     <xsl:template name="DimSize">
         <xsl:choose>
-            <xsl:when test="./@name"><xsl:value-of select="fn:DimSize(./@name)"/></xsl:when>
+            <xsl:when test="./@name">
+                <xsl:variable name="fqn"> <xsl:value-of select="translate(./@name,' .','__')"/></xsl:variable>
+                <xsl:value-of select="fn:DimSize($fqn)"/>
+            </xsl:when>
             <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -758,7 +768,7 @@
                     <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
                     <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
-                    <input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/>
+                    <!-- input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/ -->
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>

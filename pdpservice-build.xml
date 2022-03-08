@@ -29,13 +29,14 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="Builds the Simple Policy Decision Point web service."
+        name="Simple Policy Decision Point"
         default="all" basedir=".">
+
+    <description>Builds the Simple Policy Decision Point web service WAR file.</description>
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
     <property name="DEPLOYMENT_CONTEXT" value="pdp"/>
-
 
 
     <!-- ********************************************* -->
@@ -189,86 +190,95 @@
 
 
 
-    <!-- Libraries -->
-    <property name="junit.lib"       value="junit-4.4.jar"/>
-    <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib"  value="urlrewrite-3.2.0.jar"/>
+    <!--
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      Libraries
+    -->
+    <property name="json.lib" value="gson-2.8.9.jar"/>
 
 
-    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
-    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
-    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+    <property name="junit.lib" value="junit-4.4.jar"/>
+    <property name="jdom.lib" value="jdom-1.1.1.jar"/>
+    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
 
-    <property name="owlim.lib"            value="owlim-lite-4.3.jar"/>
-    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
 
-    <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
+    <property name="slf4j.lib" value="slf4j-api-1.7.32.jar"/>
+    <property name="logback-core.lib" value="logback-core-1.2.9.jar"/>
+    <property name="logback-classic.lib" value="logback-classic-1.2.9.jar"/>
+
+    <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
+    <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
-    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
-
-    <property name="http-components-httpclient.lib"       value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpclient-cache.lib" value="apache-http-components-httpclient-4.3.jar"/>
-    <property name="http-components-httpcore.lib"         value="apache-http-components-httpcore-4.3.jar"/>
+    <property name="commons-lang.lib" value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-logging.lib" value="apache-commons-logging-1.1.3.jar"/>
+    <property name="commons-io.lib" value="apache-commons-io-2.4.jar"/>
 
 
+    <property name="http-components-httpclient.lib" value="org.apache.httpcomponents.httpclient_4.5.3.jar"/>
+    <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
-    <property name="xalan.lib"         value="xalan.jar"/>
-    <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
+
+    <property name="xalan.lib" value="xalan-2.7.2.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
-    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
-    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+    <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
-    <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
+    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
 
-    <property name="json.lib"      value="json-simple-1.1.1.jar"/>
+    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
 
+    <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
+    <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
-    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
-               property="fortify.present"/>
-
-    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
-    <property name="rules.dir" value="fortify"/>
 
 
     <!-- Library (class)paths -->
-    <path id="compile.classpath">
+    <fileset id="pdp-service-libs" dir="${lib.dir}">
+        <include name="${owasp-encoder.lib}"/>
+        <include name="${owasp-encoder-jsp.lib}"/>
+
+        <include name="${json.lib}"/>
+        <include name="${sjson.lib}"/>
+        <include name="${jdom.lib}"/>
+        <include name="${junit.lib}"/>
+        <include name="${commons-cli.lib}"/>
+
+        <include name="${commons-httpclient.lib}"/>
+
+        <include name="${http-components-httpclient.lib}"/>
+        <include name="${http-components-httpcore.lib}"/>
+        <include name="${commons-logging.lib}"/>
+        <include name="${commons-lang.lib}"/>
+        <include name="${saxon-jdom.lib}"/>
+        <include name="${saxon-s9api.lib}"/>
+        <include name="${saxon.lib}"/>
+
+        <include name="${slf4j.lib}"/>
+        <include name="${logback-core.lib}"/>
+        <include name="${logback-classic.lib}"/>
+    </fileset>
+
+    <!-- Library (class)paths -->
+    <path id="pdp-service.compile.classpath">
         <pathelement path="${build.classes}"/>
+        <!--
+            We have to have the catalina and servlet api's on the classpath at
+            compile time, but their not needed at deployment because they come
+            bundled with Tomcat
+        -->
         <fileset dir="${lib.dir}">
-            <include name="${servlet-api.lib}"/>
-            <include name="${json.lib}"/>
-            <include name="${jdom.lib}"/>
-            <include name="${junit.lib}"/>
-            <include name="${commons-cli.lib}"/>
-            <include name="${http-components-httpclient.lib}"/>
-            <include name="${http-components-httpclient-cache.lib}"/>
-            <include name="${http-components-httpcore.lib}"/>
-            <include name="${commons-logging.lib}"/>
-            <include name="${commons-lang.lib}"/>
-            <include name="${saxon-jdom.lib}"/>
-            <include name="${saxon-s9api.lib}"/>
-            <include name="${saxon.lib}"/>
-
             <include name="${catalina.lib}"/>
-
-            <include name="${slf4j.lib}"/>
-            <include name="${logback-core.lib}"/>
-            <include name="${logback-classic.lib}"/>
-
-
+            <include name="${servlet-api.lib}"/>
         </fileset>
+        <fileset refid="pdp-service-libs" />
     </path>
-
-
 
     <target name="all" depends="clean,server"
             description="Builds lots of stuff."/>
-
-
 
 
     <target name="clean" description="Clean up ALL build products.">
@@ -307,65 +317,117 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="opendap/**"/>
-                <include name="org/opendap/**"/>
-                <include name="opendap/xml/Util.java"/>
+                <include name="opendap/PathBuilder.java"/>
+
+
+                <include name="opendap/auth/AuthenticationControls.java"/>
+                <include name="opendap/auth/AuthenticatedHttpRequest.java"/>
+                <include name="opendap/auth/ConfigurationException.java"/>
+                <include name="opendap/auth/EarthDataLoginAccessToken.java"/>
+                <include name="opendap/auth/GuestProfile.java"/>
+                <include name="opendap/auth/IdFilter.java"/>
+                <include name="opendap/auth/IdPManager.java"/>
+                <include name="opendap/auth/IdProvider.java"/>
+                <include name="opendap/auth/UserProfile.java"/>
+                <include name="opendap/auth/Util.java"/>
+
+
+
+                <include name="opendap/bes/AdminInfo.java"/>
+                <include name="opendap/bes/BadConfigurationException.java"/>
+                <include name="opendap/bes/BES.java"/>
+                <include name="opendap/bes/BesAdminFail.java"/>
+                <include name="opendap/bes/BESChunkedOutputStream.java"/>
+                <include name="opendap/bes/BESConfig.java"/>
+                <include name="opendap/bes/BesConfigurationModule.java"/>
+                <include name="opendap/bes/BESError.java"/>
+                <include name="opendap/bes/BesGroup.java"/>
+                <include name="opendap/bes/BESManager.java"/>
+                <include name="opendap/bes/BESResource.java"/>
+                <include name="opendap/bes/BesSiteMap.java"/>
+                <include name="opendap/bes/CyclicGroup.java"/>
+
+                <include name="opendap/bes/Version.java"/>
+                <include name="opendap/bes/caching/**"/>
+                <include name="opendap/bes/dap2Responders/BesApi.java"/>
+                <include name="opendap/bes/dap4Responders/MediaType.java"/>
+
+
+
+
                 <include name="opendap/coreServlet/RequestCache.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
+                <include name="opendap/coreServlet/OPeNDAPException.java"/>
+                <include name="opendap/coreServlet/ResourceInfo.java"/>
+                <include name="opendap/coreServlet/ReqInfo.java"/>
+                <include name="opendap/coreServlet/Scrub.java"/>
+                <include name="opendap/coreServlet/Util.java"/>
 
 
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
+                <include name="opendap/dap/User.java"/>
+                <include name="opendap/dap/Request.java"/>
 
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
+                <include name="opendap/dap4/Dap4Error.java"/>
+                <include name="opendap/dap4/QueryParameters.java"/>
+
+                <include name="opendap/http/mediaTypes/**"/>
+
+                <include name="opendap/io/Chunk.java"/>
+                <include name="opendap/io/ChunkedInputStream.java"/>
+                <include name="opendap/io/ChunkedOutputStream.java"/>
+                <include name="opendap/io/ChunkProtocol.java"/>
+                <include name="opendap/io/HyraxStringEncoding.java"/>
+
+                <include name="opendap/logging/Procedure.java"/>
+                <include name="opendap/logging/LogUtil.java"/>
+                <include name="opendap/logging/Timer.java"/>
+
+
+                <include name="opendap/ngap/NgapBesApi.java"/>
+
+                <include name="opendap/ppt/NewPPTClient.java"/>
+                <include name="opendap/ppt/OPeNDAPClient.java"/>
+                <include name="opendap/ppt/PPTEndOfStreamException.java"/>
+                <include name="opendap/ppt/PPTException.java"/>
+                <include name="opendap/ppt/PPTSessionProtocol.java"/>
+
+
+                <include name="opendap/namespaces/BES.java"/>
+                <include name="opendap/namespaces/DAP4.java"/>
+
+
+
+
+                <include name="opendap/xml/Util.java"/>
+                <include name="opendap/xml/Transformer.java"/>
+
+
+
 
                 <!-- Exclude the WCS and semantics code  -->
                 <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/semantics/**"/>
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
                 <exclude name="opendap/aws/**"/>
-                <exclude name="opendap/noaa_s3/**"/>
 
                 <!-- Exclude async test code -->
                 <exclude name="opendap/async/**"/>
 
 
                 <!-- Exclude Hyrax (for the most part)   -->
-                <exclude name="opendap/hai/**"/>
-                <exclude name="opendap/bes/**"/>
-                <exclude name="opendap/coreServlet/**"/>
-                <exclude name="opendap/dap/**"/>
-                <exclude name="opendap/dap4/**"/>
                 <exclude name="opendap/gateway/**"/>
-                <exclude name="opendap/io/**"/>
-                <exclude name="opendap/namespaces/**"/>
                 <exclude name="opendap/nciso/**"/>
                 <exclude name="opendap/ncml/**"/>
-                <exclude name="opendap/ppt/**"/>
                 <exclude name="opendap/semantics/**"/>
                 <exclude name="opendap/services/**"/>
                 <exclude name="opendap/threddsHandler/**"/>
                 <exclude name="opendap/viewers/**"/>
                 <exclude name="opendap/wcs/**"/>
                 <exclude name="opendap/webstart/**"/>
-                <exclude name="opendap/xml/**"/>
 
 
 
             </fileset>
-            <fileset dir="${src.dir}">
-                <include name="opendap/xml/Util.java"/>
-                <include name="opendap/coreServlet/RequestCache.java"/>
-                <include name="opendap/coreServlet/ServletUtil.java"/>
-                <include name="opendap/coreServlet/Scrub.java"/>
-                <include name="opendap/coreServlet/ReqInfo.java"/>
-                <include name="opendap/coreServlet/Util.java"/>
-
-            </fileset>
-
-
         </copy>
 
 
@@ -395,7 +457,7 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}">
 
-            <classpath refid="compile.classpath"/>
+            <classpath refid="pdp-service.compile.classpath"/>
 
             <src path="${build.src}"/>
 
@@ -469,87 +531,6 @@
 
     </target>
 
-
-    <target name="fortify" if="fortify.present">
-        <typedef name="sourceanalyzer"
-                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
-        <!-- call clean to ensure that all source files are recompiled -->
-        <antcall target="clean"/>
-
-
-
-        <!-- call the compile target using the SCA Compiler Adapter to -->
-        <!-- translate all source files -->
-        <antcall target="compile">
-            <param name="build.compiler"
-                   value="com.fortify.dev.ant.SCACompiler"/>
-        </antcall>
-
-
-        <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                       >
-            <fileset dir="${WebInfResources.dir}">
-                <include name="**/*.properties"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </sourceanalyzer>
-
-
-
-        <!-- run analysis -->
-        <echo>sourceanalyzer scan</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
-                        scan="true"
-                        resultsfile="${build.dir}/issues.fpr"
-                        rules="${rules.dir}/OlfsRulePack.xml"
-                >
-        </sourceanalyzer>
-    </target>
-
-
-    <!-- OS-X stuff -->
-
-    <property name="osx.resources" location="${resources.dir}/osx"/>
-    <property name="build.osx" location="${build.dir}/macosx"/>
-    <property name="packagemaker" location="/Developer/usr/bin/packagemaker"/>
-
-
-    <property name="CATALINA_HOME" value="CATALINA_HOME_IS_NOT_SET"/>
-
-
-    <target name="osx-package"
-        depends="server"
-        description="Builds OSX package installer for the OLFS">
-
-        <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
-
-        <copy file="${build.dist}/opendap.war" tofile="${build.osx}${CATALINA_HOME}/webapps/opendap.war"/>
-
-        <copy todir="${build.dir}/osx-resources" filtering="true">
-          <fileset dir="${osx.resources}" />
-        </copy>
-
-        <chmod file="${build.dir}/osx-resources/InstallationCheck" perm="755"/>
-
-        <exec executable="${packagemaker}">
-            <arg value="--root"/>
-            <arg value="${build.osx}"/>
-            <arg value="--id" />
-            <arg value="org.opendap.olfs-${OLFS_VERSION}"/>
-            <arg value="--title" />
-            <arg value="OPeNDAP olfs-${OLFS_VERSION}"/>
-            <arg value="--version" />
-            <arg value="${OLFS_VERSION}"/>
-            <arg value="--out" />
-            <arg value="${build.dist}/olfs-${OLFS_VERSION}.pkg"/>
-            <arg value="--resources" />
-            <arg value="${build.dir}/osx-resources"/>
-        </exec>
-    </target>
 
 
 

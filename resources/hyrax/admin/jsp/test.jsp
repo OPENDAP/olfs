@@ -3,7 +3,7 @@
   ~ // This file is part of the "Hyrax Data Server" project.
   ~ //
   ~ //
-  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Copyright (c) 2022 OPeNDAP, Inc.
   ~ // Author: Nathan David Potter  <ndp@opendap.org>
   ~ //
   ~ // This library is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   --%>
 <%@ page import="java.util.Enumeration" %>
+<%@ page import="opendap.coreServlet.ReqInfo" %>
 <HTML>
 <BODY>
 Hello!  The time is now <%= new java.util.Date() %>
@@ -194,11 +195,6 @@ servletInfo: <strong><%= getServletInfo() %></strong> <br/>
                 %>
             </dl>
         </dd>
-
-
-
-
-
         <dd>getPathInfo():     <strong><%= request.getPathInfo() %> </strong></dd>
         <dd>getPathTranslated():     <strong><%= request.getPathTranslated() %> </strong></dd>
         <dd>getProtocol():     <strong><%= request.getProtocol() %> </strong></dd>
@@ -215,6 +211,7 @@ servletInfo: <strong><%= getServletInfo() %></strong> <br/>
         <dd>getServerPort():     <strong><%= request.getServerPort() %> </strong></dd>
         <dd>getServletPath():     <strong><%= request.getServletPath() %> </strong></dd>
         <dd>isSecure():     <strong><%= request.isSecure() %> </strong></dd>
+        <dd>ReqInfo.getRequestUrlPath():     <strong><%= ReqInfo.getRequestUrlPath(request) %> </strong></dd>
 
 
     <dt><strong>response</strong></dt>

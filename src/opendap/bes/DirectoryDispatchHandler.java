@@ -60,8 +60,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private HttpServlet dispatchServlet;
     private String systemPath;
 
-    private BesApi _besApi;
+    private BesApi d_besApi;
 
+    private boolean d_allowDirectDataSourceAccess = false;
 
     public DirectoryDispatchHandler() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -78,7 +79,15 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         dispatchServlet = s;
         systemPath = ServletUtil.getSystemPath(s,"");
-        _besApi = besApi;
+        d_besApi = besApi;
+
+        d_allowDirectDataSourceAccess = false;
+        Element dv = config.getChild("AllowDirectDataSourceAccess");
+        if (dv != null) {
+            d_allowDirectDataSourceAccess = true;
+        }
+        log.info("AllowDirectDataSourceAccess: {}", d_allowDirectDataSourceAccess);
+
         initialized = true;
     }
 
@@ -111,7 +120,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
         try {
-            ResourceInfo dsi = new BESResource(collectionName,_besApi);
+            ResourceInfo dsi = new BESResource(collectionName, d_besApi);
             log.debug("getLastModified():  Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -168,7 +177,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 isContentsRequest = true;
 
         } else {
-            ResourceInfo dsi = new BESResource(dsName,_besApi);
+            ResourceInfo dsi = new BESResource(dsName, d_besApi);
             if (dsi.sourceExists() &&
                     dsi.isNode() ) {
                     isDirectoryResponse = true;
@@ -227,7 +236,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String collectionURL = PathBuilder.pathConcat(ReqInfo.getServiceUrl(request),collectionName);
 
         Document showNodeDoc = new Document();
-        _besApi.getBesNode(collectionName, showNodeDoc);
+        d_besApi.getBesNode(collectionName, showNodeDoc);
 
         if(log.isDebugEnabled()){
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -235,15 +244,15 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         JDOMSource besNode = new JDOMSource(showNodeDoc);
 
-        AdminInfo adminInfo = _besApi.getAdminInfo(collectionName);
+        AdminInfo adminInfo = d_besApi.getAdminInfo(collectionName);
         String publisherJsonLD = adminInfo.getAsJsonLdPublisher();
 
         String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
-        if(BesDapDispatcher.useDAP2ResourceUrlResponse())
+        if(BesDapDispatcher.dataRequestFormType() == DataRequestFormType.dap2)
             xsltDoc = systemPath + "/xsl/node_contents.xsl";
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
-        String supportEmail = _besApi.getSupportEmail(requestedResourceId);
+        String supportEmail = d_besApi.getSupportEmail(requestedResourceId);
         String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
         Transformer transformer = new Transformer(xsltDoc);
@@ -253,8 +262,11 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         transformer.setParameter("collectionURL",collectionURL);
         transformer.setParameter("catalogPublisherJsonLD",publisherJsonLD);
         transformer.setParameter("supportLink", mailtoHrefAttributeValue);
-        if(BesDapDispatcher.allowDirectDataSourceAccess())
+
+        if(d_allowDirectDataSourceAccess)
             transformer.setParameter("allowDirectDataSourceAccess","true");
+
+        transformer.setParameter("datasetUrlResponseType",BesDapDispatcher.datasetUrlResponseActionStr());
 
         AuthenticationControls.setLoginParameters(transformer,request);
 
