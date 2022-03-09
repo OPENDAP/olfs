@@ -139,8 +139,8 @@ jobs:
         - java -version >&2
         - echo "#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#" >&2
         - export STAGE=scan
-        - ant server -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build
-        - ant sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
+        - ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true show sonar
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan

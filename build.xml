@@ -172,6 +172,7 @@
         <echo level="info" message="              user.name: ${user.name}"/>
         <echo level="info" message="              user.home: ${user.home}"/>
         <echo level="info" message="              java.home: ${java.home}"/>
+        <echo level="info" message="           java.version: ${java.version}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Distribution Targets: "/>
         <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
