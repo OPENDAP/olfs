@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URLDecoder;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -718,13 +719,25 @@ public class ReqInfo {
         String schema = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-0.1.0.json";
         String program = "hyrax";
         String version = opendap.bes.Version.getHyraxVersionString();
-        String request_url = getRequestUrlPath(request);
 
+        JSONArray parameters = new JSONArray();
+
+        String request_url = getRequestUrlPath(request);
+        String ce = getConstraintExpression(request);
+        String decoded_ce= "";
+        if(!ce.isEmpty()){
+            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
+            request_url += "?" + ce;
+        }
         JSONObject param = new JSONObject();
         param.put("request_url",request_url);
-        JSONArray parameters = new JSONArray();
         parameters.add(param);
 
+        if(!decoded_ce.isEmpty()) {
+            param = new JSONObject();
+            param.put("decoded_constraint", decoded_ce);
+            parameters.add(param);
+        }
         JSONObject history_json_obj = new JSONObject();
 
         history_json_obj.put("$schema", schema);
