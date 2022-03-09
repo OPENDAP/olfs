@@ -724,14 +724,20 @@ public class ReqInfo {
 
         String request_url = getRequestUrlPath(request);
         String ce = getConstraintExpression(request);
+        String decoded_ce= "";
         if(!ce.isEmpty()){
-            // ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
+            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
             request_url += "?" + ce;
         }
         JSONObject param = new JSONObject();
         param.put("request_url",request_url);
         parameters.add(param);
-        
+
+        if(!decoded_ce.isEmpty()) {
+            param = new JSONObject();
+            param.put("decoded_constraint", decoded_ce);
+            parameters.add(param);
+        }
         JSONObject history_json_obj = new JSONObject();
 
         history_json_obj.put("$schema", schema);
