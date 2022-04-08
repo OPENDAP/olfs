@@ -57,7 +57,6 @@ import java.util.Date;
  * Provides access to files held in the BES that the BES does not recognize as data.
  *
  */
-@Deprecated
 public class FileDispatchHandler implements DispatchHandler {
 
     private org.slf4j.Logger log;

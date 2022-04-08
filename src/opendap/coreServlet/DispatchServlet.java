@@ -353,7 +353,7 @@ public class DispatchServlet extends HttpServlet {
             httpGetHandlers.add(new opendap.bes.BESThreddsDispatchHandler());
         }
 
-        // httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
+        httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
 
         for (DispatchHandler dh : httpGetHandlers) {
             dh.init(this, config);
