@@ -117,7 +117,7 @@
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logfile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${logdir}/HyraxAccess.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
