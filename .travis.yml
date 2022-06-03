@@ -28,6 +28,7 @@ addons:
   apt:
     packages:
       - awscli
+      - junit
 
 env:
   global:
