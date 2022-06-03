@@ -62,6 +62,7 @@ install:
   - nvm install 12.13.0
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
+  - dpkg -L junit
 
 # We need the gradlescan target because we can't run simultaneous
 # sonarscans without encountering a race condition at sonarcloud.io
