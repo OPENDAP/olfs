@@ -122,14 +122,14 @@ jobs:
         - export STAGE=test
         - ant show check
 
-    - stage: test
+    - stage: disabled
       name: "jdk8"
       jdk: openjdk8
       script:
         - export STAGE=test
         - ant show check
 
-    - stage: test
+    - stage: disabled
       name: "jdk11"
       jdk: openjdk11
       script:
