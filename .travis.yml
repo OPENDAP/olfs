@@ -2,7 +2,7 @@
 # Initial Travic-CI control file. 6.11.15 jhrg
 # Added sonar scan 3.12.19 jhrg 
 
-dist: focal
+dist: trusty
 
 # Use the docker container-based build systems
 sudo: false
@@ -76,6 +76,8 @@ stages:
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+  - name: disabled
+    if: branch = disabled
 
 # caching for gradle
 before_cache:
@@ -113,7 +115,7 @@ jobs:
         - ./gradlew tasks
         - ./gradlew war
 
-    - stage: test
+    - stage: disabled
       name: "jdk7"
       jdk: openjdk7
       script:
