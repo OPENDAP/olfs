@@ -556,7 +556,7 @@
     </target>
 
     <target name="DISTRO"
-            depends="clean,src-dist,server-dist,hyrax-robots-dist,check"
+            depends="clean,src-dist,server-dist,hyrax-robots-dist"
             description="Builds complete distribution"
     >
 
