@@ -92,7 +92,7 @@ cache:
 jobs:
   include:
 
-    - stage: build
+    - stage: disabled
       name: "jdk8"
       jdk: openjdk8
       script:
