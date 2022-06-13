@@ -163,8 +163,8 @@ jobs:
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
-      name: "olfs-snapshot (jdk8)"
-      jdk: openjdk8
+      name: "olfs-snapshot (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -178,8 +178,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "olfs-build-number (jdk8)"
-      jdk: openjdk8
+      name: "olfs-build-number (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -193,8 +193,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-snapshot (jdk8)"
-      jdk: openjdk8
+      name: "ngap-snapshot (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -208,8 +208,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-build-number (jdk8)"
-      jdk: openjdk8
+      name: "ngap-build-number (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
