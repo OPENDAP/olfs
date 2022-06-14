@@ -142,6 +142,7 @@ jobs:
       addons: sonarcloud
       script:
         - export STAGE=scan
+        - export ANT_OPTS="-Xms256m -Xmx8g"
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
         - travis_wait 30 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true show sonar
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
