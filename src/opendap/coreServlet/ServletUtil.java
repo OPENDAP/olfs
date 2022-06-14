@@ -604,4 +604,17 @@ public class ServletUtil {
         return probeMsg.toString();
 
     }
+
+    public static String getSystemProperties(){
+        java.util.Properties properties = System.getProperties();
+        StringBuilder sb = new StringBuilder();
+        properties.forEach((k, v) -> sb.append(k).append(": ").append(v).append(System.getProperties().getProperty("line.separator")));
+        return sb.toString();
+    }
+
+    public static void main(String a[]){
+        System.out.println(getSystemProperties());
+        System.out.println("-------------------------------------------------");
+        System.out.println(Util.getMemoryReport());
+    }
 }

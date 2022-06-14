@@ -37,10 +37,7 @@ sonarqube {
         property "sonar.organization", "opendap"
         property "sonar.inclusions", "src"
         property "sonar.exclusions", "src/opendap/Coverity_Model.java," +
-                                    "src/opendap/experiments/**/*.java," +
-                                    "src/opendap/metacat/**/*.java," +
-                                    "src/opendap/aws/**/*.java," +
-                                    "src/opendap/noaa_s3/**/*.java," +
+                                    "retired/**/*.java," +
                                     "src/opendap/**/*Test.java"
         property "sonar.java.binaries", "build"
         property "sonar.java.libraries", "lib/*.jar"
