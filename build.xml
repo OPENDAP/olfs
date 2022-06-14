@@ -816,6 +816,9 @@
     <property name="sonar.exclusions" value="retired/**/*.java" />
     <property name="sonar.java.binaries" value="build" />
     <property name="sonar.java.libraries" value="lib/*.jar" />
+    <property name="sonar.log.level" value="DEBUG" />
+    <property name="sonar.ws.timeout" value="2700" />
+
 
     <!-- Define SonarQube Scanner for Ant Target -->
     <target name="sonar">
