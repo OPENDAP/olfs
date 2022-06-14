@@ -136,7 +136,7 @@ jobs:
         - export STAGE=test
         - ant show check
 
-    - stage: scan
+    - stage: disabled
       name: "sonarscan (jdk11)"
       jdk: openjdk11
       addons: sonarcloud
@@ -155,7 +155,7 @@ jobs:
         - echo $STAGE
         - ./run-snyk.sh
 
-    - stage: gradlescan
+    - stage: scan
       name: "gradle sonarscan (jdk11)"
       jdk: openjdk11
       script:
