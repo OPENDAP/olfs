@@ -608,7 +608,14 @@ public class ServletUtil {
     public static String getSystemProperties(){
         java.util.Properties properties = System.getProperties();
         StringBuilder sb = new StringBuilder();
-        properties.forEach((k, v) -> sb.append(k).append(": ").append(v).append(System.getProperties().getProperty("line.separator")));
+        Enumeration<String> pNames;
+        pNames = (Enumeration<String>)properties.propertyNames();
+        while(pNames.hasMoreElements()){
+            String pName = pNames.nextElement();
+            String pValue = properties.getProperty(pName);
+            sb.append(pName).append(": ").append(pValue);
+            sb.append(System.getProperties().getProperty("line.separator"));
+        }
         return sb.toString();
     }
 
