@@ -27,8 +27,8 @@ addons:
   # ssh_known_hosts: www.opendap.org
   apt:
     packages:
-      - awscli
       - ant
+      - gnupg
 #      - junit
 
 env:
