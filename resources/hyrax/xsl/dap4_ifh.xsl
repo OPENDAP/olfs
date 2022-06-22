@@ -256,14 +256,6 @@
                 initCollapsibles("<xsl:value-of select="$docsService"/>");
             </xsl:element>
 
-            <!--
-                <div>
-                    <span class="medium_bold">DAP4 Types Found:</span>
-                    <ul class="small">
-                        <xsl:copy-of  select="$hasDap4Types"/>
-                    </ul>
-                </div>
-            -->
         </xhtml>
 
     </xsl:template>
@@ -777,12 +769,54 @@
                     <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
                     <!-- CoverageJSON needs a DAP4 implementation in the BES -->
                     <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
-                    <xsl:if test="not(normalize-space($hasDap4Types))">
-                        <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
-                    </xsl:if>
+
+                    <xsl:choose>
+                        <xsl:when test="normalize-space($hasDap4Types)">
+                            <!-- DISABLE the Get As NetCDF-3 option -->
+                            <xsl:variable name="omgwhy">
+                                <xsl:text>The \x22Get As NetCDF-3\x22 response button has been disabled because the </xsl:text>
+                                <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
+                                <xsl:text>a NetCDF-3 response encoding:\n\n</xsl:text>
+                                <xsl:value-of select="$hasDap4Types"/>
+                            </xsl:variable>
+                            <input
+                                type="button"
+                                value="Get as NetCDF 3"
+                                class="disabled_button"
+                                onclick="alert('{$omgwhy}')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <input
+                                type="button"
+                                value="Get as NetCDF 3"
+                                onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
                     <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
-                    <!-- input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/ -->
+                    <xsl:choose>
+                        <xsl:when test="normalize-space($hasDap4Types)">
+                            <!-- DISABLE the Get As DAP2 Binary response option -->
+                            <xsl:variable name="omgwhy">
+                                <xsl:text>The \x22DAP2 Binary Object\x22 response button has been disabled because the </xsl:text>
+                                <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
+                                <xsl:text>the DAP2 data model:\n\n</xsl:text>
+                                <xsl:value-of select="$hasDap4Types"/>
+                            </xsl:variable>
+                            <input
+                                type="button"
+                                value="DAP2 Binary Object"
+                                class="disabled_button"
+                                onclick="alert('{$omgwhy}')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <input
+                                type="button"
+                                value="DAP2 Binary Object"
+                                onclick="getAs_button_action('DAP2 Data', '.dods')"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <input type="button" value="Show Help" onclick="help_button()"/>
                 </div>
             </td>
@@ -944,10 +978,10 @@
     the value of $hasDap4Types
     -->
     <xsl:template name="varDecl">
-        <li><xsl:value-of select="name(.)"/>
-            <xsl:text> </xsl:text>
-            <xsl:value-of select="@name"/>
-        </li>
+        <xsl:value-of select="name(.)"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>\n</xsl:text>
     </xsl:template>
     <xsl:template match="dap:Group" mode="findD4Types">
         <xsl:call-template name="varDecl" />
