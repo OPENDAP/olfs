@@ -54,6 +54,10 @@
         </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="hasDap4Types">
+        <xsl:apply-templates select="/dap:Dataset" mode="findD4Types"/>
+    </xsl:variable>
+
 
 <!--###########################################################################
     Variable: DimsMap
@@ -252,6 +256,14 @@
                 initCollapsibles("<xsl:value-of select="$docsService"/>");
             </xsl:element>
 
+            <!--
+                <div>
+                    <span class="medium_bold">DAP4 Types Found:</span>
+                    <ul class="small">
+                        <xsl:copy-of  select="$hasDap4Types"/>
+                    </ul>
+                </div>
+            -->
         </xhtml>
 
     </xsl:template>
@@ -765,7 +777,9 @@
                     <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
                     <!-- CoverageJSON needs a DAP4 implementation in the BES -->
                     <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
-                    <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                    <xsl:if test="not(normalize-space($hasDap4Types))">
+                        <input type="button" value="Get as NetCDF 3" onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                    </xsl:if>
                     <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
                     <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
                     <!-- input type="button" value="DAP2 Binary Object" onclick="getAs_button_action('DAP2 Data', '.dods')"/ -->
@@ -925,5 +939,28 @@
         </xsl:comment>
     </xsl:template>
 
+    <!--
+    Templates to test for the presence of DAP4 variables. Used to compute
+    the value of $hasDap4Types
+    -->
+    <xsl:template name="varDecl">
+        <li><xsl:value-of select="name(.)"/>
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="@name"/>
+        </li>
+    </xsl:template>
+    <xsl:template match="dap:Group" mode="findD4Types">
+        <xsl:call-template name="varDecl" />
+        <xsl:apply-templates mode="findD4Types"/>
+    </xsl:template>
+    <xsl:template match="dap:Structure | dap:Sequence" mode="findD4Types">
+        <xsl:call-template name="varDecl" />
+        <xsl:apply-templates mode="findD4Types"/>
+    </xsl:template>
+    <xsl:template match="dap:Int8 | dap:Int64 | dap:UInt64" mode="findD4Types">
+        <xsl:call-template name="varDecl" />
+    </xsl:template>
+    <!-- Suppress all text and attribute output other than what we define for this mode -->
+    <xsl:template match="@*|text()" mode="findD4Types"/>
 
 </xsl:stylesheet>
