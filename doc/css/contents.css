@@ -154,3 +154,8 @@ HR {
     font-style: italic;
 }
 
+.disabled_button
+{
+    color: grey;
+    outline-color: grey;
+}
