@@ -1,4 +1,36 @@
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.18.11 (08 July 2022)
+#
+
+## Configuration and behavior updates.
+
+### Added code to detect client protcol change (HYRAX-141).
+Updated ReqInfo.getRequestUrlPath() so that it utilizes the request headers:
+* - "CloudFront-Forwarded-Proto"
+* - "X-Forwarded-Proto"
+* - "X-Forwarded-Port"
+In reconstructing the "request url" dereferenced by the initiating client. This
+means the if some upstream entity rewrites the URL (Like CloudFront does when
+it drops the https protocol in favor of http for internal access) it can be
+detected and the links built by the server and returned to the client are now
+correct.
+
+### Patched bug where unexpected Authentication headers would trigger a redirect
+loop.
+
+### Fixed broken service for delivering flat (not-data) files to clients.
+
+## Made the "Get As NetCDF-3" an "Get As DAP2 Binary" buttons on the DAP4 Data
+Request form context sensitive. If the dataset in question contains variables
+whose data types are found in DAP4 and not in DAP2/NetCDF-3 then the buttons are
+disabled. A more complete solution is envisioned where the projected variables
+are assessed and if only DAP2/NetCDF-3 types are selected then the buttons would
+would be enabled. This fix is only a step in that more dynamic direction.
+
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.10 (04 January 2022)
+#
 
 ## Configuration and behavior updates.
 In order to make the server's behavior more understandable to users, and its configuration

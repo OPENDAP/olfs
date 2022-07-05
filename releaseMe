@@ -1,13 +1,23 @@
 #!/bin/sh
 
-hyrax_version=1.13.1
-olfs_version=1.16.0
+hyrax_version=1.16.6
+olfs_version=1.18.11
 
 lastUpdate=`head -1 ChangeLog | awk '{print $1;}' -`
 now=`date "+%Y-%m-%d" `
 
-echo "$now ---  hyrax=$hyrax_version olfs=$olfs_version  " > olfs-$olfs_version.changes
-echo " " >> olfs-$olfs_version.changes
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## Hyrax-1.16.6
+## olfs-1.18.11
+##
+echo "## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --" > olfs-$olfs_version.changes
+echo "# ${now}" >> olfs-$olfs_version.changes
+echo "#" >> olfs-$olfs_version.changes
+echo "# Hyrax-${hyrax_version}" >> olfs-$olfs_version.changes
+echo "# OLFS-$olfs_version" > olfs-$olfs_version.changes >> olfs-$olfs_version.changes
+echo "#" >> olfs-$olfs_version.changes
+echo "" >> olfs-$olfs_version.changes
 gitlog-to-changelog --since=$lastUpdate >> olfs-$olfs_version.changes
 echo " " >> olfs-$olfs_version.changes
 echo "$lastUpdate ---  hyrax=1.13.0 olfs=1.15.0  " >> olfs-$olfs_version.changes

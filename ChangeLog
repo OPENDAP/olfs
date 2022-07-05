@@ -1,3 +1,973 @@
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## Hyrax-1.16.6
+## olfs-1.18.11
+##
+
+2022-07-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.11-0 2022-07-05T17:58:43+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-503 2022-07-05T17:18:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-07-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-501 2022-07-01T21:52:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-500 2022-07-01T19:47:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-497 2022-07-01T13:39:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-29  Nathan Potter  <ndp@opendap.org>
+	
+	Dap4 types remove nc3 button (#153)
+	* First pass at removing the Get As NetCDF3 button based on the 
+	presence of incompatible DAP4 types.
+	* Second pass at conditionally available  response buttons.
+	* Second pass at conditionally available  response buttons.
+	
+2022-06-27  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Adding memcached-session-manager-tc9-2.3.2.jar for Tomcat 9
+	
+2022-06-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-495 2022-06-27T17:33:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-494 2022-06-27T16:58:03+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-490 2022-06-21T21:58:17+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-487 2022-06-21T08:33:33+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-486 2022-06-21T01:00:20+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-482 2022-06-20T23:37:59+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-20  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Dropped awscli from travis host, add gnupg
+	
+2022-06-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-480 2022-06-19T14:03:36+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-478 2022-06-19T11:05:00+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-19  Nathan Potter  <ndp@opendap.org>
+	
+	Jaxb and javax update (#151)
+	* Add jaxb-runtime and javax-annotations to dependencies
+	* Adding javax-activation to lib and gradle
+	
+2022-06-17  ndp-opendap  <ndp@opendap.org>
+	
+	Unwinding jaxb failed jaxb stuff
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Added jaxb-runtime-2.3.6 to libs, build.xml, and gradle.build
+	
+2022-06-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-475 2022-06-17T11:11:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-471 2022-06-16T17:40:36+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-468 2022-06-16T16:36:53+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-462 2022-06-14T18:52:56+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-14  ndp-opendap  <ndp@opendap.org>
+	
+	Switching sonarscan to gradle build...
+	
+	Setting sonar.log.level to DEBUG and sonar.ws.timeout to 2700
+	
+	Making ServletUtil changes JDK7
+	
+	Updating sonar scan library, new methods for ServletUtil
+	
+	Increased sonar.qualitygate.timeout to 2700 seconds(45 minutes) 
+	(doubt this helps)
+	
+	Increased travis_wait from 30 minutes to 45 minutes (doubt this 
+	helps)
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Trying a bigger memory space for ant sonarscan
+	
+2022-06-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-461 2022-06-13T21:55:09+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-13  ndp-opendap  <ndp@opendap.org>
+	
+	Moving snapshots off openjdk8 to openjdk11
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Disabling JDK8 build stage
+	
+2022-06-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-460 2022-06-13T01:37:39+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-435 2022-06-10T20:09:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-06  ndp-opendap  <ndp@opendap.org>
+	
+	Dropped DISTRO dependency on "check" target as that invokes 
+	JUnit tests which no linger work in TravisCI
+	
+2022-06-04  ndp-opendap  <ndp@opendap.org>
+	
+	Dropping junit stuff because "focal" does not seem to  have it.
+	
+	Switching build machine to "focal" from "trusty"
+	
+	Disabled JDK8 and JDK11 JUnit tests because TravisCI appears to 
+	have dropped support for JUnit with no warning. Nice change control 
+	TravisCI
+	
+	Back to "trusty", disabled JDK JUnit tests
+	
+2022-06-03  ndp-opendap  <ndp@opendap.org>
+	
+	Debugging apt ant/junit installation
+	
+	Debugging apt  junit installation
+	
+	Trying to add junit and ant to apt packages, switch to focal
+	
+	Trying to add junit to apt packages
+	
+	Switching TravisCI build to "bionic" from "focal"
+	
+	Switching TravisCI build to "focal" from "trusty"
+	
+	Switching TravisCI build back to "trusty"
+	
+2022-06-02  ndp-opendap  <ndp@opendap.org>
+	
+	Swtiching TravisCI to 'bionic'
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Switching TravisCI build to "focal" from "trusty"
+	
+2022-06-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-414 2022-06-02T20:53:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-413 2022-06-02T19:52:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-31  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Repaired HyraxAccessLog appender fileNamePattern so that rolled 
+	up log files have the correct name and end up in the correct location.
+	
+2022-05-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-409 2022-05-27T21:08:20+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-408 2022-05-27T20:58:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-402 2022-05-26T23:41:25+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-400 2022-05-26T19:49:04+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-394 2022-05-26T15:47:54+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-390 2022-05-25T21:55:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-386 2022-05-24T16:44:12+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-385 2022-05-23T20:14:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-384 2022-05-23T20:02:07+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-374 2022-05-18T19:57:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-371 2022-05-17T20:39:35+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-370 2022-05-17T18:47:04+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-368 2022-05-13T20:16:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-362 2022-05-11T21:51:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-347 2022-05-09T20:43:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-344 2022-05-07T12:03:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-342 2022-05-06T22:45:41+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-302 2022-05-02T20:03:56+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-300 2022-05-02T17:22:19+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-298 2022-05-02T16:33:07+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-290 2022-04-29T18:02:31+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-281 2022-04-27T19:28:12+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-279 2022-04-27T18:17:42+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-277 2022-04-27T17:23:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-275 2022-04-27T00:55:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-273 2022-04-26T19:21:13+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-271 2022-04-25T19:59:33+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-269 2022-04-25T17:27:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-248 2022-04-19T16:04:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-241 2022-04-13T21:34:53+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-238 2022-04-13T19:19:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-236 2022-04-13T15:48:59+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-235 2022-04-12T21:54:25+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-234 2022-04-12T21:27:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-232 2022-04-12T14:09:32+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-230 2022-04-11T12:02:44+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-08  Nathan Potter  <ndp@opendap.org>
+	
+	Apparently FileDispatchHandler is not actually ready to be 
+	deprecated. (#149)
+	
+2022-04-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-226 2022-04-08T19:21:14+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-225 2022-04-08T18:43:03+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-223 2022-04-08T15:57:58+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-216 2022-04-06T21:07:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-210 2022-04-04T20:10:11+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-207 2022-04-01T23:48:01+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-200 2022-03-31T19:15:49+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-198 2022-03-31T16:41:57+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-190 2022-03-30T19:57:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-184 2022-03-30T00:12:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-168 2022-03-24T23:06:19+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-166 2022-03-24T22:19:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-152 2022-03-22T17:12:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-148 2022-03-19T00:42:31+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-17  Nathan Potter  <ndp@opendap.org>
+	
+	Resetting jdk11 builds, dropping workaround (#147)
+	
+2022-03-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-144 2022-03-14T16:37:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-138 2022-03-10T19:26:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-10  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Fixed kayako feedback link
+	
+2022-03-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-135 2022-03-10T00:40:41+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-09  ndp-opendap  <ndp@opendap.org>
+	
+	Adding trav_wait 30 to gradlescan
+	
+2022-03-09  Nathan Potter  <ndp@opendap.org>
+	
+	Adding a travis_wait 30 call to sonarscan (#146)
+	
+2022-03-09  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Merge pull request #144 from OPENDAP/kayako_feedback
+	Added Kayako feedback link in footer of landing page
+	
+	Merge new changes from master
+	
+2022-03-09  ndp-opendap  <ndp@opendap.org>
+	
+	Upping sonarscan timeout to 30 minutes
+	
+2022-03-09  Nathan Potter  <ndp@opendap.org>
+	
+	Adding constraint expression to the history_json request_url 
+	field (#143)
+	* Adding constraint expression to the history_json request_url 
+	field
+	* URLDecode CE string before adding it to the request_url
+	* Removed URLDecode of CE string when adding it to the
+	history_json.request_url so that it matches what is
+	written to the CF history attribute.
+	* TravisCI hack for jdk-11
+	* TravisCI hack for jdk-11
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Adding ant targets to TravisCI build stage for sonarscan to 
+	see more infos
+	* Adding calls to the ant 'show' target for builds to verify 
+	jdk in use
+	* More TravisCI hackery for java 11
+	* Added decoded_constraint to history_json parameters
+	* Set sonarscan timeout to 9.5 minutes.
+	
+2022-03-08  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Merge branch 'master' into kayako_feedback
+	
+2022-03-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-129 2022-03-08T17:25:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-127 2022-03-08T00:49:23+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-06  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Add kayako feedback link
+	
+2022-03-04  ndp-opendap  <ndp@opendap.org>
+	
+	Merge remote-tracking branch 'origin/master'
+	
+	Moving Gradle scan into "gradlescan" stage to prevent a race 
+	condition in sonarcloud.io when two scans are being run at the same 
+	time.
+	
+2022-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-125 2022-03-04T21:34:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-123 2022-03-04T20:27:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-122 2022-03-04T20:00:37+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-120 2022-03-04T19:20:50+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-119 2022-03-04T19:09:05+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-04  ndp-opendap  <ndp@opendap.org>
+	
+	Merge remote-tracking branch 'origin/master'
+	
+	Moving Gradle scan into "scan" stage
+	
+2022-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-117 2022-03-04T14:18:02+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-115 2022-03-04T01:38:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-113 2022-03-02T19:55:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-112 2022-03-02T18:48:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-01  ndp-opendap  <ndp@opendap.org>
+	
+	force build
+	
+	Force build
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Toned down the logging of unanticipated Authorization headers
+	
+	Toned down the logging of unanticipated Authorization headers
+	
+2022-02-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-102 2022-02-25T21:35:43+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-02-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-100 2022-02-24T19:20:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-98 2022-02-24T16:52:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-24  ndp-opendap  <ndp@opendap.org>
+	
+	Dropped "Get As DAP2 Binary Object" button from the DAP4 Data 
+	Request Form because it is: - Not a compatible data model - Too much 
+	hacking to support the two request CE   syntax verions
+	
+2022-02-23  ndp-opendap  <ndp@opendap.org>
+	
+	Trying to undo the broken Version.java.in trick because it is 
+	breaking our deplyments.
+	
+2022-02-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-96 2022-02-22T17:43:52+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-94 2022-02-20T23:03:05+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-91 2022-02-18T20:53:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-90 2022-02-17T21:48:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-17  Nathan Potter  <ndp@opendap.org>
+	
+	Patching redirect loop from unexpected authorization header 
+	(#142)
+	* Patching redirect loop from unexpected authorization header
+	* SPelling correction
+	* Reworked EDL Auth token detetion logic
+	* Updated log message
+	* Refining usopported authorization schee rejection
+	* Updating key for unsupported authorization scheme rejection
+	* Updating key for unsupported authorization scheme rejection
+	* Fixing mangled URS auth keys
+	* Sorting out bad refactor of EDL token content.
+	* Switched 403 response for RejectUnsupportedAuthzSchemes
+	from a simple response.sendError() to throwing a Forbidden
+	exception which shuold allow for custom message content.
+	* Updated bad auth rejection message.
+	
+2022-02-17  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Trying a hack to the minimum description length in json-ld
+	
+2022-02-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-89 2022-02-17T01:19:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-88 2022-02-16T23:37:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-86 2022-02-16T22:34:02+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-85 2022-02-16T18:25:55+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-84 2022-02-16T01:53:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-82 2022-02-15T22:30:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-79 2022-02-14T18:52:56+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-77 2022-02-13T19:09:42+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-13  Nathan Potter  <ndp@opendap.org>
+	
+	Detect client protcol change (#141)
+	* Updated RequInfo.getRequestUrlPath() so that it utilizes
+	the request headers:
+	- "CloudFront-Forwarded-Proto"
+	- "X-Forwarded-Proto"
+	- "X-Forwarded-Port"
+	In reconstructing the "request url" dereferenced by the
+	initiating client. This means the if some upstream entity
+	rewrites the URL (Like CloudFront does when it drops the
+	https protcol in favor of http for internal access) it
+	can be detected and links built by the server and returned
+	to the client as links be correct.
+	* Renamed ForceDataRequestFormLinkToHttps to ForceLinksToHttps
+	which is more in the spirit of the action.
+	* Added explanatory comment/reference for
+	javax.servlet.forward.* stuff
+	* Small bug fixes and copyright update on affected files
+	* TravisCI tweak to snapshot and trigger downstream builds.
+	* Trying deploy regex
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Hacking conditional deploy
+	* Hacking conditional deploy, v2
+	* Documentation comments in config file templates.
+	* Push for build
+	
+2022-02-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-76 2022-02-12T05:19:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-75 2022-02-12T04:48:26+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-74 2022-02-12T03:13:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-73 2022-02-12T02:21:27+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-66 2022-02-11T21:06:11+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-10  Sam Lloyd  <slloyd@opendap.org>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	added gradle build to travis (#138)
+	* added gradle build to travis
+	* Dropped java 11
+	* added gradle build to travis
+	* Adding java11
+	* Add java11 to sonarscan
+	* removed extra blank lines
+	* removed duplicate scripts calls
+	* Build with gradle and java-11
+	* refactored scan acitvity
+	* first pass at gradle sonar scan code
+	* possible junit-jupiter-apr fix
+	* source and target compatibility change
+	* revert source and target compatibility change
+	* gradle and travis file changes
+	* gradle and travis file changes
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* clean up
+	* sonar.qualitygate.wait=true added
+	* small travis changes
+	
+2022-02-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-63 2022-02-09T00:45:30+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-61 2022-02-08T18:04:58+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-59 2022-02-07T18:55:36+0000 - Triggering OLFS build 
+	for snapshots.
+
+2022-02-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-54 2022-02-03T21:20:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-53 2022-02-03T21:10:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-03  ndp-opendap  <ndp@opendap.org>
+	
+	Hacking a localhost exception for HTTPS forcing of EDL returnTo 
+	URLs
+	
+	Hacking a localhost exception for HTTPS forcing of EDL returnTo 
+	URLs
+	
+	Testing for CloudFront-Forwarded-Proto headers. Force https is 
+	on only for Dataset URL in Forms.
+	
+2022-02-03  Nathan Potter  <ndp@opendap.org>
+	
+	Trying gradle builds with jdk11 (#140)
+	* Trying gradle build with jdk11
+	* Trying gradle build with jdk11
+	* Trying snyk with jdk11
+	
+2022-02-03  ndp-opendap  <ndp@opendap.org>
+	
+	Added jaxb-api.2.3.1 to Gradle files.
+	
+	Disabling ForceLinksToHttps to see if that is causing test 
+	failures in NGAP Bamboo build
+	
+2022-02-02  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing Version.java template values
+	
+	Dropping sshpass
+	
+2022-02-02  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing return to link for EDL so that it too is governed by 
+	ForceLinks (#139)
+	* Fixing return to link for EDL so that it too is governed by 
+	ForceLinks
+	* Fixing the travis mess
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target - created jdk11 stage to
+	better understand jdk11 compile errors
+	* Added jaxb-api-2.3.1.jar to libs
+	* Added jaxb-api-2.3.1.jar for jdk11 build.
+	Turned on verbose ant invocation for jdk11 build
+	* Sonar Fixes. TravisCI adjustment.
+	* Sonar Fixes.
+	* Sonar unfixing to trigger failure
+	* Sonar unfixing to trigger failure
+	* Sonar fixing unfix
+	* Sonar fixing unfix
+	* Sonar fixing unfix
+	* Sorting Gradle targets
+	* Sorting Gradle targets
+	* Dropping redundant assignment.
+	
+2022-02-02  ndp-opendap  <ndp@opendap.org>
+	
+	Triggering travisci build
+	
+2022-01-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-52 2022-02-01T05:11:45+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-51 2022-01-31T01:32:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-50 2022-01-31T00:08:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-48 2022-01-27T23:18:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-43 2022-01-26T19:59:57+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-41 2022-01-26T15:13:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-40 2022-01-25T23:05:31+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-39 2022-01-24T20:10:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-34 2022-01-19T23:07:28+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-30 2022-01-19T18:33:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-13  James Gallagher  <jgallagher@opendap.org>
+	    Samuel Lloyd  <slloyd@opendap.org>
+	    The-Robot-Travis  <npotter@opendap.org>
+	
+	Gradle build (#128)
+	* first commit
+	* simplifing the ant_convert_build.gradle file
+	* Hacks...
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* Moved Slav''s gradle file to 'build-for-synk' and hacked on 
+	build.gradle
+	gradle compileJava at least does not fail outright. WIP
+	* Added sourceSet for resources - WIP
+	The resources do not yet wind up in the war file.
+	* Added info
+	* Removed deprecated jcenter() from repositories{}
+	* Removed gradle_local_repo in favor of using 'lib'
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* Mods to the build.gradle file
+	* build.gradle changes
+	* build.gradle changes
+	* Took the filtering code and moved it around. Still a WIP
+	The war file looks OK, modulo the known issues
+	* filtering WIP
+	* more on the filtering; still a WIP since the war file does 
+	not work
+	* Hack for templated java source
+	* WIP - resolving the runtime classpath
+	* More work on the class cast error
+	The error is org.slf4j.impl.SimpleLoggerFactory cannot be cast 
+	to
+	ch.qos.logback.classic.LoggerContext
+	* Gradle file that builds a working opendap.war file
+	* Added wcs resources
+	* Correct libraries set for opendap.war - may not be minimal, 
+	however.
+	* Hacked the build.gradle. It now makes a runnable war file.
+	* checkpoint
+	* Added simple gradle build to Travis
+	* debug gradle build
+	* Added gradlew and switched to using that in travis
+	* Added gradle cache control and added opendap/bes/Version.java 
+	so the ant build works
+	* The jdk7 gradle build does not work - dropped
+	* checkpoint
+	* Gradle build and setting *_VESION on the cmd line works
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* small fixes to previous push
+	* first pass at adding gradle scan to travis
+	* first pass at adding gradle scan to travis
+	* first pass at adding gradle scan to travis
+	* added gradle build to travis
+	
+2022-01-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-17 2022-01-11T17:07:29+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-16 2022-01-08T18:44:27+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-14 2022-01-07T23:16:30+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-06  ndp-opendap  <ndp@opendap.org>
+	
+	update
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	 Adding ant_targets, updating NEWS typo
+	
+2022-01-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-12 2022-01-05T21:45:47+0000 - Triggering OLFS build 
+	for snapshots.
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## Hyrax-1.16.5
+## olfs-1.18.10
+##
+
 2021-12-30  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes-3.20.10-0 2021-12-30T20:42:12+0000 - Triggering OLFS build 

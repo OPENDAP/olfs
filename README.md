@@ -4,14 +4,16 @@
 
 # Hyrax/OLFS 
 
-**_Hyrax Version 1.16.5 (04 January 2022)_**
+**_Hyrax Version 1.16.6 (08 July 2022)_**
 
-**_OLFS  Version 1.18.10  (04 January 2022 2021)_** 
+**_OLFS  Version 1.18.11  (08 July 2022)_** 
 
 
-### OLFS-1.18.10 requires
-* **bes-3.20.10** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5810850.svg)](https://doi.org/10.5281/zenodo.5810850)
-* **libdap4-3.20.9** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5807905.svg)](https://doi.org/10.5281/zenodo.5807905)
+### OLFS-1.18.11 requires
+* **bes-3.20.11** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6799677.svg)](https://doi.org/10.5281/zenodo.6799677)
+
+* **libdap4-3.20.10** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6789103.svg)](https://doi.org/10.5281/zenodo.6789103)
+
 
 
 
