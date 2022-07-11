@@ -997,7 +997,22 @@
 
     <xsl:template match="dap:Int8 | dap:Int64 | dap:UInt64" mode="findD4Types">
         <xsl:call-template name="varDecl" />
+        <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
+
+    <xsl:template match="dap:Attribute[@type='Int64' or @type='UInt64' or @type='Int8']" mode="findD4Types">
+        <xsl:call-template name="attrDecl" />
+    </xsl:template>
+
+    <xsl:template name="attrDecl">
+        <xsl:value-of select="@type"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text> (</xsl:text>
+        <xsl:value-of select="name(.)"/>
+        <xsl:text>)\n</xsl:text>
+    </xsl:template>
+
 
     <!-- Suppress all text and attribute output other than what we define for this mode -->
     <xsl:template match="@*|text()" mode="findD4Types"/>
