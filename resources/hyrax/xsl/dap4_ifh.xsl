@@ -974,8 +974,8 @@
     </xsl:template>
 
     <!--
-    Templates to catalog the variables with DAP4 data types not found in DAP2
-    or nectdf-3 data models.
+    Templates to catalog the variables and Attributes with DAP4 data types not
+    found in DAP2 or nectdf-3 data models.
     Used to compute the value of the global variable $hasDap4Types
     -->
     <xsl:template name="varDecl">
@@ -1012,7 +1012,6 @@
         <xsl:value-of select="name(.)"/>
         <xsl:text>)\n</xsl:text>
     </xsl:template>
-
 
     <!-- Suppress all text and attribute output other than what we define for this mode -->
     <xsl:template match="@*|text()" mode="findD4Types"/>
