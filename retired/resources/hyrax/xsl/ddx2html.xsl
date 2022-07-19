@@ -48,7 +48,7 @@
     <xsl:variable name="LocalOntology"><xsl:value-of select="$XML_BASE"/>.rdf</xsl:variable>
     <xsl:variable name="LocalAttributeNS"><xsl:value-of select="$XML_BASE"/>/att#</xsl:variable>
 
-    <xsl:include href="xml2rdf.xsl"/>
+    <xsl:include href="../../../../resources/hyrax/xsl/xml2rdf.xsl"/>
 
 
 
