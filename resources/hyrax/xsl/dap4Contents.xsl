@@ -295,7 +295,7 @@
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
         <!-- DAP4 Service Links -->
         <td align="center" >
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <tr>
                     <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.dmr.xml"/>
@@ -342,7 +342,7 @@
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
         <!-- DAP2 Service Links -->
         <td align="center">
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <tr >
                     <td align="center" itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.dds"/>
@@ -385,7 +385,7 @@
         </xsl:variable>
 
         <td align="center">
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <td align="center">
                     <xsl:comment>viewersService: <xsl:value-of select="$viewersService"/></xsl:comment>
                     <a href="{$viewersService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
@@ -438,7 +438,7 @@
 
     <xsl:template name="NoDapServiceLinks">
         <td  align="center">
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <tr>
                     <td align="center">-</td>
                     <td align="center">-</td>
@@ -448,7 +448,7 @@
             </table>
         </td>
         <td align="center">
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <tr>
                     <td align="center">-</td>
                     <td align="center">-</td>
@@ -457,7 +457,7 @@
             </table>
         </td>
         <td align="center">
-            <table class="tablecelllinks">
+            <table class="response_links">
                 <tr>
                     <td align="center">-</td>
                 </tr>
