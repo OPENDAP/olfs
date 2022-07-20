@@ -175,9 +175,6 @@
                     </tr>
                     <tr>
                         <td>
-                            <!-- xsl:if test="bes:dataset/@name!='/'" >
-                                <a href="..">Parent Directory/</a>
-                            </xsl:if -->
                             <xsl:if test="$besPrefix!='/'" >
                                 <xsl:if test="bes:dataset/@name='/'" >
                                     <a href="..">Parent Directory/</a>
@@ -242,11 +239,6 @@
             <!--         HERE IS THE HYRAX VERSION NUMBER               -->
             <!--                                                        -->
             <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
-                <!-- xsl:if test="bes:dataset/@name='/'">
-                    <span class="uuid">
-                        ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
-                    </span>
-                </xsl:if -->
                 <div>
                     <a href="{$docsService}/">Documentation</a>
                     <span class="small" style="font-weight: normal; display: inline; float: right; padding-right: 10px;">
@@ -309,48 +301,39 @@
         <td align="center">
             <table>
                 <tr>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.ddx" />
                         <meta itemprop="encodingFormat" content="text/xml" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.ddx">ddx</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.dds" />
                         <meta itemprop="encodingFormat" content="text/plain" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.dds">dds</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.das" />
                         <meta itemprop="encodingFormat" content="text/plain" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.das">das</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.info" />
                         <meta itemprop="encodingFormat" content="text/html" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.info">info</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.html" />
                         <meta itemprop="encodingFormat" content="text/html" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.html">html</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.rdf" />
                         <meta itemprop="encodingFormat" content="application/rdf+xml" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.rdf">rdf</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.covjson" />
                         <meta itemprop="encodingFormat" content="application/covjson" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.covjson">covjson</a>&NBSP;</td>
-                    <!--
-                    <xsl:if test="$allowDirectDataSourceAccess='true'">
-                        <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
-                            <meta itemprop="name" content="{@name}" />
-                            <meta itemprop="contentSize" content="{@size}" />
-                            <a itemprop="contentUrl" href="{encode-for-uri(@name)}">file</a>&NBSP;</td>
-                    </xsl:if>
-                    -->
 
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
-                        <td itemprop="distribution" itemscope="" itemtype="http://schema.org/DataDownload">
+                        <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                             <meta itemprop="name" content="{@name}" />
                             <meta itemprop="contentSize" content="{@size}" />
-                            <!-- a itemprop="contentUrl" href="{encode-for-uri(@name)}">file</a-->
                             <xsl:element name="a">
                                 <xsl:attribute name="itemprop">contentUrl</xsl:attribute>
                                 <xsl:attribute name="href">
