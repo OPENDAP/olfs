@@ -159,3 +159,10 @@ HR {
     color: grey;
     outline-color: grey;
 }
+
+.response_links {
+    /* border: 1px solid #999; */
+    padding: 0;
+    align-content: center;
+    width: 75%;
+}
