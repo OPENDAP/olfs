@@ -450,7 +450,7 @@ public class ServletUtil {
      */
     public static String probeRequest(HttpServlet servlet, HttpServletRequest request) {
 
-        Enumeration e;
+        Enumeration<String> e;
         int i;
         String minorSeparator = ".............................\n";
 
