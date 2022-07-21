@@ -265,7 +265,7 @@
             <xsl:value-of select="@lastModified"/>
         </td>
 
-        <td align="right">-</td>
+        <td align="center">-</td>
         <xsl:call-template name="NoDapServiceLinks" />
     </xsl:template>
 
