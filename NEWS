@@ -1,4 +1,21 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.18.12 (25 July 2022)
+#
+
+* Setting BES timeOut to 55 seconds (thanks CloudFront) for the NGAP deployment
+* Added Attributes with DAP4 types to the "No NetCDF-3 Downloads For You"
+  feature.
+* Updated ncWMS to version 2.5.2
+* Migrated to Java-11
+* Retiring various XSLT stuff
+* Fixed dap4Contents.xsl so that the viewers link works.
+* Migrated the schema.org annotations from the node_contents.xsl to
+  dap4Contents.xsl
+* Rewrote schema.org links to https.
+* Removed commented out code.
+* Fixed page formatting with new css type
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.11 (08 July 2022)
 #
 

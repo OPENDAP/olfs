@@ -1,4 +1,87 @@
 ## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## Hyrax-1.16.7
+## olfs-1.18.12
+##
+
+2022-07-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.13-0 2022-07-22T14:41:58+0000 - Triggering OLFS build for snapshots.
+
+2022-07-21  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-15 2022-07-22T00:24:34+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.12-14 2022-07-21T23:51:20+0000 - Triggering OLFS build for snapshots.
+
+2022-07-21  ndp-opendap  <ndp@opendap.org>
+
+	Switched to templated Enumeration declration
+
+	Formatting those missing links.
+
+2022-07-21  Nathan Potter  <ndp@opendap.org>
+
+	Ncwms refit (#154)
+	* Retiring various XSLT stuff
+	* Fixed dap4Contents.xsl so that the viewers link works, and  migrated the schema.org annotations from the node_contents.xsl
+	* Fixed Updated schema.org links to https.
+	Removed commented out code.
+	* Fixed page formating with new css type
+
+2022-07-19  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-13 2022-07-19T16:35:54+0000 - Triggering OLFS build for snapshots.
+
+2022-07-14  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-11 2022-07-14T17:17:56+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.12-6 2022-07-14T14:57:54+0000 - Triggering OLFS build for snapshots.
+
+2022-07-12  ndp-opendap  <ndp@opendap.org>
+
+	Lets go Travis!
+
+2022-07-11  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added Attributes with DAP4 types to the "No NetCDF-3 Downloads For You" feature.
+
+2022-07-09  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-1 2022-07-09T19:05:19+0000 - Triggering OLFS build for snapshots.
+
+2022-07-07  ndp-opendap  <ndp@opendap.org>
+
+	Setting BES timeOut to 55 seconds (thanks CloudFront) for the NGAP deployment
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## Hyrax-1.16.7
+## olfs-1.18.11
+##
+
+2022-07-06  ndp-opendap  <ndp@opendap.org>
+
+	Update build offset for hyrax-1.16.7
+
+2022-07-06  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-0 2022-07-06T18:20:59+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.11-1 2022-07-06T16:55:01+0000 - Triggering OLFS build for snapshots.
+
+2022-07-05  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.18.11
+
+2022-07-05  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.11-0 2022-07-05T17:58:43+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.10-503 2022-07-05T17:18:27+0000 - Triggering OLFS build for snapshots.
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ## Hyrax-1.16.6
 ## olfs-1.18.11
 ##

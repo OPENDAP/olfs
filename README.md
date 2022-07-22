@@ -4,20 +4,16 @@
 
 # Hyrax/OLFS 
 
-**_Hyrax Version 1.16.6 (08 July 2022)_**
+**_Hyrax Version 1.16.8 (08 July 2022)_**
 
-**_OLFS  Version 1.18.11  (08 July 2022)_** 
-
-
-### OLFS-1.18.11 requires
-* **bes-3.20.11** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6799677.svg)](https://doi.org/10.5281/zenodo.6799677)
-
-* **libdap4-3.20.10** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6789103.svg)](https://doi.org/10.5281/zenodo.6789103)
+**_OLFS  Version 1.18.12  (08 July 2022)_** 
 
 
+### OLFS-1.18.12 requires
+* **[bes-3.20.13](https://github.com/OPENDAP/bes/releases/tag/3.20.13)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6884800.svg)](https://doi.org/10.5281/zenodo.6884800)
 
-
-
+* **[libdap-3.20.11](https://github.com/OPENDAP/libdap4/releases/tag/3.20.11)**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6878992.svg)](https://doi.org/10.5281/zenodo.6878992)
 
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
