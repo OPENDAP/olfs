@@ -1,5 +1,5 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-# OLFS Version 1.18.12 (25 July 2022)
+# OLFS Version 1.18.13 (25 July 2022)
 #
 
 * Setting BES timeOut to 55 seconds (thanks CloudFront) for the NGAP deployment
@@ -14,6 +14,13 @@
 * Rewrote schema.org links to https.
 * Removed commented out code.
 * Fixed page formatting with new css type
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.18.12 (09 July 2022)
+#
+
+Nothing to see here
+
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.11 (08 July 2022)

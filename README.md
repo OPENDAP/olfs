@@ -6,10 +6,10 @@
 
 **_Hyrax Version 1.16.8 (08 July 2022)_**
 
-**_OLFS  Version 1.18.12  (08 July 2022)_** 
+**_OLFS  Version 1.18.13  (08 July 2022)_** 
 
 
-### OLFS-1.18.12 requires
+### OLFS-1.18.13 requires
 * **[bes-3.20.13](https://github.com/OPENDAP/bes/releases/tag/3.20.13)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6884800.svg)](https://doi.org/10.5281/zenodo.6884800)
 
 * **[libdap-3.20.11](https://github.com/OPENDAP/libdap4/releases/tag/3.20.11)**
