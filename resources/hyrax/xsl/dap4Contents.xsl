@@ -307,7 +307,7 @@
                         <meta itemprop="name" content="{@name}.dap"/>
                         <meta itemprop="encodingFormat" content="application/vnd.opendap.data"/>
                         <a title="DAP4 Data Response (.dap)"
-                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dap">html</a>
+                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dap">dap</a>
                     </td>
                     <td itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.dmr.html"/>
