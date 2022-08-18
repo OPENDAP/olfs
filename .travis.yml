@@ -42,7 +42,7 @@ env:
     # GIT_UID for travis-ci-opendap
     - secure: "jnuhhkxj0UlQLZSObVEi5xi0dAHObLy6S6f4hhCLKsI0nDgdL8Xj212ZubI4mlRSOgCmfbBNSSz20WgH11D7fuvPQQVyN6MMbh9OrE6JT1NEnA+Rzl+1tjWYTTBCkw1fQjchCg6fR+5Poyq4zfXOaG3H8DBZfrSGFTTdC2BdcWs="
     # GIT_PSWD for travis-ci-opendap
-    - secure: "i9V81CV2PlYy4NsTSvx8XydBlBkemXIFWkWBXupViKHqOAGVfyBArm2lj/uKz6TnUcvCngDQIjeDqTOOOArxNpoHLO07PqF4be4K+i4+fctDM6lP2Rd/+p2Jc9W3mV1KSrZF/QteyUahUFCaqSTxOe3h7mI178CaGoNJdTV4k/w="
+    - secure: "KYXSNaFsAVD5ubOsPNvDhd2rmzuyGIUh0p8s1VPEezxjTDPcA4T3FXnKVClFTUcJFFY8TJ9uqowbMyQ1D4TB1h+IiAI5FIOE48qEs2N89c4hV677vfPZiXBZKy7gnCDnqvYi6qesXSqH1GIYHJex60ouzWYGYxxwJbWEbKmpuhU="
     # WOO_UID for travis
     - secure: "jXqnDaiGjCUUAc4r865NkgbXCPfqRxrfWP+lKtAG7Lc/U6sTQBIJww1bsvfizFOdiEAgAzk4OAgE4z6djf7WbhHzyQKxGIieyLWUXoKhzAKjRYwidmKp6gBWOZSvcxURcYF2SpRAuKASpv/9lvZ3bNOlHu9LYQJ7r49AmCXJ98o="
     # SNYK_TOKEN
