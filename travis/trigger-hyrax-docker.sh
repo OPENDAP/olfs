@@ -30,12 +30,15 @@ echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time
 
 cat snapshot.time
 
+# Bounding the commit message with the " character allows use to include
+# new line stuff for easy commit message readability later.
 git commit -am \
-"hyrax-${HYRAX_BUILD_VERSION} - Triggering hyrax-docker image production.
-Build Matrix:
-${BES_SNAPSHOT}
-${OLFS_SNAPSHOT_TAG} 
-${HYRAX_SNAPSHOT_TAG}";
+"OLFS Triggering hyrax-docker image production.
+Build Version Matrix:
+  ${BES_SNAPSHOT}
+  ${OLFS_SNAPSHOT_TAG}
+  ${HYRAX_SNAPSHOT_TAG}
+";
 
 git status;
 git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all;
