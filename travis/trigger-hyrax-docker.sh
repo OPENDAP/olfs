@@ -30,10 +30,15 @@ echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time
 
 cat snapshot.time
 
-git commit -am "${OLFS_SNAPSHOT_TAG} Triggering Hyrax-Docker image builds for snapshots.";
+git commit -am \
+"hyrax-${HYRAX_BUILD_VERSION} - Triggering hyrax-docker image production.
+Build Matrix:
+${BES_SNAPSHOT}
+${OLFS_SNAPSHOT_TAG} 
+${HYRAX_SNAPSHOT_TAG}";
+
 git status;
 git push https://$GIT_UID:$GIT_PSWD@github.com/opendap/hyrax-docker --all;
 
 echo "-- -- -- -- -- -- -- -- -- after_deploy END -- -- -- -- -- -- -- -- --"
-
 
