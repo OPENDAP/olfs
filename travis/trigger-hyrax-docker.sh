@@ -33,11 +33,11 @@ cat snapshot.time
 # Bounding the commit message with the " character allows use to include
 # new line stuff for easy commit message readability later.
 git commit -am \
-"olfs: Triggering hyrax-docker image production.
+"OLFS: Triggering hyrax-docker image production.
 Build Version Matrix:
-  ${BES_SNAPSHOT}
-  ${OLFS_SNAPSHOT_TAG}
-  ${HYRAX_SNAPSHOT_TAG}
+${BES_SNAPSHOT}
+${OLFS_SNAPSHOT_TAG}
+${HYRAX_SNAPSHOT_TAG}
 ";
 
 git status;
