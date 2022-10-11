@@ -3,11 +3,12 @@ function make_a_selection(){
     alert("Please select one or more variables before attempting to download/access data.");
 }
 
+/* Retired, Old button function
 function getAs_button_action(type_name, suffix) {
     var url = new String(document.forms[0].url.value);
 
     var url_parts = url.split("?");
-    /* handle case where constraint is null. */
+    // handle case where constraint is null.
     if (url_parts[1] != null && url_parts[1].length>0) {
         var get_as_url = url_parts[0] + suffix + "?" + url_parts[1];
     } else if(enforce_selection) {
@@ -18,6 +19,43 @@ function getAs_button_action(type_name, suffix) {
         var get_as_url = url_parts[0] +  suffix + "?";
     }
     window.open(encodeURI(get_as_url),type_name);
+}
+*/
+
+function response_encoding_change(){
+    var encoding_suffix = String(document.forms[0].encoding.value);
+    var encoding_name = String(document.forms[0].encoding[encoding.selectedIndex].text);
+    alert("You picked: " + encoding_name + " (request suffix: " + encoding_suffix + ")");
+}
+
+function copy_encoded_url_to_clipboard(){
+    var encoded_request_url = encodeURI(document.forms[0].url.value)
+    navigator.clipboard.writeText(encoded_request_url).then(function() {
+        console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+    });
+}
+
+function getdata_button_action(){
+    var url = String(document.forms[0].url.value);
+    var type_name = String(document.forms[0].encoding[encoding.selectedIndex].text);
+    var encoding_suffix = String(document.forms[0].encoding.value);
+
+    if(encoding_suffix === ""){
+        alert("OOPS! You must select a Download Encoding before you can get data!");
+        return;
+    }
+
+    if(enforce_selection) {
+        var url_parts = url.split("?");
+        // If the constraint is empty then we ask the user to make a selection
+        if (url_parts[1] == null || url_parts[1].length>0) {
+            make_a_selection();
+            return;
+        }
+    }
+    window.open(encodeURI(url),type_name);
 }
 
 
@@ -119,18 +157,20 @@ function dap4_url(base_url) {
     this.update_url = function () {
 
         var msg = "Updated Data Request URL.\nold url: "+this.url+"\n";
+        var encoding_suffix = String(document.forms[0].encoding.value);
 
         this.build_DAP4_constraint();
-        var url_text = this.url;
+        var url_text = this.url + encoding_suffix;
         // Only add the projection & selection (and ?) if there really are
         // constraints!
-        if (this.constraintExpression.length > 0)
+        if (this.constraintExpression.length > 0) {
             url_text += "?dap4.ce=" + this.constraintExpression;
-
+        }
         document.forms[0].url.value = url_text;
-        msg = msg + "new url: "+this.url;
-
-        if (DEBUG.enabled()) alert(msg);
+        if (DEBUG.enabled()) {
+            msg = msg + "new url: "+this.url;
+            alert(msg);
+        }
     }
 
 
@@ -142,9 +182,7 @@ function dap4_url(base_url) {
         var ce = "";
         var s = "";
         for (var i = 0; i < this.num_dap_vars; ++i) {
-
             var dapVar = this.dap_vars[i];
-
             var varProj = dapVar.getDap4CE();
             if (varProj.length > 0) {
                 if (ce.length > 0)
@@ -152,10 +190,8 @@ function dap4_url(base_url) {
                 ce += varProj;
             }
         }
-
         this.constraintExpression = ce;
     }
-
 
     /*
      * Add the variable to the array of dap_vars. The var_index is the
