@@ -28,6 +28,10 @@ function response_encoding_change(){
     alert("You picked: " + encoding_name + " (request suffix: " + encoding_suffix + ")");
 }
 
+/**
+ * Thanks to Dean Taylor's StackOverflow answer:
+ *     https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+ */
 function copy_encoded_url_to_clipboard(){
     var encoded_request_url = encodeURI(document.forms[0].url.value)
     navigator.clipboard.writeText(encoded_request_url).then(function() {
@@ -141,11 +145,11 @@ function debug_obj() {
 
 /***********************************************************************
  *
- * The dap4_url object.
+ * The dap4_dataset object.
  *
  *
  */
-function dap4_url(base_url) {
+function dap4_dataset(base_url) {
     this.url = base_url;
     this.constraintExpression = "";
     this.num_dap_vars = 0;

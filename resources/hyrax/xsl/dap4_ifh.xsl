@@ -117,7 +117,7 @@
 
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
+                    DAP4_DATASET = new dap4_dataset("<xsl:value-of select="$datasetUrl"/>");
                     DEBUG = new debug_obj();
                     var es = "<xsl:value-of select="$enforceSelection"/>";
                     enforce_selection = es.localeCompare("true")==0;
@@ -449,7 +449,7 @@
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
             <xsl:if test="parent::dap:Dataset">
-                DAP4_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
+                DAP4_DATASET.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
             </xsl:if>
 
             <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
@@ -521,7 +521,7 @@
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
-                   onChange="DAP4_URL.update_url()"/>
+                   onChange="DAP4_DATASET.update_url()"/>
             <xsl:element name="script">
                 <xsl:attribute name="type">text/javascript</xsl:attribute>
                 <xsl:value-of select="$myJSVarName"/>.addDimension(<xsl:value-of select="$dimTag"/>,<xsl:value-of
@@ -563,7 +563,7 @@
 
         <div class="medium" style="margin-left: 10px;padding: 1px;" id="{$selectionId}">
             <xsl:value-of select="@name"/>
-            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_URL.update_url()">
+            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_DATASET.update_url()">
                 <option value="==" selected="">==</option>
                 <option value="!=">!=</option>
                 <option value="&lt;">&lt;</option>
@@ -573,7 +573,7 @@
                 <option value="-">--</option>
             </select>
             <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
-                   onChange="DAP4_URL.update_url()"/>
+                   onChange="DAP4_DATASET.update_url()"/>
         </div>
 
         <xsl:element name="script">
@@ -749,6 +749,10 @@
     </xsl:template>
 
 
+
+    <!-- ############################################################################################ -->
+    <!--           Page Components                                                                    -->
+
     <xsl:template name="oldrequestbuttons">
         <div style="width:100%;margin-left:10px;">
             <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
@@ -806,10 +810,6 @@
         </div>
     </xsl:template>
 
-    <!-- ############################################################################################ -->
-    <!--           Page Components                                                                    -->
-
-
     <!-- ######################################## -->
     <!--            Actions Buttons Row           -->
     <xsl:template name="dataRequestButtonsRow">
@@ -826,7 +826,7 @@
 
                 <div style="width:100%;margin-left:10px;">
                     <label for="encoding" class="medium">Download Encoding:</label>
-                    <select name="Response Encoding" id="encoding" onchange="DAP4_URL.update_url()">
+                    <select name="Response Encoding" id="encoding" onchange="DAP4_DATASET.update_url()">
                         <option value="">Choose One...</option>
                         <option value=".dap.csv">CSV</option>
                         <option value=".dap.nc">NetCDF-3</option>
