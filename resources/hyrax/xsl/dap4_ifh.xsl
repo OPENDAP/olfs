@@ -832,23 +832,22 @@
                         <option value=".dap.nc">NetCDF-3</option>
                         <option value=".dap.nc4">NetCDF-4</option>
                         <option value=".dap">DAP4 Binary</option>
-                        <option value=".dods">DAP2 Binary</option>
                     </select>
                     <input type="button" value="Get Data" onclick="getdata_button_action()"/>
                     <xsl:if test="normalize-space($hasDap4Types)">
                         <xsl:variable name="omgwhy">
                             <xsl:text>This dataset contains variables/attributes whose data types are </xsl:text>
-                            <xsl:text>not compatible with the DAP2/NetCDF-3 data models. </xsl:text>
+                            <xsl:text>not compatible with the NetCDF-3 data models. </xsl:text>
                             <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
-                            <xsl:text>attributes and you choose the “NetCDF-3” or “DAP2 Binary” download </xsl:text>
+                            <xsl:text>attributes and you choose the “NetCDF-3” download </xsl:text>
                             <xsl:text>encoding, your request will FAIL\n</xsl:text>
                             <xsl:text>--- --- --- --- --- --- --- ---\n</xsl:text>
-                            <xsl:text>DAP2/NetCDF-3 incompatible variables/attributes inventory:\n\n</xsl:text>
+                            <xsl:text>NetCDF-3 incompatible variables/attributes inventory:\n\n</xsl:text>
                             <xsl:value-of select="$hasDap4Types"/>
                         </xsl:variable>
                         <xsl:variable name="title">
                             <xsl:text>Attention! This dataset contains data types that are </xsl:text>
-                            <xsl:text>incompatible with DAP2 and NetCDF-3 data encodings. </xsl:text>
+                            <xsl:text>incompatible with the NetCDF-3 data encoding. </xsl:text>
                             <xsl:text>Click for more specific information. </xsl:text>
                         </xsl:variable>
                         <xsl:element name="input">
@@ -894,8 +893,8 @@
 
                 <xsl:variable name="rawTitle">
                     <xsl:text>Copies the raw Data URL to your clipboard. </xsl:text>
-                    <xsl:text>The copy may not work with simple clients </xsl:text>
-                    <xsl:text>like cURL and wget with out some modifications. </xsl:text>
+                    <xsl:text>The copy may not work with simple clients such </xsl:text>
+                    <xsl:text>as cURL and wget with out some modifications. </xsl:text>
                 </xsl:variable>
                 <input
                     type="button"
