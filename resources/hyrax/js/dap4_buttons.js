@@ -59,7 +59,6 @@ function copy_encoded_url_to_clipboard(){
         document.body.appendChild(tmpTextArea);
         tmpTextArea.focus();
         tmpTextArea.select();
-        alert("looky here");
 
         try {
             // Copy the value of the selected text area to the clipboard.
@@ -70,6 +69,7 @@ function copy_encoded_url_to_clipboard(){
             console.error('Fallback Copy: Oops, unable to copy', err);
         }
         // Remove the temporary text area from the document
+        alert("looky here");
         document.body.removeChild(tmpTextArea);
         return;
     }
