@@ -59,7 +59,7 @@ function copy_encoded_url_to_clipboard(){
         } catch (err) {
             console.error('Fallback Copy: Oops, unable to copy', err);
         }
-        document.body.removeChild(textArea);
+        document.body.removeChild(tmpTextArea);
 
         return;
     }
