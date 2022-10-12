@@ -838,7 +838,7 @@
                     <xsl:if test="normalize-space($hasDap4Types)">
                         <xsl:variable name="omgwhy">
                             <xsl:text>This dataset contains variables/attributes whose data types are </xsl:text>
-                            <xsl:text>not compatible with the DAP2/NetCDF-3 data models.
+                            <xsl:text>not compatible with the DAP2/NetCDF-3 data models. </xsl:text>
                             <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
                             <xsl:text>attributes and you choose the “NetCDF-3” or “DAP2 Binary” download </xsl:text>
                             <xsl:text>encoding, then your request will FAIL\n</xsl:text>
