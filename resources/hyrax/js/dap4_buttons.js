@@ -29,7 +29,7 @@ function response_encoding_change(){
 }
 
 /**
- * Thanks to Dean Taylor's StackOverflow answer:
+ * Based on Dean Taylor's StackOverflow answer:
  *     https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
  */
 function copy_encoded_url_to_clipboard(){
@@ -40,6 +40,12 @@ function copy_encoded_url_to_clipboard(){
         if (debug_local || DEBUG.enabled()) {
             alert("Using fallback copy scheme document.execCommand('copy') to copy URI Encoded URL:\n"+encoded_request_url);
         }
+        // Since the navigator.clipboard is not available we need to create a
+        // temporary text area in the document to hold the URI encode URL value.
+        // We'll set its value to the URI encoded URL, set the focus to the temporary
+        // textarea, select it, copy it, and then remove the temporary textarea
+        // from the document.
+
         var tmpTextArea = document.createElement("textarea");
         tmpTextArea.value = encoded_request_url;
 
@@ -48,19 +54,21 @@ function copy_encoded_url_to_clipboard(){
         tmpTextArea.style.left = "0";
         tmpTextArea.style.position = "fixed";
 
+        // Add the textarea, set the focus to it, and select it.
         document.body.appendChild(tmpTextArea);
         tmpTextArea.focus();
         tmpTextArea.select();
 
         try {
+            // Copy the value of the selected text area to the clipboard.
             var successful = document.execCommand('copy');
             var msg = successful ? 'successful' : 'unsuccessful';
             console.log('Fallback Copy: Copying text command was ' + msg);
         } catch (err) {
             console.error('Fallback Copy: Oops, unable to copy', err);
         }
+        // Remove the temporary text area from the document
         document.body.removeChild(tmpTextArea);
-
         return;
     }
 
