@@ -47,7 +47,7 @@ function copy_encoded_url_to_clipboard(){
         // from the document.
 
         var tmpTextArea = document.createElement("textarea");
-        //tmpTextArea.hidden = true;
+        tmpTextArea.hidden = true;
         tmpTextArea.value = encoded_request_url;
 
         // Avoid scrolling to bottom
@@ -69,7 +69,7 @@ function copy_encoded_url_to_clipboard(){
             console.error('Fallback Copy: Oops, unable to copy', err);
         }
         // Remove the temporary text area from the document
-        alert("looky here");
+        // alert("looky here");
         //document.body.removeChild(tmpTextArea);
         return;
     }
