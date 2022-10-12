@@ -32,22 +32,36 @@ function response_encoding_change(){
  * Based on Dean Taylor's StackOverflow answer:
  *     https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
  */
-function copy_encoded_url_to_clipboard(){
+function copy_url_to_clipboard(encode){
+    const encode_url = Boolean(encode);
     const debug_local = false;
-    const encoded_request_url = encodeURI(document.forms[0].url.value)
+    const encoding_suffix = String(document.forms[0].encoding.value);
+
+    if(encoding_suffix === ""){
+        msg = "Warning: You have not selected a Download Encoding.\n";
+        msg += "The copied URL will not be usable without manual modification.";
+        alert(msg);
+    }
+
+    var request_url = String(document.forms[0].url.value);
+    if(encode_url) {
+        request_url = encodeURI(request_url);
+    }
 
     if (!navigator.clipboard) {
         if (debug_local || DEBUG.enabled()) {
-            alert("Using fallback copy scheme document.execCommand('copy') to copy URI Encoded URL:\n"+encoded_request_url);
+            msg = "Using fallback copy scheme document.execCommand('copy') to ";
+            msg += "copy URI Encoded URL:\n"+request_url;
+            alert(msg);
         }
         // Since the navigator.clipboard is not available we need to create a
         // temporary text area in the document to hold the URI encode URL value.
-        // We'll set its value to the URI encoded URL, set the focus to the temporary
-        // textarea, select it, copy it, and then remove the temporary textarea
-        // from the document.
+        // We'll set its value to the URI encoded URL, set the focus to the
+        // temporary textarea, select it, copy it, and then remove the temporary
+        // textarea from the document.
 
         var tmpTextArea = document.createElement("textarea");
-        tmpTextArea.value = encoded_request_url;
+        tmpTextArea.value = request_url;
 
         // Avoid scrolling to bottom
         tmpTextArea.style.top = "0";
@@ -73,10 +87,10 @@ function copy_encoded_url_to_clipboard(){
     }
 
     if (debug_local || DEBUG.enabled()) {
-        alert("Using navigator.clipboard.writeText() to copy URI Encoded URL:\n"+encoded_request_url);
+        alert("Using navigator.clipboard.writeText() to copy URI Encoded URL:\n"+request_url);
     }
 
-    navigator.clipboard.writeText(encoded_request_url).then(function() {
+    navigator.clipboard.writeText(request_url).then(function() {
         console.log('Async: Copying to clipboard was successful!');
     }, function(err) {
         console.error('Async: Could not copy text: ', err);

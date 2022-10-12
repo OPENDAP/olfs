@@ -873,12 +873,29 @@
             </td>
             <td>
                 <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"> </input>
+                <xsl:variable name="encodedTitle">
+                    <xsl:text>Copies the Data URL to your clipboard. </xsl:text>
+                    <xsl:text>The copy will be encoded so that it can be </xsl:text>
+                    <xsl:text>used directly with cURL and other simple data access clients. </xsl:text>
+                </xsl:variable>
+
                 <input
                     type="button"
                     style="margin-left:10;"
-                    title="Copies the URI encoded Data Request URL to your clipboard. This can be used directly with cURL and other simple data access clients."
-                    value="Copy URI encoded URL"
-                    onclick="copy_encoded_url_to_clipboard()"/>
+                    title="{$encodedTitle}"
+                    value="Copy encoded URL"
+                    onclick="copy_url_to_clipboard(true)"/>
+
+                <xsl:variable name="rawTitle">
+                    <xsl:text>Copies the raw Data URL to your clipboard. </xsl:text>
+                    <xsl:text>The copy may not work with simple clients </xsl:text>
+                    <xsl:text>like cURL and wget with out some modifications. </xsl:text>
+                </xsl:variable>
+                <input
+                    type="button"
+                    title="{$rawTitle}"
+                    value="Copy raw URL"
+                    onclick="copy_url_to_clipboard(false)"/>
             </td>
         </tr>
     </xsl:template>
