@@ -70,7 +70,7 @@ function copy_encoded_url_to_clipboard(){
         }
         // Remove the temporary text area from the document
         alert("looky here");
-        document.body.removeChild(tmpTextArea);
+        //document.body.removeChild(tmpTextArea);
         return;
     }
 
