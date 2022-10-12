@@ -33,11 +33,28 @@ function response_encoding_change(){
  *     https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
  */
 function copy_encoded_url_to_clipboard(){
-    var encoded_request_url = encodeURI(document.forms[0].url.value)
-
-    if (true || DEBUG.enabled()) {
-        alert("URI Encoded URL:\n"+encoded_request_url);
+    const debug_local = true;
+    if (!navigator.clipboard) {
+        if (debug_local || DEBUG.enabled()) {
+            alert("Using  document.execCommand('copy') to copy to clipboard");
+        }
+        document.forms[0].url.focus();
+        document.forms[0].url.select();
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Fallback Copy: Copying text command was ' + msg);
+        } catch (err) {
+            console.error('Fallback Copy: Oops, unable to copy', err);
+        }
+        return;
     }
+    const encoded_request_url = encodeURI(document.forms[0].url.value)
+
+    if (debug_local || DEBUG.enabled()) {
+        alert("Using navigator.clipboard.writeText() to copy URI Encoded URL:\n"+encoded_request_url);
+    }
+
     navigator.clipboard.writeText(encoded_request_url).then(function() {
         console.log('Async: Copying to clipboard was successful!');
     }, function(err) {
