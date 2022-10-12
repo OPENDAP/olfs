@@ -53,11 +53,13 @@ function copy_encoded_url_to_clipboard(){
         tmpTextArea.style.top = "0";
         tmpTextArea.style.left = "0";
         tmpTextArea.style.position = "fixed";
+        tmpTextArea.hidden = true;
 
         // Add the textarea, set the focus to it, and select it.
         document.body.appendChild(tmpTextArea);
         tmpTextArea.focus();
         tmpTextArea.select();
+        alert("looky here");
 
         try {
             // Copy the value of the selected text area to the clipboard.
