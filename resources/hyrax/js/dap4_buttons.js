@@ -33,12 +33,12 @@ function response_encoding_change(){
  *     https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
  */
 function copy_encoded_url_to_clipboard(){
-    const debug_local = true;
+    const debug_local = false;
     const encoded_request_url = encodeURI(document.forms[0].url.value)
 
     if (!navigator.clipboard) {
         if (debug_local || DEBUG.enabled()) {
-            alert("Using  document.execCommand('copy') to copy to clipboard");
+            alert("Using fallback copy scheme document.execCommand('copy') to copy URI Encoded URL:\n"+encoded_request_url);
         }
         var tmpTextArea = document.createElement("textarea");
         tmpTextArea.value = encoded_request_url;
