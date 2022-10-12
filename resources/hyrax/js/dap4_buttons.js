@@ -34,6 +34,10 @@ function response_encoding_change(){
  */
 function copy_encoded_url_to_clipboard(){
     var encoded_request_url = encodeURI(document.forms[0].url.value)
+
+    if (true || DEBUG.enabled()) {
+        alert("URI Encoded URL:\n"+encoded_request_url);
+    }
     navigator.clipboard.writeText(encoded_request_url).then(function() {
         console.log('Async: Copying to clipboard was successful!');
     }, function(err) {
