@@ -190,7 +190,7 @@
 
 
                     <table width="100%" border="0">
-                        <xsl:call-template name="dataRequestButtonsRow"/>
+                        <xsl:call-template name="dataRequestRow"/>
                         <xsl:call-template name="dataUrlRow">
                             <xsl:with-param name="datasetUrl" select="$datasetUrl"/>
                         </xsl:call-template>
@@ -754,6 +754,9 @@
     <!-- ############################################################################################ -->
     <!--           Page Components                                                                    -->
 
+    <!--
+    Deprecated data request buttons @TODO Remove
+    -->
     <xsl:template name="oldrequestbuttons">
         <div style="width:100%;margin-left:10px;">
             <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
@@ -813,7 +816,7 @@
 
     <!-- ######################################## -->
     <!--            Actions Buttons Row           -->
-    <xsl:template name="dataRequestButtonsRow">
+    <xsl:template name="dataRequestRow">
         <tr>
             <td align="right">
                 <div class="medium_bold">
@@ -828,9 +831,9 @@
                     <label for="encoding" class="medium">Download Encoding:</label>
                     <select name="Response Encoding" id="encoding" onchange="DAP4_DATASET.update_url()">
                         <option value="">Choose One...</option>
-                        <option value=".dap.csv">CSV</option>
-                        <option value=".dap.nc">NetCDF-3</option>
                         <option value=".dap.nc4">NetCDF-4</option>
+                        <option value=".dap.nc">NetCDF-3</option>
+                        <option value=".dap.csv">CSV</option>
                         <option value=".dap">DAP4 Binary</option>
                     </select>
                     <input type="button" value="Get Data" onclick="getdata_button_action()"/>
@@ -840,8 +843,8 @@
                             <xsl:text>not compatible with the NetCDF-3 data model. </xsl:text>
                             <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
                             <xsl:text>attributes and you choose the “NetCDF-3” download </xsl:text>
-                            <xsl:text>encoding, your request will FAIL\n</xsl:text>
-                            <xsl:text>--- --- --- --- --- --- --- ---\n</xsl:text>
+                            <xsl:text>encoding, your request will FAIL.\n</xsl:text>
+                            <xsl:text>---:--- ---:--- ---:--- ---:--- ---:--- ---:--- ---:--- ---:---\n</xsl:text>
                             <xsl:text>NetCDF-3 incompatible variables/attributes inventory:\n\n</xsl:text>
                             <xsl:value-of select="$hasDap4Types"/>
                         </xsl:variable>

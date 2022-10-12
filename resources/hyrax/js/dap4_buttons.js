@@ -40,7 +40,7 @@ function copy_url_to_clipboard(encode){
     if(encoding_suffix === ""){
         msg = "Warning: You have not selected a Download Encoding.\n";
         msg += "The copied URL may not be usable with simple data access ";
-        msg += "like cURL and wget without additional modifications.";
+        msg += "clients like 'cURL' and 'wget' without additional modifications.";
         alert(msg);
     }
 
