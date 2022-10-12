@@ -891,7 +891,7 @@
                     type="button"
                     style="margin-left:10;"
                     title="{$encodedTitle}"
-                    value="Copy encoded URL"
+                    value="Copy encoded Data URL"
                     onclick="copy_url_to_clipboard(true)"/>
 
                 <xsl:variable name="rawTitle">
@@ -902,7 +902,7 @@
                 <input
                     type="button"
                     title="{$rawTitle}"
-                    value="Copy raw URL"
+                    value="Copy raw Data URL"
                     onclick="copy_url_to_clipboard(false)"/>
             </td>
         </tr>
