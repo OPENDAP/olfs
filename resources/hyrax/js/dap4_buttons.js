@@ -479,7 +479,7 @@ function dap_var(name, js_var_name, isArray, isContainer) {
         this.updateProjection();
         if (DEBUG.enabled()) showProjection();
         this.updateChecked();
-        DAP4_URL.update_url();
+        DAP4_DATASET.update_url();
     };
 
     /*
@@ -789,8 +789,8 @@ function dap_var(name, js_var_name, isArray, isContainer) {
 function showProjection() {
 
     var msg = "Projection Report:\n";
-    for (var i = 0; i < DAP4_URL.num_dap_vars; i++) {
-        var dapVar = DAP4_URL.dap_vars[i];
+    for (var i = 0; i < DAP4_DATASET.num_dap_vars; i++) {
+        var dapVar = DAP4_DATASET.dap_vars[i];
         msg += dapVar.name + ": " + dapVar.projected + "\n";
         if (dapVar.hasProjectedChildren()) {
             msg += "Projected Children: \n" + dapVar.get_projection();
