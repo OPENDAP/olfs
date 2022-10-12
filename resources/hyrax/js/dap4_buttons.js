@@ -34,12 +34,24 @@ function response_encoding_change(){
  */
 function copy_encoded_url_to_clipboard(){
     const debug_local = true;
+    const encoded_request_url = encodeURI(document.forms[0].url.value)
+
     if (!navigator.clipboard) {
         if (debug_local || DEBUG.enabled()) {
             alert("Using  document.execCommand('copy') to copy to clipboard");
         }
-        document.forms[0].url.focus();
-        document.forms[0].url.select();
+        var tmpTextArea = document.createElement("textarea");
+        tmpTextArea.value = encoded_request_url;
+
+        // Avoid scrolling to bottom
+        tmpTextArea.style.top = "0";
+        tmpTextArea.style.left = "0";
+        tmpTextArea.style.position = "fixed";
+
+        document.body.appendChild(tmpTextArea);
+        tmpTextArea.focus();
+        tmpTextArea.select();
+
         try {
             var successful = document.execCommand('copy');
             var msg = successful ? 'successful' : 'unsuccessful';
@@ -47,9 +59,10 @@ function copy_encoded_url_to_clipboard(){
         } catch (err) {
             console.error('Fallback Copy: Oops, unable to copy', err);
         }
+        document.body.removeChild(textArea);
+
         return;
     }
-    const encoded_request_url = encodeURI(document.forms[0].url.value)
 
     if (debug_local || DEBUG.enabled()) {
         alert("Using navigator.clipboard.writeText() to copy URI Encoded URL:\n"+encoded_request_url);
