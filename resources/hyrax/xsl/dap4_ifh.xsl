@@ -851,7 +851,12 @@
                             <xsl:text>incompatible with DAP2 and NetCDF-3 data encodings. </xsl:text>
                             <xsl:text>Click for more specific information. </xsl:text>
                         </xsl:variable>
-                        <input type="button" value="!! Attention !!" title="{$title}" onclick="alert('{$omgwhy}')" />
+                        <input
+                            type="button"
+                            style="background-color: #ffc200"
+                            value="!! Attention !!"
+                            title="{$title}"
+                            onclick="alert('{$omgwhy}')" />
                     </xsl:if>
                 </div>
             </td>
