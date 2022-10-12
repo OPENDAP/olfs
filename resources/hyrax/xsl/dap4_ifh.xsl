@@ -841,7 +841,7 @@
                             <xsl:text>not compatible with the DAP2/NetCDF-3 data models. </xsl:text>
                             <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
                             <xsl:text>attributes and you choose the “NetCDF-3” or “DAP2 Binary” download </xsl:text>
-                            <xsl:text>encoding, then your request will FAIL\n</xsl:text>
+                            <xsl:text>encoding, your request will FAIL\n</xsl:text>
                             <xsl:text>--- --- --- --- --- --- --- ---\n</xsl:text>
                             <xsl:text>DAP2/NetCDF-3 incompatible variables/attributes inventory:\n\n</xsl:text>
                             <xsl:value-of select="$hasDap4Types"/>
