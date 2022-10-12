@@ -837,7 +837,7 @@
                     <xsl:if test="normalize-space($hasDap4Types)">
                         <xsl:variable name="omgwhy">
                             <xsl:text>This dataset contains variables/attributes whose data types are </xsl:text>
-                            <xsl:text>not compatible with the NetCDF-3 data models. </xsl:text>
+                            <xsl:text>not compatible with the NetCDF-3 data model. </xsl:text>
                             <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
                             <xsl:text>attributes and you choose the “NetCDF-3” download </xsl:text>
                             <xsl:text>encoding, your request will FAIL\n</xsl:text>
