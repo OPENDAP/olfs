@@ -1057,12 +1057,22 @@
         <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
 
+    <!--
+    Old version u=had Int8 which is not compatible with DAP2 but is compatible with NetCDF-3 and since
+    we dropped DAP2 binary responses from the form only NetCDF-3 matters for this test.
     <xsl:template match="dap:Int8 | dap:Int64 | dap:UInt64" mode="findD4Types">
+    -->
+    <xsl:template match="dap:Int64 | dap:UInt64" mode="findD4Types">
         <xsl:call-template name="varDecl" />
         <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
 
+    <!--
+    Old version u=had Int8 which is not compatible with DAP2 but is compatible with NetCDF-3 and since
+    we dropped DAP2 binary responses from the form only NetCDF-3 matters for this test.
     <xsl:template match="dap:Attribute[@type='Int64' or @type='UInt64' or @type='Int8']" mode="findD4Types">
+    -->
+    <xsl:template match="dap:Attribute[@type='Int64' or @type='UInt64']" mode="findD4Types">
         <xsl:call-template name="attrDecl" />
     </xsl:template>
 
