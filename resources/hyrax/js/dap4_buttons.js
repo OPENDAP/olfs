@@ -184,7 +184,6 @@ function dap4_dataset(base_url) {
      */
     this.build_DAP4_constraint = function () {
         var ce = "";
-        var s = "";
         for (var i = 0; i < this.num_dap_vars; ++i) {
             var dapVar = this.dap_vars[i];
             var varProj = dapVar.getDap4CE();

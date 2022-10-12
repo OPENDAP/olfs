@@ -433,6 +433,7 @@
         <xsl:comment>
             -----------
             myFQN:           <xsl:value-of select="$myFQN"/>
+            type_name:       <xsl:value-of select="name(.)"/>
             myJSVarName:     <xsl:value-of select="$myJSVarName"/>
             checkBoxName:    <xsl:value-of select="$checkBoxName"/>
             isContainer:     <xsl:value-of select="$isContainer"/>
@@ -823,7 +824,6 @@
             </td>
             <td>
                 <!-- xsl:call-template name="oldrequestbuttons"/ -->
-
                 <div style="width:100%;margin-left:10px;">
                     <label for="encoding" class="medium">Download Encoding:</label>
                     <select name="Response Encoding" id="encoding" onchange="DAP4_DATASET.update_url()">
@@ -835,10 +835,21 @@
                         <option value=".dods">DAP2 Binary</option>
                     </select>
                     <input type="button" value="Get Data" onclick="getdata_button_action()"/>
+                    <xsl:if test="normalize-space($hasDap4Types)">
+                        <xsl:variable name="omgwhy">
+                            <xsl:text>The following dataset variables have data types which are </xsl:text>
+                            <xsl:text>not compatible with the DAP2/NetCDF-3 data model:\n\n</xsl:text>
+                            <xsl:value-of select="$hasDap4Types"/>
+                        </xsl:variable>
+                        <xsl:variable name="title">
+                            <xsl:text>Attention! This dataset contains data types that are </xsl:text>
+                            <xsl:text>incompatible with DAP2 and NetCDF-3 data encodings.</xsl:text>
+                        </xsl:variable>
+                        <input type="button" value="!! Attention !!" title="{$title}" onclick="alert('{$omgwhy}')" />
+                    </xsl:if>
                 </div>
             </td>
         </tr>
-
     </xsl:template>
 
 
