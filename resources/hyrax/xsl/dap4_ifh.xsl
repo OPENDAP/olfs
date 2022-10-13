@@ -41,6 +41,7 @@
     <xsl:param name="logoutLink" />
     <xsl:param name="enforceSelection" />
     <xsl:param name="forceDataRequestFormLinkToHttps" />
+    <xsl:param name="allowDirectDataSourceAccess" />
 
 
     <xsl:variable name="debug" select="false()"/>
@@ -118,6 +119,7 @@
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
                     DAP4_DATASET = new dap4_dataset("<xsl:value-of select="$datasetUrl"/>");
+                    AllowDirectDataSourceAccess = Boolean("<xsl:value-of select="$allowDirectDataSourceAccess"/>");
                     DEBUG = new debug_obj();
                     var es = "<xsl:value-of select="$enforceSelection"/>";
                     enforce_selection = es.localeCompare("true")==0;
@@ -835,6 +837,9 @@
                         <option value=".dap.nc">NetCDF-3</option>
                         <option value=".dap.csv">CSV</option>
                         <option value=".dap">DAP4 Binary</option>
+                        <xsl:if test="$allowDirectDataSourceAccess='true'">
+                           <option value=".file">Download Source Data File</option>
+                        </xsl:if>
                     </select>
                     <input type="button" value="Get Data" onclick="getdata_button_action()"/>
                     <xsl:if test="normalize-space($hasDap4Types)">
@@ -897,7 +902,7 @@
                 <xsl:variable name="rawTitle">
                     <xsl:text>Copies the raw Data URL to your clipboard. </xsl:text>
                     <xsl:text>The copy may not work with simple clients such </xsl:text>
-                    <xsl:text>as cURL and wget without some modifications. </xsl:text>
+                    <xsl:text>as cURL and wget without some modifications, ymmv. </xsl:text>
                 </xsl:variable>
                 <input
                     type="button"

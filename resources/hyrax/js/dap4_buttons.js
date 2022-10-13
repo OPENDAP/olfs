@@ -102,17 +102,52 @@ function getdata_button_action(){
     var url = String(document.forms[0].url.value);
     var type_name = String(document.forms[0].encoding[encoding.selectedIndex].text);
     var encoding_suffix = String(document.forms[0].encoding.value);
+    const url_parts = url.split("?");
+    const url_path = url_parts[0];
+    const constraint = url_parts[1];
+    const debug_local = false;
+
+    if (debug_local || DEBUG.enabled()) {
+        let msg = String("getdata_button_action(): \n");
+        msg += "  url: "+ url + "\n";
+        msg += "  type_name: "+ type_name + "\n";
+        msg += "  encoding_suffix: "+ encoding_suffix + "\n";
+        msg += "  url_path: "+ url_path + "\n";
+        msg += "  constraint: "+ constraint + "\n";
+        alert(msg);
+    }
 
     if(encoding_suffix === ""){
         alert("OOPS! You must select a Download Encoding before you can get data!");
         return;
     }
 
-    if(enforce_selection) {
-        var url_parts = url.split("?");
+    if(enforce_selection && encoding_suffix !== ".file") {
         // If the constraint is empty then we ask the user to make a selection
-        if (url_parts[1] == null || url_parts[1].length>0) {
+        if (constraint == null || constraint.length === 0) {
             make_a_selection();
+            return;
+        }
+    }
+
+    if(!AllowDirectDataSourceAccess && encoding_suffix === ".file"){
+        const msg = "I'm sorry, I can't do that. " + type_name + " access is not enabled on this server."
+        alert (msg);
+        return;
+    }
+
+    if(encoding_suffix === ".file" && constraint!=null && constraint.length !== 0){
+        let msg = "Warning: You have chosen retrieve the source data file, but ";
+        msg += "you have also specified a subset (aka constraint) expression. ";
+        msg += "Subset activities are not compatible with the file download action.\n\n";
+        msg += "If you want to subset the data click Cancel and choose a ";
+        msg += "different download type such as NetCDF-4.\n\n";
+        msg += "Otherwise click OK to download the complete source data file.";
+        msg += "";
+        if (confirm(msg)){
+            url = String(url_path);
+        }
+        else {
             return;
         }
     }
