@@ -41,6 +41,7 @@
     <xsl:param name="logoutLink" />
     <xsl:param name="enforceSelection" />
     <xsl:param name="forceDataRequestFormLinkToHttps" />
+    <xsl:param name="allowDirectDataSourceAccess" />
 
 
     <xsl:variable name="debug" select="false()"/>
@@ -117,7 +118,8 @@
 
                 <xsl:element name="script">
                     <xsl:attribute name="type">text/javascript</xsl:attribute>
-                    DAP4_URL = new dap4_url("<xsl:value-of select="$datasetUrl"/>");
+                    DAP4_DATASET = new dap4_dataset("<xsl:value-of select="$datasetUrl"/>");
+                    AllowDirectDataSourceAccess = Boolean("<xsl:value-of select="$allowDirectDataSourceAccess"/>");
                     DEBUG = new debug_obj();
                     var es = "<xsl:value-of select="$enforceSelection"/>";
                     enforce_selection = es.localeCompare("true")==0;
@@ -190,7 +192,7 @@
 
 
                     <table width="100%" border="0">
-                        <xsl:call-template name="dataRequestButtonsRow"/>
+                        <xsl:call-template name="dataRequestRow"/>
                         <xsl:call-template name="dataUrlRow">
                             <xsl:with-param name="datasetUrl" select="$datasetUrl"/>
                         </xsl:call-template>
@@ -433,6 +435,7 @@
         <xsl:comment>
             -----------
             myFQN:           <xsl:value-of select="$myFQN"/>
+            type_name:       <xsl:value-of select="name(.)"/>
             myJSVarName:     <xsl:value-of select="$myJSVarName"/>
             checkBoxName:    <xsl:value-of select="$checkBoxName"/>
             isContainer:     <xsl:value-of select="$isContainer"/>
@@ -449,7 +452,7 @@
                 select="$myJSVarName"/>", <xsl:value-of select="$isArray"/>,<xsl:value-of select="$isContainer"/>);
 
             <xsl:if test="parent::dap:Dataset">
-                DAP4_URL.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
+                DAP4_DATASET.add_dap_var(<xsl:value-of select="$myJSVarName"/>);
             </xsl:if>
 
             <xsl:value-of select="$myJSVarName"/>.checkBox = "<xsl:value-of select="$checkBoxName"/>";
@@ -521,7 +524,7 @@
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
-                   onChange="DAP4_URL.update_url()"/>
+                   onChange="DAP4_DATASET.update_url()"/>
             <xsl:element name="script">
                 <xsl:attribute name="type">text/javascript</xsl:attribute>
                 <xsl:value-of select="$myJSVarName"/>.addDimension(<xsl:value-of select="$dimTag"/>,<xsl:value-of
@@ -563,7 +566,7 @@
 
         <div class="medium" style="margin-left: 10px;padding: 1px;" id="{$selectionId}">
             <xsl:value-of select="@name"/>
-            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_URL.update_url()">
+            <select id="{$relOpWidget}" onfocus="describe_selection()" onchange="DAP4_DATASET.update_url()">
                 <option value="==" selected="">==</option>
                 <option value="!=">!=</option>
                 <option value="&lt;">&lt;</option>
@@ -573,7 +576,7 @@
                 <option value="-">--</option>
             </select>
             <input type="text" id="{$rValueWidget}" size="6" onFocus="describe_selection()"
-                   onChange="DAP4_URL.update_url()"/>
+                   onChange="DAP4_DATASET.update_url()"/>
         </div>
 
         <xsl:element name="script">
@@ -749,13 +752,73 @@
     </xsl:template>
 
 
+
     <!-- ############################################################################################ -->
     <!--           Page Components                                                                    -->
 
+    <!--
+    Deprecated data request buttons @TODO Remove
+    -->
+    <xsl:template name="oldrequestbuttons">
+        <div style="width:100%;margin-left:10px;">
+            <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
+            <!-- CoverageJSON needs a DAP4 implementation in the BES -->
+            <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
+
+            <xsl:choose>
+                <xsl:when test="normalize-space($hasDap4Types)">
+                    <!-- DISABLE the Get As NetCDF-3 option -->
+                    <xsl:variable name="omgwhy">
+                        <xsl:text>The \x22Get As NetCDF-3\x22 response button has been disabled because the </xsl:text>
+                        <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
+                        <xsl:text>a NetCDF-3 response encoding:\n\n</xsl:text>
+                        <xsl:value-of select="$hasDap4Types"/>
+                    </xsl:variable>
+                    <input
+                            type="button"
+                            value="Get as NetCDF 3"
+                            class="disabled_button"
+                            onclick="alert('{$omgwhy}')" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <input
+                            type="button"
+                            value="Get as NetCDF 3"
+                            onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
+            <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
+            <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
+            <xsl:choose>
+                <xsl:when test="normalize-space($hasDap4Types)">
+                    <!-- DISABLE the Get As DAP2 Binary response option -->
+                    <xsl:variable name="omgwhy">
+                        <xsl:text>The \x22DAP2 Binary Object\x22 response button has been disabled because the </xsl:text>
+                        <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
+                        <xsl:text>the DAP2 data model:\n\n</xsl:text>
+                        <xsl:value-of select="$hasDap4Types"/>
+                    </xsl:variable>
+                    <input
+                            type="button"
+                            value="DAP2 Binary Object"
+                            class="disabled_button"
+                            onclick="alert('{$omgwhy}')" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <input
+                            type="button"
+                            value="DAP2 Binary Object"
+                            onclick="getAs_button_action('DAP2 Data', '.dods')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <input type="button" value="Show Help" onclick="help_button()"/>
+        </div>
+    </xsl:template>
 
     <!-- ######################################## -->
     <!--            Actions Buttons Row           -->
-    <xsl:template name="dataRequestButtonsRow">
+    <xsl:template name="dataRequestRow">
         <tr>
             <td align="right">
                 <div class="medium_bold">
@@ -765,63 +828,47 @@
                 </div>
             </td>
             <td>
+                <!-- xsl:call-template name="oldrequestbuttons"/ -->
                 <div style="width:100%;margin-left:10px;">
-                    <input type="button" value="Get as CSV" onclick="getAs_button_action('CSV Data','.dap.csv')"/>
-                    <!-- CoverageJSON needs a DAP4 implementation in the BES -->
-                    <!-- input type="button" value="Get as CoverageJSON" onclick="covjson_button()"/ -->
-
-                    <xsl:choose>
-                        <xsl:when test="normalize-space($hasDap4Types)">
-                            <!-- DISABLE the Get As NetCDF-3 option -->
-                            <xsl:variable name="omgwhy">
-                                <xsl:text>The \x22Get As NetCDF-3\x22 response button has been disabled because the </xsl:text>
-                                <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
-                                <xsl:text>a NetCDF-3 response encoding:\n\n</xsl:text>
-                                <xsl:value-of select="$hasDap4Types"/>
-                            </xsl:variable>
-                            <input
-                                type="button"
-                                value="Get as NetCDF 3"
-                                class="disabled_button"
-                                onclick="alert('{$omgwhy}')" />
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <input
-                                type="button"
-                                value="Get as NetCDF 3"
-                                onclick="getAs_button_action('NetCDF-3 Data', '.dap.nc')"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-
-                    <input type="button" value="Get as NetCDF 4" onclick="getAs_button_action('NetCDF-4 Data', '.dap.nc4')"/>
-                    <input type="button" value="DAP4 Binary Object" onclick="getAs_button_action('DAP4 Data', '.dap')"/>
-                    <xsl:choose>
-                        <xsl:when test="normalize-space($hasDap4Types)">
-                            <!-- DISABLE the Get As DAP2 Binary response option -->
-                            <xsl:variable name="omgwhy">
-                                <xsl:text>The \x22DAP2 Binary Object\x22 response button has been disabled because the </xsl:text>
-                                <xsl:text>following dataset variables have data types which are not compatible with </xsl:text>
-                                <xsl:text>the DAP2 data model:\n\n</xsl:text>
-                                <xsl:value-of select="$hasDap4Types"/>
-                            </xsl:variable>
-                            <input
-                                type="button"
-                                value="DAP2 Binary Object"
-                                class="disabled_button"
-                                onclick="alert('{$omgwhy}')" />
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <input
-                                type="button"
-                                value="DAP2 Binary Object"
-                                onclick="getAs_button_action('DAP2 Data', '.dods')"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                    <input type="button" value="Show Help" onclick="help_button()"/>
+                    <label for="encoding" class="medium">Download Encoding:</label>
+                    <select name="Response Encoding" id="encoding" onchange="DAP4_DATASET.update_url()">
+                        <option value="">Choose One...</option>
+                        <option value=".dap.nc4">NetCDF-4</option>
+                        <option value=".dap.nc">NetCDF-3</option>
+                        <option value=".dap.csv">CSV</option>
+                        <option value=".dap">DAP4 Binary</option>
+                        <xsl:if test="$allowDirectDataSourceAccess='true'">
+                           <option value=".file">Download Source Data File</option>
+                        </xsl:if>
+                    </select>
+                    <input type="button" value="Get Data" onclick="getdata_button_action()"/>
+                    <xsl:if test="normalize-space($hasDap4Types)">
+                        <xsl:variable name="omgwhy">
+                            <xsl:text>This dataset contains variables/attributes whose data types are </xsl:text>
+                            <xsl:text>not compatible with the NetCDF-3 data model. </xsl:text>
+                            <xsl:text>If your request includes any of these incompatible variables or </xsl:text>
+                            <xsl:text>attributes and you choose the “NetCDF-3” download </xsl:text>
+                            <xsl:text>encoding, your request will FAIL.\n</xsl:text>
+                            <xsl:text>---:--- ---:--- ---:--- ---:--- ---:--- ---:--- ---:--- ---:---\n</xsl:text>
+                            <xsl:text>NetCDF-3 incompatible variables/attributes inventory:\n\n</xsl:text>
+                            <xsl:value-of select="$hasDap4Types"/>
+                        </xsl:variable>
+                        <xsl:variable name="title">
+                            <xsl:text>Attention! This dataset contains data types that are </xsl:text>
+                            <xsl:text>incompatible with the NetCDF-3 data encoding. </xsl:text>
+                            <xsl:text>Click for more specific information. </xsl:text>
+                        </xsl:variable>
+                        <xsl:element name="input">
+                            <xsl:attribute name="type">button</xsl:attribute>
+                            <xsl:attribute name="style">background-color: #ffc200</xsl:attribute>
+                            <xsl:attribute name="value">!! Attention !!</xsl:attribute>
+                            <xsl:attribute name="title"><xsl:value-of select="$title"/></xsl:attribute>
+                            <xsl:attribute name="onclick">alert('<xsl:value-of select="$omgwhy"/>')</xsl:attribute>
+                        </xsl:element>
+                    </xsl:if>
                 </div>
             </td>
         </tr>
-
     </xsl:template>
 
 
@@ -839,6 +886,29 @@
             </td>
             <td>
                 <input name="url" type="text" style="width:98%;margin-left:10;" value="{$datasetUrl}"> </input>
+                <xsl:variable name="encodedTitle">
+                    <xsl:text>Copies the Data URL to your clipboard. </xsl:text>
+                    <xsl:text>The copy will be encoded so that it can be </xsl:text>
+                    <xsl:text>used directly with cURL and other simple data access clients. </xsl:text>
+                </xsl:variable>
+
+                <input
+                    type="button"
+                    style="margin-left:10;"
+                    title="{$encodedTitle}"
+                    value="Copy encoded Data URL"
+                    onclick="copy_url_to_clipboard(true)"/>
+
+                <xsl:variable name="rawTitle">
+                    <xsl:text>Copies the raw Data URL to your clipboard. </xsl:text>
+                    <xsl:text>The copy may not work with simple clients such </xsl:text>
+                    <xsl:text>as cURL and wget without some modifications, ymmv. </xsl:text>
+                </xsl:variable>
+                <input
+                    type="button"
+                    title="{$rawTitle}"
+                    value="Copy raw Data URL"
+                    onclick="copy_url_to_clipboard(false)"/>
             </td>
         </tr>
     </xsl:template>
@@ -995,12 +1065,22 @@
         <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
 
+    <!--
+    Old version u=had Int8 which is not compatible with DAP2 but is compatible with NetCDF-3 and since
+    we dropped DAP2 binary responses from the form only NetCDF-3 matters for this test.
     <xsl:template match="dap:Int8 | dap:Int64 | dap:UInt64" mode="findD4Types">
+    -->
+    <xsl:template match="dap:Int64 | dap:UInt64" mode="findD4Types">
         <xsl:call-template name="varDecl" />
         <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
 
+    <!--
+    Old version u=had Int8 which is not compatible with DAP2 but is compatible with NetCDF-3 and since
+    we dropped DAP2 binary responses from the form only NetCDF-3 matters for this test.
     <xsl:template match="dap:Attribute[@type='Int64' or @type='UInt64' or @type='Int8']" mode="findD4Types">
+    -->
+    <xsl:template match="dap:Attribute[@type='Int64' or @type='UInt64']" mode="findD4Types">
         <xsl:call-template name="attrDecl" />
     </xsl:template>
 
