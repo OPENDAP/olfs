@@ -897,7 +897,7 @@
                 <xsl:variable name="rawTitle">
                     <xsl:text>Copies the raw Data URL to your clipboard. </xsl:text>
                     <xsl:text>The copy may not work with simple clients such </xsl:text>
-                    <xsl:text>as cURL and wget with out some modifications. </xsl:text>
+                    <xsl:text>as cURL and wget without some modifications. </xsl:text>
                 </xsl:variable>
                 <input
                     type="button"
