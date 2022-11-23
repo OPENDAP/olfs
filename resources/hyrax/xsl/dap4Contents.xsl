@@ -275,9 +275,18 @@
         <!-- DAP4 Data Request Form -->
         <td>
             <b>
-                <a href="{encode-for-uri(@name)}.dmr.html">
-                    <xsl:value-of select="@name"/>
-                </a>
+                <xsl:choose>
+                    <xsl:when test="@dap_url">
+                        <a href="{@dap_url}.dmr.html">
+                            <xsl:value-of select="@name"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <a href="{encode-for-uri(@name)}.dmr.html">
+                            <xsl:value-of select="@name"/>
+                        </a>
+                    </xsl:otherwise>
+                </xsl:choose>
             </b>
         </td>
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
