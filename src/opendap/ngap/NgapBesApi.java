@@ -154,10 +154,11 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         addEdlAuthToken(request,user);
 
-        request.addContent(setContainerElement("ngapContainer","ngap",remoteDataSourceUrl,type));
+        request.addContent(setContainerElement(getBesContainerName(),
+                getBesSpaceName(),remoteDataSourceUrl,type));
 
         Element def = defineElement("d1","default");
-        e = (containerElement("ngapContainer"));
+        e = (containerElement(getBesContainerName()));
 
         if(ce!=null && !ce.equals(""))
             e.addContent(constraintElement(ce));
@@ -274,10 +275,11 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         addEdlAuthToken(request,user);
 
-        request.addContent(setContainerElement("ngapContainer","ngap",remoteDataSourceUrl,type));
+        request.addContent(setContainerElement(getBesContainerName(),
+                getBesSpaceName(),remoteDataSourceUrl,type));
 
         Element def = defineElement("d1","default");
-        e = (containerElement("ngapContainer"));
+        e = (containerElement(getBesContainerName()));
 
         if(qp.getCe()!=null && !qp.getCe().equals(""))
             e.addContent(dap4ConstraintElement(qp.getCe()));

@@ -160,6 +160,9 @@ public class HtmlDMR extends Dap4Responder {
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
             transformer.setParameter("forceDataRequestFormLinkToHttps", (BesDapDispatcher.forceLinksToHttps()?"true":"false"));
+            if(BesDapDispatcher.allowDirectDataSourceAccess()){
+                transformer.setParameter("allowDirectDataSourceAccess","true");
+            }
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
