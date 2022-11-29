@@ -273,20 +273,18 @@
     <xsl:template name="DapServiceLinks" >
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
         <!-- DAP4 Data Request Form -->
+        <xsl:variable name="dap_service_url">
+            <xsl:choose>
+                <xsl:when test="@dap_url" ><xsl:value-of select="@dap_url"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="encode-for-uri(@name)"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <td>
+            <xsl:comment>Using dap_service_url: <xsl:value-of select="$dap_service_url"/></xsl:comment>
+
             <b>
-                <xsl:choose>
-                    <xsl:when test="@dap_url">
-                        <a href="{@dap_url}.dmr.html">
-                            <xsl:value-of select="@name"/>
-                        </a>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <a href="{encode-for-uri(@name)}.dmr.html">
-                            <xsl:value-of select="@name"/>
-                        </a>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <a href="{$dap_service_url}.dmr.html"><xsl:value-of select="@name"/></a>
             </b>
         </td>
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
@@ -307,28 +305,28 @@
             <table class="response_links">
                 <tr>
                     <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{@name}.dmr.xml"/>
+                        <meta itemprop="name" content="{$dap_service_url}.dmr.xml"/>
                         <meta itemprop="encodingFormat" content="application/vnd.opendap.dataset-metadata+xml"/>
                         <a title="DAP4 Metadata Response (.dmr.xml)"
-                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dmr">dmr</a>
+                           itemprop="contentUrl" href="{$dap_service_url}.dmr.xml">dmr</a>
                     </td>
                     <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{@name}.dap"/>
+                        <meta itemprop="name" content="{$dap_service_url}.dap"/>
                         <meta itemprop="encodingFormat" content="application/vnd.opendap.data"/>
                         <a title="DAP4 Data Response (.dap)"
-                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dap">html</a>
+                           itemprop="contentUrl" href="{$dap_service_url}.dap">dap</a>
                     </td>
                     <td itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{@name}.dmr.html"/>
+                        <meta itemprop="name" content="{$dap_service_url}.dmr.html"/>
                         <meta itemprop="encodingFormat" content="text/html"/>
                         <a title="DAP4 Data Request Form (.dmr.html)"
-                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dmr.html">html</a>
+                           itemprop="contentUrl" href="{$dap_service_url}.dmr.html">html</a>
                     </td>
                     <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{@name}.dmr.rdf"/>
+                        <meta itemprop="name" content="{$dap_service_url}.dmr.rdf"/>
                         <meta itemprop="encodingFormat" content="application/rdf+xml"/>
                         <a title="DAP4 Metadata Response encoded as RDF (.dmr.rdf)"
-                           itemprop="contentUrl" href="{encode-for-uri(@name)}.dmr.rdf">rdf</a>
+                           itemprop="contentUrl" href="{$dap_service_url}.dmr.rdf">rdf</a>
                     </td>
 
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
@@ -338,7 +336,7 @@
                             <xsl:element name="a">
                                 <xsl:attribute name="itemprop">contentUrl</xsl:attribute>
                                 <xsl:attribute name="href">
-                                    <xsl:value-of select="encode-for-uri(@name)"/>
+                                    <xsl:value-of select="$dap_service_url"/>
                                     <xsl:if test="$datasetUrlResponseType!='download'">.file</xsl:if>
                                 </xsl:attribute>
                                 <xsl:text>file</xsl:text>
@@ -382,25 +380,28 @@
 
     <xsl:template name="DatasetViewers" >
 
-        <xsl:variable name="datasetID">
-            <xsl:choose>
-                <xsl:when test="../../@name='/'">
-                    <xsl:value-of select="bes:path_concat(($besPrefix,@name))" />
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="bes:path_concat(($besPrefix, ../@name,@name))" />
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:if test="not(@dap_url)">
+            <xsl:variable name="datasetID">
+                <xsl:choose>
+                    <xsl:when test="../../@name='/'">
+                        <xsl:value-of select="bes:path_concat(($besPrefix,@name))" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="bes:path_concat(($besPrefix, ../@name,@name))" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
 
-        <td align="center">
-            <table class="response_links">
-                <td align="center">
-                    <xsl:comment>viewersService: <xsl:value-of select="$viewersService"/></xsl:comment>
-                    <a href="{$viewersService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
-                </td>
-            </table>
-        </td>
+            <td align="center">
+                <table class="response_links">
+                    <td align="center">
+                        <xsl:comment>viewersService: <xsl:value-of select="$viewersService"/></xsl:comment>
+                        <a href="{$viewersService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
+                    </td>
+                </table>
+            </td>
+
+        </xsl:if>
 
     </xsl:template>
 
