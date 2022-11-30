@@ -298,7 +298,6 @@
 
         <td>
             <b>
-                <a href="{$dap_service_url}.dmr.html"><xsl:value-of select="@name"/></a>
                 <xsl:element name="a">
                     <xsl:attribute name="href"><xsl:value-of select="$dap_service_url"/>.dmr.html</xsl:attribute>
                     <xsl:if test="$description">
