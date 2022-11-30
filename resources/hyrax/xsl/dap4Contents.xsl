@@ -257,8 +257,15 @@
             	 colon characters were confusing browsers. Colons were added to the set of
             	 URL chars not scrubbed at the request of NASA/Raytheon. The equivalent edit
             	 was made in several places below. jhrg 5/7/15 -->
-            <a href="{encode-for-uri(@name)}/contents.html">
-                <xsl:value-of select="@name"/>/</a>
+            <xsl:element name="a">
+                <xsl:if test="bes:description">
+                    <xsl:attribute name="title" select="bes:description"/>
+                </xsl:if>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="encode-for-uri(@name)"/>/contents.html
+                </xsl:attribute>
+                <xsl:value-of select="@name"/>/
+            </xsl:element>
         </td>
 
         <td align="center" nowrap="nowrap">
@@ -279,12 +286,26 @@
                 <xsl:otherwise><xsl:value-of select="encode-for-uri(@name)"/></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:comment>Using dap_service_url: <xsl:value-of select="$dap_service_url"/></xsl:comment>
+
+        <xsl:variable name="description">
+            <xsl:choose>
+                <xsl:when test="bes:description" ><xsl:value-of select="bes:description"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="encode-for-uri(@name)"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:comment>Using description: <xsl:value-of select="description"/></xsl:comment>
 
         <td>
-            <xsl:comment>Using dap_service_url: <xsl:value-of select="$dap_service_url"/></xsl:comment>
-
             <b>
                 <a href="{$dap_service_url}.dmr.html"><xsl:value-of select="@name"/></a>
+                <xsl:element name="a">
+                    <xsl:attribute name="href"><xsl:value-of select="$dap_service_url"/>.dmr.html</xsl:attribute>
+                    <xsl:if test="$description">
+                        <xsl:attribute name="title"><xsl:value-of select="$description"/></xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="@name"/>
+                </xsl:element>
             </b>
         </td>
         <!-- == == == == == == == == == == == == == == == == == == == == == -->
