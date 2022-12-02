@@ -1510,6 +1510,7 @@ public class BesApi implements Cloneable {
 
     public Element dap4ConstraintElement(String ce) {
         Element e = new Element("dap4constraint",BES_NS);
+
         e.setText(ce);
         return e;
     }
@@ -2240,7 +2241,8 @@ public class BesApi implements Cloneable {
         return getDap2RequestDocumentAsync(
                 user,
                 type,
-                dataSource,ce,
+                dataSource,
+                ce,
                 null,
                 null,
                 xmlBase,
