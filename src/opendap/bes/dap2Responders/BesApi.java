@@ -49,17 +49,14 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.net.URLEncoder;
 /**
  *
  * Subclass BesApi to get different BES behaviors.
@@ -1502,16 +1499,33 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Element constraintElement(String ce) {
+    public Element dap2ConstraintElement(String ce) {
         Element e = new Element("constraint",BES_NS);
-        e.setText(ce);
+        String encoded_ce;
+        try{
+            encoded_ce = URLEncoder.encode(ce,"UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            String msg = "Unable to encode DAP2 Constraint Expression. msg: "+uee.getMessage();
+            log.debug(msg);
+            encoded_ce = ce;
+        }
+        e.setText(encoded_ce);
         return e;
     }
 
     public Element dap4ConstraintElement(String ce) {
         Element e = new Element("dap4constraint",BES_NS);
-
-        e.setText(ce);
+        String encoded_ce;
+        try{
+            encoded_ce = URLEncoder.encode(ce,"UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            String msg = "Unable to encode DAP4 Constraint Expression. msg: "+uee.getMessage();
+            log.debug(msg);
+            encoded_ce = ce;
+        }
+        e.setText(encoded_ce);
         return e;
     }
 
@@ -2306,7 +2320,7 @@ public class BesApi implements Cloneable {
         e = (containerElement(getBesContainerName()));
 
         if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
+            e.addContent(dap2ConstraintElement(ce));
 
         def.addContent(e);
 
