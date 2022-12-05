@@ -34,6 +34,7 @@ import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
@@ -1503,10 +1504,12 @@ public class BesApi implements Cloneable {
         Element e = new Element("constraint",BES_NS);
         String encoded_ce;
         try{
-            encoded_ce = URLEncoder.encode(ce,"UTF-8");
+            encoded_ce = URLEncoder.encode(ce, HyraxStringEncoding.getCharset().name());
         }
         catch (UnsupportedEncodingException uee) {
-            String msg = "Unable to encode DAP2 Constraint Expression. msg: "+uee.getMessage();
+            String msg = "Unable to encode DAP2 Constraint " +
+                    "Expression. ce: "+ce+" Error message: " +
+                    uee.getMessage();
             log.debug(msg);
             encoded_ce = ce;
         }
@@ -1518,10 +1521,12 @@ public class BesApi implements Cloneable {
         Element e = new Element("dap4constraint",BES_NS);
         String encoded_ce;
         try{
-            encoded_ce = URLEncoder.encode(ce,"UTF-8");
+            encoded_ce = URLEncoder.encode(ce, HyraxStringEncoding.getCharset().name());
         }
         catch (UnsupportedEncodingException uee) {
-            String msg = "Unable to encode DAP4 Constraint Expression. msg: "+uee.getMessage();
+            String msg = "Unable to encode DAP4 Constraint " +
+                    "Expression. dap4.ce="+ce+" Error message: " +
+                    uee.getMessage();
             log.debug(msg);
             encoded_ce = ce;
         }
