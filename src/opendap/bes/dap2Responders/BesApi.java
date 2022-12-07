@@ -1497,45 +1497,23 @@ public class BesApi implements Cloneable {
         return e;
     }
 
-    /**
-     * URLEncodes the passed string (constraint expression, query string, etc)
-     * making a special case of the space ' ' character.
-     * The encoder replaces spaces with plus signs ' ' --> '+' and that
-     * breaks the libdap parser. Since the encoder will encode
-     * the original plus signs to their hex value: '+' --> %2B we can safely
-     * replace the new, introduced, plus signs with the hex for space, %20
-     * @param ce The constraint expression string to encode.
-     * @return The encoded version of ce.
-     */
-    private String encode_ce(String ce){
-        String encoded_ce;
-        try{
-            encoded_ce = URLEncoder.encode(ce, HyraxStringEncoding.getCharset().name());
 
-            // Replace remaining '+' characters with %20
-            encoded_ce = encoded_ce.replaceAll("\\+","%20");
-        }
-        catch (UnsupportedEncodingException uee) {
-            String msg = "Unable to encode Constraint " +
-                    "Expression. ce: "+ce+" Error message: " +
-                    uee.getMessage();
-            log.error(msg);
-            encoded_ce = ce;
-        }
-        return encoded_ce;
-    }
 
 
     public Element dap2ConstraintElement(String ce) {
         Element e = new Element("constraint",BES_NS);
-        String encoded_ce = encode_ce(ce);
+        // We replace the space characters in the CE with %20
+        // so the libdap ce parsers don't blow a gasket.
+        String encoded_ce = ce.replaceAll(" ","%20");
         e.setText(encoded_ce);
         return e;
     }
 
     public Element dap4ConstraintElement(String ce) {
         Element e = new Element("dap4constraint",BES_NS);
-        String encoded_ce = encode_ce(ce);
+        // We replace the space characters in the CE with %20
+        // so the libdap ce parsers don't blow a gasket.
+        String encoded_ce = ce.replaceAll(" ","%20");
         e.setText(encoded_ce);
         return e;
     }
