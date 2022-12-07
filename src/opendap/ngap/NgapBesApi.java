@@ -161,7 +161,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
         e = (containerElement(getBesContainerName()));
 
         if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
+            e.addContent(dap2ConstraintElement(ce));
 
         def.addContent(e);
 

@@ -663,7 +663,7 @@
         <xsl:if test="generate-id(.)!=generate-id(/dap:Dataset)">
             <xsl:apply-templates select=".." mode="computeFQN"/>
             <xsl:value-of select="$separator"/>
-            <xsl:value-of select="translate(@name,' .','__')"/>
+            <xsl:value-of select="translate(@name,'.','_')"/>
         </xsl:if>
     </xsl:template>
     <!-- ################################################################### -->
