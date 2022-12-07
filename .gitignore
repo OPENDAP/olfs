@@ -12,6 +12,9 @@
 build
 release
 
+## Scratch dir
+scratch
+
 # Is there a file called ']' somewhere in this project? jhrg 3/11/15
 ]
 
