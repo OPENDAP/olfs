@@ -736,6 +736,9 @@
                         <span class="em">
                             <xsl:for-each select="dap:Value"><xsl:if test="(position( )) > 1">, </xsl:if><xsl:value-of select="."/></xsl:for-each>
                         </span>
+                        <span class="small" style="vertical-align: 15%; font-style: italic; font-size: 75%;">
+                            (Type is <xsl:value-of select="@type"/>)
+                        </span>
                     </div>
                 </li>
 

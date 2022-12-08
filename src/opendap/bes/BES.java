@@ -907,13 +907,13 @@ public class BES {
                 Timer.stop(timedProc);
             }
         }
-        while(besTrouble && attempts < getMaxCommandAttempts());
+        while (besTrouble && attempts < getMaxCommandAttempts());
 
-        if(besTrouble){
-            if(besFatalError != null)
+        if (besTrouble) {
+            if (besFatalError != null)
                 throw besFatalError;
 
-            if(pptException != null)
+            if (pptException != null)
                 throw pptException;
         }
         log.debug("END");
