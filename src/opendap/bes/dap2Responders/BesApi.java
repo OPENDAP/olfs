@@ -34,6 +34,7 @@ import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
@@ -49,17 +50,14 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.net.URLEncoder;
 /**
  *
  * Subclass BesApi to get different BES behaviors.
@@ -1469,8 +1467,6 @@ public class BesApi implements Cloneable {
 
 
 
-
-
     public Element setContainerElement(String name,
                                                String space,
                                                String source,
@@ -1502,15 +1498,23 @@ public class BesApi implements Cloneable {
     }
 
 
-    public Element constraintElement(String ce) {
+
+
+    public Element dap2ConstraintElement(String ce) {
         Element e = new Element("constraint",BES_NS);
-        e.setText(ce);
+        // We replace the space characters in the CE with %20
+        // so the libdap ce parsers don't blow a gasket.
+        String encoded_ce = ce.replaceAll(" ","%20");
+        e.setText(encoded_ce);
         return e;
     }
 
     public Element dap4ConstraintElement(String ce) {
         Element e = new Element("dap4constraint",BES_NS);
-        e.setText(ce);
+        // We replace the space characters in the CE with %20
+        // so the libdap ce parsers don't blow a gasket.
+        String encoded_ce = ce.replaceAll(" ","%20");
+        e.setText(encoded_ce);
         return e;
     }
 
@@ -2240,7 +2244,8 @@ public class BesApi implements Cloneable {
         return getDap2RequestDocumentAsync(
                 user,
                 type,
-                dataSource,ce,
+                dataSource,
+                ce,
                 null,
                 null,
                 xmlBase,
@@ -2304,7 +2309,7 @@ public class BesApi implements Cloneable {
         e = (containerElement(getBesContainerName()));
 
         if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
+            e.addContent(dap2ConstraintElement(ce));
 
         def.addContent(e);
 

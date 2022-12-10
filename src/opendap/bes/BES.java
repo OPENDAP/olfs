@@ -850,70 +850,76 @@ public class BES {
             besFatalError = null;
             attempts++;
 
-            log.debug("This is attempt: {}",attempts);
+            OPeNDAPClient oc = null;
+            Procedure timedProc=null;
 
-            OPeNDAPClient oc = getClient();
-            if(oc==null){
-                String msg = "FAILED to retrieve a valid OPeNDAPClient instance! "+
-                        "BES Prefix: "+getPrefix()+" BES NickName: "+getNickName()+" BES Host: "+getHost();
-                log.error(msg);
-                throw new IOException(msg);
-
-            }
-            tweakRequestId(request,oc);
-            if(log.isDebugEnabled()) {
-                log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
-            }
-            Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
-            if(besCommandLogger.isInfoEnabled()){
-                besCommandLogger.info("BES COMMAND ({})\n{}\n",new Date(),showRequest(request));
-            }
-
-            Procedure timedProc = Timer.start();
+            log.debug("This is attempt: {}", attempts);
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                oc = getClient();
+                if (oc == null) {
+                    besTrouble = true;
+                    String msg = "FAILED to retrieve a valid OPeNDAPClient instance! " +
+                            "BES Prefix: " + getPrefix() + " BES NickName: " + getNickName() + " BES Host: " + getHost();
+                    throw new PPTException(msg);
+                }
 
+                tweakRequestId(request, oc);
+                if (log.isDebugEnabled()) {
+                    log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
+                }
+                Logger besCommandLogger = LoggerFactory.getLogger("BesCommandLog");
+                if (besCommandLogger.isInfoEnabled()) {
+                    besCommandLogger.info("BES COMMAND ({})\n{}\n", new Date(), showRequest(request));
+                }
+
+                timedProc= Timer.start();
                 boolean result = oc.sendRequest(request, os, baos);
                 log.debug("besTransaction() - Completed.");
                 if (!result) {
-
+                    // We got back an error object from the BES in the baos.
+                    // We feed that to the BESError class to build the error object.
                     log.debug("BESError: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
                     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
                     BESError besError = new BESError(bais);
 
-                    log.error("besTransaction() -  BES Transaction received a BESError Object. Msg: {}", besError.getMessage());
+                    log.error("ERROR: BES transaction received a BESError Object. Msg: {}", besError.getMessage());
 
                     int besErrCode = besError.getBesErrorCode();
                     // If the BES experienced a fatal error then we know we have
                     // to dump the connection to the child besListener.
                     if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
                         besTrouble = true;
-                        besFatalError =  besError;
+                        besFatalError = besError;
                     }
                     else {
                         // If the error is not fatal then we just throw it and move on.
                         throw besError;
                     }
                 }
-            } catch (PPTException e) {
+            }
+            catch (PPTException e) {
                 besTrouble = true;
-                log.debug("OLFS Encountered a PPT Problem! Transaction attempt: {}  Message: {}", attempts, e.getMessage());
-                String msg = "Problem encountered with BES connection. Message: '" + e.getMessage() + "' " +
-                        "OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.";
-                log.error(msg);
-                e.setErrorMessage(msg);
+                String errmsg = "ERROR: Problem encountered with BES connection. On transaction attempt:" + attempts + " ";
+                errmsg += " a PPTException was caught. Message: " + e.getMessage();
+                if(oc != null) {
+                    errmsg += " (OPeNDAPClient executed " + oc.getCommandCount() + " prior commands.)";
+                }
+                log.error(errmsg);
+                e.setErrorMessage(errmsg);
                 pptException = e;
-            } finally {
-                returnClient(oc, besTrouble);
-                Timer.stop(timedProc);
+            }
+            finally {
+                if(oc!=null) returnClient(oc, besTrouble);
+                if(timedProc!=null) Timer.stop(timedProc);
             }
         }
-        while(besTrouble && attempts < getMaxCommandAttempts());
+        while (besTrouble && attempts < getMaxCommandAttempts());
 
-        if(besTrouble){
-            if(besFatalError != null)
+        if (besTrouble) {
+            if (besFatalError != null)
                 throw besFatalError;
 
-            if(pptException != null)
+            if (pptException != null)
                 throw pptException;
         }
         log.debug("END");
