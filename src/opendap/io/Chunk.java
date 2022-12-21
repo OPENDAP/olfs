@@ -193,6 +193,11 @@ public class Chunk {
                     if (totalBytesRead == 0)
                         totalBytesRead = -1;
                     done = true;
+
+                    String msg = "Socket Read Exception: Attempted to read "+len+" bytes starting " +
+                            "at "+off+" into a buffer of length "+buf.length+" ";
+                    log.error(msg);
+                    throw new IOException(msg);
                 }
                 else {
                     totalBytesRead += bytesRead;
