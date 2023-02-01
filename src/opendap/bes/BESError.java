@@ -389,16 +389,11 @@ public class BESError extends OPeNDAPException {
                 httpStatus = HttpServletResponse.SC_FORBIDDEN;
                 break;
 
+            case BESError.TIME_OUT:
             case BESError.USER_SYNTAX_ERROR:
                 httpStatus = HttpServletResponse.SC_BAD_REQUEST;
                 break;
-
-            case BESError.TIME_OUT:
-                // Not a great semantic match as it's not a server error per say,
-                // but this what the users wanted.
-                httpStatus = HttpServletResponse.SC_GATEWAY_TIMEOUT;
-                break;
-
+                
             default:
                 httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 break;
