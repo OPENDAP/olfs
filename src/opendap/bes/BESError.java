@@ -389,14 +389,13 @@ public class BESError extends OPeNDAPException {
                 httpStatus = HttpServletResponse.SC_FORBIDDEN;
                 break;
 
+            // Since BES timeout conditions are mostly from users asking for too
+            // much stuff from something like fileout_netcdf we map the
+            // BES timeout to BAD_REQUEST because the user can change their
+            // request to make it work. ndp 2/2/2223
+            case BESError.TIME_OUT:
             case BESError.USER_SYNTAX_ERROR:
                 httpStatus = HttpServletResponse.SC_BAD_REQUEST;
-                break;
-
-            case BESError.TIME_OUT:
-                // Not a great semantic match as it's not a server error per say,
-                // but this what the users wanted.
-                httpStatus = HttpServletResponse.SC_GATEWAY_TIMEOUT;
                 break;
 
             default:
