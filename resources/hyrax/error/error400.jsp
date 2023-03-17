@@ -70,7 +70,7 @@
             <p align="left">It appears that you have submitted a Bad Request. </p>
             <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong><pre><%= Encode.forHtml(message) %></pre> </strong></p> </blockquote>
+            <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
             <% } %>
 
             <p align="left">There may simply be problem with the syntax of your OPeNDAP URL. If you are using server
