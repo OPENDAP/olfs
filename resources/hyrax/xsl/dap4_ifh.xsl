@@ -1012,16 +1012,23 @@
     <xsl:template name="GlobalDimensionsPresentation">
         <xsl:param name="title" />
         <div class="tightView">
-            <ul class="collapsibleList">
-                <li>
-                    <div class="small_bold" style="color:#527CC1;"><xsl:value-of select="$title"/></div>
-                    <xsl:for-each select="dap:Dimension">
-                        <ul>
-                        <xsl:call-template name="Dimension"/>
-                        </ul>
-                    </xsl:for-each>
-                </li>
-            </ul>
+            <xsl:choose>
+                <xsl:when test="dap:Dimension">
+                    <ul class="collapsibleList">
+                        <li>
+                            <div class="small_bold" style="color:#527CC1;"><xsl:value-of select="$title"/></div>
+                            <xsl:for-each select="dap:Dimension">
+                                <ul>
+                                    <xsl:call-template name="Dimension"/>
+                                </ul>
+                            </xsl:for-each>
+                        </li>
+                    </ul>
+                </xsl:when>
+                <xsl:otherwise>
+                    <span class="small_italic">None</span>
+                </xsl:otherwise>
+            </xsl:choose>
         </div>
     </xsl:template>
 
