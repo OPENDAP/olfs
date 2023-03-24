@@ -181,7 +181,7 @@
                         <xsl:value-of select="@name"/>
                     </span>
                     <span class="small"  style="float: right; padding: 7px 10px;">
-                        <a title="XML encoded DMR document" href="{@name}.dmr.xml">DMR</a>
+                        <a title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
                     </span>
                 </h1>
                 <hr size="1" noshade="noshade"/>
