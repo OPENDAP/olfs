@@ -988,6 +988,7 @@
                 </div>
             </td>
 
+            <!--
             <td>
                 <div style="margin-left:25px;">
                     <xsl:for-each select="dap:Dimension">
@@ -995,7 +996,33 @@
                     </xsl:for-each>
                 </div>
             </td>
+            -->
+            <td width="100%">
+                <div style="width:100%;margin-left:25px;">
+                    <xsl:call-template name="GlobalDimensionsPresentation">
+                        <xsl:with-param name="title">View/Hide</xsl:with-param>
+                    </xsl:call-template>
+
+                    <!-- xsl:apply-templates select="dap:Attribute"/ -->
+                </div>
+            </td>
         </tr>
+    </xsl:template>
+
+    <xsl:template name="GlobalDimensionsPresentation">
+        <xsl:param name="title" />
+        <div class="tightView">
+            <ul class="collapsibleList">
+                <li>
+                    <div class="small_bold" style="color:#527CC1;"><xsl:value-of select="$title"/></div>
+                    <xsl:for-each select="dap:Dimension">
+                        <ul>
+                        <xsl:call-template name="Dimension"/>
+                        </ul>
+                    </xsl:for-each>
+                </li>
+            </ul>
+        </div>
     </xsl:template>
 
 
