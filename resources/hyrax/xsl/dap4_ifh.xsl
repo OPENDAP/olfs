@@ -180,7 +180,9 @@
                     <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;">
                         <xsl:value-of select="@name"/>
                     </span>
-
+                    <span class="small"  style="float: right; padding: 7px 10px;">
+                        <a title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
+                    </span>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
@@ -986,6 +988,7 @@
                 </div>
             </td>
 
+            <!--
             <td>
                 <div style="margin-left:25px;">
                     <xsl:for-each select="dap:Dimension">
@@ -993,7 +996,40 @@
                     </xsl:for-each>
                 </div>
             </td>
+            -->
+            <td width="100%">
+                <div style="width:100%;margin-left:25px;">
+                    <xsl:call-template name="GlobalDimensionsPresentation">
+                        <xsl:with-param name="title">View/Hide</xsl:with-param>
+                    </xsl:call-template>
+
+                    <!-- xsl:apply-templates select="dap:Attribute"/ -->
+                </div>
+            </td>
         </tr>
+    </xsl:template>
+
+    <xsl:template name="GlobalDimensionsPresentation">
+        <xsl:param name="title" />
+        <div class="tightView">
+            <xsl:choose>
+                <xsl:when test="dap:Dimension">
+                    <ul class="collapsibleList">
+                        <li>
+                            <div class="small_bold" style="color:#527CC1;"><xsl:value-of select="$title"/></div>
+                            <xsl:for-each select="dap:Dimension">
+                                <ul>
+                                    <xsl:call-template name="Dimension"/>
+                                </ul>
+                            </xsl:for-each>
+                        </li>
+                    </ul>
+                </xsl:when>
+                <xsl:otherwise>
+                    <span class="small_italic">None</span>
+                </xsl:otherwise>
+            </xsl:choose>
+        </div>
     </xsl:template>
 
 
