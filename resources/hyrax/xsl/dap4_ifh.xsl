@@ -180,10 +180,22 @@
                     <span style="font-size: 20px;  vertical-align: 15%; font-weight: normal;">
                         <xsl:value-of select="@name"/>
                     </span>
-                    <span class="small"  style="float: right; padding: 7px 10px;">
-                        <a title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
-                    </span>
+                    <!-- div
+                            class="small"
+                            style="background-color: #527CC1; float: right; font-weight: normal; font-style: italic; padding: 7px 7px 0px 0px">
+                        <a style="color: white;" title="XML encoded DMR document" href="{@name}.dmr.xml">dataset metadata response (dmr)</a>
+                    </div -->
+                    <div
+                        class="small"
+                        style="background-color: #527CC1; float: right; font-weight: normal; font-style: italic; padding: 7px 7px 0px 0px">
+                        <a style="color: white;" title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
+                    </div>
                 </h1>
+
+                <!-- span class="small" >
+                    <a title="XML encoded DMR document" href="{@name}.dmr.xml">dataset metadata response (dmr)</a>
+                </span -->
+
                 <hr size="1" noshade="noshade"/>
 
                 <!-- ****************************************************** -->
