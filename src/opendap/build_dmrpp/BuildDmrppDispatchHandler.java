@@ -31,6 +31,13 @@ import opendap.bes.BesDapDispatcher;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
+import opendap.dap.User;
+import opendap.dap4.QueryParameters;
+import org.apache.catalina.util.XMLWriter;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
@@ -70,7 +77,7 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
 
     private Logger log;
     private boolean _initialized;
-    private String _prefix = "build_dmrpp/";
+    private String _prefix = "build_dmrpp";
     private BuildDmrppBesApi _besApi;
 
     private static final String d_landingPage="/docs/ngap/ngap.html";
@@ -107,6 +114,9 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                                    boolean sendResponse)
             throws Exception {
 
+        User user = new User(request);
+        QueryParameters qp = new QueryParameters(request);
+
         String relativeURL = ReqInfo.getLocalUrl(request);
         log.debug("relativeURL:    "+relativeURL);
 
@@ -131,7 +141,7 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                 }
                 else {
                     log.info("Sending build_dmrpp Response");
-                    if (!super.requestDispatch(request, response, true)) {
+                    /*if (!super.requestDispatch(request, response, true)) {
                         if (!response.isCommitted()) {
                             String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(BuildDmrppBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
                             throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
@@ -140,7 +150,19 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                             isMyRequest = false;
                             log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
                         }
+                    }*/
+                    if(relativeURL.startsWith(_prefix)){
+                        relativeURL = relativeURL.substring(_prefix.length());
                     }
+
+                    Document build_dmrpp_cmd;
+                    build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp);
+
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    log.error(xmlo.outputString(build_dmrpp_cmd));
+
+                    _besApi.besTransaction(relativeURL, build_dmrpp_cmd, response.getOutputStream());
+
                     log.info("Sent DAP build_dmrpp Response.");
                     dapServiceCounter.incrementAndGet();
                 }

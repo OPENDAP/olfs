@@ -69,6 +69,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
     public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
 
+    public static final String DMRPP = "dmrpp";
     private Logger log;
     private String _servicePrefix;
 
@@ -339,6 +340,16 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
 
     }
 
+
+    public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp)
+            throws BadConfigurationException {
+
+        Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, DMRPP, XML_ERRORS);
+        Element root = besRequest.getRootElement();
+
+        return besRequest;
+
+    }
 
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern) {
 
