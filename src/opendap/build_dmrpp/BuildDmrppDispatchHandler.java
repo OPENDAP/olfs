@@ -141,22 +141,12 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                 }
                 else {
                     log.info("Sending build_dmrpp Response");
-                    /*if (!super.requestDispatch(request, response, true)) {
-                        if (!response.isCommitted()) {
-                            String s = Util.dropSuffixFrom(relativeURL, Pattern.compile(BuildDmrppBesApi.MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-                            throw new opendap.http.error.BadRequest("The requested DAP response suffix of '" +
-                                    relativeURL.substring(s.length()) + "' is not recognized by this server.");
-                        } else {
-                            isMyRequest = false;
-                            log.error("The response was committed prior to encountering a problem. Unable to send a 404 error. Giving up...");
-                        }
-                    }*/
+
                     if(relativeURL.startsWith(_prefix)){
                         relativeURL = relativeURL.substring(_prefix.length());
                     }
 
-                    Document build_dmrpp_cmd;
-                    build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp);
+                    Document build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp);
 
                     XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                     log.error(xmlo.outputString(build_dmrpp_cmd));

@@ -345,7 +345,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
             throws BadConfigurationException {
 
         Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, DMRPP, XML_ERRORS);
-        Element root = besRequest.getRootElement();
+        //Element root = besRequest.getRootElement();
 
         return besRequest;
 
