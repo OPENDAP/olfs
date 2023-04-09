@@ -92,8 +92,6 @@
                 In addition <strong>Hyrax</strong> and other new servers support the following DAP4 URL extensions: <br/><br/>
                 <span style="margin: 20px;"><strong>dmr</strong> - <em>The DAP4 dataset metadata response.</em></span><br/>
                 <span style="margin: 20px;"><strong>dap</strong> - <em>The DAP4 data response.</em></span><br/>
-                <span style="margin: 20px;"><strong>dsr</strong> - <em>The DAP4 dataset services response.</em></span><br/>
-                <span style="margin: 20px;"><strong>ddx</strong> - <em>The DAP3.2 dataset metadata response.</em></span><br/>
 
             </p>
             <% if(supportEmail!=null){ %>
