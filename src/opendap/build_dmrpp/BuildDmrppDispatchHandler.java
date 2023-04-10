@@ -117,6 +117,12 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
         User user = new User(request);
         QueryParameters qp = new QueryParameters(request);
 
+        String invocation = request.getRequestURL().toString();
+        String qs = request.getQueryString();
+        if(qs!=null)
+            invocation += "?" + qs;
+        log.debug("invocation:    "+invocation);
+
         String relativeURL = ReqInfo.getLocalUrl(request);
         log.debug("relativeURL:    "+relativeURL);
 
@@ -146,7 +152,8 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                         relativeURL = relativeURL.substring(_prefix.length());
                     }
 
-                    Document build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp);
+                    Document build_dmrpp_cmd;
+                    build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp, invocation);
 
                     XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                     log.error(xmlo.outputString(build_dmrpp_cmd));

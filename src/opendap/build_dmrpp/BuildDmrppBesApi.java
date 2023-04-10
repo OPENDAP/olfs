@@ -68,6 +68,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
 
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
     public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
+    public static final String INVOCATION_CONTEXT = "invocation";
 
     public static final String DMRPP = "dmrpp";
     private Logger log;
@@ -231,7 +232,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
      * @param type
      * @param remoteDataSourceUrl
      * @param qp
-     * @param xmlBase
+     * @param invocation
      * @param formURL
      * @param returnAs
      * @param errorContext
@@ -243,7 +244,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
                                             String type,
                                             String remoteDataSourceUrl,
                                             QueryParameters qp,
-                                            String xmlBase,
+                                            String invocation,
                                             String formURL,
                                             String returnAs,
                                             String errorContext)
@@ -267,8 +268,8 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
         if(!logEntryForBes.isEmpty())
             request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
-        if(xmlBase!=null)
-            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
+        if(invocation!=null)
+            request.addContent(setContextElement(INVOCATION_CONTEXT,invocation));
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
@@ -341,14 +342,11 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
     }
 
 
-    public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp)
+    public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp, String invocation)
             throws BadConfigurationException {
 
-        Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, null, null, DMRPP, XML_ERRORS);
-        //Element root = besRequest.getRootElement();
-
+        Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, invocation, null, DMRPP, XML_ERRORS);
         return besRequest;
-
     }
 
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern) {
