@@ -156,7 +156,6 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                     build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp, invocation);
 
                     XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                    log.error(xmlo.outputString(build_dmrpp_cmd));
 
                     _besApi.besTransaction(relativeURL, build_dmrpp_cmd, response.getOutputStream());
 
