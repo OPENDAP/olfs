@@ -94,10 +94,6 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
     </BESManager>
 
 
-    <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
-    <GatewayService  prefix="gateway" useMemoryCache="true" />
-
-
     <!--
     <DatasetUrlResponse type="..." />
     Supported type values are: dsr, download, and requestForm
@@ -134,70 +130,12 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
     -->
     <DataRequestForm type="dap4" />
 
-    <!--
-        'AllowDirectDataSourceAccess' - When enabled users will be able to use
-        Hyrax as a file server and download the underlying data files/granules/objects
-        directly, without utilizing the DAP APIs.
-    -->
-    <!-- AllowDirectDataSourceAccess / -->
-
-
-    <!-- @DEPRECATED - ForceDataRequestFormLinkToHttps - IGNORED -  @DEPRECATED -->
-
-
-    <!--
-    'ForceLinksToHttps' - The presence of this element will cause the server to "force" all
-    of the links returned by the server to be expressed with the HTTPS protocol.
-
-    When the 'ForceLinksToHttps' element is absent from the config (commented out) then
-    the forcing to https is feature is disabled. The server will continue to return https
-    urls when:
-        - The incoming request URL uses https.
-        - The server detects the presence of the CloudFront-Forwarded-Proto or X-Forwarded-Proto
-        request headers with a values of https. These are typically set by some redirecting
-        entity (like Cloudfront) that is in the business of rewriting the request URLs to remove
-        the HTTPS protocol for internal request servicing.
-
-    'ForceLinksToHttps' is a heavy handed way of accomplishing this in the absence of *-Forwarded-Proto
-    headers. It is heavy handed because it will break thinks like accesses http://localhost that retrun
-    redirects ot content with URLs that reference the server (ex: the xml:base attribute in the DMR)
-    -->
-    <!-- ForceLinksToHttps /  -->
-
-
-
 
     <!--
         HttpPost Support
     -->
     <HttpPost enabled="true" max="2000000"/>
 
-
-
-    <!--
-        'RequireUserSelection' - When enabled this will cause both the DAP2
-        and DAP4 Data Request Forms to require the users to choose one or more
-        variables before they may utilize the 'Get As X' buttons in the UI. This
-        effectively prevents users from inadvertently asking that the entire
-        dataset be converted into NetCDF (for example) when all they actually
-        require are one or two variables. If not enabled the Data Request Forms
-        will not require the user to make a selection.
-    -->
-    <!-- RequireUserSelection /-->
-
-
-    <!--
-        'AllowDirectDataSourceAccess' - When enabled users will be able to use
-        Hyrax as a file server and download the underlying data files/granules/objects
-        directly, without utilizing the DAP APIs.
-    -->
-    <!-- AllowDirectDataSourceAccess / -->
-
-    <!--
-        'AddFileoutTypeSuffixToDownloadFilename' - When enabled the server will add
-        the file type suffix of the requested data format to the download file name.
-    -->
-    <!-- AddFileoutTypeSuffixToDownloadFilename / -->
 
     <!--
         `EnableCombinedLog` - Enabling this feature will cause the OLFS to send
@@ -206,46 +144,6 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
         client behavior.
     -->
     <EnableCombinedLog />
-
-
-    <!--
-        'NoDynamicNavigation' - This is an "alpha" feature that disables dynamic
-        navigation/catalog content generation. When enabled, the static (user
-        supplied) THREDDS catalogs will still work. All of the regular dynamic
-        catalog/contents pages will be disabled.
-    -->
-    <!-- NoDynamicNavigation /-->
-
-
-    <!--
-        'Bot Blocker' - Used to block access from specific IP addresses
-        and by a range of IP addresses using a regular expression.
-    -->
-    <!-- BotBlocker -->
-    <!-- <IpAddress>127.0.0.1</IpAddress> -->
-    <!-- This matches all IPv4 addresses, work yours out from here.... -->
-    <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-    <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-    <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-    <!-- /BotBlocker -->
-
-
-    <!--
-        'Timer' - Enables or disables the generation of internal timing metrics for the OLFS
-        If commented out the timing is disabled. If you want timing metrics to be output
-        to the log then uncomment the Timer and set the enabled attribute's value to "true"
-        WARNING: There is some performance cost to utilizing the Timer.
-    -->
-    <!-- Timer enabled="false" / -->
-
-
-
-    <!--
-        'PreloadNcmlIntoBes' - This is a prototype feature that was never readied
-        for production. ENABLE AT YOUR OWN RISK.
-    -->
-    <!-- PreloadNcmlIntoBes -->
-
 
 
 </OLFSConfig>

@@ -34,6 +34,7 @@
         can produce a Web Application aRchive (WAR) file for each of:
         - The OLFS/Hyrax service build targets(s): server
         - The NGAP/Hyrax service, build targets(s): ngap
+        - The build dmr++ service, build targets(s): build_dmrpp
         - The robots.txt service, build targets(s): robots, hyrax-robots
 
         Also builds:
@@ -46,6 +47,7 @@
 
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
     <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
+    <property name="BUILD_DMRPP_DEPLOYMENT_CONTEXT" value="build_dmrpp"/>
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
@@ -61,10 +63,12 @@
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
     <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
+    <property name="BUILD_DMRPP_VERSION" value="${HYRAX_VERSION}"/>
     <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
+    <property name="NGAP_DIST_BASE" value="ngap-${NGAP_VERSION}"/>
+    <property name="BUILD_DMRPP_DIST_BASE" value="build_dmrpp-${BUILD_DMRPP_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
@@ -141,14 +145,16 @@
         <echo level="info" message="##########################################################"/>
         <echo level="info" message="# Build Settings"/>
         <echo level="info" message="#"/>
-        <echo level="info" message="           Project Name: ${ant.project.name}"/>
-        <echo level="info" message="           Project File: ${ant.file}"/>
-        <echo level="info" message="          Hyrax Version: ${HYRAX_VERSION}"/>
-        <echo level="info" message="           OLFS Version: ${OLFS_VERSION}"/>
-        <echo level="info" message="           NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="            WCS Version: ${WCS_VERSION}"/>
-        <echo level="info" message="     Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="                  Project Name: ${ant.project.name}"/>
+        <echo level="info" message="                  Project File: ${ant.file}"/>
+        <echo level="info" message="                 Hyrax Version: ${HYRAX_VERSION}"/>
+        <echo level="info" message="                  OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="                  NGAP Version: ${NGAP_VERSION}"/>
+        <echo level="info" message="           BUILD_DMRPP Version: ${BUILD_DMRPP_VERSION}"/>
+        <echo level="info" message="                   WCS Version: ${WCS_VERSION}"/>
+        <echo level="info" message="            Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="BUILD_DMRPP Deployment Context: ${BUILD_DMRPP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="                src.dir: ${src.dir}"/>
@@ -222,6 +228,9 @@
 
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
     <property name="build.ngap.resources" location="${build.dir}/ngap"/>
+
+    <property name="BuildDmrpp.Resources.dir" location="${resources.dir}/build_dmrpp"/>
+    <property name="build.BuildDmrpp.resources" location="${build.dir}/build_dmrpp"/>
 
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
@@ -470,7 +479,7 @@
             <fileset dir="${robotsResources.dir}"/>
         </copy>
 
-        <copy todir="${build.ngap.resources}" filtering="true">
+        <copy todir="${build..resources}" filtering="true">
             <fileset dir="${ngapResources.dir}">
                 <exclude name="*.png" />
                 <exclude name="lib/**" />
@@ -842,9 +851,9 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target
-        name="ngap"
-        depends="clean,compile"
-        description="Performs a clean build of the core software and assembles the WAR file.">
+            name="ngap"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the WAR file.">
 
         <echo level="info" message="Building Hyrax NGAP server war file."/>
         <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
@@ -921,8 +930,8 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target name="ngap-dist"
-        depends="ngap"
-        description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
+            depends="ngap"
+            description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
         <tar destfile="${build.dist}/${NGAP_DIST_BASE}-webapp.tgz" compression="gzip">
             <zipfileset dir="${build.dist}" prefix="${NGAP_DIST_BASE}-webapp">
@@ -930,6 +939,106 @@
             </zipfileset>
         </tar>
         <delete file="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"/>
+    </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+    <target
+            name="build_dmrpp"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the build_dmrpp WAR file.">
+
+        <echo level="info" message="Building Hyrax build dmr++ service war file."/>
+        <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="ngapResources.dir:     ${ngapResources.dir}"/>
+        <echo level="info" message="build.dist:            ${build.dist}"/>
+
+        <!-- Drop this bit, and the bits below that include it in the war and
+             delete it from the dist dir -->
+        <!-- copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/ -->
+
+        <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
+        <copy todir="${build.ngap.resources}/lib" filtering="false">
+            <fileset refid="hyrax-libs"/>
+            <fileset dir="${ngapResources.dir}/lib">
+
+                <!-- We exclude these because they get placed into
+                $CATALINA_HOM/lib when the Docker containers are built.-->
+                <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
+                <exclude name="memcached-session-manager-2.3.2.jar"/>
+                <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
+
+            </fileset>
+
+        </copy>
+
+
+        <!--
+        Here we:
+         - Set the WAR file name to ${NGAP_DEPLOYMENT_CONTEXT}.war (A value of
+           ROOT will deploy to "/".)
+         - Utilize a special NGAP web.xml that deploys with the Hyrax
+           authentication and authorization filters enabled
+        -->
+        <war destfile="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"
+             webxml="${build.ngap.resources}/web.xml">
+
+            <lib dir="${build.ngap.resources}/lib"/>
+
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
+                <include name="**/*"/>
+                <exclude name="WEB-INF/conf/olfs.xml"/>
+                <exclude name="WEB-INF/conf/logback.xml"/>
+                <exclude name="WEB-INF/web.xml"/>
+                <exclude name="WEB-INF/urlrewrite.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF">
+                <include name="urlrewrite.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF/conf">
+                <include name="logback.xml"/>
+                <include name="olfs.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${doc.dir}" prefix="docs">
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+
+            <!-- = = = = = = BUILD_DMRPP LANDING PAGE = = = = = = -->
+            <zipfileset dir="${build.BuildDmrpp.resources}/landing" prefix="docs/ngap" />
+            <zipfileset dir="${build.BuildDmrpp.resources}/landing" prefix="docs/ngap">
+                <include name="*.png" />
+            </zipfileset>
+            <!-- = = = = = = = = = = = = = = = = = = = = = -->
+
+        </war>
+        <delete file="${build.dist}/index.html"/>
+    </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+    <target name="build_dmrpp-dist"
+            depends="build_dmrpp"
+            description="Packages the BUILD_DMRPP war file (${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
+
+        <tar destfile="${build.dist}/${BUILD_DMRPP_DIST_BASE}-webapp.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${BUILD_DMRPP_DIST_BASE}-webapp">
+                <include name="${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"/>
+            </zipfileset>
+        </tar>
+        <delete file="${build.dist}/${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"/>
     </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->

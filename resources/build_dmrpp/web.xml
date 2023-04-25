@@ -179,9 +179,9 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <servlet>
-        <servlet-name>hyrax</servlet-name>
+        <servlet-name>build_dmrpp</servlet-name>
 
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
+        <servlet-class>opendap.build_dmrpp.BuildDmrppServlet</servlet-class>
 
         <init-param>
             <param-name>DebugOn</param-name>
@@ -197,56 +197,6 @@
 
     </servlet>
 
-    <!-- - - - - - - - - WCS Servlet - - - - - - - - - -->
-    <servlet>
-        <servlet-name>wcs</servlet-name>
-        <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
-        <init-param>
-            <param-name>WCSConfigFileName</param-name>
-            <param-value>wcs_service.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
-
-
-    <servlet>
-        <servlet-name>w10n</servlet-name>
-        <servlet-class>opendap.w10n.W10nServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>aggregation</servlet-name>
-        <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
-        <!-- init-param>
-            <param-name>DeveloperMode</param-name>
-            <param-value>true</param-value>
-        </init-param -->
-        <!-- Most people don't use the HAI, so don't load it by default -->
-        <!-- load-on-startup>1</load-on-startup -->
-    </servlet>
-
-    <servlet>
-        <servlet-name>viewers</servlet-name>
-
-        <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
-
-        <init-param>
-            <param-name>ConfigFileName</param-name>
-            <param-value>viewers.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
-
     <servlet>
         <servlet-name>docs_servlet</servlet-name>
         <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
@@ -254,18 +204,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- moved to the robots.txt service -->
-    <servlet>
-        <servlet-name>site_map_service</servlet-name>
-        <servlet-class>opendap.bes.BESSiteMapService</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <!-- servlet>
-        <servlet-name>echo</servlet-name>
-        <servlet-class>opendap.experiments.EchoServlet </servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet -->
 
     <filter>
         <filter-name>UrlRewriteFilter</filter-name>
@@ -289,50 +227,18 @@
         <dispatcher>ERROR</dispatcher>
     </filter-mapping>
 
-    <!-- servlet-mapping>
-        <servlet-name>echo</servlet-name>
-        <url-pattern>/echo/*</url-pattern>
-    </servlet-mapping -->
 
     <servlet-mapping>
-        <servlet-name>site_map_service</servlet-name>
-        <url-pattern>/siteMap/*</url-pattern>
+        <servlet-name>build_dmrpp</servlet-name>
+        <url-pattern>/build_dmrpp/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
-        <url-pattern>/hyrax/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/hai/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>viewers</servlet-name>
-        <url-pattern>/viewers/*</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>docs_servlet</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>aggregation</servlet-name>
-        <url-pattern>/aggregation/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>w10n</servlet-name>
-        <url-pattern>/w10n/*</url-pattern>
-    </servlet-mapping>
-    
-    <servlet-mapping>
-        <servlet-name>wcs</servlet-name>
-        <url-pattern>/wcs/*</url-pattern>
-    </servlet-mapping>
 
     <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
@@ -402,48 +308,6 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.htm</welcome-file>
     </welcome-file-list>
-
-
-
-    <!-- Define a Security Constraint on the Admin command and user interfaces -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Hyrax Admin Interface</web-resource-name>
-            <url-pattern>/hai/*</url-pattern>
-            <url-pattern>/admin/*</url-pattern>
-        </web-resource-collection>
-
-        <auth-constraint>
-            <role-name>manager</role-name>
-        </auth-constraint>
-
-        <user-data-constraint>
-            <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-            <!-- transport-guarantee>NONE</transport-guarantee -->
-        </user-data-constraint>
-    </security-constraint>
-
-    <!-- Define the Login Configuration for this Application -->
-
-    <login-config>
-        <auth-method>FORM</auth-method>
-        <realm-name>Hyrax Administration Pages</realm-name>
-        <form-login-config>
-            <form-login-page>/admin/jsp/login.jsp</form-login-page>
-            <form-error-page>/admin/jsp/login-failed.jsp</form-error-page>
-        </form-login-config>
-    </login-config>
-
-
-    <!-- Security roles referenced by this web application -->
-    <security-role>
-        <description>
-            The role that is required to login to the Hyrax Administration Application
-        </description>
-        <role-name>manager</role-name>
-    </security-role>
-
 
 </web-app>
 

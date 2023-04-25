@@ -28,33 +28,16 @@ package opendap.build_dmrpp;
 
 import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
-import opendap.bes.BESError;
-import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Util;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.ServletLogUtil;
 import opendap.namespaces.BES;
-import opendap.ppt.PPTException;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.HeadMethod;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,11 +47,15 @@ import java.util.regex.Pattern;
  * Cloned from: opendap.gateway
  * To change this template use File | Settings | File Templates.
  */
-public class BuildDmrppBesApi extends BesApi implements Cloneable {
+public class BuildDmrppBesApi implements Cloneable {
 
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
     public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
     public static final String INVOCATION_CONTEXT = "invocation";
+
+    private static final String SPACE_NAME = "builddmrpp";
+    private static final String CONTAINER_NAME = "builddmrppContainer";
+
 
     public static final String DMRPP = "dmrpp";
     private Logger log;
@@ -84,102 +71,13 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
         _servicePrefix = servicePrefix;
     }
 
-    /**
-     * This child class of opendap.bes.BesXmlAPI provides an implementation of the
-     * getRequestDocument method that utilizes the BES wcs_gateway_module.
-     * @param type The type of thing being requested. For example a DDX would be
-     * opendap.bes.BesXmlAPI.DDX
-     * @param remoteDataSourceUrl See opendap.bes.BesXmlAPI.DDX
-     * @param ce See opendap.bes.BesXmlAPI
-     * @param xmlBase See opendap.bes.BesXmlAPI
-     * @param formURL See opendap.bes.BesXmlAPI
-     * @param returnAs See opendap.bes.BesXmlAPI
-     * @param errorContext See opendap.bes.BesXmlAPI
-     * @return The request Document
-     * @throws opendap.bes.BadConfigurationException When the bad things happen.
-     *
-     *
-     *
-     *
-     *
-     *     public  Document getRequestDocument(String type,
-                                                String dataSource,
-                                                String ce,
-                                                String xdap_accept,
-                                                int maxResponseSize,
-                                                String xmlBase,
-                                                String formURL,
-                                                String returnAs,
-                                                String errorContext)
-                throws BadConfigurationException {
 
-     *
-     *
-     *
-     *
-     * @see opendap.bes.dap2Responders.BesApi
-     */
-    @Override
-    public Document getDap2RequestDocumentAsync(User user,
-                                                String type,
-                                           String remoteDataSourceUrl,
-                                           String ce,
-                                           String async,
-                                           String storeResult,
-                                           String xmlBase,
-                                           String formURL,
-                                           String returnAs,
-                                           String errorContext)
-                throws BadConfigurationException {
-
-
-        log.debug("Building request for BES builddmrpp_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
-        Element e, request = new Element("request", BES.BES_NS);
-
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":builddmrpp_request]";
-        request.setAttribute("reqID",reqID);
-
-        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-
-        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
-        if(!logEntryForBes.isEmpty())
-            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
-
-        if(xmlBase!=null)
-            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
-
-        if(user.getMaxResponseSize()>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
-
-        addEdlAuthToken(request,user);
-
-        request.addContent(setContainerElement(getBesContainerName(),
-                getBesSpaceName(),remoteDataSourceUrl,type));
-
-        Element def = defineElement("d1","default");
-        e = (containerElement(getBesContainerName()));
-
-        if(ce!=null && !ce.equals(""))
-            e.addContent(dap2ConstraintElement(ce));
-
-        def.addContent(e);
-
-        request.addContent(def);
-
-        e = getElement(type,"d1",formURL,returnAs);
-
-        request.addContent(e);
-
-        log.debug("Built request for BES builddmrpp_module.");
-
-
-        return new Document(request);
-
+    public static Element setContextElement(String name, String value) {
+        Element e = new Element("setContext",BES.BES_NS);
+        e.setAttribute("name",name);
+        e.setText(value);
+        return e;
     }
-
 
     /**
      * Adds the user id and/or the associated EDL auth token to the request
@@ -210,7 +108,7 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
     public static void addEdlAuthToken(Element request, User user) {
         UserProfile up = user.profile();
         if (up != null) {
-            request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
+            request.addContent(setContextElement(BesApi.UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
@@ -226,81 +124,6 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
     }
 
 
-    /**
-     *
-     * @param user
-     * @param type
-     * @param remoteDataSourceUrl
-     * @param qp
-     * @param invocation
-     * @param formURL
-     * @param returnAs
-     * @param errorContext
-     * @return
-     * @throws BadConfigurationException
-     */
-    @Override
-    public  Document getDap4RequestDocument(User user,
-                                            String type,
-                                            String remoteDataSourceUrl,
-                                            QueryParameters qp,
-                                            String invocation,
-                                            String formURL,
-                                            String returnAs,
-                                            String errorContext)
-            throws BadConfigurationException {
-
-
-        log.debug("getDap4RequestDocument() - Building request for BES builddmrpp_module request. remoteDataSourceUrl: {}",remoteDataSourceUrl);
-        Element e, request = new Element("request", BES.BES_NS);
-
-        //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
-
-        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
-
-        request.setAttribute("reqID",reqID);
-
-        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-
-        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
-        if(!logEntryForBes.isEmpty())
-            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
-
-        if(invocation!=null)
-            request.addContent(setContextElement(INVOCATION_CONTEXT,invocation));
-
-        if(user.getMaxResponseSize()>=0)
-            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
-
-        addEdlAuthToken(request,user);
-
-        request.addContent(setContainerElement(getBesContainerName(),
-                getBesSpaceName(),remoteDataSourceUrl,type));
-
-        Element def = defineElement("d1","default");
-        e = (containerElement(getBesContainerName()));
-
-        if(qp.getCe()!=null && !qp.getCe().equals(""))
-            e.addContent(dap4ConstraintElement(qp.getCe()));
-
-        if(qp.getFunc()!=null && !qp.getFunc().equals(""))
-            e.addContent(dap4FunctionElement(qp.getFunc()));
-
-        def.addContent(e);
-
-        request.addContent(def);
-
-        e = getElement(type,"d1",formURL,returnAs,qp.getAsync(),qp.getStoreResultRequestServiceUrl());
-
-        request.addContent(e);
-
-        log.debug("getDap4RequestDocument() - Built request for BES builddmrpp_module.");
-
-        return new Document(request);
-
-    }
 
 
     public Object clone() throws CloneNotSupportedException {
@@ -308,275 +131,102 @@ public class BuildDmrppBesApi extends BesApi implements Cloneable {
     }
 
 
-    /**
-     * This method defines which "space" (aka catalog) the BES will use to service the request. Here
-     * we override the parent class which uses the "space" called "catalog" to use the "space" called "builddmrpp".
-     * This is what causes the BES to invoke the builddmrpp handler
-     *
-     * @return
-     */
-    @Override
-    protected String getBesSpaceName() {
-        return "builddmrpp";
-    }
-
-    /**
-     * This defines the name of the container built by the BES. It's name matters not, it's really an ID, but to keep
-     * the BES commands readable and consistent we typically associate it with the "space" name.
-     *
-     * @return The name of the BES "container" which will be built into the request document.
-     */
-    @Override
-    protected String getBesContainerName() {
-        return "builddmrppContainer";
-    }
-
-
-
-    private String getDataSourceUrl(HttpServletRequest req, String pathPrefix) {
-
-        String relativeURL = ReqInfo.getLocalUrl(req);
-
-        return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(MATCH_LAST_DOT_SUFFIX_REGEX_STRING));
-
-    }
 
 
     public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp, String invocation)
             throws BadConfigurationException {
 
-        Document besRequest = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, invocation, null, DMRPP, XML_ERRORS);
-        return besRequest;
-    }
+        log.debug("Constructing BES build dmr++ request. dataSource: {}",dataSource);
+        Element e;
+        Element request = new Element("request", BES.BES_NS);
 
-    public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern) {
+        //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        // Strip leading slash(es)
-        while (relativeURL.startsWith("/") && !relativeURL.equals("/"))
-            relativeURL = relativeURL.substring(1, relativeURL.length());
+        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
 
-        String dataSourceUrl = relativeURL;
+        request.setAttribute("reqID",reqID);
 
-        // Strip the path off.
-        if (pathPrefix != null && dataSourceUrl.startsWith(pathPrefix))
-            dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
+        request.addContent(setContextElement(BesApi.EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
-        if (!dataSourceUrl.equals("")) {
-            dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
+        request.addContent(setContextElement(BesApi.ERRORS_CONTEXT, BesApi.XML_ERRORS));
+
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(BesApi.OLFS_LOG_CONTEXT,logEntryForBes));
+
+        if(invocation!=null)
+            request.addContent(setContextElement(INVOCATION_CONTEXT,invocation));
+
+        if(user.getMaxResponseSize()>=0)
+            request.addContent(setContextElement(BesApi.MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        addEdlAuthToken(request,user);
+
+        // request.addContent(setContainerElement(CONTAINER_NAME, SPACE_NAME,dataSource,BesApi.DAP4_DATA));
+        e = new Element("setContainer",BES.BES_NS);
+        e.setAttribute("name",CONTAINER_NAME);
+        e.setAttribute("space",SPACE_NAME);
+        e.setText(dataSource);
+        request.addContent(e);
+
+//         Element def = defineElement("d1","default");
+        Element def = new Element("define",BES.BES_NS);
+        e.setAttribute("name","d1");
+        e.setAttribute("space","default");
+
+        e = new Element("container",BES.BES_NS);
+        e.setAttribute("name",CONTAINER_NAME);
+
+        if(qp.getCe()!=null && !qp.getCe().equals("")) {
+            Element ceElem = new Element("dap4constraint",BES.BES_NS);
+            // We replace the space characters in the CE with %20
+            // so the libdap ce parsers don't blow a gasket.
+            String encoded_ce = qp.getCe().replaceAll(" ","%20");
+            ceElem.setText(encoded_ce);
+            e.addContent(ceElem);
         }
-        //dataSourceUrl = opendap.gateway.HexAsciiEncoder.hexToString(dataSourceUrl);
 
-        return dataSourceUrl;
+        if(qp.getFunc()!=null && !qp.getFunc().equals("")) {
+            // e.addContent(dap4FunctionElement(qp.getFunc()));
+            Element d4FuncElem = new Element("dap4function",BES.BES_NS);
+            e.setText(qp.getFunc());
+            e.addContent(d4FuncElem);
+        }
+        def.addContent(e);
+
+        request.addContent(def);
+
+        // Build and add the <get /> element
+        e = new Element("get",BES.BES_NS);
+        e.setAttribute("type",BesApi.DAP4_DATA);
+        e.setAttribute("definition","d1");
+        e.setAttribute("returnAs",DMRPP);
+
+        if(qp.getAsync()!=null && !qp.getAsync().isEmpty())
+            e.setAttribute("async",qp.getAsync());
+
+        if(qp.getStoreResultRequestServiceUrl()!=null && !qp.getStoreResultRequestServiceUrl().isEmpty())
+            e.setAttribute("store_result",qp.getStoreResultRequestServiceUrl());
+
+        request.addContent(e);
+
+        log.debug("Built request for BES build_dmrpp_module.");
+
+        return new Document(request);
     }
 
-
-    /**
-     *  Returns the DDX request document for the passed dataSource
-     *  using the passed constraint expression.
-     * @param dataSource The data set whose DDX is being requested
-     * @param xmlBase The request URL.
-     * @param contentID contentID of the first MIME part.
-     * @param mimeBoundary The MIME boundary to use in the response..
-     * @return The DDX request document.
-     * @throws BadConfigurationException When no BES can be found to
-     * service the request.
-     */
-    @Override
-    public Document getDap4DataRequest(User user,
-                                       String dataSource,
-                                       QueryParameters qp,
-                                       String xmlBase,
-                                       String contentID,
-                                       String mimeBoundary)
-            throws BadConfigurationException {
-
-        Document reqDoc = getDap4RequestDocument(user, DAP4_DATA, dataSource, qp, xmlBase, null, null, XML_ERRORS);
-
-        Element req = reqDoc.getRootElement();
-        if(req==null)
-            throw new BadConfigurationException("Request document is corrupt! Missing root element!");
-
-        Element getReq = req.getChild("get",BES.BES_NS);
-        if(getReq==null)
-            throw new BadConfigurationException("Request document is corrupt! Missing 'get' element!");
-
-        Element e = new Element("contentStartId",BES.BES_NS);
-        e.setText(contentID);
-        getReq.addContent(e);
-
-        e = new Element("mimeBoundary",BES.BES_NS);
-        e.setText(mimeBoundary);
-        getReq.addContent(e);
-
-        return reqDoc;
-
-    }
-
-    /*
-
-    @Override
-    public boolean getInfo(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
-
-
-        String besDataSourceId = getBesDataSourceID(dataSource);
-
-        return super.getInfo(besDataSourceId, response);
-
-    }
-    */
-
-
+/*
     String stripPrefix(String dataSource){
 
-
         while(dataSource.startsWith("/") && !dataSource.equals("/"))
-            dataSource = dataSource.substring(1,dataSource.length());
-
+            dataSource = dataSource.substring(1);
 
         if(dataSource.startsWith(_servicePrefix))
-            return dataSource.substring(_servicePrefix.length(),dataSource.length());
+            return dataSource.substring(_servicePrefix.length());
 
         return dataSource;
-
     }
-
-    /**
-     * Because the ngap-service doesn't support a catalog we ignore the checkWithBes parameter
-     *
-     * @param relativeUrl        The relative URL of the client request. No Constraint expression (i.e. No query section of
-     *                           the URL - the question mark and everything after it.)
-     * @param suffixMatchPattern This parameter provides the method with a suffix regex to use in evaluating what part,
-     *                           if any, of the relative URL must be removed to construct the besDataSourceId.
-     * @param checkWithBes       This boolean value instructs the code to ask the appropriate BES if the resulting
-     *                           besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
-     *                           doesn't have catalog services this parameter is ignored.
-     * @return
-     */
-    @Override
-    public String getBesDataSourceID(String relativeUrl, Pattern suffixMatchPattern, boolean checkWithBes) {
-        log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
-        if (Util.matchesSuffixPattern(relativeUrl, suffixMatchPattern)) {
-            try {
-
-                String remoteDatasourceUrl = getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern);
-
-                log.debug("getBesDataSourceID() - besDataSourceId: {}", remoteDatasourceUrl);
-                return remoteDatasourceUrl;
-            } catch (NumberFormatException e) {
-                log.debug("getBesDataSourceID() - Failed to extract target dataset URL from relative URL '{}'", relativeUrl);
-            }
-        }
-
-        return null;
+*/
 
 
-    }
-
-    @Override
-    public void getBesNode(String dataSource, Document response)
-            throws BadConfigurationException, PPTException, JDOMException, IOException, BESError {
-
-        // Returns a dummied up BesResource object
-        getBesNodeDummy(dataSource, response);
-
-        // While this on the other hand runs out on the web and asks for the information
-        // directly from the remote service. Not a whitelisted task so not production
-        // getBesNodeRemote(dataSource, response);
-    }
-
-    public void getBesNodeDummy(String dataSource, Document response) {
-        Element rootElement = new Element("response",BES.BES_NS);
-        response.setRootElement(rootElement);
-        Element showNode = new Element("showNode",BES.BES_NS);
-        rootElement.addContent(showNode);
-        Element item = new Element("item",BES.BES_NS);
-        showNode.addContent(item);
-
-        SimpleDateFormat fdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
-        item.setAttribute("isData", "true");
-        item.setAttribute("lastModified", fdf.format(new Date()));
-        item.setAttribute("name", dataSource);
-        item.setAttribute("type", "leaf");
-    }
-
-
-
-    public void getBesNodeRemote(String dataSourceUrl, Document response) throws IOException {
-        // Go get the HEAD for the catalog
-        // FIXME: This DOES NOT utilize the whitelist in the BES and this should to be MOVED to the BES
-        HttpClient httpClient = new HttpClient();
-        HeadMethod headReq = new HeadMethod(dataSourceUrl);
-
-        try {
-            int statusCode = httpClient.executeMethod(headReq);
-
-            if (statusCode != HttpStatus.SC_OK) {
-                log.error("Unable to HEAD remote resource: " + dataSourceUrl);
-                String msg = "OLFS: Unable to access requested resource: " + dataSourceUrl;
-                throw new OPeNDAPException(statusCode, msg);
-            }
-
-            Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
-            Date lastModified = new Date();
-
-            if (lastModifiedHeader != null) {
-                String lmtString = lastModifiedHeader.getValue();
-                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-                try {
-                    lastModified = format.parse(lmtString);
-                } catch (ParseException e) {
-                    log.warn("Failed to parse last modified time. LMT String: {}, resource URL: {}", lmtString, dataSourceUrl);
-                }
-            }
-
-            int size = -1;
-            Header contentLengthHeader = headReq.getResponseHeader("Content-Length");
-
-            if (contentLengthHeader != null) {
-                String sizeStr = contentLengthHeader.getValue();
-                try {
-                    size = Integer.parseInt(sizeStr);
-                } catch (NumberFormatException nfe) {
-                    log.warn("Received invalid content length from datasource: {}: ", dataSourceUrl);
-                }
-            }
-            Element catalogElement = getShowNodeResponseDocForDatasetUrl(dataSourceUrl, size, lastModified);
-            response.detachRootElement();
-            response.setRootElement(catalogElement);
-
-        }
-
-        catch (Exception e) {
-            StringBuilder s = new StringBuilder();
-            s.append("Unable to HEAD the remote resource: '").append(dataSourceUrl).append("' ");
-            s.append("Caught ").append(e.getClass().getName()).append("  Error Msg: ").append(e.getMessage());
-            throw new IOException(s.toString(), e);
-        }
-    }
-
-    public Element getShowNodeResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified) throws IOException {
-
-        Element root = new Element("response",BES.BES_NS);
-        root.addNamespaceDeclaration(BES.BES_NS);
-        root.setAttribute("reqID","NGAP_BesApi_Construct");
-        Element showCatalog = new Element("showNode",BES.BES_NS);
-        root.addContent(showCatalog);
-
-        if(dataSourceURL!=null && dataSourceURL.length()>0){
-            Element item = new Element("item",BES.BES_NS);
-            showCatalog.addContent(item);
-            item.setAttribute("name",dataSourceURL);
-            item.setAttribute("size",""+size);
-
-            SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
-            item.setAttribute("lastModified",sdf.format(lastModified));
-            item.setAttribute("isData", "true");
-            item.setAttribute("type", "leaf");
-        }
-        return root;
-    }
 }

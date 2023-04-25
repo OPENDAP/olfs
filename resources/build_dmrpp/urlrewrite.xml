@@ -55,7 +55,7 @@
 
 
     <rule>
-        <from>^/(wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
+        <from>^/(pdpService|error|docs|jsp|xsl|build_dmrpp|js)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
@@ -67,7 +67,7 @@
     <rule>
         <condition type="attribute" name="doRedirect" operator="equal">1</condition>
         <from>^\/(.*)$</from>
-        <to last="true">/hyrax/builddmrpp/$1</to>
+        <to last="true">/build_dmrpp/$1</to>
     </rule>
 
     <rule>

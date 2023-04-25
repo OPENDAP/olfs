@@ -26,15 +26,13 @@
 
 package opendap.build_dmrpp;
 
-import opendap.bes.BadConfigurationException;
-import opendap.bes.BesDapDispatcher;
+import opendap.bes.*;
 import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Util;
+import opendap.coreServlet.DispatchHandler;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import org.apache.catalina.util.XMLWriter;
-import org.jdom.JDOMException;
+import opendap.ppt.PPTException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.Document;
@@ -46,8 +44,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
 
 
 /**
@@ -58,7 +56,7 @@ import java.util.regex.Pattern;
  * Cloned from: opendap.gateway
  * To change this template use File | Settings | File Templates.
  */
-public class BuildDmrppDispatchHandler extends BesDapDispatcher {
+public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     private static final AtomicLong build_dmrppServiceEndpointCounter;
     static {
@@ -75,18 +73,14 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
         reqCounter = new AtomicLong(0);
     }
 
-    private Logger log;
+    private final Logger log;
     private boolean _initialized;
     private String _prefix = "build_dmrpp";
-    private BuildDmrppBesApi _besApi;
-
-    private static final String d_landingPage="/docs/ngap/ngap.html";
 
     public BuildDmrppDispatchHandler() {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
-        _besApi = null;
     }
 
     @Override
@@ -103,12 +97,29 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
 
         ingestPrefix(config);
 
-        _besApi = new BuildDmrppBesApi(_prefix);
-        super.init(servlet, config, _besApi);
         _initialized=true;
     }
 
     @Override
+    public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {
+        return requestDispatch(request,null,false);
+    }
+
+    @Override
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        requestDispatch(request,response,true);
+    }
+
+    @Override
+    public long getLastModified(HttpServletRequest req) {
+        return 0;
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
     public boolean requestDispatch(HttpServletRequest request,
                                    HttpServletResponse response,
                                    boolean sendResponse)
@@ -127,7 +138,7 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
         log.debug("relativeURL:    "+relativeURL);
 
         while(relativeURL.startsWith("/") && relativeURL.length()>1)
-            relativeURL = relativeURL.substring(1,relativeURL.length());
+            relativeURL = relativeURL.substring(1);
         boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
         boolean itsJustThePrefix = _prefix.equals(relativeURL);
         boolean isMyRequest = itsJustThePrefixWithoutTheSlash || relativeURL.startsWith(_prefix);
@@ -152,14 +163,13 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
                         relativeURL = relativeURL.substring(_prefix.length());
                     }
 
+                    BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi();
                     Document build_dmrpp_cmd;
-                    build_dmrpp_cmd = _besApi.getBuildDmrppDocument(user, relativeURL, qp, invocation);
+                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, relativeURL, qp, invocation);
 
-                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    besTransaction(relativeURL, build_dmrpp_cmd, response.getOutputStream());
 
-                    _besApi.besTransaction(relativeURL, build_dmrpp_cmd, response.getOutputStream());
-
-                    log.info("Sent DAP build_dmrpp Response.");
+                    log.info("Sent DAP build dmr++ response.");
                     dapServiceCounter.incrementAndGet();
                 }
             }
@@ -167,6 +177,24 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
         }
         return isMyRequest;
     }
+
+    private void besTransaction(String dataSource,  Document request, OutputStream os)
+                throws BadConfigurationException, IOException, PPTException, BESError {
+
+        log.debug("besTransaction() started.");
+        if(log.isDebugEnabled()){
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            log.debug("besTransaction() request document: \n-----------\n" + xmlo.outputString(request) + "-----------\n");
+        }
+
+        BES bes = BESManager.getBES(dataSource);
+        int bes_timeout_seconds = bes.getTimeout() / 1000;
+        request.getRootElement().addContent(0, BesApi.setContextElement("bes_timeout", Integer.toString(bes_timeout_seconds)));
+        bes.besTransaction(request, os);
+
+    }
+
+
 
 
     private void ingestPrefix(Element config) throws BadConfigurationException {
@@ -220,11 +248,11 @@ public class BuildDmrppDispatchHandler extends BesDapDispatcher {
         sos.print("transform: translate(0px, 100px); ");
         sos.println("'>");
         sos.println("-------------------------------------<br/>");
-        sos.println("      NGAP Service Endpoint<br/>");
+        sos.println("      Build dmr++ service endpoint<br/>");
         sos.println(". . . . . . . . . . . . . . . . .<br/>");
-        sos.println("All Requests: " + reqCounter.get() + "<br/>");
-        sos.println(" DAP Service: " + dapServiceCounter.get() + "<br/>");
-        sos.println("   This page: " + build_dmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("       All Requests: " + reqCounter.get() + "<br/>");
+        sos.println("Build dmr++ service: " + dapServiceCounter.get() + "<br/>");
+        sos.println("          This page: " + build_dmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
         sos.println("-------------------------------------<br/>");
         sos.println("</p>");
         sos.println("</body>");

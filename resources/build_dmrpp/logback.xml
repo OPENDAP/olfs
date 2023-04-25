@@ -166,57 +166,19 @@
 
     <logger name="opendap.io.ChunkedInputStream" level="error"/>
 
-    <logger name="opendap.dap.User"  level="info"/>
-    <logger name="opendap.auth"      level="all"/>
-    <logger name="opendap.auth.Util" level="all"/>
-    <logger name="opendap.ngap"      level="info"/>
-
-    <logger name="opendap.bes.dap2Responders.Netcdf4"   level="info" />
+    <logger name="opendap.bes.dap2Responders.BesApi"   level="info" />
     <logger name="opendap.bes.dap4Responders.DataResponse.Netcdf4DR" level="info" />
 
-    <logger name="NodeCache" level="all">
-        <appender-ref ref="DebugLogDateRoller"/>
-    </logger>
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
-    <!-- logger name="HyraxLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
     <logger name="DocsAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <logger name="SiteMapAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
     <logger name="PDPServiceAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
     <!-- logger name="PDPServiceLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="HyraxGatewayAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="HyraxGatewayLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="HyraxAdminAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="HyraxAdminLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="S3ServiceAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="S3ServiceLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="WCSAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="WCSLastModifiedAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger -->
     <logger name="BesCommandLog" level="info">
