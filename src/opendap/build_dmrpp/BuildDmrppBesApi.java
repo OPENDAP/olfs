@@ -133,11 +133,9 @@ public class BuildDmrppBesApi implements Cloneable {
 
 
 
-    public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp, String invocation)
-            throws BadConfigurationException {
+    public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp, String invocation, int timeout_seconds) {
 
         log.debug("Constructing BES build dmr++ request. dataSource: {}",dataSource);
-        Element e;
         Element request = new Element("request", BES.BES_NS);
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
@@ -149,6 +147,8 @@ public class BuildDmrppBesApi implements Cloneable {
         request.addContent(setContextElement(BesApi.EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(BesApi.ERRORS_CONTEXT, BesApi.XML_ERRORS));
+
+        request.addContent(setContextElement("bes_timeout", Integer.toString(timeout_seconds)));
 
         String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
@@ -163,19 +163,19 @@ public class BuildDmrppBesApi implements Cloneable {
         addEdlAuthToken(request,user);
 
         // request.addContent(setContainerElement(CONTAINER_NAME, SPACE_NAME,dataSource,BesApi.DAP4_DATA));
-        e = new Element("setContainer",BES.BES_NS);
-        e.setAttribute("name",CONTAINER_NAME);
-        e.setAttribute("space",SPACE_NAME);
-        e.setText(dataSource);
-        request.addContent(e);
+        Element setContainerElem = new Element("setContainer",BES.BES_NS);
+        setContainerElem.setAttribute("name",CONTAINER_NAME);
+        setContainerElem.setAttribute("space",SPACE_NAME);
+        setContainerElem.setText(dataSource);
+        request.addContent(setContainerElem);
 
 //         Element def = defineElement("d1","default");
-        Element def = new Element("define",BES.BES_NS);
-        e.setAttribute("name","d1");
-        e.setAttribute("space","default");
+        Element defineElem = new Element("define",BES.BES_NS);
+        defineElem.setAttribute("name","d1");
+        defineElem.setAttribute("space","default");
 
-        e = new Element("container",BES.BES_NS);
-        e.setAttribute("name",CONTAINER_NAME);
+        Element containerElem = new Element("container",BES.BES_NS);
+        containerElem.setAttribute("name",CONTAINER_NAME);
 
         if(qp.getCe()!=null && !qp.getCe().equals("")) {
             Element ceElem = new Element("dap4constraint",BES.BES_NS);
@@ -183,32 +183,32 @@ public class BuildDmrppBesApi implements Cloneable {
             // so the libdap ce parsers don't blow a gasket.
             String encoded_ce = qp.getCe().replaceAll(" ","%20");
             ceElem.setText(encoded_ce);
-            e.addContent(ceElem);
+            containerElem.addContent(ceElem);
         }
 
         if(qp.getFunc()!=null && !qp.getFunc().equals("")) {
             // e.addContent(dap4FunctionElement(qp.getFunc()));
             Element d4FuncElem = new Element("dap4function",BES.BES_NS);
-            e.setText(qp.getFunc());
-            e.addContent(d4FuncElem);
+            d4FuncElem.setText(qp.getFunc());
+            containerElem.addContent(d4FuncElem);
         }
-        def.addContent(e);
+        defineElem.addContent(containerElem);
 
-        request.addContent(def);
+        request.addContent(defineElem);
 
         // Build and add the <get /> element
-        e = new Element("get",BES.BES_NS);
-        e.setAttribute("type",BesApi.DAP4_DATA);
-        e.setAttribute("definition","d1");
-        e.setAttribute("returnAs",DMRPP);
+        Element getElement = new Element("get",BES.BES_NS);
+        getElement.setAttribute("type",BesApi.DAP4_DATA);
+        getElement.setAttribute("definition","d1");
+        getElement.setAttribute("returnAs",DMRPP);
 
         if(qp.getAsync()!=null && !qp.getAsync().isEmpty())
-            e.setAttribute("async",qp.getAsync());
+            getElement.setAttribute("async",qp.getAsync());
 
         if(qp.getStoreResultRequestServiceUrl()!=null && !qp.getStoreResultRequestServiceUrl().isEmpty())
-            e.setAttribute("store_result",qp.getStoreResultRequestServiceUrl());
+            getElement.setAttribute("store_result",qp.getStoreResultRequestServiceUrl());
 
-        request.addContent(e);
+        request.addContent(getElement);
 
         log.debug("Built request for BES build_dmrpp_module.");
 

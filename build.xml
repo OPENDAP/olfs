@@ -956,13 +956,10 @@
             description="Performs a clean build of the core software and assembles the build_dmrpp WAR file.">
 
         <echo level="info" message="Building Hyrax build dmr++ service war file."/>
-        <echo level="info" message="build.hyrax.resources: ${build.hyrax.resources}"/>
-        <echo level="info" message="ngapResources.dir:     ${ngapResources.dir}"/>
-        <echo level="info" message="build.dist:            ${build.dist}"/>
-
-        <!-- Drop this bit, and the bits below that include it in the war and
-             delete it from the dist dir -->
-        <!-- copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/ -->
+        <echo level="info" message="   build.hyrax.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="       ngapResources.dir: ${ngapResources.dir}"/>
+        <echo level="info" message="BuildDmrpp.Resources.dir: ${BuildDmrpp.Resources.dir}"/>
+        <echo level="info" message="              build.dist: ${build.dist}"/>
 
         <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
         <copy todir="${build.ngap.resources}/lib" filtering="false">
@@ -987,8 +984,8 @@
          - Utilize a special NGAP web.xml that deploys with the Hyrax
            authentication and authorization filters enabled
         -->
-        <war destfile="${build.dist}/${NGAP_DEPLOYMENT_CONTEXT}.war"
-             webxml="${build.ngap.resources}/web.xml">
+        <war destfile="${build.dist}/${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"
+             webxml="${build.BuildDmrpp.resources}/web.xml">
 
             <lib dir="${build.ngap.resources}/lib"/>
 

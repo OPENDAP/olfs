@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -112,7 +113,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     @Override
     public long getLastModified(HttpServletRequest req) {
-        return 0;
+        return new Date().getTime();
     }
 
     @Override
@@ -154,7 +155,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
                 reqCounter.incrementAndGet();
                 if(itsJustThePrefix){
-                    sendSimpleNgapLandingPage(response);
+                    sendLandingPage(response);
                 }
                 else {
                     log.info("Sending build_dmrpp Response");
@@ -165,9 +166,17 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
                     BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi();
                     Document build_dmrpp_cmd;
-                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, relativeURL, qp, invocation);
+                    BES bes = BESManager.getBES(relativeURL);
+                    int bes_timeout_seconds = bes.getTimeout() / 1000;
 
-                    besTransaction(relativeURL, build_dmrpp_cmd, response.getOutputStream());
+                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, relativeURL, qp, invocation, bes_timeout_seconds);
+
+                    log.debug("Beginning BES transaction.");
+                    if(log.isDebugEnabled()){
+                        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                        log.debug("BES command document: \n-----------\n" + xmlo.outputString(build_dmrpp_cmd) + "-----------\n");
+                    }
+                    bes.besTransaction(build_dmrpp_cmd, response.getOutputStream());
 
                     log.info("Sent DAP build dmr++ response.");
                     dapServiceCounter.incrementAndGet();
@@ -176,22 +185,6 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
         }
         return isMyRequest;
-    }
-
-    private void besTransaction(String dataSource,  Document request, OutputStream os)
-                throws BadConfigurationException, IOException, PPTException, BESError {
-
-        log.debug("besTransaction() started.");
-        if(log.isDebugEnabled()){
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            log.debug("besTransaction() request document: \n-----------\n" + xmlo.outputString(request) + "-----------\n");
-        }
-
-        BES bes = BESManager.getBES(dataSource);
-        int bes_timeout_seconds = bes.getTimeout() / 1000;
-        request.getRootElement().addContent(0, BesApi.setContextElement("bes_timeout", Integer.toString(bes_timeout_seconds)));
-        bes.besTransaction(request, os);
-
     }
 
 
@@ -230,7 +223,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
     }
 
 
-    private void sendSimpleNgapLandingPage(HttpServletResponse response) throws IOException {
+    private void sendLandingPage(HttpServletResponse response) throws IOException {
         // This could be made a real page (JSP?), but having something
         // simple in place should reduce problems caused by ELB health
         // check clients beating on the endpoint.
