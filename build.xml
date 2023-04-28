@@ -34,7 +34,6 @@
         can produce a Web Application aRchive (WAR) file for each of:
         - The OLFS/Hyrax service build targets(s): server
         - The NGAP/Hyrax service, build targets(s): ngap
-        - The build dmr++ service, build targets(s): build_dmrpp
         - The robots.txt service, build targets(s): robots, hyrax-robots
 
         Also builds:
@@ -47,7 +46,6 @@
 
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
     <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
-    <property name="BUILD_DMRPP_DEPLOYMENT_CONTEXT" value="build_dmrpp"/>
 
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
@@ -63,12 +61,10 @@
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION" value="Not.A.Release"/>
     <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
-    <property name="BUILD_DMRPP_VERSION" value="${HYRAX_VERSION}"/>
     <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${NGAP_VERSION}"/>
-    <property name="BUILD_DMRPP_DIST_BASE" value="build_dmrpp-${BUILD_DMRPP_VERSION}"/>
+    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
@@ -150,11 +146,9 @@
         <echo level="info" message="                 Hyrax Version: ${HYRAX_VERSION}"/>
         <echo level="info" message="                  OLFS Version: ${OLFS_VERSION}"/>
         <echo level="info" message="                  NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="           BUILD_DMRPP Version: ${BUILD_DMRPP_VERSION}"/>
         <echo level="info" message="                   WCS Version: ${WCS_VERSION}"/>
         <echo level="info" message="            Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="BUILD_DMRPP Deployment Context: ${BUILD_DMRPP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="                src.dir: ${src.dir}"/>
@@ -228,9 +222,6 @@
 
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
     <property name="build.ngap.resources" location="${build.dir}/ngap"/>
-
-    <property name="BuildDmrpp.Resources.dir" location="${resources.dir}/build_dmrpp"/>
-    <property name="build.BuildDmrpp.resources" location="${build.dir}/build_dmrpp"/>
 
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
@@ -479,7 +470,7 @@
             <fileset dir="${robotsResources.dir}"/>
         </copy>
 
-        <copy todir="${build..resources}" filtering="true">
+        <copy todir="${build.ngap.resources}" filtering="true">
             <fileset dir="${ngapResources.dir}">
                 <exclude name="*.png" />
                 <exclude name="lib/**" />
