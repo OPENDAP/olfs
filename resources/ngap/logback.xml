@@ -150,33 +150,11 @@
         </encoder>
     </appender>
 
-
-    <logger name="AuthenticationLog" level="info">
-        <appender-ref ref="AuthLog"/>
-    </logger>
-
     <logger name="opendap" level="error">
-        <appender-ref ref="DebugLogDateRoller"/>
+        <appender-ref ref="ErrorLog"/>
     </logger>
 
-    <logger name="opendap.dap.User" level="info"/>
-    <logger name="opendap.auth" level="all"/>
-    <logger name="opendap.auth.Util" level="all"/>
-    <logger name="opendap.ngap" level="info"/>
 
-    <logger name="opendap.io.ChunkedInputStream" level="error"/>
-
-    <logger name="opendap.dap.User"  level="info"/>
-    <logger name="opendap.auth"      level="all"/>
-    <logger name="opendap.auth.Util" level="all"/>
-    <logger name="opendap.ngap"      level="info"/>
-
-    <logger name="opendap.bes.dap2Responders.Netcdf4"   level="info" />
-    <logger name="opendap.bes.dap4Responders.DataResponse.Netcdf4DR" level="info" />
-
-    <logger name="NodeCache" level="all">
-        <appender-ref ref="DebugLogDateRoller"/>
-    </logger>
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
