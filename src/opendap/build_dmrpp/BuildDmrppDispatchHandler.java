@@ -28,10 +28,11 @@ package opendap.build_dmrpp;
 
 import opendap.bes.*;
 import opendap.bes.dap2Responders.BesApi;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.DispatchHandler;
+import opendap.bes.dap4Responders.MediaType;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
+import opendap.http.mediaTypes.Dmrpp;
 import opendap.ppt.PPTException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -135,14 +136,14 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
             invocation += "?" + qs;
         log.debug("invocation:    "+invocation);
 
-        String relativeURL = ReqInfo.getLocalUrl(request);
-        log.debug("relativeURL:    "+relativeURL);
+        String resourceID = ReqInfo.getLocalUrl(request);
+        log.debug("resourceID:    "+resourceID);
 
-        while(relativeURL.startsWith("/") && relativeURL.length()>1)
-            relativeURL = relativeURL.substring(1);
-        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
-        boolean itsJustThePrefix = _prefix.equals(relativeURL);
-        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || relativeURL.startsWith(_prefix);
+        while(resourceID.startsWith("/") && resourceID.length()>1)
+            resourceID = resourceID.substring(1);
+        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(resourceID);
+        boolean itsJustThePrefix = _prefix.equals(resourceID);
+        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix);
 
         if(isMyRequest) {
             if (sendResponse) {
@@ -160,16 +161,29 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                 else {
                     log.info("Sending build_dmrpp Response");
 
-                    if(relativeURL.startsWith(_prefix)){
-                        relativeURL = relativeURL.substring(_prefix.length());
+                    if(resourceID.startsWith(_prefix)){
+                        resourceID = resourceID.substring(_prefix.length());
                     }
+                    MediaType responseMediaType =  new Dmrpp();
+                    // Stash the Media type in case there's an error downstream.
+                    // That way the error handler will know how to encode the error.
+                    RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+                    String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1));
+                    downloadFileName += responseMediaType.getMediaSuffix();
+                    log.debug("downloadFileName:  {}",downloadFileName );
+                    response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
+
+                    response.setContentType(responseMediaType.getMimeType());
+                    Version.setOpendapMimeHeaders(request, response);
+                    response.setHeader("Content-Description", responseMediaType.getMimeType());
 
                     BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi();
                     Document build_dmrpp_cmd;
-                    BES bes = BESManager.getBES(relativeURL);
+                    BES bes = BESManager.getBES(resourceID);
                     int bes_timeout_seconds = bes.getTimeout() / 1000;
 
-                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, relativeURL, qp, invocation, bes_timeout_seconds);
+                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, resourceID, qp, invocation, bes_timeout_seconds);
 
                     log.debug("Beginning BES transaction.");
                     if(log.isDebugEnabled()){
