@@ -33,7 +33,6 @@ import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Dmrpp;
-import opendap.ppt.PPTException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.Document;
@@ -45,7 +44,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -60,14 +58,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class BuildDmrppDispatchHandler implements DispatchHandler {
 
-    private static final AtomicLong build_dmrppServiceEndpointCounter;
+    private static final AtomicLong buildDmrppServiceEndpointCounter;
     static {
-        build_dmrppServiceEndpointCounter = new AtomicLong(0);
+        buildDmrppServiceEndpointCounter = new AtomicLong(0);
     }
 
-    private static final AtomicLong dapServiceCounter;
+    private static final AtomicLong buildDmrppServiceCounter;
     static {
-        dapServiceCounter = new AtomicLong(0);
+        buildDmrppServiceCounter = new AtomicLong(0);
     }
 
     private static final AtomicLong reqCounter;
@@ -134,16 +132,24 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         String qs = request.getQueryString();
         if(qs!=null)
             invocation += "?" + qs;
-        log.debug("invocation:    "+invocation);
+        log.debug("invocation:    " + invocation);
 
         String resourceID = ReqInfo.getLocalUrl(request);
-        log.debug("resourceID:    "+resourceID);
+        log.debug("resourceID:    " + resourceID);
 
         while(resourceID.startsWith("/") && resourceID.length()>1)
             resourceID = resourceID.substring(1);
-        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(resourceID);
-        boolean itsJustThePrefix = _prefix.equals(resourceID);
-        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix);
+
+        boolean itsJustThePrefixWithoutTheSlash = false;
+        boolean itsJustThePrefix = false;
+        boolean itsJustTheSlash = resourceID.equals("/");
+        if(!itsJustTheSlash){
+            itsJustThePrefix = _prefix.equals(resourceID);
+            if(!_prefix.isEmpty()) {
+                itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf("/")).equals(resourceID);
+            }
+        }
+        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix) || itsJustTheSlash ;
 
         if(isMyRequest) {
             if (sendResponse) {
@@ -155,7 +161,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                 }
 
                 reqCounter.incrementAndGet();
-                if(itsJustThePrefix){
+                if(itsJustThePrefix || itsJustTheSlash){
                     sendLandingPage(response);
                 }
                 else {
@@ -175,25 +181,27 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                     response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
 
                     response.setContentType(responseMediaType.getMimeType());
-                    Version.setOpendapMimeHeaders(request, response);
                     response.setHeader("Content-Description", responseMediaType.getMimeType());
 
+                    // Version.setOpendapMimeHeaders(request, response);
+
+
                     BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi();
-                    Document build_dmrpp_cmd;
+                    Document buildDmrppCmdDoc;
                     BES bes = BESManager.getBES(resourceID);
                     int bes_timeout_seconds = bes.getTimeout() / 1000;
 
-                    build_dmrpp_cmd = buildDmrppBesApi.getBuildDmrppDocument(user, resourceID, qp, invocation, bes_timeout_seconds);
+                    buildDmrppCmdDoc = buildDmrppBesApi.getBuildDmrppDocument(user, resourceID, qp, invocation, bes_timeout_seconds);
 
                     log.debug("Beginning BES transaction.");
                     if(log.isDebugEnabled()){
                         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                        log.debug("BES command document: \n-----------\n" + xmlo.outputString(build_dmrpp_cmd) + "-----------\n");
+                        log.debug("BES command document: \n-----------\n" + xmlo.outputString(buildDmrppCmdDoc) + "-----------\n");
                     }
-                    bes.besTransaction(build_dmrpp_cmd, response.getOutputStream());
+                    bes.besTransaction(buildDmrppCmdDoc, response.getOutputStream());
 
-                    log.info("Sent DAP build dmr++ response.");
-                    dapServiceCounter.incrementAndGet();
+                    long reqNum = buildDmrppServiceCounter.incrementAndGet();
+                    log.info("Sent DAP build dmr++ response {}",reqNum);
                 }
             }
 
@@ -210,19 +218,11 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
         if (config != null) {
 
-            Element build_dmrppService = config.getChild("build_dmrppService");
-            if (build_dmrppService != null) {
-                Element e = build_dmrppService.getChild("prefix");
-                if (e != null) {
-                    _prefix = e.getTextTrim();
-                    if (_prefix.equals("/")) {
-                        String msg = "Bad Configuration. The <Handler> " +
-                                "element that declares " + this.getClass().getName() +
-                                " MUST provide 1 <prefix>  " +
-                                "child element whose value may not be equal to \"/\"";
-                        log.error(msg);
-                        throw new BadConfigurationException(msg);
-                    }
+            Element buildDmrppService = config.getChild("BuildDmrppService");
+            if (buildDmrppService != null) {
+                String prefix = buildDmrppService.getAttributeValue("prefix");
+                if (prefix != null) {
+                    _prefix = prefix;
                 }
             }
         }
@@ -233,7 +233,6 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
             _prefix = _prefix.substring(1);
 
         log.info("Using prefix=" + _prefix);
-
     }
 
 
@@ -258,8 +257,8 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         sos.println("      Build dmr++ service endpoint<br/>");
         sos.println(". . . . . . . . . . . . . . . . .<br/>");
         sos.println("       All Requests: " + reqCounter.get() + "<br/>");
-        sos.println("Build dmr++ service: " + dapServiceCounter.get() + "<br/>");
-        sos.println("          This page: " + build_dmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("Build dmr++ service: " + buildDmrppServiceCounter.get() + "<br/>");
+        sos.println("          This page: " + buildDmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
         sos.println("-------------------------------------<br/>");
         sos.println("</p>");
         sos.println("</body>");

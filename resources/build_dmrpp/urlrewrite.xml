@@ -34,12 +34,12 @@
          <set name="doRedirect">1</set>
     </rule>
 
-    <rule>
-        <!-- This routes requests for "/" and "/index.html"
-             to the NGAP Landing Page -->
-        <from>^\/(index\.html)?$</from>
-        <to last="true">/docs/ngap/ngap.html</to>
-    </rule>
+    <!-- This rule routes requests for "/" and "/index.html"
+         to the NGAP Landing Page -->
+    <!-- rule>
+         <from>^\/(index\.html)?$</from>
+         <to last="true">/docs/ngap/ngap.html</to>
+     </rule -->
     <rule>
         <from>^\/?favicon\.ico$</from>
         <to last="true">/docs/images/favicon.ico</to>
@@ -55,7 +55,7 @@
 
 
     <rule>
-        <from>^/(pdpService|error|docs|jsp|xsl|build_dmrpp|js)(/.*)?$</from>
+        <from>^/(pdpService|error|docs|jsp|xsl|js)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 

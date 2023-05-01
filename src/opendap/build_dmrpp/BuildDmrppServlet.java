@@ -25,6 +25,7 @@
  */
 package opendap.build_dmrpp;
 
+import opendap.bes.BESManager;
 import opendap.coreServlet.*;
 import opendap.http.error.BadRequest;
 import opendap.logging.ServletLogUtil;
@@ -73,11 +74,16 @@ public class BuildDmrppServlet extends HttpServlet {
 
         ServletLogUtil.logServerStartup("init()");
 
+        String contextPath = getServletContext().getContextPath();
         buildDmrppDispatchHandler = new BuildDmrppDispatchHandler();
 
         try {
             config = loadConfig();
+
+            initBesManager();
+
             buildDmrppDispatchHandler.init(this, config);
+
 
         } catch (Exception e) {
             log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
@@ -96,7 +102,7 @@ public class BuildDmrppServlet extends HttpServlet {
      *                                        to parse (as an XML document).
      */
     private Element loadConfig() throws ServletException {
-        String configFileName="BuildDmrppConfigFileName";
+        String configFileName="ConfigFileName";
         String filename = getInitParameter(configFileName);
         if (filename == null) {
 
@@ -125,15 +131,15 @@ public class BuildDmrppServlet extends HttpServlet {
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            String msg = "gateway configuration file \"" + filename + "\" cannot be found.";
+            String msg = "The build_dmrpp configuration file \"" + filename + "\" cannot be found.";
             log.warn(msg);
             //throw new ServletException(msg, e);
         } catch (IOException e) {
-            String msg = "gateway configuration file \"" + filename + "\" is not readable.";
+            String msg = "The build_dmrpp configuration file \"" + filename + "\" is not readable.";
             log.error(msg);
             throw new ServletException(msg, e);
         } catch (JDOMException e) {
-            String msg = "gateway configuration file \"" + filename + "\" cannot be parsed.";
+            String msg = "The build_dmrpp configuration file \"" + filename + "\" cannot be parsed.";
             log.error(msg);
             throw new ServletException(msg, e);
         }
@@ -156,7 +162,7 @@ public class BuildDmrppServlet extends HttpServlet {
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.BUILD_DMRPP_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             if (ReqInfo.isServiceOnlyRequest(req))
                 return new Date().getTime();
@@ -164,7 +170,7 @@ public class BuildDmrppServlet extends HttpServlet {
             return buildDmrppDispatchHandler.getLastModified(req);
         }
         finally {
-            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.BUILD_DMRPP_LAST_MODIFIED_LOG_ID);
         }
     }
 
@@ -191,14 +197,13 @@ public class BuildDmrppServlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             if (!redirect(request, response)) {
 
                 if(!buildDmrppDispatchHandler.requestDispatch(request,response,true)){
                     if(!response.isCommitted()){
-                        log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                        // throw new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix");
-                        request_status = OPeNDAPException.anyExceptionHandler(new BadRequest("Bad Gateway URL! Not an OPeNDAP request suffix"), this,  response);
+                        log.info("Unrecognized build_dmrpp request.");
+                        request_status = OPeNDAPException.anyExceptionHandler(new BadRequest("ERROR: Unrecognized Request URL!"), this,  response);
                     }
                 }
             }
@@ -209,8 +214,22 @@ public class BuildDmrppServlet extends HttpServlet {
                 log.error("THE BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.GATEWAY_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID);
             RequestCache.closeThreadCache();
+        }
+    }
+
+    private void initBesManager() throws ServletException {
+        Element besManagerElement = config.getChild(BESManager.BES_MANAGER_CONFIG_ELEMENT);
+        if (besManagerElement == null) {
+            String msg = "Invalid configuration. Missing required 'BESManager' element. DispatchServlet FAILED to init()!";
+            log.error(msg);
+            throw new ServletException(msg);
+        }
+        try {
+            BESManager.init(getServletContext(), besManagerElement);
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 

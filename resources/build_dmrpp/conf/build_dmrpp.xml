@@ -93,43 +93,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
 
     </BESManager>
 
-
-    <!--
-    <DatasetUrlResponse type="..." />
-    Supported type values are: dsr, download, and requestForm
-    The DatasetUrlResponse element is used to configure the type of response
-    that the server will generate when a client attempts to access the Dataset URL.
-    The type of response is controlled by the value of the type attribute.
-    The supported values are: dsr, download, and requestForm.
-
-    Allowed Values
-    dsr:
-        The dap4 DSR response will be returned for the dataset URL.
-
-    download:
-        If the configuration parameter AllowDirectDataSourceAccess is present then
-        the source data file will be returned for the dataset URL. If the configuration
-        parameter AllowDirectDataSourceAccess is not present then a 403 forbidden will
-        be returned for the dataset URL. (This is basically a file retrieval service,
-        any constraint expression submitted with the dataset URL will be ignored.)
-
-    requestForm:
-        The Hyrax Data Request Form Page will be returned for the
-        dataset URL.
-
-    -->
-    <DatasetUrlResponse type="requestForm"/>
-
-    <!--
-        <DataRequestForm type="..." />
-        Supported type values are: dap2 and dap4
-        The DataRequestForm element defines the target DAP data model for the dataset links
-        in the "blue-bar" catalog.html pages. These links point to the DAP Data Request Form for each dataset.
-        This element also determines the type  of Data request form page  returned when the
-        DatasetUrlResponse type="requestForm" and the request is for the Dataset URL.
-    -->
-    <DataRequestForm type="dap4" />
-
+    <BuildDmrppService  prefix="" />
 
     <!--
         HttpPost Support
@@ -144,7 +108,6 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
         client behavior.
     -->
     <EnableCombinedLog />
-
 
 </OLFSConfig>
 

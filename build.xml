@@ -47,6 +47,8 @@
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
     <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
 
+    <property name="MKDMRPP_DEPLOYMENT_CONTEXT" value="build_dmrpp"/>
+
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
     <!-- relative to the project "Basedir" directory,  -->
@@ -219,6 +221,9 @@
 
     <property name="build.hyrax.resources" location="${build.dir}/resources"/>
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+
+    <property name="mkDmrppResources.dir" location="${resources.dir}/build_dmrpp"/>
+    <property name="build.mkdmrpp.resources" location="${build.dir}/build_dmrpp"/>
 
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
     <property name="build.ngap.resources" location="${build.dir}/ngap"/>
@@ -472,6 +477,13 @@
 
         <copy todir="${build.ngap.resources}" filtering="true">
             <fileset dir="${ngapResources.dir}">
+                <exclude name="*.png" />
+                <exclude name="lib/**" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.mkdmrpp.resources}" filtering="true">
+            <fileset dir="${mkDmrppResources.dir}">
                 <exclude name="*.png" />
                 <exclude name="lib/**" />
             </fileset>
@@ -934,6 +946,86 @@
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+    <target
+            name="build_dmrpp"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the build_dmrpp WAR file.">
+
+        <echo level="info" message="Building the build dmr++ service war file."/>
+        <echo level="info" message="build.hyrax.resources:   ${build.hyrax.resources}"/>
+        <echo level="info" message="buildDmrppResources.dir: ${mkDmrppResources.dir}"/>
+        <echo level="info" message="ngapResources.dir:       ${ngapResources.dir}"/>
+        <echo level="info" message="build.dist:              ${build.dist}"/>
+
+
+        <!-- Drop this bit, and the bits below that include it in the war and
+             delete it from the dist dir -->
+        <!-- copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/ -->
+
+        <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
+        <copy todir="${build.mkdmrpp.resources}/lib" filtering="false">
+            <fileset refid="hyrax-libs"/>
+            <fileset dir="${ngapResources.dir}/lib">
+                <!-- We exclude these because they get placed into
+                $CATALINA_HOM/lib when the Docker containers are built.-->
+                <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
+                <exclude name="memcached-session-manager-2.3.2.jar"/>
+                <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
+            </fileset>
+        </copy>
+
+
+
+        <!--
+        Here we:
+         - Set the WAR file name to ${NGAP_DEPLOYMENT_CONTEXT}.war (A value of
+           ROOT will deploy to "/".)
+         - Utilize a special NGAP web.xml that deploys with the Hyrax
+           authentication and authorization filters enabled
+        -->
+        <war destfile="${build.dist}/${MKDMRPP_DEPLOYMENT_CONTEXT}.war"
+             webxml="${build.mkdmrpp.resources}/web.xml">
+
+            <lib dir="${build.mkdmrpp.resources}/lib"/>
+
+            <classes dir="${build.classes}"/>
+            <zipfileset dir="${build.hyrax.resources}" prefix="">
+                <include name="WEB-INF/conf/logback-test.xml" />
+                <include name="WEB-INF/conf/user-access.xml" />
+                <include name="error/**/*" />
+                <include name="js/**/*" />
+                <include name="jsp/**/*" />
+            </zipfileset>
+
+
+            <zipfileset dir="${build.mkdmrpp.resources}" prefix="WEB-INF">
+                <include name="urlrewrite.xml"/>
+                <include name="conf/logback.xml"/>
+                <include name="conf/build_dmrpp.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${doc.dir}" prefix="docs">
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+            <!--
+-->
+            <!-- = = = = = = NGAP LANDING PAGE = = = = = = -->
+            <!--
+            <zipfileset dir="${build.ngap.resources}/landing" prefix="docs/ngap" />
+            <zipfileset dir="${ngapResources.dir}/landing" prefix="docs/ngap">
+                <include name="*.png" />
+            </zipfileset>
+            -->
+            <!-- = = = = = = = = = = = = = = = = = = = = = -->
+
+        </war>
+        <delete file="${build.dist}/index.html"/>
+    </target>
 
 
 </project>

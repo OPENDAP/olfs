@@ -124,13 +124,9 @@ public class BuildDmrppBesApi implements Cloneable {
     }
 
 
-
-
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
-
-
 
 
     public Document getBuildDmrppDocument(User user, String dataSource, QueryParameters qp, String invocation, int timeout_seconds) {

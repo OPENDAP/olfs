@@ -190,7 +190,7 @@
 
         <init-param>
             <param-name>ConfigFileName</param-name>
-            <param-value>olfs.xml</param-value>
+            <param-value>build_dmrpp.xml</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup>
