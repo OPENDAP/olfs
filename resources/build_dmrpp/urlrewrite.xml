@@ -55,12 +55,13 @@
 
 
     <rule>
-        <from>^/(pdpService|error|docs|jsp|xsl|js)(/.*)?$</from>
+        <from>^/(pdpService|error|docs|jsp|xsl|js|build_dmrpp)(/.*)?$</from>
+        <!-- from>^/(admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js)(/.*)?$</from -->
         <set name="doRedirect">0</set>
     </rule>
 
     <!--
-    The following rule shunts requests to the ngap
+    The following rule shunts requests to the build dmr++
     service endpoint if they are not explicitly for the hyrax, wcs
     or some other service endpoint.
     -->

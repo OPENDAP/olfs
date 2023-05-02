@@ -186,7 +186,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                     // Version.setOpendapMimeHeaders(request, response);
 
 
-                    BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi();
+                    BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi(_prefix);
                     Document buildDmrppCmdDoc;
                     BES bes = BESManager.getBES(resourceID);
                     int bes_timeout_seconds = bes.getTimeout() / 1000;
