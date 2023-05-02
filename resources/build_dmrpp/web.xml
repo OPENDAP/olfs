@@ -236,10 +236,9 @@
         <url-pattern>/build_dmrpp/*</url-pattern>
     </servlet-mapping>
 
-    
-    <!-- ==================== Default Session Configuration ================= -->
-  <!-- You can set the default session timeout (in minutes) for all newly   -->
-  <!-- created sessions by modifying the value below.                       -->
+    <!-- ==================== Default Session Configuration ================ -->
+    <!-- You can set the default session timeout (in minutes) for all newly  -->
+    <!-- created sessions by modifying the value below.                      -->
 
     <session-config>
         <session-timeout>30</session-timeout>
