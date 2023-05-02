@@ -103,7 +103,7 @@ public class Json extends Dap4Responder {
 
         Version.setOpendapMimeHeaders(request, response);
 
-        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        response.setHeader("Content-Description", responseMediaType.getMimeType());
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsJson(

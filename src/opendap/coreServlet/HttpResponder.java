@@ -141,7 +141,7 @@ public abstract class HttpResponder {
      * @return The filename part of the resourceID
      */
     public String getDownloadFileName(String resourceID){
-        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1, resourceID.length()));
+        String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1));
         log.debug("getDownloadFileName() - input: {} output: {}",resourceID,downloadFileName );
 
         return downloadFileName;
