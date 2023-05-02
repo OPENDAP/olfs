@@ -318,7 +318,6 @@
         <include name="${http-components-httpclient.lib}"/>
         <include name="${http-components-httpcore.lib}"/>
 
-
         <include name="${saxon-jdom.lib}"/>
         <include name="${saxon-s9api.lib}"/>
         <include name="${saxon.lib}"/>
@@ -344,6 +343,34 @@
         <include name="${javax.activation.lib}"/>
         <include name="${xlink.lib}"/>
     </fileset>
+    <!--
+        These are the library jars used by Hyrax.
+    -->
+    <fileset id="mkdmrpp-libs" dir="${lib.dir}">
+        <include name="${owasp-encoder.lib}"/>
+        <include name="${owasp-encoder-jsp.lib}"/>
+
+        <include name="${json.lib}"/>
+        <include name="${sjson.lib}"/>
+        <include name="${jdom.lib}"/>
+        <include name="${junit.lib}"/>
+
+        <include name="${commons-cli.lib}"/>
+
+        <include name="${http-components-httpclient.lib}"/>
+        <include name="${http-components-httpcore.lib}"/>
+
+        <include name="${saxon-jdom.lib}"/>
+        <include name="${saxon-s9api.lib}"/>
+        <include name="${saxon.lib}"/>
+
+        <include name="${slf4j.lib}"/>
+        <include name="${logback-core.lib}"/>
+        <include name="${logback-classic.lib}"/>
+
+        <include name="${urlRewrite.lib}"/>
+    </fileset>
+
 
 
     <!-- Library compile (class)paths -->
@@ -359,6 +386,20 @@
             <include name="${servlet-api.lib}"/>
         </fileset>
         <fileset refid="hyrax-libs" />
+    </path>
+
+    <path id="mkdmrpp.compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <!--
+            We have to have the catalina and servlet api's on the classpath at
+            compile time, but their not needed at deployment because they come
+            bundled with Tomcat
+        -->
+        <fileset dir="${lib.dir}">
+            <include name="${catalina.lib}"/>
+            <include name="${servlet-api.lib}"/>
+        </fileset>
+        <fileset refid="mkdmrpp-libs" />
     </path>
 
 
@@ -969,7 +1010,7 @@
 
         <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
         <copy todir="${build.mkdmrpp.resources}/lib" filtering="false">
-            <fileset refid="hyrax-libs"/>
+            <fileset refid="mkdmrpp-libs"/>
             <fileset dir="${ngapResources.dir}/lib">
                 <!-- We exclude these because they get placed into
                 $CATALINA_HOM/lib when the Docker containers are built.-->
