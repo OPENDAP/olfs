@@ -1,7 +1,7 @@
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
-<%@ page import="opendap.bes.dap2Responders.BesApi" %>
+<%@ page import="opendap.bes.BesApi" %>
 <%@ page import="opendap.bes.BadConfigurationException" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////

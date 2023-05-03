@@ -28,6 +28,7 @@ package opendap.bes.dap2Responders;
 
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
+import opendap.bes.BesApi;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;

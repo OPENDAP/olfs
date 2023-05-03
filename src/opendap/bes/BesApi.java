@@ -24,17 +24,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap2Responders;
+package opendap.bes;
 
 import opendap.PathBuilder;
 import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
-import opendap.bes.*;
 import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.io.HyraxStringEncoding;
 import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
@@ -57,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.net.URLEncoder;
+
 /**
  *
  * Subclass BesApi to get different BES behaviors.

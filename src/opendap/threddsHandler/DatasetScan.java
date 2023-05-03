@@ -29,7 +29,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.namespaces.THREDDS;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -37,8 +37,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

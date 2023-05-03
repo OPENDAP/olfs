@@ -28,8 +28,7 @@ package opendap.build_dmrpp;
 
 import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
-import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.ServletLogUtil;

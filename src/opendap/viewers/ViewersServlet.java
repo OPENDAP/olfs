@@ -29,7 +29,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;

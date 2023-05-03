@@ -28,7 +28,7 @@ package opendap.aggregation;
 
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.http.error.BadRequest;

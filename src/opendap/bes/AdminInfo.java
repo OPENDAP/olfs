@@ -25,16 +25,10 @@
  */
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
-import opendap.ppt.PPTException;
-import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
-
-import static opendap.bes.dap2Responders.BesApi.BES_SERVER_ADMINISTRATOR_KEY;
 
 /**
  * A class to wrap the BES.ServerAdministrator object. In the BES the object is defined like this:

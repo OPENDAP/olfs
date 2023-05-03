@@ -26,7 +26,6 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;

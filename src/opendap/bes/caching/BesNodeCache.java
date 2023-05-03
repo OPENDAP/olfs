@@ -2,7 +2,7 @@ package opendap.bes.caching;
 
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;

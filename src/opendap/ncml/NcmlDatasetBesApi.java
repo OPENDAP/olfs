@@ -27,7 +27,7 @@
 package opendap.ncml;
 
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.logging.ServletLogUtil;
@@ -73,7 +73,7 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
      * @param errorContext See opendap.bes.BesXmlAPI
      * @return The request Document
      * @throws opendap.bes.BadConfigurationException When the bad things happen.
-     * @see opendap.bes.dap2Responders.BesApi
+     * @see BesApi
      */
     @Override
     public  Document getDap2RequestDocument(User user,

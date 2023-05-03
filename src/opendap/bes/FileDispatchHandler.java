@@ -26,15 +26,10 @@
 
 package opendap.bes;
 
-import net.sf.saxon.style.XSLOutput;
-import opendap.bes.caching.BesNodeCache;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
-import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.error.Forbidden;
-import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.services.FileService;
@@ -47,10 +42,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.Date;
 
 /**

@@ -26,10 +26,9 @@
 
 package opendap.ngap;
 
-import opendap.PathBuilder;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -39,7 +38,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;

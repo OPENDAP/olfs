@@ -25,6 +25,7 @@
  */
 package opendap.bes.dap2Responders;
 
+import opendap.bes.BesApi;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
@@ -62,7 +63,7 @@ public class XmlData extends Dap4Responder {
 
 
 
-    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+    public XmlData(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 

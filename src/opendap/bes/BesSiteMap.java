@@ -1,7 +1,6 @@
 package opendap.bes;
 
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import org.jdom.Element;

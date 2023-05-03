@@ -142,7 +142,7 @@
     </logger>
 
     <logger name="opendap.bes.BESManager"                  level="error" />
-    <logger name="opendap.bes.dap2Responders.BesApi"       level="error" />
+    <logger name="opendap.bes.BesApi" level="error" />
     <logger name="opendap.bes.BES"                         level="all"   />
     <logger name="opendap.bes.BesDapDispatcher"            level="all"   />
     <logger name="opendap.bes.DirectoryDispatchHandler"    level="all"   />

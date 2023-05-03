@@ -26,13 +26,10 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.ppt.PPTException;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

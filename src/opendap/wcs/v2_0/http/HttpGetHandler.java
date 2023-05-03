@@ -28,7 +28,7 @@ package opendap.wcs.v2_0.http;
 
 import net.sf.saxon.s9api.XdmNode;
 import opendap.PathBuilder;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;

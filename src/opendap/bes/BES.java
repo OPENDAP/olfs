@@ -26,7 +26,6 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
