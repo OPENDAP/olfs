@@ -28,7 +28,7 @@ package opendap.gateway;
 
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;

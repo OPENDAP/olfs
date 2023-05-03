@@ -26,7 +26,7 @@
 
 package opendap.bes.dap4Responders;
 
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.io.HyraxStringEncoding;
 import org.jdom.Document;
 import org.jdom.output.Format;

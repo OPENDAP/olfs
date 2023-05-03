@@ -27,7 +27,7 @@
 package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.PathBuilder;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;

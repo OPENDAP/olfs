@@ -28,7 +28,6 @@ package opendap.bes;
 
 
 import opendap.PathBuilder;
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;

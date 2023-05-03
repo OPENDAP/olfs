@@ -33,7 +33,7 @@ import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.DatasetUrlResponseAction;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.io.HyraxStringEncoding;
 import opendap.namespaces.BES;
 import opendap.namespaces.THREDDS;

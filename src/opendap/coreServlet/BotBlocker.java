@@ -25,7 +25,7 @@
  */
 package opendap.coreServlet;
 
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
 import org.jdom.Element;

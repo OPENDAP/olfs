@@ -29,7 +29,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import opendap.PathBuilder;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.namespaces.THREDDS;

@@ -27,7 +27,7 @@ package opendap.nciso;
 
 import opendap.bes.BESResource;
 import opendap.bes.Version;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.User;

@@ -26,7 +26,7 @@
 package opendap.ncml;
 
 import opendap.bes.BesDapDispatcher;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;

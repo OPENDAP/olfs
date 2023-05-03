@@ -26,7 +26,6 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.coreServlet.ResourceInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -36,8 +35,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 
 /**

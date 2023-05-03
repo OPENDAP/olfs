@@ -29,7 +29,7 @@ package opendap.wcs.v2_0;
 import opendap.bes.BESError;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import opendap.http.Util;
@@ -485,7 +485,7 @@ public class GetCoverageRequestProcessor {
                     besCmd =
                             besApi.getDap2RequestDocumentAsync(
                                     user,
-                                    opendap.bes.dap2Responders.BesApi.DAP2_DATA,
+                                    BesApi.DAP2_DATA,
                                     besDatatsetId,
                                     dap2ce,
                                     null,
@@ -493,7 +493,7 @@ public class GetCoverageRequestProcessor {
                                     null,
                                     null,
                                     null,
-                                    opendap.bes.dap2Responders.BesApi.XML_ERRORS);
+                                    BesApi.XML_ERRORS);
                     break;
 
                 case netcdf:

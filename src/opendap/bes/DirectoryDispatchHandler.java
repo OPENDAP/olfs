@@ -26,7 +26,6 @@
 
 package opendap.bes;
 
-import opendap.bes.dap2Responders.BesApi;
 import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;

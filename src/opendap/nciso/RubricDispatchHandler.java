@@ -25,15 +25,13 @@
  */
 package opendap.nciso;
 
-import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.Version;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
-import opendap.http.mediaTypes.TextHtml;
 import opendap.http.mediaTypes.TextXml;
 import opendap.xml.Transformer;
 import org.jdom.Document;

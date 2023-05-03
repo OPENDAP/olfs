@@ -166,7 +166,7 @@
 
     <logger name="opendap.io.ChunkedInputStream" level="error"/>
 
-    <logger name="opendap.bes.dap2Responders.BesApi"   level="info" />
+    <logger name="opendap.bes.BesApi" level="info" />
     <logger name="opendap.bes.dap4Responders.DataResponse.Netcdf4DR" level="info" />
 
     <logger name="HyraxAccess" level="info">

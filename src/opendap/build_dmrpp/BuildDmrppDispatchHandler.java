@@ -27,7 +27,7 @@
 package opendap.build_dmrpp;
 
 import opendap.bes.*;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.User;

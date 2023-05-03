@@ -31,7 +31,7 @@ import opendap.auth.UserProfile;
 import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
@@ -115,7 +115,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
      *
      *
      *
-     * @see opendap.bes.dap2Responders.BesApi
+     * @see BesApi
      */
     @Override
     public Document getDap2RequestDocumentAsync(User user,

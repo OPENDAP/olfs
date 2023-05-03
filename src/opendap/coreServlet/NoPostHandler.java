@@ -26,7 +26,7 @@
 
 package opendap.coreServlet;
 
-import opendap.bes.dap2Responders.BesApi;
+import opendap.bes.BesApi;
 import org.jdom.Element;
 
 import javax.servlet.ServletOutputStream;
