@@ -1440,7 +1440,7 @@ public class BesApi implements Cloneable {
      * be used to fulfill the request (In the event that Hyrax is configured to use multiple BESs this string will
      * be used to locate the appropriate BES).
      * @param request   The BES request document.
-     * @param os   The outputstream to write the BES response to.
+     * @param os   The OutputStream to write the BES response to.
      * any error information will be written to the OutputStream err.
      * @throws BadConfigurationException
      * @throws IOException

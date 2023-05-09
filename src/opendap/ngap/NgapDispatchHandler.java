@@ -52,6 +52,9 @@ import java.util.regex.Pattern;
  */
 public class NgapDispatchHandler extends BesDapDispatcher {
 
+    private static final String DEFAULT_PREFIX = "ngap";
+    private static final String THE_SLASH = "/";
+
     private static final AtomicLong ngapServiceEndpointCounter;
     static {
         ngapServiceEndpointCounter = new AtomicLong(0);
@@ -69,7 +72,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
     private Logger log;
     private boolean _initialized;
-    private String _prefix = "ngap/";
+    private String _prefix;
     private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
 
@@ -80,6 +83,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
         _besApi = null;
+        _prefix = DEFAULT_PREFIX;
     }
 
     @Override
@@ -111,9 +115,10 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         String relativeURL = ReqInfo.getLocalUrl(request);
         log.debug("relativeURL:    "+relativeURL);
 
-        while(relativeURL.startsWith("/") && relativeURL.length()>1)
-            relativeURL = relativeURL.substring(1,relativeURL.length());
-        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
+        while(relativeURL.startsWith(THE_SLASH) && relativeURL.length()>1)
+            relativeURL = relativeURL.substring(1);
+
+        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf(THE_SLASH)).equals(relativeURL);
         boolean itsJustThePrefix = _prefix.equals(relativeURL);
         boolean isMyRequest = itsJustThePrefixWithoutTheSlash || relativeURL.startsWith(_prefix);
 
@@ -154,7 +159,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
     private void ingestPrefix(Element config) throws BadConfigurationException {
 
-        _prefix = "ngap";
+        _prefix = DEFAULT_PREFIX;
 
         if (config != null) {
 

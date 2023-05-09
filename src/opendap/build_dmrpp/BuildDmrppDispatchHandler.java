@@ -58,6 +58,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class BuildDmrppDispatchHandler implements DispatchHandler {
 
+    private static final String DEFAULT_PREFIX = "build_dmrpp";
+    private static final String THE_SLASH = "/";
     private static final AtomicLong buildDmrppServiceEndpointCounter;
     static {
         buildDmrppServiceEndpointCounter = new AtomicLong(0);
@@ -75,12 +77,13 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     private final Logger log;
     private boolean _initialized;
-    private String _prefix = "build_dmrpp";
+    private String _prefix;
 
     public BuildDmrppDispatchHandler() {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
+        _prefix = DEFAULT_PREFIX;
     }
 
     @Override
@@ -142,14 +145,14 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
         boolean itsJustThePrefixWithoutTheSlash = false;
         boolean itsJustThePrefix = false;
-        boolean itsJustTheSlash = resourceID.equals("/");
+        boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
         if(!itsJustTheSlash){
             itsJustThePrefix = _prefix.equals(resourceID);
             if(!_prefix.isEmpty()) {
                 itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf("/")).equals(resourceID);
             }
         }
-        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix) || itsJustTheSlash ;
+        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix) || !itsJustTheSlash ;
 
         if(isMyRequest) {
             if (sendResponse) {
@@ -214,7 +217,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     private void ingestPrefix(Element config) throws BadConfigurationException {
 
-        _prefix = "build_dmrpp";
+        _prefix = DEFAULT_PREFIX;
 
         if (config != null) {
 
