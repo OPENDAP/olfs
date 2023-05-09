@@ -58,6 +58,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class BuildDmrppDispatchHandler implements DispatchHandler {
 
+    private static final String DEFAULT_PREFIX = "build_dmrpp";
+    private static final String THE_SLASH = "/";
     private static final AtomicLong buildDmrppServiceEndpointCounter;
     static {
         buildDmrppServiceEndpointCounter = new AtomicLong(0);
@@ -75,12 +77,13 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     private final Logger log;
     private boolean _initialized;
-    private String _prefix = "build_dmrpp";
+    private String _prefix;
 
     public BuildDmrppDispatchHandler() {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
+        _prefix = DEFAULT_PREFIX;
     }
 
     @Override
@@ -137,16 +140,16 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         String resourceID = ReqInfo.getLocalUrl(request);
         log.debug("resourceID:    " + resourceID);
 
-        while(resourceID.startsWith("/") && resourceID.length()>1)
+        while(resourceID.startsWith(THE_SLASH) && resourceID.length()>1)
             resourceID = resourceID.substring(1);
 
         boolean itsJustThePrefixWithoutTheSlash = false;
         boolean itsJustThePrefix = false;
-        boolean itsJustTheSlash = resourceID.equals("/");
+        boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
         if(!itsJustTheSlash){
             itsJustThePrefix = _prefix.equals(resourceID);
             if(!_prefix.isEmpty()) {
-                itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf("/")).equals(resourceID);
+                itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf(THE_SLASH)).equals(resourceID);
             }
         }
         boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix) || itsJustTheSlash ;
@@ -175,7 +178,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                     // That way the error handler will know how to encode the error.
                     RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
 
-                    String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf("/") + 1));
+                    String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf(THE_SLASH) + 1));
                     downloadFileName += responseMediaType.getMediaSuffix();
                     log.debug("downloadFileName:  {}",downloadFileName );
                     response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
@@ -214,7 +217,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
     private void ingestPrefix(Element config) throws BadConfigurationException {
 
-        _prefix = "build_dmrpp";
+        _prefix = DEFAULT_PREFIX;
 
         if (config != null) {
 
@@ -226,10 +229,13 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                 }
             }
         }
-        if (!_prefix.endsWith("/"))
-            _prefix += "/";
+        if(_prefix.equals("")){
+            _prefix=THE_SLASH;
+        }
+        if (!_prefix.endsWith(THE_SLASH))
+            _prefix += THE_SLASH;
 
-        if (_prefix.startsWith("/"))
+        if (_prefix.startsWith(THE_SLASH) && _prefix.length()>1)
             _prefix = _prefix.substring(1);
 
         log.info("Using prefix=" + _prefix);
