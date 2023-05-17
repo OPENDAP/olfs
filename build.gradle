@@ -255,8 +255,8 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
     implementation group: 'io.netty', name: 'netty-codec', version: '4.1.68.Final'
 
-    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
-    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
+    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
+    implementation group: 'xalan', name: 'xalan', version: '2.7.3'
 
     // ---- NGAP libraries -----
     ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")

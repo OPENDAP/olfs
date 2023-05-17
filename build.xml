@@ -260,9 +260,9 @@
     <property name="http-components-httpcore.lib" value="org.apache.httpcomponents.httpcore_4.4.6.jar"/>
 
 
-    <property name="xalan.lib" value="xalan-2.7.2.jar"/>
-    <property name="xercesImpl.lib" value="xercesImpl-2.12.1.jar"/>
-    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+    <property name="xalan.lib" value="xalan-j-2.7.3.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.12.2.jar"/>
+    <property name="xercesXmlApis.lib" value="xerces-xml-apis-2.12.2.jar"/>
 
     <property name="saxon-jdom.lib" value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
