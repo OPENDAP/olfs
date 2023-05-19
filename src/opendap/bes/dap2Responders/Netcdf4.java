@@ -29,9 +29,7 @@ import opendap.bes.BesApi;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
@@ -127,8 +125,9 @@ public class Netcdf4 extends Dap4Responder {
         response.setHeader("Content-Disposition", contentDisposition);
 
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap2DataAsNetcdf4(user, resourceID, constraintExpression, cf_history_entry, history_json_entry, os);
+        besApi.writeDap2DataAsNetcdf4(user, resourceID, constraintExpression, cf_history_entry, history_json_entry, os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());

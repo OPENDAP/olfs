@@ -201,7 +201,8 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                         log.debug("BES command document: \n-----------\n" + xmlo.outputString(buildDmrppCmdDoc) + "-----------\n");
                     }
-                    bes.besTransaction(buildDmrppCmdDoc, response.getOutputStream());
+                    ServletResponseTransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
+                    bes.besTransaction(buildDmrppCmdDoc, response.getOutputStream(), tc);
 
                     long reqNum = buildDmrppServiceCounter.incrementAndGet();
                     log.info("Sent DAP build dmr++ response {}",reqNum);

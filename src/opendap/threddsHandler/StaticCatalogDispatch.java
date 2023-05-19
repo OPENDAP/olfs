@@ -301,7 +301,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besApi.writeFile(user, remoteCatalog,baos);
+        TransmitCoordinator tc = new ByteArrayOutputStreamTransmitCoordinator(baos);
+        besApi.writeFile(user, remoteCatalog,baos, tc);
         ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();
@@ -405,7 +406,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         BesApi besApi = new BesGatewayApi();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besApi.writeFile(user, remoteCatalog, baos);
+        TransmitCoordinator tc = new ByteArrayOutputStreamTransmitCoordinator(baos);
+        besApi.writeFile(user, remoteCatalog, baos, tc);
         ByteArrayInputStream catDocIs = new ByteArrayInputStream(baos.toByteArray());
 
         String typeMatch = _besApi.getBesCombinedTypeMatch();

@@ -29,6 +29,7 @@ import opendap.bes.BESError;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
+import opendap.coreServlet.TransmitCoordinator;
 import opendap.ppt.PPTException;
 import org.apache.http.client.CredentialsProvider;
 import org.jdom.Document;
@@ -169,7 +170,7 @@ public class Attachment {
      * @throws IOException                 When things can't be read or written.
      * @throws java.net.URISyntaxException If the target URL is hosed.
      */
-    public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
+    public void write(String mimeBoundary, ServletOutputStream sos, TransmitCoordinator tc ) throws IOException, URISyntaxException, PPTException, BadConfigurationException, BESError {
 
 
         sos.println("--" + mimeBoundary);
@@ -208,7 +209,7 @@ public class Attachment {
                             "Unable to access BES!");
                 }
                 BesApi besApi = new BesApi();
-                besApi.besTransaction(_besDatasetId, _besCmd, sos);
+                besApi.besTransaction(_besDatasetId, _besCmd, sos, tc);
                 break;
 
             case document:

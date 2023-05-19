@@ -30,10 +30,7 @@ import opendap.bes.Version;
 import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.MimeBoundary;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
@@ -139,12 +136,16 @@ public class NormativeDR extends Dap4Responder {
         User user = new User(request);
 
         DataOutputStream os;
-        ByteArrayOutputStream srr = null;
+        ByteArrayOutputStream srr;
+        TransmitCoordinator tc;
         if(qp.isStoreResultRequest()){
             srr = new ByteArrayOutputStream();
             os = new DataOutputStream(srr);
+            tc = new ByteArrayOutputStreamTransmitCoordinator(srr);
         }
         else {
+            srr = null;
+            tc = new ServletResponseTransmitCoordinator(response);
             os = new DataOutputStream(response.getOutputStream());
         }
         besApi.writeDap4Data(
@@ -154,7 +155,7 @@ public class NormativeDR extends Dap4Responder {
                 xmlBase,
                 startID,
                 mb.getBoundary(),
-                os);
+                os, tc);
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }

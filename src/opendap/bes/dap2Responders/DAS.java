@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.ServletResponseTransmitCoordinator;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextPlain;
 import opendap.logging.ServletLogUtil;
@@ -112,8 +113,9 @@ public class DAS extends Dap4Responder {
         response.setStatus(HttpServletResponse.SC_OK);
 
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
+        ServletResponseTransmitCoordinator sostc = new ServletResponseTransmitCoordinator(response);
         User user = new User(request);
-        besApi.writeDAS(user, resourceID, constraintExpression, os);
+        besApi.writeDAS(user, resourceID, constraintExpression, os, sostc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

@@ -31,6 +31,7 @@ import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
 import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletResponseTransmitCoordinator;
 import opendap.dap.User;
 import opendap.http.Util;
 import opendap.ppt.PPTException;
@@ -124,7 +125,8 @@ public class GetCoverageRequestProcessor {
                 throw new WcsException("The BESManager has not been configured. Unable to access BES!", WcsException.NO_APPLICABLE_CODE);
 
             BesApi besApi = new BesApi();
-            besApi.besTransaction(besDatasetId, besCmd, response.getOutputStream());
+            ServletResponseTransmitCoordinator sostc = new ServletResponseTransmitCoordinator(response);
+            besApi.besTransaction(besDatasetId, besCmd, response.getOutputStream(),sostc);
         } else if (dapDatasetUrl.toLowerCase().startsWith(Util.HTTP_PROTOCOL) ||
                 dapDatasetUrl.toLowerCase().startsWith((Util.HTTPS_PROTOCOL))) {
             CredentialsProvider authCreds = WcsServiceManager.getCredentialsProvider();

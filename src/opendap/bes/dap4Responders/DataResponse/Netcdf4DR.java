@@ -30,9 +30,7 @@ import opendap.bes.Version;
 import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Netcdf4;
@@ -132,8 +130,9 @@ public class Netcdf4DR extends Dap4Responder{
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         response.setHeader("Content-Disposition", contentDisposition);
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, history_json_entry, os);
+        besApi.writeDap4DataAsNetcdf4(user, resourceID, qp, cf_history_entry, history_json_entry, os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}",getServiceTitle(),os.size());

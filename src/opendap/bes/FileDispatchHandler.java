@@ -220,8 +220,9 @@ public class FileDispatchHandler implements DispatchHandler {
         }
 
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         ServletOutputStream sos = response.getOutputStream();
-        _besApi.writeFile(user, name, sos);
+        _besApi.writeFile(user, name, sos, tc);
 
         sos.flush();
     }

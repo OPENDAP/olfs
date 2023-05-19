@@ -28,10 +28,7 @@ package opendap.bes.dap4Responders;
 
 import opendap.bes.*;
 import opendap.bes.BesApi;
-import opendap.coreServlet.MimeTypes;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.ResourceInfo;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.error.Forbidden;
@@ -252,9 +249,9 @@ public class FileAccess extends Dap4Responder {
             }
         }
 
-
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         ServletOutputStream sos = response.getOutputStream();
-        besApi.writeFile(user, dataSourceId, sos);
+        besApi.writeFile(user, dataSourceId, sos, tc);
 
         sos.flush();
 

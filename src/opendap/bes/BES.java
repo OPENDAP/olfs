@@ -25,7 +25,8 @@
  */
 
 package opendap.bes;
-
+import opendap.coreServlet.ByteArrayOutputStreamTransmitCoordinator;
+import opendap.coreServlet.TransmitCoordinator;
 import opendap.io.HyraxStringEncoding;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -788,7 +789,7 @@ public class BES {
      * received from the BES.
      * @throws BESError When the BES itself returns a BESError document.
      */
-    public void  besTransaction(Document request, Document response )
+    public void  besTransaction(Document request, Document response)
             throws IOException, PPTException, JDOMException, BESError {
 
 
@@ -798,7 +799,10 @@ public class BES {
 
 
         try (ByteArrayOutputStream responseStream = new ByteArrayOutputStream()) {
-            besTransaction(request,responseStream);
+
+            ByteArrayOutputStreamTransmitCoordinator baostc = new ByteArrayOutputStreamTransmitCoordinator(responseStream);
+
+            besTransaction(request, responseStream, baostc);
             log.debug("besTransaction() The BES returned this document:\n{}", responseStream);
             if (responseStream.size() != 0) {
 
@@ -817,6 +821,7 @@ public class BES {
                 // Set the root element to be the one sent from the BES.
                 response.setRootElement(root);
             }
+
         }
         log.debug("END.");
     }
@@ -834,7 +839,7 @@ public class BES {
      * @throws PPTException When bad things happen in the talking to the BES.
      * @throws BESError When the BES itself returns a BESError document.
      */
-    public void besTransaction(Document request, OutputStream os)
+    public void besTransaction(Document request, OutputStream os, TransmitCoordinator tc)
             throws IOException, PPTException, BESError {
 
         log.debug("BEGIN");
@@ -912,7 +917,7 @@ public class BES {
                 if(timedProc!=null) Timer.stop(timedProc);
             }
         }
-        while (besTrouble && attempts < getMaxCommandAttempts());
+        while (besTrouble && attempts < getMaxCommandAttempts() && !tc.isCommitted());
 
         if (besTrouble) {
             if (besFatalError != null)

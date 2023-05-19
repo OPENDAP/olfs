@@ -30,7 +30,9 @@ import opendap.bes.BESError;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
+import opendap.coreServlet.FileOutputStreamTransmitCoordinator;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.TransmitCoordinator;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.Util;
@@ -228,7 +230,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
     }
 
 
-    private void writeDmrFromBes(User user, String besDatasource, String datasetUrl, OutputStream fos)
+    private void writeDmrFromBes(User user, String besDatasource, String datasetUrl, OutputStream fos, TransmitCoordinator tc)
             throws WcsException, IOException {
         
         if(!BESManager.isInitialized())
@@ -237,7 +239,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
         BesApi besApi = new BesApi();
         QueryParameters qp = new QueryParameters();
         try {
-            besApi.writeDMR(user, besDatasource, qp, datasetUrl, fos);
+            besApi.writeDMR(user, besDatasource, qp, datasetUrl, fos, tc);
         } catch (BadConfigurationException | PPTException | BESError error) {
             String msg = "Failed to get DMR from BES! Caught " + error.getClass().getName() +
                     " Message: " + error.getMessage();
@@ -357,11 +359,12 @@ public class DynamicServiceCatalog implements WcsCatalog{
             else {
                 _log.debug("getCachedDMR() - Retrieving DMR from DAP service");
                 FileOutputStream fos = new FileOutputStream(dmrCacheFile);
+                TransmitCoordinator tc = new FileOutputStreamTransmitCoordinator(fos);
 
                 try {
                     if (datasetUrl.startsWith(Util.BES_PROTOCOL)) {
                         String besDatasource = datasetUrl.substring(Util.BES_PROTOCOL.length());
-                        writeDmrFromBes(user, besDatasource,datasetUrl,fos);
+                        writeDmrFromBes(user, besDatasource,datasetUrl,fos, tc);
                     } else if (datasetUrl.startsWith(Util.HTTP_PROTOCOL) || datasetUrl.startsWith(Util.HTTPS_PROTOCOL)) {
                         String dmrUrl = datasetUrl + ".dmr.xml";
                         _log.debug("getCachedDMR() - DMR URL: {}",dmrUrl);

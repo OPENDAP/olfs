@@ -27,10 +27,9 @@ package opendap.wcs.v2_0.http;
 
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
+import opendap.coreServlet.ServletResponseTransmitCoordinator;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -135,9 +134,9 @@ public class MultipartResponse {
         servResponse.setHeader("Content-Description", "WCS 2.0 Response");
 
         ServletOutputStream os = servResponse.getOutputStream();
-
+        ServletResponseTransmitCoordinator tc = new ServletResponseTransmitCoordinator(servResponse);
         for (Attachment a : attachments)
-            a.write(mimeBoundary, os);
+            a.write(mimeBoundary, os, tc);
 
 
         closeMimeDoc(os);
