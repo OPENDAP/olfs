@@ -30,9 +30,7 @@ import opendap.bes.Version;
 import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.DMR;
@@ -109,9 +107,10 @@ public class NormativeDMR extends Dap4Responder {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         User user = new User(request);
-        besApi.writeDMR(user, resourceID, qp, xmlBase, os);
+        besApi.writeDMR(user, resourceID, qp, xmlBase, os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

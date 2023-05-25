@@ -1,6 +1,8 @@
 package opendap.bes;
 
 
+import opendap.coreServlet.FileOutputStreamTransmitCoordinator;
+import opendap.coreServlet.TransmitCoordinator;
 import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import org.jdom.Element;
@@ -235,7 +237,8 @@ public class BesSiteMap {
                     makeCacheFileAsRequired();
                     log.debug("UPDATING SiteMap file: {}", smcFile.getAbsolutePath());
                     try (FileOutputStream fos = new FileOutputStream(smcFile)) {
-                        writeBesSiteMap(fos);
+                        TransmitCoordinator tc = new FileOutputStreamTransmitCoordinator(fos);
+                        writeBesSiteMap(fos, tc);
                     }
                 }
                 // Downgrade lock to readLock
@@ -340,9 +343,9 @@ public class BesSiteMap {
      * @throws IOException
      * @throws BESError
      */
-    private void writeBesSiteMap(OutputStream os) throws BadConfigurationException, PPTException, IOException, BESError {
+    private void writeBesSiteMap(OutputStream os, TransmitCoordinator tc) throws BadConfigurationException, PPTException, IOException, BESError {
         BesApi besApi = new BesApi();
-        besApi.writeCombinedSiteMapResponse(dapServicePrefix,os);
+        besApi.writeCombinedSiteMapResponse(dapServicePrefix,os, tc);
     }
 
     /**

@@ -29,9 +29,7 @@ import opendap.bes.BesApi;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
 import opendap.logging.ServletLogUtil;
@@ -111,13 +109,14 @@ public class XmlData extends Dap4Responder {
         response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         response.setStatus(HttpServletResponse.SC_OK);
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsXml(
                 user,
                 resourceID,
                 constraintExpression,
                 xmlBase,
-                os);
+                os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.info("Sent {} size: {}", getServiceTitle(),os.size());

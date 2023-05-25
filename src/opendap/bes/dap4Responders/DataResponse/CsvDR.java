@@ -30,9 +30,7 @@ import opendap.bes.Version;
 import opendap.bes.BesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextCsv;
@@ -109,8 +107,9 @@ public class CsvDR extends Dap4Responder {
 
         User user = new User(request);
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
-        besApi.writeDap4DataAsCsv(user, resourceID, qp,os);
+        besApi.writeDap4DataAsCsv(user, resourceID, qp, os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {}  size: {}",getServiceTitle(),os.size());

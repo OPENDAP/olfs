@@ -315,11 +315,11 @@ public class AggregationServlet extends HttpServlet {
      * @throws BadConfigurationException
      * @throws BESError
      */
-    private void writeSinglePlainGranule(User user, String granule, OutputStream os)
+    private void writeSinglePlainGranule(User user, String granule, OutputStream os, TransmitCoordinator tc)
             throws IOException, BadConfigurationException {
     	
         try {
-            besApi.writeFile(user, granule, os);
+            besApi.writeFile(user, granule, os, tc);
         }
         catch (BESError | PPTException | IOException | BadConfigurationException e) {
             String msg = e.getMessage();
@@ -336,7 +336,7 @@ public class AggregationServlet extends HttpServlet {
      * @param out The ServletOutputStream
      * @throws Exception
      */
-    private void writePlainGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out)
+    private void writePlainGranules(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, TransmitCoordinator tc)
             throws IOException, BadConfigurationException {
 
         Map<String, String[]> queryParameters = request.getParameterMap();
@@ -355,7 +355,7 @@ public class AggregationServlet extends HttpServlet {
             String granuleName = getNameForZip(basename(granule)[1], ResponseFormat.PLAIN);
             try {
                 zos.putNextEntry(new ZipEntry(granuleName));
-                writeSinglePlainGranule(user, granule, zos);
+                writeSinglePlainGranule(user, granule, zos, tc);
                 zos.closeEntry();
             }
             catch (ZipException ze) {
@@ -388,6 +388,7 @@ public class AggregationServlet extends HttpServlet {
             String granule,
             String ce,
             OutputStream os,
+            TransmitCoordinator tc,
             ResponseFormat format)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
@@ -399,17 +400,17 @@ public class AggregationServlet extends HttpServlet {
             case NETCDF_3:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf3());
-                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, historyJsonEntry, os);
+                besApi.writeDap2DataAsNetcdf3(user, granule,  ce, cfHistoryEntry, historyJsonEntry, os, tc);
                 break;
             case NETCDF_4:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new Netcdf4());
-                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, historyJsonEntry, os);
+                besApi.writeDap2DataAsNetcdf4(user, granule, ce, cfHistoryEntry, historyJsonEntry, os, tc);
                 break;
             case ASCII:
                 // Stash the Media type in case there's an error. That way the error handler will know how to encode the error.
                 RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, new TextPlain());
-                besApi.writeDap2DataAsAscii(user, granule, ce, os);
+                besApi.writeDap2DataAsAscii(user, granule, ce, os, tc);
                 break;
             default:
             	break;
@@ -438,7 +439,7 @@ public class AggregationServlet extends HttpServlet {
      * @throws BESError
      */
     private void writeFormattedGranules(HttpServletRequest request, HttpServletResponse response,
-                                        ServletOutputStream out, ResponseFormat format)
+                                        ServletOutputStream out, TransmitCoordinator tc, ResponseFormat format)
             throws BadRequest, IOException, PPTException, BadConfigurationException, BESError {
 
         // This ctor vets the params and throws an Exception if there are problems
@@ -451,14 +452,13 @@ public class AggregationServlet extends HttpServlet {
         User user = new User(request);
 
         ZipOutputStream zos = new ZipOutputStream(out);
-
         for (int i = 0; i < N; ++i) {
             String granule = params.getFilename(i);
             String ce = params.getArrayCE(i);
 
             try {
                 zos.putNextEntry(new ZipEntry(getNameForZip(basename(granule)[1], format)));
-                writeSingleFormattedGranule(user, granule, ce, zos, format);
+                writeSingleFormattedGranule(user, granule, ce, zos, tc, format);
                 zos.closeEntry();
             } catch (ZipException ze) {
                 out.println("Aggregation Error: " + ze.getMessage());
@@ -494,13 +494,14 @@ public class AggregationServlet extends HttpServlet {
 
         FilterAsciiHeaderStream filter = new FilterAsciiHeaderStream(out);
         filter.set(false);// let the first set of header lines through
+        TransmitCoordinator tc = new FilterAsciiHeaderStreamTransmitCoordinator(filter);
 
         for (int i = 0; i < numFiles; ++i) {
             String granule = params.getFilename(i);
             String ce = params.getTableCE(i);
 
             try {
-                writeSingleFormattedGranule(user, granule, ce, filter, ResponseFormat.ASCII);
+                writeSingleFormattedGranule(user, granule, ce, filter, tc, ResponseFormat.ASCII);
                 filter.set(true);// filter out all the remaining header lines
             } catch (IOException ioe) {
                 out.println("Aggregation error building table of values: " + ioe.getMessage());
@@ -526,6 +527,8 @@ public class AggregationServlet extends HttpServlet {
 
 
         try {
+
+            TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
             ServletOutputStream out = response.getOutputStream();
 
             RequestCache.openThreadCache();
@@ -541,16 +544,16 @@ public class AggregationServlet extends HttpServlet {
                     writeAggregationVersion(request, response, out);
                     break;
                 case "file":
-                    writePlainGranules(request, response, out);
+                    writePlainGranules(request, response, out, tc);
                     break;
                 case "netcdf3":
-                    writeFormattedGranules(request, response, out, ResponseFormat.NETCDF_3);
+                    writeFormattedGranules(request, response, out, tc, ResponseFormat.NETCDF_3);
                     break;
                 case "netcdf4":
-                    writeFormattedGranules(request, response, out, ResponseFormat.NETCDF_4);
+                    writeFormattedGranules(request, response, out, tc, ResponseFormat.NETCDF_4);
                     break;
                 case "ascii":
-                    writeFormattedGranules(request, response, out, ResponseFormat.ASCII);
+                    writeFormattedGranules(request, response, out, tc, ResponseFormat.ASCII);
                     break;
                 case "csv":
                     writeGranulesSingleTable(request, response, out);

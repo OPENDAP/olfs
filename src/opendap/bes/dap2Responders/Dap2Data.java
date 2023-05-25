@@ -29,9 +29,7 @@ import opendap.bes.BesApi;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
@@ -128,15 +126,17 @@ public class Dap2Data extends Dap4Responder {
 
 
         DataOutputStream os;
-        ByteArrayOutputStream srr = null;
+        ByteArrayOutputStream srr = new ByteArrayOutputStream();
+        TransmitCoordinator tc;
         if(qp.isStoreResultRequest()){
-            srr = new ByteArrayOutputStream();
             os = new DataOutputStream(srr);
+            tc = new ByteArrayOutputStreamTransmitCoordinator(srr);
         }
         else {
+            tc = new ServletResponseTransmitCoordinator(response);
             os = new DataOutputStream(response.getOutputStream());
         }
-        besApi.writeDap2Data(user, resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),os);
+        besApi.writeDap2Data(user, resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),os, tc);
         if(qp.isStoreResultRequest()){
             handleStoreResultResponse(srr, response);
         }

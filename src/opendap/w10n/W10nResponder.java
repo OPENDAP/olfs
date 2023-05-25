@@ -748,6 +748,7 @@ public class W10nResponder {
         String contentDisposition = ATTACHMENT +downloadFileName+"\"";
         response.setHeader(CONTENT_DISPOSITION, contentDisposition);
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf3(
                 user,
@@ -755,7 +756,7 @@ public class W10nResponder {
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
                 null,
-                os);
+                os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent NetCDF-3 for {} size: {}",
@@ -804,6 +805,7 @@ public class W10nResponder {
         String contentDisposition = ATTACHMENT +downloadFileName+"\"";
         response.setHeader(CONTENT_DISPOSITION, contentDisposition);
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         besApi.writeDap2DataAsNetcdf4(
                 user,
@@ -811,7 +813,7 @@ public class W10nResponder {
                 w10nRequest.getDap2CE(),
                 w10nRequest.getXmlBase(),
                 null,
-                os);
+                os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("sendNetCdf4() - Sent NetCDF-4 for dataset: {} size: {}",
@@ -861,6 +863,7 @@ public class W10nResponder {
                         defaultDataMediaType,
                         supportedDataMediaTypes));
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         ServletOutputStream os = response.getOutputStream();
         besApi.writeDap2DataAsW10nJson(
                 user,
@@ -869,7 +872,7 @@ public class W10nResponder {
                 w10nMetaObject,
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
-                os);
+                os, tc);
         os.flush();
     }
 
@@ -893,6 +896,7 @@ public class W10nResponder {
 
         log.debug("sendDap2Data() - Sending DAP2 data response for dataset: {}",w10nRequest.getValidResourcePath());
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
 
         String resourceID = w10nRequest.getRequestedResourceId();
@@ -908,7 +912,7 @@ public class W10nResponder {
         log.debug("sendDap2Data() - DAP2 Data file downloadFileName: {}", downloadFileName);
 
         response.setHeader(CONTENT_DESCRIPTION, "DAP2 Data Response");
-        besApi.writeDap2Data(user, w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, os);
+        besApi.writeDap2Data(user, w10nRequest.getValidResourcePath(), w10nRequest.getDap2CE(), null, null, os, tc);
 
         os.flush();
     }
@@ -945,8 +949,9 @@ public class W10nResponder {
                 log.debug("sendFile() - MIME type: {}", responseMediaType.getMimeType());
             }
         }
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         ServletOutputStream sos = response.getOutputStream();
-        besApi.writeFile(user, name, sos);
+        besApi.writeFile(user, name, sos, tc);
         sos.flush();
     }
 
@@ -1024,6 +1029,7 @@ public class W10nResponder {
                         defaultMetaMediaType,
                         supportedMetaMediaTypes));
 
+        TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         ServletOutputStream os = response.getOutputStream();
 
         besApi.writeDap2MetadataAsW10nJson(
@@ -1034,7 +1040,7 @@ public class W10nResponder {
                 w10nRequest.callback(),
                 w10nRequest.flatten(),
                 w10nRequest.traverse(),
-                os);
+                os, tc);
 
         os.flush();
 

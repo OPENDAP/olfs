@@ -30,7 +30,9 @@ import opendap.PathBuilder;
 import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
 import opendap.bes.caching.BesNodeCache;
+import opendap.coreServlet.ByteArrayOutputStreamTransmitCoordinator;
 import opendap.coreServlet.ResourceInfo;
+import opendap.coreServlet.TransmitCoordinator;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.ServletLogUtil;
@@ -238,13 +240,14 @@ public class BesApi implements Cloneable {
                          String dataSource,
                                 String constraintExpression,
                                 String xmlBase,
-                                OutputStream os)
+                                OutputStream os,
+                         TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDDXRequest(user, dataSource, constraintExpression, xmlBase),
-                os);
+                os, tc);
     }
 
     /**
@@ -263,13 +266,14 @@ public class BesApi implements Cloneable {
                         String dataSource,
                         QueryParameters qp,
                         String xmlBase,
-                        OutputStream os)
+                        OutputStream os,
+                         TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDMRRequest(user, dataSource,qp,xmlBase),
-                os);
+                os, tc);
     }
 
     /**
@@ -290,18 +294,21 @@ public class BesApi implements Cloneable {
                                  String xmlBase,
                                  String contentID,
                                  String mimeBoundary,
-                                 OutputStream os)
+                                 OutputStream os,
+                              TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
-            getDap4DataRequest(user,
-                            dataSource,
-                            qp,
-                            xmlBase,
-                            contentID,
-                            mimeBoundary),
-                            os);
+            getDap4DataRequest(
+                    user,
+                    dataSource,
+                    qp,
+                    xmlBase,
+                    contentID,
+                    mimeBoundary),
+                os,
+                tc);
     }
 
 
@@ -317,9 +324,9 @@ public class BesApi implements Cloneable {
 
 
         ByteArrayOutputStream ddxString = new ByteArrayOutputStream();
+        ByteArrayOutputStreamTransmitCoordinator baostc = new ByteArrayOutputStreamTransmitCoordinator(ddxString);
 
-
-        writeDDX(user, dataSource,constraintExpression,xmlBase,ddxString);
+        writeDDX(user, dataSource,constraintExpression,xmlBase,ddxString,baostc);
 
 
         SAXBuilder sb = new SAXBuilder();
@@ -360,9 +367,9 @@ public class BesApi implements Cloneable {
 
 
         ByteArrayOutputStream ddxString = new ByteArrayOutputStream();
+        ByteArrayOutputStreamTransmitCoordinator baostc = new ByteArrayOutputStreamTransmitCoordinator(ddxString);
 
-
-        writeDMR(user, dataSource,qp,xmlBase,ddxString);
+        writeDMR(user, dataSource,qp,xmlBase,ddxString, baostc);
 
 
         SAXBuilder sb = new SAXBuilder();
@@ -392,10 +399,12 @@ public class BesApi implements Cloneable {
      * @throws PPTException              .
      */
     public void writeDDS(User user,
-                         String dataSource,
-                            String constraintExpression,
-                            OutputStream os)
-            throws BadConfigurationException,
+            String dataSource,
+            String constraintExpression,
+            OutputStream os,
+            TransmitCoordinator tc)
+            throws
+            BadConfigurationException,
             BESError,
             IOException,
             PPTException {
@@ -403,7 +412,7 @@ public class BesApi implements Cloneable {
         besTransaction(
                 dataSource,
                 getDDSRequest(user, dataSource, constraintExpression),
-                os);
+                os, tc);
     }
 
 
@@ -421,7 +430,8 @@ public class BesApi implements Cloneable {
      */
     public void writeFile(User user,
                           String dataSource,
-                             OutputStream os)
+                             OutputStream os,
+                          TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -430,7 +440,8 @@ public class BesApi implements Cloneable {
         besTransaction(
                 dataSource,
                 getStreamRequest(user,dataSource),
-                os);
+                os,
+                tc);
     }
 
 
@@ -450,7 +461,8 @@ public class BesApi implements Cloneable {
     public void writeDAS(User user,
                          String dataSource,
                             String constraintExpression,
-                            OutputStream os)
+                            OutputStream os,
+                         TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -459,7 +471,8 @@ public class BesApi implements Cloneable {
         besTransaction(
                 dataSource,
                 getDASRequest(user,dataSource,constraintExpression),
-                os);
+                os,
+                tc);
     }
 
 
@@ -483,7 +496,8 @@ public class BesApi implements Cloneable {
                                      String constraintExpression,
                                      String async,
                                      String storeResult,
-                                     OutputStream os)
+                                     OutputStream os,
+                              TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -493,7 +507,8 @@ public class BesApi implements Cloneable {
         besTransaction(
                 dataSource,
                 getDap2RequestDocumentAsync(user, DAP2_DATA, dataSource, constraintExpression, async, storeResult,  null, null, null, XML_ERRORS),
-                os);
+                os,
+                tc);
     }
 
     /**
@@ -517,13 +532,15 @@ public class BesApi implements Cloneable {
                                        String constraintExpression,
                                        String cf_history_entry,
                                        String history_json_entry,
-                                       OutputStream os)
+                                       OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap2DataAsNetcdf3Request(user, dataSource, constraintExpression, cf_history_entry, history_json_entry),
-                os);
+                os,
+                tc);
     }
 
 
@@ -546,13 +563,15 @@ public class BesApi implements Cloneable {
                                        QueryParameters qp,
                                        String cf_history_entry,
                                        String history_json_entry,
-                                       OutputStream os)
+                                       OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap4DataAsNetcdf3Request(user, dataSource, qp, cf_history_entry, history_json_entry),
-                os);
+                os,
+                tc);
     }
 
 
@@ -576,13 +595,15 @@ public class BesApi implements Cloneable {
                                        String constraintExpression,
                                        String cf_history_entry,
                                        String history_json_entry,
-                                       OutputStream os)
+                                       OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap2DataAsNetcdf4Request(user, dataSource, constraintExpression, cf_history_entry, history_json_entry),
-                os);
+                os,
+                tc);
     }
 
     /**
@@ -604,13 +625,15 @@ public class BesApi implements Cloneable {
                                        QueryParameters qp,
                                        String cf_history_entry,
                                        String history_json_entry,
-                                       OutputStream os)
+                                       OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap4DataAsNetcdf4Request(user, dataSource, qp, cf_history_entry, history_json_entry),
-                os);
+                os,
+                tc);
     }
 
 
@@ -634,13 +657,15 @@ public class BesApi implements Cloneable {
                                    String dataSource,
                                       String constraintExpression,
                                       String xmlBase,
-                                      OutputStream os)
+                                      OutputStream os,
+                                   TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getXmlDataRequest(user,dataSource,constraintExpression,xmlBase),
-                os);
+                os,
+                tc);
     }
 
 
@@ -663,13 +688,15 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsGmlJpeg2000(User user,
                                            String dataSource,
                                               String constraintExpression,
-                                              OutputStream os)
+                                              OutputStream os,
+                                           TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap2DataAsGmlJpeg2000Request(user, dataSource, constraintExpression),
-                os);
+                os,
+                tc);
     }
 
     /**
@@ -688,14 +715,16 @@ public class BesApi implements Cloneable {
      */
     public void writeDap4DataAsGmlJpeg2000(User user,
                                            String dataSource,
-                                       QueryParameters qp,
-                                       OutputStream os)
+                                           QueryParameters qp,
+                                           OutputStream os,
+                                           TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap4DataAsGmlJpeg2000Request(user, dataSource, qp),
-                os);
+                os,
+                tc);
     }
 
 
@@ -716,13 +745,15 @@ public class BesApi implements Cloneable {
      */
     public void writeDap4DataAsJson(User user, String dataSource,
                                     QueryParameters qp,
-                                    OutputStream os)
+                                    OutputStream os,
+                                    TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap4DataAsJsonRequest(user, dataSource, qp),
-                os);
+                os,
+                tc);
     }
 
     /**
@@ -742,13 +773,15 @@ public class BesApi implements Cloneable {
     public void writeDap4DataAsCovJson(User user,
                                        String dataSource,
                                         QueryParameters qp,
-                                        OutputStream os)
+                                        OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap4DataAsCovJsonRequest(user, dataSource, qp),
-                os);
+                os,
+                tc);
     }
 
 
@@ -766,7 +799,8 @@ public class BesApi implements Cloneable {
      * @throws PPTException              .
      */
     public void writeCombinedSiteMapResponse(String sitePrefix,
-                                             OutputStream os)
+                                             OutputStream os,
+                                             TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         Iterator<BesGroup> bgIt = BESManager.getBesGroups();
@@ -778,7 +812,8 @@ public class BesApi implements Cloneable {
             besTransaction(
                     besPrefix,
                     getSiteMapRequestDocument(siteMapPrefix),
-                    os);
+                    os,
+                    tc);
         }
     }
 
@@ -796,13 +831,14 @@ public class BesApi implements Cloneable {
      * @throws PPTException              .
      */
     public void writePathInfoResponse(String dataSource,
-                                         OutputStream os)
+                                         OutputStream os,
+                                      TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
             getShowPathInfoRequestDocument(dataSource),
-            os);
+            os, tc);
     }
 
     public void getPathInfoDocument(String dataSource, Document response)
@@ -812,7 +848,8 @@ public class BesApi implements Cloneable {
             JDOMException, BESError {
 
         ByteArrayOutputStream pathInfoDocString = new ByteArrayOutputStream();
-        writePathInfoResponse(dataSource,pathInfoDocString);
+        ByteArrayOutputStreamTransmitCoordinator baostc = new ByteArrayOutputStreamTransmitCoordinator(pathInfoDocString);
+        writePathInfoResponse(dataSource,pathInfoDocString, baostc);
 
         SAXBuilder sb = new SAXBuilder();
         Document pathInfoResponseDoc = sb.build(new ByteArrayInputStream(pathInfoDocString.toByteArray()));
@@ -838,13 +875,15 @@ public class BesApi implements Cloneable {
     public void  writeDap4DataAsGeoTiff(User user,
                                         String dataSource,
                                        QueryParameters qp,
-                                       OutputStream os)
+                                       OutputStream os,
+                                        TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
-            dataSource,
-            getDap4DataAsGeoTiffRequest(user, dataSource, qp),
-            os);
+                dataSource,
+                getDap4DataAsGeoTiffRequest(user, dataSource, qp),
+                os,
+                tc);
     }
 
 
@@ -865,13 +904,14 @@ public class BesApi implements Cloneable {
     public void writeDap4DataAsIjsn(User user,
                                     String dataSource,
                                        QueryParameters qp,
-                                       OutputStream os)
+                                       OutputStream os,
+                                    TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
             getDap4IjsnDataRequest(user, dataSource, qp),
-            os);
+            os, tc);
     }
 
 
@@ -894,14 +934,15 @@ public class BesApi implements Cloneable {
                                    String dataSource,
                                        QueryParameters qp,
                                        String xmlBase,
-                                       OutputStream os)
+                                       OutputStream os,
+                                   TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
 
          besTransaction(
                 dataSource,
                 getDap4RequestDocument(user,XML_DATA, dataSource, qp, xmlBase, null, null, XML_ERRORS),
-                os);
+                os, tc);
     }
 
 
@@ -922,13 +963,14 @@ public class BesApi implements Cloneable {
     public void writeDap4MetadataAsJson(User user,
                                         String dataSource,
                                             QueryParameters qp,
-                                            OutputStream os)
+                                            OutputStream os,
+                                        TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
             getDap4JsonMetadataRequest(user, dataSource, qp),
-            os);
+            os, tc);
     }
 
 
@@ -949,13 +991,14 @@ public class BesApi implements Cloneable {
     public void  writeDap4MetadataAsIjsn(User user,
                                          String dataSource,
                                             QueryParameters qp,
-                                            OutputStream os)
+                                            OutputStream os,
+                                         TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getDap4IjsnMetadataRequest(user, dataSource, qp),
-                os);
+                os, tc);
     }
 
 
@@ -978,13 +1021,14 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsIjsn(User user,
                                     String dataSource,
                                             String constraintExpression,
-                                            OutputStream os)
+                                            OutputStream os,
+                                    TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap2IjsnDataRequest(user, dataSource, constraintExpression),
-            os);
+            os, tc);
     }
 
 
@@ -1006,13 +1050,14 @@ public class BesApi implements Cloneable {
     public void writeDap2MetadataAsIjsn(User user,
                                         String dataSource,
                                            String constraintExpression,
-                                           OutputStream os)
+                                           OutputStream os,
+                                        TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getDap2IjsnMetadataRequest(user, dataSource, constraintExpression),
-                os);
+                os, tc);
     }
 
     /**
@@ -1033,13 +1078,15 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsJson(User user,
                                     String dataSource,
                                        String constraintExpression,
-                                       OutputStream os)
+                                       OutputStream os,
+                                    TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
                 dataSource,
                 getDap2DataAsJsonRequest(user, dataSource, constraintExpression),
-                os);
+                os,
+                tc);
     }
 
 
@@ -1061,7 +1108,8 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsCovJson(User user,
                                        String dataSource,
                                     String constraintExpression,
-                                    OutputStream os)
+                                    OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
@@ -1070,7 +1118,7 @@ public class BesApi implements Cloneable {
                         user,
                         dataSource,
                         constraintExpression),
-                        os);
+                        os, tc);
     }
 
 
@@ -1092,13 +1140,14 @@ public class BesApi implements Cloneable {
     public void writeDap2MetadataAsJson(User user,
                                         String dataSource,
                                            String constraintExpression,
-                                           OutputStream os)
+                                           OutputStream os,
+                                        TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getDap2MetadataAsJsonRequest(user, dataSource, constraintExpression),
-                os);
+                os, tc);
     }
 
 
@@ -1123,13 +1172,14 @@ public class BesApi implements Cloneable {
                                        String w10nMeta,
                                        String w10nCallback,
                                        boolean w10nFlatten,
-                                       OutputStream os)
+                                       OutputStream os,
+                                        TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getDap2DataAsW10nJsonRequest(user, dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten),
-                os);
+                os, tc);
     }
 
 
@@ -1155,13 +1205,14 @@ public class BesApi implements Cloneable {
                                            String w10nCallback,
                                            boolean w10nFlatten,
                                            boolean w10nTraverse,
-                                           OutputStream os)
+                                           OutputStream os,
+                                            TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getDap2MetadataAsW10nJsonRequest(user, dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, w10nTraverse),
-                os);
+                os, tc);
     }
 
 
@@ -1183,13 +1234,14 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsGeoTiff(User user,
                                        String dataSource,
                                           String constraintExpression,
-                                          OutputStream os)
+                                          OutputStream os,
+                                       TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         besTransaction(
             dataSource,
             getDap2DataAsGeoTiffRequest(user, dataSource, constraintExpression),
-            os);
+            os, tc);
     }
 
 
@@ -1211,7 +1263,8 @@ public class BesApi implements Cloneable {
     public void writeDap2DataAsAscii(User user,
                                      String dataSource,
                                         String constraintExpression,
-                                        OutputStream os)
+                                        OutputStream os,
+                                     TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -1220,7 +1273,7 @@ public class BesApi implements Cloneable {
          besTransaction(
                 dataSource,
                 getDap2DataAsAsciiRequest(user, dataSource, constraintExpression),
-                os);
+                os, tc);
     }
 
 
@@ -1241,7 +1294,8 @@ public class BesApi implements Cloneable {
     public void writeDap4DataAsCsv(User user,
                                    String dataSource,
                                       QueryParameters qp,
-                                      OutputStream os)
+                                      OutputStream os,
+                                   TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -1250,7 +1304,7 @@ public class BesApi implements Cloneable {
         besTransaction(
                 dataSource,
                 getDap4DataAsCsvRequest(user, dataSource, qp),
-                os);
+                os, tc);
     }
 
 
@@ -1271,7 +1325,8 @@ public class BesApi implements Cloneable {
     public void writeDap2DataRequestForm(User user,
                                          String dataSource,
                                             String url,
-                                            OutputStream os)
+                                            OutputStream os,
+                                         TransmitCoordinator tc)
             throws BadConfigurationException,
             BESError,
             IOException,
@@ -1280,7 +1335,7 @@ public class BesApi implements Cloneable {
          besTransaction(
                  dataSource,
                  getHtmlFormRequest(user, dataSource,url),
-                 os);
+                 os, tc);
     }
 
 
@@ -1300,13 +1355,14 @@ public class BesApi implements Cloneable {
      */
     public void writeDap2HtmlInfoPage(User user,
                                       String dataSource,
-                                         OutputStream os)
+                                         OutputStream os,
+                                      TransmitCoordinator tc)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
          besTransaction(
                 dataSource,
                 getHtmlInfoPageRequest(user,dataSource),
-                os);
+                os, tc);
     }
 
 
@@ -1446,7 +1502,7 @@ public class BesApi implements Cloneable {
      * @throws IOException
      * @throws PPTException
      */
-    public void besTransaction(String dataSource,  Document request, OutputStream os)
+    public void besTransaction(String dataSource, Document request, OutputStream os, TransmitCoordinator tc)
             throws BadConfigurationException, IOException, PPTException, BESError {
 
         log.debug("besTransaction() started.");
@@ -1455,7 +1511,7 @@ public class BesApi implements Cloneable {
         BES bes = BESManager.getBES(dataSource);
         int bes_timeout_seconds = bes.getTimeout()/1000;
         request.getRootElement().addContent(0,setContextElement("bes_timeout",Integer.toString(bes_timeout_seconds)));
-        bes.besTransaction(request, os);
+        bes.besTransaction(request, os, tc);
     }
 
 
