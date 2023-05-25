@@ -253,11 +253,23 @@ public class OPeNDAPException extends Exception {
                 }
             }
             else {
+                //--------------------------------------------------------------
+                // We are here because the response is "committed" i.e. response
+                // headers and data values (data being some or all of the
+                // requested response) have already been sent to the requesting
+                // client. This means that transmitting the error information is
+                // really a "punt" - the response is essentially broken and now
+                // the task is to send the client some clue that a person will
+                // be able to interpret. Because the response is committed we
+                // can't change the HTTP status, retrieve the transmitted bytes,
+                // etc. So we are just going to throw the error object over
+                // the wall.
+                //
                 try {
                     oe.sendAsDap2Error(response);
                 }
                 catch(IOException ioe){
-                    log.error("Failed to transmit DAP2 error object to " +
+                    log.error("Failed to transmit DAP error object to " +
                             "requesting client. Caught {} Message: {}", ioe.getClass().getName(),ioe.getMessage());
                 }
             }

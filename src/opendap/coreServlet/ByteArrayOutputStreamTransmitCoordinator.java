@@ -20,7 +20,13 @@ public class ByteArrayOutputStreamTransmitCoordinator implements TransmitCoordin
     }
 
     @Override
-    public void reset() {
+    public void reset() throws IllegalStateException {
+        if(isCommitted()){
+            throw new IllegalStateException("Ouch! Attempted reset of" +
+                    " ByteArrayOutputStream failed because bytes have already " +
+                    "been written to the stream.");
+        }
+
         d_baos.reset();
     }
 

@@ -307,8 +307,8 @@ public class BesApi implements Cloneable {
                     xmlBase,
                     contentID,
                     mimeBoundary),
-                    os,
-                    tc);
+                os,
+                tc);
     }
 
 

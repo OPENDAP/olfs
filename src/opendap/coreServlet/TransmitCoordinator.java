@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface TransmitCoordinator {
     boolean isCommitted();
-    void reset();
+    void reset() throws IllegalStateException;
 }
 

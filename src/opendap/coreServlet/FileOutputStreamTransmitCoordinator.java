@@ -14,7 +14,11 @@ public class FileOutputStreamTransmitCoordinator implements TransmitCoordinator 
     }
 
     @Override
-    public void reset() {
-
+    public void reset() throws IllegalStateException {
+        if(isCommitted()){
+            throw new IllegalStateException("Ouch! Attempted reset of" +
+                    " FileOutputStream failed because a FileOutputStream cannot " +
+                    "be reset.");
+        }
     }
 }

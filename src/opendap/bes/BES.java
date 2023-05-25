@@ -858,7 +858,7 @@ public class BES {
             Procedure timedProc=null;
 
             log.debug("This is attempt: {}", attempts);
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (ByteArrayOutputStream errorOutputStream = new ByteArrayOutputStream()) {
                 oc = getClient();
                 if (oc == null) {
                     besTrouble = true;
@@ -877,13 +877,13 @@ public class BES {
                 }
 
                 timedProc= Timer.start();
-                boolean result = oc.sendRequest(request, os, baos);
+                boolean result = oc.sendRequest(request, os, errorOutputStream);
                 log.debug("besTransaction() - Completed.");
                 if (!result) {
                     // We got back an error object from the BES in the baos.
                     // We feed that to the BESError class to build the error object.
-                    log.debug("BESError: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
-                    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharset().name()));
+                    ByteArrayInputStream bais = new ByteArrayInputStream(errorOutputStream.toByteArray());
                     BESError besError = new BESError(bais);
 
                     log.error("ERROR: BES transaction received a BESError Object. Msg: {}", besError.getMessage());
@@ -891,7 +891,7 @@ public class BES {
                     int besErrCode = besError.getBesErrorCode();
                     // If the BES experienced a fatal error then we know we have
                     // to dump the connection to the child besListener.
-                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR || besErrCode == BESError.TIME_OUT) {
+                    if (besErrCode == BESError.INTERNAL_FATAL_ERROR) {
                         besTrouble = true;
                         besFatalError = besError;
                     }
