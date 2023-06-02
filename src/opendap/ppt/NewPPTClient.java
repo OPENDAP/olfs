@@ -181,12 +181,8 @@ public class NewPPTClient {
     }
 
 
-
-
-    public boolean initConnection() throws PPTException {
-
-        //Logger log = LoggerFactory.getLogger(BES.class);
-        log.debug("initConnection() -  START");
+    private void testPPTConnection() throws PPTException {
+        log.debug("START");
 
         try {
             _rawOut.write(PPTSessionProtocol.PPT_CLIENT_TESTING_CONNECTION.getBytes(HyraxStringEncoding.getCharset()));
@@ -205,37 +201,20 @@ public class NewPPTClient {
         int bytesRead;
 
         try {
-
             bytesRead = _rawIn.read(inBuff);
-            /*
-            int lapCounter = 1;
-            while(bytesRead<0 && lapCounter <= 10){
-                log.debug("Reached End Of Stream when attempting to retrieve the PPT handshake response. Attempt: "+lapCounter);
-                log.debug(showConnectionProperties());
-                log.debug("Sleeping for 1 second");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.error("Something woke me up!!! Msg: "+e.getMessage());
-                }
-                bytesRead = _rawIn.read(inBuff);
-                lapCounter++;
-            }
-            */
         }
         catch (IOException e) {
-           String msg = "Caught "+e.getClass().getSimpleName()+" attempting to read initialization response from server.  Message: ";
-           msg += e.getMessage();
-           log.error(msg);
-           closeConnection(false);
-           throw new PPTException(msg, e);
+            String msg = "Caught "+e.getClass().getSimpleName()+" attempting to read initialization response from server.  Message: ";
+            msg += e.getMessage();
+            log.error(msg);
+            closeConnection(false);
+            throw new PPTException(msg, e);
         }
 
         if(bytesRead<0){
             log.error("initConnection() -  Encountered End Of Stream when attempting to read server handshake response!");
             throw new PPTEndOfStreamException("PPT Connection encounter a premature End Of Stream - The connection appears to have been prematurely closed.");
         }
-
 
         try {
             String status = new String(inBuff, 0, bytesRead, HyraxStringEncoding.getCharset());
@@ -262,15 +241,16 @@ public class NewPPTClient {
             throw new PPTException(msg, e);
         }
 
+    }
+
+
+    public void initConnection() throws PPTException {
+
+        log.debug("START");
+        testPPTConnection();
         _out = new BESChunkedOutputStream(_rawOut);
-
-
-
         _in = new ChunkedInputStream(_rawIn);
-
-        log.debug("initConnection() -  END");
-
-        return true;
+        log.debug("END");
     }
 
     /**
