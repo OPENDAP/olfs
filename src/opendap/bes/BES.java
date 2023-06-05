@@ -1191,18 +1191,23 @@ public class BES {
     private void checkInClient(OPeNDAPClient dapClient) throws PPTException {
 
 
-        if (config.getMaxCommands() > 0 && dapClient.getCommandCount() > config.getMaxCommands()) {
+        if (
+            !dapClient.isOk() ||
+            (config.getMaxCommands() > 0 &&
+            dapClient.getCommandCount() > config.getMaxCommands())
+        ){
             discardClient(dapClient);
             if(log.isDebugEnabled()) {
                 String msg = "checkInClient() This instance of OPeNDAPClient (id:" +
                         dapClient.getID() + ") has " +
-                        "excecuted " + dapClient.getCommandCount() +
+                        "executed " + dapClient.getCommandCount() +
                         " commands which is in excess of the maximum command " +
                         "limit of " + config.getMaxCommands() + ", discarding client.";
                 log.debug(msg);
             }
 
-        } else {
+        }
+        else {
 
             if (clientQueue.offer(dapClient)) {
                 log.debug("Returned OPeNDAPClient (id:{}) to Client Pool.", dapClient.getID());
