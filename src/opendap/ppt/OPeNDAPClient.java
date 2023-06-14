@@ -27,10 +27,12 @@
 
 package opendap.ppt;
 
+import opendap.bes.BESError;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Util;
 import org.apache.commons.cli.*;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -38,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+
+import static opendap.namespaces.BES.BES_NS;
 
 /**
  * OpenDAPClient is an object that handles the connection to, sending requests
@@ -693,4 +697,43 @@ public class OPeNDAPClient {
 
 
     }
+
+    public Document getShowStatusRequestDocument(){
+        Element request = new Element("request", BES_NS);
+        request.setAttribute("reqID", "client: " + getID() + ":"+ commandCount );
+        request.addContent(new Element("showStatus"));
+        return new Document(request);
+    }
+
+    public String getShowStatusRequestString(){
+        Document request = getShowStatusRequestDocument();
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        return xmlo.outputString(request);
+    }
+
+    public String getStatusResponse()
+            throws BESError, IOException, PPTException {
+        ByteArrayOutputStream response = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
+        executeCommand(getShowStatusRequestString(),response,error);
+        log.debug("Status Response Document: {}",(response.size()>0?response:"(empty)"));
+        log.debug("Status Error Document: {}",(error.size()>0?error:"(empty)"));
+        if(error.size()>0){
+            throw new PPTException("Received error content from BES showStatus " +
+                    "command! error_mdg: " + error);
+        }
+        return response.toString(HyraxStringEncoding.getCharset());
+    }
+
+    public boolean isOk(){
+        boolean reallyImFine = true;
+        try {
+            getStatusResponse();
+        } catch (BESError | IOException | PPTException e) {
+            log.debug("Caught {}. Message: {}",e.getClass().getName(),e.getMessage());
+            reallyImFine = false;
+        }
+        return reallyImFine;
+    }
+
 }
