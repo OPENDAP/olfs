@@ -67,6 +67,7 @@
 
     <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
     <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
+    <property name="MKDMRPP_DIST_BASE" value="build_dmrpp-${HYRAX_VERSION}"/>
     <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
@@ -222,8 +223,8 @@
     <property name="build.hyrax.resources" location="${build.dir}/resources"/>
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
 
-    <property name="mkDmrppResources.dir" location="${resources.dir}/build_dmrpp"/>
-    <property name="build.mkdmrpp.resources" location="${build.dir}/build_dmrpp"/>
+    <property name="mkDmrppResources.dir" location="${resources.dir}/mkdmrpp"/>
+    <property name="build.mkdmrpp.resources" location="${build.dir}/mkdmrpp"/>
 
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
     <property name="build.ngap.resources" location="${build.dir}/ngap"/>
@@ -993,7 +994,7 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target
-            name="build_dmrpp"
+            name="mkdmrpp"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the build_dmrpp WAR file.">
 
@@ -1067,6 +1068,24 @@
         </war>
         <delete file="${build.dist}/index.html"/>
     </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+
+    <target name="mkdmrpp-dist"
+            depends="mkdmrpp"
+            description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
+
+        <tar destfile="${build.dist}/${MKDMRPP_DIST_BASE}-webapp.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${MKDMRPP_DIST_BASE}-webapp">
+                <include name="${MKDMRPP_DEPLOYMENT_CONTEXT}.war"/>
+            </zipfileset>
+        </tar>
+        <delete file="${build.dist}/${MKDMRPP_DEPLOYMENT_CONTEXT}.war"/>
+    </target>
+
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
+    <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
 
 </project>
