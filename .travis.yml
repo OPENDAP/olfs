@@ -223,6 +223,36 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
+    - stage: snappah
+      name: "build_dmrpp-snapshot (jdk11)"
+      jdk: openjdk11
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-snapshot" mkdmrpp-dist
+        - echo "Build DMR++ Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
+    - stage: snappah
+      name: "build_dmrpp-build-number (jdk11)"
+      jdk: openjdk11
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-${OLFS_BUILD_VERSION}" mkdmrpp-dist
+        - echo "Build DMR++ Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
       # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
       # snapshot time and pushes the result to GitHub. This push triggers TravisCI
       # to build the Docker containers for all of the Hyrax snapshot products.
