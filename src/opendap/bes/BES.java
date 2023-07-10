@@ -1157,7 +1157,6 @@ public class BES {
      */
     public void returnClient(OPeNDAPClient dapClient, boolean discard) throws PPTException {
 
-
         if (dapClient == null)
             return;
         try {
@@ -1189,8 +1188,6 @@ public class BES {
 
 
     private void checkInClient(OPeNDAPClient dapClient) throws PPTException {
-
-
         if (
             !dapClient.isOk() ||
             (config.getMaxCommands() > 0 &&
@@ -1205,10 +1202,8 @@ public class BES {
                         "limit of " + config.getMaxCommands() + ", discarding client.";
                 log.debug(msg);
             }
-
         }
         else {
-
             if (clientQueue.offer(dapClient)) {
                 log.debug("Returned OPeNDAPClient (id:{}) to Client Pool.", dapClient.getID());
             } else {
@@ -1216,10 +1211,7 @@ public class BES {
                         "full and I need to check in a client! This Should " +
                         "NEVER Happen!");
             }
-
         }
-
-
     }
 
 
