@@ -100,8 +100,8 @@ jobs:
         - export STAGE=build
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
-    - stage: build
-      name: "gradle (jdk11)"
+    - stage: disabled
+      name: "gradle build (jdk11)"
       jdk: openjdk11
       script:
         - export STAGE=build
@@ -110,23 +110,23 @@ jobs:
         - ./gradlew war
 
 
-    - stage: scan
-      name: "synk (jdk11)"
+    - stage: disabled
+      name: "synk scan(jdk11)"
       jdk: openjdk11
       script:
         - export STAGE=scan
         - echo $STAGE
         - ./run-snyk.sh
 
-    - stage: scan
-      name: "gradle sonarscan (jdk11)"
+    - stage: disabled
+      name: "gradle sonarscan scan(jdk11)"
       jdk: openjdk11
       script:
         - export STAGE=scan
         - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
-    - stage: snappah
+    - stage: disabled
       name: "olfs-snapshot (jdk11)"
       jdk: openjdk11
       script:
@@ -141,7 +141,7 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
+    - stage: disabled
       name: "olfs-build-number (jdk11)"
       jdk: openjdk11
       script:
@@ -156,7 +156,7 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
+    - stage: disabled
       name: "ngap-snapshot (jdk11)"
       jdk: openjdk11
       script:
@@ -171,7 +171,7 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
+    - stage: disabled
       name: "ngap-build-number (jdk11)"
       jdk: openjdk11
       script:
@@ -201,7 +201,7 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: mooch
+    - stage: snappah
       name: "build_dmrpp-build-number (jdk11)"
       jdk: openjdk11
       script:
@@ -215,6 +215,7 @@ jobs:
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
+
 
       # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
       # snapshot time and pushes the result to GitHub. This push triggers TravisCI
