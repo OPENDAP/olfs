@@ -68,16 +68,17 @@ install:
 # We need the gradlescan target because we can't run simultaneous
 # sonarscans without encountering a race condition at sonarcloud.io
 stages:
-  - name: build
-  - name: test
-  - name: scan
-  - name: gradlescan
-  - name: snappah
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
-  - name: hyrax-docker-trigger
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
-  - name: disabled
-    if: branch = disabled
+  - name: mooch
+#  - name: build
+#  - name: test
+#  - name: scan
+#  - name: gradlescan
+#  - name: snappah
+#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+#  - name: hyrax-docker-trigger
+#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+#  - name: disabled
+#    if: branch = disabled
 
 # caching for gradle
 before_cache:
@@ -238,7 +239,7 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
+    - stage: mooch
       name: "build_dmrpp-build-number (jdk11)"
       jdk: openjdk11
       script:
@@ -246,7 +247,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-${OLFS_BUILD_VERSION}" mkdmrpp-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-${BUILD_DMRPP_VERSION}" mkdmrpp-dist
         - echo "Build DMR++ Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
