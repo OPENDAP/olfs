@@ -245,7 +245,7 @@ jobs:
 
 
 
-# The deploy section copies the snapshot build product our S3 bucket
+# The "deploy" section copies the snapshot build product to our S3 bucket
 deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
