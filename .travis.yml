@@ -68,7 +68,6 @@ install:
 # We need the gradlescan target because we can't run simultaneous
 # sonarscans without encountering a race condition at sonarcloud.io
 stages:
-  - name: mooch
   - name: build
   - name: test
   - name: scan
