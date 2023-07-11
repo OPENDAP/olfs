@@ -69,16 +69,16 @@ install:
 # sonarscans without encountering a race condition at sonarcloud.io
 stages:
   - name: mooch
-#  - name: build
-#  - name: test
-#  - name: scan
-#  - name: gradlescan
-#  - name: snappah
-#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
-#  - name: hyrax-docker-trigger
-#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
-#  - name: disabled
-#    if: branch = disabled
+  - name: build
+  - name: test
+  - name: scan
+  - name: gradlescan
+  - name: snappah
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+  - name: hyrax-docker-trigger
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+  - name: disabled
+    if: branch = disabled
 
 # caching for gradle
 before_cache:
@@ -92,13 +92,6 @@ cache:
 
 jobs:
   include:
-
-    - stage: disabled
-      name: "jdk8"
-      jdk: openjdk8
-      script:
-        - export STAGE=build
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
     - stage: build
       name: "jdk11"
@@ -116,37 +109,6 @@ jobs:
         - ./gradlew tasks
         - ./gradlew war
 
-    - stage: disabled
-      name: "jdk7"
-      jdk: openjdk7
-      script:
-        - export STAGE=test
-        - ant show check
-
-    - stage: disabled
-      name: "jdk8"
-      jdk: openjdk8
-      script:
-        - export STAGE=test
-        - ant show check
-
-    - stage: disabled
-      name: "jdk11"
-      jdk: openjdk11
-      script:
-        - export STAGE=test
-        - ant show check
-
-    - stage: disabled
-      name: "sonarscan (jdk11)"
-      jdk: openjdk11
-      addons: sonarcloud
-      script:
-        - export STAGE=scan
-        - export ANT_OPTS="-Xms256m -Xmx8g"
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
       name: "synk (jdk11)"
