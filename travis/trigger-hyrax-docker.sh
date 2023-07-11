@@ -13,7 +13,7 @@ echo "#"
 git config --global user.name "The-Robot-Travis"
 git config --global user.email "npotter@opendap.org"
 
-# This will get both the BES and libdap version numbers
+# This will get the BES, build_dmrpp, and libdap version numbers
 BES_SNAPSHOT=$(cat ./bes-snapshot)
 
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "`date "+%FT%T%z"`
