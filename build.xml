@@ -47,8 +47,6 @@
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
     <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
 
-    <property name="MKDMRPP_DEPLOYMENT_CONTEXT" value="build_dmrpp"/>
-
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
     <!-- relative to the project "Basedir" directory,  -->
@@ -60,15 +58,14 @@
          These properties should be set from the command
          line when running the DISTRO build target.
     -->
-    <property name="HYRAX_VERSION" value="Not.A.Release"/>
-    <property name="OLFS_VERSION" value="Not.A.Release"/>
-    <property name="NGAP_VERSION" value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION" value="${HYRAX_VERSION}"/>
+    <property name="HYRAX_VERSION"       value="Not.A.Release"/>
+    <property name="OLFS_VERSION"        value="Not.A.Release"/>
+    <property name="NGAP_VERSION"        value="${HYRAX_VERSION}"/>
+    <property name="WCS_VERSION"         value="${HYRAX_VERSION}"/>
 
-    <property name="OLFS_DIST_BASE" value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE" value="ngap-${HYRAX_VERSION}"/>
-    <property name="MKDMRPP_DIST_BASE" value="build_dmrpp-${HYRAX_VERSION}"/>
-    <property name="WEBAPP_DIST" value="${OLFS_DIST_BASE}-webapp"/>
+    <property name="OLFS_DIST_BASE"        value="olfs-${OLFS_VERSION}"/>
+    <property name="NGAP_DIST_BASE"        value="ngap-${HYRAX_VERSION}"/>
+    <property name="WEBAPP_DIST"           value="${OLFS_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
@@ -223,8 +220,11 @@
     <property name="build.hyrax.resources" location="${build.dir}/resources"/>
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
 
-    <property name="mkDmrppResources.dir" location="${resources.dir}/mkdmrpp"/>
-    <property name="build.mkdmrpp.resources" location="${build.dir}/mkdmrpp"/>
+    <property name="BUILD_DMRPP_DEPLOYMENT_CONTEXT" value="build_dmrpp"/>
+    <property name="BUILD_DMRPP_VERSION" value="Not.A.Release"/>
+    <property name="BUILD_DMRPP_DIST_BASE" value="build_dmrpp-${BUILD_DMRPP_VERSION}"/>
+    <property name="build_dmrpp.resources.dir" location="${resources.dir}/build_dmrpp"/>
+    <property name="build_dmrpp.build.resources" location="${build.dir}/build_dmrpp"/>
 
     <property name="ngapResources.dir" location="${resources.dir}/ngap"/>
     <property name="build.ngap.resources" location="${build.dir}/ngap"/>
@@ -347,7 +347,7 @@
     <!--
         These are the library jars used by Hyrax.
     -->
-    <fileset id="mkdmrpp-libs" dir="${lib.dir}">
+    <fileset id="build_dmrpp-libs" dir="${lib.dir}">
         <include name="${owasp-encoder.lib}"/>
         <include name="${owasp-encoder-jsp.lib}"/>
 
@@ -389,7 +389,7 @@
         <fileset refid="hyrax-libs" />
     </path>
 
-    <path id="mkdmrpp.compile.classpath">
+    <path id="build_dmrpp.compile.classpath">
         <pathelement path="${build.classes}"/>
         <!--
             We have to have the catalina and servlet api's on the classpath at
@@ -400,7 +400,7 @@
             <include name="${catalina.lib}"/>
             <include name="${servlet-api.lib}"/>
         </fileset>
-        <fileset refid="mkdmrpp-libs" />
+        <fileset refid="build_dmrpp-libs" />
     </path>
 
 
@@ -524,8 +524,8 @@
             </fileset>
         </copy>
 
-        <copy todir="${build.mkdmrpp.resources}" filtering="true">
-            <fileset dir="${mkDmrppResources.dir}">
+        <copy todir="${build_dmrpp.build.resources}" filtering="true">
+            <fileset dir="${build_dmrpp.resources.dir}">
                 <exclude name="*.png" />
                 <exclude name="lib/**" />
             </fileset>
@@ -994,13 +994,13 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
     <target
-            name="mkdmrpp"
+            name="build_dmrpp"
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the build_dmrpp WAR file.">
 
         <echo level="info" message="Building the build dmr++ service war file."/>
         <echo level="info" message="build.hyrax.resources:   ${build.hyrax.resources}"/>
-        <echo level="info" message="buildDmrppResources.dir: ${mkDmrppResources.dir}"/>
+        <echo level="info" message="buildDmrppResources.dir: ${build_dmrpp.resources.dir}"/>
         <echo level="info" message="ngapResources.dir:       ${ngapResources.dir}"/>
         <echo level="info" message="build.dist:              ${build.dist}"/>
 
@@ -1010,8 +1010,8 @@
         <!-- copy file="${ngapResources.dir}/logback-ngap.xml" tofile="${build.dist}/logback-test.xml"/ -->
 
         <!-- Combine the libraries in the build dir, for inclusion in the WAR file below. -->
-        <copy todir="${build.mkdmrpp.resources}/lib" filtering="false">
-            <fileset refid="mkdmrpp-libs"/>
+        <copy todir="${build_dmrpp.build.resources}/lib" filtering="false">
+            <fileset refid="build_dmrpp-libs"/>
             <fileset dir="${ngapResources.dir}/lib">
                 <!-- We exclude these because they get placed into
                 $CATALINA_HOM/lib when the Docker containers are built.-->
@@ -1030,10 +1030,10 @@
          - Utilize a special NGAP web.xml that deploys with the Hyrax
            authentication and authorization filters enabled
         -->
-        <war destfile="${build.dist}/${MKDMRPP_DEPLOYMENT_CONTEXT}.war"
-             webxml="${build.mkdmrpp.resources}/web.xml">
+        <war destfile="${build.dist}/${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"
+             webxml="${build_dmrpp.build.resources}/web.xml">
 
-            <lib dir="${build.mkdmrpp.resources}/lib"/>
+            <lib dir="${build_dmrpp.build.resources}/lib"/>
 
             <classes dir="${build.classes}"/>
             <zipfileset dir="${build.hyrax.resources}" prefix="">
@@ -1045,7 +1045,7 @@
             </zipfileset>
 
 
-            <zipfileset dir="${build.mkdmrpp.resources}" prefix="WEB-INF">
+            <zipfileset dir="${build_dmrpp.build.resources}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
                 <include name="conf/logback.xml"/>
                 <include name="conf/build_dmrpp.xml"/>
@@ -1072,16 +1072,16 @@
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
 
-    <target name="mkdmrpp-dist"
-            depends="mkdmrpp"
+    <target name="build_dmrpp-dist"
+            depends="build_dmrpp"
             description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
-        <tar destfile="${build.dist}/${MKDMRPP_DIST_BASE}-webapp.tgz" compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="${MKDMRPP_DIST_BASE}-webapp">
-                <include name="${MKDMRPP_DEPLOYMENT_CONTEXT}.war"/>
+        <tar destfile="${build.dist}/${BUILD_DMRPP_DIST_BASE}-webapp.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${BUILD_DMRPP_DIST_BASE}-webapp">
+                <include name="${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
         </tar>
-        <delete file="${build.dist}/${MKDMRPP_DEPLOYMENT_CONTEXT}.war"/>
+        <delete file="${build.dist}/${BUILD_DMRPP_DEPLOYMENT_CONTEXT}.war"/>
     </target>
 
     <!-- == == == == == == == == == == == == == == == == == == == == == == -->
