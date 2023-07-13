@@ -332,7 +332,7 @@ public class DispatchServlet extends HttpServlet {
         httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         httpGetHandlers.add(new opendap.gateway.DispatchHandler());
-        httpGetHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
+        //httpGetHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
         httpGetHandlers.add(new opendap.ngap.NgapDispatchHandler());
         httpGetHandlers.add(new opendap.bes.BesDapDispatcher());
 
@@ -340,7 +340,7 @@ public class DispatchServlet extends HttpServlet {
             // The DAP dispatch handler does POST
             httpPostHandlers.add( new opendap.bes.BesDapDispatcher());
             // And the BuildDmrpp dispatch handler does POST
-            httpPostHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
+            //httpPostHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
             // And the NGAP dispatch handler does POST
             httpPostHandlers.add(new opendap.ngap.NgapDispatchHandler());
         }
