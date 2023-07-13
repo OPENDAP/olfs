@@ -163,6 +163,7 @@
     <logger name="opendap.auth" level="all"/>
     <logger name="opendap.auth.Util" level="all"/>
     <logger name="opendap.ngap" level="info"/>
+    <logger name="opendap.build_dmrpp" level="all"/>
 
     <logger name="opendap.io.ChunkedInputStream" level="error"/>
 
@@ -187,9 +188,9 @@
 
     <root level="error">
         <!--
-            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-            and it must appear here in the root level in order to catch all the stuff,
-            adn in order for the Java software to be able to locate it at run time.
+            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface.
+            It must appear here in the root level in order to catch all the stuff,
+            and in order for the HAI software to locate it at run time.
         -->
         <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>

@@ -128,89 +128,86 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                                    boolean sendResponse)
             throws Exception {
 
-        User user = new User(request);
-        QueryParameters qp = new QueryParameters(request);
+        if (sendResponse) {
+            User user = new User(request);
+            QueryParameters qp = new QueryParameters(request);
 
-        String invocation = request.getRequestURL().toString();
-        String qs = request.getQueryString();
-        if(qs!=null)
-            invocation += "?" + qs;
-        log.debug("invocation:    " + invocation);
+            String invocation = request.getRequestURL().toString();
+            String qs = request.getQueryString();
+            if (qs != null)
+                invocation += "?" + qs;
+            log.debug("invocation:    " + invocation);
 
-        String resourceID = ReqInfo.getLocalUrl(request);
-        log.debug("resourceID:    " + resourceID);
+            String resourceID = ReqInfo.getLocalUrl(request);
+            log.debug("resourceID:    " + resourceID);
 
-        while(resourceID.startsWith(THE_SLASH) && resourceID.length()>1)
-            resourceID = resourceID.substring(1);
+            while (resourceID.startsWith(THE_SLASH) && resourceID.length() > 1)
+                resourceID = resourceID.substring(1);
 
-        boolean itsJustThePrefixWithoutTheSlash = false;
-        boolean itsJustThePrefix = false;
-        boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
-        if(!itsJustTheSlash){
-            itsJustThePrefix = _prefix.equals(resourceID);
-            if(!_prefix.isEmpty()) {
-                itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf(THE_SLASH)).equals(resourceID);
-            }
-        }
-        boolean isMyRequest = itsJustThePrefixWithoutTheSlash || resourceID.startsWith(_prefix) || itsJustTheSlash ;
+            boolean itsJustThePrefixWithoutTheSlash = false;
+            boolean itsJustThePrefix = false;
 
-        if(isMyRequest) {
-            if (sendResponse) {
-
-                if(itsJustThePrefixWithoutTheSlash ){
-                    response.sendRedirect(_prefix);
-                    log.debug("Sent redirect to service prefix: "+_prefix);
-                    return true;
-                }
-
-                reqCounter.incrementAndGet();
-                if(itsJustThePrefix || itsJustTheSlash){
-                    sendLandingPage(response);
-                }
-                else {
-                    log.info("Sending build_dmrpp Response");
-
-                    if(resourceID.startsWith(_prefix)){
-                        resourceID = resourceID.substring(_prefix.length());
-                    }
-                    MediaType responseMediaType =  new Dmrpp();
-                    // Stash the Media type in case there's an error downstream.
-                    // That way the error handler will know how to encode the error.
-                    RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
-
-                    String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf(THE_SLASH) + 1));
-                    downloadFileName += responseMediaType.getMediaSuffix();
-                    log.debug("downloadFileName:  {}",downloadFileName );
-                    response.setHeader("Content-Disposition", " attachment; filename=\"" +downloadFileName+"\"");
-
-                    response.setContentType(responseMediaType.getMimeType());
-                    response.setHeader("Content-Description", responseMediaType.getMimeType());
-
-                    // Version.setOpendapMimeHeaders(request, response);
-
-
-                    BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi(_prefix);
-                    Document buildDmrppCmdDoc;
-                    BES bes = BESManager.getBES(resourceID);
-                    int bes_timeout_seconds = bes.getTimeout() / 1000;
-
-                    buildDmrppCmdDoc = buildDmrppBesApi.getBuildDmrppDocument(user, resourceID, qp, invocation, bes_timeout_seconds);
-
-                    log.debug("Beginning BES transaction.");
-                    if(log.isDebugEnabled()){
-                        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                        log.debug("BES command document: \n-----------\n" + xmlo.outputString(buildDmrppCmdDoc) + "-----------\n");
-                    }
-                    ServletResponseTransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
-                    bes.besTransaction(buildDmrppCmdDoc, response.getOutputStream(), tc);
-
-                    long reqNum = buildDmrppServiceCounter.incrementAndGet();
-                    log.info("Sent DAP build dmr++ response {}",reqNum);
+            boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
+            log.debug("itsJustTheSlash: {}", (itsJustTheSlash?"true":"false"));
+            if (!itsJustTheSlash) {
+                itsJustThePrefix = _prefix.equals(resourceID);
+                if (!_prefix.isEmpty()) {
+                    itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf(THE_SLASH)).equals(resourceID);
                 }
             }
+            log.debug("itsJustThePrefix: {}", (itsJustThePrefix?"true":"false"));
+            log.debug("itsJustThePrefixWithoutTheSlash: {}", (itsJustThePrefixWithoutTheSlash?"true":"false"));
 
+            if (itsJustThePrefixWithoutTheSlash) {
+                response.sendRedirect(_prefix);
+                log.debug("Sent redirect to service prefix: " + _prefix);
+                return true;
+            }
+
+            reqCounter.incrementAndGet();
+            if (itsJustThePrefix || itsJustTheSlash) {
+                sendLandingPage(response);
+            } else {
+                log.info("Sending build_dmrpp Response");
+
+                if (resourceID.startsWith(_prefix)) {
+                    resourceID = resourceID.substring(_prefix.length());
+                }
+                MediaType responseMediaType = new Dmrpp();
+                // Stash the Media type in case there's an error downstream.
+                // That way the error handler will know how to encode the error.
+                RequestCache.put(OPeNDAPException.ERROR_RESPONSE_MEDIA_TYPE_KEY, responseMediaType);
+
+                String downloadFileName = Scrub.fileName(resourceID.substring(resourceID.lastIndexOf(THE_SLASH) + 1));
+                downloadFileName += responseMediaType.getMediaSuffix();
+                log.debug("downloadFileName:  {}", downloadFileName);
+                response.setHeader("Content-Disposition", " attachment; filename=\"" + downloadFileName + "\"");
+
+                response.setContentType(responseMediaType.getMimeType());
+                response.setHeader("Content-Description", responseMediaType.getMimeType());
+
+                // Version.setOpendapMimeHeaders(request, response);
+
+                BuildDmrppBesApi buildDmrppBesApi = new BuildDmrppBesApi(_prefix);
+                Document buildDmrppCmdDoc;
+                BES bes = BESManager.getBES(resourceID);
+                int bes_timeout_seconds = bes.getTimeout() / 1000;
+
+                buildDmrppCmdDoc = buildDmrppBesApi.getBuildDmrppDocument(user, resourceID, qp, invocation, bes_timeout_seconds);
+
+                log.debug("Beginning BES transaction.");
+                if (log.isDebugEnabled()) {
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    log.debug("BES command document: \n-----------\n" + xmlo.outputString(buildDmrppCmdDoc) + "-----------\n");
+                }
+                ServletResponseTransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
+                bes.besTransaction(buildDmrppCmdDoc, response.getOutputStream(), tc);
+
+                long reqNum = buildDmrppServiceCounter.incrementAndGet();
+                log.info("Sent DAP build dmr++ response {}", reqNum);
+            }
         }
-        return isMyRequest;
+        return true;
     }
 
 
@@ -230,9 +227,9 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
                 }
             }
         }
-        if(_prefix.equals("")){
-            _prefix=THE_SLASH;
-        }
+        //if(_prefix.equals("")){
+        //    _prefix=THE_SLASH;
+        //}
         if (!_prefix.endsWith(THE_SLASH))
             _prefix += THE_SLASH;
 
@@ -252,7 +249,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         sos.println("<html>");
         sos.println("<head>");
         sos.println("<meta http-equiv=\"refresh\" content=\"60\">");
-        sos.println("<title>OPeNDAP Hyrax: NGAP Service</title>");
+        sos.println("<title>OPeNDAP Build DMR++ Service</title>");
         sos.println("</head>");
         sos.println("<body>");
         sos.print("<p style='");

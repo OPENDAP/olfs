@@ -232,7 +232,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-snapshot" mkdmrpp-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DBUILD_DMRPP_DIST_BASE="build_dmrpp-snapshot" build_dmrpp-dist
         - echo "Build DMR++ Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
@@ -247,7 +247,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DMKDMRPP_DIST_BASE="build_dmrpp-${BUILD_DMRPP_VERSION}" mkdmrpp-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DBUILD_DMRPP_DIST_BASE="build_dmrpp-${BUILD_DMRPP_VERSION}" build_dmrpp-dist
         - echo "Build DMR++ Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
