@@ -146,14 +146,17 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
 
             boolean itsJustThePrefixWithoutTheSlash = false;
             boolean itsJustThePrefix = false;
+
             boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
+            log.debug("itsJustTheSlash: {}", (itsJustTheSlash?"true":"false"));
             if (!itsJustTheSlash) {
                 itsJustThePrefix = _prefix.equals(resourceID);
                 if (!_prefix.isEmpty()) {
                     itsJustThePrefixWithoutTheSlash = _prefix.substring(0, _prefix.lastIndexOf(THE_SLASH)).equals(resourceID);
                 }
             }
-
+            log.debug("itsJustThePrefix: {}", (itsJustThePrefix?"true":"false"));
+            log.debug("itsJustThePrefixWithoutTheSlash: {}", (itsJustThePrefixWithoutTheSlash?"true":"false"));
 
             if (itsJustThePrefixWithoutTheSlash) {
                 response.sendRedirect(_prefix);
