@@ -101,8 +101,8 @@ public class Timer {
         p.name = key.toString();
         p.start();
 
-        threadLog.append("[").append(threadName).append("] ").append(key.toString()).append("  STARTED: ").append(p.start).append("\n");
-        log.info("start() - {} started:  {} ", key.toString(), p.start);
+        threadLog.append("[").append(threadName).append("] [").append(key).append("  STARTED: ").append(p.start).append(" ns");
+        log.info("start() - {} started:  {} ", key, p.start);
         return p;
     }
 
@@ -116,20 +116,12 @@ public class Timer {
         if(!enabled)
             return;
 
-        StringBuilder sb = new StringBuilder();
         procedure.end();
 
-        String threadName = Thread.currentThread().getName();
-        sb.append("stop() - ").append(procedure.name).append(" stopped:  ");
-        sb.append(procedure.end).append(" (").append(procedure.elapsedTime()).append(" ms)");
-
-        if(log.isInfoEnabled()) {
-            log.info(sb.toString());
-        }
         StringBuilder threadLog = getThreadLog();
-        threadLog.append("[").append(threadName).append("] ").append(procedure.name).append(" STOPPED: ").append(procedure.end);
-        threadLog.append(" ELAPSED: ").append(procedure.elapsedTime()).append("\n");
-
+        threadLog.append(" STOPPED: ").append(procedure.end);
+        threadLog.append(" ns ELAPSED: ").append(procedure.elapsedTime()).append(" ms ]");
+        log.info(threadLog.toString());
     }
 
 
