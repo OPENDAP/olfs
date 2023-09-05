@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This Timer is thread safe.
@@ -39,7 +41,13 @@ public class Timer {
 
     private static Logger log = LoggerFactory.getLogger(Timer.class);
     private static ConcurrentHashMap<String, StringBuilder> threadLogs = new ConcurrentHashMap<>();
-    private static boolean enabled = false;
+    private static AtomicBoolean enabled;
+    static {
+        enabled = new AtomicBoolean(false);
+    }
+
+    private static final String mrk = "][";
+
 
     /**
      * Private because this is a singleton
@@ -49,15 +57,15 @@ public class Timer {
     /**
      * Turn on the Timer.
      */
-    public static void enable(){
-        enabled = true;
+    public static boolean enable(){
+        return enabled.getAndSet(true);
     }
 
     /**
      * Turn off the Timer.
      */
-    public static void disable() {
-        enabled = false;
+    public static boolean disable() {
+        return  enabled.getAndSet(false);
     }
 
     /**
@@ -65,7 +73,7 @@ public class Timer {
      * @return True if Timer is enabled.
      */
     public static boolean isEnabled(){
-        return enabled;
+        return enabled.get();
     }
 
 
@@ -82,10 +90,10 @@ public class Timer {
     /**
      * Starts (and logs) a timer associated with the current thread. The time will back up the call stack and
      * name the Timer for the calling class and method.
-     * @return A an object to hand the Timer.stop() method.
+     * @return A Procedure object to hand the Timer.stop() method.
      */
     public static Procedure start(){
-        if(!enabled)
+        if(!enabled.get())
             return null;
 
         StringBuilder threadLog = getThreadLog();
@@ -101,7 +109,16 @@ public class Timer {
         p.name = key.toString();
         p.start();
 
-        threadLog.append("[").append(threadName).append("] [").append(key).append("  STARTED: ").append(p.start).append(" ns");
+        // BES
+        //# 1601642669|&|2122|&|timing|&|TimingFields
+
+        Date now = new Date();
+        threadLog.append("[");
+        threadLog.append(now.getTime()).append(mrk);
+        threadLog.append(threadName).append(mrk);
+        threadLog.append("timing").append(mrk);
+        threadLog.append(key).append(mrk);
+        threadLog.append("STARTED: ").append(p.start).append(" ns").append(mrk);
         log.info("start() - {} started:  {} ", key, p.start);
         return p;
     }
@@ -113,14 +130,17 @@ public class Timer {
      * @param procedure  The Procedure to stop timing.
      */
     public static void stop(Procedure procedure){
-        if(!enabled)
+        if(!enabled.get())
             return;
 
         procedure.end();
 
         StringBuilder threadLog = getThreadLog();
-        threadLog.append(" STOPPED: ").append(procedure.end);
-        threadLog.append(" ns ELAPSED: ").append(procedure.elapsedTime()).append(" ms ]");
+        threadLog.append("STOPPED: ").append(procedure.end);
+        threadLog.append(" ns").append(mrk);
+        threadLog.append("ELAPSED: ").append(procedure.elapsedTime());
+        threadLog.append(" ms").append("]");
+        threadLog.append("\n");
         log.info(threadLog.toString());
     }
 
@@ -130,7 +150,7 @@ public class Timer {
      * @param pw  A PrintStream to which to print the report String.
      */
     public static void report(PrintStream pw){
-        if(!enabled) {
+        if(!enabled.get()) {
             pw.print("Timer is NOT enabled");
             return;
         }
@@ -142,7 +162,7 @@ public class Timer {
      * Resets the Timer for the current thread.
      */
     public static void reset() {
-        if(!enabled)
+        if(!enabled.get())
             return;
         String threadName = Thread.currentThread().getName();
         threadLogs.remove(threadName);
@@ -154,7 +174,7 @@ public class Timer {
      * @return A summary of the current timing activities since the last call to Timer.reset()
      */
     public static String report() {
-        if (!enabled)
+        if (!enabled.get())
             return "Timer is NOT enabled";
 
         return getThreadLog().toString();

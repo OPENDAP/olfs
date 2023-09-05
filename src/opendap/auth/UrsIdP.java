@@ -216,15 +216,21 @@ public class UrsIdP extends IdProvider{
 
         log.debug("UID request: url: {} post_body: {}",url,post_body.toString());
 
-
-        Logger edl_logger = LoggerFactory.getLogger("EDL_LOG");
-        Timer.enable();
-        Procedure timedProc = Timer.start();
-        String contents = Util.submitHttpRequest(url, headers, post_body.toString());
-        Timer.stop(timedProc);
-        String report = Timer.report();
-        edl_logger.info(report);
-        Timer.disable();
+        String contents;
+        try {
+            Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
+            Timer.enable();
+            Timer.reset();
+            Procedure timedProc = Timer.start();
+            contents = Util.submitHttpRequest(url, headers, post_body.toString());
+            Timer.stop(timedProc);
+            String report = Timer.report();
+            edlLog.info(report);
+        }
+        finally {
+            Timer.reset();
+            Timer.disable();
+        }
 
         log.debug("url {} returned contents: {}",url,contents);
 

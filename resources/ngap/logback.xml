@@ -109,6 +109,18 @@
         </encoder>
     </appender>
 
+    <appender name="EdlLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/EDLTimer.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logdir}/EDLTimer.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}] %m</pattern>
+        </encoder>
+    </appender>
+
 
 
     <appender name="DebugLogDateRoller" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -199,6 +211,10 @@
     </logger -->
     <logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
+    </logger>
+
+    <logger name="EDL_LOG" level="info">
+        <appender-ref ref="EdlLogAppender"/>
     </logger>
 
     <root level="error">
