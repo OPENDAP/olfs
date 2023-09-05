@@ -32,6 +32,8 @@ import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
+import opendap.logging.Procedure;
+import opendap.logging.Timer;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,12 +216,28 @@ public class UrsIdP extends IdProvider{
 
         log.debug("UID request: url: {} post_body: {}",url,post_body.toString());
 
-        String contents = Util.submitHttpRequest(url, headers, post_body.toString());
+        String contents;
+        try {
+            Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
+            Timer.enable();
+            Timer.reset();
+            Procedure timedProc = Timer.start();
+            contents = Util.submitHttpRequest(url, headers, post_body.toString());
+            Timer.stop(timedProc);
+            String report = Timer.report();
+            edlLog.info(report);
+        }
+        finally {
+            Timer.reset();
+            Timer.disable();
+        }
+
         log.debug("url {} returned contents: {}",url,contents);
 
         JsonParser jparse = new JsonParser();
         JsonObject profile = jparse.parse(contents).getAsJsonObject();
         String uid = profile.get("uid").getAsString();
+
 
         log.debug("uid: {}",uid);
 
