@@ -35,11 +35,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Created by ndp on 9/24/14.
+ * Base class for the ID Provider implementations.
  */
 public abstract class IdProvider {
 
 
+    public static final String AUTHORIZATION_HEADER_KEY="authorization";
     protected String authContext;
     private String description;
     protected String serviceContext;

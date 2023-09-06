@@ -52,7 +52,6 @@ import java.util.Map;
 public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
-    public static final String AUTHORIZATION_HEADER_KEY="authorization";
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
     public static final String URS_URL_KEY = "UrsUrl";
@@ -274,7 +273,7 @@ public class UrsIdP extends IdProvider{
         UserProfile userProfile = new UserProfile();
         userProfile.setAuthContext(getAuthContext());
 
-        // Add the this instance of UserProfile to the session for retrieval
+        // Add this instance of UserProfile to the session for retrieval
         // down stream on this request.
         // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
@@ -292,12 +291,12 @@ public class UrsIdP extends IdProvider{
         }
 
         if(!foundEDLAuthToken) {
-            if(authz_header_value!=null){
-                if(rejectUnsupportedAuthzSchemes){
+            if (authz_header_value != null) {
+                if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
-                    if(AuthorizationHeader.isBasic(authz_header_value)){
+                    if (AuthorizationHeader.isBasic(authz_header_value)) {
                         msg += "Your request included unencrypted credentials that this ";
                         msg += "service is not prepared to receive. Please check the version ";
                         msg += "and configuration of your client software as this is a security ";
@@ -337,7 +336,7 @@ public class UrsIdP extends IdProvider{
 
             log.info("URS Code: {}", LogUtil.scrubEntry(code));
 
-            // If we get here, the the user was redirected by URS back to our application,
+            // If we get here, the user was redirected by URS back to our application,
             // and we have a code. We now exchange the code for a token, which is
             // returned as a json document.
             String url = getUrsUrl() + "/oauth/token";
@@ -366,21 +365,21 @@ public class UrsIdP extends IdProvider{
 
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
-            getEDLUserProfile(userProfile,edlat.getEndPoint(),edlat.getTokenType(),edlat.getAccessToken());
+            getEDLUserProfile(userProfile, edlat.getEndPoint(), edlat.getTokenType(), edlat.getAccessToken());
             log.info("URS UID: {}", userProfile.getUID());
+
+
+            // Finally, redirect the user back to the original requested resource.
+            String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
+
+            if (redirectUrl == null) {
+                redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
+            }
+            log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
+
+            response.sendRedirect(redirectUrl);
         }
-
-        // Finally, redirect the user back to the original requested resource.
-        String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
-
-        if (redirectUrl == null) {
-            redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
-        }
-        log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
-
-        response.sendRedirect(redirectUrl);
-
         log.debug("END (session: {})", session.getId());
         return true;
 
