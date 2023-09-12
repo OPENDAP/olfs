@@ -254,7 +254,7 @@ public class UrsIdP extends IdProvider{
     private String getEdlRedirectUri(HttpServletRequest request){
         String edlRedirectUrl =  ReqInfo.getRequestUrlPath(request);
         edlRedirectUrl = edlRedirectUrl.substring(0,edlRedirectUrl.indexOf("/",9));
-        edlRedirectUrl += getLoginEndpoint();
+        edlRedirectUrl = PathBuilder.pathConcat(edlRedirectUrl, getLoginEndpoint());
         return edlRedirectUrl;
     }
 
