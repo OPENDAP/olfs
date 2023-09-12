@@ -243,8 +243,23 @@ public class UrsIdP extends IdProvider{
         return uid;
     }
 
+    /**
+     * Builds the EDL returnTo URL. By using the URL returned by
+     * ReqInfo.getRequestUrlPath() we capitalize on the work done inside to
+     * sort out the correct request scheme/protocol.
+     * @param request The request to assess
+     * @return The EDL redirect_uri parameter value for the EDL authorization
+     * redirect being built for the requesting client.
+     */
+    private String getEdlRedirectUri(HttpServletRequest request){
+        String edlRedirectUrl =  ReqInfo.getRequestUrlPath(request);
+        edlRedirectUrl = edlRedirectUrl.substring(0,edlRedirectUrl.indexOf("/",9));
+        edlRedirectUrl = PathBuilder.pathConcat(edlRedirectUrl, getLoginEndpoint());
+        return edlRedirectUrl;
+    }
 
     /**
+     *
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
@@ -314,18 +329,11 @@ public class UrsIdP extends IdProvider{
             // redirect the user to URS to start the authentication process.
             String code = request.getParameter("code");
             if (code == null) {
-                //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
-                //   "&response_type=code&redirect_uri=" + request.getRequestURL();
-                // request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
-
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
-                url += "&";
-
-                String returnToUrl = ReqInfo.getRequestUrlPath(request);
-
-                url += "response_type=code&redirect_uri=" + returnToUrl;
+                url += "&response_type=code";
+                url += "&redirect_uri=" + getEdlRedirectUri(request);
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);

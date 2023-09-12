@@ -48,7 +48,7 @@ import java.io.OutputStream;
 
 public class Util {
 
-    public static final String PROTOCOL_TERMINATON = "://";
+    public static final String PROTOCOL_TERMINATION = "://";
     public static final String HTTP_PROTOCOL = "http://";
     public static final String HTTPS_PROTOCOL = "https://";
     public static final String BES_PROTOCOL = "bes://";
