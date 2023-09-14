@@ -174,16 +174,9 @@ public class Timer {
      * @return A summary of the current timing activities since the last call to Timer.reset()
      */
     public static String report() {
-        if (!enabled.get()) {
-            Date now = new Date();
-            StringBuilder sb = new StringBuilder();
-            sb.append("[");
-            sb.append(now.getTime()).append(mrk);
-            sb.append(Thread.currentThread().getName()).append(mrk);
-            sb.append("Timer is NOT enabled for this Thread.");
-            sb.append("]\n");
-            return sb.toString();
-        }
+        if (!enabled.get())
+            return "Timer is NOT enabled";
+
         return getThreadLog().toString();
     }
 }
