@@ -149,7 +149,7 @@
     </filter-mapping>
 
     <!-- Uncomment These two filters to enable access control. -->
-<!--
+<!-- 
     <filter>
         <filter-name>IdP</filter-name>
         <filter-class>opendap.auth.IdFilter</filter-class>
