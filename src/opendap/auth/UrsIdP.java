@@ -52,7 +52,6 @@ import java.util.Map;
 public class UrsIdP extends IdProvider{
 
     public static final String DEFAULT_AUTH_CONTEXT="urs";
-    public static final String AUTHORIZATION_HEADER_KEY="authorization";
     public static final String OAUTH_USER_ID_ENDPOINT_PATH="/oauth/tokens/user";
 
     public static final String URS_URL_KEY = "UrsUrl";
@@ -244,8 +243,23 @@ public class UrsIdP extends IdProvider{
         return uid;
     }
 
+    /**
+     * Builds the EDL returnTo URL. By using the URL returned by
+     * ReqInfo.getRequestUrlPath() we capitalize on the work done inside to
+     * sort out the correct request scheme/protocol.
+     * @param request The request to assess
+     * @return The EDL redirect_uri parameter value for the EDL authorization
+     * redirect being built for the requesting client.
+     */
+    private String getEdlRedirectUri(HttpServletRequest request){
+        String edlRedirectUrl =  ReqInfo.getRequestUrlPath(request);
+        edlRedirectUrl = edlRedirectUrl.substring(0,edlRedirectUrl.indexOf("/",9));
+        edlRedirectUrl = PathBuilder.pathConcat(edlRedirectUrl, getLoginEndpoint());
+        return edlRedirectUrl;
+    }
 
     /**
+     *
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
@@ -274,7 +288,7 @@ public class UrsIdP extends IdProvider{
         UserProfile userProfile = new UserProfile();
         userProfile.setAuthContext(getAuthContext());
 
-        // Add the this instance of UserProfile to the session for retrieval
+        // Add this instance of UserProfile to the session for retrieval
         // down stream on this request.
         // We set the state of the instance of userProfile below.
         session.setAttribute(IdFilter.USER_PROFILE, userProfile);
@@ -292,12 +306,12 @@ public class UrsIdP extends IdProvider{
         }
 
         if(!foundEDLAuthToken) {
-            if(authz_header_value!=null){
-                if(rejectUnsupportedAuthzSchemes){
+            if (authz_header_value != null) {
+                if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
-                    if(AuthorizationHeader.isBasic(authz_header_value)){
+                    if (AuthorizationHeader.isBasic(authz_header_value)) {
                         msg += "Your request included unencrypted credentials that this ";
                         msg += "service is not prepared to receive. Please check the version ";
                         msg += "and configuration of your client software as this is a security ";
@@ -315,10 +329,6 @@ public class UrsIdP extends IdProvider{
             // redirect the user to URS to start the authentication process.
             String code = request.getParameter("code");
             if (code == null) {
-                //String url = getUrsUrl() + "/oauth/authorize?client_id=" + getUrsClientAppId() +
-                //   "&response_type=code&redirect_uri=" + request.getRequestURL();
-                // request.getRequestURL(); // TODO: REMOVE THIS LINE BEFORE COMMIT
-
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
@@ -337,7 +347,7 @@ public class UrsIdP extends IdProvider{
 
             log.info("URS Code: {}", LogUtil.scrubEntry(code));
 
-            // If we get here, the the user was redirected by URS back to our application,
+            // If we get here, the user was redirected by URS back to our application,
             // and we have a code. We now exchange the code for a token, which is
             // returned as a json document.
             String url = getUrsUrl() + "/oauth/token";
@@ -366,7 +376,7 @@ public class UrsIdP extends IdProvider{
 
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
-            getEDLUserProfile(userProfile,edlat.getEndPoint(),edlat.getTokenType(),edlat.getAccessToken());
+            getEDLUserProfile(userProfile, edlat.getEndPoint(), edlat.getTokenType(), edlat.getAccessToken());
             log.info("URS UID: {}", userProfile.getUID());
         }
 

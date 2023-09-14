@@ -150,8 +150,8 @@ public class PEPFilter implements Filter {
                 UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
                 if(userProfile!=null){
                     userId = userProfile.getUID();
-                    IdProvider ipd = userProfile.getIdP();
-                    authContext = ipd.getAuthContext();
+                    IdProvider idP = userProfile.getIdP();
+                    authContext = idP.getAuthContext();
                 }
             }
 
@@ -178,6 +178,7 @@ public class PEPFilter implements Filter {
                 }
                 return;
             }
+
             // Are they allowed access?
             if (requestIsGranted(userId, authContext, hsReq)) {
                 // Yup, so we just move along...
