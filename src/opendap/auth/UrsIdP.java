@@ -332,8 +332,11 @@ public class UrsIdP extends IdProvider{
                 String url;
                 url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
                 url += "client_id=" + getUrsClientAppId();
-                url += "&response_type=code";
-                url += "&redirect_uri=" + getEdlRedirectUri(request);
+                url += "&";
+
+                String returnToUrl = ReqInfo.getRequestUrlPath(request);
+
+                url += "response_type=code&redirect_uri=" + returnToUrl;
 
                 log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
                 response.sendRedirect(url);
@@ -375,19 +378,19 @@ public class UrsIdP extends IdProvider{
             userProfile.setEDLAccessToken(edlat);
             getEDLUserProfile(userProfile, edlat.getEndPoint(), edlat.getTokenType(), edlat.getAccessToken());
             log.info("URS UID: {}", userProfile.getUID());
-
-
-            // Finally, redirect the user back to the original requested resource.
-            String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-            log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
-
-            if (redirectUrl == null) {
-                redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
-            }
-            log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
-
-            response.sendRedirect(redirectUrl);
         }
+
+        // Finally, redirect the user back to the original requested resource.
+        String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
+
+        if (redirectUrl == null) {
+            redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
+        }
+        log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
+
+        response.sendRedirect(redirectUrl);
+
         log.debug("END (session: {})", session.getId());
         return true;
 

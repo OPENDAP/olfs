@@ -29,7 +29,6 @@ package opendap.auth;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
-import opendap.http.error.Forbidden;
 import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -169,25 +168,8 @@ public class PEPFilter implements Filter {
                 // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
             }
 
-            String authHdr = ((HttpServletRequest) request).getHeader(IdProvider.AUTHORIZATION_HEADER_KEY);
-            if(authHdr != null){
-                if (IdPManager.hasDefaultProvider()) {
-                    try {
-                        boolean retVal;
-                        retVal = IdPManager.getDefaultProvider().doLogin(hsReq,hsRes);
-                        if(retVal && session != null) {
-                            UserProfile up = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
-                            userId = up.getUID();
-                            IdProvider idP = up.getIdP();
-                            authContext = idP.getAuthContext();
-                        }
-                    }
-                    catch (Forbidden http_403){
-                        log.error("Failed to validate EDL auth Token. Message: "+http_403.getMessage());
-                    }
-                }
-            }
-            if (userId == null && everyOneMustHaveUid) { // Do they have to be authenticated?
+            // So - Do they have to be authenticated?
+            if (userId == null && everyOneMustHaveUid) {
                 if (IdPManager.hasDefaultProvider()) {
                     hsRes.sendRedirect(IdPManager.getDefaultProvider().getLoginEndpoint());
                 } else {
