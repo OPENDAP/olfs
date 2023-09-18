@@ -220,8 +220,7 @@ public class IdFilter implements Filter {
                             idProvider.doLogin(hsReq, hsRes);
                             //
                             // We return here and don't do the filter chain because the "doLogin" method will, when
-                            // completed send a 302 redirect to the client. Thus we want the process to stop here until
-                            // login is completed
+                            // completed send a 302 redirect to the client. We want the processing to end here.
                             //
                             log.debug("END (session: {})",session.getId());
                             return;
