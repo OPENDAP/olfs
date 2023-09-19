@@ -277,6 +277,8 @@ public class UrsIdP extends IdProvider{
                 EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_hdr_value, getUrsClientAppId());
                 userProfile.setEDLAccessToken(edlat);
                 userProfile.setAuthContext(getAuthContext());
+                String uid = getEdlUserId(edlat.getAccessToken());
+                userProfile.setUID(uid);
                 getEDLUserProfile(userProfile);
                 foundAuthToken = userProfile.getUID() != null;
             }
