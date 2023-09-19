@@ -294,24 +294,22 @@ public class IdFilter implements Filter {
                 hsReq = authReq;
             }
             else {
-                log.debug("No UserProfile object found in Session. Request is not authenticated.");
-                String auth_hdr_value = request.getHeader(IdProvider.AUTHORIZATION_HEADER_KEY);
-                if(auth_hdr_value != null && !auth_hdr_value.isEmpty()){
+                log.debug("No UserProfile object found in Session. Request is not yet authenticated.");
                     if (IdPManager.hasDefaultProvider()) {
                         try {
                             boolean retVal;
-                            retVal = IdPManager.getDefaultProvider().doLogin(hsReq,hsRes);
+                            retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request,up);
                             if(retVal){
-
+                                log.info("Validated Authorization header. uid: {}",up.getUID());
                             }
                         }
                         catch (Forbidden http_403){
-                            log.error("Failed to validate EDL auth Token. Message: "+http_403.getMessage());
+                            log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
                         }
                     }
                 }
 
-            }
+
             // Cache the  request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
             synchronized(session) {
@@ -427,8 +425,6 @@ public class IdFilter implements Filter {
             throw e;
         }
 	}
-
-
 
 
 

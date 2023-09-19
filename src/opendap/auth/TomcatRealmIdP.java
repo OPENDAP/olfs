@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.PathBuilder;
+import opendap.http.error.Forbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,11 @@ public class TomcatRealmIdP extends IdProvider {
 
         response.sendRedirect(redirectUrl);
         return true;
+    }
+
+    @Override
+    public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
+        return false;
     }
 
     @Override

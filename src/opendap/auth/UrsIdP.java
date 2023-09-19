@@ -169,12 +169,15 @@ public class UrsIdP extends IdProvider{
 
 
 
-    void getEDLUserProfile(UserProfile userProfile, String endpoint, String tokenType, String accessToken ) throws IOException {
+    void getEDLUserProfile(UserProfile userProfile) throws IOException {
+
+        EarthDataLoginAccessToken edlat = userProfile.getEDLAccessToken();
+
         Map<String, String> headers = new HashMap<>();
         // Now that we have an access token, we can retrieve the user profile. This
         // is returned as a JSON document.
-        String url = PathBuilder.pathConcat(ursUrl, endpoint) + "?client_id=" + getUrsClientAppId();
-        String authHeader = tokenType + " " + accessToken;
+        String url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
+        String authHeader = edlat.getTokenType() + " " + edlat.getAccessToken();
         headers.put("Authorization", authHeader);
 
         log.info("URS User Profile Request URL: {}", url);
@@ -261,25 +264,27 @@ public class UrsIdP extends IdProvider{
 
     public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
 
-        boolean foundEDLAuthToken = false;
+        boolean foundAuthToken = false;
 
-        String authz_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
-        if(authz_header_value != null) {
+        String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
+        if(authz_hdr_value != null && !authz_hdr_value.isEmpty()) {
 
-            if (AuthorizationHeader.isBearer(authz_header_value)) {
-                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_header_value, getUrsClientAppId());
-                userProfile.setEDLAccessToken(edlat);
-                String uid = getEdlUserId(edlat.getAccessToken());
-                userProfile.setUID(uid);
-                foundEDLAuthToken = uid != null;
+            if (userProfile == null) {
+                userProfile = new UserProfile();
             }
 
-            if (!foundEDLAuthToken) {
-                if (rejectUnsupportedAuthzSchemes) {
+            if (AuthorizationHeader.isBearer(authz_hdr_value)) {
+                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_hdr_value, getUrsClientAppId());
+                userProfile.setEDLAccessToken(edlat);
+                userProfile.setAuthContext(getAuthContext());
+                getEDLUserProfile(userProfile);
+                foundAuthToken = userProfile.getUID() != null;
+            }
+            else if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
-                    msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
-                    if (AuthorizationHeader.isBasic(authz_header_value)) {
+                    msg += AuthorizationHeader.getScheme(authz_hdr_value) + "' ";
+                    if (AuthorizationHeader.isBasic(authz_hdr_value)) {
                         msg += "Your request included unencrypted credentials that this ";
                         msg += "service is not prepared to receive. Please check the version ";
                         msg += "and configuration of your client software as this is a security ";
@@ -288,13 +293,16 @@ public class UrsIdP extends IdProvider{
                     msg += "I am sorry, but I cannot allow this.";
                     throw new Forbidden(msg);
                 }
+            else {
                 String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
                 msg += "Authorization Scheme: {}";
-                log.warn(msg, AuthorizationHeader.getScheme(authz_header_value));
+                log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
+            }
+
+            if (!foundAuthToken) {
             }
         }
-
-        return foundEDLAuthToken;
+        return foundAuthToken;
     }
 
 
@@ -335,7 +343,7 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
-        boolean foundEDLAuthToken = doTokenAuthentication(request,userProfile);
+        boolean foundEDLAuthToken = false; // doTokenAuthentication(request,userProfile);
 
         if(!foundEDLAuthToken) {
 
@@ -390,8 +398,9 @@ public class UrsIdP extends IdProvider{
 
             EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
             userProfile.setEDLAccessToken(edlat);
-            getEDLUserProfile(userProfile, edlat.getEndPoint(), edlat.getTokenType(), edlat.getAccessToken());
+            getEDLUserProfile(userProfile);
             log.info("URS UID: {}", userProfile.getUID());
+        }
 
         // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);

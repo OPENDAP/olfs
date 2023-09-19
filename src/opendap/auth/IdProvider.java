@@ -104,11 +104,14 @@ public abstract class IdProvider {
     public abstract boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException, Forbidden;
 
 
-    /**
-     * Logs a user out.
-     * This method simply terminates the local session and redirects the user back
-     * to the home page.
-     */
+    public abstract boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden ;
+
+
+        /**
+         * Logs a user out.
+         * This method simply terminates the local session and redirects the user back
+         * to the home page.
+         */
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
