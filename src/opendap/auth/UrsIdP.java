@@ -303,6 +303,8 @@ public class UrsIdP extends IdProvider{
                 EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_hdr_value, getUrsClientAppId());
                 userProfile.setEDLAccessToken(edlat);
                 userProfile.setAuthContext(getAuthContext());
+
+
                 String uid = getEdlUserId(edlat.getAccessToken());
                 userProfile.setUID(uid);
 
@@ -314,7 +316,7 @@ public class UrsIdP extends IdProvider{
                 // of the UserProfile, and we want the EDL user profile we have
                 // know the UId to ask for it. Which means two trips...
                 //
-                //getEDLUserProfile(userProfile);
+                // getEDLUserProfile(userProfile);
 
                 foundValidAuthToken = userProfile.getUID() != null;
             }

@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 public class BuildDmrppBesApi implements Cloneable {
 
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
-    public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
     public static final String INVOCATION_CONTEXT = "invocation";
 
     private static final String SPACE_NAME = "builddmrpp";
@@ -96,7 +95,6 @@ public class BuildDmrppBesApi implements Cloneable {
      *
      * From a bes command:
      *   <bes:setContext name="uid">ndp_opendap</bes:setContext>
-     *   <bes:setContext name="edl_echo_token">anecho:tokenvalue</bes:setContext>
      *    <bes:setContext name="edl_auth_token">Bearer Abearertokenvalue</bes:setContext>
      *
      * @param request The BES request in which to set the UID_CONTEXT and
@@ -111,9 +109,6 @@ public class BuildDmrppBesApi implements Cloneable {
 
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
-
-                // Make and add the @deprecated Echo-Token value
-                request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, oat.getEchoTokenValue()));
 
                 // Add the new service chaining Authorization header value
                 request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAuthorizationHeaderValue()));
