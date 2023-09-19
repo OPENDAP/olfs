@@ -258,6 +258,46 @@ public class UrsIdP extends IdProvider{
         return edlRedirectUrl;
     }
 
+
+    public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
+
+        boolean foundEDLAuthToken = false;
+
+        String authz_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
+        if(authz_header_value != null) {
+
+            if (AuthorizationHeader.isBearer(authz_header_value)) {
+                EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_header_value, getUrsClientAppId());
+                userProfile.setEDLAccessToken(edlat);
+                String uid = getEdlUserId(edlat.getAccessToken());
+                userProfile.setUID(uid);
+                foundEDLAuthToken = uid != null;
+            }
+
+            if (!foundEDLAuthToken) {
+                if (rejectUnsupportedAuthzSchemes) {
+                    String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
+                    msg += "header. 'Authorization Scheme: ";
+                    msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
+                    if (AuthorizationHeader.isBasic(authz_header_value)) {
+                        msg += "Your request included unencrypted credentials that this ";
+                        msg += "service is not prepared to receive. Please check the version ";
+                        msg += "and configuration of your client software as this is a security ";
+                        msg += "concern and needs to be corrected. ";
+                    }
+                    msg += "I am sorry, but I cannot allow this.";
+                    throw new Forbidden(msg);
+                }
+                String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
+                msg += "Authorization Scheme: {}";
+                log.warn(msg, AuthorizationHeader.getScheme(authz_header_value));
+            }
+        }
+
+        return foundEDLAuthToken;
+    }
+
+
     /**
      *
      * Performs the user login operations.
@@ -295,35 +335,9 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
-        boolean foundEDLAuthToken = false;
-        String authz_header_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
-        if(AuthorizationHeader.isBearer(authz_header_value)){
-            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_header_value,getUrsClientAppId());
-            userProfile.setEDLAccessToken(edlat);
-            String uid = getEdlUserId(edlat.getAccessToken());
-            userProfile.setUID(uid);
-            foundEDLAuthToken = uid!=null;
-        }
+        boolean foundEDLAuthToken = doTokenAuthentication(request,userProfile);
 
         if(!foundEDLAuthToken) {
-            if (authz_header_value != null) {
-                if (rejectUnsupportedAuthzSchemes) {
-                    String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
-                    msg += "header. 'Authorization Scheme: ";
-                    msg += AuthorizationHeader.getScheme(authz_header_value) + "' ";
-                    if (AuthorizationHeader.isBasic(authz_header_value)) {
-                        msg += "Your request included unencrypted credentials that this ";
-                        msg += "service is not prepared to receive. Please check the version ";
-                        msg += "and configuration of your client software as this is a security ";
-                        msg += "concern and needs to be corrected. ";
-                    }
-                    msg += "I am sorry, but I cannot allow this.";
-                    throw new Forbidden(msg);
-                }
-                String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
-                msg += "Authorization Scheme: {}";
-                log.warn(msg, AuthorizationHeader.getScheme(authz_header_value));
-            }
 
             // Check to see if we have a code returned from URS. If not, we must
             // redirect the user to URS to start the authentication process.
@@ -378,7 +392,6 @@ public class UrsIdP extends IdProvider{
             userProfile.setEDLAccessToken(edlat);
             getEDLUserProfile(userProfile, edlat.getEndPoint(), edlat.getTokenType(), edlat.getAccessToken());
             log.info("URS UID: {}", userProfile.getUID());
-        }
 
         // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);

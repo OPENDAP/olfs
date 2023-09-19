@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class IdFilter implements Filter {
@@ -55,6 +56,10 @@ public class IdFilter implements Filter {
     private Logger log;
     private static final String logName = "AuthenticationLog";
     private AtomicLong counter;
+    private static final java.util.concurrent.locks.Lock initLock;
+    static {
+        initLock = new ReentrantLock();
+    }
 
     public static final String RETURN_TO_URL      = "return_to_url";
     public static final String USER_PROFILE       = "user_profile";
@@ -75,70 +80,86 @@ public class IdFilter implements Filter {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.filterConfig = filterConfig;
+        initLock.lock();
         try {
-            init();
+            if (isInitialized)
+                return;
+            this.filterConfig = filterConfig;
+            try {
+                init();
+            } catch (IOException | JDOMException se) {
+                log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
+                        "Caught {} Message: {} ", se.getClass().getName(), se.getMessage());
+            }
         }
-        catch (IOException | JDOMException se){
-            log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
-                    "Caught {} Message: {} ",se.getClass().getName(),se.getMessage());
+        finally {
+            initLock.unlock();
         }
 
     }
 
     private void init() throws IOException, JDOMException {
 
-        if(isInitialized)
-            return;
+        initLock.lock();
+        try {
+            if(isInitialized)
+                return;
 
-        counter = new AtomicLong(0);
-        ServletLogUtil.initLogging(filterConfig.getServletContext());
-        log = LoggerFactory.getLogger(this.getClass());
-        log.info("init() - Initializing IdFilter...");
+            counter = new AtomicLong(0);
+            ServletLogUtil.initLogging(filterConfig.getServletContext());
+            log = LoggerFactory.getLogger(this.getClass());
+            log.info("init() - Initializing IdFilter...");
 
-        String context = filterConfig.getServletContext().getContextPath();
+            String context = filterConfig.getServletContext().getContextPath();
 
-        String configFileName = filterConfig.getInitParameter(CONFIG_PARAMETER_NAME);
-        if(configFileName==null){
-            configFileName = DEFAULT_CONFIG_FILE_NAME;
-            String msg = "init() - The web.xml configuration for "+getClass().getName()+
-                    " does not contain an init-parameter named \""+ CONFIG_PARAMETER_NAME +"\" " +
-                    "Using the DEFAULT name: "+configFileName;
-            log.warn(msg);
+            String configFileName = filterConfig.getInitParameter(CONFIG_PARAMETER_NAME);
+            if(configFileName==null){
+                configFileName = DEFAULT_CONFIG_FILE_NAME;
+                String msg = "init() - The web.xml configuration for "+getClass().getName()+
+                        " does not contain an init-parameter named \""+ CONFIG_PARAMETER_NAME +"\" " +
+                        "Using the DEFAULT name: "+configFileName;
+                log.warn(msg);
+            }
+
+            String configDirName = ServletUtil.getConfigPath(filterConfig.getServletContext());
+            File configFile = new File(configDirName,configFileName);
+
+            // Load Config File
+            Element config;
+            config = opendap.xml.Util.getDocumentRoot(configFile);
+
+
+            Element e = config.getChild("EnableGuestProfile");
+            if(e!=null){
+                enableGuestProfile = true;
+                guestEndpoint = PathBuilder.pathConcat(context, "guest");
+            }
+            log.info("init() - Guest Profile {}", enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
+
+            // Set up authentication controls. If the configuration element is missing that's fine
+            // because we know that it will still configure the login/logout endpoint values.
+            AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),context);
+
+            IdPManager.setServiceContext(context);
+            // Load ID Providers (Might be several)
+            for (Object o : config.getChildren("IdProvider")) {
+                Element idpConfig = (Element) o;
+                IdPManager.addProvider(idpConfig);
+            }
+            isInitialized = true;
+
+            log.info("init() - IdFilter HAS BEEN INITIALIZED!");
+            }
+        finally {
+            initLock.unlock();
         }
 
-        String configDirName = ServletUtil.getConfigPath(filterConfig.getServletContext());
-        File configFile = new File(configDirName,configFileName);
-
-        // Load Config File
-        Element config;
-        config = opendap.xml.Util.getDocumentRoot(configFile);
-
-
-        Element e = config.getChild("EnableGuestProfile");
-        if(e!=null){
-            enableGuestProfile = true;
-            guestEndpoint = PathBuilder.pathConcat(context, "guest");
-        }
-        log.info("init() - Guest Profile {}", enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
-
-        // Set up authentication controls. If the configuration element is missing that's fine
-        // because we know that it will still configure the login/logout endpoint values.
-        AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),context);
-
-        IdPManager.setServiceContext(context);
-        // Load ID Providers (Might be several)
-        for (Object o : config.getChildren("IdProvider")) {
-            Element idpConfig = (Element) o;
-            IdPManager.addProvider(idpConfig);
-        }
-        isInitialized = true;
-        log.info("init() - IdFilter HAS BEEN INITIALIZED!");
     }
 
 
     public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
+        // Ensure initialization has been accomplished
         if (!isInitialized) {
             try {
                 init();
@@ -150,20 +171,22 @@ public class IdFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
+
+
+
         try {
             RequestCache.openThreadCache();
 
             HttpServletRequest request = (HttpServletRequest) sreq;
             HttpServletRequest hsReq = request;
 
-            String requestId = this.getClass().getName()+"-"+counter.incrementAndGet();
+            String requestId = this.getClass().getName()+"-" + counter.incrementAndGet();
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
-
             // Get session, make new as needed.
             HttpSession session = hsReq.getSession(true);
             log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
-
             Util.debugHttpRequest(request,log);
+
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
             String requestURI = hsReq.getRequestURI();
@@ -184,13 +207,17 @@ public class IdFilter implements Filter {
             if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
                 doLogout(hsReq, hsRes);
                 return;
-            } else if (AuthenticationControls.isIntitialized() && requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
+            }
+            else if (AuthenticationControls.isIntitialized() &&
+                    requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
                 doLandingPage(hsReq, hsRes);
                 return;
-            } else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
+            }
+            else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
                 doGuestLogin(hsReq, hsRes);
                 return;
-            } else {
+            }
+            else {
                 // Check IdProviders to see if this request is a valid login context.
                 for (IdProvider idProvider : IdPManager.getProviders()) {
 
@@ -211,19 +238,27 @@ public class IdFilter implements Filter {
                         }
                         try {
                             //
-                            // Run the login gizwhat. This may involve simply collecting credentials from the user and
-                            // forwarding them on to the IdP, or it may involve a complex dance of redirection in which
-                            // the user drives their browser through an elaborate auth like OAuth2 so they can come back
-                            // to this very spot with some kind of cookie/token/thingy that lets the doLogin invocation
-                            // complete.
+                            // Run the login gizwhat. This may involve simply
+                            // collecting credentials from the user and
+                            // forwarding them on to the IdP, or it may involve
+                            // a complex dance of redirection in which
+                            // the user drives their browser through an
+                            // elaborate scheme like OAuth2 so they can come
+                            // back to this very spot with some kind of
+                            // cookie/token/thingy that lets the doLogin
+                            // invocation complete.
                             //
                             idProvider.doLogin(hsReq, hsRes);
                             //
-                            // We return here and don't do the filter chain because the "doLogin" method will, when
-                            // completed send a 302 redirect to the client. We want the processing to end here.
+                            // We return here and don't do the filter chain
+                            // because the "doLogin" method will, when
+                            // completed send the client a 302 redirect to the
+                            // RETURN_TO_URL. We want the processing to end
+                            // here.
                             //
                             log.debug("END (session: {})",session.getId());
                             return;
+
 
                         } catch (IOException | Forbidden e) {
                             String msg = "Your Login Transaction FAILED!   " +
@@ -239,11 +274,17 @@ public class IdFilter implements Filter {
                 }
             }
 
+
+
+
+
             //
-            // We get here because the user is NOT trying to login. Since Tomcat and the Servlet API have their own
-            // "login" scheme (name & password based) API we need to check if _our_ login thing ran and if so (detected by
-            // the presence of the USER_PROFILE attribute in the session) we need to spoof the API to show our
-            // authenticated user.
+            // We get here because the user is NOT trying to login. Since Tomcat
+            // and the Servlet API have their own
+            // "login" scheme (name & password based) API we need to check if
+            // _our_ login thing ran and if so (detected by
+            // the presence of the USER_PROFILE attribute in the session) we
+            // need to spoof the API to show our authenticated user.
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if (up != null) {
@@ -254,6 +295,22 @@ public class IdFilter implements Filter {
             }
             else {
                 log.debug("No UserProfile object found in Session. Request is not authenticated.");
+                String auth_hdr_value = request.getHeader(IdProvider.AUTHORIZATION_HEADER_KEY);
+                if(auth_hdr_value != null && !auth_hdr_value.isEmpty()){
+                    if (IdPManager.hasDefaultProvider()) {
+                        try {
+                            boolean retVal;
+                            retVal = IdPManager.getDefaultProvider().doLogin(hsReq,hsRes);
+                            if(retVal){
+
+                            }
+                        }
+                        catch (Forbidden http_403){
+                            log.error("Failed to validate EDL auth Token. Message: "+http_403.getMessage());
+                        }
+                    }
+                }
+
             }
             // Cache the  request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
@@ -370,6 +427,8 @@ public class IdFilter implements Filter {
             throw e;
         }
 	}
+
+
 
 
 
