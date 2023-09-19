@@ -276,14 +276,26 @@ public class UrsIdP extends IdProvider{
         return edlRedirectUrl;
     }
 
-
+    /**
+     * Checks the passed request for an Authorization header and if present
+     * attempts to use the header to perform a step with EDL that validates
+     * the token. Only works for Bearer tokens atm.
+     *
+     * @param request The HttpServletRequest whose headers we will examine for
+     *                an Authorization header.
+     * @param userProfile The user profile that will receive the Authentication
+     *                    context, EDL Token, and UID if the token checks out.
+     * @return True if the token "worked" to identify/authenticate the UserProfile
+     * @throws IOException
+     * @throws Forbidden
+     */
     public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
 
         if (userProfile == null) {
             return false;
         }
 
-        boolean foundAuthToken = false;
+        boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authz_hdr_value != null && !authz_hdr_value.isEmpty()) {
@@ -293,8 +305,18 @@ public class UrsIdP extends IdProvider{
                 userProfile.setAuthContext(getAuthContext());
                 String uid = getEdlUserId(edlat.getAccessToken());
                 userProfile.setUID(uid);
+
+                // I am hesitant to remove thiscall to getEDLUserProfile().
+                // Everything seems to work
+                // without it, and retrieving the user profile adds the time
+                // cost of another round-trip to EDL. We always have to
+                // grab the UID regardless, we need it  as part of the mvp state
+                // of the UserProfile, and we want the EDL user profile we have
+                // know the UId to ask for it. Which means two trips...
+                //
                 //getEDLUserProfile(userProfile);
-                foundAuthToken = userProfile.getUID() != null;
+
+                foundValidAuthToken = userProfile.getUID() != null;
             }
             else if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
@@ -315,7 +337,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
-        return foundAuthToken;
+        return foundValidAuthToken;
     }
 
 
@@ -409,7 +431,6 @@ public class UrsIdP extends IdProvider{
         userProfile.setEDLAccessToken(edlat);
         getEDLUserProfile(userProfile);
         log.info("URS UID: {}", userProfile.getUID());
-
 
         // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);

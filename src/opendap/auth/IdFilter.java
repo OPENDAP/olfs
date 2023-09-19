@@ -203,17 +203,20 @@ public class IdFilter implements Filter {
                 requestUrl += "?" + query;
             }
 
-            // Intercept login/logout requests
+            // Intercept requests for the login/logout endpoints
             if (requestURI.equals(AuthenticationControls.getLogoutEndpoint())) {
                 doLogout(hsReq, hsRes);
                 return;
             }
             else if (AuthenticationControls.isIntitialized() &&
                     requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
+                // The Landing Page is essentially a user profile page with
+                // only the ability to login. No editing.
                 doLandingPage(hsReq, hsRes);
                 return;
             }
             else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
+                // This is the Guest User login endpoint which may be disabled.
                 doGuestLogin(hsReq, hsRes);
                 return;
             }
@@ -223,6 +226,8 @@ public class IdFilter implements Filter {
 
                     String loginEndpoint = idProvider.getLoginEndpoint();
                     if(requestURI.equals(loginEndpoint)) {
+                        // We take the first matching IdProvider
+                        // and then we do the login.
                         synchronized (session) {
                             // Check the RETURN_TO_URL and if it's the login endpoint
                             // return to the root dir of the web application after
@@ -275,12 +280,14 @@ public class IdFilter implements Filter {
             }
 
             //
-            // We get here because the user is NOT trying to login. Since Tomcat
-            // and the Servlet API have their own
+            // We only ever get here because the user is NOT requesting one of
+            // the login endpoints.
+            // Since Tomcat and the Servlet API have their own
             // "login" scheme (name & password based) API we need to check if
             // _our_ login thing ran and if so (detected by
             // the presence of the USER_PROFILE attribute in the session) we
-            // need to spoof the API to show our authenticated user.
+            // need to a special HttpRequest object to hold our authenticated
+            // user and then pass it on to the filter chain.
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if (up != null) {
@@ -290,6 +297,8 @@ public class IdFilter implements Filter {
                 hsReq = authReq;
             }
             else {
+                // Lacking a UserProfile we check for a default IdP and then try
+                // a token based authentication.
                 log.debug("No UserProfile object found in Session. Request is not yet authenticated. " +
                         "Checking Authorization headers...");
                 if (IdPManager.hasDefaultProvider()) {
@@ -299,6 +308,14 @@ public class IdFilter implements Filter {
                         retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}", userProfile.getUID());
+                            // By adding the UserProfile to the session here
+                            // it's available for the PEPFilter which is invoked
+                            // by the call to:
+                            //     filterChain.doFilter(hsReq, hsRes);
+                            // below. This is key to data access w/o redirects
+                            // or sessions. Well, there's a session, but for
+                            // tokens it only needs to persist for the duration
+                            // of the current request
                             session.setAttribute(USER_PROFILE, userProfile);
                         }
                     }
@@ -308,16 +325,17 @@ public class IdFilter implements Filter {
                 }
             }
 
-
             // Cache the  request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
             synchronized(session) {
                 Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
             }
+
+            // This call leads to the PEPFilter, wooo!
             filterChain.doFilter(hsReq, hsRes);
+
             log.debug("END (session: {})",session.getId());
             ServletLogUtil.logServerAccessEnd(200,logName);
-
         }
         finally {
             RequestCache.closeThreadCache();
