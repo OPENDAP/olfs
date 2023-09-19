@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static opendap.auth.IdFilter.USER_PROFILE;
+
 /**
  * Created by ndp on 9/25/14.
  */
@@ -176,7 +178,20 @@ public class UrsIdP extends IdProvider{
         Map<String, String> headers = new HashMap<>();
         // Now that we have an access token, we can retrieve the user profile. This
         // is returned as a JSON document.
-        String url = PathBuilder.pathConcat(ursUrl, edlat.getEndPoint()) + "?client_id=" + getUrsClientAppId();
+
+        // EDL endpoint: /api/users/user_id
+        String url;
+        String edl_user_api_endpoint = edlat.getEndPoint();
+
+        if (edlat.getEndPoint() == null) {
+            url = PathBuilder.pathConcat(ursUrl, "/api/users/");
+            url = PathBuilder.pathConcat(url, userProfile.getUID());
+        }
+        else {
+            url = PathBuilder.pathConcat(ursUrl, edl_user_api_endpoint);
+        }
+
+        url += "?client_id=" + getUrsClientAppId();
         String authHeader = edlat.getTokenType() + " " + edlat.getAccessToken();
         headers.put("Authorization", authHeader);
 
@@ -264,22 +279,21 @@ public class UrsIdP extends IdProvider{
 
     public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
 
+        if (userProfile == null) {
+            return false;
+        }
+
         boolean foundAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if(authz_hdr_value != null && !authz_hdr_value.isEmpty()) {
-
-            if (userProfile == null) {
-                userProfile = new UserProfile();
-            }
-
             if (AuthorizationHeader.isBearer(authz_hdr_value)) {
                 EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(authz_hdr_value, getUrsClientAppId());
                 userProfile.setEDLAccessToken(edlat);
                 userProfile.setAuthContext(getAuthContext());
                 String uid = getEdlUserId(edlat.getAccessToken());
                 userProfile.setUID(uid);
-                getEDLUserProfile(userProfile);
+                //getEDLUserProfile(userProfile);
                 foundAuthToken = userProfile.getUID() != null;
             }
             else if (rejectUnsupportedAuthzSchemes) {
@@ -299,9 +313,6 @@ public class UrsIdP extends IdProvider{
                 String msg = "WARNING - Received unexpected Authorization header, IGNORED! ";
                 msg += "Authorization Scheme: {}";
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
-            }
-
-            if (!foundAuthToken) {
             }
         }
         return foundAuthToken;
@@ -341,68 +352,64 @@ public class UrsIdP extends IdProvider{
         // Add this instance of UserProfile to the session for retrieval
         // down stream on this request.
         // We set the state of the instance of userProfile below.
-        session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+        session.setAttribute(USER_PROFILE, userProfile);
 
         Util.debugHttpRequest(request,log);
 
-        boolean foundEDLAuthToken = false; // doTokenAuthentication(request,userProfile);
+        // Check to see if we have a code returned from URS. If not, we must
+        // redirect the user to EDL to start the authentication process.
+        String code = request.getParameter("code");
+        if (code == null) {
+            String url;
+            url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
+            url += "client_id=" + getUrsClientAppId();
+            url += "&";
 
-        if(!foundEDLAuthToken) {
+            String returnToUrl = ReqInfo.getRequestUrlPath(request);
 
-            // Check to see if we have a code returned from URS. If not, we must
-            // redirect the user to URS to start the authentication process.
-            String code = request.getParameter("code");
-            if (code == null) {
-                String url;
-                url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
-                url += "client_id=" + getUrsClientAppId();
-                url += "&";
+            url += "response_type=code&redirect_uri=" + returnToUrl;
 
-                String returnToUrl = ReqInfo.getRequestUrlPath(request);
+            log.info("Redirecting client to EDL SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
+            response.sendRedirect(url);
 
-                url += "response_type=code&redirect_uri=" + returnToUrl;
-
-                log.info("Redirecting client to URS SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
-                response.sendRedirect(url);
-
-                log.debug("END (session: {})", session.getId());
-                return false;
-            }
-
-            log.info("URS Code: {}", LogUtil.scrubEntry(code));
-
-            // If we get here, the user was redirected by URS back to our application,
-            // and we have a code. We now exchange the code for a token, which is
-            // returned as a json document.
-            String url = getUrsUrl() + "/oauth/token";
-
-            String postData = "grant_type=authorization_code&code=" + code +
-                    "&redirect_uri=" + ReqInfo.getRequestUrlPath(request);
-
-            Map<String, String> headers = new HashMap<>();
-
-            String authHeader = "Basic " + getUrsClientAppAuthCode();
-            headers.put("Authorization", authHeader);
-
-            log.info("URS Token Request URL: {}", url);
-            log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
-            log.info("URS Token Request Authorization Header: {}", authHeader);
-
-            String contents = Util.submitHttpRequest(url, headers, postData);
-
-            log.info("URS Token: {}", contents);
-
-
-            // Parse the json to extract the token.
-            JsonParser jparse = new JsonParser();
-            JsonObject json = jparse.parse(contents).getAsJsonObject();
-
-
-            EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
-            userProfile.setEDLAccessToken(edlat);
-            getEDLUserProfile(userProfile);
-            log.info("URS UID: {}", userProfile.getUID());
+            log.debug("END (session: {})", session.getId());
+            return false;
         }
+
+        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
+
+        // If we get here, the user was redirected by URS back to our application,
+        // and we have a code. We now exchange the code for a token, which is
+        // returned as a json document.
+        String url = getUrsUrl() + "/oauth/token";
+
+        String postData = "grant_type=authorization_code&code=" + code +
+                "&redirect_uri=" + ReqInfo.getRequestUrlPath(request);
+
+        Map<String, String> headers = new HashMap<>();
+
+        String authHeader = "Basic " + getUrsClientAppAuthCode();
+        headers.put("Authorization", authHeader);
+
+        log.info("URS Token Request URL: {}", url);
+        log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
+        log.info("URS Token Request Authorization Header: {}", authHeader);
+
+        String contents = Util.submitHttpRequest(url, headers, postData);
+
+        log.info("URS Token: {}", contents);
+
+
+        // Parse the json to extract the token.
+        JsonParser jparse = new JsonParser();
+        JsonObject json = jparse.parse(contents).getAsJsonObject();
+
+
+        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
+        userProfile.setEDLAccessToken(edlat);
+        getEDLUserProfile(userProfile);
+        log.info("URS UID: {}", userProfile.getUID());
+
 
         // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);

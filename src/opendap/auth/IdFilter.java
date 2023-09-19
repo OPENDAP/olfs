@@ -274,10 +274,6 @@ public class IdFilter implements Filter {
                 }
             }
 
-
-
-
-
             //
             // We get here because the user is NOT trying to login. Since Tomcat
             // and the Servlet API have their own
@@ -294,20 +290,23 @@ public class IdFilter implements Filter {
                 hsReq = authReq;
             }
             else {
-                log.debug("No UserProfile object found in Session. Request is not yet authenticated.");
-                    if (IdPManager.hasDefaultProvider()) {
-                        try {
-                            boolean retVal;
-                            retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request,up);
-                            if(retVal){
-                                log.info("Validated Authorization header. uid: {}",up.getUID());
-                            }
-                        }
-                        catch (Forbidden http_403){
-                            log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                log.debug("No UserProfile object found in Session. Request is not yet authenticated. " +
+                        "Checking Authorization headers...");
+                if (IdPManager.hasDefaultProvider()) {
+                    try {
+                        UserProfile userProfile = new UserProfile();
+                        boolean retVal;
+                        retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
+                        if(retVal){
+                            log.info("Validated Authorization header. uid: {}", userProfile.getUID());
+                            session.setAttribute(USER_PROFILE, userProfile);
                         }
                     }
+                    catch (Forbidden http_403){
+                        log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                    }
                 }
+            }
 
 
             // Cache the  request URL in the session. We do this here because we know by now that the request was

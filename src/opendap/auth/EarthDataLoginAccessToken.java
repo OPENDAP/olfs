@@ -60,12 +60,12 @@ public class EarthDataLoginAccessToken implements Serializable {
 
     public EarthDataLoginAccessToken() {
         creationTime = new Date();
-        accessToken = "ASPECIALURSACCESSTOKENSTRING";
-        endPoint = "http://endpoint.url";
+        accessToken = null;
+        endPoint = null;
         expiresIn = 3600;
-        tokenType = "token_type";
-        refreshToken = "ASPECIALURSREFRESHTOKEN";
-        edlClientAppId="ThatSecretSauceFromEDL";
+        tokenType = null;
+        refreshToken = null;
+        edlClientAppId = null;
     }
 
 
