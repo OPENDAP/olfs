@@ -67,7 +67,6 @@ import java.util.regex.Pattern;
 public class NgapBesApi extends BesApi implements Cloneable {
 
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
-    public static final String EDL_ECHO_TOKEN_CONTEXT = "edl_echo_token";
 
     private Logger log;
     private String _servicePrefix;
@@ -197,7 +196,6 @@ public class NgapBesApi extends BesApi implements Cloneable {
      *
      * From a bes command:
      *   <bes:setContext name="uid">ndp_opendap</bes:setContext>
-     *   <bes:setContext name="edl_echo_token">anecho:tokenvalue</bes:setContext>
      *    <bes:setContext name="edl_auth_token">Bearer Abearertokenvalue</bes:setContext>
      *
      * @param request The BES request in which to set the UID_CONTEXT and
@@ -212,15 +210,10 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
-
-                // Make and add the @deprecated Echo-Token value
-                request.addContent(setContextElement(EDL_ECHO_TOKEN_CONTEXT, oat.getEchoTokenValue()));
-
                 // Add the new service chaining Authorization header value
                 request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAuthorizationHeaderValue()));
             }
         }
-
     }
 
 

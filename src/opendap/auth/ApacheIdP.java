@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -151,6 +152,11 @@ public class ApacheIdP extends IdProvider {
         log.info("doLogin(): redirecting to {}",redirectUrl);
         response.sendRedirect(redirectUrl);
         return true;
+    }
+
+    @Override
+    public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
+        return false;
     }
 
 

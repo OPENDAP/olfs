@@ -49,14 +49,20 @@ public class AuthorizationHeader {
     }
 
     public static String getScheme(String auth_header_value) {
+        if(auth_header_value == null)
+            return null;
+
         String[] tokens = getTokens(auth_header_value);
-        if (tokens!=null && tokens.length == 2) {
+        if (tokens.length == 2) {
             return tokens[0];
         }
         return null;
     }
 
     public static String getPayload(String auth_header_value) {
+        if(auth_header_value == null)
+            return null;
+
         String[] tokens = getTokens(auth_header_value);
         if (tokens.length == 2) {
             String payload = tokens[1];
