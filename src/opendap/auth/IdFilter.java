@@ -172,8 +172,6 @@ public class IdFilter implements Filter {
             }
         }
 
-
-
         try {
             RequestCache.openThreadCache();
 
@@ -186,7 +184,6 @@ public class IdFilter implements Filter {
             HttpSession session = hsReq.getSession(true);
             log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
             Util.debugHttpRequest(request,log);
-
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
             String requestURI = hsReq.getRequestURI();
@@ -221,13 +218,15 @@ public class IdFilter implements Filter {
                 return;
             }
             else {
-                // Check IdProviders to see if this request is a valid login context.
+                // Check IdProviders to see if this request is someone's
+                // login end point context.
                 for (IdProvider idProvider : IdPManager.getProviders()) {
 
                     String loginEndpoint = idProvider.getLoginEndpoint();
                     if(requestURI.equals(loginEndpoint)) {
                         // We take the first matching IdProvider
-                        // and then we do the login.
+                        // then we send the request to matching IdProvider
+                        // to do the login.
                         synchronized (session) {
                             // Check the RETURN_TO_URL and if it's the login endpoint
                             // return to the root dir of the web application after
@@ -248,7 +247,7 @@ public class IdFilter implements Filter {
                             // forwarding them on to the IdP, or it may involve
                             // a complex dance of redirection in which
                             // the user drives their browser through an
-                            // elaborate scheme like OAuth2 so they can come
+                            // elaborate scheme like OAuth2, so they can come
                             // back to this very spot with some kind of
                             // cookie/token/thingy that lets the doLogin
                             // invocation complete.
@@ -262,6 +261,14 @@ public class IdFilter implements Filter {
                             // here.
                             //
                             log.debug("END (session: {})",session.getId());
+                            // NOTE: We don't call filterChain.doFilter() here
+                            // because the contract is that the
+                            // IpProvider.doLogin() method is going to get the
+                            // user authenticated (or not). After authentication
+                            // the IpProvider.doLogin() will look at the users
+                            // session to find the IdFilter.RETURN_TO_URL and
+                            // redirect the client there. Otherwise, return some
+                            // error object.
                             return;
 
 
@@ -552,10 +559,10 @@ public class IdFilter implements Filter {
                 out.println("<pre>");
                 out.print("<b>All_Session_Attributes</b>: [ ");
 
-                Enumeration attrNames = session.getAttributeNames();
+                Enumeration<String> attrNames = session.getAttributeNames();
                 if(attrNames.hasMoreElements()){
                     while(attrNames.hasMoreElements()){
-                        String attrName = attrNames.nextElement().toString();
+                        String attrName = attrNames.nextElement();
                         out.print("\""+attrName+"\"");
                         out.print((attrNames.hasMoreElements()?", ":""));
                     }
@@ -568,11 +575,11 @@ public class IdFilter implements Filter {
                 out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
             }
             else {
-                out.println(noProfile.toString());
+                out.println(noProfile);
             }
         }
         else {
-            out.println(noProfile.toString());
+            out.println(noProfile);
         }
         // Finish up the page
         out.println("</body></html>");
