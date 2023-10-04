@@ -62,7 +62,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
             <!-- The ClientPool maximum number of concurrent
               -  BES client connections allowed.
               -->
-            <ClientPool maximum="200" maxCmds="2000" />
+            <ClientPool maximum="25" maxCmds="2000" />
 
         </BES>
 
