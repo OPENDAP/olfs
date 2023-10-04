@@ -53,7 +53,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
             <!-- <adminPort>11002</adminPort> -->
 
             <!--
-                The maximum response size, in kilobytes, for non authenticated users
+                The maximum response size, in kilobytes, for non-authenticated users
                 A value of zero means there is no limit.
             -->
             <maxResponseSize>0</maxResponseSize>
