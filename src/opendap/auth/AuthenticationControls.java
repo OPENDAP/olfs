@@ -150,14 +150,7 @@ public class AuthenticationControls {
     public static void setLoginParameters(Transformer transformer, HttpServletRequest request) throws SaxonApiException {
 
         if(initialized) {
-            String userId = null;
-            Principal userPrinciple = request.getUserPrincipal();
-            if (request.getRemoteUser() != null) {
-                userId = request.getRemoteUser();
-
-            } else if (userPrinciple != null) {
-                userId = userPrinciple.getName();
-            }
+            String userId = Util.getUID(request);
 
             log.debug("xsltDir() - UserId: {}", userId);
             if (userId != null) {

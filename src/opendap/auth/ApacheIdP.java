@@ -111,10 +111,8 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         String redirectUrl = null;
 
-        String uid = request.getRemoteUser();
-
+        String uid = Util.getUID(request);
         if (uid==null) {
-
             // Hmmm... The user has not logged in.
 
             StringBuilder msg = new StringBuilder();

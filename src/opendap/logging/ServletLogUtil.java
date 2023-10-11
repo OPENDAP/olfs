@@ -381,28 +381,10 @@ public class ServletLogUtil {
         MDC.put(HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
 
-        String uid = "";
-        if(session!=null){
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
-            if(up!=null){
-                uid = up.getUID();
-            }
-        }
-        if (uid.isEmpty()) {
-            String remoteUser = req.getRemoteUser();
-            if (remoteUser == null) {
-                Principal userPrinciple = req.getUserPrincipal();
-                if (userPrinciple != null) {
-                    uid = userPrinciple.getName();
-                }
-            }
-            else {
-                uid = remoteUser;
-            }
-        }
-        MDC.put(USER_ID_KEY, uid.isEmpty() ? "-" : uid );
+        String uid = opendap.auth.Util.getUID(req);
+        MDC.put(USER_ID_KEY, uid==null ? "-" : uid  );
 
-        MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
+        MDC.put(START_TIME_KEY, Long.toString(System.currentTimeMillis()));
 
         String userAgent = Scrub.simpleString(req.getHeader("User-Agent"));
         MDC.put(USER_AGENT_KEY,  userAgent==null?"-":userAgent);
