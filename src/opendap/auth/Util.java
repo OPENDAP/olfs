@@ -37,8 +37,11 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Map;
+
+import static opendap.auth.IdFilter.USER_PROFILE;
 
 /**
  * Created by ndp on 9/24/14.
@@ -192,5 +195,29 @@ public class Util {
         }
         session.setAttribute(IdFilter.RETURN_TO_URL,requestUrl);
         log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
+    }
+
+    public static String getUID(HttpServletRequest req){
+        HttpSession session  = req.getSession(false);
+        String uid = null;
+        if(session!=null){
+            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            if(up!=null){
+                uid = up.getUID();
+            }
+        }
+        if (uid!=null && uid.isEmpty()) {
+            String remoteUser = req.getRemoteUser();
+            if (remoteUser == null) {
+                Principal userPrinciple = req.getUserPrincipal();
+                if (userPrinciple != null) {
+                    uid = userPrinciple.getName();
+                }
+            }
+            else {
+                uid = remoteUser;
+            }
+        }
+        return uid;
     }
 }
