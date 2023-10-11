@@ -197,6 +197,12 @@ public class Util {
         log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
     }
 
+    /**
+     * Examines the request and the session object if there is one and tries to
+     * figure out the correct UID, if there even is one
+     * @param req The request to examine.
+     * @return The uid for the current user or null.
+     */
     public static String getUID(HttpServletRequest req){
         HttpSession session  = req.getSession(false);
         String uid = null;

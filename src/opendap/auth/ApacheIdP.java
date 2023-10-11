@@ -106,7 +106,7 @@ public class ApacheIdP extends IdProvider {
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         /**
-         * Redirect the user back to the their original requested resource.
+         * Redirect the user back to their original requested resource.
          */
         HttpSession session = request.getSession(false);
         String redirectUrl = null;
