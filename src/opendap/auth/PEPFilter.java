@@ -154,18 +154,10 @@ public class PEPFilter implements Filter {
                     authContext = idP.getAuthContext();
                 }
             }
-
             if(userId==null) {
-                String remoteUser = hsReq.getRemoteUser();
-                if (remoteUser == null) {
-                    Principal userPrinciple = hsReq.getUserPrincipal();
-                    if (userPrinciple != null) {
-                        userId = userPrinciple.getName();
-                    }
-                } else {
-                    userId = remoteUser;
-                }
-                // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
+                userId = Util.getUID(hsReq);
+                // @FIXME Deal with authContext for Tomcat and Apache
+                //   httpd authenticated users
             }
 
             // So - Do they have to be authenticated?
