@@ -410,10 +410,11 @@ public class BESConfig  {
                 break;
             }
             default: {
-                throw new BadConfigurationException(
-                        "ERROR When attempting to set the Max Variable Size the value " +
-                                "of the 'units' attribute was not recognized." +
-                                "It may be b, k, M, or G. Found: "+ units_str);
+                log.error("ERROR When attempting to set the Max Variable Size the value " +
+                                "of the 'units' attribute: {} was not recognized." +
+                                "Allowed values are B, K, M, G, T, P, or E. (case-insensitive)" +
+                                "Using default value of K (kilobytes)", units_str);
+                scalar = 2^10; // kilobytes
             }
         }
         return scalar;
