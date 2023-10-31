@@ -281,7 +281,19 @@ public class BES {
         return config.getMaxClients();
     }
 
-    public int getMaxResponseSize() {
+    /**
+     *
+     * @return The maximum size, in bytes, allowed in a response.
+     */
+    public long getMaxResponseSize() {
+        return config.getMaxResponseSize();
+    }
+
+    /**
+     *
+     * @return The maximum size, in bytes, for a variable in a response.
+     */
+    public long getMaxVariableSize() {
         return config.getMaxResponseSize();
     }
 

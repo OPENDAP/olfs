@@ -148,6 +148,10 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
+
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
 
@@ -219,6 +223,9 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));

@@ -150,6 +150,10 @@ public class BuildDmrppBesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(BesApi.MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(BesApi.MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
+
         addEdlAuthToken(request,user);
 
         // request.addContent(setContainerElement(CONTAINER_NAME, SPACE_NAME,dataSource,BesApi.DAP4_DATA));

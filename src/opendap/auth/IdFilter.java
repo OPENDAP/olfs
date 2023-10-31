@@ -324,6 +324,15 @@ public class IdFilter implements Filter {
                             // tokens it only needs to persist for the duration
                             // of the current request
                             session.setAttribute(USER_PROFILE, userProfile);
+
+                            // By replacing the HttpServletRequest with our own version
+                            // We can inject the uid into
+                            //   HttpServletRequest.getRemoteUser()
+                            //   HttpServletRequest.getUserPrincipal()
+                            //
+                            AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
+                            authReq.setUid(userProfile.getUID());
+                            hsReq = authReq;
                         }
                     }
                     catch (Forbidden http_403){

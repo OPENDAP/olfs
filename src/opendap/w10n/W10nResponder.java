@@ -273,7 +273,7 @@ public class W10nResponder {
                 if(isFile) {
                     // And then we to send the response, using the MediaType to determine what to
                     // send back.
-                    sendW10nMetaResponseForDap2Metadata(user, w10nRequest, user.getMaxResponseSize(), response);
+                    sendW10nMetaResponseForDap2Metadata(user, w10nRequest, response);
                 }
                 else {
                     // It's not a file! That's a BAD THING.
@@ -975,7 +975,6 @@ public class W10nResponder {
      */
     private void sendW10nMetaResponseForDap2Metadata(User user,
                                                      W10nRequest w10nRequest,
-                                                    int maxResponseSize,
                                                     HttpServletResponse response)
             throws OPeNDAPException, IOException, JDOMException, SaxonApiException {
 
@@ -993,7 +992,7 @@ public class W10nResponder {
         }
 
         if(mt.getName().equalsIgnoreCase(Json.NAME)){
-            sendDap2MetadataAsW10nJson(user, w10nRequest,maxResponseSize,response);
+            sendDap2MetadataAsW10nJson(user, w10nRequest,response);
             return;
         }
         throw  new NotAcceptable("Unsupported response encoding! You have requested an unsupported return type of"+ mt.getMimeType());
@@ -1007,7 +1006,6 @@ public class W10nResponder {
      * @param user The User profile and tokens that may be required to complete
      *            downstream transactions.
      * @param w10nRequest The w10nRequest object for the request to be serviced.
-     * @param maxResponseSize  Max response size.
      * @param response The outgoing response.
      * @throws IOException
      * @throws PPTException
@@ -1016,7 +1014,6 @@ public class W10nResponder {
      */
     private void sendDap2MetadataAsW10nJson(User user,
                                             W10nRequest w10nRequest,
-                                            int maxResponseSize,
                                             HttpServletResponse response)
             throws IOException, PPTException, BadConfigurationException, BESError {
 
