@@ -105,7 +105,7 @@ public class BESConfig  {
         copy._BesHost            = _BesHost;
         copy._BesPort            = _BesPort;
         copy._BesAdminPort       = _BesAdminPort;
-        copy._BesMaxResponseSize = _BesMaxResponseSize;
+        copy._BesMaxVariableSize = _BesMaxResponseSize;
         copy._BesMaxResponseSize = _BesMaxVariableSize;
         copy._BesMaxClients      = _BesMaxClients;
         copy._BesMaxCommands     = _BesMaxCommands;
