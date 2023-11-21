@@ -50,10 +50,33 @@
             <!-- <adminPort>11002</adminPort> -->
 
             <!--
-                The maximum response size, in kilobytes, for non authenticated users
-                A value of zero means there is no limit.
+               - The maximum response size.
+               - units:
+               -   G|g - Gegabytes
+               -   M|m - Megabytes
+               -   K|k - kilobytes
+               -   B|b - bytes
+               - If the units attribute is omitted then
+               -   the units will default to kilobytes
+               -
+               - A value of zero means there is no limit.
             -->
-            <maxResponseSize>0</maxResponseSize>
+            <maxResponseSize units="G">0</maxResponseSize>
+
+
+            <!--
+               - The maximum variable size.
+               - units:
+               -   G|g - Gegabytes
+               -   M|m - Megabytes
+               -   K|k - kilobytes
+               -   B|b - bytes
+               - If the units attribute is omitted then
+               -   the units will default to kilobytes
+               -
+               - A value of zero means there is no limit.
+            -->
+            <maxVariableSize units="M">0</maxVariableSize>
 
 
             <!-- The ClientPool maximum number of concurrent

@@ -151,6 +151,9 @@ public class NgapBesApi extends BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
         addEdlAuthToken(request,user);
 
         request.addContent(setContainerElement(getBesContainerName(),
@@ -265,6 +268,9 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
         addEdlAuthToken(request,user);
 

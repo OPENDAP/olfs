@@ -130,6 +130,7 @@ public class BesApi implements Cloneable {
     public static final String CLOUDY_DAP_CONTEXT = "cloudydap";
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
+    public static final String MAX_VARIABLE_SIZE_CONTEXT = "max_variable_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
     public static final String HISTORY_JSON_ENTRY_CONTEXT = "history_json_entry";
 
@@ -2346,6 +2347,9 @@ public class BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
         request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
         UserProfile profile = user.profile();
@@ -2441,6 +2445,9 @@ public class BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
         request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 

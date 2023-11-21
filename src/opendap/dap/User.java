@@ -82,19 +82,20 @@ public class User {
     }
 
 
-    public int getMaxResponseSize(){
-
-        if(getUID()==null) {
-
-            BES bes;
-            try {
-                bes = BESManager.getBES(getRelativeUrl());
-            } catch (BadConfigurationException e) {
-                return 0;
-            }
+    public long getMaxResponseSize(){
+        try {
+            BES bes = BESManager.getBES(getRelativeUrl());
             return bes.getMaxResponseSize();
+        } catch (BadConfigurationException e) {
+            return 0;
         }
-
-        return 0;
+    }
+    public long getMaxVariableSize(){
+        try {
+            BES bes = BESManager.getBES(getRelativeUrl());
+            return bes.getMaxVariableSize();
+        } catch (BadConfigurationException e) {
+            return 0;
+        }
     }
 }
