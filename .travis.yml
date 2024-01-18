@@ -17,6 +17,7 @@ branches:
   only:
     - master
     - /^(.*-test-deploy)$/
+    - /^.*test-scan$/
 
 notifications:
   email:
@@ -67,9 +68,11 @@ install:
 
 # We need the gradlescan target because we can't run simultaneous
 # sonarscans without encountering a race condition at sonarcloud.io
+#
+# The above is no longer true, 'gradlescan' is not used. jhrg 1/18/24
 stages:
   - name: build
-  - name: test
+  - name: test    # Ths is never used. jhrg 1/18/24
   - name: scan
   - name: gradlescan
   - name: snappah
@@ -157,8 +160,10 @@ jobs:
         - ./run-snyk.sh
 
     - stage: scan
-      name: "gradle sonarscan (jdk11)"
-      jdk: openjdk11
+      # name: "gradle sonarscan (jdk11)"
+      # jdk: openjdk11
+      name: "gradle sonarscan (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=scan
         - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
