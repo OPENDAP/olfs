@@ -1,5 +1,5 @@
 
-# Initial Travic-CI control file. 6.11.15 jhrg
+# Initial Travis-CI control file. 6.11.15 jhrg
 # Added sonar scan 3.12.19 jhrg 
 
 dist: focal
@@ -12,7 +12,7 @@ language: java
 services:
   - docker
 
-# safelist
+# safe list
 branches:
   only:
     - master
@@ -159,13 +159,18 @@ jobs:
         - ./run-snyk.sh
 
     - stage: scan
+      # jhrg 1/18/24
       # name: "gradle sonarscan (jdk11)"
       # jdk: openjdk11
       name: "gradle sonarscan (jdk17)"
       jdk: openjdk17
       script:
         - export STAGE=scan
-        - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        # edit to address the java 11 issue. jhrg 1/18/24
+        # - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        # Added sonar.scanner.force-deprecated-java-version=true as a patch for the java 11 issue. jhrg 1/18/24
+        # sonar.login --> sonar.token as per warning, I wonder about the need to set the quality gate timeout. jhrg 1/18/24
+        - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.scanner.force-deprecated-java-version=true -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
