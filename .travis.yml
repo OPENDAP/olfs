@@ -109,8 +109,10 @@ jobs:
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
     - stage: build
-      name: "gradle (jdk11)"
-      jdk: openjdk11
+      # name: "gradle (jdk11)"
+      # jdk: openjdk11
+      name: "gradle (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=build
         - ./gradlew --version
@@ -139,15 +141,17 @@ jobs:
         - export STAGE=test
         - ant show check
 
-    - stage: disabled
-      name: "sonarscan (jdk11)"
-      jdk: openjdk11
+    - stage: scan
+      # name: "sonarscan (jdk11)"
+      # jdk: openjdk11
+      name: "sonarscan (jdk17)"
+      jdk: openjdk17
       addons: sonarcloud
       script:
         - export STAGE=scan
         - export ANT_OPTS="-Xms256m -Xmx8g"
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
+        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.scanner.force-deprecated-java-version=true -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
@@ -170,6 +174,7 @@ jobs:
         # - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
         # Added sonar.scanner.force-deprecated-java-version=true as a patch for the java 11 issue. jhrg 1/18/24
         # sonar.login --> sonar.token as per warning, I wonder about the need to set the quality gate timeout. jhrg 1/18/24
+        - java -version
         - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.scanner.force-deprecated-java-version=true -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
