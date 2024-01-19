@@ -1,5 +1,5 @@
 
-# Initial Travis-CI control file. 6.11.15 jhrg
+# Initial Travic-CI control file. 6.11.15 jhrg
 # Added sonar scan 3.12.19 jhrg 
 
 dist: focal
@@ -12,7 +12,7 @@ language: java
 services:
   - docker
 
-# safe list
+# safelist
 branches:
   only:
     - master
@@ -67,11 +67,9 @@ install:
 
 # We need the gradlescan target because we can't run simultaneous
 # sonarscans without encountering a race condition at sonarcloud.io
-#
-# The above is no longer true, 'gradlescan' is not used. jhrg 1/18/24
 stages:
   - name: build
-  - name: test    # Ths is never used. jhrg 1/18/24
+  - name: test
   - name: scan
   - name: gradlescan
   - name: snappah
@@ -102,19 +100,15 @@ jobs:
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
     - stage: build
-      # name: "jdk11" jhrg 1/18/24
-      # jdk: openjdk11
-      name: "jdk17"
-      jdk: openjdk17
+      name: "jdk11"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
-    - stage: disabled # jhrg 1/18/24
-      # name: "gradle (jdk11)" jhrg 1/18/24
-      # jdk: openjdk11
-      name: "gradle (jdk17)"
-      jdk: openjdk17
+    - stage: build
+      name: "gradle (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=build
         - ./gradlew --version
@@ -143,17 +137,15 @@ jobs:
         - export STAGE=test
         - ant show check
 
-    - stage: scan
-      # name: "sonarscan (jdk11)" jhrg 1/18/24
-      # jdk: openjdk11
-      name: "sonarscan (jdk17)"
-      jdk: openjdk17
+    - stage: disabled
+      name: "sonarscan (jdk11)"
+      jdk: openjdk11
       addons: sonarcloud
       script:
         - export STAGE=scan
         - export ANT_OPTS="-Xms256m -Xmx8g"
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.scanner.force-deprecated-java-version=true -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
+        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
@@ -164,20 +156,12 @@ jobs:
         - echo $STAGE
         - ./run-snyk.sh
 
-    - stage: disabled # jhrg 1/18/24
-      # jhrg 1/18/24
-      # name: "gradle sonarscan (jdk11)"
-      # jdk: openjdk11
-      name: "gradle sonarscan (jdk17)"
-      jdk: openjdk17
+    - stage: scan
+      name: "gradle sonarscan (jdk11)"
+      jdk: openjdk11
       script:
         - export STAGE=scan
-        # edit to address the java 11 issue. jhrg 1/18/24
-        # - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
-        # Added sonar.scanner.force-deprecated-java-version=true as a patch for the java 11 issue. jhrg 1/18/24
-        # sonar.login --> sonar.token as per warning, I wonder about the need to set the quality gate timeout. jhrg 1/18/24
-        - java -version
-        - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.scanner.force-deprecated-java-version=true -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=1800
+        - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
