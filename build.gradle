@@ -167,7 +167,7 @@ sourceSets {
         }
 
         war {
-            baseName = 'ngap'
+            archiveBaseName = 'ngap'
 
             // Copy/filter the various resource files
             dependsOn 'copyHyraxResources'
@@ -336,7 +336,7 @@ compileJava {
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    baseName = 'opendap'
+    archiveBaseName = 'opendap'
 
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
@@ -348,8 +348,8 @@ war {
 }
 
 task buildOpendapWar(type: War, dependsOn: classes){
-    baseName = 'opendap_server'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_server'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Server war'
@@ -365,8 +365,8 @@ task buildOpendapWar(type: War, dependsOn: classes){
 
 task buildNgapWar(type: War, dependsOn: classes){
     dependsOn configurations.ngapDep
-    baseName = 'opendap_ngap'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_ngap'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Ngap war.'
@@ -382,8 +382,8 @@ task buildNgapWar(type: War, dependsOn: classes){
 }
 
 task buildRobotsWar(type: War, dependsOn: classes){
-    baseName = 'opendap_robots'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_robots'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Robots war.'
